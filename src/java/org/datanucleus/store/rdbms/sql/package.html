@@ -1,0 +1,33 @@
+<body>
+    <p>
+        Series of classes used to generate SQL statements. Based around the notion that an SQL statement
+        (SQLStatement) has a series of tables (SQLTable) involved, with a series of joins (SQLJoin),
+        subject to a series of conditions, based on expressions 
+        (see <i>org.datanucleus.store.rdbms.sql.expression</i>. The tables involved in the statement
+        can be grouped for convenience to represent objects and relations between objects (like in JDOQL/JPQL).
+
+        <b>This package has now replaced <b>FetchStatement</b>, and will also replace QueryStatement, 
+            StatementText and all code under <i>org.datanucleus.store.mapped.expression</i></b>.
+    </p>
+    <p>
+        Provides helpers to generate the SQLStatement. These include
+        <ul>
+            <li>DiscriminatorStatementGenerator that selects a candidate table and uses the
+            discriminator column of that table (or of its supertable) to identify the returned object</li>
+            <li>UnionStatementGenerator that does a UNION of all possible candidates selecting
+            a column "NUCLEUS_TYPE" to identify the object type of the row.</li>
+            <li>Numerous methods of SQLStatementHelper to assist in joining between tables of an
+            inheritance tree, and across relations.</li>
+        </ul>
+    </p>
+    <p>
+        Allows control over how tables in the SQL statement are aliased. This uses a plugin-point
+        <i>org.datanucleus.store.rdbms.sql_tablenamer</i> and DataNucleus provides the following options
+        <ul>
+            <li><b>alpha-scheme</b> where tables are named using a letter to symbolise their
+            "table-group", followed by a number for the number within that group.
+            So you get names like A0, A1, A2, A3, B0, B1, C0 etc</li>
+            <li><i>t-scheme</i> where tables are named T0, T1, T2, T3, etc</li>
+        </ul>
+    </p>
+</body>

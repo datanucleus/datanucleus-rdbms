@@ -1,0 +1,11 @@
+<BODY>
+	Provides a definition of the schema in the datastore, including tables, columns and types.
+    The public access point for datastore schema information is <b>RDBMSSchemaHandler</b>
+    which provides a series of methods for accessing key schema data. For example
+    <ul>
+        <li><b>handler.getSchemaData(conn, "types");</b> returns all JDBC/SQL type information
+            for this datastore.</li>
+        <li><b>handler.getSchemaData(conn, "tables", "myCatalog", "mySchema");</b> returns all 
+            table information in the supplied catalog/schema for this datastore.</li>
+    </ul>
+</BODY>

@@ -1,0 +1,9 @@
+<BODY>
+    <p>
+        Package containing mappings for Oracle datastores, extending on the mappings found in packages
+        <B>org.datanucleus.store.rdbms.mapping.java</B> and <B>org.datanucleus.store.rdbms.mapping.datastore</B>. 
+        The typical issue with Oracle is that to store a BLOB you have to INSERT using "EMPTY_BLOB()" and then 
+        have a postInsert() step that retrieves the "EMPTY_BLOB" and updates it directly. Totally contrary to the 
+        idea of having a "standard" JDBC API and strangely its only Oracle that needs such drugs to perform basic things.
+    </p>
+</BODY>
