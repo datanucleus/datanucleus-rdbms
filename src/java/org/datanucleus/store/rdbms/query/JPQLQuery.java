@@ -103,6 +103,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JPQLQuery extends AbstractJPQLQuery
 {
+    /** Extension for how to handle multivalued fields. Support values of "none" and "bulk-fetch" (default). */
+    public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
+
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
 
@@ -902,7 +905,12 @@ public class JPQLQuery extends AbstractJPQLQuery
                 {
                     if (fpMmd.hasCollection())
                     {
-                        if (SCOUtils.collectionHasSerialisedElements(fpMmd))
+                        String multifetchType = getStringExtensionProperty(EXTENSION_MULTIVALUED_FETCH, null);
+                        if (multifetchType != null && multifetchType.equalsIgnoreCase("none"))
+                        {
+                            NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query");
+                        }
+                        else if (SCOUtils.collectionHasSerialisedElements(fpMmd))
                         {
                             // Ignore collections serialised into the owner (retrieved in main query)
                         }
