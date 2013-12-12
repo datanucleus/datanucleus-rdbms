@@ -723,6 +723,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                     try
                                     {
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
+                                        SQLStatementHelper.applyParametersToStatement(psSco, ec,
+                                            datastoreCompilation.getStatementParameters(), 
+                                            datastoreCompilation.getParameterNameByPosition(), parameters);
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
                                     }
