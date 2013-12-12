@@ -644,16 +644,9 @@ public class JPQLQuery extends AbstractJPQLQuery
                                     NucleusLogger.DATASTORE_RETRIEVE.debug(">> JPQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
-                                        try
-                                        {
-                                            PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
-                                            ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
-                                            qr.registerMemberBulkResultSet(iterStmt, rsSCO);
-                                        }
-                                        finally
-                                        {
-                                            mconn.release();
-                                        }
+                                        PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
+                                        ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
+                                        qr.registerMemberBulkResultSet(iterStmt, rsSCO);
                                     }
                                     catch (SQLException e)
                                     {
