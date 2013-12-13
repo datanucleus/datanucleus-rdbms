@@ -280,11 +280,28 @@
                 <version>2.4.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
                     <instructions>
                         <Bundle-SymbolicName>org.datanucleus.store.rdbms;singleton:=true</Bundle-SymbolicName>
                         <Import-Package>
-                            org.datanucleus*;version="${dn.core.version}",*
+                            org.datanucleus*;version="${dn.core.version}",
+                            com.ibm.db2.jcc;resolution:=optional,
+                            com.informix.jdbc;resolution:=optional,
+                            com.jolbox.bonecp;resolution:=optional,
+                            com.mchange.v2.c3p0;resolution:=optional,
+                            com.mckoi;resolution:=optional,
+                            com.microsoft.sqlserver.jdbc;resolution:=optional,
+                            com.mysql.jdbc;resolution:=optional,
+                            com.sap.dbtech.jdbc;resolution:=optional,
+                            com.sybase.jdbc2.jdbc;resolution:=optional,
+                            org.sqlite;resolution:=optional,
+                            net.sourceforge.jtds.jdbc;resolution:=optional,
+                            org.apache.derby.jdbc;resolution:=optional,
+                            org.firebirdsql.jdbc;resolution:=optional,
+                            org.h2;resolution:=optional,
+                            org.hsqldb;resolution:=optional,
+                            org.postgresql;resolution:=optional,
+                            org.apache.tomcat.jdbc.pool;version="7.0.0";resolution:=optional,
+                            *
                         </Import-Package>
                     </instructions>
                 </configuration>
