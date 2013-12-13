@@ -1047,40 +1047,54 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 RelationType fpRelType = fpMmd.getRelationType(clr);
                 if (RelationType.isRelationMultiValued(fpRelType))
                 {
-                    if (fpMmd.hasCollection())
+                    String multifetchType = getStringExtensionProperty(EXTENSION_MULTIVALUED_FETCH, null);
+                    if (multifetchType == null)
                     {
-                        String multifetchType = getStringExtensionProperty(EXTENSION_MULTIVALUED_FETCH, null);
-                        if (multifetchType != null && multifetchType.equalsIgnoreCase("none"))
+                        // We currently default to not loading multi-valued fields, so advise the user of the presence of bulk-fetch
+                        NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + 
+                            " marked in the FetchPlan, yet this is not fetched by this query." + 
+                            " You can enable 'bulk-fetch' to fetch this in a single call (add query extension '" + EXTENSION_MULTIVALUED_FETCH + "' set to 'bulk-fetch')");
+                    }
+                    else if (multifetchType.equalsIgnoreCase("bulk-fetch"))
+                    {
+                        if (fpMmd.hasCollection())
                         {
-                            NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query");
-                        }
-                        else if (SCOUtils.collectionHasSerialisedElements(fpMmd))
-                        {
-                            // Ignore collections serialised into the owner (retrieved in main query)
-                        }
-                        else
-                        {
-                            // Fetch collection elements for all candidate owners
-                            IteratorStatement iterStmt = getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd);
-                            if (iterStmt != null)
+                            if (multifetchType != null && multifetchType.equalsIgnoreCase("none"))
                             {
-                                datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);
+                                NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query");
+                            }
+                            else if (SCOUtils.collectionHasSerialisedElements(fpMmd))
+                            {
+                                // Ignore collections serialised into the owner (retrieved in main query)
                             }
                             else
                             {
-                                NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                                // Fetch collection elements for all candidate owners
+                                IteratorStatement iterStmt = getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd);
+                                if (iterStmt != null)
+                                {
+                                    datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);
+                                }
+                                else
+                                {
+                                    NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                                }
                             }
                         }
-                    }
-                    else if (fpMmd.hasMap())
-                    {
-                        // TODO Cater for maps
-                        NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                        else if (fpMmd.hasMap())
+                        {
+                            // TODO Cater for maps
+                            NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query (bulk-fetch not supported for maps yet)");
+                        }
+                        else
+                        {
+                            // TODO Cater for arrays
+                            NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query (bulk-fetch not supported for arrays yet)");
+                        }
                     }
                     else
                     {
-                        // TODO Cater for arrays
-                        NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                        NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query.");
                     }
                 }
             }
