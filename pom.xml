@@ -1,32 +1,20 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.datanucleus</groupId>
+
+    <parent>
+        <groupId>org.datanucleus</groupId>
+        <artifactId>datanucleus-maven-parent</artifactId>
+        <version>3.3-SNAPSHOT</version>
+    </parent>
+
     <artifactId>datanucleus-rdbms</artifactId>
     <version>3.2.10-SNAPSHOT</version>
-    <packaging>bundle</packaging>
+
     <name>DataNucleus RDBMS</name>
     <description>
         Plugin for DataNucleus providing persistence to RDBMS datastores.
     </description>
-    <url>http://www.datanucleus.org</url>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dn.core.version>3.2.9</dn.core.version>
-    </properties>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
 
     <scm>
         <connection>scm:git:git://github.com/datanucleus/datanucleus-rdbms.git</connection>
@@ -34,33 +22,57 @@
         <developerConnection>scm:git:git://github.com/datanucleus/datanucleus-rdbms.git</developerConnection>
     </scm>
 
-    <developers>
-        <developer>
-            <id>andy</id>
-            <name>Andy</name>
-            <organization>DataNucleus</organization>
-        </developer>
-    </developers>
+    <properties>
+        <dn.core.version>3.2.9</dn.core.version>
+    </properties>
 
-    <repositories>
-        <repository>
-            <id>DN_M2_Repo</id>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>datanucleus-nightly</id>
-            <name>DataNucleus Nightly</name>
-            <url>file:${user.home}/htdocs/downloads/maven2-nightly/</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-    </distributionManagement>
-
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <overview>${basedir}/src/java/org/datanucleus/store/rdbms/overview.html</overview>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>org.datanucleus.store.rdbms;singleton:=true</Bundle-SymbolicName>
+                        <Import-Package>
+                            org.datanucleus*;version="${dn.core.version}",
+                            com.ibm.db2.jcc;resolution:=optional,
+                            com.informix.jdbc;resolution:=optional,
+                            com.jolbox.bonecp;resolution:=optional,
+                            com.mchange.v2.c3p0;resolution:=optional,
+                            com.mckoi;resolution:=optional,
+                            com.microsoft.sqlserver.jdbc;resolution:=optional,
+                            com.mysql.jdbc;resolution:=optional,
+                            com.sap.dbtech.jdbc;resolution:=optional,
+                            com.sybase.jdbc2.jdbc;resolution:=optional,
+                            org.sqlite;resolution:=optional,
+                            net.sourceforge.jtds.jdbc;resolution:=optional,
+                            org.apache.derby.jdbc;resolution:=optional,
+                            org.firebirdsql.jdbc;resolution:=optional,
+                            org.h2;resolution:=optional,
+                            org.hsqldb;resolution:=optional,
+                            org.postgresql;resolution:=optional,
+                            org.apache.tomcat.jdbc.pool;version="7.0.0";resolution:=optional,
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
     <dependencies>
         <dependency>
             <groupId>org.datanucleus</groupId>
@@ -69,8 +81,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.transaction</groupId> 
-            <artifactId>jta</artifactId> 
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
             <version>1.1</version>
             <scope>provided</scope>
             <optional>true</optional>
@@ -174,176 +186,5 @@
             <optional>true</optional>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <build>
-        <sourceDirectory>src/java</sourceDirectory>
-        <resources>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/java</directory>
-                <includes>
-                    <include>**/plugin.xml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.dtd</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.jdo</include>
-                    <include>**/META-INF/services/*</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>${basedir}</directory>
-                <includes>
-                    <include>plugin.xml</include>
-                    <include>schema/*</include>
-                </includes>
-            </resource>
-            <resource>
-                <!-- Need to have MANIFEST-MF in place before packaging, so unit-tests will work -->
-                <directory>${basedir}/META-INF</directory>
-                <targetPath>META-INF</targetPath>
-                <includes>
-                    <include>MANIFEST.MF</include>
-                    <include>LICENSE.txt</include>
-                    <include>NOTICE.txt</include>
-                    <include>README.txt</include>
-                </includes>
-            </resource>
-        </resources>
-
-        <testSourceDirectory>src/test</testSourceDirectory>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test</directory>
-                <includes>
-                    <include>**/persistence*.xml</include>
-                    <include>**/plugin*.xml</include>
-                    <include>**/*.jdo*</include>
-                    <include>**/*.orm*</include>
-                    <include>**/*.xsd</include>
-                    <include>**/*.jdoquery*</include>
-                    <include>**/*.MF</include>
-                    <include>log4j.properties</include>
-                </includes>
-            </testResource>
-        </testResources>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <overview>${basedir}/src/java/org/datanucleus/store/rdbms/overview.html</overview>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${basedir}</directory>
-                            <includes>
-                                <include>*.log</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.10</version>
-                <configuration>
-                    <testFailureIgnore>true</testFailureIgnore>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.4.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>org.datanucleus.store.rdbms;singleton:=true</Bundle-SymbolicName>
-                        <Import-Package>
-                            org.datanucleus*;version="${dn.core.version}",
-                            com.ibm.db2.jcc;resolution:=optional,
-                            com.informix.jdbc;resolution:=optional,
-                            com.jolbox.bonecp;resolution:=optional,
-                            com.mchange.v2.c3p0;resolution:=optional,
-                            com.mckoi;resolution:=optional,
-                            com.microsoft.sqlserver.jdbc;resolution:=optional,
-                            com.mysql.jdbc;resolution:=optional,
-                            com.sap.dbtech.jdbc;resolution:=optional,
-                            com.sybase.jdbc2.jdbc;resolution:=optional,
-                            org.sqlite;resolution:=optional,
-                            net.sourceforge.jtds.jdbc;resolution:=optional,
-                            org.apache.derby.jdbc;resolution:=optional,
-                            org.firebirdsql.jdbc;resolution:=optional,
-                            org.h2;resolution:=optional,
-                            org.hsqldb;resolution:=optional,
-                            org.postgresql;resolution:=optional,
-                            org.apache.tomcat.jdbc.pool;version="7.0.0";resolution:=optional,
-                            *
-                        </Import-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-
-        <extensions> 
-            <extension> 
-                <groupId>org.apache.maven.wagon</groupId> 
-                <artifactId>wagon-ssh-external</artifactId> 
-                <version>2.2</version> 
-            </extension> 
-        </extensions> 
-    </build>
-
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
