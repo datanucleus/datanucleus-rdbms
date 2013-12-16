@@ -1865,7 +1865,7 @@ public class SQLStatement
      */
     private String getSqlForJoins(boolean lock)
     {
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         DatastoreAdapter dba = getDatastoreAdapter();
         if (requiresJoinReorder)
         {

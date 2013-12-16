@@ -324,7 +324,7 @@ public class SQLText
             return sql;
         }
 
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         if (encloseInParentheses)
         {
             sql.append("(");
