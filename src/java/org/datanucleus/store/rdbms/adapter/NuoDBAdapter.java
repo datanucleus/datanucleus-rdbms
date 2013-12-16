@@ -24,11 +24,12 @@ import org.datanucleus.store.rdbms.key.Index;
 
 /**
  * Adapter for NuoDB (http://www.nuodb.com).
- * Note that this is a start point, but sadly the NuoDB JDBC driver is sadly limited in what it implements
- * and how well it follows JDBC conventions (or not, in its case).
- * Example 1 : DMD.getIndexInfo will return "ordinal_position" with origin 0 instead of 1 (see TableImpl line 1170).
- * Example 2 : DMD.getSQLKeywords is not implemented
- * Example 3 : DMD max lengths are returned as 0!
+ * Note that this is a start point, but currently (2.0.1) the NuoDB JDBC driver is limited in what it implements
+ * and how well it follows JDBC conventions (or not).
+ * Issue 1 : DMD.getIndexInfo will return "ordinal_position" with origin 0 instead of 1 (see TableImpl line 1170).
+ * Issue 2 : DMD.getSQLKeywords is not implemented
+ * Issue 3 : DMD max lengths are returned as 0!
+ * Note that Issue 1 and Issue 2 should be fixed in v2.0.2 when released
  */
 public class NuoDBAdapter extends BaseDatastoreAdapter
 {
