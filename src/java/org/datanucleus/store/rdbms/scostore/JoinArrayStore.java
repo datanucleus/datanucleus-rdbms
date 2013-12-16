@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -137,8 +138,118 @@ public class JoinArrayStore extends AbstractArrayStore
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
 
+        // Generate the statement, and statement mapping/parameter information
+        IteratorStatement iterStmt = getIteratorStatement(ec.getClassLoaderResolver(), ec.getFetchPlan(), true);
+        SQLStatement sqlStmt = iterStmt.sqlStmt;
+        StatementClassMapping iteratorMappingClass = iterStmt.stmtClassMapping;
+
+        // Input parameter(s) - the owner
+        int inputParamNum = 1;
+        StatementMappingIndex ownerIdx = new StatementMappingIndex(ownerMapping);
+        if (sqlStmt.getNumberOfUnions() > 0)
+        {
+            // Add parameter occurrence for each union of statement
+            for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
+            {
+                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                for (int k=0;k<paramPositions.length;k++)
+                {
+                    paramPositions[k] = inputParamNum++;
+                }
+                ownerIdx.addParameterOccurrence(paramPositions);
+            }
+        }
+        else
+        {
+            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            for (int k=0;k<paramPositions.length;k++)
+            {
+                paramPositions[k] = inputParamNum++;
+            }
+            ownerIdx.addParameterOccurrence(paramPositions);
+        }
+
+        StatementParameterMapping iteratorMappingParams = new StatementParameterMapping();
+        iteratorMappingParams.addMappingForParameter("owner", ownerIdx);
+
+        if (ec.getTransaction().getSerializeRead() != null && ec.getTransaction().getSerializeRead())
+        {
+            sqlStmt.addExtension("lock-for-update", true);
+        }
+        String stmt = sqlStmt.getSelectStatement().toSQL();
+
+        try
+        {
+            ManagedConnection mconn = storeMgr.getConnection(ec);
+            SQLController sqlControl = storeMgr.getSQLController();
+            try
+            {
+                // Create the statement and set the owner
+                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+                int numParams = ownerIdx.getNumberOfParameterOccurrences();
+                for (int paramInstance=0;paramInstance<numParams;paramInstance++)
+                {
+                    ownerIdx.getMapping().setObject(ec, ps,
+                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                }
+
+                try
+                {
+                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
+                    try
+                    {
+                        if (elementsAreEmbedded || elementsAreSerialised)
+                        {
+                            // No ResultObjectFactory needed - handled by SetStoreIterator
+                            return new ArrayStoreIterator(ownerOP, rs, null, this);
+                        }
+                        else if (elementMapping instanceof ReferenceMapping)
+                        {
+                            // No ResultObjectFactory needed - handled by SetStoreIterator
+                            return new ArrayStoreIterator(ownerOP, rs, null, this);
+                        }
+                        else
+                        {
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
+                                iteratorMappingClass, false, null, clr.classForName(elementType));
+                            return new ArrayStoreIterator(ownerOP, rs, rof, this);
+                        }
+                    }
+                    finally
+                    {
+                        rs.close();
+                    }
+                }
+                finally
+                {
+                    sqlControl.closeStatement(mconn, ps);
+                }
+            }
+            finally
+            {
+                mconn.release();
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+        }
+        catch (MappedDatastoreException e)
+        {
+            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+        }
+    }
+
+    /**
+     * Method to return the SQLStatement and mapping for an iterator for this backing store.
+     * @param clr ClassLoader resolver
+     * @param fp FetchPlan to use in determing which fields of element to select
+     * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
+     * @return The SQLStatement and its associated StatementClassMapping
+     */
+    public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
+    {
         SQLStatement sqlStmt = null;
-        final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         StatementClassMapping iteratorMappingClass = null;
 
@@ -236,15 +347,18 @@ public class JoinArrayStore extends AbstractArrayStore
             SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(),
                 sqlStmt.getPrimaryTable().getGroupName());
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass,
-                ownerOP.getExecutionContext().getFetchPlan(), elementSqlTbl, emd, 0);
+                fp, elementSqlTbl, emd, 0);
         }
 
-        // Apply condition on join-table owner field to filter by owner
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
-        SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
-        SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
-        sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
+        if (addRestrictionOnOwner)
+        {
+            // Apply condition on join-table owner field to filter by owner
+            SQLTable ownerSqlTbl =
+                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
+            SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
+            sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
+        }
 
         if (relationDiscriminatorMapping != null)
         {
@@ -267,100 +381,6 @@ public class JoinArrayStore extends AbstractArrayStore
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        // Input parameter(s) - the owner
-        int inputParamNum = 1;
-        StatementMappingIndex ownerIdx = new StatementMappingIndex(ownerMapping);
-        if (sqlStmt.getNumberOfUnions() > 0)
-        {
-            // Add parameter occurrence for each union of statement
-            for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
-            {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<paramPositions.length;k++)
-                {
-                    paramPositions[k] = inputParamNum++;
-                }
-                ownerIdx.addParameterOccurrence(paramPositions);
-            }
-        }
-        else
-        {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<paramPositions.length;k++)
-            {
-                paramPositions[k] = inputParamNum++;
-            }
-            ownerIdx.addParameterOccurrence(paramPositions);
-        }
-
-        StatementParameterMapping iteratorMappingParams = new StatementParameterMapping();
-        iteratorMappingParams.addMappingForParameter("owner", ownerIdx);
-
-        if (ec.getTransaction().getSerializeRead() != null && ec.getTransaction().getSerializeRead())
-        {
-            sqlStmt.addExtension("lock-for-update", true);
-        }
-        String stmt = sqlStmt.getSelectStatement().toSQL();
-
-        try
-        {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
-            try
-            {
-                // Create the statement and set the owner
-                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
-                int numParams = ownerIdx.getNumberOfParameterOccurrences();
-                for (int paramInstance=0;paramInstance<numParams;paramInstance++)
-                {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
-                }
-
-                try
-                {
-                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
-                    try
-                    {
-                        if (elementsAreEmbedded || elementsAreSerialised)
-                        {
-                            // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ArrayStoreIterator(ownerOP, rs, null, this);
-                        }
-                        else if (elementMapping instanceof ReferenceMapping)
-                        {
-                            // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ArrayStoreIterator(ownerOP, rs, null, this);
-                        }
-                        else
-                        {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
-                                iteratorMappingClass, false, null, clr.classForName(elementType));
-                            return new ArrayStoreIterator(ownerOP, rs, rof, this);
-                        }
-                    }
-                    finally
-                    {
-                        rs.close();
-                    }
-                }
-                finally
-                {
-                    sqlControl.closeStatement(mconn, ps);
-                }
-            }
-            finally
-            {
-                mconn.release();
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
-        }
-        catch (MappedDatastoreException e)
-        {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
-        }
+        return new IteratorStatement(this, sqlStmt, iteratorMappingClass);
     }
 }

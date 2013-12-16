@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -527,98 +528,10 @@ public class FKArrayStore extends AbstractArrayStore
             return null;
         }
 
-        SQLStatement sqlStmt = null;
-
-        SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
-        StatementClassMapping iteratorMappingDef = new StatementClassMapping();
-
-        if (elementInfo[0].getDatastoreClass().getDiscriminatorMetaData() != null &&
-            elementInfo[0].getDatastoreClass().getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
-        {
-            String elementType = ownerMemberMetaData.getArray().getElementType();
-            if (ClassUtils.isReferenceType(clr.classForName(elementType)))
-            {
-                String[] clsNames =
-                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
-                Class[] cls = new Class[clsNames.length];
-                for (int i=0; i<clsNames.length; i++)
-                {
-                    cls[i] = clr.classForName(clsNames[i]);
-                }
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement();
-            }
-            else
-            {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
-                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
-            }
-            iterateUsingDiscriminator = true;
-
-            // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
-        }
-        else
-        {
-            for (int i=0;i<elementInfo.length;i++)
-            {
-                final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
-                UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                SQLStatement subStmt = stmtGen.getStatement();
-
-                // Select the required fields (of the element class)
-                if (sqlStmt == null)
-                {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingDef,
-                        ownerOP.getExecutionContext().getFetchPlan(), subStmt.getPrimaryTable(), emd, 0);
-                }
-                else
-                {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
-                        ownerOP.getExecutionContext().getFetchPlan(), subStmt.getPrimaryTable(), emd, 0);
-                }
-
-                if (sqlStmt == null)
-                {
-                    sqlStmt = subStmt;
-                }
-                else
-                {
-                    sqlStmt.union(subStmt);
-                }
-            }
-        }
-
-        // Apply condition to filter by owner
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
-        SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
-        SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
-        sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
-
-        if (relationDiscriminatorMapping != null)
-        {
-            // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
-            SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
-            SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
-            sqlStmt.whereAnd(distExpr.eq(distVal), true);
-        }
-
-        if (orderMapping != null)
-        {
-            // Order by the ordering column, when present
-            SQLTable orderSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
-            orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
-            sqlStmt.setOrdering(orderExprs, descendingOrder);
-        }
+        // Generate the statement, and statement mapping/parameter information
+        IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext().getClassLoaderResolver(), ownerOP.getExecutionContext().getFetchPlan(), true);
+        SQLStatement sqlStmt = iterStmt.getSQLStatement();
+        StatementClassMapping iteratorMappingDef = iterStmt.getStatementClassMapping();
 
         // Input parameter(s) - the owner
         int inputParamNum = 1;
@@ -711,5 +624,111 @@ public class FKArrayStore extends AbstractArrayStore
         {
             throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
         }
+    }
+
+    /**
+     * Method to return the SQLStatement and mapping for an iterator for this backing store.
+     * @param clr ClassLoader resolver
+     * @param fp FetchPlan to use in determing which fields of element to select
+     * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
+     * @return The SQLStatement and its associated StatementClassMapping
+     */
+    public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
+    {
+        SQLStatement sqlStmt = null;
+        SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
+        StatementClassMapping iteratorMappingClass = new StatementClassMapping();
+
+        if (elementInfo[0].getDatastoreClass().getDiscriminatorMetaData() != null &&
+            elementInfo[0].getDatastoreClass().getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
+        {
+            String elementType = ownerMemberMetaData.getArray().getElementType();
+            if (ClassUtils.isReferenceType(clr.classForName(elementType)))
+            {
+                String[] clsNames =
+                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+                Class[] cls = new Class[clsNames.length];
+                for (int i=0; i<clsNames.length; i++)
+                {
+                    cls[i] = clr.classForName(clsNames[i]);
+                }
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement();
+            }
+            else
+            {
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
+                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+            }
+            iterateUsingDiscriminator = true;
+
+            // Select the required fields
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass,
+                fp, sqlStmt.getPrimaryTable(), emd, 0);
+        }
+        else
+        {
+            for (int i=0;i<elementInfo.length;i++)
+            {
+                final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
+                UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
+                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                SQLStatement subStmt = stmtGen.getStatement();
+
+                // Select the required fields (of the element class)
+                if (sqlStmt == null)
+                {
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass,
+                        fp, subStmt.getPrimaryTable(), emd, 0);
+                }
+                else
+                {
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
+                        fp, subStmt.getPrimaryTable(), emd, 0);
+                }
+
+                if (sqlStmt == null)
+                {
+                    sqlStmt = subStmt;
+                }
+                else
+                {
+                    sqlStmt.union(subStmt);
+                }
+            }
+        }
+
+        if (addRestrictionOnOwner)
+        {
+            // Apply condition to filter by owner
+            SQLTable ownerSqlTbl =
+                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
+            SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
+            sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
+        }
+
+        if (relationDiscriminatorMapping != null)
+        {
+            // Apply condition on distinguisher field to filter by distinguisher (when present)
+            SQLTable distSqlTbl =
+                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
+            SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
+            sqlStmt.whereAnd(distExpr.eq(distVal), true);
+        }
+
+        if (orderMapping != null)
+        {
+            // Order by the ordering column, when present
+            SQLTable orderSqlTbl =
+                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
+            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+            orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
+            sqlStmt.setOrdering(orderExprs, descendingOrder);
+        }
+
+        return new IteratorStatement(this, sqlStmt, iteratorMappingClass);
     }
 }

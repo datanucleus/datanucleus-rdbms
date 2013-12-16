@@ -35,10 +35,12 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.scostore.BaseContainerStore;
+import org.datanucleus.store.rdbms.scostore.FKArrayStore;
 import org.datanucleus.store.rdbms.scostore.FKListStore;
 import org.datanucleus.store.rdbms.scostore.FKMapStore;
 import org.datanucleus.store.rdbms.scostore.FKSetStore;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
+import org.datanucleus.store.rdbms.scostore.JoinArrayStore;
 import org.datanucleus.store.rdbms.scostore.JoinListStore;
 import org.datanucleus.store.rdbms.scostore.JoinMapStore;
 import org.datanucleus.store.rdbms.scostore.JoinSetStore;
@@ -95,6 +97,14 @@ public class BulkFetchHelper
         {
             iterStmt = ((FKListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
         }
+        else if (backingStore instanceof JoinArrayStore)
+        {
+            iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+        }
+        else if (backingStore instanceof FKArrayStore)
+        {
+            iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+        }
         else if (backingStore instanceof JoinMapStore)
         {
             // TODO Implement this
@@ -106,7 +116,7 @@ public class BulkFetchHelper
             return null;
         }
 
-        if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore)
+        if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore || backingStore instanceof JoinArrayStore)
         {
             // Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
@@ -140,7 +150,7 @@ public class BulkFetchHelper
             ownerMapIdx.setColumnPositions(ownerColIndexes);
             iterStmt.setOwnerMapIndex(ownerMapIdx);
         }
-        else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore)
+        else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore || backingStore instanceof FKArrayStore)
         {
             // Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
