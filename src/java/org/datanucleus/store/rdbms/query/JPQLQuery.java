@@ -648,9 +648,11 @@ public class JPQLQuery extends AbstractJPQLQuery
                                     try
                                     {
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
-                                        SQLStatementHelper.applyParametersToStatement(psSco, ec,
-                                            datastoreCompilation.getStatementParameters(), 
-                                            datastoreCompilation.getParameterNameByPosition(), parameters);
+                                        if (datastoreCompilation.getStatementParameters() != null)
+                                        {
+                                            BulkFetchHelper helper = new BulkFetchHelper(this);
+                                            helper.applyParametersToStatement(psSco, ec, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
+                                        }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
                                     }
@@ -926,7 +928,8 @@ public class JPQLQuery extends AbstractJPQLQuery
                             else
                             {
                                 // Fetch collection elements for all candidate owners
-                                IteratorStatement iterStmt = getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd);
+                                BulkFetchHelper helper = new BulkFetchHelper(this);
+                                IteratorStatement iterStmt = helper.getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd, datastoreCompilation);
                                 if (iterStmt != null)
                                 {
                                     datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);

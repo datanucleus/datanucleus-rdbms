@@ -69,24 +69,14 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.scostore.BaseContainerStore;
-import org.datanucleus.store.rdbms.scostore.FKListStore;
-import org.datanucleus.store.rdbms.scostore.FKMapStore;
-import org.datanucleus.store.rdbms.scostore.FKSetStore;
-import org.datanucleus.store.rdbms.scostore.JoinListStore;
-import org.datanucleus.store.rdbms.scostore.JoinMapStore;
-import org.datanucleus.store.rdbms.scostore.JoinSetStore;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
-import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
@@ -726,9 +716,11 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                     try
                                     {
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
-                                        SQLStatementHelper.applyParametersToStatement(psSco, ec,
-                                            datastoreCompilation.getStatementParameters(), 
-                                            datastoreCompilation.getParameterNameByPosition(), parameters);
+                                        if (datastoreCompilation.getStatementParameters() != null)
+                                        {
+                                            BulkFetchHelper helper = new BulkFetchHelper(this);
+                                            helper.applyParametersToStatement(psSco, ec, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
+                                        }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
                                     }
@@ -1070,7 +1062,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             else
                             {
                                 // Fetch collection elements for all candidate owners
-                                IteratorStatement iterStmt = getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd);
+                                BulkFetchHelper helper = new BulkFetchHelper(this);
+                                IteratorStatement iterStmt = helper.getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd, datastoreCompilation);
                                 if (iterStmt != null)
                                 {
                                     datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);
@@ -1104,115 +1097,6 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             NucleusLogger.QUERY.debug(LOCALISER.msg("021084", getLanguage(), System.currentTimeMillis()-startTime));
         }
-    }
-
-    protected IteratorStatement getSQLStatementForContainerFieldBatch(ExecutionContext ec, AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd)
-    {
-        IteratorStatement iterStmt = null;
-        Store backingStore = ((RDBMSStoreManager)storeMgr).getBackingStoreForField(clr, mmd, null);
-        if (backingStore instanceof JoinSetStore)
-        {
-            iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof FKSetStore)
-        {
-            iterStmt = ((FKSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof JoinListStore)
-        {
-            iterStmt = ((JoinListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof FKListStore)
-        {
-            iterStmt = ((FKListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
-
-        if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore)
-        {
-            // Generate an iterator query of the form
-            // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
-            // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
-            SQLStatement sqlStmt = iterStmt.getSQLStatement();
-            JoinTable joinTbl = (JoinTable)sqlStmt.getPrimaryTable().getTable();
-            JavaTypeMapping joinOwnerMapping = joinTbl.getOwnerMapping();
-
-            // Generate the EXISTS subquery (based on the JDOQL query)
-            SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
-            Set<String> options = new HashSet<String>();
-            options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, getFetchPlan(), ec, getParsedImports(), options, extensions);
-            sqlMapper.compile();
-
-            // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
-            BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
-            sqlStmt.whereAnd(existsExpr, true);
-
-            // Join to outer statement so we restrict to collection elements for the query candidates
-            SQLExpression joinTblOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(sqlStmt, sqlStmt.getPrimaryTable(), joinOwnerMapping);
-            SQLExpression existsOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(existsStmt, existsStmt.getPrimaryTable(), 
-                existsStmt.getPrimaryTable().getTable().getIdMapping());
-            existsStmt.whereAnd(joinTblOwnerExpr.eq(existsOwnerExpr), true);
-
-            // Select the owner candidate so we can separate the collection elements out to their owner
-            int[] ownerColIndexes = sqlStmt.select(joinTblOwnerExpr, null);
-            StatementMappingIndex ownerMapIdx = new StatementMappingIndex(existsStmt.getPrimaryTable().getTable().getIdMapping());
-            ownerMapIdx.setColumnPositions(ownerColIndexes);
-            iterStmt.setOwnerMapIndex(ownerMapIdx);
-        }
-        else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore)
-        {
-            // Generate an iterator query of the form
-            // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
-            // WHERE EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND ELEM_TBL.OWNER_ID = OWNER_TBL.ID)
-            SQLStatement sqlStmt = iterStmt.getSQLStatement();
-
-            // Generate the EXISTS subquery (based on the JDOQL query)
-            SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
-            Set<String> options = new HashSet<String>();
-            options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, getFetchPlan(), ec, getParsedImports(), options, extensions);
-            sqlMapper.compile();
-
-            // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
-            BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
-            sqlStmt.whereAnd(existsExpr, true);
-
-            // Join to outer statement so we restrict to collection elements for the query candidates
-            SQLExpression elemTblOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
-                ((BaseContainerStore) backingStore).getOwnerMapping());
-            SQLExpression existsOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(existsStmt, existsStmt.getPrimaryTable(), 
-                existsStmt.getPrimaryTable().getTable().getIdMapping());
-            existsStmt.whereAnd(elemTblOwnerExpr.eq(existsOwnerExpr), true);
-
-            // Select the owner candidate so we can separate the collection elements out to their owner
-            int[] ownerColIndexes = sqlStmt.select(elemTblOwnerExpr, null);
-            StatementMappingIndex ownerMapIdx = new StatementMappingIndex(existsStmt.getPrimaryTable().getTable().getIdMapping());
-            ownerMapIdx.setColumnPositions(ownerColIndexes);
-            iterStmt.setOwnerMapIndex(ownerMapIdx);
-        }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-        }
-        return iterStmt;
     }
 
     /**
