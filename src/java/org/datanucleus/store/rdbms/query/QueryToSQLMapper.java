@@ -3417,7 +3417,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             stack.push(sqlExpr);
             return sqlExpr;
         }
-        throw new NucleusUserException("Variable " + varName + " is unbound and cannot be determined");
+        throw new NucleusUserException("Variable '" + varName + "' is unbound and cannot be determined (is it a misspelled field name? or is not intended to be a variable?)");
     }
 
     /**
