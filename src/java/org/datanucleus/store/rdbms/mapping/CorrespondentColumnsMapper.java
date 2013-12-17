@@ -78,7 +78,7 @@ public class CorrespondentColumnsMapper
             int noOfUserColumns = colmds.length;
 
             // Generate string of user-specified columns for use in diagnostics
-            StringBuffer str=new StringBuffer("Columns [");
+            StringBuilder str=new StringBuilder("Columns [");
             for (int i=0;i<noOfUserColumns;i++)
             {
                 str.append(colmds[i].getName());
@@ -236,7 +236,7 @@ public class CorrespondentColumnsMapper
             ColumnMetaData[] colmds = columnContainer.getColumnMetaData();
 
             // Generate string of user-specified columns for use in diagnostics
-            StringBuffer str=new StringBuffer("Columns [");
+            StringBuilder str=new StringBuilder("Columns [");
             for (int i=0;i<noOfUserColumns;i++)
             {
                 str.append(colmds[i].getName());

@@ -192,7 +192,7 @@ public class RDBMSTableIndexInfo implements ListStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSTableIndexInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSTableIndexInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

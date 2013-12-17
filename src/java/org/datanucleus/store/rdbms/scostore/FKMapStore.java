@@ -953,7 +953,7 @@ public class FKMapStore extends AbstractMapStore
      */
     private String getUpdateFkStmt()
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(getMapTable().toString());
         stmt.append(" SET ");
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)

@@ -152,7 +152,7 @@ public class RDBMSTypesInfo implements MapStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSTypesInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSTypesInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

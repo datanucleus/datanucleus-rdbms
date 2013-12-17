@@ -614,7 +614,7 @@ public abstract class SQLExpression
          */
         public String toString()
         {
-            StringBuffer expr = new StringBuffer();
+            StringBuilder expr = new StringBuilder();
             int size = exprs.size();
             for (int i=0; i<size; i++)
             {

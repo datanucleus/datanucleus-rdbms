@@ -292,7 +292,7 @@ public class ColumnImpl implements Column
      */
     public String getSQLDefinition()
     {
-        StringBuffer def = new StringBuffer(identifier.toString());
+        StringBuilder def = new StringBuilder(identifier.toString());
 
         if (!StringUtils.isWhitespace(columnMetaData.getColumnDdl()))
         {
@@ -302,7 +302,7 @@ public class ColumnImpl implements Column
             return def.toString();
         }
 
-        StringBuffer typeSpec = new StringBuffer(typeInfo.getTypeName());
+        StringBuilder typeSpec = new StringBuilder(typeInfo.getTypeName());
         DatastoreAdapter adapter = getStoreManager().getDatastoreAdapter();
 
         // Add type specification.
@@ -341,7 +341,7 @@ public class ColumnImpl implements Column
             // Add any precision - note that there is no obvious flag in the JDBC typeinfo to
             // tell us whether the type allows this specification or not, and many JDBC just
             // return crap anyway. We use the allowsPrecisionSpec flag for this
-            StringBuffer precSpec = new StringBuffer();
+            StringBuilder precSpec = new StringBuilder();
             int sqlPrecision = getSQLPrecision();
             if (sqlPrecision > 0 && typeInfo.isAllowsPrecisionSpec())
             {

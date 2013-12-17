@@ -201,7 +201,7 @@ public class ForeignKeyInfo implements StoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str= new StringBuffer();
+        StringBuilder str= new StringBuilder();
         str.append(this.getClass().getName() + "\n");
         str.append("  pkTableCat    = " + getProperty("pk_table_cat") + "\n");
         str.append("  pkTableSchem  = " + getProperty("pk_table_schema") + "\n");

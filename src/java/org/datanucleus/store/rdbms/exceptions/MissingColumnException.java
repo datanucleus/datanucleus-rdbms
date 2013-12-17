@@ -49,7 +49,7 @@ public class MissingColumnException extends DatastoreValidationException
 
     private static String getColumnNameList(Collection columns)
     {
-        StringBuffer list = new StringBuffer();
+        StringBuilder list = new StringBuilder();
         Iterator<Column> i = columns.iterator();
 
         while (i.hasNext())

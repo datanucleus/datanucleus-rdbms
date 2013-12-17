@@ -136,7 +136,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         Table containerTable = getContainerTable();
         JavaTypeMapping elementMapping = getElementMapping();
 
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(containerTable.toString());
         stmt.append(" SET ");
         for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
@@ -257,7 +257,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         JavaTypeMapping elementMapping = getElementMapping();
         ElementContainerStore.ElementInfo[] elementInfo = getElementInfo();
 
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         String containerAlias = "THIS";
         String joinedElementAlias = "ELEM";
         for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
@@ -472,7 +472,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
     private String getRemoveStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer();
+        StringBuilder stmt = new StringBuilder();
         stmt.append("DELETE FROM ");
         stmt.append(containerTable.toString());
 

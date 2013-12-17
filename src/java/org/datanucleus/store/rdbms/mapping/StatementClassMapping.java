@@ -238,7 +238,7 @@ public class StatementClassMapping
 
     public String toString()
     {
-        StringBuffer str = new StringBuffer("StatementClassMapping:");
+        StringBuilder str = new StringBuilder("StatementClassMapping:");
         str.append("class=" + className + ",member=" + memberName);
 
         str.append(",mappings=[");

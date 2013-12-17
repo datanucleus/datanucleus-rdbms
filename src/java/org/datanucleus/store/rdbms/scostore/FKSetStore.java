@@ -913,7 +913,7 @@ public class FKSetStore extends AbstractSetStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
                     //CANNOT USE ? to replace. JDBC drivers does not accept, so we replace
@@ -988,7 +988,7 @@ public class FKSetStore extends AbstractSetStore
 
     private String getUpdateFkStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         if (elementInfo.length > 1)
         {
             //CANNOT USE ? to replace. JDBC drivers does not accept, so we replace

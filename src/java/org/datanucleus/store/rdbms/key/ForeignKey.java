@@ -295,7 +295,7 @@ public class ForeignKey extends Key
         }
         else
         {
-            StringBuffer s = new StringBuffer("FOREIGN KEY ");
+            StringBuilder s = new StringBuilder("FOREIGN KEY ");
             s.append(getColumnList(columns));
 
             // Referenced table

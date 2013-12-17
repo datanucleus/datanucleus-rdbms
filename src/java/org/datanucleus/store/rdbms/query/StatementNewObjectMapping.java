@@ -84,7 +84,7 @@ public class StatementNewObjectMapping
 
     public String toString()
     {
-        StringBuffer str = new StringBuffer("StatementNewObject: " + cls.getName() + "(");
+        StringBuilder str = new StringBuilder("StatementNewObject: " + cls.getName() + "(");
         if (ctrArgMappings != null)
         {
             Iterator<Integer> keyIter = ctrArgMappings.keySet().iterator();

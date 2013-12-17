@@ -136,7 +136,7 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
                     try
                     {
                         int c;
-                        StringBuffer sb = new StringBuffer();
+                        StringBuilder sb = new StringBuilder();
                         while ((c = br.read()) != -1)
                         {
                             sb.append((char)c);

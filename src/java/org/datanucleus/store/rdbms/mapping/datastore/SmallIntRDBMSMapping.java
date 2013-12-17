@@ -74,7 +74,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
             if (getJavaTypeMapping().getJavaType() == Boolean.class)
             {
                 // With a Boolean we'll store it as 1, 0 (see setBoolean/getBoolean methods)
-                StringBuffer constraints = new StringBuffer("CHECK (" + column.getIdentifier() + " IN (0,1)");
+                StringBuilder constraints = new StringBuilder("CHECK (" + column.getIdentifier() + " IN (0,1)");
                 if (column.isNullable())
                 {
                     constraints.append(" OR " + column.getIdentifier() + " IS NULL");

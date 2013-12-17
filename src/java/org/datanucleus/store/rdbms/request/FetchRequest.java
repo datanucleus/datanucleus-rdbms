@@ -231,7 +231,7 @@ public class FetchRequest extends Request
         }
 
         // Generate convenience string for logging
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         if (mmds != null)
         {
             for (int i=0;i<mmds.length;i++)

@@ -550,7 +550,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             return null;
         }
 
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
 
         for (int i = 0; i < javaName.length(); ++i)
         {

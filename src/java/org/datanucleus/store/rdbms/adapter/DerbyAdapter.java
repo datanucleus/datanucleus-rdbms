@@ -398,7 +398,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (start != null)
         {
@@ -443,7 +443,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
-        StringBuffer stmt=new StringBuffer("VALUES NEXT VALUE FOR ");
+        StringBuilder stmt=new StringBuilder("VALUES NEXT VALUE FOR ");
         stmt.append(sequence_name);
         stmt.append(" ");
         return stmt.toString();

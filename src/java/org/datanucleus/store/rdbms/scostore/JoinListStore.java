@@ -797,7 +797,7 @@ public class JoinListStore extends AbstractListStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 stmt.append(containerTable.toString());
                 stmt.append(" SET ");
                 for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
@@ -847,7 +847,7 @@ public class JoinListStore extends AbstractListStore
             return null;
         }
 
-        StringBuffer stmt = new StringBuffer("DELETE FROM ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ");
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
 

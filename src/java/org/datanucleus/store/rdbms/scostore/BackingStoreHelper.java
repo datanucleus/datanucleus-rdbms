@@ -426,7 +426,7 @@ public class BackingStoreHelper
      * @param containerAlias Any alias for the container of this mapping
      * @param firstWhereClause Whether this is the first WHERE clause (i.e omit the first "AND")
      */
-    public static void appendWhereClauseForElement(StringBuffer stmt, JavaTypeMapping elementMapping, Object element,
+    public static void appendWhereClauseForElement(StringBuilder stmt, JavaTypeMapping elementMapping, Object element,
             boolean elementsSerialised, String containerAlias, boolean firstWhereClause)
     {
         if (!firstWhereClause)
@@ -501,7 +501,7 @@ public class BackingStoreHelper
      * @param containerAlias Any alias for the container of this mapping
      * @param firstWhereClause Whether this is the first WHERE clause (i.e omit the first "AND")
      */
-    public static void appendWhereClauseForMapping(StringBuffer stmt, JavaTypeMapping mapping, String containerAlias,
+    public static void appendWhereClauseForMapping(StringBuilder stmt, JavaTypeMapping mapping, String containerAlias,
             boolean firstWhereClause)
     {
         for (int i = 0; i < mapping.getNumberOfDatastoreMappings(); i++)

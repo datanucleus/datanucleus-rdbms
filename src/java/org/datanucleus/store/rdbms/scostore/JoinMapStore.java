@@ -507,7 +507,7 @@ public class JoinMapStore extends AbstractMapStore
      */
     private String getPutStmt()
     {
-        StringBuffer stmt = new StringBuffer("INSERT INTO ");
+        StringBuilder stmt = new StringBuilder("INSERT INTO ");
         stmt.append(mapTable.toString());
         stmt.append(" (");
         for (int i=0; i<valueMapping.getNumberOfDatastoreMappings(); i++)
@@ -585,7 +585,7 @@ public class JoinMapStore extends AbstractMapStore
      */
     private String getUpdateStmt()
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
         for (int i=0; i<valueMapping.getNumberOfDatastoreMappings(); i++)
@@ -617,7 +617,7 @@ public class JoinMapStore extends AbstractMapStore
      */
     private String getRemoveStmt()
     {
-        StringBuffer stmt = new StringBuffer("DELETE FROM ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ");
         stmt.append(mapTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -638,7 +638,7 @@ public class JoinMapStore extends AbstractMapStore
      */
     private String getClearStmt()
     {
-        StringBuffer stmt = new StringBuffer("DELETE FROM ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ");
         stmt.append(mapTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -1149,7 +1149,7 @@ public class JoinMapStore extends AbstractMapStore
      */
     private String getMaxAdapterColumnIdStmt()
     {
-        StringBuffer stmt = new StringBuffer("SELECT MAX(" + 
+        StringBuilder stmt = new StringBuilder("SELECT MAX(" + 
             adapterMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
         stmt.append(" FROM ");
         stmt.append(mapTable.toString());

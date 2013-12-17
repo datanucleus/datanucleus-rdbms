@@ -198,7 +198,7 @@ public class MappedTypeManager
 
         public String toString()
         {
-            StringBuffer str = new StringBuffer("MappedType " + cls.getName() + " [");
+            StringBuilder str = new StringBuilder("MappedType " + cls.getName() + " [");
             if (javaMappingType != null)
             {
                 str.append(" mapping=" + javaMappingType);

@@ -207,7 +207,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
         
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (increment != null)
         {
@@ -245,7 +245,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
-        StringBuffer stmt=new StringBuffer("SELECT ");
+        StringBuilder stmt=new StringBuilder("SELECT ");
         stmt.append(" NEXTVAL('"+sequence_name+"') ");
 
         return stmt.toString();

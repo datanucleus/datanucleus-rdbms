@@ -513,7 +513,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
     private String getContainsValueStmt(JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, 
             Table mapTable)
     {
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -592,7 +592,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
     protected String getUpdateEmbeddedKeyStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping,
             JavaTypeMapping keyMapping, Table mapTable)
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
         for (int i=0; i<fieldMapping.getNumberOfDatastoreMappings(); i++)
@@ -644,7 +644,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
     protected String getUpdateEmbeddedValueStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping,
            JavaTypeMapping valueMapping, Table mapTable)
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
         for (int i=0; i<fieldMapping.getNumberOfDatastoreMappings(); i++)

@@ -703,7 +703,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
 
     private String getIndexOfStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -768,7 +768,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
 
     private String getLastIndexOfStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -818,7 +818,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      */
     protected String getIndicesOfStmt(Collection elements)
     {
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -888,7 +888,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("DELETE FROM ");
+                StringBuilder stmt = new StringBuilder("DELETE FROM ");
                 stmt.append(containerTable.toString());
                 stmt.append(" WHERE ");
 
@@ -924,7 +924,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 stmt.append(containerTable.toString());
                 stmt.append(" SET ");
 

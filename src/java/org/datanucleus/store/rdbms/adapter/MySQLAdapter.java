@@ -234,7 +234,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      **/
     public String getCreateTableStatement(TableImpl table, Column[] columns, Properties props, IdentifierFactory factory)  
     {
-        StringBuffer createStmt = new StringBuffer(super.getCreateTableStatement(table, columns, props, factory));
+        StringBuilder createStmt = new StringBuilder(super.getCreateTableStatement(table, columns, props, factory));
 
         String engineType = "INNODB";
         if (props != null)

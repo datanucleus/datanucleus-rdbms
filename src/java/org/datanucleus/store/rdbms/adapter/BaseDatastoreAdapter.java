@@ -183,7 +183,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             datastoreProductVersion = metadata.getDatabaseProductVersion();
 
             // Try to convert the "version" string into a W.X.Y.Z version string
-            StringBuffer strippedProductVersion=new StringBuffer();
+            StringBuilder strippedProductVersion=new StringBuilder();
             char previousChar = ' ';
             for (int i=0; i<datastoreProductVersion.length(); ++i)
             {
@@ -1140,7 +1140,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getCreateTableStatement(TableImpl table, Column[] columns, Properties props, IdentifierFactory factory)
     {
-        StringBuffer createStmt = new StringBuffer();
+        StringBuilder createStmt = new StringBuilder();
         String indent = "    ";
         if (getContinuationString().length() == 0)
         {
@@ -1201,7 +1201,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // UNIQUE( col [,col] )
         if (supportsOption(UNIQUE_IN_END_CREATE_STATEMENTS))
         {
-            StringBuffer uniqueConstraintStmt = new StringBuffer();
+            StringBuilder uniqueConstraintStmt = new StringBuilder();
             for (int i = 0; i < columns.length; ++i)
             {
                 if (columns[i].isUnique())
@@ -1228,7 +1228,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // FOREIGN KEY(col [,col] ) REFERENCES {TBL} (col [,col])
         if (supportsOption(FK_IN_END_CREATE_STATEMENTS))
         {
-            StringBuffer fkConstraintStmt = new StringBuffer();
+            StringBuilder fkConstraintStmt = new StringBuilder();
             ClassLoaderResolver clr = table.getStoreManager().getNucleusContext().getClassLoaderResolver(null);
             List<ForeignKey> fks = table.getExpectedForeignKeys(clr);
             if (fks != null && !fks.isEmpty())
@@ -1248,7 +1248,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // CHECK (column_identifier IN (literal[,literal]))
         if (supportsOption(CHECK_IN_END_CREATE_STATEMENTS))
         {
-            StringBuffer checkConstraintStmt = new StringBuffer();
+            StringBuilder checkConstraintStmt = new StringBuilder();
 	        for (int i = 0; i < columns.length; ++i)
 	        {
 	            if (columns[i].getConstraints() != null)
@@ -1386,7 +1386,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getCheckConstraintForValues(DatastoreIdentifier identifier, Object[] values, boolean nullable)
     {
-        StringBuffer constraints = new StringBuffer("CHECK (");
+        StringBuilder constraints = new StringBuilder("CHECK (");
         constraints.append(identifier);
         constraints.append(" IN (");
         for (int i=0;i<values.length;i++)
@@ -1534,7 +1534,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     public String toString()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("================ DatabaseAdapter ==================");
         sb.append("\n");
         sb.append("Adapter : " + this.getClass().getName());

@@ -221,7 +221,7 @@ public class UpdateRequest extends Request
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 // Debug info about fields being updated
-                StringBuffer fieldStr = new StringBuffer();
+                StringBuilder fieldStr = new StringBuilder();
                 for (int i=0;i<updateFieldNumbers.length;i++)
                 {
                     if (fieldStr.length() > 0)
@@ -454,12 +454,12 @@ public class UpdateRequest extends Request
         List mc = new ArrayList();
 
         /** for UPDATE statement **/
-        StringBuffer columnAssignments = new StringBuffer();
+        StringBuilder columnAssignments = new StringBuilder();
 
         Map assignedColumns = new HashMap();
 
         /** Where clause for the statement. Built during the consumption process. */
-        StringBuffer where = new StringBuffer();
+        StringBuilder where = new StringBuilder();
 
         /** MetaData for the class of the object */
         private final AbstractClassMetaData cmd;

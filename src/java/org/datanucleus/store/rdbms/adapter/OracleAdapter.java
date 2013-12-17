@@ -425,7 +425,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (min != null)
         {
@@ -467,7 +467,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
-        StringBuffer stmt=new StringBuffer("SELECT ");
+        StringBuilder stmt=new StringBuilder("SELECT ");
         stmt.append(sequence_name);
         stmt.append(".NEXTVAL from dual ");
 
@@ -578,7 +578,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
     throws SQLException
     {
         // setup SQL for query from Oracle data dictionary view ALL_TAB_COLUMNS
-        StringBuffer columnsQuery = new StringBuffer();
+        StringBuilder columnsQuery = new StringBuilder();
         columnsQuery.append("SELECT NULL TABLE_CAT, OWNER TABLE_SCHEM, TABLE_NAME, COLUMN_NAME, NULL DATA_TYPE, ");
         columnsQuery.append("DATA_TYPE TYPE_NAME, DECODE(DATA_TYPE,'NUMBER',DATA_PRECISION,DATA_LENGTH) COLUMN_SIZE, ");
         columnsQuery.append("0 BUFFER_LENGTH, DATA_SCALE DECIMAL_DIGITS, 10 NUM_PREC_RADIX, ");

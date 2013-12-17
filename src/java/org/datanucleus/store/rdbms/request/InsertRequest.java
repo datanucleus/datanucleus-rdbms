@@ -634,8 +634,8 @@ public class InsertRequest extends Request
         /** Numbers of all relations fields (bidir that may already be attached when persisting). */
         List relationFields = new ArrayList();
 
-        StringBuffer columnNames = new StringBuffer();
-        StringBuffer columnValues = new StringBuffer();
+        StringBuilder columnNames = new StringBuilder();
+        StringBuilder columnValues = new StringBuilder();
 
         Map assignedColumns = new HashMap();
 

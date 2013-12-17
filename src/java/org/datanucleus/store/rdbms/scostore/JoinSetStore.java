@@ -569,7 +569,7 @@ public class JoinSetStore extends AbstractSetStore
      */
     protected String getRemoveStmt(Object element)
     {
-        StringBuffer stmt = new StringBuffer("DELETE FROM ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ");
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -602,7 +602,7 @@ public class JoinSetStore extends AbstractSetStore
             return null;
         }
 
-        StringBuffer stmt = new StringBuffer("DELETE FROM ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ");
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
 
@@ -779,7 +779,7 @@ public class JoinSetStore extends AbstractSetStore
 
     private String getLocateStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("SELECT 1 FROM ");
+        StringBuilder stmt = new StringBuilder("SELECT 1 FROM ");
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -822,7 +822,7 @@ public class JoinSetStore extends AbstractSetStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("SELECT MAX(" + 
+                StringBuilder stmt = new StringBuilder("SELECT MAX(" + 
                         orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
                 stmt.append(" FROM ");
                 stmt.append(containerTable.toString());

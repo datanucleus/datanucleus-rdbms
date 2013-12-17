@@ -192,7 +192,7 @@ public class RDBMSTableFKInfo implements ListStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSTableFKInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSTableFKInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

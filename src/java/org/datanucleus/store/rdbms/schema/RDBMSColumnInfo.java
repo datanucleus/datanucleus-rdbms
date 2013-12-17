@@ -313,7 +313,7 @@ public class RDBMSColumnInfo implements ListStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSColumnInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSColumnInfo : ");
         str.append("  tableCat        = " + tableCat + "\n");
         str.append("  tableSchem      = " + tableSchem + "\n");
         str.append("  tableName       = " + tableName + "\n");

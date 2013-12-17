@@ -1275,7 +1275,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, "types", null);
             if (typesInfo != null && typesInfo.getNumberOfChildren() > 0)
             {
-                StringBuffer typeStr = new StringBuffer();
+                StringBuilder typeStr = new StringBuilder();
                 Iterator jdbcTypesIter = typesInfo.getChildren().keySet().iterator();
                 while (jdbcTypesIter.hasNext())
                 {
@@ -1853,7 +1853,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Multiple possible roots so use UNION statement
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    StringBuffer str = new StringBuffer();
+                    StringBuilder str = new StringBuilder();
                     Iterator<AbstractClassMetaData> rootCmdIter = rootCmds.iterator();
                     while (rootCmdIter.hasNext())
                     {
@@ -2063,7 +2063,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             m = tbl.getIdMapping();
         }
-        StringBuffer columnsName = new StringBuffer();
+        StringBuilder columnsName = new StringBuilder();
         for (int i = 0; i < m.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)

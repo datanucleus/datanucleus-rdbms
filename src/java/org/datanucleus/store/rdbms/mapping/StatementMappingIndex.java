@@ -182,7 +182,7 @@ public class StatementMappingIndex
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("mapping: " + mapping);
         if (paramPositions != null)
         {

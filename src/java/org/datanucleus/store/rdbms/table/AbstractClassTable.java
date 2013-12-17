@@ -454,7 +454,7 @@ public abstract class AbstractClassTable extends TableImpl
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
             // Provide field->column mapping debug message
-            StringBuffer columnsStr = new StringBuffer();
+            StringBuilder columnsStr = new StringBuilder();
             for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
             {
                 if (i > 0)
@@ -467,7 +467,7 @@ public abstract class AbstractClassTable extends TableImpl
             {
                 columnsStr.append("[none]");
             }
-            StringBuffer datastoreMappingTypes = new StringBuffer();
+            StringBuilder datastoreMappingTypes = new StringBuilder();
             for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
             {
                 if (i > 0)

@@ -170,7 +170,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
             try
             {
                 Connection conn = (Connection) mconn.getConnection();
-                StringBuffer stmtStr = new StringBuffer("CALL " + procedureName);
+                StringBuilder stmtStr = new StringBuilder("CALL " + procedureName);
                 stmtStr.append("(");
                 if (storedProcParams != null && !storedProcParams.isEmpty())
                 {

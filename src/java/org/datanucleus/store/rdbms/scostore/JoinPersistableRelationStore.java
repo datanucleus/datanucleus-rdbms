@@ -224,7 +224,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             JavaTypeMapping ownerMapping = joinTable.getOwnerMapping();
             JavaTypeMapping relatedMapping = joinTable.getRelatedMapping();
 
-            StringBuffer stmt = new StringBuffer("INSERT INTO ");
+            StringBuilder stmt = new StringBuilder("INSERT INTO ");
             stmt.append(joinTable.toString());
             stmt.append(" (");
             for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
@@ -279,7 +279,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             JavaTypeMapping ownerMapping = joinTable.getOwnerMapping();
             JavaTypeMapping relatedMapping = joinTable.getRelatedMapping();
 
-            StringBuffer stmt = new StringBuffer("UPDATE ");
+            StringBuilder stmt = new StringBuilder("UPDATE ");
             stmt.append(joinTable.toString());
             stmt.append(" SET ");
             for (int i = 0; i < relatedMapping.getNumberOfDatastoreMappings(); i++)
@@ -315,7 +315,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         {
             JavaTypeMapping ownerMapping = joinTable.getOwnerMapping();
 
-            StringBuffer stmt = new StringBuffer("DELETE FROM ");
+            StringBuilder stmt = new StringBuilder("DELETE FROM ");
             stmt.append(joinTable.toString());
             stmt.append(" WHERE ");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);

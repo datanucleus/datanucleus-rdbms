@@ -342,7 +342,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
     {
         if (sizeStmt == null)
         {
-            StringBuffer stmt = new StringBuffer("SELECT COUNT(*) FROM ");
+            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ");
             stmt.append(mapTable.toString());
             stmt.append(" WHERE ");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);

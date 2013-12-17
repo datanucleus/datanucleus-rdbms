@@ -94,7 +94,7 @@ public class StatementResultMapping
 
     public String toString()
     {
-        StringBuffer str = new StringBuffer("StatementResults:");
+        StringBuilder str = new StringBuilder("StatementResults:");
         if (mappings != null)
         {
             Iterator<Map.Entry<Integer, Object>> mapIter = mappings.entrySet().iterator();

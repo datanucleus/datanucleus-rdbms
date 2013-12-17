@@ -85,7 +85,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt = new StringBuffer("CREATE GENERATOR ");
+        StringBuilder stmt = new StringBuilder("CREATE GENERATOR ");
         stmt.append(sequence_name);
         // TODO Can we use the additional parameters ?
 
@@ -104,7 +104,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt=new StringBuffer("SELECT GEN_ID(");
+        StringBuilder stmt=new StringBuilder("SELECT GEN_ID(");
         stmt.append(sequence_name);
         stmt.append(",1) FROM RDB$DATABASE");
 

@@ -134,7 +134,7 @@ public class SQLJoin
     {
         if (type != JoinType.NON_ANSI_JOIN)
         {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             if (type == JoinType.INNER_JOIN)
             {
                 result.append("INNER JOIN ");

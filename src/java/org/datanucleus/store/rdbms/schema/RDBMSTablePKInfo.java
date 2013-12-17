@@ -192,7 +192,7 @@ public class RDBMSTablePKInfo implements ListStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSTablePKInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSTablePKInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

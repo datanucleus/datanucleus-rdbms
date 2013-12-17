@@ -1063,7 +1063,7 @@ public class FKListStore extends AbstractListStore
 
     private String getUpdateFkStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         if (elementInfo.length > 1)
         {
             stmt.append("?");
@@ -1131,7 +1131,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
                     stmt.append("?");
@@ -1210,7 +1210,7 @@ public class FKListStore extends AbstractListStore
 
     private String getSetStatementString(Object element)
     {
-        StringBuffer stmt = new StringBuffer("UPDATE ");
+        StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(containerTable.toString()); // TODO Allow for multiple element tables
         stmt.append(" SET ");
         for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
@@ -1265,7 +1265,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 // TODO Allow for multiple element tables
                 stmt.append(containerTable.toString());
                 stmt.append(" SET ");
@@ -1336,7 +1336,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
                     stmt.append("?");

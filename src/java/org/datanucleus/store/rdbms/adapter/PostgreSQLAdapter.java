@@ -356,7 +356,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      **/
     public String getAutoIncrementStmt(Table table, String columnName)
     {
-        StringBuffer stmt=new StringBuffer("SELECT currval('");
+        StringBuilder stmt=new StringBuilder("SELECT currval('");
 
         // PostgreSQL creates a sequence for each SERIAL column with name of the form "{table}_seq"
         // in the current catalog/schema. PostgreSQL doesn't use catalog so ignore that
@@ -415,7 +415,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (min != null)
         {
@@ -458,7 +458,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt=new StringBuffer("SELECT nextval('");
+        StringBuilder stmt=new StringBuilder("SELECT nextval('");
         stmt.append(sequence_name);
         stmt.append("')");
 

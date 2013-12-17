@@ -110,7 +110,7 @@ public class StatementParameterMapping
 
     public String toString()
     {
-        StringBuffer str = new StringBuffer("StatementParameters:");
+        StringBuilder str = new StringBuilder("StatementParameters:");
         if (mappings != null)
         {
             Iterator<Map.Entry<String, StatementMappingIndex>> mapIter = mappings.entrySet().iterator();

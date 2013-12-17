@@ -428,7 +428,7 @@ public class DeleteRequest extends Request
             if (refMapping.isNullable()) // Only clear the references that can be cleared
             {
                 // Create a statement to clear the link from the previous related object
-                StringBuffer clearLinkStmt = new StringBuffer("UPDATE " + refTable.toString() + " SET ");
+                StringBuilder clearLinkStmt = new StringBuilder("UPDATE " + refTable.toString() + " SET ");
                 for (int j=0;j<refMapping.getNumberOfDatastoreMappings();j++)
                 {
                     if (j > 0)
@@ -503,7 +503,7 @@ public class DeleteRequest extends Request
         boolean initialized = false;
 
         /** Where clause for the statement. Built during the consumption process. */
-        StringBuffer where = new StringBuffer();
+        StringBuilder where = new StringBuilder();
 
         /** Current parameter index. */
         int paramIndex = 1;

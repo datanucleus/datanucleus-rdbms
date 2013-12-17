@@ -216,7 +216,7 @@ public class SQLTypeInfo implements StoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("SQLTypeInfo : ");
+        StringBuilder str = new StringBuilder("SQLTypeInfo : ");
         str.append("  typeName          = " + getTypeName() + "\n");
         str.append("  jdbcTypeName      = " + JDBCUtils.getNameForJDBCType(getDataType()) + "\n");
         str.append("  dataType          = " + getDataType() + "\n");

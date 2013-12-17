@@ -452,7 +452,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("INSERT INTO ");
+                StringBuilder stmt = new StringBuilder("INSERT INTO ");
                 stmt.append(getContainerTable().toString());
                 stmt.append(" (");
                 for (int i = 0; i < getOwnerMapping().getNumberOfDatastoreMappings(); i++)
@@ -583,7 +583,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("DELETE FROM ");
+                StringBuilder stmt = new StringBuilder("DELETE FROM ");
                 stmt.append(getContainerTable().toString());
                 stmt.append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -701,7 +701,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             String containerAlias = "THIS";
             String joinedElementAlias = "ELEM";
-            StringBuffer stmt = new StringBuffer("SELECT COUNT(*) FROM ");
+            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ");
             stmt.append(getContainerTable().toString()).append(" ").append(containerAlias);
 
             // Add join to element table if required (only allows for 1 element table currently)
@@ -758,7 +758,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             {
                 // TODO Support more than one element table
                 // Add a discriminator filter for collections with an element discriminator
-                StringBuffer discrStmt = new StringBuffer();
+                StringBuilder discrStmt = new StringBuilder();
                 for (int i = 0; i < getElementInfo().length; i++)
                 {
                     if (getElementInfo()[i].getDiscriminatorMapping() != null)

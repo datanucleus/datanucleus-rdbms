@@ -379,7 +379,7 @@ public class ResultClassROF implements ResultObjectFactory
                 }
                 else
                 {
-                    StringBuffer str = new StringBuffer();
+                    StringBuilder str = new StringBuilder();
                     for (int i=0;i<stmtMappings.length;i++)
                     {
                         if (i > 0)
@@ -466,7 +466,7 @@ public class ResultClassROF implements ResultObjectFactory
             Constructor ctr = ClassUtils.getConstructorWithArguments(newMap.getObjectClass(), ctrArgTypes);
             if (ctr == null)
             {
-                StringBuffer str = new StringBuffer(newMap.getObjectClass().getName() + "(");
+                StringBuilder str = new StringBuilder(newMap.getObjectClass().getName() + "(");
                 for (int i=0;i<ctrArgTypes.length;i++)
                 {
                     str.append(ctrArgTypes[i].getName());

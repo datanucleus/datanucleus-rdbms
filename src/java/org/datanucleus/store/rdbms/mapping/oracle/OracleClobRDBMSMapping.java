@@ -120,7 +120,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
                 // Note: Using clob.stringValue() results in StoreManagerTest
                 // exception: "java.sql.SQLException: Conversion to String failed"
 
-                StringBuffer sbuf = new StringBuffer();
+                StringBuilder sbuf = new StringBuilder();
                 Reader reader = clob.getCharacterStream();
                 try
                 {

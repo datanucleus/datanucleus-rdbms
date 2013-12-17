@@ -418,7 +418,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (min != null)
         {
@@ -455,7 +455,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
-        StringBuffer stmt=new StringBuffer("CALL NEXT VALUE FOR ");
+        StringBuilder stmt=new StringBuilder("CALL NEXT VALUE FOR ");
         stmt.append(sequence_name);
 
         return stmt.toString();

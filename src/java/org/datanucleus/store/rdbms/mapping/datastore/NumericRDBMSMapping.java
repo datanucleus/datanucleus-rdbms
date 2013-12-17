@@ -84,7 +84,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
             {
                 column.getColumnMetaData().setLength(1);
 
-                StringBuffer constraints = new StringBuffer("CHECK (" + column.getIdentifier() + " IN (1,0)");
+                StringBuilder constraints = new StringBuilder("CHECK (" + column.getIdentifier() + " IN (1,0)");
                 if (column.isNullable())
                 {
                     constraints.append(" OR " + column.getIdentifier() + " IS NULL");

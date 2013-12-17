@@ -143,7 +143,7 @@ public abstract class JoinTable extends TableImpl
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             // Provide field->column mapping debug message
-            StringBuffer columnsStr = new StringBuffer();
+            StringBuilder columnsStr = new StringBuilder();
             for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
             {
                 if (i > 0)
@@ -156,7 +156,7 @@ public abstract class JoinTable extends TableImpl
             {
                 columnsStr.append("[none]");
             }
-            StringBuffer datastoreMappingTypes = new StringBuffer();
+            StringBuilder datastoreMappingTypes = new StringBuilder();
             for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
             {
                 if (i > 0)

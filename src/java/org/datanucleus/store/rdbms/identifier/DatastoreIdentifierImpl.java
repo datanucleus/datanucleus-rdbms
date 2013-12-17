@@ -217,7 +217,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
         String separator = dba.getCatalogSeparator();
 
         // Fully qualify the name with catalog/schema if required
-        StringBuffer name = new StringBuffer();
+        StringBuilder name = new StringBuilder();
 
         if (supportsCatalogName && catalogName != null)
         {

@@ -169,7 +169,7 @@ public class JDBCTypeInfo implements MapStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("JDBCTypeInfo : ");
+        StringBuilder str = new StringBuilder("JDBCTypeInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

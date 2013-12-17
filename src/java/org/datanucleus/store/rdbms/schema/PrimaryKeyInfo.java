@@ -160,7 +160,7 @@ public class PrimaryKeyInfo implements StoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str= new StringBuffer();
+        StringBuilder str= new StringBuilder();
         str.append(this.getClass().getName() + "\n");
         str.append("  tableCat    = " + getProperty("table_cat") + "\n");
         str.append("  tableSchem  = " + getProperty("table_schema") + "\n");

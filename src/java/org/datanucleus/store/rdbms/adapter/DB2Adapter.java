@@ -286,7 +286,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
         
-        StringBuffer stmt = new StringBuffer("CREATE SEQUENCE ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         stmt.append(" AS INTEGER ");
 
@@ -329,7 +329,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
-        StringBuffer stmt=new StringBuffer("VALUES NEXTVAL FOR ");
+        StringBuilder stmt=new StringBuilder("VALUES NEXTVAL FOR ");
         stmt.append(sequence_name);
 
         return stmt.toString();

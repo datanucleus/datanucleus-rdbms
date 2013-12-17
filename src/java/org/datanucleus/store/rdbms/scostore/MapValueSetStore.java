@@ -310,7 +310,7 @@ class MapValueSetStore extends AbstractSetStore
      */
     private String getFindKeyStmt()
     {
-        StringBuffer stmt = new StringBuffer("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)

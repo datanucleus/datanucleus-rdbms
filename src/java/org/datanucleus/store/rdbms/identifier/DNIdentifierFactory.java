@@ -539,7 +539,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             return null;
         }
 
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         char prev = '\0';
 
         for (int i = 0; i < javaName.length(); ++i)

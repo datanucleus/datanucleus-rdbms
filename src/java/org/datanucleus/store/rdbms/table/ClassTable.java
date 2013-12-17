@@ -504,7 +504,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             {
                                 // TODO Change this to reflect that we have updated the previous mapping
                                 // Provide field->column mapping debug message
-                                StringBuffer columnsStr = new StringBuffer();
+                                StringBuilder columnsStr = new StringBuilder();
                                 for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
                                 {
                                     if (i > 0)
@@ -517,7 +517,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 {
                                     columnsStr.append("[none]");
                                 }
-                                StringBuffer datastoreMappingTypes = new StringBuffer();
+                                StringBuilder datastoreMappingTypes = new StringBuilder();
                                 for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
                                 {
                                     if (i > 0)

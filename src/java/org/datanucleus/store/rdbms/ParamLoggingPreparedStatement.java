@@ -100,7 +100,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
      */
     public String getStatementWithParamsReplaced()
     {
-        StringBuffer statementWithParams = new StringBuffer();
+        StringBuilder statementWithParams = new StringBuilder();
         if (subStatements == null)
         {
             return getStatementWithParamsReplacedForSubStatement(currentStatement);
@@ -133,7 +133,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
      */
     private String getStatementWithParamsReplacedForSubStatement(SubStatement stParams)
     {
-        StringBuffer statementWithParams = new StringBuffer();
+        StringBuilder statementWithParams = new StringBuilder();
         StringTokenizer tokenizer = new StringTokenizer(stParams.statementText, "?", true);
 
         int i = 1;
@@ -167,7 +167,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         }
     }
 
-    private void appendParamValue(StringBuffer statementWithParams, final Object paramValue)
+    private void appendParamValue(StringBuilder statementWithParams, final Object paramValue)
     {
         if (paramAngleBrackets)
         {

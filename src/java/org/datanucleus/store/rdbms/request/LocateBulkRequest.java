@@ -264,7 +264,7 @@ public class LocateBulkRequest extends BulkRequest
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            StringBuffer str = new StringBuffer();
+            StringBuilder str = new StringBuilder();
             for (int i=0;i<ops.length;i++)
             {
                 if (i > 0)

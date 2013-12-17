@@ -291,7 +291,7 @@ public class FKArrayStore extends AbstractArrayStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
                     stmt.append("?");
@@ -438,7 +438,7 @@ public class FKArrayStore extends AbstractArrayStore
         {
             synchronized (this)
             {
-                StringBuffer stmt = new StringBuffer("UPDATE ");
+                StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
                     stmt.append("?");

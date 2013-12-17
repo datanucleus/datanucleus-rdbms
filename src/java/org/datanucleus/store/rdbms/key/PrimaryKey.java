@@ -72,7 +72,7 @@ public class PrimaryKey extends CandidateKey
      */
     public String toString()
     {
-        StringBuffer s = new StringBuffer("PRIMARY KEY ").append(getColumnList(columns));
+        StringBuilder s = new StringBuilder("PRIMARY KEY ").append(getColumnList(columns));
 
         return s.toString();
     }

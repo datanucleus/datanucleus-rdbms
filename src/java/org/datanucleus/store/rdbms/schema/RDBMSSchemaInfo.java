@@ -187,7 +187,7 @@ public class RDBMSSchemaInfo implements MapStoreSchemaData
      */
     public String toString()
     {
-        StringBuffer str = new StringBuffer("RDBMSSchemaInfo : ");
+        StringBuilder str = new StringBuilder("RDBMSSchemaInfo : ");
         Iterator iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {

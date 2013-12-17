@@ -119,7 +119,7 @@ public class MaxGenerator extends AbstractRDBMSGenerator
     private String getStatement()
     {
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
-        StringBuffer stmt = new StringBuffer();
+        StringBuilder stmt = new StringBuilder();
         stmt.append("SELECT max(");
         stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get("column-name")));
         stmt.append(") FROM ");

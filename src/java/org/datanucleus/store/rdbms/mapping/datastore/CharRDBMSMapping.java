@@ -114,7 +114,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             {
                 // With a Boolean we'll store it as "Y", "N" (see setBoolean/getBoolean methods)
                 column.getColumnMetaData().setLength(1);
-                StringBuffer constraints = new StringBuffer("CHECK (" + column.getIdentifier() + " IN ('Y','N')");
+                StringBuilder constraints = new StringBuilder("CHECK (" + column.getIdentifier() + " IN ('Y','N')");
                 if (column.isNullable())
                 {
                     constraints.append(" OR " + column.getIdentifier() + " IS NULL");

@@ -183,7 +183,7 @@ abstract class Key
      */
     public static String getColumnList(Collection cols)
     {
-        StringBuffer s = new StringBuffer("(");
+        StringBuilder s = new StringBuilder("(");
         Iterator i = cols.iterator();
         while (i.hasNext())
         {

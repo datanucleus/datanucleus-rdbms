@@ -297,7 +297,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
         if (op.isEmbedded())
         {
-            StringBuffer str = new StringBuffer();
+            StringBuilder str = new StringBuilder();
             if (mmds != null)
             {
                 for (int i=0;i<mmds.length;i++)

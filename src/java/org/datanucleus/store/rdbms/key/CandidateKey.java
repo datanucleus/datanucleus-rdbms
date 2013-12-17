@@ -92,7 +92,7 @@ public class CandidateKey extends Key
      **/
     public String toString()
     {
-        StringBuffer s = new StringBuffer("UNIQUE ").append(getColumnList(columns));
+        StringBuilder s = new StringBuilder("UNIQUE ").append(getColumnList(columns));
 
         return s.toString();
     }
