@@ -103,7 +103,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JPQLQuery extends AbstractJPQLQuery
 {
-    /** Extension for how to handle multivalued fields. Support values of "none" and "bulk-fetch" (default). */
+    /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
@@ -908,12 +908,13 @@ public class JPQLQuery extends AbstractJPQLQuery
                     String multifetchType = getStringExtensionProperty(EXTENSION_MULTIVALUED_FETCH, null);
                     if (multifetchType == null)
                     {
-                        // We currently default to not loading multi-valued fields, so advise the user of the presence of bulk-fetch
-                        NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + 
-                            " marked in the FetchPlan, yet this is not fetched by this query." + 
-                            " You can enable 'bulk-fetch' to fetch this in a single call (add query extension '" + EXTENSION_MULTIVALUED_FETCH + "' set to 'bulk-fetch')");
+                        // Default to bulk-fetch, so advise the user of why this is happening and how to turn it off
+                        NucleusLogger.QUERY.debug("You have selected field " + fpMmd.getFullFieldName() + " for fetching by this query. We will fetch it using bulk-fetch." +
+                            " To disable this set the query extension/hint '" + EXTENSION_MULTIVALUED_FETCH + "' as 'none' or remove the field from the query FetchPlan" +
+                            " If this bulk-fetch generates an invalid or unoptimised query, please report it with a way of reproducing it");
+                        multifetchType = "bulk-fetch";
                     }
-                    else if (multifetchType.equalsIgnoreCase("bulk-fetch"))
+                    if (multifetchType.equalsIgnoreCase("bulk-fetch"))
                     {
                         if (fpMmd.hasCollection())
                         {
