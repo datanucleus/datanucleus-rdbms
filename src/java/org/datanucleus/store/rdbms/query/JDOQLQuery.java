@@ -719,7 +719,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                         if (datastoreCompilation.getStatementParameters() != null)
                                         {
                                             BulkFetchHelper helper = new BulkFetchHelper(this);
-                                            helper.applyParametersToStatement(psSco, ec, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
+                                            helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
                                         }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
@@ -1064,7 +1064,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             {
                                 // Fetch collection elements for all candidate owners
                                 BulkFetchHelper helper = new BulkFetchHelper(this);
-                                IteratorStatement iterStmt = helper.getSQLStatementForContainerFieldBatch(ec, candidateCmd, parameters, fpMmd, datastoreCompilation);
+                                IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation);
                                 if (iterStmt != null)
                                 {
                                     datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);

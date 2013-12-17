@@ -55,6 +55,15 @@ import org.datanucleus.store.scostore.Store;
 
 /**
  * Helper class to generate the necessary statement for multi-valued field bulk-fetch.
+ * In simple terms if we have a query with resultant SQL like
+ * <pre>SELECT COL1, COL2, COL3, ... FROM CANDIDATE_TBL T1 WHERE T1.COL2 = value</pre>
+ * then to retrieve a multi-valued collection field of the candidate class it generates an SQL like
+ * <pre>SELECT ELEM.COL1, ELEM.COL2, ... FROM ELEMENT_TBL ELEM WHERE EXISTS (
+ * SELECT T1.ID FROM CANDIDATE_TBL T1 WHERE T1.COL2 = value AND ELEM.OWNER_ID = T1.ID)</pre>
+ * Obviously there are differences when using a join-table, or when the elements are embedded into the join-table, but the
+ * basic idea is we generate an iterator statement for the elements (just like the backing store normally would) except
+ * instead of restricting the statement to just a particular owner, it adds an EXISTS clause with the query as the exists
+ * subquery).
  */
 public class BulkFetchHelper
 {
@@ -67,17 +76,17 @@ public class BulkFetchHelper
 
     /**
      * Convenience method to generate a bulk-fetch statement for the specified multi-valued field of the owning query.
-     * @param ec ExecutionContext
      * @param candidateCmd Metadata for the candidate
      * @param parameters Parameters for the query
      * @param mmd Metadata for the multi-valued field
      * @param datastoreCompilation The datastore compilation of the query
      * @return The bulk-fetch statement for retrieving this multi-valued field.
      */
-    public IteratorStatement getSQLStatementForContainerFieldBatch(ExecutionContext ec, AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd,
+    public IteratorStatement getSQLStatementForContainerField(AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd,
             RDBMSQueryCompilation datastoreCompilation)
     {
         IteratorStatement iterStmt = null;
+        ExecutionContext ec = query.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         RDBMSStoreManager storeMgr = (RDBMSStoreManager) query.getStoreManager();
         Store backingStore = storeMgr.getBackingStoreForField(clr, mmd, null);
@@ -118,14 +127,14 @@ public class BulkFetchHelper
 
         if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore || backingStore instanceof JoinArrayStore)
         {
-            // Generate an iterator query of the form
+            // Set/List/array using join-table : Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
             // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
             SQLStatement sqlStmt = iterStmt.getSQLStatement();
             JoinTable joinTbl = (JoinTable)sqlStmt.getPrimaryTable().getTable();
             JavaTypeMapping joinOwnerMapping = joinTbl.getOwnerMapping();
 
-            // Generate the EXISTS subquery (based on the JDOQL query)
+            // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
             Set<String> options = new HashSet<String>();
@@ -152,12 +161,12 @@ public class BulkFetchHelper
         }
         else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore || backingStore instanceof FKArrayStore)
         {
-            // Generate an iterator query of the form
+            // Set/List/array using foreign-key : Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
             // WHERE EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND ELEM_TBL.OWNER_ID = OWNER_TBL.ID)
             SQLStatement sqlStmt = iterStmt.getSQLStatement();
 
-            // Generate the EXISTS subquery (based on the JDOQL query)
+            // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
             Set<String> options = new HashSet<String>();
@@ -198,12 +207,11 @@ public class BulkFetchHelper
      * Convenience method to apply the passed parameters to the provided bulk-fetch statement.
      * Takes care of applying parameters across any UNIONs of elements.
      * @param ps PreparedStatement
-     * @param ec ExecutionContext
      * @param datastoreCompilation The datastore compilation for the query itself
      * @param sqlStmt The bulk-fetch iterator statement
      * @param parameters The map of parameters passed in to the query
      */
-    public void applyParametersToStatement(PreparedStatement ps, ExecutionContext ec, RDBMSQueryCompilation datastoreCompilation, SQLStatement sqlStmt, Map parameters)
+    public void applyParametersToStatement(PreparedStatement ps, RDBMSQueryCompilation datastoreCompilation, SQLStatement sqlStmt, Map parameters)
     {
         Map<Integer, String> stmtParamNameByPosition = null;
         List<SQLStatementParameter> stmtParams = null;
@@ -226,7 +234,7 @@ public class BulkFetchHelper
                 }
             }
 
-            SQLStatementHelper.applyParametersToStatement(ps, ec, stmtParams, stmtParamNameByPosition, parameters);
+            SQLStatementHelper.applyParametersToStatement(ps, query.getExecutionContext(), stmtParams, stmtParamNameByPosition, parameters);
         }
     }
 }
