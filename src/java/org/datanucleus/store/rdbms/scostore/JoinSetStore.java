@@ -247,7 +247,7 @@ public class JoinSetStore extends AbstractSetStore
             // The field is already a SCO wrapper so just query it
             if (((SCOMtoN)elementColl).contains(ownerOP.getObject()))
             {
-                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), element));
+                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
@@ -260,7 +260,7 @@ public class JoinSetStore extends AbstractSetStore
             // have SCO's to use contains() on
             if (locate(ownerOP, element))
             {
-                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), element));
+                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
