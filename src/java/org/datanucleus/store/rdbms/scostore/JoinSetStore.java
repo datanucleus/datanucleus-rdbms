@@ -245,7 +245,8 @@ public class JoinSetStore extends AbstractSetStore
         if (elementColl != null && elementColl instanceof SCOMtoN)
         {
             // The field is already a SCO wrapper so just query it
-            if (((SCOMtoN)elementColl).contains(ownerOP.getObject()))
+            // TODO Maybe this check should only apply when not the OWNER of the relation
+            if (((SCOMtoN)elementColl).contains(ownerOP.getObject())/* && ownerMemberMetaData.getMappedBy() != null*/)
             {
                 NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
