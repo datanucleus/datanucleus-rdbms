@@ -311,6 +311,7 @@ public class JoinSetStore extends AbstractSetStore
         boolean toBeInserted = true;
         if (relationType == RelationType.MANY_TO_MANY_BI)
         {
+            // TODO Why not just return if this is the non-owner side?
             // This is an M-N relation so we need to check if the element already has us in its collection
             // to avoid duplicate join table entries
             toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);

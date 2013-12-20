@@ -182,6 +182,12 @@ public class JoinListStore extends AbstractListStore
             return true;
         }
 
+        if (relationType == RelationType.MANY_TO_MANY_BI && ownerMemberMetaData.getMappedBy() != null)
+        {
+            // M-N non-owner : don't add from this side to avoid duplicates
+            return true;
+        }
+
         // Calculate the amount we need to shift any existing elements by
         // This is used where inserting between existing elements and have to shift down all elements after the start point
         int shift = c.size();
