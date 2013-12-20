@@ -27,6 +27,7 @@ import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.PrimaryKeyMetaData;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -115,9 +116,10 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             elementMapping = ColumnCreator.createColumnsForJoinTables(elementClass, mmd, 
                 elemColmd, storeMgr, this, false, false, FieldRole.ROLE_COLLECTION_ELEMENT, clr);
 
-            if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()))
+            RelationType relationType = mmd.getRelationType(clr);
+            if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()) && relationType != RelationType.MANY_TO_MANY_BI)
             {
-                // Make all element col(s) nullable so we can store null elements
+                // 1-N : Make all element col(s) nullable so we can store null elements
                 for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = elementMapping.getDatastoreMapping(i).getColumn();
