@@ -21,6 +21,7 @@ package org.datanucleus.store.rdbms.table;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ElementMetaData;
@@ -140,6 +141,13 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             {
                 // Indexed Collection with <order>, so add index mapping
                 orderRequired = true;
+
+                RelationType relType = mmd.getRelationType(clr);
+                if (relType == RelationType.MANY_TO_MANY_BI)
+                {
+                    // Don't support M-N using indexed List
+                    throw new NucleusUserException(LOCALISER.msg("020002", mmd.getFullFieldName())).setFatal();
+                }
             }
         }
         else if (List.class.isAssignableFrom(mmd.getType()))
