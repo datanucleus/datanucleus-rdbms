@@ -49,6 +49,8 @@ import org.datanucleus.util.NucleusLogger;
  * <li><B>orderMapping</B> which may be null, or otherwise stores an index for the elements.
  * This is either to provide uniqueness or ordering in a List (and part of the PK).</li>
  * </ul>
+ * Note that with an M-N relation there will be 2 instances of the CollectionTable - one represents the relation
+ * from owner to element, and the other for the relation from element to owner.
  * </p>
  */
 public class CollectionTable extends ElementContainerTable implements DatastoreElementContainer
@@ -109,8 +111,10 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 // Column mappings defined at other side (M-N) on <join>
                 elemColmd = relatedMmds[0].getJoinMetaData().getColumnMetaData();
             }
+
             elementMapping = ColumnCreator.createColumnsForJoinTables(elementClass, mmd, 
                 elemColmd, storeMgr, this, false, false, FieldRole.ROLE_COLLECTION_ELEMENT, clr);
+
             if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()))
             {
                 // Make all element col(s) nullable so we can store null elements
