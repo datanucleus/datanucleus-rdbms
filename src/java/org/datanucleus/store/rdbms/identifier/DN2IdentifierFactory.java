@@ -23,6 +23,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 
 /**
@@ -81,6 +82,19 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
     {
         if (destinationId != null)
         {
+            RelationType relType = ownerFmd.getRelationType(clr);
+            if (relType == RelationType.MANY_TO_MANY_BI && ownerFmd.hasCollection() && ownerFmd.getMappedBy() != null)
+            {
+                // M-N join table at non-owner side : need to swap the terminations that are assigned by fieldRole
+                if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
+                {
+                    fieldRole = FieldRole.ROLE_OWNER;
+                }
+                else if (fieldRole == FieldRole.ROLE_OWNER)
+                {
+                    fieldRole = FieldRole.ROLE_COLLECTION_ELEMENT;
+                }
+            }
             return newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole);
         }
         else
