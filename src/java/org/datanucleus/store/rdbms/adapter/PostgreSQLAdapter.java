@@ -492,6 +492,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      */
     public String getRangeByLimitEndOfStatementClause(long offset, long count)
     {
+        // TODO PostgreSQL supports SQL 2008 standard OFFSET/FETCH keywords now (see DerbyAdapter/MSSQLServerAdapter for required code)
         String str = "";
         if (count > 0)
         {

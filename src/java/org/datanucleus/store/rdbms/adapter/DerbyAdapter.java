@@ -391,37 +391,21 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         {
             return super.getRangeByLimitEndOfStatementClause(offset, count);
         }
-
-        if (offset >= 0 && count > 0)
-        {
-            if (count > 1)
-            {
-                return "OFFSET " + offset + " ROWS FETCH NEXT " + count + " ROWS ONLY ";
-            }
-            else
-            {
-                return "OFFSET " + offset + " ROWS FETCH NEXT ROW ONLY ";
-            }
-        }
-        else if (offset <= 0 && count > 0)
-        {
-            if (count > 1)
-            {
-                return "FETCH NEXT " + count + " ROWS ONLY ";
-            }
-            else
-            {
-                return "FETCH NEXT ROW ONLY ";
-            }
-        }
-        else if (offset >= 0 && count < 0)
-        {
-            return "OFFSET " + offset + " ROWS ";
-        }
-        else
+        else if (offset <= 0 && count <= 0)
         {
             return "";
         }
+
+        StringBuilder str = new StringBuilder();
+        if (offset > 0)
+        {
+            str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
+        }
+        if (count > 0)
+        {
+            str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
+        }
+        return str.toString();
     }
 
     // ---------------------------- Sequence Support ---------------------------
