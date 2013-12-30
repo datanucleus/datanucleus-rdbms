@@ -378,6 +378,52 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         return false;
     }
 
+    /**
+     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle
+     * restriction of ranges using the OFFSET/FETCH keywords.
+     * @param offset The offset to return from
+     * @param count The number of items to return
+     * @return The SQL to append to allow for ranges using OFFSET/FETCH.
+     */
+    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    {
+        if (datastoreMajorVersion < 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion < 5))
+        {
+            return super.getRangeByLimitEndOfStatementClause(offset, count);
+        }
+
+        if (offset >= 0 && count > 0)
+        {
+            if (count > 1)
+            {
+                return "OFFSET " + offset + " ROWS FETCH NEXT " + count + " ROWS ONLY ";
+            }
+            else
+            {
+                return "OFFSET " + offset + " ROWS FETCH NEXT ROW ONLY ";
+            }
+        }
+        else if (offset <= 0 && count > 0)
+        {
+            if (count > 1)
+            {
+                return "FETCH NEXT " + count + " ROWS ONLY ";
+            }
+            else
+            {
+                return "FETCH NEXT ROW ONLY ";
+            }
+        }
+        else if (offset >= 0 && count < 0)
+        {
+            return "OFFSET " + offset + " ROWS ";
+        }
+        else
+        {
+            return "";
+        }
+    }
+
     // ---------------------------- Sequence Support ---------------------------
 
     /**
