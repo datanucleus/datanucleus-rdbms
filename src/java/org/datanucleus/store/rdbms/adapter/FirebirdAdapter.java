@@ -110,4 +110,32 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
 
         return stmt.toString();
     }
+
+    /**
+     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle
+     * restriction of ranges using the ROWS keyword.
+     * @param offset The offset to return from
+     * @param count The number of items to return
+     * @return The SQL to append to allow for ranges using ROWS.
+     */
+    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    {
+        if (offset >= 0 && count > 0)
+        {
+            return "ROWS " + offset + " TO " + (offset+count) + " ";
+        }
+        else if (offset <= 0 && count > 0)
+        {
+            return "ROWS 1 TO " + count + " ";
+        }
+        else if (offset >= 0 && count < 0)
+        {
+            // MySQL doesnt allow just offset so use Long.MAX_VALUE as count
+            return "ROWS " + offset + " ";
+        }
+        else
+        {
+            return "";
+        }
+    }
 }
