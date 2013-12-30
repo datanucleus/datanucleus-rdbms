@@ -130,7 +130,6 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         }
         else if (offset >= 0 && count < 0)
         {
-            // MySQL doesnt allow just offset so use Long.MAX_VALUE as count
             return "ROWS " + offset + " ";
         }
         else
