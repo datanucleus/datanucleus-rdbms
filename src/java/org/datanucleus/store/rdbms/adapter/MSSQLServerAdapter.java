@@ -27,6 +27,7 @@ import java.sql.Statement;
 import java.sql.Types;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
@@ -44,6 +45,8 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Provides methods for adapting SQL language elements to the Microsoft SQL Server database.
+ * Note that majorVersion from JDBC doesn't align to version number of SQLServer.
+ * 1995 = "6", 1998 = "7", 2000/2003 = "8", 2005 = "9", 2008 = "10", 2012 = "11"
  *
  * @see BaseDatastoreAdapter
  */
@@ -104,16 +107,22 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_OPTION_PLACED_WITHIN_JOIN);
         supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
-        // TODO ORDERBY_NULLS_DIRECTIVES is supported in SQLServer 2012 and later (what is majorVersion for that?)
+
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
-
         supportedOptions.remove(FK_DELETE_ACTION_DEFAULT);
         supportedOptions.remove(FK_DELETE_ACTION_RESTRICT);
         supportedOptions.remove(FK_DELETE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_DEFAULT);
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
+
+        if (datastoreMajorVersion >= 11)
+        {
+            // SQLServer 2012+ support these features
+            supportedOptions.add(SEQUENCES);
+            supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
+        }
     }
 
     /**
@@ -518,5 +527,85 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
             str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
         }
         return str.toString();
+    }
+
+    /**
+     * Accessor for the sequence statement to create the sequence.
+     * @param sequence_name Name of the sequence 
+     * @param min Minimum value for the sequence
+     * @param max Maximum value for the sequence
+     * @param start Start value for the sequence
+     * @param increment Increment value for the sequence
+     * @param cache_size Cache size for the sequence
+     * @return The statement for getting the next id from the sequence
+     */
+    public String getSequenceCreateStmt(String sequence_name,
+            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    {
+        if (datastoreMajorVersion < 11)
+        {
+            // Not supported prior to SQLServer 2012
+            return super.getSequenceCreateStmt(sequence_name, min, max, start, increment, cache_size);
+        }
+
+        if (sequence_name == null)
+        {
+            throw new NucleusUserException(LOCALISER.msg("051028"));
+        }
+
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
+        stmt.append(sequence_name);
+        if (start != null)
+        {
+            stmt.append(" START WITH " + start);
+        }
+        if (increment != null)
+        {
+            stmt.append(" INCREMENT BY " + increment);
+        }
+        if (min != null)
+        {
+            stmt.append(" MINVALUE " + min);
+        }
+        if (max != null)
+        {
+            stmt.append(" MAXVALUE " + max);
+        }
+        if (cache_size != null)
+        {
+            stmt.append(" CACHE " + cache_size);
+        }
+        else
+        {
+            stmt.append(" CACHE 1");
+        }
+
+        return stmt.toString();
+    }
+
+    /**
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequence_name Name of the sequence 
+     * @return The statement for getting the next id for the sequence
+     **/
+    public String getSequenceNextStmt(String sequence_name)
+    {
+        if (datastoreMajorVersion < 11)
+        {
+            // Not supported prior to SQLServer 2012
+            return super.getSequenceNextStmt(sequence_name);
+        }
+
+        if (sequence_name == null)
+        {
+            throw new NucleusUserException(LOCALISER.msg("051028"));
+        }
+
+        // Do we need to quote the sequence name here?
+        StringBuilder stmt = new StringBuilder("SELECT NEXT VALUE FOR '");
+        stmt.append(sequence_name);
+        stmt.append("'");
+
+        return stmt.toString();
     }
 }
