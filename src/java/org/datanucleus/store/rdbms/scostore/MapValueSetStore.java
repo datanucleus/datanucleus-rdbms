@@ -57,6 +57,7 @@ import org.datanucleus.util.ClassUtils;
 
 /**
  * RDBMS-specific implementation of a SetStore for map values.
+ * TODO This should be CollectionStore rather than the more specific SetStore
  */
 class MapValueSetStore extends AbstractSetStore
 {

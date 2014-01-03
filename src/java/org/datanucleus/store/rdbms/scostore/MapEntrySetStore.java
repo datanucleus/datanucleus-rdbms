@@ -163,18 +163,18 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param sm ObjectProvider of the object
+     * @param op ObjectProvider of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider sm, Collection coll)
+    public void update(ObjectProvider op, Collection coll)
     {
         // Crude update - remove existing and add new!
         // TODO Update this to just remove what is not needed, and add what is really new
-        clear(sm);
-        addAll(sm, coll, 0);
+        clear(op);
+        addAll(op, coll, 0);
     }
 
-    public boolean contains(ObjectProvider sm, Object element)
+    public boolean contains(ObjectProvider op, Object element)
     {
         if (!validateElementType(element))
         {
@@ -182,16 +182,16 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         }
         Entry entry = (Entry)element;
 
-        return mapStore.containsKey(sm, entry.getKey());
+        return mapStore.containsKey(op, entry.getKey());
     }
 
     /**
      * Method to add an entry to the Map.
-     * @param sm ObjectProvider for the owner
+     * @param op ObjectProvider for the owner
      * @param element Entry to add
      * @return Whether it was added
      */
-    public boolean add(ObjectProvider sm, Object element, int size)
+    public boolean add(ObjectProvider op, Object element, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its entry set");
     }
@@ -209,11 +209,11 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
 
     /**
      * Method to remove an entry from the Map.
-     * @param sm ObjectProvider for the owner
+     * @param op ObjectProvider for the owner
      * @param element Entry to remove
      * @return Whether it was removed
      */
-    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementType(element))
         {
@@ -221,7 +221,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         }
 
         Entry entry = (Entry)element;
-        Object removed = mapStore.remove(sm, entry.getKey());
+        Object removed = mapStore.remove(op, entry.getKey());
 
         // NOTE: this may not return an accurate result if a null value is being removed
         return removed == null ? entry.getValue() == null : removed.equals(entry.getValue());
@@ -229,11 +229,11 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
 
     /**
      * Method to remove entries from the Map.
-     * @param sm ObjectProvider for the owner
+     * @param op ObjectProvider for the owner
      * @param elements Entries to remove
      * @return Whether they were removed
      */
-    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+    public boolean removeAll(ObjectProvider op, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -247,7 +247,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
             Object element=iter.next();
             Entry entry = (Entry)element;
 
-            Object removed = mapStore.remove(sm, entry.getKey());
+            Object removed = mapStore.remove(op, entry.getKey());
 
             // NOTE: this may not return an accurate result if a null value is being removed.
             modified = removed == null ? entry.getValue() == null : removed.equals(entry.getValue());
@@ -258,11 +258,11 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
 
     /**
      * Method to clear the Map.
-     * @param sm ObjectProvider for the owner.
+     * @param op ObjectProvider for the owner.
      */
-    public void clear(ObjectProvider sm)
+    public void clear(ObjectProvider op)
     {
-        mapStore.clear(sm);
+        mapStore.clear(op);
     }
 
     public MapStore getMapStore()
@@ -280,14 +280,14 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         return valueMapping;
     }
 
-    public int size(ObjectProvider sm)
+    public int size(ObjectProvider op)
     {
         int numRows;
 
         String stmt = getSizeStmt();
         try
         {
-            ExecutionContext ec = sm.getExecutionContext();
+            ExecutionContext ec = op.getExecutionContext();
 
             ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
@@ -297,7 +297,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
                 try
                 {
                     int jdbcPosition = 1;
-                    BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                    BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
@@ -404,7 +404,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        AbstractMemberMetaData ownerMemberMetaData = null;
+                        AbstractMemberMetaData ownerMemberMetaData = mapStore.getOwnerMemberMetaData();
                         if (mapTable instanceof JoinTable)
                         {
                             ownerMemberMetaData = ((JoinTable) mapTable).getOwnerMemberMetaData();
@@ -468,6 +468,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         sqlStmt.setClassLoaderResolver(clr);
 
         // Select the key mapping
+        // TODO If key is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForKey = sqlStmt.getPrimaryTable();
         if (keyMapping.getTable() != sqlStmt.getPrimaryTable().getTable())
         {
@@ -483,6 +484,7 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         iteratorKeyResultCols = sqlStmt.select(entrySqlTblForKey, keyMapping, null);
 
         // Select the value mapping
+        // TODO If value is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForVal = sqlStmt.getPrimaryTable();
         if (valueMapping.getTable() != sqlStmt.getPrimaryTable().getTable())
         {
@@ -553,18 +555,18 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
         private final MapEntrySetStore setStore;
 
         /**
-         * Constructor for iterating the Set of entry.
-         * @param sm the ObjectProvider
+         * Constructor for iterating the Set of entries.
+         * @param op the ObjectProvider
          * @param rs the ResultSet
          * @param setStore the set store
-         * @param ownerMmd the owner member meta data - can be null
+         * @param ownerMmd the owner member meta data - can be null (for non-joinTable cases)
          * @throws MappedDatastoreException
          */
-        protected SetIterator(ObjectProvider sm, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
+        protected SetIterator(ObjectProvider op, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
                 ResultSet rs, int[] keyResultCols, int[] valueResultCols) throws MappedDatastoreException
         {
-            this.sm = sm;
-            this.ec = sm.getExecutionContext();
+            this.sm = op;
+            this.ec = op.getExecutionContext();
             this.setStore = setStore;
 
             ArrayList results = new ArrayList();
@@ -579,31 +581,33 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
                     ownerFieldNum = ownerMmd.getAbsoluteFieldNumber();
                 }
 
+                // TODO If key is persistable and has inheritance, use discriminator to determine type
                 JavaTypeMapping keyMapping = setStore.getKeyMapping();
                 if (keyMapping instanceof EmbeddedKeyPCMapping ||
                     keyMapping instanceof SerialisedPCMapping ||
                     keyMapping instanceof SerialisedReferenceMapping)
                 {
-                    key = keyMapping.getObject(ec, rs, keyResultCols, sm, ownerFieldNum);
+                    key = keyMapping.getObject(ec, rs, keyResultCols, op, ownerFieldNum);
                 }
                 else
                 {
                     key = keyMapping.getObject(ec, rs, keyResultCols);
                 }
 
+                // TODO If value is persistable and has inheritance, use discriminator to determine type
                 JavaTypeMapping valueMapping = setStore.getValueMapping();
                 if (valueMapping instanceof EmbeddedValuePCMapping ||
                     valueMapping instanceof SerialisedPCMapping ||
                     valueMapping instanceof SerialisedReferenceMapping)
                 {
-                    value = valueMapping.getObject(ec, rs, valueResultCols, sm, ownerFieldNum);
+                    value = valueMapping.getObject(ec, rs, valueResultCols, op, ownerFieldNum);
                 }
                 else
                 {
                     value = valueMapping.getObject(ec, rs, valueResultCols);
                 }
 
-                results.add(new EntryImpl(sm, key, value, setStore.getMapStore()));
+                results.add(new EntryImpl(op, key, value, setStore.getMapStore()));
             }
 
             delegate = results.iterator();
@@ -638,24 +642,18 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
     }
 
     /**
-     * Inner class representing the entry.
-     **/
+     * Inner class representing the entry in the map.
+     */
     private static class EntryImpl implements Entry
     {
-        private final ObjectProvider sm;
+        private final ObjectProvider ownerOP;
         private final Object key;
         private final Object value;
         private final MapStore mapStore;
 
-        /**
-         * Entry constructor
-         * @param sm the ObjectProvider
-         * @param key the key
-         * @param value the value
-         */
-        public EntryImpl(ObjectProvider sm, Object key, Object value, MapStore mapStore)
+        public EntryImpl(ObjectProvider op, Object key, Object value, MapStore mapStore)
         {
-            this.sm = sm;
+            this.ownerOP = op;
             this.key = key;
             this.value = value;
             this.mapStore = mapStore;
@@ -682,32 +680,17 @@ class MapEntrySetStore extends BaseContainerStore implements SetStore
                    (value == null ? e.getValue() == null : value.equals(e.getValue()));
         }
 
-        /**
-         * Accessor for the Key.
-         * @return The Key.
-         **/
         public Object getKey()
         {
             return key;
         }
-
-        /**
-         * Accessor for the Value.
-         * @return The Value.
-         **/
         public Object getValue()
         {
             return value;
         }
-
-        /**
-         * Mutator for the Value.
-         * @param value The Value.
-         * @return the previous value, or <code>null</code> if none.
-         **/
         public Object setValue(Object value)
         {
-            return mapStore.put(sm, key, value);
+            return mapStore.put(ownerOP, key, value);
         }
     }
 }
