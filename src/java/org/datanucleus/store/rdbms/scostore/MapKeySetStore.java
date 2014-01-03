@@ -262,13 +262,13 @@ class MapKeySetStore extends AbstractSetStore
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new SetStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
                         else
                         {
                             rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null,
                                         clr.classForName(elementType));
-                            return new SetStoreIterator(ownerOP, rs, rof, this);
+                            return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
                     finally

@@ -56,10 +56,9 @@ import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.util.ClassUtils;
 
 /**
- * RDBMS-specific implementation of a SetStore for map values.
- * TODO This should be CollectionStore rather than the more specific SetStore
+ * RDBMS-specific implementation of a CollectionStore for map values.
  */
-class MapValueSetStore extends AbstractSetStore
+class MapValueCollectionStore extends AbstractCollectionStore
 {
     protected final MapStore mapStore;
 
@@ -83,7 +82,7 @@ class MapValueSetStore extends AbstractSetStore
      * @param clr The ClassLoaderResolver
      * @param storeMgr Manager for the datastore
      */
-    MapValueSetStore(MapTable mapTable, MapStore mapStore, ClassLoaderResolver clr)
+    MapValueCollectionStore(MapTable mapTable, MapStore mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -116,7 +115,7 @@ class MapValueSetStore extends AbstractSetStore
      * @param valueMapping mapping to the key/value
      * @param ownerMmd Metadata for the owning member
      */
-    MapValueSetStore(DatastoreClass mapTable, MapStore mapStore, ClassLoaderResolver clr, 
+    MapValueCollectionStore(DatastoreClass mapTable, MapStore mapStore, ClassLoaderResolver clr, 
         JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, AbstractMemberMetaData ownerMmd)
     {
         super(mapTable.getStoreManager(), clr);
@@ -376,13 +375,13 @@ class MapValueSetStore extends AbstractSetStore
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new SetStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
                         else
                         {
                             rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null,
                                         clr.classForName(elementType));
-                            return new SetStoreIterator(ownerOP, rs, rof, this);
+                            return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
                     finally

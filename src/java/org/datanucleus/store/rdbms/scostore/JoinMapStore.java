@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
+import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
@@ -84,7 +85,7 @@ public class JoinMapStore extends AbstractMapStore
     private StatementParameterMapping getMappingParams = null;
 
     private SetStore keySetStore = null;
-    private SetStore valueSetStore = null;
+    private CollectionStore valueSetStore = null;
     private SetStore entrySetStore = null;
     
     /**
@@ -468,12 +469,12 @@ public class JoinMapStore extends AbstractMapStore
     /**
      * Accessor for the values in the Map.
      * @return The values.
-     **/
-    public synchronized SetStore valueSetStore()
+     */
+    public synchronized CollectionStore valueCollectionStore()
     {
         if (valueSetStore == null)
         {
-            valueSetStore = newMapValueSetStore();
+            valueSetStore = newMapValueCollectionStore();
         }
         return valueSetStore;
     }
@@ -959,9 +960,9 @@ public class JoinMapStore extends AbstractMapStore
         return new MapKeySetStore((MapTable)mapTable, this, clr);
     }
 
-    protected SetStore newMapValueSetStore()
+    protected CollectionStore newMapValueCollectionStore()
     {
-        return new MapValueSetStore((MapTable)mapTable, this, clr);
+        return new MapValueCollectionStore((MapTable)mapTable, this, clr);
     }
 
     protected SetStore newMapEntrySetStore()

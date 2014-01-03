@@ -64,6 +64,7 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.JoinTable;
+import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
@@ -929,9 +930,9 @@ public class FKMapStore extends AbstractMapStore
      * Accessor for the values in the Map.
      * @return The values.
      */
-    public synchronized SetStore valueSetStore()
+    public synchronized CollectionStore valueCollectionStore()
     {
-        return new MapValueSetStore(valueTable, this, clr, ownerMapping, valueMapping, ownerMemberMetaData);
+        return new MapValueCollectionStore(valueTable, this, clr, ownerMapping, valueMapping, ownerMemberMetaData);
     }
 
     /**

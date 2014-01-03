@@ -35,63 +35,63 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * RDBMS-specific implementation of {@link Iterator} for Sets.
+ * RDBMS-specific implementation of {@link Iterator} for Collections/Sets.
  */
-class SetStoreIterator implements Iterator
+class CollectionStoreIterator implements Iterator
 {
-    private final AbstractSetStore abstractSetStore;
+    private final AbstractCollectionStore collStore;
     private final ObjectProvider op;
     private final ExecutionContext ec;
     private final Iterator delegate;
     private Object lastElement = null;
 
-    SetStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractSetStore setStore)
+    CollectionStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore store)
         throws MappedDatastoreException
     {
         this.op = op;
         this.ec = op.getExecutionContext();
-        this.abstractSetStore = setStore;
+        this.collStore = store;
         ArrayList results = new ArrayList();
         if (rs != null)
         {
             while (next(rs))
             {
                 Object nextElement;
-                if (abstractSetStore.elementsAreEmbedded || abstractSetStore.elementsAreSerialised)
+                if (collStore.elementsAreEmbedded || collStore.elementsAreSerialised)
                 {
-                    int param[] = new int[abstractSetStore.elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[collStore.elementMapping.getNumberOfDatastoreMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
                     }
 
-                    if (abstractSetStore.elementMapping instanceof SerialisedPCMapping ||
-                        abstractSetStore.elementMapping instanceof SerialisedReferenceMapping ||
-                        abstractSetStore.elementMapping instanceof EmbeddedElementPCMapping)
+                    if (collStore.elementMapping instanceof SerialisedPCMapping ||
+                        collStore.elementMapping instanceof SerialisedReferenceMapping ||
+                        collStore.elementMapping instanceof EmbeddedElementPCMapping)
                     {
                         // Element = Serialised
                         int ownerFieldNumber = -1;
-                        if (abstractSetStore.containerTable != null)
+                        if (collStore.containerTable != null)
                         {
-                            ownerFieldNumber = getOwnerMemberMetaData(abstractSetStore.containerTable).getAbsoluteFieldNumber();
+                            ownerFieldNumber = getOwnerMemberMetaData(collStore.containerTable).getAbsoluteFieldNumber();
                         }
-                        nextElement = abstractSetStore.elementMapping.getObject(ec, rs, param, op, ownerFieldNumber);
+                        nextElement = collStore.elementMapping.getObject(ec, rs, param, op, ownerFieldNumber);
                     }
                     else
                     {
                         // Element = Non-PC
-                        nextElement = abstractSetStore.elementMapping.getObject(ec, rs, param);
+                        nextElement = collStore.elementMapping.getObject(ec, rs, param);
                     }
                 }
-                else if (abstractSetStore.elementMapping instanceof ReferenceMapping)
+                else if (collStore.elementMapping instanceof ReferenceMapping)
                 {
                     // Element = Reference (Interface/Object)
-                    int param[] = new int[abstractSetStore.elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[collStore.elementMapping.getNumberOfDatastoreMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
                     }
-                    nextElement = abstractSetStore.elementMapping.getObject(ec, rs, param);
+                    nextElement = collStore.elementMapping.getObject(ec, rs, param);
                 }
                 else
                 {
@@ -124,7 +124,7 @@ class SetStoreIterator implements Iterator
             throw new IllegalStateException("No entry to remove");
         }
 
-        abstractSetStore.remove(op, lastElement, -1, true);
+        collStore.remove(op, lastElement, -1, true);
         delegate.remove();
 
         lastElement = null;

@@ -970,18 +970,18 @@ public class JoinSetStore extends AbstractSetStore
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new SetStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new SetStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
                         else
                         {
                             ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
                                 iteratorMappingClass, false, null, clr.classForName(elementType));
-                            return new SetStoreIterator(ownerOP, rs, rof, this);
+                            return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
                     finally

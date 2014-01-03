@@ -1111,7 +1111,7 @@ public class FKSetStore extends AbstractSetStore
                                 clr.classForName(elementType));
                         }
 
-                        return new SetStoreIterator(op, rs, rof, this);
+                        return new CollectionStoreIterator(op, rs, rof, this);
                     }
                     finally
                     {
