@@ -32,10 +32,6 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public class FirebirdAdapter extends BaseDatastoreAdapter
 {
-    /**
-     * Constructs a Firebird adapter based on the given JDBC metadata.
-     * @param metadata the database metadata.
-     */
     public FirebirdAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
@@ -49,6 +45,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(SEQUENCES);
+        supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
     }
 
     public String getVendorID()
@@ -85,9 +82,9 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(LOCALISER.msg("051028"));
         }
 
-        StringBuilder stmt = new StringBuilder("CREATE GENERATOR ");
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
-        // TODO Can we use the additional parameters ?
+        // TODO Support the other parameters if Firebird ever supports specification of such with its sequences
 
         return stmt.toString();
     }
