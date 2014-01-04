@@ -119,7 +119,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
     {
         if (offset >= 0 && count > 0)
         {
-            return "ROWS " + offset + " TO " + (offset+count) + " ";
+            return "ROWS " + (offset+1) + " TO " + (offset+count) + " ";
         }
         else if (offset <= 0 && count > 0)
         {
