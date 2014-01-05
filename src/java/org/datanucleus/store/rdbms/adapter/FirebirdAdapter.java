@@ -23,6 +23,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
+import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Table;
 
@@ -46,6 +48,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
+        supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
     }
 
     public String getVendorID()
@@ -61,6 +64,17 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
         return new org.datanucleus.store.rdbms.schema.FirebirdTypeInfo(rs);
+    }
+
+    /**
+     * Firebird accepts the PK in the CREATE TABLE statement.
+     * @param pk An object describing the primary key.
+     * @param factory Identifier factory
+     * @return The PK statement
+     */
+    public String getAddPrimaryKeyStatement(PrimaryKey pk, IdentifierFactory factory)
+    {
+        return null;
     }
 
     /**
