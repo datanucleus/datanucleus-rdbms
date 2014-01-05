@@ -252,7 +252,7 @@ public final class SQLQuery extends AbstractSQLQuery
                 throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
             }
         }
-        else
+        else if (type == SELECT)
         {
             // Query statement (SELECT, stored-procedure)
             AbstractRDBMSQueryResult qr = null;
@@ -368,6 +368,54 @@ public final class SQLQuery extends AbstractSQLQuery
                 throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
             }
             return qr;
+        }
+        else
+        {
+            // 'Other' statement (manually invoked stored-procedure?, CREATE?, DROP?, or similar)
+            try
+            {
+                RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
+                ManagedConnection mconn = storeMgr.getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
+
+                try
+                {
+                    PreparedStatement ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, compiledSQL, this);
+                    try
+                    {
+                        // Set the values of any parameters
+                        for (int i=0;i<parameters.size();i++)
+                        {
+                            Object obj = parameters.get(Integer.valueOf(i+1));
+                            ps.setObject((i+1), obj);
+                        }
+
+                        // Apply any user-specified constraints over timeouts etc
+                        RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
+
+                        sqlControl.executeStatement(ec, mconn, compiledSQL, ps);
+                    }
+                    catch (QueryInterruptedException qie)
+                    {
+                        // Execution was cancelled so cancel the PreparedStatement
+                        ps.cancel();
+                        throw qie;
+                    }
+                    finally
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (SQLException e)
+            {
+                throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
+            }
+            return true;
         }
     }
 

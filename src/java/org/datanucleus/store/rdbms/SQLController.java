@@ -455,6 +455,61 @@ public class SQLController
     }
 
     /**
+     * Method to execute a PreparedStatement (using PreparedStatement.execute()).
+     * Prints logging information about timings.
+     * @param conn The connection (required since the one on PreparedStatement is not always the same so we can't use it)
+     * @param stmt The statement text
+     * @param ps The Prepared Statement
+     * @param processNow Whether to process this statement now (only applies if is batched)
+     * @return The numer of rows affected (as per PreparedStatement.execute)
+     * @throws SQLException Thrown if an error occurs
+     */
+    public boolean executeStatement(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps)
+    throws SQLException
+    {
+        if (supportsBatching)
+        {
+            // Check for a waiting batched statement that is ready for processing
+            ConnectionStatementState state = getConnectionStatementState(conn);
+            if (state != null && state.processable)
+            {
+                // Process the batch statement before returning our new query statement
+                processConnectionStatement(conn);
+            }
+        }
+
+        // Process the normal execute statement
+        long startTime = System.currentTimeMillis();
+        if (NucleusLogger.DATASTORE_NATIVE.isDebugEnabled())
+        {
+            if (ps instanceof ParamLoggingPreparedStatement)
+            {
+                NucleusLogger.DATASTORE_NATIVE.debug(((ParamLoggingPreparedStatement)ps).getStatementWithParamsReplaced());
+            }
+            else
+            {
+                NucleusLogger.DATASTORE_NATIVE.debug(stmt);
+            }
+        }
+
+        boolean flag = ps.execute();
+        if (ec != null && ec.getStatistics() != null)
+        {
+            // Add to statistics
+            ec.getStatistics().incrementNumWrites();
+        }
+
+        ps.clearBatch();
+        if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
+        {
+            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("045002",
+                "" + (System.currentTimeMillis() - startTime), StringUtils.toJVMIDString(ps)));
+        }
+
+        return flag;
+    }
+
+    /**
      * Method to execute a PreparedStatement query, and return the ResultSet.
      * Prints logging information about timings.
      * @param conn The connection (required since the one on PreparedStatement is not always the same so we can't use it)
