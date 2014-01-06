@@ -197,4 +197,9 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         }
         return str.toString();
     }
+
+    public String getDatastoreDateStatement()
+    {
+        return "SELECT now() FROM DUAL";
+    }
 }
