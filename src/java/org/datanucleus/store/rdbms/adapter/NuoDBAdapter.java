@@ -61,9 +61,11 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX);
         supportedOptions.add(CROSSJOIN_ASINNER11_SYNTAX);
 
-        // Doesn't seem to support RESTRICT FK constraints
+        // Doesn't seem to support RESTRICT/NULL FK constraints
         supportedOptions.remove(FK_DELETE_ACTION_RESTRICT);
+        supportedOptions.remove(FK_DELETE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
+        supportedOptions.remove(FK_UPDATE_ACTION_NULL);
 
         // These are not supported in 2.0.2
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
