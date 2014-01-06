@@ -331,6 +331,7 @@ Contributors:
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
+            <excludes vendor-id="nuodb"/>
         </mapping>
         <mapping java-type="java.lang.Boolean" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
@@ -358,6 +359,7 @@ Contributors:
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
+            <excludes vendor-id="nuodb"/>
         </mapping>
         <mapping java-type="java.lang.Byte" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
@@ -476,6 +478,7 @@ Contributors:
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
+            <excludes vendor-id="nuodb"/>
         </mapping>
         <mapping java-type="java.lang.Integer" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
@@ -525,6 +528,7 @@ Contributors:
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
+            <excludes vendor-id="nuodb"/>
         </mapping>
         <mapping java-type="java.lang.Long" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
@@ -557,6 +561,7 @@ Contributors:
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
+            <excludes vendor-id="nuodb"/>
         </mapping>
 
         <mapping java-type="java.lang.String" jdbc-type="VARCHAR" sql-type="VARCHAR" default="true"
