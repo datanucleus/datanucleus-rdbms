@@ -37,6 +37,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.add(SEQUENCES);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
+        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
 
         // NuoDB JDBC driver doesn't specify lengths (as of v2.0.2)
         if (maxTableNameLength <= 0)
@@ -59,6 +60,10 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         // CROSS JOIN syntax is not supported
         supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX);
         supportedOptions.add(CROSSJOIN_ASINNER11_SYNTAX);
+
+        // Doesn't seem to support RESTRICT FK constraints
+        supportedOptions.remove(FK_DELETE_ACTION_RESTRICT);
+        supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
     }
 
     /**
