@@ -49,6 +49,13 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
+
+        if (datastoreMajorVersion < 2)
+        {
+            // CROSS JOIN syntax is not supported before Firebird 2
+            supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX);
+            supportedOptions.add(CROSSJOIN_ASINNER11_SYNTAX);
+        }
     }
 
     public String getVendorID()
