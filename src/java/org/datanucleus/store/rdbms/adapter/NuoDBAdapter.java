@@ -66,6 +66,11 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
     }
 
+    public String getVendorID()
+    {
+        return "nuodb";
+    }
+
     /**
      * Returns the appropriate DDL to create an index.
      * It should return something like:

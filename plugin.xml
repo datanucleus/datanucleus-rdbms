@@ -303,6 +303,7 @@ Contributors:
     PostgreSQL : JDBC TINYINT, DECIMAL, FLOAT not supported
     MaxDB/SAPDB : JDBC TINYINT, BIT, BIGINT, NUMERIC not supported, SQL INT types are alias to the SQL INTEGER type
     Sybase : JDBC FLOAT, BIGINT not supported, SQL INT types are alias to the SQL INTEGER type
+    NuoDB : TINYINT not supported
     -->
     <extension point="org.datanucleus.store.rdbms.rdbms_mapping">
         <mapping java-type="java.lang.Boolean" jdbc-type="BIT" sql-type="BIT" default="true"
