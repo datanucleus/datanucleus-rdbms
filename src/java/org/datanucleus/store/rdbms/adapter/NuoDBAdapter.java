@@ -19,17 +19,13 @@ package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.DatabaseMetaData;
 
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
 
 /**
  * Adapter for NuoDB (http://www.nuodb.com).
- * Note that this is a start point, but currently (2.0.1) the NuoDB JDBC driver is limited in what it implements
- * and how well it follows JDBC conventions (or not).
- * Issue 1 : DMD.getIndexInfo will return "ordinal_position" with origin 0 instead of 1 (see TableImpl line 1170).
- * Issue 2 : DMD.getSQLKeywords is not implemented
- * Issue 3 : DMD max lengths are returned as 0!
- * Note that Issue 1 and Issue 2 should be fixed in v2.0.2 when released
+ * This adapter was written based on v2.0.2 of the NuoDB JDBC driver.
  */
 public class NuoDBAdapter extends BaseDatastoreAdapter
 {
@@ -37,9 +33,10 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
+        supportedOptions.add(SEQUENCES);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
 
-        // NuoDB JDBC driver doesn't specify lengths
+        // NuoDB JDBC driver doesn't specify lengths (as of v2.0.2)
         if (maxTableNameLength <= 0)
         {
             maxTableNameLength = 128;
@@ -56,6 +53,10 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         {
             maxIndexNameLength = 128;
         }
+
+        // CROSS JOIN syntax is not supported
+        supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX);
+        supportedOptions.add(CROSSJOIN_ASINNER11_SYNTAX);
     }
 
     /**
@@ -75,5 +76,82 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + 
            " ON " + idx.getTable().toString() + ' ' +
            idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
+    }
+
+    /**
+     * Accessor for the sequence statement to create the sequence.
+     * @param sequence_name Name of the sequence 
+     * @param min Minimum value for the sequence
+     * @param max Maximum value for the sequence
+     * @param start Start value for the sequence
+     * @param increment Increment value for the sequence
+     * @param cache_size Cache size for the sequence
+     * @return The statement for getting the next id from the sequence
+     */
+    public String getSequenceCreateStmt(String sequence_name,
+            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    {
+        if (sequence_name == null)
+        {
+            throw new NucleusUserException(LOCALISER.msg("051028"));
+        }
+
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
+        stmt.append(sequence_name);
+        if (start != null)
+        {
+            stmt.append(" START WITH " + start);
+        }
+        // TODO Support other parameters if NuoDB ever supports them
+
+        return stmt.toString();
+    }
+
+    /**
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequence_name Name of the sequence 
+     * @return The statement for getting the next id for the sequence
+     **/
+    public String getSequenceNextStmt(String sequence_name)
+    {
+        if (sequence_name == null)
+        {
+            throw new NucleusUserException(LOCALISER.msg("051028"));
+        }
+        StringBuilder stmt=new StringBuilder("SELECT NEXT VALUE FOR ");
+        stmt.append(sequence_name);
+        stmt.append(" FROM DUAL");
+
+        return stmt.toString();
+    }
+
+    /**
+     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle
+     * restriction of ranges using the OFFSET/FETCH keywords.
+     * @param offset The offset to return from
+     * @param count The number of items to return
+     * @return The SQL to append to allow for ranges using OFFSET/FETCH.
+     */
+    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    {
+        if (datastoreMajorVersion < 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion < 5))
+        {
+            return super.getRangeByLimitEndOfStatementClause(offset, count);
+        }
+        else if (offset <= 0 && count <= 0)
+        {
+            return "";
+        }
+
+        StringBuilder str = new StringBuilder();
+        if (offset > 0)
+        {
+            str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
+        }
+        if (count > 0)
+        {
+            str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
+        }
+        return str.toString();
     }
 }
