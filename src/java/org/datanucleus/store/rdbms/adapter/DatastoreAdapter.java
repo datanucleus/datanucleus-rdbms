@@ -846,6 +846,16 @@ public interface DatastoreAdapter
             Integer increment, Integer cache_size);
 
     /**
+     * Convenience method to return whether the specified sequence already exists.
+     * @param conn Connection to use for checking
+     * @param catalogName Catalog name
+     * @param schemaName Schema name
+     * @param seqName Name of the sequence
+     * @return Whether it exists
+     */
+    boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName);
+
+    /**
      * Iterator for the reserved words constructed from the method
      * DataBaseMetaData.getSQLKeywords + standard SQL reserved words
      * @return an Iterator with a set of reserved words

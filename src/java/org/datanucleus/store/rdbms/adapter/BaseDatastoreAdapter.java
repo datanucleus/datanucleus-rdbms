@@ -1076,6 +1076,12 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     // ---------------------------- Sequence Support ---------------------------
 
+    public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
+    {
+        // Override this with database-specific mechanism for checking if a sequence exists (still not part of standard JDBC after 15 yrs!)
+        return true;
+    }
+
     /**
      * Accessor for the sequence create statement for this datastore.
      * @param sequence_name Name of the sequence 

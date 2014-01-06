@@ -21,6 +21,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.valuegenerator;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -228,8 +229,18 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator
      */
     protected boolean repositoryExists()
     {
-        // TODO Check for SEQUENCE existence
-        return super.repositoryExists();
+        String sequenceCatalogName = properties.getProperty("sequence-catalog-name");
+        if (sequenceCatalogName == null)
+        {
+            sequenceCatalogName = properties.getProperty("catalog-name");
+        }
+        String sequenceSchemaName = properties.getProperty("sequence-schema-name");
+        if (sequenceSchemaName == null)
+        {
+            sequenceSchemaName = properties.getProperty("schema-name");
+        }
+        return ((RDBMSStoreManager)storeMgr).getDatastoreAdapter().sequenceExists((Connection) connection.getConnection(), 
+            sequenceCatalogName, sequenceSchemaName, properties.getProperty("sequence-name"));
     }
 
     /**
