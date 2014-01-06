@@ -371,6 +371,10 @@ public interface DatastoreAdapter
     public static final String TX_ISOLATION_REPEATABLE_READ = "TxIsolationReadRepeatableRead";
     public static final String TX_ISOLATION_SERIALIZABLE = "TxIsolationSerializable";
 
+    public static final String RESULTSET_TYPE_FORWARD_ONLY = "ResultSetTypeForwardOnly";
+    public static final String RESULTSET_TYPE_SCROLL_SENSITIVE = "ResultSetTypeScrollSens";
+    public static final String RESULTSET_TYPE_SCROLL_INSENSITIVE = "ResultSetTypeScrollInsens";
+
     /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.
      * @return The options (Collection<String>)

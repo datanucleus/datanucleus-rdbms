@@ -67,6 +67,9 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
 
+        supportedOptions.remove(RESULTSET_TYPE_SCROLL_SENSITIVE);
+        supportedOptions.remove(RESULTSET_TYPE_SCROLL_INSENSITIVE);
+
         // These are not supported in 2.0.2
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(TX_ISOLATION_READ_UNCOMMITTED);

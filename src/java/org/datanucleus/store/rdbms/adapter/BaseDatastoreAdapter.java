@@ -385,6 +385,10 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             throw new NucleusDataStoreException(LOCALISER.msg("051004"), e);
         }
 
+        supportedOptions.add(RESULTSET_TYPE_FORWARD_ONLY);
+        supportedOptions.add(RESULTSET_TYPE_SCROLL_SENSITIVE);
+        supportedOptions.add(RESULTSET_TYPE_SCROLL_INSENSITIVE);
+
         supportedOptions.add(ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE);
         supportedOptions.add(VIEWS);
         supportedOptions.add(DATETIME_STORES_MILLISECS);

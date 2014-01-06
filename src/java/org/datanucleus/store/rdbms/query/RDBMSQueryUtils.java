@@ -39,6 +39,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -54,6 +55,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -181,6 +183,27 @@ public class RDBMSQueryUtils extends QueryUtils
              !rsTypeString.equals("scroll-insensitive")))
         {
             throw new NucleusUserException(LOCALISER.msg("052510"));
+        }
+        if (rsTypeString != null)
+        {
+            DatastoreAdapter dba = ((RDBMSStoreManager)query.getStoreManager()).getDatastoreAdapter();
+
+            // Add checks on what the DatastoreAdapter supports
+            if (rsTypeString.equals("scroll-sensitive") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_SENSITIVE))
+            {
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using forward-only");
+                rsTypeString = "forward-only";
+            }
+            else if (rsTypeString.equals("scroll-insensitive") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_INSENSITIVE))
+            {
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using forward-only");
+                rsTypeString = "forward-only";
+            }
+            else if (rsTypeString.equals("forward-only") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_FORWARD_ONLY))
+            {
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using scroll-sensitive");
+                rsTypeString = "scroll-sensitive";
+            }
         }
 
         String rsConcurrencyString = RDBMSQueryUtils.getResultSetConcurrencyForQuery(query);
