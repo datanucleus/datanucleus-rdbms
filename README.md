@@ -11,3 +11,11 @@ This project is built using Maven, by executing `mvn clean install` which instal
 repository.
 
 Please refer to http://www.datanucleus.org/plugins/store.rdbms.html  for more information.
+
+License
+-------
+Apache 2 licensed
+
+Issue Tracker
+-------------
+http://www.datanucleus.org/servlet/jira/browse/NUCRDBMS
