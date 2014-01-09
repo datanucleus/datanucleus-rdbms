@@ -1742,7 +1742,7 @@ public class SQLStatement
             }
             else if (dba.getRangeByRowNumberColumn().length() > 0)
             {
-                // Creates a query of the form
+                // DB2-specific ROW_NUMBER weirdness. Creates a query of the form
                 // SELECT subq.x1, subq.x2, ... FROM (
                 //     SELECT x1, x2, ..., {keyword} rn FROM ... WHERE ... ORDER BY ...) subq
                 // WHERE subq.rn >= {offset} AND subq.rn < {count}
@@ -1761,6 +1761,18 @@ public class SQLStatement
                         // Use column alias where possible
                         selectedCol = selectedCol.substring(dotIndex + 4);
                     }
+                    else 
+                    {
+                        // strip out qualifier when encountered from column name since we are adding a new qualifier above.
+                        // NOTE THAT THIS WILL FAIL IF THE ORIGINAL QUERY HAD "A0.COL1, B0.COL1" IN THE SELECT
+                        dotIndex = selectedCol.indexOf(".");
+                        if (dotIndex > 0) 
+                        {
+                            // Remove qualifier name and the dot
+                            selectedCol = selectedCol.substring(dotIndex+1);
+                        }
+                    }
+
                     sql.append(selectedCol);
                     if (selectIter.hasNext())
                     {
