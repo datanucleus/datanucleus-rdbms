@@ -217,20 +217,32 @@ public class BulkFetchHelper
         List<SQLStatementParameter> stmtParams = null;
         if (datastoreCompilation.getStatementParameters() != null)
         {
+            int numUnions = sqlStmt.getNumberOfUnions();
+
             stmtParams = new ArrayList<SQLStatementParameter>();
             stmtParams.addAll(datastoreCompilation.getStatementParameters());
-            stmtParamNameByPosition = new HashMap<Integer, String>();
-            stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
-            int numUnions = sqlStmt.getNumberOfUnions();
-            int numParams = stmtParamNameByPosition.size();
             for (int i=0;i<numUnions;i++)
             {
                 stmtParams.addAll(datastoreCompilation.getStatementParameters());
-                Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
-                while (paramEntryIter.hasNext())
+            }
+
+            if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
+            {
+                // ParameterNameByPosition is only populated with implicit parameters
+                stmtParamNameByPosition = new HashMap<Integer, String>();
+                stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
+                int numParams = stmtParamNameByPosition.size();
+                for (int i=0;i<numUnions;i++)
                 {
-                    Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
-                    stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
+                    if (datastoreCompilation.getParameterNameByPosition() != null)
+                    {
+                        Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
+                        while (paramEntryIter.hasNext())
+                        {
+                            Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
+                            stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
+                        }
+                    }
                 }
             }
 
