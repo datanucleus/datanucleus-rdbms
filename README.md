@@ -41,7 +41,7 @@ the tables PERSON and EMPLOYEE will be in the same table group.
 ### Table Naming
 
 With the SQLStatement API a developer can define the aliases of tables in the SQL statement. If they don't define an alias then the aliases will 
-be generated for them using a DataNucleus extension. The plugin-point _org.datanucleus.store.rdbms.sql_tablenamer_ defines an interface
+be generated for them using a DataNucleus extension. The plugin-point `org.datanucleus.store.rdbms.sql_tablenamer` defines an interface
 to be implemented by plugins for naming of tables. The default option is __alpha-scheme__.
 
 __alpha-scheme__ will name tables based on the table group they are in and the number of the table within that group. So you will get table 
