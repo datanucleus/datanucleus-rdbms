@@ -3092,6 +3092,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         {
             return m;
         }
+        else if (mmd.isPrimaryKey() && pkMappings != null)
+        {
+            // pkMappings aren't in memberMappingsMap when in subclasses
+            for (int i=0;i<pkMappings.length;i++)
+            {
+                if (pkMappings[i].getMemberMetaData().equals(mmd))
+                {
+                    return pkMappings[i];
+                }
+            }
+        }
 
         // Check supertable
         int ifc = cmd.getNoOfInheritedManagedMembers();

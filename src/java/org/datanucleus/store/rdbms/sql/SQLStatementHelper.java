@@ -468,7 +468,8 @@ public class SQLStatementHelper
             {
                 AbstractMemberMetaData pkMmd = candidateCmd.getMetaDataForManagedMemberAtAbsolutePosition(pkPositions[i]);
                 JavaTypeMapping pkMapping = candidateTbl.getMemberMapping(pkMmd);
-                int[] colNumbers = stmt.select(stmt.getPrimaryTable(), pkMapping, "DN_APPID", false);
+                SQLTable sqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, stmt.getPrimaryTable(), pkMapping);
+                int[] colNumbers = stmt.select(sqlTbl, pkMapping, "DN_APPID", false);
                 if (mappingDefinition != null)
                 {
                     StatementMappingIndex appIdIdx = new StatementMappingIndex(pkMapping);
