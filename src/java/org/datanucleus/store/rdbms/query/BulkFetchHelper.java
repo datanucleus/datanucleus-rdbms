@@ -234,14 +234,11 @@ public class BulkFetchHelper
                 int numParams = stmtParamNameByPosition.size();
                 for (int i=0;i<numUnions;i++)
                 {
-                    if (datastoreCompilation.getParameterNameByPosition() != null)
+                    Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
+                    while (paramEntryIter.hasNext())
                     {
-                        Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
-                        while (paramEntryIter.hasNext())
-                        {
-                            Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
-                            stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
-                        }
+                        Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
+                        stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
                     }
                 }
             }
