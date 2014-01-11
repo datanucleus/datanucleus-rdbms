@@ -120,6 +120,40 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
 
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
     {
+        /*PreparedStatement ps = null;
+        ResultSet rs = null;
+        try
+        {
+            String GET_SEQUENCE_STMT = "SELECT * FROM SYSTEM.SEQUENCES";
+
+            NucleusLogger.DATASTORE_SCHEMA.debug("Retrieving sequence info using the following SQL : " + GET_SEQUENCE_STMT);
+            ps = conn.prepareStatement(GET_SEQUENCE_STMT);
+            rs = ps.executeQuery();
+            while (rs.next())
+            {
+                
+            }
+        }
+        catch (SQLException sqle)
+        {
+            NucleusLogger.DATASTORE_SCHEMA.warn(">> Exception caught", sqle);
+        }
+        finally
+        {
+            try
+            {
+                if (rs != null && !rs.isClosed())
+                {
+                    rs.close();
+                }
+                ps.close();
+            }
+            catch (SQLException sqle)
+            {
+
+            }
+        }*/
+
         // TODO Make use of the following
         // SELECT * FROM SYSTEM.SEQUENCES;
         //SCHEMA SEQUENCENAME
