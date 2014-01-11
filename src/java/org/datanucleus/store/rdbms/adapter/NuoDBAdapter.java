@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.adapter;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
 import org.datanucleus.exceptions.NucleusUserException;
@@ -115,6 +116,16 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         // We generate the PK in the CREATE TABLE statement
         return null;
+    }
+
+    public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
+    {
+        // TODO Make use of the following
+        // SELECT * FROM SYSTEM.SEQUENCES;
+        //SCHEMA SEQUENCENAME
+        //====== ============
+        //HOCKEY HOCKEY$IDENTITY_SEQUENCE
+        return true;
     }
 
     /**
