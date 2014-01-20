@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 
 import java.util.List;
 
+import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
@@ -142,6 +143,16 @@ public class BooleanExpression extends SQLExpression
             if (!right.hasClosure())
             {
                 right = right.eq(new BooleanLiteral(stmt, mapping, Boolean.TRUE));
+            }
+
+            if (stmt.getQueryGenerator() != null && stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.UPDATE)
+            {
+                // Special case : UPDATE clause AND should be replaced by boolean expression with "," separating the clauses
+                BooleanExpression boolExpr = new BooleanExpression(stmt, null, mapping);
+                boolExpr.st.append(left);
+                boolExpr.st.append(',');
+                boolExpr.st.append(right);
+                return boolExpr;
             }
             return new BooleanExpression(left, Expression.OP_AND, right);
         }

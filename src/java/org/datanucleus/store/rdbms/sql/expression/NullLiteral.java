@@ -64,7 +64,7 @@ public class NullLiteral extends SQLExpression implements SQLLiteral
         }
         if (stmt.getQueryGenerator() != null && stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.UPDATE)
         {
-            // UPDATE clause needs "x = NULL"
+            // Special case : UPDATE clause needs "x = NULL"
             return new BooleanExpression(expr, Expression.OP_EQ, this);
         }
 
