@@ -309,7 +309,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     protected String truncate(String identifier, int length)
     {
         // return namingFactory.truncate(identifier, length);
-        if (length == 0) // Special case of no truncation
+        if (length < 0) // Special case of no truncation
         {
             return identifier;
         }
