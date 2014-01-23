@@ -42,8 +42,8 @@ public class JDBCUtils
     private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
         RDBMSStoreManager.class.getClassLoader());
 
-    private static Map supportedJdbcTypesById = new HashMap();
-    private static Map unsupportedJdbcTypesById = new HashMap();
+    private static Map<Integer, String> supportedJdbcTypesById = new HashMap();
+    private static Map<Integer, String> unsupportedJdbcTypesById = new HashMap();
 
     static
     {
@@ -93,15 +93,15 @@ public class JDBCUtils
     {
         int[] types = new int[supportedJdbcTypesById.size() + unsupportedJdbcTypesById.size()];
         int i = 0;
-        Iterator suppIter = supportedJdbcTypesById.keySet().iterator();
+        Iterator<Integer> suppIter = supportedJdbcTypesById.keySet().iterator();
         while (suppIter.hasNext())
         {
-            types[i++] = ((Integer)suppIter.next()).intValue();
+            types[i++] = suppIter.next().intValue();
         }
-        Iterator unsuppIter = unsupportedJdbcTypesById.keySet().iterator();
+        Iterator<Integer> unsuppIter = unsupportedJdbcTypesById.keySet().iterator();
         while (unsuppIter.hasNext())
         {
-            types[i++] = ((Integer)unsuppIter.next()).intValue();
+            types[i++] = unsuppIter.next().intValue();
         }
         return types;
     }
@@ -113,10 +113,10 @@ public class JDBCUtils
      */
     public static String getNameForJDBCType(int jdbcType)
     {
-        String typeName = (String)supportedJdbcTypesById.get(Integer.valueOf(jdbcType));
+        String typeName = supportedJdbcTypesById.get(Integer.valueOf(jdbcType));
         if (typeName == null)
         {
-            typeName = (String)unsupportedJdbcTypesById.get(Integer.valueOf(jdbcType));
+            typeName = unsupportedJdbcTypesById.get(Integer.valueOf(jdbcType));
         }
         return typeName;
     }
@@ -133,14 +133,14 @@ public class JDBCUtils
             return 0;
         }
 
-        Set entries = supportedJdbcTypesById.entrySet();
-        Iterator entryIter = entries.iterator();
+        Set<Map.Entry<Integer, String>> entries = supportedJdbcTypesById.entrySet();
+        Iterator<Map.Entry<Integer, String>> entryIter = entries.iterator();
         while (entryIter.hasNext())
         {
-            Map.Entry entry = (Map.Entry)entryIter.next();
-            if (typeName.equalsIgnoreCase((String)entry.getValue()))
+            Map.Entry<Integer, String> entry = entryIter.next();
+            if (typeName.equalsIgnoreCase(entry.getValue()))
             {
-                return ((Integer)entry.getKey()).intValue();
+                return entry.getKey().intValue();
             }
         }
         return 0;
