@@ -19,11 +19,19 @@ package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 
+import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.schema.StoreSchemaHandler;
 
 /**
  * Adapter for NuoDB (http://www.nuodb.com).
@@ -35,8 +43,8 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
+        supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
-        supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
 
@@ -67,6 +75,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_DELETE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
+        supportedOptions.remove(DEFERRED_CONSTRAINTS);
 
         supportedOptions.remove(RESULTSET_TYPE_SCROLL_SENSITIVE);
         supportedOptions.remove(RESULTSET_TYPE_SCROLL_INSENSITIVE);
@@ -80,6 +89,52 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     public String getVendorID()
     {
         return "nuodb";
+    }
+
+    public String getCatalogName(Connection conn) throws SQLException
+    {
+        return null;
+    }
+
+    public String getSchemaName(Connection conn) throws SQLException 
+    {
+        Statement stmt = conn.createStatement();
+        try 
+        {
+            String stmtText = "SELECT CURRENT_SCHEMA FROM DUAL";
+            ResultSet rs = stmt.executeQuery(stmtText);
+            try 
+            {
+                if (!rs.next()) 
+                {
+                    throw new NucleusDataStoreException("No result returned from " + stmtText).setFatal();
+                }
+                return rs.getString(1);
+            }
+            finally 
+            {
+                rs.close();
+            }
+        }
+        finally
+        {
+            stmt.close();
+        }
+    }
+
+    public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn) 
+    {
+        super.initialiseTypes(handler, mconn);
+
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.NuoDBTypeInfo(
+                "FLOAT", (short) Types.DOUBLE, 53, null, null, null, 1, false, (short) 2,
+                false, false, false, null, (short) 0, (short) 0, 2);
+        addSQLTypeForJDBCType(handler, mconn, (short) Types.DOUBLE, sqlType, true);
+
+        sqlType = new org.datanucleus.store.rdbms.schema.NuoDBTypeInfo(
+                "TEXT", (short) Types.CLOB, 2147483647, null, null, null, 1, true, (short) 1,
+                false, false, false, "TEXT", (short) 0, (short) 0, 0);
+        addSQLTypeForJDBCType(handler, mconn, (short) Types.CLOB, sqlType, true);
     }
 
     /**
@@ -250,6 +305,6 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
 
     public String getDatastoreDateStatement()
     {
-        return "SELECT now() FROM DUAL";
+        return "SELECT CURRENT_DATE FROM DUAL";
     }
 }
