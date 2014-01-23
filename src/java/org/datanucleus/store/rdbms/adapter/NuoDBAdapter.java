@@ -138,8 +138,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Returns the appropriate DDL to create an index.
-     * It should return something like:
+     * Returns the appropriate DDL to create an index. It should return something like:
      * <pre>
      * CREATE INDEX FOO_N1 ON FOO (BAR,BAZ) [Extended Settings]
      * CREATE UNIQUE INDEX FOO_U1 ON FOO (BAR,BAZ) [Extended Settings]
@@ -162,7 +161,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Firebird accepts the PK in the CREATE TABLE statement.
+     * Override the default implementation since we accept the PK in the CREATE TABLE statement.
      * @param pk An object describing the primary key.
      * @param factory Identifier factory
      * @return The PK statement
