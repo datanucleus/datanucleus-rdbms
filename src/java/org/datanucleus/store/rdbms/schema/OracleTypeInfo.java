@@ -24,7 +24,12 @@ import java.sql.ResultSet;
  */
 public class OracleTypeInfo extends SQLTypeInfo
 {
-    /** internally defined number for SDO_GEOMETRY types **/
+    /** 
+     * Oracles Spatial specific SqlTypeInfo moved to 
+     * datanucleus-geospatial module. Don't use TYPES_SDO_GEOMETRY 
+     * anymore.
+     **/
+    @Deprecated
     public static final int TYPES_SDO_GEOMETRY = -123;
 
     /** XMLType type - _SQL_TYPECODE **/
