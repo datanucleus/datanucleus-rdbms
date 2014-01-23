@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
@@ -44,6 +43,7 @@ public class IncompatibleDataTypeException extends DatastoreValidationException
     public IncompatibleDataTypeException(Column column, int expectedType, int actualType)
     {
         super(LOCALISER_RDBMS.msg("020009", column, 
-            JDBCUtils.getNameForJDBCType(actualType), JDBCUtils.getNameForJDBCType(expectedType)));
+            column.getStoreManager().getDatastoreAdapter().getNameForJDBCType(actualType), 
+            column.getStoreManager().getDatastoreAdapter().getNameForJDBCType(expectedType)));
     }
 }

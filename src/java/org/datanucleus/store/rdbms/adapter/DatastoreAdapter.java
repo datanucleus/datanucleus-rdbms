@@ -389,6 +389,20 @@ public interface DatastoreAdapter
     boolean supportsOption(String option);
 
     /**
+     * Return a name for a JDBC Types value.
+     * @param jdbcType The jdbc type
+     * @return The name
+     */
+    String getNameForJDBCType(int jdbcType);
+
+    /**
+     * Method to return the type given the "jdbc-type" name.
+     * @param typeName "jdbc-type" name
+     * @return Whether it is valid
+     */
+    int getJDBCTypeForName(String typeName);
+
+    /**
      * Accessor for a Mapping Manager suitable for use with this datastore adapter.
      * @param storeMgr The StoreManager
      * @return The Mapping Manager.

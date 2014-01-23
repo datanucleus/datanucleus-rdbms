@@ -46,7 +46,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -95,6 +94,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
         RDBMSStoreManager.class.getClassLoader());
+
+    protected Map<Integer, String> supportedJdbcTypesById = new HashMap();
+    protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap();
 
     /** The set of reserved keywords for this datastore. */
     protected final HashSet<String> reservedKeywords = new HashSet();
@@ -157,6 +159,41 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     protected BaseDatastoreAdapter(DatabaseMetaData metadata)
     {
         super();
+
+        // Add the supported and unsupported JDBC types for lookups
+        supportedJdbcTypesById.put(Integer.valueOf(Types.BIGINT), "BIGINT");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.BIT), "BIT");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.BLOB), "BLOB");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.BOOLEAN), "BOOLEAN");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.CHAR), "CHAR");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.CLOB), "CLOB");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.DATALINK), "DATALINK");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.DATE), "DATE");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.DECIMAL), "DECIMAL");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.DOUBLE), "DOUBLE");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.FLOAT), "FLOAT");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.INTEGER), "INTEGER");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.LONGVARBINARY), "LONGVARBINARY");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.LONGVARCHAR), "LONGVARCHAR");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.NUMERIC), "NUMERIC");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.REAL), "REAL");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.SMALLINT), "SMALLINT");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.TIME), "TIME");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.TIMESTAMP), "TIMESTAMP");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.TINYINT), "TINYINT");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.VARBINARY), "VARBINARY");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.VARCHAR), "VARCHAR");
+        supportedJdbcTypesById.put(Integer.valueOf(-9), "NVARCHAR"); // JDK 1.6 addition
+        supportedJdbcTypesById.put(Integer.valueOf(-15), "NCHAR"); // JDK 1.6 addition
+        supportedJdbcTypesById.put(Integer.valueOf(2011), "NCLOB"); // JDK 1.6 addition
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.BINARY), "BINARY");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.DISTINCT), "DISTINCT");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.JAVA_OBJECT), "JAVA_OBJECT");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.NULL), "NULL");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.OTHER), "OTHER");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");
 
         reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL92_RESERVED_WORDS));
         reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL99_RESERVED_WORDS));
@@ -455,6 +492,36 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         handler.getSchemaData(mconn.getConnection(), "types", null);
     }
 
+    public String getNameForJDBCType(int jdbcType)
+    {
+        String typeName = supportedJdbcTypesById.get(Integer.valueOf(jdbcType));
+        if (typeName == null)
+        {
+            typeName = unsupportedJdbcTypesById.get(Integer.valueOf(jdbcType));
+        }
+        return typeName;
+    }
+
+    public int getJDBCTypeForName(String typeName)
+    {
+        if (typeName == null)
+        {
+            return 0;
+        }
+
+        Set<Map.Entry<Integer, String>> entries = supportedJdbcTypesById.entrySet();
+        Iterator<Map.Entry<Integer, String>> entryIter = entries.iterator();
+        while (entryIter.hasNext())
+        {
+            Map.Entry<Integer, String> entry = entryIter.next();
+            if (typeName.equalsIgnoreCase(entry.getValue()))
+            {
+                return entry.getKey().intValue();
+            }
+        }
+        return 0;
+    }
+
     /**
      * Set any properties controlling how the adapter is configured.
      * @param props The properties
@@ -489,14 +556,22 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         RDBMSMappingManager mapMgr = (RDBMSMappingManager)storeMgr.getMappingManager();
         RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
 
-        int[] jdbcTypes = JDBCUtils.getJDBCTypes();
-        for (int i=0;i<jdbcTypes.length;i++)
+        for (int jdbcType : supportedJdbcTypesById.keySet())
         {
-            if (types.getChild("" + jdbcTypes[i]) == null)
+            if (types.getChild("" + jdbcType) == null)
             {
                 // JDBC type not supported by adapter so deregister the mapping
                 // Means that we don't need to add "excludes" definitions to plugin.xml
-                mapMgr.deregisterDatastoreMappingsForJDBCType(JDBCUtils.getNameForJDBCType(jdbcTypes[i]));
+                mapMgr.deregisterDatastoreMappingsForJDBCType(supportedJdbcTypesById.get(jdbcType));
+            }
+        }
+        for (int jdbcType : unsupportedJdbcTypesById.keySet())
+        {
+            if (types.getChild("" + jdbcType) == null)
+            {
+                // JDBC type not supported by adapter so deregister the mapping
+                // Means that we don't need to add "excludes" definitions to plugin.xml
+                mapMgr.deregisterDatastoreMappingsForJDBCType(unsupportedJdbcTypesById.get(jdbcType));
             }
         }
     }

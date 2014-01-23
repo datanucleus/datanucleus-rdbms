@@ -30,7 +30,6 @@ import java.util.Hashtable;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
@@ -188,7 +187,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             {
                 // We don't support this JDBC type using *this* PostgreSQL SQL type
                 NucleusLogger.DATASTORE.debug(LOCALISER.msg("051007", info.getTypeName(), 
-                    JDBCUtils.getNameForJDBCType(info.getDataType())));
+                    getNameForJDBCType(info.getDataType())));
                 return null;
             }
         }

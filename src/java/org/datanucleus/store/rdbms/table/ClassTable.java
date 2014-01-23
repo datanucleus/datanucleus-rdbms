@@ -78,7 +78,6 @@ import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
 import org.datanucleus.store.rdbms.exceptions.DuplicateColumnException;
 import org.datanucleus.store.rdbms.exceptions.NoSuchPersistentFieldException;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
-import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -854,8 +853,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 IdentifierFactory idFactory = getStoreManager().getIdentifierFactory();
                 DatastoreIdentifier colIdentifier = idFactory.newIdentifier(IdentifierType.COLUMN, colmd.getName());
                 Column col = addColumn(null, colIdentifier, null, colmd);
-                SQLTypeInfo sqlTypeInfo = storeMgr.getSQLTypeInfoForJDBCType(
-                    JDBCUtils.getJDBCTypeForName(colmd.getJdbcType()));
+                SQLTypeInfo sqlTypeInfo = storeMgr.getSQLTypeInfoForJDBCType(dba.getJDBCTypeForName(colmd.getJdbcType()));
                 col.setTypeInfo(sqlTypeInfo);
 
                 if (unmappedColumns == null)

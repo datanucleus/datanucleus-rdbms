@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.util.Localiser;
@@ -218,8 +217,7 @@ public class SQLTypeInfo implements StoreSchemaData
     {
         StringBuilder str = new StringBuilder("SQLTypeInfo : ");
         str.append("  typeName          = " + getTypeName() + "\n");
-        str.append("  jdbcTypeName      = " + JDBCUtils.getNameForJDBCType(getDataType()) + "\n");
-        str.append("  dataType          = " + getDataType() + "\n");
+        str.append("  dataType (jdbc)   = " + getDataType() + "\n");
         str.append("  precision         = " + getPrecision() + "\n");
         str.append("  literalPrefix     = " + getLiteralPrefix() + "\n");
         str.append("  literalSuffix     = " + getLiteralSuffix() + "\n");
@@ -253,7 +251,7 @@ public class SQLTypeInfo implements StoreSchemaData
 
         if (actual == Types.OTHER)
         {
-            NucleusLogger.DATASTORE.warn(LOCALISER.msg("020191", JDBCUtils.getNameForJDBCType(actual)));
+            NucleusLogger.DATASTORE.warn(LOCALISER.msg("020191", actual));
             return true;
         }
         

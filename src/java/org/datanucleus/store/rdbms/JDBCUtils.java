@@ -47,7 +47,7 @@ public class JDBCUtils
 
     static
     {
-        // Add the supported types
+        // Add the supported types TODO Remove this in DN 4.0
         supportedJdbcTypesById.put(Integer.valueOf(Types.BIGINT), "BIGINT");
         supportedJdbcTypesById.put(Integer.valueOf(Types.BIT), "BIT");
         supportedJdbcTypesById.put(Integer.valueOf(Types.BLOB), "BLOB");
@@ -86,28 +86,8 @@ public class JDBCUtils
     }
 
     /**
-     * Accessor for the JDBC types.
-     * @return JDBC types.
-     */
-    public static final int[] getJDBCTypes()
-    {
-        int[] types = new int[supportedJdbcTypesById.size() + unsupportedJdbcTypesById.size()];
-        int i = 0;
-        Iterator<Integer> suppIter = supportedJdbcTypesById.keySet().iterator();
-        while (suppIter.hasNext())
-        {
-            types[i++] = suppIter.next().intValue();
-        }
-        Iterator<Integer> unsuppIter = unsupportedJdbcTypesById.keySet().iterator();
-        while (unsuppIter.hasNext())
-        {
-            types[i++] = unsuppIter.next().intValue();
-        }
-        return types;
-    }
-
-    /**
      * Accessor for a string name of a JDBC Type
+     * @deprecated Use DatastoreAdapter.getNameForJDBCType(). Dropped in ver 4.0
      * @param jdbcType The JDBC Type
      * @return The name
      */
@@ -123,6 +103,7 @@ public class JDBCUtils
     
     /**
      * Method to return the type given the "jdbc-type" name.
+     * @deprecated Use DatastoreAdapter.getNameForJDBCType(). Dropped in ver 4.0
      * @param typeName "jdbc-type" name
      * @return Whether it is valid
      */

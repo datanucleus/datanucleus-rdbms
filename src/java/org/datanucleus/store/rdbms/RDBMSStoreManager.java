@@ -1287,7 +1287,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     catch (NumberFormatException nfe) { };
 
-                    String typeName = JDBCUtils.getNameForJDBCType(jdbcTypeNumber);
+                    String typeName = dba.getNameForJDBCType(jdbcTypeNumber);
                     if (typeName == null)
                     {
                         typeName = "[id=" + jdbcTypeNumber + "]";
@@ -2308,7 +2308,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (jdbcTypeInfo.getNumberOfChildren() == 0)
         {
             // No sql-type for this jdbc-type so unsupported
-            throw new UnsupportedDataTypeException(LOCALISER.msg("051005", JDBCUtils.getNameForJDBCType(jdbcType)));
+            throw new UnsupportedDataTypeException(LOCALISER.msg("051005", dba.getNameForJDBCType(jdbcType)));
         }
 
         SQLTypeInfo sqlTypeInfo = (SQLTypeInfo) jdbcTypeInfo.getChild(sqlType != null ? sqlType : "DEFAULT");
@@ -2324,7 +2324,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     // fallback to DEFAULT
                     NucleusLogger.DATASTORE_SCHEMA.warn("Attempt to find JDBC driver 'typeInfo' for jdbc-type=" + 
-                        JDBCUtils.getNameForJDBCType(jdbcType) +
+                        dba.getNameForJDBCType(jdbcType) +
                         " but sql-type=" + sqlType + " is not found. Using default sql-type for this jdbc-type.");
                     sqlTypeInfo = (SQLTypeInfo) jdbcTypeInfo.getChild("DEFAULT");
                 }
@@ -2575,7 +2575,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     Collection sqlTypeNames = jdbcType.getChildren().keySet();
 
                     // SQL type names for JDBC type
-                    String typeStr = "JDBC Type=" + JDBCUtils.getNameForJDBCType(jdbcTypeNumber) +
+                    String typeStr = "JDBC Type=" + dba.getNameForJDBCType(jdbcTypeNumber) +
                         " sqlTypes=" + StringUtils.collectionToString(sqlTypeNames);
                     ps.println(typeStr);
 
