@@ -457,10 +457,10 @@ public class SQLController
     /**
      * Method to execute a PreparedStatement (using PreparedStatement.execute()).
      * Prints logging information about timings.
+     * @param ec Execution Context
      * @param conn The connection (required since the one on PreparedStatement is not always the same so we can't use it)
      * @param stmt The statement text
      * @param ps The Prepared Statement
-     * @param processNow Whether to process this statement now (only applies if is batched)
      * @return The numer of rows affected (as per PreparedStatement.execute)
      * @throws SQLException Thrown if an error occurs
      */
