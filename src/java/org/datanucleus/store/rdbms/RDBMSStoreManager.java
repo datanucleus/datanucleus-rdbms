@@ -3981,10 +3981,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.SchemaAwareStoreManager#createSchema(java.util.Set, java.util.Properties)
-     */
-    public void createSchema(Set<String> inputClassNames, Properties props)
+    public void createSchema(String schemaName, Properties props)
+    {
+        // TODO Support schema creation
+        throw new UnsupportedOperationException("Dont support the creation of a schema with RDBMS currently");
+    }
+
+    public void deleteSchema(String schemaName, Properties props)
+    {
+        // TODO Support schema deletion
+        throw new UnsupportedOperationException("Dont support the deletion of a schema with RDBMS currently");
+    }
+
+    public void createSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
 
@@ -4312,10 +4321,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.SchemaAwareStoreManager#deleteSchema(java.util.Set)
-     */
-    public void deleteSchema(Set<String> inputClassNames, Properties props)
+    public void deleteSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
 
@@ -4435,10 +4441,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.SchemaAwareStoreManager#validateSchema(java.util.Set)
-     */
-    public void validateSchema(Set<String> inputClassNames, Properties props)
+    public void validateSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
         if (classNames != null && classNames.size() > 0)
