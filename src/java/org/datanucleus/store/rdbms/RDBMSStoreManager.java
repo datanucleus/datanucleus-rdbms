@@ -1408,50 +1408,52 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     private void initialiseSchema(Connection conn, ClassLoaderResolver clr)
     throws Exception
     {
-        // Initialise the Catalog/Schema names
         if (schemaName == null && catalogName == null)
         {
-            // User didn't provide catalog/schema so determine the defaults from the datastore
-            // TODO Should we bother with this if the RDBMS doesn't support catalog/schema in the table identifiers ?
-            try
+            // Initialise the Catalog/Schema names
+            if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS) || dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS))
             {
+                // User didn't provide catalog/schema and the datastore supports one or other so determine the defaults from the datastore
                 try
                 {
-                    catalogName = dba.getCatalogName(conn);
-                    schemaName = dba.getSchemaName(conn);
-                }
-                catch (UnsupportedOperationException e)
-                {
-                    if (!readOnlyDatastore && !fixedDatastore)
+                    try
                     {
-                        // If we aren't a read-only datastore, try to create a table and then 
-                        // retrieve its details, so as to obtain the catalog, schema. 
-                        ProbeTable pt = new ProbeTable(this);
-                        pt.initialize(clr);
-                        pt.create(conn);
-                        try
+                        catalogName = dba.getCatalogName(conn);
+                        schemaName = dba.getSchemaName(conn);
+                    }
+                    catch (UnsupportedOperationException e)
+                    {
+                        if (!readOnlyDatastore && !fixedDatastore)
                         {
-                            String[] schema_details = pt.findSchemaDetails(conn);
-                            if (schema_details != null)
+                            // If we aren't a read-only datastore, try to create a table and then 
+                            // retrieve its details, so as to obtain the catalog, schema. 
+                            ProbeTable pt = new ProbeTable(this);
+                            pt.initialize(clr);
+                            pt.create(conn);
+                            try
                             {
-                                catalogName = schema_details[0];
-                                schemaName = schema_details[1];
+                                String[] schema_details = pt.findSchemaDetails(conn);
+                                if (schema_details != null)
+                                {
+                                    catalogName = schema_details[0];
+                                    schemaName = schema_details[1];
+                                }
                             }
-                        }
-                        finally
-                        {
-                            pt.drop(conn);
+                            finally
+                            {
+                                pt.drop(conn);
+                            }
                         }
                     }
                 }
-            }
-            catch (SQLException e)
-            {
-                String msg = LOCALISER_RDBMS.msg("050005", e.getMessage()) + ' ' + 
-                    LOCALISER_RDBMS.msg("050006");
-                NucleusLogger.DATASTORE_SCHEMA.warn(msg);
-                // This is only logged as a warning since if the JDBC driver has some issue creating the ProbeTable we would be stuck
-                // We need to allow SchemaTool "dbinfo" mode to work in all circumstances.
+                catch (SQLException e)
+                {
+                    String msg = LOCALISER_RDBMS.msg("050005", e.getMessage()) + ' ' + 
+                            LOCALISER_RDBMS.msg("050006");
+                    NucleusLogger.DATASTORE_SCHEMA.warn(msg);
+                    // This is only logged as a warning since if the JDBC driver has some issue creating the ProbeTable we would be stuck
+                    // We need to allow SchemaTool "dbinfo" mode to work in all circumstances.
+                }
             }
         }
         // TODO If catalogName/schemaName are set convert them to the adapter case
