@@ -194,6 +194,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.OTHER), "OTHER");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.SQLXML), "SQLXML");
 
         reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL92_RESERVED_WORDS));
         reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL99_RESERVED_WORDS));
