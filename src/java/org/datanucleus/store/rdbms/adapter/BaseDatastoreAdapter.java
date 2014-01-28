@@ -183,9 +183,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedJdbcTypesById.put(Integer.valueOf(Types.TINYINT), "TINYINT");
         supportedJdbcTypesById.put(Integer.valueOf(Types.VARBINARY), "VARBINARY");
         supportedJdbcTypesById.put(Integer.valueOf(Types.VARCHAR), "VARCHAR");
-        supportedJdbcTypesById.put(Integer.valueOf(-9), "NVARCHAR"); // JDK 1.6 addition
-        supportedJdbcTypesById.put(Integer.valueOf(-15), "NCHAR"); // JDK 1.6 addition
-        supportedJdbcTypesById.put(Integer.valueOf(2011), "NCLOB"); // JDK 1.6 addition
+        supportedJdbcTypesById.put(Integer.valueOf(Types.NVARCHAR), "NVARCHAR");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.NCHAR), "NCHAR");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.NCLOB), "NCLOB");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.BINARY), "BINARY");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.DISTINCT), "DISTINCT");
