@@ -129,6 +129,9 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
                 public void transactionFlushed() {}
                 public void transactionEnded() {}
                 public void transactionCommitted() {}
+                public void transactionSetSavepoint(String name) {}
+                public void transactionReleaseSavepoint(String name) {}
+                public void transactionRollbackToSavepoint(String name) {}
             });
         }
     }
@@ -163,6 +166,9 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
                 public void transactionFlushed() {}
                 public void transactionEnded() {}
                 public void transactionCommitted() {}
+                public void transactionSetSavepoint(String name) {}
+                public void transactionReleaseSavepoint(String name) {}
+                public void transactionRollbackToSavepoint(String name) {}
             });
         }
     }
@@ -195,6 +201,9 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
                 public void transactionFlushed() {}
                 public void transactionEnded() {}
                 public void transactionCommitted() {}
+                public void transactionSetSavepoint(String name) {}
+                public void transactionReleaseSavepoint(String name) {}
+                public void transactionRollbackToSavepoint(String name) {}
             });
         }
     }
