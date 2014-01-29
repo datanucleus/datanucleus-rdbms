@@ -42,6 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Writer;
+import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -1824,6 +1825,33 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             return rootCmd.getFullClassName();
                         }*/
                     }
+                }
+
+                // Check how many concrete classes we have in this tree, in case only one
+                int numConcrete = 0;
+                String concreteClassName = null;
+                Class rootCls = clr.classForName(rootCmd.getFullClassName());
+                if (!Modifier.isAbstract(rootCls.getModifiers()))
+                {
+                    concreteClassName = rootCmd.getFullClassName();
+                    numConcrete++;
+                }
+                for (String subclassName : subclasses)
+                {
+                    Class subcls = clr.classForName(subclassName);
+                    if (!Modifier.isAbstract(subcls.getModifiers()))
+                    {
+                        if (concreteClassName == null)
+                        {
+                            concreteClassName = subclassName;
+                        }
+                        numConcrete++;
+                    }
+                }
+                if (numConcrete == 1)
+                {
+                    // Single possible concrete class, so return it
+                    return concreteClassName;
                 }
 
                 // Simple candidate query of this class and subclasses
