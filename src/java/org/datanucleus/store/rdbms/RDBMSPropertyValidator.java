@@ -17,12 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
-import org.datanucleus.properties.PersistencePropertyValidator;
+import org.datanucleus.properties.PropertyValidator;
 
 /**
  * Validator for persistence properties used by RDBMS.
  */
-public class RDBMSPropertyValidator implements PersistencePropertyValidator
+public class RDBMSPropertyValidator implements PropertyValidator
 {
     /**
      * Validate the specified property.
