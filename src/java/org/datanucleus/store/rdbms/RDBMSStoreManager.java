@@ -75,6 +75,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -281,7 +282,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @exception NucleusDataStoreException If the database could not be accessed or the name of the
      *                schema could not be determined.
      */
-    public RDBMSStoreManager(ClassLoaderResolver clr, NucleusContext ctx, Map<String, Object> props)
+    public RDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
     {
         super("rdbms", clr, ctx, props);
 
@@ -371,7 +372,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Initialise any properties controlling the adapter
                 // Just use properties matching the pattern "datanucleus.rdbms.adapter.*"
                 Map<String, Object> dbaProps = new HashMap();
-                Map<String, Object> omfProps = ctx.getPersistenceConfiguration().getPersistenceProperties();
+                Map<String, Object> omfProps = ctx.getConfiguration().getPersistenceProperties();
                 Iterator<Map.Entry<String, Object>> propIter = omfProps.entrySet().iterator();
                 while (propIter.hasNext())
                 {
@@ -1465,11 +1466,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         // AutoStarter - Don't allow usage of SchemaTable mechanism if fixed/readonly schema
-        String autoStartMechanismName = nucleusContext.getPersistenceConfiguration().getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
+        String autoStartMechanismName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
         if ((readOnlyDatastore || fixedDatastore) && "SchemaTable".equals(autoStartMechanismName))
         {
             // Schema fixed and user requires an auto-starter needing schema content so turn it off
-            nucleusContext.getPersistenceConfiguration().setProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None");
+            nucleusContext.getConfiguration().setProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None");
         }
     }
 

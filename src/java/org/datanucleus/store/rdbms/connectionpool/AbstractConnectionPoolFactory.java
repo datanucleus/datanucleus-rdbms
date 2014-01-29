@@ -25,7 +25,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 
@@ -87,7 +87,7 @@ public abstract class AbstractConnectionPoolFactory implements ConnectionPoolFac
         dbProps.setProperty("password", dbPassword);
 
         // Optional driver properties
-        PersistenceConfiguration conf = storeMgr.getNucleusContext().getPersistenceConfiguration();
+        Configuration conf = storeMgr.getNucleusContext().getConfiguration();
         String drvPropsString = (String) conf.getProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_DRIVER_PROPS);
         if (drvPropsString != null) 
         {

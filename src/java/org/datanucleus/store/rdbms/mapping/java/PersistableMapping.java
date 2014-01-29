@@ -491,7 +491,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     {
                         // Inserting other object, and this object is detached but if detached from this datastore
                         // we can just return the value now and attach later (in InsertRequest)
-                        if (!ec.getNucleusContext().getPersistenceConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
+                        if (!ec.getNucleusContext().getConfiguration().getBooleanProperty(PropertyNames.PROPERTY_ATTACH_SAME_DATASTORE))
                         {
                             if (ec.getObjectFromCache(api.getIdForObject(value)) != null)
                             {

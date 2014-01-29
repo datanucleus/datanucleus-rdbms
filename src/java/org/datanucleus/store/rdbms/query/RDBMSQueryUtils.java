@@ -29,7 +29,7 @@ import java.util.List;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -108,7 +108,7 @@ public class RDBMSQueryUtils extends QueryUtils
     public static String getResultSetTypeForQuery(Query query)
     {
         String rsTypeString = 
-            query.getExecutionContext().getNucleusContext().getPersistenceConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
+            query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
         Object rsTypeExt = query.getExtension(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
         if (rsTypeExt != null)
         {
@@ -128,7 +128,7 @@ public class RDBMSQueryUtils extends QueryUtils
     public static String getResultSetConcurrencyForQuery(Query query)
     {
         String rsConcurrencyString = 
-            query.getExecutionContext().getNucleusContext().getPersistenceConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
+            query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
         Object rsConcurrencyExt = query.getExtension(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
         if (rsConcurrencyExt != null)
         {
@@ -231,7 +231,7 @@ public class RDBMSQueryUtils extends QueryUtils
     {
         NucleusContext nucleusCtx = query.getExecutionContext().getNucleusContext();
         RDBMSStoreManager storeMgr = (RDBMSStoreManager) query.getStoreManager();
-        PersistenceConfiguration conf = nucleusCtx.getPersistenceConfiguration();
+        Configuration conf = nucleusCtx.getConfiguration();
 
         if (applyTimeout)
         {

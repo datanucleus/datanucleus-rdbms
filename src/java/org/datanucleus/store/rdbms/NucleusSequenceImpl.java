@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms;
 import java.util.Properties;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PersistenceConfiguration;
+import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.ExtensionMetaData;
@@ -93,7 +93,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                     // Note : it may be worthwhile to use the PM's connection here however where a Sequence doesnt yet
                     // exist the connection would then be effectively dead until the end of the tx
                     // The way around this would be to find a way of checking for existence of the sequence
-                    PersistenceConfiguration conf = ec.getNucleusContext().getPersistenceConfiguration();
+                    Configuration conf = ec.getNucleusContext().getConfiguration();
                     int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(
                         conf.getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION));
                     this.mconn = ((RDBMSStoreManager)storeManager).getConnection(isolationLevel);

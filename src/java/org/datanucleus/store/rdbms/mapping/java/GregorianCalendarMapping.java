@@ -204,7 +204,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTimeInMillis(ts.getTime());
 
-            String timezoneID = ec.getNucleusContext().getPersistenceConfiguration().getStringProperty("datanucleus.ServerTimeZoneID");
+            String timezoneID = ec.getNucleusContext().getConfiguration().getStringProperty("datanucleus.ServerTimeZoneID");
             if (timezoneID != null)
             {
                 // Apply server timezone ID since we dont know what it was upon persistence

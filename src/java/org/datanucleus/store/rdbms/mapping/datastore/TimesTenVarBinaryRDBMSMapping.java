@@ -57,8 +57,7 @@ public class TimesTenVarBinaryRDBMSMapping extends VarBinaryRDBMSMapping
             {
                 // Use the default string length
                 // todo set length from persistence configuration
-                /* column.getColumnMetaData().setLength(storeMgr.getNucleusContext().getPersistenceConfiguration().
-              getIntProperty("datanucleus.rdbms.varBinaryDefaultLength"));  */
+                /* column.getColumnMetaData().setLength(storeMgr.getNucleusContext().getConfiguration().getIntProperty("datanucleus.rdbms.varBinaryDefaultLength"));  */
                 column.getColumnMetaData().setLength(1024);
             }
         }
