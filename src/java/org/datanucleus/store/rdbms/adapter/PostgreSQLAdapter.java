@@ -21,7 +21,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.adapter;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -395,6 +397,49 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     }
 
     // ---------------------------- Sequence Support ---------------------------
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#sequenceExists(java.sql.Connection, java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
+    {
+        String stmtStr = "SELECT relname FROM pg_class WHERE relname=?";
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try
+        {
+            NucleusLogger.DATASTORE_NATIVE.debug(stmtStr + " : for sequence=" + seqName);
+            ps = conn.prepareStatement(stmtStr);
+            ps.setString(1, seqName);
+            rs = ps.executeQuery();
+            if (rs.next())
+            {
+                return true;
+            }
+            return false;
+        }
+        catch (SQLException sqle)
+        {
+            NucleusLogger.DATASTORE_RETRIEVE.debug("Exception while executing query for sequence " + seqName + " : " + stmtStr + " - " + sqle.getMessage());
+        }
+        finally
+        {
+            try
+            {
+                if (rs != null && !rs.isClosed())
+                {
+                    rs.close();
+                }
+                ps.close();
+            }
+            catch (SQLException sqle)
+            {
+            }
+        }
+
+        return super.sequenceExists(conn, catalogName, schemaName, seqName);
+    }
 
     /**
      * Accessor for the sequence statement to create the sequence.
