@@ -765,7 +765,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 {
                     throw new QueryTimeoutException("Query has been timed out", sqle);
                 }
-                throw new NucleusException(LOCALISER.msg("021042"), sqle);
+                throw new NucleusException(LOCALISER.msg("021042", datastoreCompilation.getSQL()), sqle);
             }
 
             if (NucleusLogger.QUERY.isDebugEnabled())
