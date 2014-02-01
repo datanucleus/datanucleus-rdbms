@@ -32,11 +32,13 @@ import java.util.Properties;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
+import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * This generator utilises datastore sequences. It uses a statement like
@@ -234,13 +236,28 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator
         {
             sequenceCatalogName = properties.getProperty("catalog-name");
         }
+        if (!StringUtils.isWhitespace(sequenceCatalogName))
+        {
+            IdentifierFactory idFactory = ((RDBMSStoreManager)storeMgr).getIdentifierFactory();
+            sequenceCatalogName = idFactory.getIdentifierInAdapterCase(sequenceCatalogName);
+        }
+
         String sequenceSchemaName = properties.getProperty("sequence-schema-name");
         if (sequenceSchemaName == null)
         {
             sequenceSchemaName = properties.getProperty("schema-name");
         }
+        if (!StringUtils.isWhitespace(sequenceSchemaName))
+        {
+            IdentifierFactory idFactory = ((RDBMSStoreManager)storeMgr).getIdentifierFactory();
+            sequenceSchemaName = idFactory.getIdentifierInAdapterCase(sequenceSchemaName);
+        }
+
+        String seqName = properties.getProperty("sequence-name");
+        IdentifierFactory idFactory = ((RDBMSStoreManager)storeMgr).getIdentifierFactory();
+        seqName = idFactory.getIdentifierInAdapterCase(seqName);
         return ((RDBMSStoreManager)storeMgr).getDatastoreAdapter().sequenceExists((Connection) connection.getConnection(), 
-            sequenceCatalogName, sequenceSchemaName, properties.getProperty("sequence-name"));
+            sequenceCatalogName, sequenceSchemaName, seqName);
     }
 
     /**
