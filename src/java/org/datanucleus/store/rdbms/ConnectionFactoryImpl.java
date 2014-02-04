@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -600,6 +601,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             {
                 listeners.clear();
             }
+            if (savepoints != null)
+            {
+                savepoints.clear();
+                savepoints = null;
+            }
             this.conn = null;
         }
 
@@ -625,6 +631,78 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 }
             }
             return null;
+        }
+
+        private Map<String, Savepoint> savepoints = null;
+        /* (non-Javadoc)
+         * @see org.datanucleus.store.connection.AbstractManagedConnection#setSavepoint(java.lang.String)
+         */
+        @Override
+        public void setSavepoint(String name)
+        {
+            try
+            {
+                Savepoint sp = ((Connection)conn).setSavepoint(name);
+                if (savepoints == null)
+                {
+                    savepoints = new HashMap<String, Savepoint>();
+                }
+                savepoints.put(name, sp);
+            }
+            catch (SQLException sqle)
+            {
+                throw new NucleusDataStoreException("Exception setting savepoint " + name, sqle);
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see org.datanucleus.store.connection.AbstractManagedConnection#releaseSavepoint(java.lang.String)
+         */
+        @Override
+        public void releaseSavepoint(String name)
+        {
+            try
+            {
+                if (savepoints == null)
+                {
+                    return;
+                }
+                Savepoint sp = savepoints.remove(name);
+                if (sp == null)
+                {
+                    throw new IllegalStateException("No savepoint with name " + name);
+                }
+                ((Connection)conn).releaseSavepoint(sp);
+            }
+            catch (SQLException sqle)
+            {
+                throw new NucleusDataStoreException("Exception releasing savepoint " + name, sqle);
+            }
+        }
+
+        /* (non-Javadoc)
+         * @see org.datanucleus.store.connection.AbstractManagedConnection#rollbackToSavepoint(java.lang.String)
+         */
+        @Override
+        public void rollbackToSavepoint(String name)
+        {
+            try
+            {
+                if (savepoints == null)
+                {
+                    return;
+                }
+                Savepoint sp = savepoints.get(name);
+                if (sp == null)
+                {
+                    throw new IllegalStateException("No savepoint with name " + name);
+                }
+                ((Connection)conn).rollback(sp);
+            }
+            catch (SQLException sqle)
+            {
+                throw new NucleusDataStoreException("Exception rolling back to savepoint " + name, sqle);
+            }
         }
     }
 
