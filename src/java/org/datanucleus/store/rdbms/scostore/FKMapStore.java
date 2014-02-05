@@ -30,6 +30,7 @@ import org.datanucleus.Transaction;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData;
@@ -215,7 +216,8 @@ public class FKMapStore extends AbstractMapStore
             if (key_field_name != null)
             {
                 // check if key field exists in the ClassMetaData for the element-value type
-                vkfmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForMember(valueClass, clr, key_field_name);
+                AbstractClassMetaData vkCmd = storeMgr.getMetaDataManager().getMetaDataForClass(valueClass, clr);
+                vkfmd = (vkCmd != null ? vkCmd.getMetaDataForMember(key_field_name) : null);
                 if (vkfmd == null)
                 {
                     throw new NucleusUserException(LOCALISER.msg("056052", valueClass.getName(), key_field_name));
@@ -327,7 +329,8 @@ public class FKMapStore extends AbstractMapStore
             if (value_field_name != null)
             {
                 // check if value field exists in the ClassMetaData for the element-value type
-                vkfmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForMember(keyClass, clr, value_field_name);
+                AbstractClassMetaData vkCmd = storeMgr.getMetaDataManager().getMetaDataForClass(keyClass, clr);
+                vkfmd = (vkCmd != null ? vkCmd.getMetaDataForMember(value_field_name) : null);
                 if (vkfmd == null)
                 {
                     throw new NucleusUserException(LOCALISER.msg("056059", keyClass.getName(), value_field_name));

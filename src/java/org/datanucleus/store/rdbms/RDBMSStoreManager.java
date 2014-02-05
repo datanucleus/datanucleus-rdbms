@@ -2507,7 +2507,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         else
         {
-            AbstractMemberMetaData mmd = getMetaDataManager().getMetaDataForMember(im.className, im.fieldName, clr);
+            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(im.className, clr);
+            AbstractMemberMetaData mmd = cmd.getMetaDataForMember(im.fieldName);
             m = ct.getMemberMapping(mmd);
             Table t = getTable(mmd);
             if (im.subfieldName == null)

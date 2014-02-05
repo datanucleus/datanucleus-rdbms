@@ -29,6 +29,7 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
@@ -124,7 +125,8 @@ public class FKArrayStore extends AbstractArrayStore
         {
             // 1-N FK bidirectional
             // The element class has a field for the owner.
-            AbstractMemberMetaData eofmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForMember(element_class, clr, mappedByFieldName);
+            AbstractClassMetaData eoCmd = storeMgr.getMetaDataManager().getMetaDataForClass(element_class, clr);
+            AbstractMemberMetaData eofmd = (eoCmd != null ? eoCmd.getMetaDataForMember(mappedByFieldName) : null);
             if (eofmd == null)
             {
                 throw new NucleusUserException(LOCALISER.msg("056024", mmd.getFullFieldName(), 
