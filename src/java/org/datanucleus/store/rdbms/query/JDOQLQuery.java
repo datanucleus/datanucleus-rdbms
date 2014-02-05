@@ -249,28 +249,6 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         // Make sure any persistence info is loaded
         ec.hasPersistenceInformationForClass(candidateClass);
-        AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
-        if (candidateClass.isInterface())
-        {
-            // Query of interface
-            String[] impls = ec.getMetaDataManager().getClassesImplementingInterface(candidateClass.getName(), clr);
-            // TODO What if we have persistent-interface and inheritance here? (i.e more than 1 implementation)
-            if (acmd.isImplementationOfPersistentDefinition() && impls.length == 1)
-            {
-                // Only the generated implementation, so just use its metadata
-            }
-            else
-            {
-                // Use metadata for the persistent interface
-                acmd = ec.getMetaDataManager().getMetaDataForInterface(candidateClass, clr);
-                if (acmd == null)
-                {
-                    throw new NucleusUserException("Attempting to query an interface yet it is not declared 'persistent'." +
-                        " Define the interface in metadata as being persistent to perform this operation, and make sure" +
-                    " any implementations use the same identity and identity member(s)");
-                }
-            }
-        }
 
         if (parameterValues != null)
         {
@@ -337,6 +315,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         }
 
         // Compile the query for the datastore since not cached
+        AbstractClassMetaData acmd = getCandidateClassMetaData();
         if (type == Query.BULK_UPDATE)
         {
             datastoreCompilation = new RDBMSQueryCompilation();

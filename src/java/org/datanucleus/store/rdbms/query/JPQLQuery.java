@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.PropertyNames;
@@ -246,8 +245,6 @@ public class JPQLQuery extends AbstractJPQLQuery
 
         // Create the SQL statement, and its result/parameter definitions
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-        ClassLoaderResolver clr = ec.getClassLoaderResolver();
-        AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
         QueryManager qm = getQueryManager();
         String datastoreKey = storeMgr.getQueryCacheKey();
         String queryCacheKey = getQueryCacheKey();
@@ -285,6 +282,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
 
         // No cached compilation for this query in this datastore so compile it
+        AbstractClassMetaData acmd = getCandidateClassMetaData();
         if (type == Query.BULK_UPDATE)
         {
             datastoreCompilation = new RDBMSQueryCompilation();
