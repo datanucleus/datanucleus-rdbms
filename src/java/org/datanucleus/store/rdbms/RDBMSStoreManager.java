@@ -678,7 +678,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (toBeAdded)
         {
             // Add the class to our supported list
-            addClass(className, clr);
+            manageClasses(clr, className);
 
             // Retry
             schemaLock.readLock().lock();
@@ -776,7 +776,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     if (!storeDataMgr.managesClass(subclasses[i]))
                     {
-                        addClass(subclasses[i], clr);
+                        manageClasses(clr, subclasses[i]);
                     }
                 }
             }
@@ -1588,10 +1588,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to add several persistable classes to the store manager's set of supported classes.
      * This will create any necessary database objects (tables, views, constraints, indexes etc). 
      * This will also cause the addition of any related classes.
-     * @param classNames Name of the class(es) to be added.
      * @param clr The ClassLoaderResolver
+     * @param classNames Name of the class(es) to be added.
      */
-    public void addClasses(String[] classNames, ClassLoaderResolver clr)
+    public void manageClasses(ClassLoaderResolver clr, String... classNames)
     {
         try
         {
@@ -1619,7 +1619,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Utility to remove all classes that we are managing.
      * @param clr The ClassLoaderResolver
      */
-    public void removeAllClasses(ClassLoaderResolver clr)
+    public void unmanageAllClasses(ClassLoaderResolver clr)
     {
         DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this,
             Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
@@ -4413,7 +4413,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     // Generate the tables/constraints for these classes (so we know the tables to delete)
                     // TODO This will add CREATE to the DDL, need to be able to omit this
                     String[] classNameArray = classNames.toArray(new String[classNames.size()]);
-                    addClasses(classNameArray, clr); // Add them to mgr first
+                    manageClasses(clr, classNameArray); // Add them to mgr first
 
                     // Delete the tables of the required classes
                     DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this,
@@ -4482,7 +4482,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
 
             String[] classNameArray = classNames.toArray(new String[classNames.size()]);
-            addClasses(classNameArray, clr); // Validates since we have the flags set
+            manageClasses(clr, classNameArray); // Validates since we have the flags set
         }
         else
         {
