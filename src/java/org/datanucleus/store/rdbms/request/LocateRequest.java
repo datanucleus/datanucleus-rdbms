@@ -140,7 +140,7 @@ public class LocateRequest extends Request
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
                 tenantMapping);
             SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping,
-                storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 

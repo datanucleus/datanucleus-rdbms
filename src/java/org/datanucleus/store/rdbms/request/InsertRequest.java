@@ -314,7 +314,7 @@ public class InsertRequest extends Request
                     {
                         table.getMultitenancyMapping().setObject(ec, ps,
                             multitenancyStmtMapping.getParameterPositionsForOccurrence(0), 
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                     }
 
                     // Discriminator mapping (optional)

@@ -325,7 +325,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         // Add Multi-tenancy discriminator if applicable
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
-        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID) != null)
+        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
         {
             if ("true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable")))
             {

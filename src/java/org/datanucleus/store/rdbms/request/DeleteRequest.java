@@ -295,7 +295,7 @@ public class DeleteRequest extends Request
                     {
                         table.getMultitenancyMapping().setObject(ec, ps,
                             multitenancyStatementMapping.getParameterPositionsForOccurrence(0), 
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                     }
 
                     if (optimisticChecks)

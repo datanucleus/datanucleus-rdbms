@@ -1225,7 +1225,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
                 SQLExpression tenantVal = 
                         stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1333,7 +1333,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
                 SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?

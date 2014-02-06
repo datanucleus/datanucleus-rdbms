@@ -322,7 +322,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                 stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
             SQLExpression tenantVal = 
                 stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_TENANT_ID));
+                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
