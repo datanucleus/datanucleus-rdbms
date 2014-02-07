@@ -1427,11 +1427,7 @@ public class RDBMSMappingManager implements MappingManager
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            ColumnMetaData[] fmdColmds = fmd.getColumnMetaData();
-            if (fmdColmds != null && fmdColmds.length > 0)
-            {
-                colmd.setName(fmdColmds[0].getName());
-            }
+            colmd.setName(fmd.getColumn());
             if (columnContainer != null)
             {
                 columnContainer.addColumn(colmd);
@@ -1569,11 +1565,7 @@ public class RDBMSMappingManager implements MappingManager
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            ColumnMetaData[] fmdColmds = fmd.getColumnMetaData();
-            if (fmdColmds != null && fmdColmds.length > 0)
-            {
-                colmd.setName(fmdColmds[0].getName());
-            }
+            colmd.setName(fmd.getColumn());
             fmd.addColumn(colmd);
         }
 
