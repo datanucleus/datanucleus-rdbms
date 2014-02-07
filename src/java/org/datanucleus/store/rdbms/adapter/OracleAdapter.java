@@ -198,11 +198,6 @@ public class OracleAdapter extends BaseDatastoreAdapter
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "SDO_GEOMETRY", (short)Types.STRUCT, 0, null, null, null, 1, false, (short)0,
-            false, false, false, "SDO_GEOMETRY", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)OracleTypeInfo.TYPES_SDO_GEOMETRY, sqlType, true);
-
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
             OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE,
             1073741823, "'", "'", null, 1, true, (short)0, 
             false, false, false, OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)0, (short)0, 10);
