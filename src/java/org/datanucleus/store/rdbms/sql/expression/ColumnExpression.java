@@ -21,6 +21,7 @@ import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
@@ -36,6 +37,8 @@ public class ColumnExpression extends SQLExpression
 
     boolean omitTableFromString = false;
 
+    boolean appendedSelfToStatement = false;
+    
     /**
      * Constructor for an SQL expression for a parameter.
      * @param stmt The statement
@@ -49,6 +52,7 @@ public class ColumnExpression extends SQLExpression
     {
         super(stmt, null, mapping);
         st.appendParameter(parameterName, mapping, value, colNumber);
+        appendedSelfToStatement = true;
     }
 
     /**
@@ -61,7 +65,9 @@ public class ColumnExpression extends SQLExpression
     {
         super(stmt, table, null);
         this.column = col;
-        st.append(toString());
+        // Remove append b/c setOmitTableFromString requires that we don't generate
+        // the expression for this column until we actually need it (and the caller
+        // has adjusted setOmitTableFromString appropriately).
     }
 
     /**
@@ -73,9 +79,28 @@ public class ColumnExpression extends SQLExpression
     {
         super(stmt, null, null);
         this.value = value;
-        st.append(toString());
+        // Remove append b/c setOmitTableFromString requires that we don't generate
+        // the expression for this column until we actually need it (and the caller
+        // has adjusted setOmitTableFromString appropriately).
     }
 
+    /**
+     * B/c of setOmitTableFromString, we dynamically call toString when a caller
+     * asks for it, not at construction time. We only do this once.
+     * 
+     * @return The SQL
+     */
+    @Override
+    public SQLText toSQLText()
+    {   
+        if (!appendedSelfToStatement) {
+            st.append(toString());
+            appendedSelfToStatement = true;
+        }
+        
+        return st;
+    }
+    
     public BooleanExpression eq(SQLExpression expr)
     {
         return new BooleanExpression(this, Expression.OP_EQ, expr);
@@ -89,6 +114,9 @@ public class ColumnExpression extends SQLExpression
     public void setOmitTableFromString(boolean omitTable)
     {
         this.omitTableFromString = omitTable;
+        
+        // XXX: The "appended" list in the SQLText will now be wrong b/c it was generated
+        // at construction time using toString. We need this to be dynamic.
     }
 
     /**
