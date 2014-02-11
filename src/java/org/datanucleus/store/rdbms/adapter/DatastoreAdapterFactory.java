@@ -42,7 +42,7 @@ import org.datanucleus.util.NucleusLogger;
  * Provides a level of autodetection of the adapter to use for a particular RDBMS.
  * It uses the DatabaseMetaData to extract the "product name" and matches
  * this against a series of "adapter aliases" that we define internally or that can 
- * be contributed by plugins that extend the <code>org.datanucleus.store_datastoreadapter</code> 
+ * be contributed by plugins that extend the <code>org.datanucleus.store.rdbms.datastoreadapter</code> 
  * extension point. These extension can define a priority, so if multiple adapter match for the 
  * given database connection the one with the highest priority is chosen.
  * <H3>Specification of adapter class</H3>
@@ -194,7 +194,7 @@ public class DatastoreAdapterFactory
     protected Class getAdapterClass(PluginManager pluginMgr, String adapterClassName, String productName, ClassLoaderResolver clr)
     {
         ConfigurationElement[] elems =
-            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store_datastoreadapter", null, null);
+            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastoreadapter", null, null);
         if (elems != null)
         {
             for (int i=0;i<elems.length;i++)

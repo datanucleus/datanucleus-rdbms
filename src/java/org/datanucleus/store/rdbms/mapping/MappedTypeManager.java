@@ -36,7 +36,7 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Registry of java type mapping support. Provides a lookup between java type and the mapping to use
- * for that type. Uses the plugin mechanism extension-point "org.datanucleus.store_mapping".
+ * for that type. Uses the plugin mechanism extension-point "org.datanucleus.store.rdbms.java_mapping".
  */
 public class MappedTypeManager
 {
@@ -146,7 +146,7 @@ public class MappedTypeManager
      */
     private void loadMappings(PluginManager mgr, ClassLoaderResolver clr)
     {
-        ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.store_mapping", null, null);
+        ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.java_mapping", null, null);
         if (elems != null)
         {
             for (int i=0;i<elems.length;i++)

@@ -23,13 +23,16 @@ Contributors:
     ...
 **********************************************************************-->
 <plugin id="org.datanucleus.store.rdbms" provider-name="DataNucleus">
+    <extension-point id="datastoreadapter" name="Datastore Adapter" schema="schema/datastoreadapter.exsd"/>
     <extension-point id="connectionprovider" name="Connection Provider" schema="schema/connectionprovider.exsd"/>
     <extension-point id="connectionpool" name="ConnectionPool" schema="schema/connectionpool.exsd"/>
     <extension-point id="sql_expression" name="SQL Expressions" schema="schema/sql_expression.exsd"/>
     <extension-point id="sql_method" name="SQL Methods" schema="schema/sql_method.exsd"/>
     <extension-point id="sql_operation" name="SQL Expressions" schema="schema/sql_operation.exsd"/>
     <extension-point id="sql_tablenamer" name="SQL Table Namer" schema="schema/sql_tablenamer.exsd"/>
-    <extension-point id="rdbms_mapping" name="RDBMS Mapping" schema="schema/rdbms_mapping.exsd"/>
+    <extension-point id="java_mapping" name="Types Mapping" schema="schema/java_mapping.exsd"/>
+    <extension-point id="datastore_mapping" name="Datastore Mapping" schema="schema/datastore_mapping.exsd"/>
+    <extension-point id="identifierfactory" name="Identifier Factory" schema="schema/identifierfactory.exsd"/>
 
     <!-- STORE MANAGER -->
     <extension point="org.datanucleus.store_manager">
@@ -147,8 +150,8 @@ Contributors:
         <valuegenerator name="table-sequence" class-name="org.datanucleus.store.rdbms.valuegenerator.TableGenerator" datastore="rdbms"/>
     </extension>
 
-    <!-- JAVA TYPES MAPPING, for "mapped" datastores -->
-    <extension point="org.datanucleus.store_mapping">
+    <!-- RDBMS : JAVA TYPES MAPPING -->
+    <extension point="org.datanucleus.store.rdbms.java_mapping">
         <!-- "primitive" types -->
         <mapping java-type="boolean" mapping-class="org.datanucleus.store.rdbms.mapping.java.BooleanMapping"/>
         <mapping java-type="byte" mapping-class="org.datanucleus.store.rdbms.mapping.java.ByteMapping"/>
@@ -289,7 +292,7 @@ Contributors:
         <mapping java-type="org.datanucleus.store.types.backed.Vector" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
     </extension>
 
-    <!-- RDBMS MAPPING -->
+    <!-- RDBMS Datastore Mapping -->
     <!--
     DB2 : JDBC TINYINT, BIT not supported
     Derby : JDBC TINYINT, BIT not supported, SQL INT types are alias to the SQL INTEGER type
@@ -305,7 +308,7 @@ Contributors:
     Sybase : JDBC FLOAT, BIGINT not supported, SQL INT types are alias to the SQL INTEGER type
     NuoDB : TINYINT not supported
     -->
-    <extension point="org.datanucleus.store.rdbms.rdbms_mapping">
+    <extension point="org.datanucleus.store.rdbms.datastore_mapping">
         <mapping java-type="java.lang.Boolean" jdbc-type="BIT" sql-type="BIT" default="true"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
             <excludes vendor-id="derby"/>
@@ -773,8 +776,8 @@ Contributors:
         </mapping>
     </extension>
 
-    <!-- IDENTIFIER FACTORIES -->
-    <extension point="org.datanucleus.store_identifierfactory">
+    <!-- IDENTIFIER FACTORIES. TODO Adopt NamingFactory -->
+    <extension point="org.datanucleus.store.rdbms.identifierfactory">
         <identifierfactory name="datanucleus2" class-name="org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory"/>
         <identifierfactory name="jpa" class-name="org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory"/>
         <identifierfactory name="datanucleus1" class-name="org.datanucleus.store.rdbms.identifier.DNIdentifierFactory"/>
@@ -1274,7 +1277,7 @@ Contributors:
     </extension>
 
     <!-- DATASTORE ADAPTERS -->
-    <extension point="org.datanucleus.store_datastoreadapter">
+    <extension point="org.datanucleus.store.rdbms.datastoreadapter">
         <datastore-adapter vendor-id="Adaptive Server Anywhere" class-name="org.datanucleus.store.rdbms.adapter.SybaseAdapter" priority="0"/>
         <datastore-adapter vendor-id="Adaptive Server Enterprise" class-name="org.datanucleus.store.rdbms.adapter.SybaseAdapter" priority="0"/>
         <datastore-adapter vendor-id="Adaptive Server IQ" class-name="org.datanucleus.store.rdbms.adapter.SybaseAdapter" priority="0"/>

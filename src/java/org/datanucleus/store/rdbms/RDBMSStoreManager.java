@@ -442,7 +442,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         String idFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY);
-        String idFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.store_identifierfactory", 
+        String idFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.store.rdbms.identifierfactory", 
             "name", idFactoryName, "class-name");
         if (idFactoryClassName == null)
         {
@@ -491,7 +491,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             Class[] argTypes = new Class[] {DatastoreAdapter.class, ClassConstants.CLASS_LOADER_RESOLVER, Map.class};
             Object[] args = new Object[] {dba, nucleusContext.getClassLoaderResolver(null), props};
             identifierFactory = (IdentifierFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                "org.datanucleus.store_identifierfactory", "name", idFactoryName, "class-name", 
+                "org.datanucleus.store.rdbms.identifierfactory", "name", idFactoryName, "class-name", 
                 argTypes, args);
         }
         catch (ClassNotFoundException cnfe)

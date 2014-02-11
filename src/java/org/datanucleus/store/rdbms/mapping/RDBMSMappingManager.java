@@ -127,7 +127,7 @@ public class RDBMSMappingManager implements MappingManager
         datastoreMappingsBySQLType = new MultiMap();
         datastoreMappingsByJavaType = new MultiMap();
         ConfigurationElement[] elems =
-            mgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.rdbms_mapping", null, null);
+            mgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastore_mapping", null, null);
         if (elems != null)
         {
             for (int i=0;i<elems.length;i++)
