@@ -555,14 +555,14 @@ public abstract class ElementContainerTable extends JoinTable
         {
             // User has defined a unique key on the join table
             UniqueMetaData unimd = mmd.getJoinMetaData().getUniqueMetaData();
-            ColumnMetaData[] colmds = unimd.getColumnMetaData();
-            if (colmds != null)
+            if (unimd.getNumberOfColumns() > 0)
             {
+                String[] columnNames = unimd.getColumnNames();
                 CandidateKey uniKey = new CandidateKey(this);
                 IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-                for (int i=0;i<colmds.length;i++)
+                for (String columnName : columnNames)
                 {
-                    Column col = getColumn(idFactory.newColumnIdentifier(colmds[i].getName()));
+                    Column col = getColumn(idFactory.newColumnIdentifier(columnName));
                     if (col != null)
                     {
                         uniKey.addColumn(col);
@@ -570,7 +570,7 @@ public abstract class ElementContainerTable extends JoinTable
                     else
                     {
                         throw new NucleusUserException("Unique key on join-table " + this + " has column " +
-                            colmds[i].getName() + " that is not found");
+                            columnName + " that is not found");
                     }
                 }
                 candidateKeys.add(uniKey);

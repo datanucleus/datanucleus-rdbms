@@ -2088,19 +2088,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         // Set the column(s) to index
         // Class-level index so use its column definition
-        ColumnMetaData[] colmds = imd.getColumnMetaData();
-        String[] memberNames = imd.getMemberNames();
-        // a). Columns specified directly
-        if (colmds != null && colmds.length > 0)
+        if (imd.getNumberOfColumns() > 0)
         {
-            for (int i=0;i<colmds.length;i++)
+            // a). Columns specified directly
+            String[] columnNames = imd.getColumnNames();
+            for (String columnName : columnNames)
             {
-                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(colmds[i].getName());
+                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(columnName);
                 Column col = columnsByName.get(colName);
                 if (col == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058001", toString(), index.getName(),
-                        colmds[i].getName()));
+                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058001", toString(), index.getName(), columnName));
                     break;
                 }
                 else
@@ -2109,9 +2107,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
             }
         }
-        // b). Columns specified using fields
-        else if (memberNames != null && memberNames.length > 0)
+        else if (imd.getNumberOfMembers() > 0)
         {
+            // b). Columns specified using members
+            String[] memberNames = imd.getMemberNames();
             for (int i=0;i<memberNames.length;i++)
             {
                 // Find the metadata for the actual field with the same name as this "index" field
@@ -2510,19 +2509,18 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         // Class-level index so use its column definition
-        ColumnMetaData[] colmds = umd.getColumnMetaData();
-        String[] memberNames = umd.getMemberNames();
         // a). Columns specified directly
-        if (colmds != null && colmds.length > 0)
+        if (umd.getNumberOfColumns() > 0)
         {
-            for (int i=0;i<colmds.length;i++)
+            String[] columnNames = umd.getColumnNames();
+            for (String columnName : columnNames)
             {
-                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(colmds[i].getName());
+                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(columnName);
                 Column col = columnsByName.get(colName);
                 if (col == null)
                 {
                     NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058202", 
-                        toString(), ck.getName(), colmds[i].getName()));
+                        toString(), ck.getName(), columnName));
                     break;
                 }
                 else
@@ -2532,16 +2530,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
         // b). Columns specified using fields
-        else if (memberNames != null && memberNames.length > 0)
+        else if (umd.getNumberOfMembers() > 0)
         {
-            for (int i=0;i<memberNames.length;i++)
+            String[] memberNames = umd.getMemberNames();
+            for (String memberName : memberNames)
             {
                 // Find the metadata for the actual field with the same name as this "unique" field
-                AbstractMemberMetaData realMmd = getMetaDataForMember(memberNames[i]);
+                AbstractMemberMetaData realMmd = getMetaDataForMember(memberName);
                 if (realMmd == null)
                 {
                     // User is an idiot and has specified some field that doesnt exist
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Unique metadata defined to use field " + memberNames[i] + " which doesn't exist in this class");
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Unique metadata defined to use field " + memberName + " which doesn't exist in this class");
                     return null;
                 }
                 JavaTypeMapping memberMapping = memberMappingsMap.get(realMmd);
