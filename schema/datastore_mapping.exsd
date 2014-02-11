@@ -69,7 +69,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.store.mapped.mapping.DatastoreMapping"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping"/>
                </appInfo>
             </annotation>
          </attribute>

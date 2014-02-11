@@ -62,7 +62,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.store.adapter.DatastoreAdapter"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.adapter.DatastoreAdapter"/>
                </appInfo>
             </annotation>
          </attribute>

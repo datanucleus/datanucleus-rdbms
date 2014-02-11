@@ -62,7 +62,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.store.mapped.IdentifierFactory"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.identifier.IdentifierFactory"/>
                </appInfo>
             </annotation>
          </attribute>
