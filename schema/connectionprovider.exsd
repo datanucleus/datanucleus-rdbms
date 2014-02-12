@@ -62,7 +62,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.datanucleus.store.rdbms.ConnectionProvider"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.ConnectionProvider"/>
                </appInfo>
             </annotation>
          </attribute>
