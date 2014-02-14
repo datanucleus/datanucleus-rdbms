@@ -39,14 +39,29 @@ import org.datanucleus.store.schema.StoreSchemaHandler;
  */
 public class NuoDBAdapter extends BaseDatastoreAdapter
 {
+    public static final String NONSQL92_RESERVED_WORDS =
+            "BIGINT,BINARY,BLOB,BOOLEAN,CLOB,LIMIT,NCLOB,OFFSET,ROLE,TRIGGER";
+
+    public static final String NUODB_EXTRA_RESERVED_WORDS =
+            "BITS,BREAK,CATCH,CONTAINING,END_FOR,END_IF,END_PROCEDURE," +
+                    "END_TRIGGER,END_TRY,END_WHILE,ENUM,FOR_UPDATE,IF," +
+                    "LOGICAL_AND,LOGICAL_NOT,LOGICAL_OR,NEXT_VALUE,NOT_BETWEEN," +
+                    "NOT_CONTAINING,NOT_IN,NOT_LIKE,NOT_STARTING,NVARCHAR,OFF," +
+                    "RECORD_BATCHING,REGEXP,SHOW,SMALLDATETIME,STARTING,STRING_TYPE," +
+                    "THROW,TINYBLOB,TINYINT,TRY,VAR,VER";
+
     public NuoDBAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
+
+        reservedKeywords.addAll(parseKeywordList(NONSQL92_RESERVED_WORDS));
+        reservedKeywords.addAll(parseKeywordList(NUODB_EXTRA_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(STORED_PROCEDURES);
 
         // NuoDB JDBC driver doesn't specify lengths in 2.0.2
         if (maxTableNameLength <= 0)
@@ -76,6 +91,10 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
+        supportedOptions.remove(FK_DELETE_ACTION_CASCADE);
+        supportedOptions.remove(FK_DELETE_ACTION_DEFAULT);
+        supportedOptions.remove(FK_UPDATE_ACTION_CASCADE);
+        supportedOptions.remove(FK_UPDATE_ACTION_DEFAULT);
 
         supportedOptions.remove(RESULTSET_TYPE_SCROLL_SENSITIVE);
         supportedOptions.remove(RESULTSET_TYPE_SCROLL_INSENSITIVE);
@@ -84,6 +103,8 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(TX_ISOLATION_READ_UNCOMMITTED);
         supportedOptions.remove(TX_ISOLATION_NONE);
+
+        supportedOptions.remove(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
     }
 
     public String getVendorID()
