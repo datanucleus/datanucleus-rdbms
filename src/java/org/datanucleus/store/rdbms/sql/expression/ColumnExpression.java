@@ -44,8 +44,7 @@ public class ColumnExpression extends SQLExpression
      * @param value The value for the parameter for this column
      * @param colNumber Column number of the mapping being represented here
      */
-    protected ColumnExpression(SQLStatement stmt, String parameterName, JavaTypeMapping mapping, 
-            Object value, int colNumber)
+    protected ColumnExpression(SQLStatement stmt, String parameterName, JavaTypeMapping mapping, Object value, int colNumber)
     {
         super(stmt, null, mapping);
         st.appendParameter(parameterName, mapping, value, colNumber);
@@ -88,7 +87,10 @@ public class ColumnExpression extends SQLExpression
 
     public void setOmitTableFromString(boolean omitTable)
     {
+        // Part of UPDATE ... SET clause, and we can't use the table, so mark as ignoring, rollback the SQL, and regenerate
         this.omitTableFromString = omitTable;
+        this.st.clearStatement();
+        this.st.append(toString());
     }
 
     /**

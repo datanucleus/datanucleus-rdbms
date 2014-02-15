@@ -18,6 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.scostore;
 
+import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -229,19 +230,22 @@ public abstract class ElementContainerStore extends BaseContainerStore
     protected ElementInfo[] getElementInformationForClass()
     {
         ElementInfo[] info = null;
-        DatastoreClass tbl;
+
+        DatastoreClass rootTbl;
         String[] clsNames;
-        if (!clr.classForName(elementType).isInterface())
+        if (clr.classForName(elementType).isInterface())
         {
-            tbl = storeMgr.getDatastoreClass(elementType, clr);
-            clsNames = new String[] {elementType};
+            // Collection<interface>, so find implementations of the interface and choose the first
+            clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+            rootTbl = storeMgr.getDatastoreClass(clsNames[0], clr);
         }
         else
         {
-            clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
-            tbl = storeMgr.getDatastoreClass(clsNames[0], clr);
+            clsNames = new String[] {elementType};
+            rootTbl = storeMgr.getDatastoreClass(elementType, clr);
         }
-        if (tbl == null)
+
+        if (rootTbl == null)
         {
             AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
             info = new ElementInfo[subclassCmds.length];
@@ -261,6 +265,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 info[i] = new ElementInfo(cmd, table);
             }
         }
+
         return info;
     }
 
@@ -761,55 +766,73 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 StringBuilder discrStmt = new StringBuilder();
                 for (int i = 0; i < getElementInfo().length; i++)
                 {
-                    if (getElementInfo()[i].getDiscriminatorMapping() != null)
+                    ElementInfo elemInfo = getElementInfo()[i];
+
+                    if (elemInfo.getDiscriminatorMapping() != null)
                     {
                         usingDiscriminatorInSizeStmt = true;
-                        if (discrStmt.length() > 0)
-                        {
-                            discrStmt.append(" OR ");
-                        }
-                        JavaTypeMapping discrimMapping = getElementInfo()[i].getDiscriminatorMapping();
-                        for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
-                        {
-                            if (joinedDiscrim)
-                            {
-                                discrStmt.append(joinedElementAlias);
-                            }
-                            else
-                            {
-                                discrStmt.append(containerAlias);
-                            }
-                            discrStmt.append(".");
-                            discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
-                            discrStmt.append("=");
-                            discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
-                        }
 
-                        Collection<String> subclasses = storeMgr.getSubClassesForClass(getElementInfo()[i].getClassName(), true, clr);
-                        if (subclasses != null && subclasses.size() > 0)
+                        JavaTypeMapping discrimMapping = elemInfo.getDiscriminatorMapping();
+                        // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
+                        Class cls = clr.classForName(elemInfo.getClassName());
+                        if (!Modifier.isAbstract(cls.getModifiers()))
                         {
-                            for (int j = 0; j < subclasses.size(); j++)
+                            for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
                             {
-                                for (int k = 0; k < discrimMapping.getNumberOfDatastoreMappings(); k++)
+                                if (discrStmt.length() > 0)
                                 {
                                     discrStmt.append(" OR ");
-                                    if (joinedDiscrim)
+                                }
+
+                                if (joinedDiscrim)
+                                {
+                                    discrStmt.append(joinedElementAlias);
+                                }
+                                else
+                                {
+                                    discrStmt.append(containerAlias);
+                                }
+                                discrStmt.append(".");
+                                discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                                discrStmt.append("=");
+                                discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                            }
+                        }
+
+                        Collection<String> subclasses = storeMgr.getSubClassesForClass(elemInfo.getClassName(), true, clr);
+                        if (subclasses != null && subclasses.size() > 0)
+                        {
+                            for (String subclass : subclasses)
+                            {
+                                cls = clr.classForName(subclass);
+                                if (!Modifier.isAbstract(cls.getModifiers()))
+                                {
+                                    for (int k = 0; k < discrimMapping.getNumberOfDatastoreMappings(); k++)
                                     {
-                                        discrStmt.append(joinedElementAlias);
+                                        if (discrStmt.length() > 0)
+                                        {
+                                            discrStmt.append(" OR ");
+                                        }
+
+                                        if (joinedDiscrim)
+                                        {
+                                            discrStmt.append(joinedElementAlias);
+                                        }
+                                        else
+                                        {
+                                            discrStmt.append(containerAlias);
+                                        }
+                                        discrStmt.append(".");
+                                        discrStmt.append(discrimMapping.getDatastoreMapping(k).getColumn().getIdentifier().toString());
+                                        discrStmt.append("=");
+                                        discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(k)).getUpdateInputParameter());
                                     }
-                                    else
-                                    {
-                                        discrStmt.append(containerAlias);
-                                    }
-                                    discrStmt.append(".");
-                                    discrStmt.append(discrimMapping.getDatastoreMapping(k).getColumn().getIdentifier().toString());
-                                    discrStmt.append("=");
-                                    discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(k)).getUpdateInputParameter());
                                 }
                             }
                         }
                     }
                 }
+
                 if (discrStmt.length() > 0)
                 {
                     stmt.append(" AND (");
@@ -817,9 +840,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     if (allowNulls)
                     {
                         stmt.append(" OR ");
-                        stmt.append(
-                            getElementInfo()[0].getDiscriminatorMapping().getDatastoreMapping(0).getColumn()
-                                .getIdentifier().toString());
+                        stmt.append(getElementInfo()[0].getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
                         stmt.append(" IS NULL");
                     }
                     stmt.append(")");

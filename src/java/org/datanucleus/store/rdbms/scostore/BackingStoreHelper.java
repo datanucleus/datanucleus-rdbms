@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.scostore;
 
+import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.Iterator;
@@ -238,21 +239,25 @@ public class BackingStoreHelper
         DiscriminatorStrategy strategy = info.getDiscriminatorStrategy();
         JavaTypeMapping discrimMapping = info.getDiscriminatorMapping();
 
-        // Include element type
-        if (strategy == DiscriminatorStrategy.CLASS_NAME)
+        Class cls = clr.classForName(info.getClassName());
+        if (!Modifier.isAbstract(cls.getModifiers()))
         {
-            discrimMapping.setObject(ec, ps, 
-                MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), info.getClassName());
-            jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
-        }
-        else
-        {
-            if (strategy == DiscriminatorStrategy.VALUE_MAP)
+            // Include element type
+            if (strategy == DiscriminatorStrategy.CLASS_NAME)
             {
                 discrimMapping.setObject(ec, ps, 
-                    MappingHelper.getMappingIndices(jdbcPosition, discrimMapping),
-                    info.getAbstractClassMetaData().getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                    MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), info.getClassName());
                 jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+            }
+            else
+            {
+                if (strategy == DiscriminatorStrategy.VALUE_MAP)
+                {
+                    discrimMapping.setObject(ec, ps, 
+                        MappingHelper.getMappingIndices(jdbcPosition, discrimMapping),
+                        info.getAbstractClassMetaData().getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                    jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+                }
             }
         }
 
@@ -267,22 +272,25 @@ public class BackingStoreHelper
                 while (iter.hasNext())
                 {
                     String subclass = iter.next();
-                    if (strategy == DiscriminatorStrategy.CLASS_NAME)
+                    Class subcls = clr.classForName(subclass);
+                    if (!Modifier.isAbstract(subcls.getModifiers()))
                     {
-                        discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition,
-                            discrimMapping), subclass);
-                        jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
-                    }
-                    else
-                    {
-                        if (strategy == DiscriminatorStrategy.VALUE_MAP)
+                        if (strategy == DiscriminatorStrategy.CLASS_NAME)
                         {
-                            AbstractClassMetaData subclassCmd = storeMgr.getNucleusContext().getMetaDataManager()
-                                .getMetaDataForClass(subclass, clr);
                             discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition,
-                                discrimMapping),
-                                subclassCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                                discrimMapping), subclass);
                             jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+                        }
+                        else
+                        {
+                            if (strategy == DiscriminatorStrategy.VALUE_MAP)
+                            {
+                                AbstractClassMetaData subclassCmd = storeMgr.getNucleusContext().getMetaDataManager()
+                                        .getMetaDataForClass(subclass, clr);
+                                discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping),
+                                    subclassCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                                jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+                            }
                         }
                     }
                 }

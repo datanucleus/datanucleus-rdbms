@@ -18,6 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.scostore;
 
+import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -300,38 +301,47 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         // TODO Remove the "containerTable == " clause and make discriminator restriction part of the JoinTable statement too
         // Needs to pass TCK M-M relationship test. see contains(ObjectProvider, Object) method also
-        if (elementInfo != null && containerTable == elementInfo[0].getDatastoreClass() &&
-                elementInfo[0].getDiscriminatorMapping() != null)
+        JavaTypeMapping discrimMapping = (elementInfo != null ? elementInfo[0].getDiscriminatorMapping() : null);
+
+        if (elementInfo != null && containerTable == elementInfo[0].getDatastoreClass() && discrimMapping != null)
         {
+            // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
+            StringBuilder discrimStr = new StringBuilder();
+
             // Element table has discriminator so restrict to the element-type and subclasses
-            stmt.append(" AND (");
-
-            // Add WHERE for the element and each subclass type so we restrict to valid element types
+            // Add WHERE for the element and each subclass type so we restrict to valid element types TODO Is the element itself included?
             Collection<String> subclasses = storeMgr.getSubClassesForClass(elementInfo[0].getClassName(), true, clr);
-            for (int i = 0; i < subclasses.size() + 1; i++)
+            for (String subclass : subclasses)
             {
-                JavaTypeMapping discrimMapping = elementInfo[0].getDiscriminatorMapping();
-                for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
+                Class cls = clr.classForName(subclass);
+                if (!Modifier.isAbstract(cls.getModifiers()))
                 {
-                    if (joinedDiscrim)
+                    for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
                     {
-                        stmt.append(joinedElementAlias);
-                    }
-                    else
-                    {
-                        stmt.append(containerAlias);
-                    }
-                    stmt.append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
-                    stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                        if (discrimStr.length() > 0)
+                        {
+                            discrimStr.append(" OR ");
+                        }
 
-                    if (j != discrimMapping.getNumberOfDatastoreMappings() - 1 || i != subclasses.size())
-                    {
-                        stmt.append(" OR ");
+                        if (joinedDiscrim)
+                        {
+                            discrimStr.append(joinedElementAlias);
+                        }
+                        else
+                        {
+                            discrimStr.append(containerAlias);
+                        }
+                        discrimStr.append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                        discrimStr.append(" = ");
+                        discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
                     }
                 }
             }
-            stmt.append(")");
+
+            if (discrimStr.length() > 0)
+            {
+                stmt.append(" AND (").append(discrimStr.toString()).append(")");
+            }
         }
 
         if (relationDiscriminatorMapping != null)
