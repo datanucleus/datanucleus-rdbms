@@ -1425,7 +1425,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     catch (UnsupportedOperationException e)
                     {
-                        if (!readOnlyDatastore && !fixedDatastore)
+                        if (!readOnlyDatastore && isAutoCreateTables())
                         {
                             // If we aren't a read-only datastore, try to create a table and then 
                             // retrieve its details, so as to obtain the catalog, schema. 
@@ -1468,7 +1468,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         // AutoStarter - Don't allow usage of SchemaTable mechanism if fixed/readonly schema
         String autoStartMechanismName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        if ((readOnlyDatastore || fixedDatastore) && "SchemaTable".equals(autoStartMechanismName))
+        if ((readOnlyDatastore) && "SchemaTable".equals(autoStartMechanismName))
         {
             // Schema fixed and user requires an auto-starter needing schema content so turn it off
             nucleusContext.getConfiguration().setProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None");
@@ -3409,7 +3409,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
 
-                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), autoCreateTables))
+                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), isAutoCreateTables()))
                     {
                         // Table has been created so add to our list so we dont process it multiple times
                         // Any subsequent instance of this table in the list will have the columns checked only
