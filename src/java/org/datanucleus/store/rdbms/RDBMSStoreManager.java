@@ -3620,7 +3620,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 while (errorsIter.hasNext())
                 {
                     Throwable exc = (Throwable)errorsIter.next();
-                    if (autoCreateWarnOnError)
+                    if (getSchemaHandler().isAutoCreateWarnOnError())
                     {
                         NucleusLogger.DATASTORE.warn(LOCALISER_RDBMS.msg("050044", exc));
                     }
@@ -3629,7 +3629,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         NucleusLogger.DATASTORE.error(LOCALISER_RDBMS.msg("050044", exc));
                     }
                 }
-                if (!autoCreateWarnOnError)
+                if (!getSchemaHandler().isAutoCreateWarnOnError())
                 {
                     throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("050043"), 
                         (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
