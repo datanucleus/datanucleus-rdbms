@@ -27,10 +27,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -38,6 +41,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.AbstractStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaData;
+import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -89,6 +93,128 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     public void clear()
     {
         schemaDataByName.clear();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#createSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     */
+    @Override
+    public void createSchema(String schemaName, Properties props, Object connection)
+    {
+        try
+        {
+            RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
+            String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+
+            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.TRANSACTION_NONE);
+            Connection conn = (Connection) mconn.getConnection();
+            Statement stmt = null;
+            try
+            {
+                stmt = conn.createStatement();
+                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase executing " + stmtText);
+                boolean success = stmt.execute(stmtText);
+                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase execute returned " + success);
+            }
+            catch (SQLException sqle)
+            {
+                // TODO Log this and return error
+            }
+            finally
+            {
+                if (stmt != null)
+                {
+                    try
+                    {
+                        stmt.close();
+                    }
+                    catch (SQLException sqle)
+                    {
+                    }
+                }
+                mconn.release();
+            }
+        }
+        catch (UnsupportedOperationException uoe)
+        {
+            return;
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#deleteSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     */
+    @Override
+    public void deleteSchema(String schemaName, Properties props, Object connection)
+    {
+        try
+        {
+            RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
+            String stmtText = getDatastoreAdapter().getDropDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+
+            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.TRANSACTION_NONE);
+            Connection conn = (Connection) mconn.getConnection();
+            Statement stmt = null;
+            try
+            {
+                stmt = conn.createStatement();
+                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase executing " + stmtText);
+                boolean success = stmt.execute(stmtText);
+                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase execute returned " + success);
+            }
+            catch (SQLException sqle)
+            {
+                // TODO Log this and return error
+            }
+            finally
+            {
+                if (stmt != null)
+                {
+                    try
+                    {
+                        stmt.close();
+                    }
+                    catch (SQLException sqle)
+                    {
+                    }
+                }
+                mconn.release();
+            }
+        }
+        catch (UnsupportedOperationException uoe)
+        {
+            return;
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#createSchemaForClasses(java.util.Set, java.util.Properties, java.lang.Object)
+     */
+    @Override
+    public void createSchemaForClasses(Set<String> classNames, Properties props, Object connection)
+    {
+        // TODO Move code from RDBMSStoreManager
+        ((RDBMSStoreManager)storeMgr).createSchemaForClasses(classNames, props);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#deleteSchemaForClasses(java.util.Set, java.util.Properties, java.lang.Object)
+     */
+    @Override
+    public void deleteSchemaForClasses(Set<String> classNames, Properties props, Object connection)
+    {
+        // TODO Move code from RDBMSStoreManager
+        ((RDBMSStoreManager)storeMgr).deleteSchemaForClasses(classNames, props);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#validateSchema(java.util.Set, java.util.Properties, java.lang.Object)
+     */
+    @Override
+    public void validateSchema(Set<String> classNames, Properties props, Object connection)
+    {
+        // TODO Move code from RDBMSStoreManager
+        ((RDBMSStoreManager)storeMgr).validateSchemaForClasses(classNames, props);
     }
 
     /**

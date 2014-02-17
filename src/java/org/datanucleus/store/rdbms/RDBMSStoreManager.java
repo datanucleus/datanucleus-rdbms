@@ -3931,98 +3931,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     // ---------------------------------------SchemaTool------------------------------------------------
 
-    public void createDatabase(String databaseName, Properties props)
-    {
-        try
-        {
-            String stmtText = dba.getCreateDatabaseStatement(catalogName, schemaName);
-
-            ManagedConnection mconn = getConnection(TransactionIsolation.TRANSACTION_NONE);
-            Connection conn = (Connection) mconn.getConnection();
-            Statement stmt = null;
-            try
-            {
-                stmt = conn.createStatement();
-                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase executing " + stmtText);
-                boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase execute returned " + success);
-            }
-            catch (SQLException sqle)
-            {
-                // TODO Log this and return error
-            }
-            finally
-            {
-                if (stmt != null)
-                {
-                    try
-                    {
-                        stmt.close();
-                    }
-                    catch (SQLException sqle)
-                    {
-                    }
-                }
-                mconn.release();
-            }
-        }
-        catch (UnsupportedOperationException uoe)
-        {
-            return;
-        }
-    }
-
-    public void dropDatabase(String schemaName, Properties props)
-    {
-        try
-        {
-            String stmtText = dba.getDropDatabaseStatement(catalogName, schemaName);
-
-            ManagedConnection mconn = getConnection(TransactionIsolation.TRANSACTION_NONE);
-            Connection conn = (Connection) mconn.getConnection();
-            Statement stmt = null;
-            try
-            {
-                stmt = conn.createStatement();
-                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase executing " + stmtText);
-                boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase execute returned " + success);
-            }
-            catch (SQLException sqle)
-            {
-                // TODO Log this and return error
-            }
-            finally
-            {
-                if (stmt != null)
-                {
-                    try
-                    {
-                        stmt.close();
-                    }
-                    catch (SQLException sqle)
-                    {
-                    }
-                }
-                mconn.release();
-            }
-        }
-        catch (UnsupportedOperationException uoe)
-        {
-            return;
-        }
-    }
-
     public void createSchema(String schemaName, Properties props)
     {
-        // TODO Support schema creation
-        throw new UnsupportedOperationException("Dont support the creation of a schema with RDBMS currently");
+        schemaHandler.createSchema(schemaName, props, null);
     }
 
     public void deleteSchema(String schemaName, Properties props)
     {
-        // TODO Support schema deletion
-        throw new UnsupportedOperationException("Dont support the deletion of a schema with RDBMS currently");
+        schemaHandler.deleteSchema(schemaName, props, null);
     }
 
     public void createSchemaForClasses(Set<String> inputClassNames, Properties props)
