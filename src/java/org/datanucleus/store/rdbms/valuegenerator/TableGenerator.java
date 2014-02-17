@@ -256,7 +256,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator
 	protected boolean createRepository()
 	{
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
-        if (!srm.isAutoCreateTables())
+        if (!srm.getSchemaHandler().isAutoCreateTables())
         {
             throw new NucleusUserException(LOCALISER.msg("040011", sequenceTable));
         }

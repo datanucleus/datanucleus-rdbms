@@ -1425,7 +1425,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     catch (UnsupportedOperationException e)
                     {
-                        if (!readOnlyDatastore && isAutoCreateTables())
+                        if (!readOnlyDatastore && getSchemaHandler().isAutoCreateTables())
                         {
                             // If we aren't a read-only datastore, try to create a table and then 
                             // retrieve its details, so as to obtain the catalog, schema. 
@@ -3409,7 +3409,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
 
-                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), isAutoCreateTables()))
+                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), getSchemaHandler().isAutoCreateTables()))
                     {
                         // Table has been created so add to our list so we dont process it multiple times
                         // Any subsequent instance of this table in the list will have the columns checked only
@@ -3419,19 +3419,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     else
                     {
                         // Table wasn't just created, so do any autocreate of columns necessary
-                        if (t.isInitializedModified() || autoCreateColumns)
+                        if (t.isInitializedModified() || getSchemaHandler().isAutoCreateColumns())
                         {
                             // Check for existence of the required columns and add where required
-                            t.validateColumns(getCurrentConnection(), false, autoCreateColumns, autoCreateErrors);
+                            t.validateColumns(getCurrentConnection(), false, getSchemaHandler().isAutoCreateColumns(), autoCreateErrors);
                             columnsValidated = true;
                         }
                     }
                 }
 
-                if (validateTables && !columnsValidated) // Table not just created and validation requested
+                if (getSchemaHandler().isValidateTables() && !columnsValidated) // Table not just created and validation requested
                 {
                     // Check down to the column structure where required
-                    t.validate(getCurrentConnection(), validateColumns, false, autoCreateErrors);
+                    t.validate(getCurrentConnection(), getSchemaHandler().isValidateColumns(), false, autoCreateErrors);
                 }
                 else if (!columnsValidated)
                 {
@@ -3463,7 +3463,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             while (i.hasNext())
             {
                 TableImpl t = (TableImpl) i.next();
-                if (validateConstraints || autoCreateConstraints)
+                if (getSchemaHandler().isValidateConstraints() || getSchemaHandler().isAutoCreateConstraints())
                 {
                     if (ddlWriter != null)
                     {
@@ -3493,7 +3493,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             tableConstraintsCreated.add(t);
                         }
                     }
-                    else if (t.validateConstraints(getCurrentConnection(), autoCreateConstraints, autoCreateErrors, clr))
+                    else if (t.validateConstraints(getCurrentConnection(), getSchemaHandler().isAutoCreateConstraints(), autoCreateErrors, clr))
                     {
                         tableConstraintsCreated.add(t);
                     }
@@ -3591,12 +3591,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 ViewImpl v = (ViewImpl) i.next();
                 if (checkExistTablesOrViews)
                 {
-                    if (v.exists(getCurrentConnection(), autoCreateTables))
+                    if (v.exists(getCurrentConnection(), getSchemaHandler().isAutoCreateTables()))
                     {
                         viewsCreated.add(v);
                     }
                 }
-                if (validateTables)
+                if (getSchemaHandler().isValidateTables())
                 {
                     v.validate(getCurrentConnection(), true, false, autoCreateErrors);
                 }

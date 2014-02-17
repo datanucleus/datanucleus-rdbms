@@ -271,7 +271,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator
         DatastoreAdapter dba = srm.getDatastoreAdapter();
         SQLController sqlControl = srm.getSQLController();
 
-        if (!srm.isAutoCreateTables())
+        if (!srm.getSchemaHandler().isAutoCreateTables())
         {
             throw new NucleusUserException(LOCALISER.msg("040010", getSequenceName()));
         }
