@@ -280,12 +280,17 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         }
 
         ManagedConnection mconn = new ManagedConnectionImpl(txnOptions);
-        if (resourceType.equalsIgnoreCase("nontx"))
+        boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
+        if (!releaseAfterUse)
         {
-            // Non-transactional - check if the user has requested not to release after use
-            boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
-            if (!releaseAfterUse)
+            // Don't close on release
+            if (resourceType.equalsIgnoreCase("nontx"))
             {
+                mconn.setCloseOnRelease(false);
+            }
+            else if (resourceType.equals("tx") && !ec.getTransaction().isActive() && storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_USE_PRIMARY))
+            {
+                // User is using primary factory for nontx ops also
                 mconn.setCloseOnRelease(false);
             }
         }
@@ -422,8 +427,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         {
                             if (cnx.isReadOnly() != readOnly)
                             {
-                                NucleusLogger.CONNECTION.debug("Setting readonly=" + readOnly + " to connection: " +
-                                    cnx.toString());
+                                NucleusLogger.CONNECTION.debug("Setting readonly=" + readOnly + " to connection: " + cnx.toString());
                                 cnx.setReadOnly(readOnly);
                             }
 
