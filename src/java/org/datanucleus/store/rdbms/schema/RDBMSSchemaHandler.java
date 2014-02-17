@@ -30,15 +30,14 @@ import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.AbstractStoreSchemaHandler;
 import org.datanucleus.store.schema.StoreSchemaData;
-import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -55,7 +54,7 @@ import org.datanucleus.util.StringUtils;
  * <li><b>columns</b> : Columns info for a table</li>
  * </ul>
  */
-public class RDBMSSchemaHandler implements StoreSchemaHandler
+public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 {
     /** Localiser for messages. */
     protected static final Localiser LOCALISER = Localiser.getInstance(
@@ -64,7 +63,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     /** Time within which column info is valid (millisecs). Set to 5 mins. */
     protected final long COLUMN_INFO_EXPIRATION_MS = 5*60*1000;
 
-    protected final RDBMSStoreManager storeMgr;
+    protected final RDBMSStoreManager rdbmsStoreMgr;
 
     /** 
      * Map of schema data, keyed by its symbolic name where the data is cached. 
@@ -73,9 +72,15 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
      */
     protected Map<String, StoreSchemaData> schemaDataByName = new HashMap();
 
-    public RDBMSSchemaHandler(RDBMSStoreManager storeMgr)
+    public RDBMSSchemaHandler(StoreManager storeMgr)
     {
-        this.storeMgr = storeMgr;
+        super(storeMgr);
+        this.rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
+    }
+
+    protected DatastoreAdapter getDatastoreAdapter()
+    {
+        return rdbmsStoreMgr.getDatastoreAdapter();
     }
 
     /**
@@ -84,26 +89,6 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     public void clear()
     {
         schemaDataByName.clear();
-    }
-
-    /**
-     * Method to create the schema with the supplied name.
-     * @param connection Connection to the datastore
-     * @param schemaName Name of the schema
-     */
-    public void createSchema(Object connection, String schemaName)
-    {
-        throw new NucleusUserException("DataNucleus doesnt currently support creation of schemas for RDBMS");
-    }
-
-    /**
-     * Method to delete the schema with the supplied name.
-     * @param connection Connection to the datastore
-     * @param schemaName Name of the schema
-     */
-    public void deleteSchema(Object connection, String schemaName)
-    {
-        throw new NucleusUserException("DataNucleus doesnt currently support deletion of schemas for RDBMS");
     }
 
     /**
@@ -265,15 +250,6 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     }
 
     /**
-     * Accessor for the StoreManager we handle the schema for.
-     * @return Store Manager.
-     */
-    public StoreManager getStoreManager()
-    {
-        return storeMgr;
-    }
-
-    /**
      * Returns the type of a database table/view in the datastore.
      * Uses DatabaseMetaData.getTables() to extract this information.
      * @param conn Connection to the database.
@@ -287,7 +263,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         String tableType = null;
 
         // Calculate the catalog/schema names since we need to search fully qualified
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
@@ -358,7 +334,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
             ResultSet rs = dmd.getTypeInfo();
             try
             {
-                DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+                DatastoreAdapter dba = getDatastoreAdapter();
                 while (rs.next())
                 {
                     SQLTypeInfo sqlType = dba.newSQLTypeInfo(rs);
@@ -407,7 +383,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     protected RDBMSTableFKInfo getRDBMSTableFKInfoForTable(Connection conn, Table table)
     {
         // Calculate the catalog/schema names since we need to search fully qualified
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
@@ -445,7 +421,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         // We don't cache FK info, so retrieve it directly
         RDBMSTableFKInfo info = new RDBMSTableFKInfo(catalogName, schemaName, tableName);
 
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         try
         {
             ResultSet rs = conn.getMetaData().getImportedKeys(catalogName, schemaName, tableName);
@@ -483,7 +459,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     protected RDBMSTablePKInfo getRDBMSTablePKInfoForTable(Connection conn, Table table)
     {
         // Calculate the catalog/schema names since we need to search fully qualified
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
@@ -559,7 +535,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     protected RDBMSTableIndexInfo getRDBMSTableIndexInfoForTable(Connection conn, Table table)
     {
         // Calculate the catalog/schema names since we need to search fully qualified
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), 
             table.getIdentifier().getIdentifierName());
         String catalogName = table.getCatalogName();
@@ -598,15 +574,15 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
     {
         // We don't cache Index info, so retrieve it directly
         RDBMSTableIndexInfo info = new RDBMSTableIndexInfo(catalogName, schemaName, tableName);
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         try
         {
             // Note : the table name has no quotes here.
             String schemaNameTmp = schemaName;
-            if (schemaName == null && storeMgr.getSchemaName() != null)
+            if (schemaName == null && rdbmsStoreMgr.getSchemaName() != null)
             {
                 // This is a hack for the DatabaseAdapter method that requires a schema for Oracle
-                schemaNameTmp = storeMgr.getSchemaName();
+                schemaNameTmp = rdbmsStoreMgr.getSchemaName();
                 schemaNameTmp = getIdentifierForUseWithDatabaseMetaData(schemaNameTmp);
             }
             ResultSet rs = dba.getExistingIndexes(conn, catalogName, schemaNameTmp, tableName);
@@ -670,7 +646,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         {
             String catalogName = getIdentifierForUseWithDatabaseMetaData(catalog);
             String schemaName = getIdentifierForUseWithDatabaseMetaData(schema);
-            rs = storeMgr.getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
+            rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
             while (rs.next())
             {
                 // Construct a fully-qualified name for the table in this row of the ResultSet
@@ -704,7 +680,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
                     schemaInfo.addChild(table);
                 }
 
-                RDBMSColumnInfo col = storeMgr.getDatastoreAdapter().newRDBMSColumnInfo(rs);
+                RDBMSColumnInfo col = getDatastoreAdapter().newRDBMSColumnInfo(rs);
                 table.addChild(col);
             }
         }
@@ -747,7 +723,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
      */
     protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, Table table)
     {
-        String[] c = splitTableIdentifierName(storeMgr.getDatastoreAdapter().getCatalogSeparator(), table.getIdentifier().getIdentifierName());
+        String[] c = splitTableIdentifierName(getDatastoreAdapter().getCatalogSeparator(), table.getIdentifier().getIdentifierName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
         String tableName = table.getIdentifier().getIdentifierName();
@@ -785,7 +761,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         if (info == null)
         {
             // No schema info defined yet
-            info = new RDBMSSchemaInfo(storeMgr.getCatalogName(), storeMgr.getSchemaName());
+            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
             schemaDataByName.put("tables", info);
         }
 
@@ -806,7 +782,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         // Refresh all existing tables plus this requested one
         boolean insensitiveIdentifiers = identifiersCaseInsensitive();
         Collection tableNames = new HashSet();
-        Collection tables = storeMgr.getManagedTables(catalogName, schemaName);
+        Collection tables = rdbmsStoreMgr.getManagedTables(catalogName, schemaName);
         if (tables.size() > 0)
         {
             Iterator iter = tables.iterator();
@@ -884,7 +860,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(connection, "tables", null);
         if (info == null)
         {
-            info = new RDBMSSchemaInfo(storeMgr.getCatalogName(), storeMgr.getSchemaName());
+            info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
             schemaDataByName.put("tables", info);
         }
 
@@ -908,7 +884,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
                     NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050028", 
                         tableName, catalogName, schemaName));
                 }
-                rs = storeMgr.getDatastoreAdapter().getColumns(conn, catalogName, schemaName, tableName, null);
+                rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, tableName, null);
             }
             else
             {
@@ -918,7 +894,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
                     NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050028", 
                         StringUtils.collectionToString(tableNames), catalogName, schemaName));
                 }
-                rs = storeMgr.getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
+                rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
             }
 
             boolean insensitiveIdentifiers = identifiersCaseInsensitive();
@@ -975,7 +951,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
                         table.addProperty("time", now);
                     }
 
-                    RDBMSColumnInfo col = storeMgr.getDatastoreAdapter().newRDBMSColumnInfo(rs);
+                    RDBMSColumnInfo col = getDatastoreAdapter().newRDBMSColumnInfo(rs);
                     table.addChild(col);
                 }
             }
@@ -1024,8 +1000,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
      */
     private String getTableKeyInRDBMSSchemaInfo(String catalog, String schema, String table)
     {
-        DatastoreIdentifier fullyQualifiedTableName = 
-            storeMgr.getIdentifierFactory().newTableIdentifier(table);
+        DatastoreIdentifier fullyQualifiedTableName = rdbmsStoreMgr.getIdentifierFactory().newTableIdentifier(table);
         fullyQualifiedTableName.setCatalogName(catalog);
         fullyQualifiedTableName.setSchemaName(schema);
         return fullyQualifiedTableName.getFullyQualifiedName(true);
@@ -1092,7 +1067,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
         {
             return null;
         }
-        return identifier.replace(storeMgr.getDatastoreAdapter().getIdentifierQuoteString(), "");
+        return identifier.replace(getDatastoreAdapter().getIdentifierQuoteString(), "");
         // TODO Really ought to do the case conversion so that we check in the case of the adapter
         // This is needed where the user has provided an identifier but in the wrong case
         // When you enable this the JDO2 TCK will likely go incredibly slow since Derby use of
@@ -1109,7 +1084,7 @@ public class RDBMSSchemaHandler implements StoreSchemaHandler
      */
     private boolean identifiersCaseInsensitive()
     {
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        DatastoreAdapter dba = getDatastoreAdapter();
         if (!dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_SENSITIVE) &&
             !dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED_SENSITIVE))
         {
