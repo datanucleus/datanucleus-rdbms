@@ -267,8 +267,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     /**
      * Method to create a new ManagedConnection.
-     * @param ec the object that is bound the connection during its lifecycle (if any)
-     * @param txnOptions Transaction options for creating the connection
+     * @param ec the object that is bound the connection during its lifecycle (if for a PM/EM operation)
+     * @param txnOptions Transaction options for creating the connection (optional)
      * @return The ManagedConnection
      */
     public ManagedConnection createManagedConnection(ExecutionContext ec, Map txnOptions)
@@ -281,18 +281,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         ManagedConnection mconn = new ManagedConnectionImpl(txnOptions);
         boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
-        if (!releaseAfterUse)
+        if (!releaseAfterUse && ec != null && !ec.getTransaction().isActive())
         {
-            // Don't close on release
-            if (resourceType.equalsIgnoreCase("nontx"))
-            {
-                mconn.setCloseOnRelease(false);
-            }
-            else if (resourceType.equals("tx") && !ec.getTransaction().isActive() && storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_USE_PRIMARY))
-            {
-                // User is using primary factory for nontx ops also
-                mconn.setCloseOnRelease(false);
-            }
+            // Non-transactional connection and requested not to close on release
+            mconn.setCloseOnRelease(false);
         }
         return mconn;
     }
