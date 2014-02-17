@@ -126,7 +126,7 @@ public abstract class AbstractSchemaTransaction
                     {
                         if (conn != null)
                         {
-                            if (isolationLevel != TransactionIsolation.TRANSACTION_NONE)
+                            if (isolationLevel != TransactionIsolation.NONE)
                             {
                                 if (!conn.getAutoCommit())
                                 {

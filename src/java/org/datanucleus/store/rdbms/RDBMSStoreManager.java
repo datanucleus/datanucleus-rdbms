@@ -1530,7 +1530,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         ManagedConnection mconn = null;
         try
         {
-            mconn = getConnection(TransactionIsolation.TRANSACTION_NONE);
+            mconn = getConnection(TransactionIsolation.NONE);
 
             PreparedStatement ps = null;
             ResultSet rs = null;
@@ -4153,7 +4153,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         if (!seqTablesGenerated.contains(tableName))
         {
-            ManagedConnection mconn = getConnection(TransactionIsolation.TRANSACTION_NONE);
+            ManagedConnection mconn = getConnection(TransactionIsolation.NONE);
             Connection conn = (Connection) mconn.getConnection();
             try
             {
@@ -4241,7 +4241,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             else
             {
                 PreparedStatement ps = null;
-                ManagedConnection mconn = getConnection(TransactionIsolation.TRANSACTION_NONE);
+                ManagedConnection mconn = getConnection(TransactionIsolation.NONE);
                 try
                 {
                     ps = sqlController.getStatementForUpdate(mconn, stmt, false);

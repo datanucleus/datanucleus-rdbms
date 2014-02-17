@@ -427,7 +427,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                 cnx.setReadOnly(readOnly);
                             }
 
-                            if (reqdIsolationLevel == TransactionIsolation.TRANSACTION_NONE)
+                            if (reqdIsolationLevel == TransactionIsolation.NONE)
                             {
                                 if (!cnx.getAutoCommit())
                                 {
@@ -461,7 +461,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                     cnx.getAutoCommit()));
                             }
 
-                            if (reqdIsolationLevel != isolation && isolation == TransactionIsolation.TRANSACTION_NONE)
+                            if (reqdIsolationLevel != isolation && isolation == TransactionIsolation.NONE)
                             {
                                 // User asked for a level that implies auto-commit so make sure it has that
                                 if (!cnx.getAutoCommit())

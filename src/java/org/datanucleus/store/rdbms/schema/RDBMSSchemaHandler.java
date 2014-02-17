@@ -106,7 +106,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
             String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
 
-            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.TRANSACTION_NONE);
+            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.NONE);
             Connection conn = (Connection) mconn.getConnection();
             Statement stmt = null;
             try
@@ -152,7 +152,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
             String stmtText = getDatastoreAdapter().getDropDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
 
-            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.TRANSACTION_NONE);
+            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.NONE);
             Connection conn = (Connection) mconn.getConnection();
             Statement stmt = null;
             try

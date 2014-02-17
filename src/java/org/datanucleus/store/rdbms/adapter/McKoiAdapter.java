@@ -166,7 +166,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
      */
     public int getRequiredTransactionIsolationLevel()
     {
-        return TransactionIsolation.TRANSACTION_SERIALIZABLE;
+        return TransactionIsolation.SERIALIZABLE;
     }
 
     /**
