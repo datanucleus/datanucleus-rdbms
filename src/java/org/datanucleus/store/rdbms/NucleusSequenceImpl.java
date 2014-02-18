@@ -80,6 +80,15 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
             }
         }
         props.put("sequence-name", seqMetaData.getDatastoreSequence());
+        if (seqMetaData.getAllocationSize() > 0)
+        {
+            props.put("key-increment-by", "" + seqMetaData.getAllocationSize());
+            props.put("key-cache-size", "" + seqMetaData.getAllocationSize());
+        }
+        if (seqMetaData.getInitialValue() > 0)
+        {
+            props.put("key-initial-value", "" + seqMetaData.getInitialValue());
+        }
 
         // Get a ValueGenerationManager to create the generator
         ValueGenerationManager mgr = storeManager.getValueGenerationManager();
