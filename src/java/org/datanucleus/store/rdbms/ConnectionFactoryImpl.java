@@ -281,8 +281,9 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         }
 
         ManagedConnection mconn = new ManagedConnectionImpl(txnOptions);
+        boolean singleConnection = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
         boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
-        if (!releaseAfterUse && ec != null && !ec.getTransaction().isActive())
+        if (ec != null && !ec.getTransaction().isActive() && (!releaseAfterUse || singleConnection))
         {
             // Non-transactional connection and requested not to close on release
             mconn.setCloseOnRelease(false);
@@ -708,7 +709,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         @Override
         public boolean closeAfterTransactionEnd()
         {
-            // TODO Update this to allow retaining the connection for nontx ops after txn end
+            if (storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION))
+            {
+                return false;
+            }
             return super.closeAfterTransactionEnd();
         }
     }
