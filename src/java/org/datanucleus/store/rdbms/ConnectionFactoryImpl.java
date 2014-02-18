@@ -45,6 +45,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.exceptions.UnsupportedConnectionFactoryException;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.AbstractConnectionFactory;
+import org.datanucleus.store.connection.AbstractEmulatedXAResource;
 import org.datanucleus.store.connection.AbstractManagedConnection;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -705,33 +706,21 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
     /**
      * Emulate the two phase protocol for non XA
      */
-    static class EmulatedXAResource implements XAResource
+    static class EmulatedXAResource extends AbstractEmulatedXAResource
     {
-        ManagedConnection mconn;
         Connection conn;
 
         EmulatedXAResource(ManagedConnection mconn)
         {
-            this.mconn = mconn;
+            super(mconn);
             this.conn = (Connection) mconn.getConnection();
-        }
-
-        public void start(Xid xid, int flags) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009017", mconn.toString(), xid.toString(), flags));
-        }
-
-        public int prepare(Xid xid) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009018", mconn.toString(), xid.toString()));
-            return 0;
         }
 
         public void commit(Xid xid, boolean onePhase) throws XAException
         {
+            super.commit(xid, onePhase);
             try
             {
-                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009019", mconn.toString(), xid.toString(), onePhase));
                 conn.commit();
             }
             catch (SQLException e)
@@ -747,7 +736,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         {
             try
             {
-                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009021", mconn.toString(), xid.toString()));
                 conn.rollback();
             }
             catch (SQLException e)
@@ -757,35 +745,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 xe.initCause(e);
                 throw xe;
             }
-        }
-
-        public void end(Xid xid, int flags) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009023", mconn.toString(), xid.toString(), flags));
-        }
-
-        public void forget(Xid arg0) throws XAException
-        {
-        }
-
-        public int getTransactionTimeout() throws XAException
-        {
-            return 0;
-        }
-
-        public boolean isSameRM(XAResource xares) throws XAException
-        {
-            return (this == xares);
-        }
-
-        public Xid[] recover(int flags) throws XAException
-        {
-            throw new XAException("Unsupported operation");
-        }
-
-        public boolean setTransactionTimeout(int timeout) throws XAException
-        {
-            return false;
         }
     }
 
