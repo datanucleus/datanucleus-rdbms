@@ -701,6 +701,16 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 throw new NucleusDataStoreException("Exception rolling back to savepoint " + name, sqle);
             }
         }
+
+        /* (non-Javadoc)
+         * @see org.datanucleus.store.connection.AbstractManagedConnection#closeAfterTransactionEnd()
+         */
+        @Override
+        public boolean closeAfterTransactionEnd()
+        {
+            // TODO Update this to allow retaining the connection for nontx ops after txn end
+            return super.closeAfterTransactionEnd();
+        }
     }
 
     /**
