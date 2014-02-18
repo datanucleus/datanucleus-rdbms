@@ -351,11 +351,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         // Make sure any remaining statements are executed and commit the connection
                         ((RDBMSStoreManager)storeMgr).getSQLController().processConnectionStatement(this);
                         this.needsCommitting = false;
-                        conn.commit();
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052005", StringUtils.toJVMIDString(conn)));
+                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009015", this.toString()));
                         }
+                        conn.commit();
                     }
                 }
                 catch (SQLException sqle)
@@ -375,7 +375,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         {
             if (getConnection() instanceof Connection)
             {
-                return new EmulatedXAResource((Connection)getConnection());
+                return new EmulatedXAResource(this);
             }
             else
             {
@@ -452,7 +452,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052002", StringUtils.toJVMIDString(cnx),
+                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009012", this.toString(),
                                     TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel),
                                     cnx.getAutoCommit()));
                             }
@@ -487,7 +487,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
                                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                                 {
-                                    NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052003", StringUtils.toJVMIDString(cnx)));
+                                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009013", this.toString()));
                                 }
                             }
                         }
@@ -498,13 +498,13 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         cnx = dataSources[0].getConnection();
                         if (cnx == null)
                         {
-                            String msg = LOCALISER_RDBMS.msg("052000", dataSources[0]);
+                            String msg = LOCALISER.msg("009010", dataSources[0]);
                             NucleusLogger.CONNECTION.error(msg);
                             throw new NucleusDataStoreException(msg);
                         }
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052001", StringUtils.toJVMIDString(cnx)));
+                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009011", this.toString()));
                         }
                     }
                 }
@@ -550,7 +550,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                             needsCommitting = false;
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052005", StringUtils.toJVMIDString(conn)));
+                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009015", this.toString()));
                             }
                         }
                     }
@@ -565,17 +565,17 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                     {
                         if (!conn.isClosed())
                         {
-                            conn.close();
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052003", StringUtils.toJVMIDString(conn)));
+                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009013", this.toString()));
                             }
+                            conn.close();
                         }
                         else
                         {
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("052004", StringUtils.toJVMIDString(conn)));
+                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009014", this.toString()));
                             }
                         }
                     }
@@ -707,28 +707,52 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
      */
     static class EmulatedXAResource implements XAResource
     {
+        ManagedConnection mconn;
         Connection conn;
 
-        EmulatedXAResource(Connection conn)
+        EmulatedXAResource(ManagedConnection mconn)
         {
-            this.conn = conn;
+            this.mconn = mconn;
+            this.conn = (Connection) mconn.getConnection();
+        }
+
+        public void start(Xid xid, int flags) throws XAException
+        {
+            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009017", mconn.toString(), xid.toString(), flags));
+        }
+
+        public int prepare(Xid xid) throws XAException
+        {
+            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009018", mconn.toString(), xid.toString()));
+            return 0;
         }
 
         public void commit(Xid xid, boolean onePhase) throws XAException
         {
-            NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                " is committing for transaction "+xid.toString()+" with onePhase="+onePhase);
-
             try
             {
+                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009019", mconn.toString(), xid.toString(), onePhase));
                 conn.commit();
-                NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                    " committed connection for transaction "+xid.toString()+" with onePhase="+onePhase);
             }
             catch (SQLException e)
             {
-                NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                    " failed to commit connection for transaction "+xid.toString()+" with onePhase="+onePhase);
+                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009020", mconn.toString(), xid.toString(), onePhase));
+                XAException xe = new XAException(StringUtils.getStringFromStackTrace(e));
+                xe.initCause(e);
+                throw xe;
+            }
+        }
+
+        public void rollback(Xid xid) throws XAException
+        {
+            try
+            {
+                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009021", mconn.toString(), xid.toString()));
+                conn.rollback();
+            }
+            catch (SQLException e)
+            {
+                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009022", mconn.toString(), xid.toString()));
                 XAException xe = new XAException(StringUtils.getStringFromStackTrace(e));
                 xe.initCause(e);
                 throw xe;
@@ -737,14 +761,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         public void end(Xid xid, int flags) throws XAException
         {
-            NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                " is ending for transaction "+xid.toString()+" with flags "+flags);
-            //ignore
+            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009023", mconn.toString(), xid.toString(), flags));
         }
 
         public void forget(Xid arg0) throws XAException
         {
-            //ignore
         }
 
         public int getTransactionTimeout() throws XAException
@@ -757,49 +778,14 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             return (this == xares);
         }
 
-        public int prepare(Xid xid) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                " is preparing for transaction "+xid.toString());
-
-            return 0;
-        }
-
         public Xid[] recover(int flags) throws XAException
         {
             throw new XAException("Unsupported operation");
         }
 
-        public void rollback(Xid xid) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                " is rolling back for transaction "+xid.toString());
-            try
-            {
-                conn.rollback();
-                NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                    " rolled back connection for transaction "+xid.toString());
-            }
-            catch (SQLException e)
-            {
-                NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                    " failed to rollback connection for transaction "+xid.toString());
-                XAException xe = new XAException(StringUtils.getStringFromStackTrace(e));
-                xe.initCause(e);
-                throw xe;
-            }
-        }
-
-        public boolean setTransactionTimeout(int arg0) throws XAException
+        public boolean setTransactionTimeout(int timeout) throws XAException
         {
             return false;
-        }
-
-        public void start(Xid xid, int flags) throws XAException
-        {
-            NucleusLogger.CONNECTION.debug("Managed connection "+this.toString()+
-                " is starting for transaction "+xid.toString()+" with flags "+flags);
-            //ignore
         }
     }
 
