@@ -68,6 +68,7 @@ public class H2Adapter extends BaseDatastoreAdapter
         supportedOptions.add(CHECK_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(UNIQUE_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
+        supportedOptions.add(SEQUENCES);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(TX_ISOLATION_NONE);
