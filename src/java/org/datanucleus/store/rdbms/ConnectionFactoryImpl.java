@@ -293,6 +293,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     class ManagedConnectionImpl extends AbstractManagedConnection
     {
+        XAResource xaRes = null;
         int isolation;
         boolean needsCommitting = false;
 
@@ -375,21 +376,26 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         @Override
         public XAResource getXAResource()
         {
+            if (xaRes != null)
+            {
+                return xaRes;
+            }
             if (getConnection() instanceof Connection)
             {
-                return new EmulatedXAResource(this);
+                xaRes = new EmulatedXAResource(this);
             }
             else
             {
                 try
                 {
-                    return ((XAConnection)getConnection()).getXAResource();
+                    xaRes = ((XAConnection)getConnection()).getXAResource();
                 }
                 catch (SQLException e)
                 {
                     throw new NucleusDataStoreException(e.getMessage(),e);
                 }
             }
+            return xaRes;
         }
 
         /**
@@ -605,6 +611,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 savepoints = null;
             }
             this.conn = null;
+            this.xaRes = null;
         }
 
         /**
@@ -748,6 +755,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         public void rollback(Xid xid) throws XAException
         {
+            super.rollback(xid);
             try
             {
                 conn.rollback();
