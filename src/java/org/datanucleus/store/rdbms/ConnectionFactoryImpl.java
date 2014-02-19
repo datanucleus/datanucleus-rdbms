@@ -743,6 +743,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             try
             {
                 conn.commit();
+                ((ManagedConnectionImpl)mconn).xaRes = null;
             }
             catch (SQLException e)
             {
@@ -759,6 +760,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             try
             {
                 conn.rollback();
+                ((ManagedConnectionImpl)mconn).xaRes = null;
             }
             catch (SQLException e)
             {
@@ -767,6 +769,12 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 xe.initCause(e);
                 throw xe;
             }
+        }
+
+        public void end(Xid xid, int flags) throws XAException
+        {
+            super.end(xid, flags);
+            ((ManagedConnectionImpl)mconn).xaRes = null;
         }
     }
 
