@@ -42,7 +42,6 @@ import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.SoftValueMap;
-import org.datanucleus.util.StringUtils;
 import org.datanucleus.util.WeakValueMap;
 
 /**
@@ -492,30 +491,18 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         }
     }
 
-    /**
-     * Equality operator for QueryResults.
-     * Overrides the AbstractList implementation since that uses 
-     * size() and iterator() and that would cause problems when closed.
-     * @param o The object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object o)
     {
         if (o == null || !(o instanceof ScrollableQueryResult))
         {
             return false;
         }
+        return super.equals(o);
+    }
 
-        ScrollableQueryResult other = (ScrollableQueryResult)o;
-        if (rs != null)
-        {
-            return other.rs == rs;
-        }
-        else if (query != null)
-        {
-            return other.query == query;
-        }
-        return StringUtils.toJVMIDString(other).equals(StringUtils.toJVMIDString(this));
+    public int hashCode()
+    {
+        return super.hashCode();
     }
 
     /**

@@ -292,10 +292,25 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
         }
     }
 
-    /**
-     * Override for compatibility with equals().
-     * @return The hashcode
-     */
+    public boolean equals(Object o)
+    {
+        if (o == null || !(o instanceof AbstractRDBMSQueryResult))
+        {
+            return false;
+        }
+
+        AbstractRDBMSQueryResult other = (AbstractRDBMSQueryResult)o;
+        if (rs != null)
+        {
+            return other.rs == rs;
+        }
+        else if (query != null)
+        {
+            return other.query == query;
+        }
+        return StringUtils.toJVMIDString(other).equals(StringUtils.toJVMIDString(this));
+    }
+
     public int hashCode()
     {
         if (rs != null)

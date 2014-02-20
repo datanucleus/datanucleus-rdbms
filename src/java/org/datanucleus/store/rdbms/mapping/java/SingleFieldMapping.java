@@ -95,27 +95,6 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
         return getJavaType().getName();
     }
 
-    /**
-     * Equality operator
-     * @param obj The object to compare with
-     * @return Whether the objects are equal
-     */
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-
-        if (!(obj instanceof SingleFieldMapping))
-        {
-            return false;
-        }
-
-        SingleFieldMapping other = (SingleFieldMapping) obj;
-        return getClass().equals(other.getClass()) && storeMgr.equals(other.storeMgr);
-    }
-
     public void setBoolean(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, boolean value)
     {
         getDatastoreMapping(0).setBoolean(ps, exprIndex[0], value);

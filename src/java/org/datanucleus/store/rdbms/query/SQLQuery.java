@@ -130,11 +130,6 @@ public final class SQLQuery extends AbstractSQLQuery
         super(storeMgr, ec, queryString);
     }
 
-    /**
-     * Equality operator.
-     * @param obj The object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -145,8 +140,12 @@ public final class SQLQuery extends AbstractSQLQuery
         {
             return false;
         }
-
         return inputSQL.equals(((SQLQuery)obj).inputSQL);
+    }
+
+    public int hashCode()
+    {
+        return super.hashCode() ^ inputSQL.hashCode();
     }
 
     /**

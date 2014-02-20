@@ -40,7 +40,6 @@ import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Lazy collection results from a Query with the ResultSet in a forward direction.
@@ -457,30 +456,18 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         return resultObjs.containsAll(c);
     }
 
-    /**
-     * Equality operator for QueryResults.
-     * Overrides the AbstractList implementation since that uses 
-     * size() and iterator() and that would cause problems when closed.
-     * @param o The object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object o)
     {
         if (o == null || !(o instanceof ForwardQueryResult))
         {
             return false;
         }
+        return super.equals(o);
+    }
 
-        ForwardQueryResult other = (ForwardQueryResult)o;
-        if (rs != null)
-        {
-            return other.rs == rs;
-        }
-        else if (query != null)
-        {
-            return other.query == query;
-        }
-        return StringUtils.toJVMIDString(other).equals(StringUtils.toJVMIDString(this));
+    public int hashCode()
+    {
+        return super.hashCode();
     }
 
     /**

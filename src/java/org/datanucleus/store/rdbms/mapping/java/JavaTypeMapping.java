@@ -163,7 +163,7 @@ public abstract class JavaTypeMapping
      */
     public boolean equals(Object obj)
     {
-        if (obj == null)
+        if (obj == null || !obj.getClass().equals(getClass()))
         {
             return false;
         }
@@ -172,12 +172,7 @@ public abstract class JavaTypeMapping
             return true;
         }
 
-        if (!obj.getClass().equals(getClass()))
-        {
-            return false;
-        }
-
-        AbstractContainerMapping other = (AbstractContainerMapping)obj;
+        JavaTypeMapping other = (JavaTypeMapping)obj;
         return mmd.equals(other.mmd) && table.equals(other.table);
     }
 
