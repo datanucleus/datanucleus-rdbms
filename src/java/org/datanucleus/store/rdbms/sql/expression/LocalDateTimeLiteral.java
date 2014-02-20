@@ -19,14 +19,13 @@ package org.datanucleus.store.rdbms.sql.expression;
 
 import java.util.Date;
 
-import javax.time.calendar.LocalDate;
 import javax.time.calendar.LocalDateTime;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.types.converters.LocalDateStringConverter;
+import org.datanucleus.store.types.converters.LocalDateTimeStringConverter;
 
 /**
  * Representation of an javax.time.calendar "LocalDateTime" literal.
@@ -63,7 +62,7 @@ public class LocalDateTimeLiteral extends JavaxTimeLiteral
 
         if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            String str = new LocalDateStringConverter().toDatastoreType((LocalDate)value);
+            String str = new LocalDateTimeStringConverter().toDatastoreType((LocalDateTime)value);
             delegate = new StringLiteral(stmt, mapping,
                 (this.value != null ? str : null), parameterName);
         }
