@@ -10,7 +10,7 @@
     <artifactId>datanucleus-rdbms</artifactId>
     <version>4.0.0-m1-SNAPSHOT</version>
 
-    <name>DataNucleus RDBMS</name>
+    <name>DataNucleus RDBMS plugin</name>
     <description>
         Plugin for DataNucleus providing persistence to RDBMS datastores.
     </description>
