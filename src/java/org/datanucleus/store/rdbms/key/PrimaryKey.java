@@ -37,11 +37,6 @@ public class PrimaryKey extends CandidateKey
         name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getIdentifierName();
     }
 
-    /**
-     * Equality operator
-     * @param obj The object to compare against
-     * @return Whether they are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -53,15 +48,12 @@ public class PrimaryKey extends CandidateKey
             return false;
         }
 
-        // Check for same no of columns
-        PrimaryKey pk=(PrimaryKey)obj;
-        if (pk.columns.size() != columns.size())
-        {
-            return false;
-        }
-
-        // Defer to superclass
         return super.equals(obj);
+    }
+
+    public int hashCode()
+    {
+        return super.hashCode();
     }
 
     /**

@@ -66,24 +66,23 @@ public class CandidateKey extends Key
         return columns.size();
     }
 
-    /**
-     * Equality operator.
-     * @param obj The object to compare against
-     * @return Whether the objects are equal
-     */
     public boolean equals(Object obj)
     {
         if (obj == this)
         {
             return true;
         }
-
         if (!(obj instanceof CandidateKey))
         {
             return false;
         }
 
         return super.equals(obj);
+    }
+
+    public int hashCode()
+    {
+        return super.hashCode();
     }
 
     /**
