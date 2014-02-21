@@ -1483,7 +1483,7 @@ public class SQLStatement
      */
     public void setOrdering(SQLExpression[] exprs, boolean[] descending, String[] nullOrders)
     {
-        if (exprs.length != descending.length)
+        if (exprs != null && descending != null && exprs.length != descending.length)
         {
             throw new NucleusException(LOCALISER.msg("052503", "" + exprs.length, "" + descending.length)).setFatal();
         }
