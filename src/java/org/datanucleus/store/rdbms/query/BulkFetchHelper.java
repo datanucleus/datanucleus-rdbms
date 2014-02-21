@@ -144,6 +144,7 @@ public class BulkFetchHelper
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
+            existsStmt.setOrdering(null, null); // ORDER BY in EXISTS is forbidden by some RDBMS
             BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
             sqlStmt.whereAnd(existsExpr, true);
 
@@ -176,6 +177,7 @@ public class BulkFetchHelper
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
+            existsStmt.setOrdering(null, null); // ORDER BY in EXISTS is forbidden by some RDBMS
             BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
             sqlStmt.whereAnd(existsExpr, true);
 
