@@ -316,14 +316,17 @@ public class RDBMSMappingManager implements MappingManager
         TypeConverter conv = null;
         if (!mmd.isTypeConversionDisabled())
         {
-            TypeConverter autoApplyConv = typeMgr.getAutoApplyTypeConverterFortype(mmd.getType());
             if (mmd.getTypeConverterName() != null)
             {
                 conv = typeMgr.getTypeConverterForName(mmd.getTypeConverterName());
             }
-            else if (autoApplyConv != null)
+            else
             {
-                conv = autoApplyConv;
+                TypeConverter autoApplyConv = typeMgr.getAutoApplyTypeConverterForType(mmd.getType());
+                if (autoApplyConv != null)
+                {
+                    conv = autoApplyConv;
+                }
             }
         }
         // TODO Cater for using TypeConverter for Collection/array element or Map key/value
