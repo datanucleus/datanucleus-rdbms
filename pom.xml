@@ -73,6 +73,7 @@
                             org.firebirdsql.jdbc;resolution:=optional,
                             org.h2;resolution:=optional,
                             org.hsqldb;resolution:=optional,
+                            org.hsqldb.jdbc;resolution:=optional,
                             org.postgresql;resolution:=optional,
                             org.apache.tomcat.jdbc.pool;version="7.0.0";resolution:=optional,
                             *
