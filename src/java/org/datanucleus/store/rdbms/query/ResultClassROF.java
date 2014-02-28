@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.query;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -499,12 +500,15 @@ public class ResultClassROF implements ResultObjectFactory
      */
     private void populateDeclaredFieldsForUserType(Class cls)
     {
-        for (int i=0;i<cls.getDeclaredFields().length;i++)
+        Field[] declaredFields = cls.getDeclaredFields();
+        for (int i=0;i<declaredFields.length;i++)
         {
-            if (resultClassFieldsByName.put(cls.getDeclaredFields()[i].getName().toUpperCase(), cls.getDeclaredFields()[i]) != null)
+            Field field = declaredFields[i];
+            if (!field.isSynthetic() 
+                    && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null)
             {
                 throw new NucleusUserException(LOCALISER.msg("021210",
-                    cls.getDeclaredFields()[i].getName()));
+                    field.getName()));
             }
         }
         if (cls.getSuperclass() != null)
