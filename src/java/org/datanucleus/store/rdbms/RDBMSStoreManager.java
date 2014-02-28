@@ -108,6 +108,7 @@ import org.datanucleus.store.NucleusConnection;
 import org.datanucleus.store.NucleusConnectionImpl;
 import org.datanucleus.store.NucleusSequence;
 import org.datanucleus.store.StoreData;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -3780,32 +3781,32 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public Collection getSupportedOptions()
     {
         Set set = new HashSet();
-        set.add("ORM");
-        set.add("NonDurableIdentity");
-        set.add("DatastoreIdentity");
-        set.add("ApplicationIdentity");
+        set.add(StoreManager.OPTION_ORM);
+        set.add(StoreManager.OPTION_APPLICATION_ID);
+        set.add(StoreManager.OPTION_DATASTORE_ID);
+        set.add(StoreManager.OPTION_NONDURABLE_ID);
 
         // Add isolation levels for this database adapter
         if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_COMMITTED))
         {
-            set.add("TransactionIsolationLevel.read-committed");
+            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED);
         }
         if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_UNCOMMITTED))
         {
-            set.add("TransactionIsolationLevel.read-uncommitted");
+            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_UNCOMMITTED);
         }
         if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_REPEATABLE_READ))
         {
-            set.add("TransactionIsolationLevel.repeatable-read");
+            set.add(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ);
         }
         if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_SERIALIZABLE))
         {
-            set.add("TransactionIsolationLevel.serializable");
+            set.add(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE);
         }
 
         // Query Cancel and Datastore Timeout is supported on JDOQL for RDBMS (unless turned off by user)
-        set.add("Query.Cancel");
-        set.add("Datastore.Timeout");
+        set.add(StoreManager.OPTION_QUERY_CANCEL);
+        set.add(StoreManager.OPTION_DATASTORE_TIMEOUT);
 
         return set;
     }
