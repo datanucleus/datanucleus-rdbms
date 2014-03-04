@@ -225,7 +225,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
                     }
                     else if (getJavaTypeMapping().getType().equals(java.util.BitSet.class.getName()))
                     {
-                        return TypeConversionHelper.getBitSetFromBooleanArray((boolean[]) TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
+                        return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
                     }
                     else
                     {

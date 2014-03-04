@@ -326,7 +326,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         else if (getJavaTypeMapping().getJavaType() != null &&
             getJavaTypeMapping().getJavaType().getName().equals(java.util.BitSet.class.getName()))
         {
-            return TypeConversionHelper.getBitSetFromBooleanArray((boolean[])TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
+            return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
         }
         else if (getJavaTypeMapping().getJavaType() != null &&
                 getJavaTypeMapping().getJavaType().getName().equals(java.awt.image.BufferedImage.class.getName()))
