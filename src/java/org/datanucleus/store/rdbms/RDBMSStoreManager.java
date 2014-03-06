@@ -1426,7 +1426,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     catch (UnsupportedOperationException e)
                     {
-                        if (!readOnlyDatastore && getSchemaHandler().isAutoCreateTables())
+                        if (!getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) && getSchemaHandler().isAutoCreateTables())
                         {
                             // If we aren't a read-only datastore, try to create a table and then 
                             // retrieve its details, so as to obtain the catalog, schema. 
@@ -1461,18 +1461,20 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         // TODO If catalogName/schemaName are set convert them to the adapter case
 
-        if (!readOnlyDatastore)
+        if (getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY))
+        {
+            // AutoStarter - Don't allow usage of SchemaTable mechanism if fixed/readonly schema
+            String autoStartMechanismName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
+            if ("SchemaTable".equals(autoStartMechanismName))
+            {
+                // Schema fixed and user requires an auto-starter needing schema content so turn it off
+                nucleusContext.getConfiguration().setProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None");
+            }
+        }
+        else
         {
             // Provide any add-ons for the datastore that may be needed later
             dba.initialiseDatastore(conn);
-        }
-
-        // AutoStarter - Don't allow usage of SchemaTable mechanism if fixed/readonly schema
-        String autoStartMechanismName = nucleusContext.getConfiguration().getStringProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM);
-        if ((readOnlyDatastore) && "SchemaTable".equals(autoStartMechanismName))
-        {
-            // Schema fixed and user requires an auto-starter needing schema content so turn it off
-            nucleusContext.getConfiguration().setProperty(PropertyNames.PROPERTY_AUTOSTART_MECHANISM, "None");
         }
     }
 

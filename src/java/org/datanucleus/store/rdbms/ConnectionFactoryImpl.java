@@ -280,7 +280,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             initialiseDataSources();
         }
 
-        ManagedConnection mconn = new ManagedConnectionImpl(options);
+        ManagedConnection mconn = new ManagedConnectionImpl(ec, options);
         boolean singleConnection = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
         boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
         if (ec != null && !ec.getTransaction().isActive() && (!releaseAfterUse || singleConnection))
@@ -293,13 +293,14 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     class ManagedConnectionImpl extends AbstractManagedConnection
     {
+        ExecutionContext ec;
         XAResource xaRes = null;
         int isolation;
         boolean needsCommitting = false;
 
         ConnectionProvider connProvider = null;
 
-        ManagedConnectionImpl(Map options)
+        ManagedConnectionImpl(ExecutionContext ec, Map options)
         {
             if (options != null && options.get(Transaction.TRANSACTION_ISOLATION_OPTION) != null)
             {
@@ -409,7 +410,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 try
                 {
                     RDBMSStoreManager rdbmsMgr = (RDBMSStoreManager)storeMgr;
-                    boolean readOnly = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
+                    boolean readOnly = ec != null ? ec.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) : storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
                     if (rdbmsMgr.getDatastoreAdapter() != null)
                     {
                         // Create Connection following DatastoreAdapter capabilities
