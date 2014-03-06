@@ -269,10 +269,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
     /**
      * Method to create a new ManagedConnection.
      * @param ec the object that is bound the connection during its lifecycle (if for a PM/EM operation)
-     * @param txnOptions Transaction options for creating the connection (optional)
+     * @param options Options for creating the connection (optional)
      * @return The ManagedConnection
      */
-    public ManagedConnection createManagedConnection(ExecutionContext ec, Map txnOptions)
+    public ManagedConnection createManagedConnection(ExecutionContext ec, Map options)
     {
         if (dataSources == null)
         {
@@ -280,7 +280,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             initialiseDataSources();
         }
 
-        ManagedConnection mconn = new ManagedConnectionImpl(txnOptions);
+        ManagedConnection mconn = new ManagedConnectionImpl(options);
         boolean singleConnection = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_SINGLE_CONNECTION);
         boolean releaseAfterUse = storeMgr.getBooleanProperty(PropertyNames.PROPERTY_CONNECTION_NONTX_RELEASE_AFTER_USE);
         if (ec != null && !ec.getTransaction().isActive() && (!releaseAfterUse || singleConnection))
@@ -299,11 +299,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         ConnectionProvider connProvider = null;
 
-        ManagedConnectionImpl(Map txnOptions)
+        ManagedConnectionImpl(Map options)
         {
-            if (txnOptions != null && txnOptions.get(Transaction.TRANSACTION_ISOLATION_OPTION) != null)
+            if (options != null && options.get(Transaction.TRANSACTION_ISOLATION_OPTION) != null)
             {
-                isolation = ((Number) txnOptions.get(Transaction.TRANSACTION_ISOLATION_OPTION)).intValue();
+                isolation = ((Number) options.get(Transaction.TRANSACTION_ISOLATION_OPTION)).intValue();
             }
             else
             {
