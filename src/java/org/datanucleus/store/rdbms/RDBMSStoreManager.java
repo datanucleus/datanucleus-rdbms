@@ -462,15 +462,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 props.put("DefaultSchema", schemaName);
             }
+
             String val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
-            if (val != null)
-            {
-                props.put("RequiredCase", val);
-            }
-            else
-            {
-                props.put("RequiredCase", getDefaultIdentifierCase());
-            }
+            props.put("RequiredCase", val != null ? val : getDefaultIdentifierCase());
+
             val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR);
             if (val != null)
             {

@@ -120,19 +120,20 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         if (props.containsKey("RequiredCase"))
         {
             String requiredCase = (String)props.get("RequiredCase");
-            if (requiredCase.equalsIgnoreCase("UpperCase"))
+            if (requiredCase.equalsIgnoreCase("UPPERCASE"))
             {
                 userIdentifierCase = CASE_UPPER;
             }
-            else if (requiredCase.equalsIgnoreCase("LowerCase"))
+            else if (requiredCase.equalsIgnoreCase("lowercase"))
             {
                 userIdentifierCase = CASE_LOWER;
             }
-            else if (requiredCase.equalsIgnoreCase("PreserveCase"))
+            else if (requiredCase.equalsIgnoreCase("MixedCase"))
             {
                 userIdentifierCase = CASE_PRESERVE;
             }
         }
+
         if (userIdentifierCase == CASE_UPPER)
         {
             if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
