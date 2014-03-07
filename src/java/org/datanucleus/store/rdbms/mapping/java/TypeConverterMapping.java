@@ -124,7 +124,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Boolean datastoreValue = getDatastoreMapping(0).getBoolean(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Boolean)converter.toMemberType(datastoreValue) : null);
+        return (Boolean)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -153,7 +153,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Byte datastoreValue = getDatastoreMapping(0).getByte(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Byte)converter.toMemberType(datastoreValue) : null);
+        return (Byte)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -182,7 +182,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Character datastoreValue = getDatastoreMapping(0).getChar(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Character)converter.toMemberType(datastoreValue) : null);
+        return (Character)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -211,7 +211,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Double datastoreValue = getDatastoreMapping(0).getDouble(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Double)converter.toMemberType(datastoreValue) : null);
+        return (Double)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -240,7 +240,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Float datastoreValue = getDatastoreMapping(0).getFloat(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Float)converter.toMemberType(datastoreValue) : null);
+        return (Float)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -269,7 +269,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Integer datastoreValue = getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Integer)converter.toMemberType(datastoreValue) : null);
+        return (Integer)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -298,7 +298,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Long datastoreValue = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Long)converter.toMemberType(datastoreValue) : null);
+        return (Long)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
@@ -327,7 +327,7 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
 
         Short datastoreValue = getDatastoreMapping(0).getShort(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (Short)converter.toMemberType(datastoreValue) : null);
+        return (Short)converter.toMemberType(datastoreValue);
     }
 
     /* (non-Javadoc)
