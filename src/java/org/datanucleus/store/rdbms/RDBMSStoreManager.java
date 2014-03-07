@@ -1229,7 +1229,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 NucleusLogger.DATASTORE.debug("Datastore Identifiers :" +
                     " factory=\"" + getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY) + "\"" +
-                    " case=" + identifierFactory.getIdentifierCase().toString() +
+                    " case=" + identifierFactory.getNamingCase().toString() +
                     (catalogName != null ? (" catalog=" + catalogName) : "") +
                     (schemaName != null ? (" schema=" + schemaName) : ""));
                 NucleusLogger.DATASTORE.debug("Supported Identifier Cases : " +

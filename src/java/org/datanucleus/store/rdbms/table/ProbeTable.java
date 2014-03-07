@@ -32,9 +32,9 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.identifier.IdentifierCase;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -95,13 +95,13 @@ public class ProbeTable extends TableImpl
         // This is required by RDBMS such as PostgreSQL which allow creation in one format yet
         // actually store it in another.
         String table_name = identifier.getIdentifierName();
-        if (storeMgr.getIdentifierFactory().getIdentifierCase() == IdentifierCase.LOWER_CASE ||
-            storeMgr.getIdentifierFactory().getIdentifierCase() == IdentifierCase.LOWER_CASE_QUOTED)
+        if (storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE ||
+            storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE_QUOTED)
         {
             table_name = table_name.toLowerCase();
         }
-        else if (storeMgr.getIdentifierFactory().getIdentifierCase() == IdentifierCase.UPPER_CASE ||
-            storeMgr.getIdentifierFactory().getIdentifierCase() == IdentifierCase.UPPER_CASE_QUOTED)
+        else if (storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.UPPER_CASE ||
+            storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.UPPER_CASE_QUOTED)
         {
             table_name = table_name.toUpperCase();
         }

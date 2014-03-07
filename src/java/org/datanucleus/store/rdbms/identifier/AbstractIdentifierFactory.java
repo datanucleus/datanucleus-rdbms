@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.exceptions.TooManyForeignKeysException;
 import org.datanucleus.store.rdbms.exceptions.TooManyIndicesException;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.naming.NamingCase;
 import org.datanucleus.store.schema.naming.NamingFactory;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -46,18 +47,6 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     public static final int CASE_PRESERVE = 1;
     public static final int CASE_UPPER = 2;
     public static final int CASE_LOWER = 3;
-
-    // TODO Make use of this in namings
-    protected NamingFactory namingFactory;
-
-    protected DatastoreAdapter dba;
-
-    protected ClassLoaderResolver clr;
-
-    /** Case to use for identifiers. */
-    protected IdentifierCase identifierCase;
-
-    protected String quoteString;
 
     /** The number of characters used to build the hash. */
     private static final int HASH_LENGTH = 4;
@@ -78,6 +67,21 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         return hm;
     }
 
+    // TODO Make use of this in namings
+    protected NamingFactory namingFactory;
+
+    protected DatastoreAdapter dba;
+
+    protected ClassLoaderResolver clr;
+
+    /** Case to use for identifiers. */
+    protected NamingCase namingCase;
+
+    protected String quoteString;
+
+    /** Separator to use for words in the identifiers. */
+    protected String wordSeparator = "_";
+
     protected Map<String, DatastoreIdentifier> tables = new WeakHashMap();
     protected Map<String, DatastoreIdentifier> columns = new WeakHashMap();
     protected Map<String, DatastoreIdentifier> foreignkeys = new WeakHashMap();
@@ -86,9 +90,6 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     protected Map<String, DatastoreIdentifier> primarykeys = new WeakHashMap();
     protected Map<String, DatastoreIdentifier> sequences = new WeakHashMap();
     protected Map<String, DatastoreIdentifier> references = new WeakHashMap();
-
-    /** Separator to use for words in the identifiers. */
-    protected String wordSeparator = "_";
 
     /** Default catalog name for any created identifiers. */
     protected String defaultCatalogName = null;
@@ -136,32 +137,32 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         {
             if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
             {
-                identifierCase = IdentifierCase.UPPER_CASE;
+                namingCase = NamingCase.UPPER_CASE;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE_QUOTED))
             {
-                identifierCase = IdentifierCase.UPPER_CASE_QUOTED;
+                namingCase = NamingCase.UPPER_CASE_QUOTED;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_SENSITIVE))
             {
-                identifierCase = IdentifierCase.UPPER_CASE;
+                namingCase = NamingCase.UPPER_CASE;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED_SENSITIVE))
             {
-                identifierCase = IdentifierCase.UPPER_CASE_QUOTED;
+                namingCase = NamingCase.UPPER_CASE_QUOTED;
             }
             else
             {
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE))
                 {
-                    identifierCase = IdentifierCase.LOWER_CASE;
+                    namingCase = NamingCase.LOWER_CASE;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","UPPERCASE", "LOWERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE_QUOTED))
                 {
-                    identifierCase = IdentifierCase.LOWER_CASE_QUOTED;
+                    namingCase = NamingCase.LOWER_CASE_QUOTED;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","UPPERCASE", "LOWERCASEQUOTED"));
                 }
                 else
@@ -175,32 +176,32 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         {
             if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE))
             {
-                identifierCase = IdentifierCase.LOWER_CASE;
+                namingCase = NamingCase.LOWER_CASE;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE_QUOTED))
             {
-                identifierCase = IdentifierCase.LOWER_CASE_QUOTED;
+                namingCase = NamingCase.LOWER_CASE_QUOTED;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_SENSITIVE))
             {
-                identifierCase = IdentifierCase.LOWER_CASE;
+                namingCase = NamingCase.LOWER_CASE;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED_SENSITIVE))
             {
-                identifierCase = IdentifierCase.LOWER_CASE_QUOTED;
+                namingCase = NamingCase.LOWER_CASE_QUOTED;
             }
             else
             {
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
                 {
-                    identifierCase = IdentifierCase.UPPER_CASE;
+                    namingCase = NamingCase.UPPER_CASE;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","LOWERCASE", "UPPERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE_QUOTED))
                 {
-                    identifierCase = IdentifierCase.UPPER_CASE_QUOTED;
+                    namingCase = NamingCase.UPPER_CASE_QUOTED;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","LOWERCASE", "UPPERCASEQUOTED"));
                 }
                 else
@@ -215,33 +216,33 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
             if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_SENSITIVE))
             {
-                identifierCase = IdentifierCase.MIXED_CASE;
+                namingCase = NamingCase.MIXED_CASE;
             }
             else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_QUOTED_SENSITIVE))
             {
-                identifierCase = IdentifierCase.MIXED_CASE_QUOTED;
+                namingCase = NamingCase.MIXED_CASE_QUOTED;
             }
             else
             {
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE))
                 {
-                    identifierCase = IdentifierCase.LOWER_CASE;
+                    namingCase = NamingCase.LOWER_CASE;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","MIXEDCASE", "LOWERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE_QUOTED))
                 {
-                    identifierCase = IdentifierCase.LOWER_CASE_QUOTED;
+                    namingCase = NamingCase.LOWER_CASE_QUOTED;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "LOWERCASEQUOTED"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
                 {
-                    identifierCase = IdentifierCase.UPPER_CASE;
+                    namingCase = NamingCase.UPPER_CASE;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "UPPERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE_QUOTED))
                 {
-                    identifierCase = IdentifierCase.UPPER_CASE_QUOTED;
+                    namingCase = NamingCase.UPPER_CASE_QUOTED;
                     NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "UPPERCASEQUOTED"));
                 }
                 else
@@ -285,9 +286,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      * Accessor for the identifier case being used.
      * @return The identifier case
      */
-    public IdentifierCase getIdentifierCase()
+    public NamingCase getNamingCase()
     {
-        return identifierCase;
+        return namingCase;
     }
 
     /**
@@ -367,9 +368,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
             return null;
         }
         StringBuilder id = new StringBuilder();
-        if (identifierCase == IdentifierCase.LOWER_CASE_QUOTED ||
-            identifierCase == IdentifierCase.MIXED_CASE_QUOTED ||
-            identifierCase == IdentifierCase.UPPER_CASE_QUOTED)
+        if (namingCase == NamingCase.LOWER_CASE_QUOTED ||
+            namingCase == NamingCase.MIXED_CASE_QUOTED ||
+            namingCase == NamingCase.UPPER_CASE_QUOTED)
         {
             if (!identifier.startsWith(quoteString))
             {
@@ -377,13 +378,11 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
             }
         }
 
-        if (identifierCase == IdentifierCase.LOWER_CASE ||
-            identifierCase == IdentifierCase.LOWER_CASE_QUOTED)
+        if (namingCase == NamingCase.LOWER_CASE || namingCase == NamingCase.LOWER_CASE_QUOTED)
         {
             id.append(identifier.toLowerCase());
         }
-        else if (identifierCase == IdentifierCase.UPPER_CASE ||
-            identifierCase == IdentifierCase.UPPER_CASE_QUOTED)
+        else if (namingCase == NamingCase.UPPER_CASE || namingCase == NamingCase.UPPER_CASE_QUOTED)
         {
             id.append(identifier.toUpperCase());
         }
@@ -392,9 +391,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
             id.append(identifier);
         }
 
-        if (identifierCase == IdentifierCase.LOWER_CASE_QUOTED ||
-            identifierCase == IdentifierCase.MIXED_CASE_QUOTED ||
-            identifierCase == IdentifierCase.UPPER_CASE_QUOTED)
+        if (namingCase == NamingCase.LOWER_CASE_QUOTED ||
+            namingCase == NamingCase.MIXED_CASE_QUOTED ||
+            namingCase == NamingCase.UPPER_CASE_QUOTED)
         {
             if (!identifier.endsWith(quoteString))
             {

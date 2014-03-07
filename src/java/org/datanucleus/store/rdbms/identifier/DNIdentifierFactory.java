@@ -31,6 +31,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.schema.naming.NamingCase;
 
 /**
  * Factory that creates immutable instances of DatastoreIdentifier for mapped datastores.
@@ -561,7 +562,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             char c = javaName.charAt(i);
 
             if (c >= 'A' && c <= 'Z' &&
-                (identifierCase != IdentifierCase.MIXED_CASE && identifierCase != IdentifierCase.MIXED_CASE_QUOTED))
+                (namingCase != NamingCase.MIXED_CASE && namingCase != NamingCase.MIXED_CASE_QUOTED))
             {
                 if (prev >= 'a' && prev <= 'z')
                 {
@@ -571,17 +572,17 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                 s.append(c);
             }
             else if (c >= 'A' && c <= 'Z' &&
-                (identifierCase == IdentifierCase.MIXED_CASE || identifierCase == IdentifierCase.MIXED_CASE_QUOTED))
+                (namingCase == NamingCase.MIXED_CASE || namingCase == NamingCase.MIXED_CASE_QUOTED))
             {
                 s.append(c);
             }
             else if (c >= 'a' && c <= 'z' &&
-                (identifierCase == IdentifierCase.MIXED_CASE || identifierCase == IdentifierCase.MIXED_CASE_QUOTED))
+                (namingCase == NamingCase.MIXED_CASE || namingCase == NamingCase.MIXED_CASE_QUOTED))
             {
                 s.append(c);
             }
             else if (c >= 'a' && c <= 'z' &&
-                (identifierCase != IdentifierCase.MIXED_CASE && identifierCase != IdentifierCase.MIXED_CASE_QUOTED))
+                (namingCase != NamingCase.MIXED_CASE && namingCase != NamingCase.MIXED_CASE_QUOTED))
             {
                 s.append((char)(c - ('a' - 'A')));
             }

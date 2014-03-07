@@ -26,6 +26,7 @@ Contributors:
 package org.datanucleus.store.rdbms.identifier;
 
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.schema.naming.NamingCase;
 
 /**
  * Implementation of a datastore identifier.
@@ -71,13 +72,13 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
      */
     protected String toCase(String identifierName)
     {
-        if (factory.getIdentifierCase() == IdentifierCase.LOWER_CASE ||
-            factory.getIdentifierCase() == IdentifierCase.LOWER_CASE_QUOTED)
+        if (factory.getNamingCase() == NamingCase.LOWER_CASE ||
+            factory.getNamingCase() == NamingCase.LOWER_CASE_QUOTED)
         {
             return identifierName.toLowerCase();
         }
-        else if (factory.getIdentifierCase() == IdentifierCase.UPPER_CASE ||
-            factory.getIdentifierCase() == IdentifierCase.UPPER_CASE_QUOTED)
+        else if (factory.getNamingCase() == NamingCase.UPPER_CASE ||
+            factory.getNamingCase() == NamingCase.UPPER_CASE_QUOTED)
         {
             return identifierName.toUpperCase();
         }
@@ -187,9 +188,9 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
             }
             else
             {
-                if (factory.getIdentifierCase() == IdentifierCase.LOWER_CASE_QUOTED ||
-                    factory.getIdentifierCase() == IdentifierCase.MIXED_CASE_QUOTED ||
-                    factory.getIdentifierCase() == IdentifierCase.UPPER_CASE_QUOTED)
+                if (factory.getNamingCase() == NamingCase.LOWER_CASE_QUOTED ||
+                    factory.getNamingCase() == NamingCase.MIXED_CASE_QUOTED ||
+                    factory.getNamingCase() == NamingCase.UPPER_CASE_QUOTED)
                 {
                     // Identifier should be quoted since our case requires it
                     toString = identifierQuoteString + identifierName + identifierQuoteString;

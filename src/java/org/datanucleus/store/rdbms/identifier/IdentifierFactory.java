@@ -22,6 +22,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.naming.NamingCase;
 
 /**
  * Factory that creates immutable instances of DatastoreIdentifier.
@@ -40,7 +41,7 @@ public interface IdentifierFactory
      * Accessor for the identifier case being used.
      * @return The identifier case
      */
-    IdentifierCase getIdentifierCase();
+    NamingCase getNamingCase();
 
     /**
      * Accessor for an identifier for use in the datastore adapter
