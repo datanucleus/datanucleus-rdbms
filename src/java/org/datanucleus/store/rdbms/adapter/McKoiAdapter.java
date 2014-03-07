@@ -92,7 +92,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
         return "mckoi";
     }
 
-    public boolean isKeyword(String word)
+    public boolean isReservedKeyword(String word)
     {
         /*
          * mcKoi does not support this "AAA".COL or AAA."COL"
