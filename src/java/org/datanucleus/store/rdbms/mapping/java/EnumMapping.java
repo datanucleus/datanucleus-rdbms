@@ -285,7 +285,7 @@ public class EnumMapping extends SingleFieldMapping
                 enumType = mmd.getType();
                 if (roleForMember == FieldRole.ROLE_FIELD)
                 {
-                    if (mmd != null && mmd.hasExtension(ENUM_GETTER_BY_VALUE))
+                    if (mmd.hasExtension(ENUM_GETTER_BY_VALUE))
                     {
                         // Case where the user has defined their own "value" for each enum
                         String getterMethodName = mmd.getValueForExtension(ENUM_GETTER_BY_VALUE);
@@ -296,7 +296,7 @@ public class EnumMapping extends SingleFieldMapping
                 if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
                 {
                     enumType = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
-                    if (mmd != null && mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
+                    if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
                     {
                         // Case where the user has defined their own "value" for each enum
                         String getterMethodName = mmd.getElementMetaData().getValueForExtension(ENUM_GETTER_BY_VALUE);
@@ -306,7 +306,7 @@ public class EnumMapping extends SingleFieldMapping
                 else if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
                 {
                     enumType = ec.getClassLoaderResolver().classForName(mmd.getArray().getElementType());
-                    if (mmd != null && mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
+                    if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
                     {
                         // Case where the user has defined their own "value" for each enum
                         String getterMethodName = mmd.getElementMetaData().getValueForExtension(ENUM_GETTER_BY_VALUE);
@@ -316,7 +316,7 @@ public class EnumMapping extends SingleFieldMapping
                 else if (roleForMember == FieldRole.ROLE_MAP_KEY)
                 {
                     enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getKeyType());
-                    if (mmd != null && mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
+                    if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
                     {
                         // Case where the user has defined their own "value" for each enum
                         String getterMethodName = mmd.getKeyMetaData().getValueForExtension(ENUM_GETTER_BY_VALUE);
@@ -326,7 +326,7 @@ public class EnumMapping extends SingleFieldMapping
                 else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
                 {
                     enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getValueType());
-                    if (mmd != null && mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
+                    if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(ENUM_GETTER_BY_VALUE))
                     {
                         // Case where the user has defined their own "value" for each enum
                         String getterMethodName = mmd.getValueMetaData().getValueForExtension(ENUM_GETTER_BY_VALUE);
