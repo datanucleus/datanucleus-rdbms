@@ -16,8 +16,7 @@ Contributors:
 2003 Erik Bengtson - refactored
 2004 Andy Jefferson - coding standards
 2004 Andy Jefferson - fix to case of UpperCase requested, but not supported
-2004 Andy Jefferson - fix to conversion of names in setJavaName() when
-                     user has selected PreserveCase
+2004 Andy Jefferson - fix to conversion of names in setJavaName()
 2004 Andy Jefferson - updates for use of quoted identifiers
 2005 Andy Jefferson - removed javaName, identifierQuoteString
 2008 Andy Jefferson - refactored to be RDBMS-independent
