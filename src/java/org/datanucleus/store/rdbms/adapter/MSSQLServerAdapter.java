@@ -42,6 +42,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the Microsoft SQL Server database.
@@ -100,7 +101,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        reservedKeywords.addAll(parseKeywordList(MSSQL_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(MSSQL_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(LOCK_OPTION_PLACED_AFTER_FROM);

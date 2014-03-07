@@ -53,6 +53,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the Oracle database.
@@ -129,15 +130,15 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
         if (datastoreMajorVersion <= 8)
         {
-            reservedKeywords.addAll(parseKeywordList(ORACLE_8_RESERVED_WORDS));
+            reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_8_RESERVED_WORDS));
         }
         else if (datastoreMajorVersion == 9)
         {
-            reservedKeywords.addAll(parseKeywordList(ORACLE_9_RESERVED_WORDS));
+            reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_9_RESERVED_WORDS));
         }
         else if (datastoreMajorVersion >= 10)
         {
-            reservedKeywords.addAll(parseKeywordList(ORACLE_10_RESERVED_WORDS));
+            reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_10_RESERVED_WORDS));
         }
 
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);

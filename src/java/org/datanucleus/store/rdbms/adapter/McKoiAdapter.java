@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.transaction.TransactionIsolation;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the McKoi database Server database.
@@ -75,7 +76,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
         
-        reservedKeywords.addAll(parseKeywordList(MCKOI_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(MCKOI_RESERVED_WORDS));
 
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(USE_UNION_ALL);

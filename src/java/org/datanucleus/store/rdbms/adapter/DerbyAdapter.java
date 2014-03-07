@@ -36,6 +36,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the Cloudscape/Derby database.
@@ -81,7 +82,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     public DerbyAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
-        reservedKeywords.addAll(parseKeywordList(CLOUDSCAPE_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(CLOUDSCAPE_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);

@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the PostgreSQL database.
@@ -82,7 +83,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             }
         }
         
-        reservedKeywords.addAll(parseKeywordList(POSTGRESQL_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(POSTGRESQL_RESERVED_WORDS));
 
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);

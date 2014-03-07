@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the DB2 database.
@@ -72,7 +73,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        reservedKeywords.addAll(parseKeywordList(DB2_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(DB2_RESERVED_WORDS));
 
         // Update supported options
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);

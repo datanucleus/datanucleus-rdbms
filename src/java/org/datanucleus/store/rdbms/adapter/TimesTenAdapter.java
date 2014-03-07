@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMappi
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the Oracle Times Ten database
@@ -83,7 +84,7 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        reservedKeywords.addAll(parseKeywordList(RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(RESERVED_WORDS));
 
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.add(UNIQUE_IN_END_CREATE_STATEMENTS);

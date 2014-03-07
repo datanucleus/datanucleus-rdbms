@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the MySQL database.
@@ -78,7 +79,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        reservedKeywords.addAll(parseKeywordList(NONSQL92_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(NONSQL92_RESERVED_WORDS));
 
         supportedOptions.remove(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         if (datastoreMajorVersion < 4 ||

@@ -72,6 +72,7 @@ import org.datanucleus.store.rdbms.table.ViewImpl;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to a specific vendor's
@@ -196,17 +197,17 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.SQLXML), "SQLXML");
 
-        reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL92_RESERVED_WORDS));
-        reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL99_RESERVED_WORDS));
-        reservedKeywords.addAll(parseKeywordList(SQLConstants.SQL2003_RESERVED_WORDS));
-        reservedKeywords.addAll(parseKeywordList(SQLConstants.NONRESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQLConstants.SQL92_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQLConstants.SQL99_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQLConstants.SQL2003_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQLConstants.NONRESERVED_WORDS));
 
         try
         {
             try
             {
                 String sqlKeywordsString = metadata.getSQLKeywords();
-                reservedKeywords.addAll(parseKeywordList(sqlKeywordsString));
+                reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(sqlKeywordsString));
             }
             catch (SQLFeatureNotSupportedException fnse)
             {
@@ -898,51 +899,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public ForeignKeyInfo newFKInfo(ResultSet rs)
     {
         return new ForeignKeyInfo(rs);
-    }
-
-    /**
-     * Utility method to parse a list of keywords and split them out into
-     * words.
-     * @param list The comma-separated list of keywords.
-     * @return Set of keywords.
-     **/
-    protected Set parseKeywordList(String list)
-    {
-        StringTokenizer tokens = new StringTokenizer(list, ",");
-        HashSet words = new HashSet();
-
-        while (tokens.hasMoreTokens())
-        {
-            words.add(tokens.nextToken().trim().toUpperCase());
-        }
-
-        return words;
-    }
-
-    /**
-     * Tests if a given string is a SQL key word.
-     * <p>
-     * The list of key words tested against is defined to contain all SQL/92 key
-     * words, plus any additional key words reported by the JDBC driver for this
-     * adapter via <code>DatabaseMetaData.getSQLKeywords()</code>.
-     * <p>
-     * In general, use of a SQL key word as an identifier should be avoided.
-     * SQL/92 key words are divided into reserved and non-reserved words. If a
-     * reserved word is used as an identifier it must be quoted with double
-     * quotes. Strictly speaking, the same is not true of non-reserved words.
-     * However, as C.J. Date writes in <u>A Guide To The SQL Standard </u>:
-     * <blockquote>The rule by which it is determined within the standard that
-     * one key word needs to be reserved while another need not is not clear to
-     * this writer. In practice, it is probably wise to treat all key words as
-     * reserved. </blockquote>
-     * @param word The word to test.
-     * @return <code>true</code> if <var>word </var> is a SQL key word for
-     * this DBMS. The comparison is case-insensitive.
-     * @see SQLConstants
-     */
-    public boolean isKeyword(String word)
-    {
-        return isReservedKeyword(word.toUpperCase());
     }
 
     /**

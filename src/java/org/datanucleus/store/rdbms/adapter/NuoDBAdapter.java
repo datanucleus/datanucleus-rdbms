@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Adapter for NuoDB (http://www.nuodb.com).
@@ -51,8 +52,8 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        reservedKeywords.addAll(parseKeywordList(NONSQL92_RESERVED_WORDS));
-        reservedKeywords.addAll(parseKeywordList(NUODB_EXTRA_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(NONSQL92_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(NUODB_EXTRA_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
