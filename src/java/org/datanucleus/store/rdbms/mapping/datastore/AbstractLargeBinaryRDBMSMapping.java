@@ -241,8 +241,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             // Serialised field so just perform basic Java deserialisation for retrieval
             try
             {
-                BlobImpl blob;
-                blob = new BlobImpl(bytes);
+                BlobImpl blob = new BlobImpl(bytes);
                 return blob.getObject();
             }
             catch (SQLException sqle)
@@ -345,8 +344,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             // Fallback to just perform basic Java deserialisation for retrieval
             try
             {
-                BlobImpl blob;
-                blob = new BlobImpl(bytes);
+                BlobImpl blob = new BlobImpl(bytes);
                 return blob.getObject();
             }
             catch (SQLException sqle)

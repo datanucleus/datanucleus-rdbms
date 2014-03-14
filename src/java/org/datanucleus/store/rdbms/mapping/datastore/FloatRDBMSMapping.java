@@ -122,8 +122,7 @@ public class FloatRDBMSMapping extends DoubleRDBMSMapping
             }
             else if (value instanceof Character)
             {
-                String s = value.toString();
-                ps.setFloat(param, s.charAt(0));                  
+                ps.setFloat(param, value.toString().charAt(0));                  
             }
             else if (value instanceof Float)
             {

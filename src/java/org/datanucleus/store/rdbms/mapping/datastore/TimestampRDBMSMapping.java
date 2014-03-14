@@ -82,26 +82,25 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             Calendar cal = storeMgr.getCalendarForDateTimezone();
+            // Note that passing the calendar to oracle makes it loses milliseconds
 
             if (value == null)
             {
                 ps.setNull(param, getTypeInfo().getDataType());
             }
-            else if (value instanceof java.util.Date)
+            else if (value instanceof java.sql.Timestamp)
             {
-                // pass the calendar to oracle makes it loses milliseconds
                 if (cal != null)
                 {
-                    ps.setTimestamp(param, new Timestamp(((java.util.Date) value).getTime()), cal);
+                    ps.setTimestamp(param, (Timestamp) value, cal);
                 }
                 else
                 {
-                    ps.setTimestamp(param, new Timestamp(((java.util.Date) value).getTime()));
+                    ps.setTimestamp(param, (Timestamp) value);
                 }
             }
             else if (value instanceof java.sql.Time)
             {
-                // pass the calendar to oracle makes it loses milliseconds
                 if (cal != null)
                 {
                     ps.setTimestamp(param, new Timestamp(((Time) value).getTime()), cal);
@@ -113,7 +112,6 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
             }
             else if (value instanceof java.sql.Date)
             {
-                // pass the calendar to oracle makes it loses milliseconds
                 if (cal != null)
                 {
                     ps.setTimestamp(param, new Timestamp(((java.sql.Date) value).getTime()), cal);
@@ -125,7 +123,6 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
             }
             else if (value instanceof Calendar)
             {
-                // pass the calendar to oracle makes it loses milliseconds
                 if (cal != null)
                 {
                     ps.setTimestamp(param, new Timestamp(((Calendar)value).getTime().getTime()), cal);
@@ -135,9 +132,19 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
                     ps.setTimestamp(param, new Timestamp(((Calendar)value).getTime().getTime()));
                 }
             }
+            else if (value instanceof java.util.Date)
+            {
+                if (cal != null)
+                {
+                    ps.setTimestamp(param, new Timestamp(((java.util.Date) value).getTime()), cal);
+                }
+                else
+                {
+                    ps.setTimestamp(param, new Timestamp(((java.util.Date) value).getTime()));
+                }
+            }
             else
             {
-                // pass the calendar to oracle makes it loses milliseconds
                 if (cal != null)
                 {
                     ps.setTimestamp(param, (Timestamp) value, cal);
@@ -232,7 +239,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
         }
         else
         {
-            return new Timestamp(getDatastoreAdapter().getAdapterTime(value));
+            return value;
         }
     }
 }

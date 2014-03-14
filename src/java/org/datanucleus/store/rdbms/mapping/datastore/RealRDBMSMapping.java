@@ -155,7 +155,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             float f = rs.getFloat(param);
-            value = rs.wasNull() ? null : new Float(f);
+            value = rs.wasNull() ? null : f;
         }
 		catch (SQLException e)
 		{

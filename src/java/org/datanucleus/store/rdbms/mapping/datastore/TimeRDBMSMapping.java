@@ -80,6 +80,10 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
             {
                 ps.setTime(param, new Time(((Calendar)value).getTime().getTime()));
             }
+            else if (value instanceof Time)
+            {
+                ps.setTime(param, (Time)value);
+            }
             else if (value instanceof Date)
             {
                 ps.setTime(param, new Time(((Date)value).getTime()));
@@ -120,7 +124,6 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
     public Object getObject(ResultSet rs, int param)
     {
         Time value = getTime(rs, param);
-
         if (value == null)
         {
             return null;

@@ -423,23 +423,22 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 {
                     ps.setString(param, ((java.sql.Date) value).toString());
                 }
-                else if (value instanceof java.util.Date)
-                {
-                    ps.setString(param, getJavaUtilDateFormat().format((java.util.Date) value));
-                }
                 else if (value instanceof java.sql.Timestamp)
                 {
                     Calendar cal = storeMgr.getCalendarForDateTimezone();
-
-                    // pass the calendar to oracle makes it loses milliseconds
                     if (cal != null)
                     {
+                        // Note that passing the calendar to oracle makes it loses milliseconds
                         ps.setTimestamp(param, (Timestamp) value, cal);
                     }
                     else
                     {
                         ps.setTimestamp(param, (Timestamp) value);
                     }
+                }
+                else if (value instanceof java.util.Date)
+                {
+                    ps.setString(param, getJavaUtilDateFormat().format((java.util.Date) value));
                 }
                 else if (value instanceof String)
                 {
@@ -501,6 +500,11 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 {
                     value = java.sql.Time.valueOf(s);
                 }
+                else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_TIMESTAMP))
+                {
+                    Calendar cal = storeMgr.getCalendarForDateTimezone();
+                    value = TypeConversionHelper.stringToTimestamp(s, cal);
+                }
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_DATE))
                 {
                     value = java.sql.Date.valueOf(s);
@@ -508,11 +512,6 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
                 {
                     value = getJavaUtilDateFormat().parse(s);
-                }
-                else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_TIMESTAMP))
-                {
-                    Calendar cal = storeMgr.getCalendarForDateTimezone();
-                    value = TypeConversionHelper.stringToTimestamp(s, cal);
                 }
                 else
                 {

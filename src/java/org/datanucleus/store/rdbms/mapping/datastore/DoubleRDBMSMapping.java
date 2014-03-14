@@ -248,8 +248,7 @@ public class DoubleRDBMSMapping extends AbstractDatastoreMapping
             }
             else if (value instanceof Character)
             {
-                String s = value.toString();
-                ps.setDouble(param, s.charAt(0));                  
+                ps.setDouble(param, value.toString().charAt(0));                  
             }
             else if (value instanceof BigInteger)
             {
@@ -287,7 +286,7 @@ public class DoubleRDBMSMapping extends AbstractDatastoreMapping
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_FLOAT))
             {
-                value = rs.wasNull() ? null : new Float(d);
+                value = rs.wasNull() ? null : (float)d;
             }
             else
             {

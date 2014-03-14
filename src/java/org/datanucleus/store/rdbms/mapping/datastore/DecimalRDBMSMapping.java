@@ -254,27 +254,27 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-                if( value instanceof Integer) 
+                if (value instanceof Integer) 
                 {
-                    ps.setBigDecimal(param, new BigDecimal(((Integer)value).intValue()));
+                    ps.setBigDecimal(param, BigDecimal.valueOf(((Integer)value).longValue()));
                 }
-                else if( value instanceof Long) 
+                else if (value instanceof Long)
                 {
                     ps.setBigDecimal(param, new BigDecimal(((Long)value).longValue()));
                 }
-                else if( value instanceof BigDecimal) 
+                else if (value instanceof BigDecimal) 
                 {
                     ps.setBigDecimal(param, (BigDecimal)value);
                 }
-                else if( value instanceof Float )
+                else if (value instanceof Float)
                 {
                     ps.setDouble(param, ((Float)value).doubleValue());
                 }            
-                else if( value instanceof Double )
+                else if (value instanceof Double)
                 {
                     ps.setDouble(param, ((Double)value).doubleValue());
                 }                
-                else if( value instanceof BigInteger) 
+                else if (value instanceof BigInteger)
                 {
                     ps.setBigDecimal(param, new BigDecimal((BigInteger)value));
                 }                
@@ -317,13 +317,13 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
             }            
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_FLOAT))
             {
-                double d = rs.getDouble(param);                
-                value = rs.wasNull() ? null : new Float(d);
+                double d = rs.getDouble(param);
+                value = rs.wasNull() ? null : (float)d;
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_DOUBLE))
             {
-                double d = rs.getDouble(param);                
-                value = rs.wasNull() ? null : new Double(d);
+                double d = rs.getDouble(param);
+                value = rs.wasNull() ? null : d;
             }            
             else
             {

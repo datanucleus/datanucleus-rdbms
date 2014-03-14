@@ -86,6 +86,10 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
             {
                 ps.setDate(param, new Date(((java.util.Calendar)value).getTime().getTime()));
             }
+            else if (value instanceof Date)
+            {
+                ps.setDate(param, (Date)value);
+            }
             else if (value instanceof java.util.Date)
             {
                 ps.setDate(param, new Date(((java.util.Date)value).getTime()));
@@ -104,18 +108,14 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
 
     protected Date getDate(ResultSet rs, int param)
     {
-        Date value;
-
         try
         {
-            value = rs.getDate(param);
+            return rs.getDate(param);
         }
         catch (SQLException e)
         {
             throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","java.sql.Date","" + param), e);
         }
-
-        return value;
     }
 
     /**
@@ -127,7 +127,6 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
     public Object getObject(ResultSet rs, int param)
     {
         Date value = getDate(rs, param);
-
         if (value == null)
         {
             return null;
