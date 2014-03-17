@@ -22,8 +22,8 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.store.types.converters.TypeConverterHelper;
 
 /**
  * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter that 
@@ -42,7 +42,7 @@ public class TypeConverterStringMapping extends TypeConverterMapping
         // Sanity check on converter
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         Class fieldType = clr.classForName(type);
-        Class datastoreType = TypeManager.getDatastoreTypeForTypeConverter(converter, fieldType);
+        Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, fieldType);
         if (!String.class.isAssignableFrom(datastoreType))
         {
             throw new NucleusException("Attempt to create TypeConverterStringMapping for type " + type + " yet this is not using String in the datastore");
@@ -59,7 +59,7 @@ public class TypeConverterStringMapping extends TypeConverterMapping
         super.initialize(mmd, table, clr, conv);
 
         // Sanity check on converter
-        Class datastoreType = TypeManager.getDatastoreTypeForTypeConverter(converter, mmd.getType());
+        Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, mmd.getType());
         if (!String.class.isAssignableFrom(datastoreType))
         {
             throw new NucleusException("Attempt to create TypeConverterStringMapping for member " + mmd.getFullFieldName() + " yet this is not using String in the datastore");

@@ -26,8 +26,8 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.store.types.converters.TypeConverterHelper;
 
 /**
  * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter.
@@ -86,7 +86,7 @@ public class TypeConverterMapping extends SingleFieldMapping
      */
     public String getJavaTypeForDatastoreMapping(int index)
     {
-        return TypeManager.getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
+        return TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
     }
 
     /* (non-Javadoc)

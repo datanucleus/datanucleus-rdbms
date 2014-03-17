@@ -73,6 +73,7 @@ import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
@@ -335,11 +336,11 @@ public class RDBMSMappingManager implements MappingManager
         {
             // Set mapping for converter to specific type if possible (to allow use of field in queries)
             // otherwise fallback to generic TypeConverterMapping
-            if (TypeManager.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == String.class)
+            if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == String.class)
             {
                 mc = TypeConverterStringMapping.class;
             }
-            else if (TypeManager.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Long.class)
+            else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Long.class)
             {
                 mc = TypeConverterLongMapping.class;
             }
@@ -945,12 +946,12 @@ public class RDBMSMappingManager implements MappingManager
             TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(javaType);
             if (conv != null)
             {
-                if (TypeManager.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
+                if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
                 {
                     // Fallback to TypeConverterStringMapping
                     return TypeConverterStringMapping.class;
                 }
-                else if (TypeManager.getDatastoreTypeForTypeConverter(conv, javaType) == Long.class)
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Long.class)
                 {
                     // Fallback to TypeConverterLongMapping
                     return TypeConverterLongMapping.class;
