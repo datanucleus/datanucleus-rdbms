@@ -51,105 +51,95 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
         ClassUtils.assertClassForJarExistsInClasspath(clr, "org.apache.commons.pool2.ObjectPool", "commons-pool-2.x.jar");
         ClassUtils.assertClassForJarExistsInClasspath(clr, "org.apache.commons.dbcp2.ConnectionFactory", "commons-dbcp-2.x.jar");
 
-        // Create a factory to be used by the pool to create the connections
-        Properties dbProps = getPropertiesForDriver(storeMgr);
-        org.apache.commons.dbcp2.ConnectionFactory connectionFactory = new org.apache.commons.dbcp2.DriverManagerConnectionFactory(dbURL, dbProps);
-
-        // TODO How to cache PreparedStatements with DBCP2?
-        // Create a factory for caching the PreparedStatements
-        /*org.apache.commons.pool2.KeyedObjectPoolFactory kpf = null;
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_STATEMENTS))
-        {
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_STATEMENTS);
-            if (value > 0)
-            {
-                kpf = new org.apache.commons.pool.impl.StackKeyedObjectPoolFactory(null, value);
-            }
-        }*/
-
-        // Wrap the connections and statements with pooled variants
-        org.apache.commons.dbcp2.PoolableConnectionFactory poolableCF = null;
+        org.apache.commons.dbcp2.PoolingDataSource ds = null;
+        org.apache.commons.pool2.impl.GenericObjectPool<org.apache.commons.dbcp2.PoolableConnection> connectionPool;
         try
         {
-            // TODO How to do this with DBCP2?
-            /*String testSQL = null;
+            // Create a factory to be used by the pool to create the connections
+            Properties dbProps = getPropertiesForDriver(storeMgr);
+            org.apache.commons.dbcp2.ConnectionFactory connectionFactory = new org.apache.commons.dbcp2.DriverManagerConnectionFactory(dbURL, dbProps);
+
+            // Wrap the connections and statements with pooled variants
+            org.apache.commons.dbcp2.PoolableConnectionFactory poolableCF = null;
+            poolableCF = new org.apache.commons.dbcp2.PoolableConnectionFactory(connectionFactory, null);
+
+            String testSQL = null;
             if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL))
             {
                 testSQL = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL);
-            }*/
-            poolableCF = new org.apache.commons.dbcp2.PoolableConnectionFactory(connectionFactory, null);
-            /*if (testSQL != null)
+                poolableCF.setValidationQuery(testSQL);
+            }
+
+            // Create the actual pool of connections, and apply any properties
+            connectionPool = new org.apache.commons.pool2.impl.GenericObjectPool(poolableCF);
+            if (testSQL != null)
             {
-                ((org.apache.commons.pool2.impl.GenericObjectPool)connectionPool).set
-                ((org.apache.commons.pool2.impl.GenericObjectPool)connectionPool).setTestOnBorrow(true);
+                connectionPool.setTestOnBorrow(true);
+            }
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE))
+            {
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE);
+                if (value > 0)
+                {
+                    connectionPool.setMaxIdle(value);
+                }
+            }
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE))
+            {
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE);
+                if (value > 0)
+                {
+                    connectionPool.setMinIdle(value);
+                }
+            }
+            // TODO What is the equivalent of this in DBCP2?
+            /*if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE))
+            {
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE);
+                if (value > 0)
+                {
+                    connectionPool.setMaxActive(value);
+                }
             }*/
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT))
+            {
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT);
+                if (value > 0)
+                {
+                    connectionPool.setMaxWaitMillis(value);
+                }
+            }
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TIME_BETWEEN_EVICTOR_RUNS_MILLIS))
+            {
+                // how often should the evictor run (if ever, default is -1 = off)
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TIME_BETWEEN_EVICTOR_RUNS_MILLIS);
+                if (value > 0)
+                {
+                    connectionPool.setTimeBetweenEvictionRunsMillis(value);
+
+                    // in each eviction run, evict at least a quarter of "maxIdle" connections
+                    int maxIdle = connectionPool.getMaxIdle();
+                    int numTestsPerEvictionRun = (int) Math.ceil(((double) maxIdle / 4));
+                    connectionPool.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
+                }
+            }
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS))
+            {
+                // how long may a connection sit idle in the pool before it may be evicted
+                int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+                if (value > 0)
+                {
+                    connectionPool.setMinEvictableIdleTimeMillis(value);
+                }
+            }
+
+            // Create the datasource
+            ds = new org.apache.commons.dbcp2.PoolingDataSource(connectionPool);
         }
         catch (Exception e)
         {
             throw new DatastorePoolException("DBCP2", dbDriver, dbURL, e);
         }
-
-        // Create the actual pool of connections, and apply any properties
-        org.apache.commons.pool2.impl.GenericObjectPool<org.apache.commons.dbcp2.PoolableConnection> connectionPool = new org.apache.commons.pool2.impl.GenericObjectPool(poolableCF);
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE))
-        {
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE);
-            if (value > 0)
-            {
-                connectionPool.setMaxIdle(value);
-            }
-        }
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE))
-        {
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE);
-            if (value > 0)
-            {
-                connectionPool.setMinIdle(value);
-            }
-        }
-        // TODO What is the equivalent of this in DBCP2?
-        /*if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE))
-        {
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE);
-            if (value > 0)
-            {
-                connectionPool.setMaxActive(value);
-            }
-        }*/
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT))
-        {
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT);
-            if (value > 0)
-            {
-                connectionPool.setMaxWaitMillis(value);
-            }
-        }
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TIME_BETWEEN_EVICTOR_RUNS_MILLIS))
-        {
-            // how often should the evictor run (if ever, default is -1 = off)
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TIME_BETWEEN_EVICTOR_RUNS_MILLIS);
-            if (value > 0)
-            {
-                connectionPool.setTimeBetweenEvictionRunsMillis(value);
-
-                // in each eviction run, evict at least a quarter of "maxIdle" connections
-                int maxIdle = connectionPool.getMaxIdle();
-                int numTestsPerEvictionRun = (int) Math.ceil(((double) maxIdle / 4));
-                connectionPool.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
-            }
-        }
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS))
-        {
-            // how long may a connection sit idle in the pool before it may be evicted
-            int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS);
-            if (value > 0)
-            {
-                connectionPool.setMinEvictableIdleTimeMillis(value);
-            }
-        }
-
-        // Create the datasource
-        org.apache.commons.dbcp2.PoolingDataSource<org.apache.commons.dbcp2.PoolableConnection> ds = new org.apache.commons.dbcp2.PoolingDataSource(connectionPool);
 
         return new DBCPConnectionPool(ds, connectionPool);
     }
