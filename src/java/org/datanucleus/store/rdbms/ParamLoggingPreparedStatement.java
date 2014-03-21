@@ -953,7 +953,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         ps.setURL(parameterIndex, x);
     }
 
-    // JDK 1.6 methods
+    // JDBC 4.0 methods
 
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException
     {
@@ -1062,8 +1062,6 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         // TODO Auto-generated method stub
     }
 
-    // Implementation of JDBC 4.0's Wrapper interface
-
     public boolean isWrapperFor(Class iface) throws SQLException
     {
         return PreparedStatement.class.equals(iface);
@@ -1079,6 +1077,8 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         return this;
     }
 
+    // Implementation of JDBC 4.1 methods
+
     public void closeOnCompletion() throws SQLException
     {
 //        ps.closeOnCompletion();
@@ -1089,4 +1089,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
 //        return ps.isCloseOnCompletion();
         return false;
     }
+
+    // Implementation of JDBC 4.2 methods
+    // TODO
 }
