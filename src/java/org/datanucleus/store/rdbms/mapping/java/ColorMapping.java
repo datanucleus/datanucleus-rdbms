@@ -85,15 +85,15 @@ public class ColorMapping extends SingleFieldMultiMapping
         }
         else if (index == 1)
         {
-            return ((Color)value).getRed();
+            return ((Color)value).getGreen();
         }
         else if (index == 2)
         {
-            return ((Color)value).getRed();
+            return ((Color)value).getBlue();
         }
         else if (index == 3)
         {
-            return ((Color)value).getRed();
+            return ((Color)value).getAlpha();
         }
         throw new IndexOutOfBoundsException();
     }
