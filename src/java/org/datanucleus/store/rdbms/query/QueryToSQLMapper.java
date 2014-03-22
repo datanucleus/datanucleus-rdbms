@@ -2688,12 +2688,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 if (m == null)
                 {
                     // Use the type of the input parameter value
-                    Symbol paramSym = expr.getSymbol();
+                   // Symbol paramSym = expr.getSymbol();
                     Class paramCls = paramValue.getClass();
-                    if (paramSym.getValueType() != null)
+                    /*if (paramSym.getValueType() != null)
                     {
                         paramCls = paramSym.getValueType();
-                    }
+                    }*/
                     m = exprFactory.getMappingForType(paramCls, false);
                 }
                 if (expr.getSymbol() != null && expr.getSymbol().getValueType() != null)
