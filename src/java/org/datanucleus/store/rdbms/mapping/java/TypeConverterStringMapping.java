@@ -66,6 +66,12 @@ public class TypeConverterStringMapping extends TypeConverterMapping
         }
     }
 
+    // TODO Cater for the TypeConverter providing information about defaultLength
+//    public int getDefaultLength(int index)
+//    {
+//        return ???
+//    }
+
     /**
      * Accessor for the name of the java-type actually used when mapping the particular datastore
      * field. This java-type must have an entry in the datastore mappings.
