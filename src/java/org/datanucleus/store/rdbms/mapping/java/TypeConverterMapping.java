@@ -95,7 +95,7 @@ public class TypeConverterMapping extends SingleFieldMapping
     @Override
     public Class getJavaType()
     {
-        return mmd.getType();
+        return mmd != null ? mmd.getType() : storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
     }
 
     /* (non-Javadoc)
