@@ -181,20 +181,18 @@ Contributors:
 
         <!-- "java.lang" types -->
         <mapping java-type="java.lang.Boolean" mapping-class="org.datanucleus.store.rdbms.mapping.java.BooleanMapping"/>
-        <mapping java-type="java.lang.Byte" mapping-class="org.datanucleus.store.rdbms.mapping.java.ByteMapping" />
-        <mapping java-type="java.lang.Character" mapping-class="org.datanucleus.store.rdbms.mapping.java.CharacterMapping" />
-        <mapping java-type="java.lang.Double" mapping-class="org.datanucleus.store.rdbms.mapping.java.DoubleMapping" />
-        <mapping java-type="java.lang.Float" mapping-class="org.datanucleus.store.rdbms.mapping.java.FloatMapping" />
-        <mapping java-type="java.lang.Integer" mapping-class="org.datanucleus.store.rdbms.mapping.java.IntegerMapping" />
-        <mapping java-type="java.lang.Long" mapping-class="org.datanucleus.store.rdbms.mapping.java.LongMapping" />
-        <mapping java-type="java.lang.Short" mapping-class="org.datanucleus.store.rdbms.mapping.java.ShortMapping" />
+        <mapping java-type="java.lang.Byte" mapping-class="org.datanucleus.store.rdbms.mapping.java.ByteMapping"/>
+        <mapping java-type="java.lang.Character" mapping-class="org.datanucleus.store.rdbms.mapping.java.CharacterMapping"/>
+        <mapping java-type="java.lang.Double" mapping-class="org.datanucleus.store.rdbms.mapping.java.DoubleMapping"/>
+        <mapping java-type="java.lang.Float" mapping-class="org.datanucleus.store.rdbms.mapping.java.FloatMapping"/>
+        <mapping java-type="java.lang.Integer" mapping-class="org.datanucleus.store.rdbms.mapping.java.IntegerMapping"/>
+        <mapping java-type="java.lang.Long" mapping-class="org.datanucleus.store.rdbms.mapping.java.LongMapping"/>
+        <mapping java-type="java.lang.Short" mapping-class="org.datanucleus.store.rdbms.mapping.java.ShortMapping"/>
 
         <mapping java-type="java.lang.Class" mapping-class="org.datanucleus.store.rdbms.mapping.java.ClassMapping"/>
         <mapping java-type="java.lang.Number" mapping-class="org.datanucleus.store.rdbms.mapping.java.NumberMapping"/>
         <mapping java-type="java.lang.Object" mapping-class="org.datanucleus.store.rdbms.mapping.java.SerialisedMapping"/>
         <mapping java-type="java.lang.String" mapping-class="org.datanucleus.store.rdbms.mapping.java.StringMapping"/>
-        <mapping java-type="java.lang.StringBuffer" mapping-class="org.datanucleus.store.rdbms.mapping.java.StringBufferMapping"/>
-        <mapping java-type="java.lang.StringBuilder" mapping-class="org.datanucleus.store.rdbms.mapping.java.StringBuilderMapping"/>
         <mapping java-type="java.lang.Enum" mapping-class="org.datanucleus.store.rdbms.mapping.java.EnumMapping"/>
 
         <!-- "java.awt" types -->
@@ -212,16 +210,11 @@ Contributors:
         <!-- "java.util" types -->
         <mapping java-type="java.util.Calendar" mapping-class="org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping"/>
         <mapping java-type="java.util.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping"/>
-        <mapping java-type="java.util.Locale" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocaleMapping" />
-        <mapping java-type="java.util.TimeZone" mapping-class="org.datanucleus.store.rdbms.mapping.java.TimeZoneMapping"/>
 
         <!-- "javax.time" types -->
-        <mapping java-type="javax.time.calendar.LocalDate"
-            mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping"/>
-        <mapping java-type="javax.time.calendar.LocalDateTime"
-            mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateTimeMapping"/>
-        <mapping java-type="javax.time.calendar.LocalTime"
-            mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalTimeMapping"/>
+        <mapping java-type="javax.time.calendar.LocalDate" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping"/>
+        <mapping java-type="javax.time.calendar.LocalDateTime" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateTimeMapping"/>
+        <mapping java-type="javax.time.calendar.LocalTime" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalTimeMapping"/>
 
         <!-- "java.sql" types -->
         <mapping java-type="java.sql.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.SqlDateMapping"/>
@@ -259,7 +252,6 @@ Contributors:
         <mapping java-type="java.util.ArrayList" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
         <mapping java-type="java.util.BitSet" mapping-class="org.datanucleus.store.rdbms.mapping.java.BitSetMapping"/>
         <mapping java-type="java.util.Collection" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
-        <mapping java-type="java.util.Currency" mapping-class="org.datanucleus.store.rdbms.mapping.java.CurrencyMapping"/>
         <mapping java-type="java.util.GregorianCalendar" mapping-class="org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping"/>
         <mapping java-type="java.util.HashMap" mapping-class="org.datanucleus.store.rdbms.mapping.java.MapMapping"/>
         <mapping java-type="java.util.HashSet" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
@@ -825,9 +817,6 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleCollectionMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.CollectionLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.CollectionExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.CurrencyMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
@@ -855,9 +844,6 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.IntegerMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.IntegerLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocaleMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LongMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.IntegerLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
@@ -919,15 +905,6 @@ Contributors:
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleStringMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.StringBufferMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.StringBuilderMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TimeZoneMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionLongMapping" 

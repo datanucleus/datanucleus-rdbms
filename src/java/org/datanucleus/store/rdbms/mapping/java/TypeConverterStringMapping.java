@@ -22,6 +22,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
 
@@ -66,11 +67,15 @@ public class TypeConverterStringMapping extends TypeConverterMapping
         }
     }
 
-    // TODO Cater for the TypeConverter providing information about defaultLength
-//    public int getDefaultLength(int index)
-//    {
-//        return ???
-//    }
+    public int getDefaultLength(int index)
+    {
+        if (converter instanceof ColumnLengthDefiningTypeConverter)
+        {
+            // Apply any required default length for the column
+            return ((ColumnLengthDefiningTypeConverter) converter).getDefaultColumnLength(index);
+        }
+        return super.getDefaultLength(index);
+    }
 
     /**
      * Accessor for the name of the java-type actually used when mapping the particular datastore

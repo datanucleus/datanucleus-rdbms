@@ -23,7 +23,9 @@ import java.sql.ResultSet;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.TypeConverter;
@@ -45,6 +47,10 @@ public class TypeConverterMapping extends SingleFieldMapping
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         Class fieldType = clr.classForName(type);
         converter = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fieldType);
+        if (converter == null)
+        {
+            throw new NucleusUserException("Unable to find TypeConverter for converting " + fieldType + " to String");
+        }
 
         super.initialize(storeMgr, type);
     }
@@ -67,8 +73,26 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
         else
         {
-            // Use default converter for the field type (if defined)
-            converter = table.getStoreManager().getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fmd.getType());
+            // Use default converter for the field type/role
+            Class cls = fmd.getType();
+            if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
+            {
+                cls = fmd.getType().getComponentType();
+            }
+            else if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
+            {
+                cls = clr.classForName(fmd.getCollection().getElementType());
+            }
+            else if (roleForMember == FieldRole.ROLE_MAP_KEY)
+            {
+                cls = clr.classForName(fmd.getMap().getKeyType());
+            }
+            else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
+            {
+                cls = clr.classForName(fmd.getMap().getValueType());
+            }
+
+            converter = table.getStoreManager().getNucleusContext().getTypeManager().getDefaultTypeConverterForType(cls);
             if (converter == null)
             {
                 throw new NucleusException("Attempt to create TypeConverterMapping when no type converter defined for member " + fmd.getFullFieldName());
