@@ -25,6 +25,7 @@ import org.datanucleus.ExecutionContext;
 
 /**
  * Abstract mapping for a java type that will be stored as a Integer type.
+ * @deprecated Drop this, people should use TypeConverter. This will be removed before DN 4.0
  */
 public abstract class ObjectAsIntegerMapping extends SingleFieldMapping
 {

@@ -17,7 +17,12 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.ClassNameConstants;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.ClassStringConverter;
@@ -25,7 +30,7 @@ import org.datanucleus.store.types.converters.ClassStringConverter;
 /**
  * Mapping for a Class type. Converts it to a String for persisting in the datastore.
  */
-public class ClassMapping extends ObjectAsStringMapping
+public class ClassMapping extends SingleFieldMapping
 {
     private static ClassStringConverter converter = new ClassStringConverter();
 
@@ -46,22 +51,43 @@ public class ClassMapping extends ObjectAsStringMapping
     }
 
     /**
-     * Method to set the datastore string value based on the object value.
-     * @param object The object
-     * @return The string value to pass to the datastore
+     * Accessor for the name of the java-type actually used when mapping the particular datastore
+     * field. This java-type must have an entry in the datastore mappings.
+     * @param index requested datastore field index.
+     * @return the name of java-type for the requested datastore field.
      */
-    protected String objectToString(Object object)
+    public String getJavaTypeForDatastoreMapping(int index)
     {
-        return converter.toDatastoreType((Class)object);
+        // All of the types extending this class will be using java-type of String for the datastore
+        return ClassNameConstants.JAVA_LANG_STRING;
     }
 
     /**
-     * Method to extract the objects value from the datastore string value.
-     * @param datastoreValue Value obtained from the datastore
-     * @return The value of this object (derived from the datastore string value)
+     * Method to set the object when updating the the datastore.
+     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#setObject(org.datanucleus.ExecutionContext, PreparedStatement, int[], java.lang.Object)
      */
-    protected Object stringToObject(String datastoreValue)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
-        return converter.toMemberType(datastoreValue);
+        getDatastoreMapping(0).setObject(ps, exprIndex[0], converter.toDatastoreType((Class)value));
+    }
+
+    /**
+     * Method to get the object from the datastore and convert to an object.
+     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getObject(org.datanucleus.ExecutionContext, ResultSet, int[])
+     */
+    public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
+    {
+        if (exprIndex == null)
+        {
+            return null;
+        }
+
+        Object datastoreValue = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        Object value = null;
+        if (datastoreValue != null)
+        {
+            value = converter.toMemberType((String)datastoreValue);
+        }
+        return value;
     }
 }
