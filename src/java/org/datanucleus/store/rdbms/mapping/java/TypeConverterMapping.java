@@ -17,19 +17,24 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter.
@@ -55,51 +60,91 @@ public class TypeConverterMapping extends SingleFieldMapping
         super.initialize(storeMgr, type);
     }
 
-    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        this.initialize(fmd, table, clr, null);
+        this.initialize(mmd, table, clr, null);
     }
 
-    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr, TypeConverter conv)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, TypeConverter conv)
     {
         if (conv != null)
         {
             converter = conv;
         }
-        else if (fmd.getTypeConverterName() != null)
+        else if (mmd.getTypeConverterName() != null)
         {
             // Use specified converter (if found)
-            converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(fmd.getTypeConverterName());
+            converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
         }
         else
         {
+            // TODO Aim to set the converter outside the mapping, and then just wrap the converter so this code can be deleted
+            // This code is duplicated in RDBMSMappingManager.getDefaultJavaTypeMapping
+
             // Use default converter for the field type/role
-            Class cls = fmd.getType();
+            Class cls = mmd.getType();
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
             if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
             {
-                cls = fmd.getType().getComponentType();
+                cls = mmd.getType().getComponentType();
+                colmds = mmd.getElementMetaData().getColumnMetaData();
             }
             else if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
-                cls = clr.classForName(fmd.getCollection().getElementType());
+                cls = clr.classForName(mmd.getCollection().getElementType());
+                colmds = mmd.getElementMetaData().getColumnMetaData();
             }
             else if (roleForMember == FieldRole.ROLE_MAP_KEY)
             {
-                cls = clr.classForName(fmd.getMap().getKeyType());
+                cls = clr.classForName(mmd.getMap().getKeyType());
+                colmds = mmd.getKeyMetaData().getColumnMetaData();
             }
             else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
             {
-                cls = clr.classForName(fmd.getMap().getValueType());
+                cls = clr.classForName(mmd.getMap().getValueType());
+                colmds = mmd.getValueMetaData().getColumnMetaData();
             }
 
-            converter = table.getStoreManager().getNucleusContext().getTypeManager().getDefaultTypeConverterForType(cls);
+            if (colmds != null && colmds.length > 0)
+            {
+                // TODO Support TypeConverters with multiple columns, or other jdbcType
+                String jdbcType = colmds[0].getJdbcType();
+                storeMgr = table.getStoreManager();
+                if (!StringUtils.isWhitespace(jdbcType))
+                {
+                    if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                    {
+                        converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(cls, String.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("integer"))
+                    {
+                        converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(cls, Long.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("timestamp"))
+                    {
+                        converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(cls, Timestamp.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("time"))
+                    {
+                        converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(cls, Time.class);
+                    }
+                    else if (jdbcType.equalsIgnoreCase("date"))
+                    {
+                        converter = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(cls, Date.class);
+                    }
+                }
+            }
             if (converter == null)
             {
-                throw new NucleusException("Attempt to create TypeConverterMapping when no type converter defined for member " + fmd.getFullFieldName());
+                converter = table.getStoreManager().getNucleusContext().getTypeManager().getDefaultTypeConverterForType(cls);
+                if (converter == null)
+                {
+                    throw new NucleusException("Attempt to create TypeConverterMapping when no type converter defined for member " + mmd.getFullFieldName());
+                }
             }
         }
 
-        super.initialize(fmd, table, clr);
+        super.initialize(mmd, table, clr);
     }
 
     /**

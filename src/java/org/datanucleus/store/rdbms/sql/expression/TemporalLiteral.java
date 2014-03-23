@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +28,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Representation of temporal literal in a Query.
@@ -62,9 +64,52 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
         }
         else
         {
-            // Allow for using an input parameter literal
-            throw new NucleusException("Cannot create " + this.getClass().getName() + 
-                " for value of type " + value.getClass().getName());
+            Class type = value.getClass();
+            if (mapping != null)
+            {
+                type = mapping.getJavaType();
+            }
+
+            // Cater for any TypeConverter that converts to java.sql.Time/java.sql.Date/java.sql.Timestamp/java.util.Date
+            TypeConverter converter = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, Time.class);
+            if (converter != null)
+            {
+                // Use converter
+                this.value = (Time)converter.toDatastoreType(value);
+            }
+            else
+            {
+                converter = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, java.sql.Date.class);
+                if (converter != null)
+                {
+                    // Use converter
+                    this.value = (java.sql.Date)converter.toDatastoreType(value);
+                }
+                else
+                {
+                    converter = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, Timestamp.class);
+                    if (converter != null)
+                    {
+                        // Use converter
+                        this.value = (Timestamp)converter.toDatastoreType(value);
+                    }
+                    else
+                    {
+                        converter = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getTypeConverterForType(type, Date.class);
+                        if (converter != null)
+                        {
+                            // Use converter
+                            this.value = (Date)converter.toDatastoreType(value);
+                        }
+                        else
+                        {
+                            // Allow for using an input parameter literal
+                            throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + value.getClass().getName());
+                        }
+                    }
+                }
+            }
+
         }
 
         if (parameterName != null)

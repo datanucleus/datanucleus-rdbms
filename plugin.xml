@@ -212,9 +212,9 @@ Contributors:
         <mapping java-type="java.util.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping"/>
 
         <!-- "javax.time" types -->
-        <mapping java-type="javax.time.calendar.LocalDate" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping"/>
+        <!--mapping java-type="javax.time.calendar.LocalDate" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping"/>
         <mapping java-type="javax.time.calendar.LocalDateTime" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateTimeMapping"/>
-        <mapping java-type="javax.time.calendar.LocalTime" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalTimeMapping"/>
+        <mapping java-type="javax.time.calendar.LocalTime" mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalTimeMapping"/-->
 
         <!-- "java.sql" types -->
         <mapping java-type="java.sql.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.SqlDateMapping"/>
@@ -917,23 +917,32 @@ Contributors:
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
 
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping" 
+        <!--sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.LocalDateLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringTemporalExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateTimeMapping" 
+            expression-class="org.datanucleus.store.rdbms.sql.expression.StringTemporalExpression"/-->
+        <!--sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalDateTimeMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.LocalDateTimeLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringTemporalExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.LocalTimeMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.LocalTimeLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringTemporalExpression"/>
+            expression-class="org.datanucleus.store.rdbms.sql.expression.StringTemporalExpression"/-->
 
-        <!-- Fallback for types with a String/Long-based converter and no explicit mapping -->
+        <!-- Fallback for types with a Date/String/Long-based converter and no explicit mapping -->
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterStringMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterLongMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.IntegerLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterTimestampMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlTimeMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlDateMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
     </extension>
 
     <!-- SQL METHODS -->

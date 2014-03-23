@@ -22,6 +22,9 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,7 +69,10 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterLongMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
+import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlDateMapping;
+import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlTimeMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterStringMapping;
+import org.datanucleus.store.rdbms.mapping.java.TypeConverterTimestampMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -213,46 +219,47 @@ public class RDBMSMappingManager implements MappingManager
      * Accessor for the mapping for the specified class. Usually only called by JDOQL query expressions.
      * If the type has its own table returns the id mapping of the table.
      * If the type doesn't have its own table then creates the mapping and, if it has a simple
-     * datastore representation, creates the datastore mapping. The JavaTypeMapping has no metadata/table
-     * associated.
-     * @param c Java type
+     * datastore representation, creates the datastore mapping. The JavaTypeMapping has no metadata/table associated.
+     * @param javaType Java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
      * @param clr ClassLoader resolver
      * @return The mapping for the class.
      */
-    public JavaTypeMapping getMappingWithDatastoreMapping(Class c, boolean serialised, boolean embedded, 
-            ClassLoaderResolver clr)
+    public JavaTypeMapping getMappingWithDatastoreMapping(Class javaType, boolean serialised, boolean embedded, ClassLoaderResolver clr)
     {
         try
         {
             // TODO This doesn't take into account serialised/embedded
             // If the type has its own table just take the id mapping of its table
-            DatastoreClass datastoreClass = storeMgr.getDatastoreClass(c.getName(), clr);
+            DatastoreClass datastoreClass = storeMgr.getDatastoreClass(javaType.getName(), clr);
             return datastoreClass.getIdMapping();
         }
         catch (NoTableManagedException ex)
         {
             // Doesn't allow for whether a field is serialised/embedded so they get the default mapping only
-            Class mc = getMappingClass(c, serialised, embedded, null);
-            mc = getOverrideMappingClass(mc, null, -1); // Allow for overriding in subclasses
-            JavaTypeMapping m = null;
+            Class mc = getMappingClass(javaType, serialised, embedded, null, null); // TODO Pass in 4th arg?
+
             try
             {
-                m = (JavaTypeMapping)mc.newInstance();
+                JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+                m.initialize(storeMgr, javaType.getName());
+                if (m.hasSimpleDatastoreRepresentation())
+                {
+                    // Create the datastore mapping (NOT the column)
+                    createDatastoreMapping(m, null, m.getJavaTypeForDatastoreMapping(0));
+                    // TODO How to handle SingleFieldMultiMapping cases ?
+                }
+                return m;
+            }
+            catch (NucleusUserException nue)
+            {
+                throw nue;
             }
             catch (Exception e)
             {
                 throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
             }
-            m.initialize(storeMgr, c.getName());
-            if (m.hasSimpleDatastoreRepresentation())
-            {
-                // Create the datastore mapping (NOT the column)
-                createDatastoreMapping(m, null, m.getJavaTypeForDatastoreMapping(0));
-                // TODO How to handle SingleFieldMultiMapping cases ?
-            }
-            return m;
         }
     }
 
@@ -260,46 +267,44 @@ public class RDBMSMappingManager implements MappingManager
      * Accessor for the mapping for the specified class.
      * This simply creates a JavaTypeMapping for the java type and returns it. The mapping
      * has no underlying datastore mapping(s) and no associated field/table.
-     * @param c Java type
+     * @param javaType Java type
      * @return The mapping for the class.
      */
-    public JavaTypeMapping getMapping(Class c)
+    public JavaTypeMapping getMapping(Class javaType)
     {
-        return getMapping(c, false, false, (String)null);
+        return getMapping(javaType, false, false, (String)null);
     }
 
     /**
      * Accessor for the mapping for the specified class.
      * This simply creates a JavaTypeMapping for the java type and returns it.
      * The mapping has no underlying datastore mapping(s) and no associated field/table.
-     * @param c Java type
+     * @param javaType Java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
      * @param fieldName Name of the field (for logging)
      * @return The mapping for the class.
      */
-    public JavaTypeMapping getMapping(Class c, boolean serialised, boolean embedded, String fieldName)
+    public JavaTypeMapping getMapping(Class javaType, boolean serialised, boolean embedded, String fieldName)
     {
-        Class mc = getMappingClass(c, serialised, embedded, fieldName);
-        mc = getOverrideMappingClass(mc, null, -1); // Allow for overriding in subclasses
+        Class mc = getMappingClass(javaType, serialised, embedded, null, fieldName); // TODO Pass in 4th arg?
 
-        JavaTypeMapping m = null;
         try
         {
-            m = (JavaTypeMapping)mc.newInstance();
+            JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+            m.initialize(storeMgr, javaType.getName());
+            return m;
         }
         catch (Exception e)
         {
             throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
         }
-        m.initialize(storeMgr, c.getName());
-        return m;
     }
 
     /**
-     * Accessor for the mapping for the field of the specified table.
-     * Can be used for fields of a class, elements of a collection of a class, elements of an array of
-     * a class, keys of a map of a class, values of a map of a class; this is controlled by the role argument.
+     * Accessor for the mapping for the member of the specified table.
+     * Can be used for members of a class, element of a collection of a class, element of an array of a class, 
+     * keys of a map of a class, values of a map of a class; this is controlled by the role argument.
      * @param table Table to add the mapping to
      * @param mmd MetaData for the member to map
      * @param clr The ClassLoaderResolver
@@ -308,15 +313,28 @@ public class RDBMSMappingManager implements MappingManager
      */
     public JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int fieldRole)
     {
-        Class mc = null;
-
-        AbstractMemberMetaData overrideMmd = null;
+        if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT || fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
+        {
+            // Mapping a collection/array element (in a join table)
+            return getElementMapping(table, mmd, fieldRole, clr);
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_KEY)
+        {
+            // Mapping a map key (in a join table)
+            return getKeyMapping(table, mmd, clr);
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
+        {
+            // Mapping a map value (in a join table)
+            return getValueMapping(table, mmd, clr);
+        }
 
         // Check for use of TypeConverter (either specific, or auto-apply for this type)
         TypeManager typeMgr = table.getStoreManager().getNucleusContext().getTypeManager();
         TypeConverter conv = null;
         if (!mmd.isTypeConversionDisabled())
         {
+            // User-specified TypeConverter defined for the whole member, or an autoApply is present for this member type
             if (mmd.getTypeConverterName() != null)
             {
                 conv = typeMgr.getTypeConverterForName(mmd.getTypeConverterName());
@@ -329,130 +347,120 @@ public class RDBMSMappingManager implements MappingManager
                     conv = autoApplyConv;
                 }
             }
-        }
-        // TODO Cater for using TypeConverter for Collection/array element or Map key/value
 
-        if (conv != null)
-        {
-            // Set mapping for converter to specific type if possible (to allow use of field in queries)
-            // otherwise fallback to generic TypeConverterMapping
-            if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == String.class)
+            if (conv != null)
             {
-                mc = TypeConverterStringMapping.class;
-            }
-            else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Long.class)
-            {
-                mc = TypeConverterLongMapping.class;
-            }
-            else
-            {
-                mc = TypeConverterMapping.class;
+                // Converter set, either by name or autoApply, so use the associated mapping
+                // Note that uses TypeConverterStringMapping/TypeConverterLongMapping for use in queries
+                Class mc = null;
+                if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == String.class)
+                {
+                    mc = TypeConverterStringMapping.class;
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Long.class)
+                {
+                    mc = TypeConverterLongMapping.class;
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Timestamp.class)
+                {
+                    mc = TypeConverterTimestampMapping.class;
+                }
+                else
+                {
+                    mc = TypeConverterMapping.class;
+                }
+
+                // Create the mapping of the selected type
+                JavaTypeMapping m = null;
+                try
+                {
+                    m = (JavaTypeMapping)mc.newInstance();
+                    m.setRoleForMember(FieldRole.ROLE_FIELD);
+                    ((TypeConverterMapping)m).initialize(mmd, table, clr, conv);
+                    return m;
+                }
+                catch (Exception e)
+                {
+                    throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                }
             }
         }
-        else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT || fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
+
+        AbstractMemberMetaData overrideMmd = null;
+
+        Class mc = null;
+        String userMappingClassName = mmd.getValueForExtension("mapping-class");
+        if (userMappingClassName != null)
         {
-            // Mapping a collection/array element (in a join table)
-            mc = getElementMappingClass(table, mmd, clr);
-        }
-        else if (fieldRole == FieldRole.ROLE_MAP_KEY)
-        {
-            // Mapping a map key (in a join table)
-            mc = getKeyMappingClass(table, mmd, clr);
-        }
-        else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
-        {
-            // Mapping a map value (in a join table)
-            mc = getValueMappingClass(table, mmd, clr);
+            // User has defined their own mapping class for this field so use that
+            try
+            {
+                mc = clr.classForName(userMappingClassName);
+            }
+            catch (NucleusException ne)
+            {
+                throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", mmd.getFullFieldName(), userMappingClassName)).setFatal();
+            }
         }
         else
         {
-            // Assumed to be a normal field
-            String userMappingClassName = mmd.getValueForExtension("mapping-class");
-            if (userMappingClassName != null)
+            AbstractClassMetaData typeCmd = null;
+            if (mmd.getType().isInterface())
             {
-                // User has defined their own mapping class for this field so use that
-                try
-                {
-                    mc = clr.classForName(userMappingClassName);
-                }
-                catch (NucleusException ne)
-                {
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", 
-                        mmd.getFullFieldName(), userMappingClassName)).setFatal();
-                }
+                typeCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(mmd.getType(), clr);
             }
             else
             {
-                AbstractClassMetaData acmd = null;
-                if (mmd.getType().isInterface())
-                {
-                    acmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(mmd.getType(), clr);
-                }
-                else
-                {
-                    acmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                }
+                typeCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+            }
 
-                if (mmd.hasExtension(SerialisedLocalFileMapping.SERIALIZE_TO_FOLDER_EXTENSION) && 
-                    Serializable.class.isAssignableFrom(mmd.getType()))
-                {
-                    mc = SerialisedLocalFileMapping.class;
-                }
-                else if (mmd.isSerialized())
-                {
-                    // Field is marked as serialised then we have no other option - serialise it
-                    mc = getMappingClass(mmd.getType(), true, false, mmd.getFullFieldName());
-                }
-                else if (mmd.getEmbeddedMetaData() != null)
-                {
-                    // Field has an <embedded> specification so use that
-                    mc = getMappingClass(mmd.getType(), false, true, mmd.getFullFieldName());
-                }
-                else if (acmd != null && acmd.isEmbeddedOnly())
-                {
-                    // If the reference type is declared with embedded only
-                    mc = getMappingClass(mmd.getType(), false, true, mmd.getFullFieldName());
-                }
-                else if (mmd.isEmbedded())
-                {
-                    // Otherwise, if the field is embedded then we request that it be serialised into the owner table
-                    // This is particularly for java.lang.Object which should be "embedded" by default, and hence serialised
-                    mc = getMappingClass(mmd.getType(), true, false, mmd.getFullFieldName());
-                }
-                else
-                {
-                    // Non-embedded/non-serialised - Just get the basic mapping for the type
-                    mc = getMappingClass(mmd.getType(), false, false, mmd.getFullFieldName());
+            if (mmd.hasExtension(SerialisedLocalFileMapping.SERIALIZE_TO_FOLDER_EXTENSION) && Serializable.class.isAssignableFrom(mmd.getType()))
+            {
+                // Special case : use file serialization mapping
+                mc = SerialisedLocalFileMapping.class;
+            }
+            else if (mmd.isSerialized())
+            {
+                // Field is marked as serialised then we have no other option - serialise it
+                mc = getMappingClass(mmd.getType(), true, false, null, mmd.getFullFieldName());
+            }
+            else if (mmd.getEmbeddedMetaData() != null)
+            {
+                // Field has an <embedded> specification so use that
+                mc = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
+            }
+            else if (typeCmd != null && typeCmd.isEmbeddedOnly())
+            {
+                // Reference type is declared with embedded only
+                mc = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
+            }
+            else if (mmd.isEmbedded()) // TODO Check this since it will push all basic nonPC fields through here
+            {
+                // Otherwise, if the field is embedded then we request that it be serialised into the owner table
+                // This is particularly for java.lang.Object which should be "embedded" by default, and hence serialised
+                mc = getMappingClass(mmd.getType(), true, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
+            }
+            else
+            {
+                // Non-embedded/non-serialised - Just get the basic mapping for the type
+                mc = getMappingClass(mmd.getType(), false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
 
-                    if (mmd.getParent() instanceof EmbeddedMetaData && mmd.getRelationType(clr) != RelationType.NONE)
-                    {
-                        // See NUCCORE-697 - always need to use the real member metadata for the mapping
-                        // so that it can find sub-fields when persisting/querying etc
-                        AbstractClassMetaData cmdForFmd = table.getStoreManager().getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
-                        overrideMmd = cmdForFmd.getMetaDataForMember(mmd.getName());
-                    }
+                if (mmd.getParent() instanceof EmbeddedMetaData && mmd.getRelationType(clr) != RelationType.NONE)
+                {
+                    // See NUCCORE-697 - always need to use the real member metadata for the mapping
+                    // so that it can find sub-fields when persisting/querying etc
+                    AbstractClassMetaData cmdForFmd = table.getStoreManager().getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
+                    overrideMmd = cmdForFmd.getMetaDataForMember(mmd.getName());
                 }
             }
         }
-        mc = getOverrideMappingClass(mc, mmd, fieldRole); // Allow for overriding MappingManager in subclasses
 
         // Create the mapping of the selected type
         JavaTypeMapping m = null;
         try
         {
             m = (JavaTypeMapping)mc.newInstance();
-            if (fieldRole >= 0)
-            {
-                m.setRoleForMember(fieldRole);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
-        }
-
-        if (conv == null)
-        {
+            m.setRoleForMember(FieldRole.ROLE_FIELD);
             m.initialize(mmd, table, clr);
             if (overrideMmd != null)
             {
@@ -460,29 +468,16 @@ public class RDBMSMappingManager implements MappingManager
                 m.setMemberMetaData(overrideMmd);
             }
         }
-        else
+        catch (Exception e)
         {
-            // Initialise the TypeConverterMapping to use the specified converter
-            ((TypeConverterMapping)m).initialize(mmd, table, clr, conv);
+            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
         }
 
         return m;
     }
 
     /**
-     * Convenience method to allow overriding of particular mapping classes.
-     * @param mappingClass The mapping class selected
-     * @param mmd Meta data for the member (if appropriate)
-     * @param fieldRole Role for the field (e.g collection element)
-     * @return The mapping class to use
-     */
-    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, int fieldRole)
-    {
-        return mappingClass;
-    }
-
-    /**
-     * Accessor for the mapping class for the specified class.
+     * Accessor for the mapping class for the specified type.
      * Provides special handling for interface types and for classes that are being embedded in a field.
      * Refers others to its mapping manager lookup.
      * @param c Class to query
@@ -491,7 +486,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param fieldName The full field name (for logging only)
      * @return The mapping class for the class
      **/
-    protected Class getMappingClass(Class c, boolean serialised, boolean embedded, String fieldName)
+    protected Class getMappingClass(Class c, boolean serialised, boolean embedded, ColumnMetaData[] colmds, String fieldName)
     {
         ApiAdapter api = storeMgr.getApiAdapter();
         if (api.isPersistable(c))
@@ -576,15 +571,14 @@ public class RDBMSMappingManager implements MappingManager
             // Other array types will be caught by the default mappings
         }
 
-        // Try the default mapping (doesn't allow for serialised setting)
-        Class mappingClass = getDefaultJavaTypeMapping(c);
+        // Find a suitable mapping for the type and column definition (doesn't allow for serialised setting)
+        Class mappingClass = getDefaultJavaTypeMapping(c, colmds);
         if (mappingClass == null)
         {
             Class superClass = c.getSuperclass();
-            while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && 
-                    mappingClass == null)
+            while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && mappingClass == null)
             {
-                mappingClass = getDefaultJavaTypeMapping(superClass);
+                mappingClass = getDefaultJavaTypeMapping(superClass, colmds);
                 superClass = superClass.getSuperclass();
             }
         }
@@ -603,7 +597,7 @@ public class RDBMSMappingManager implements MappingManager
                     Class[] interfaces = superClass.getInterfaces();
                     for( int i=0; i<interfaces.length && mappingClass == null; i++)
                     {
-                        mappingClass = getDefaultJavaTypeMapping(interfaces[i]);
+                        mappingClass = getDefaultJavaTypeMapping(interfaces[i], colmds);
                     }
                     superClass = superClass.getSuperclass();
                 }
@@ -619,21 +613,19 @@ public class RDBMSMappingManager implements MappingManager
     }
 
     /**
-     * Convenience accessor for the mapping class of the element mapping for a collection/array of elements.
-     * Currently only used where the collection/array elements are either serialised or embedded into a 
-     * join table.
+     * Convenience accessor for the element mapping for the element of a collection/array of elements.
+     * Currently only used where the collection/array elements are serialised/embedded into a join table.
      * @param table The table
      * @param mmd MetaData for the collection field/property containing the collection/array of PCs
      * @param clr ClassLoader resolver
-     * @return The mapping class
+     * @return The mapping
      */
-    protected Class getElementMappingClass(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    protected JavaTypeMapping getElementMapping(Table table, AbstractMemberMetaData mmd, int fieldRole, ClassLoaderResolver clr)
     {
         if (!mmd.hasCollection() && !mmd.hasArray())
         {
             // TODO Localise this message
-            throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() + 
-                " that has no collection/array!").setFatal();
+            throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() + " that has no collection/array!").setFatal();
         }
         if (mmd.getJoinMetaData() == null)
         {
@@ -655,6 +647,7 @@ public class RDBMSMappingManager implements MappingManager
             }
         }
 
+        Class mc = null;
         String userMappingClassName = null;
         if (mmd.getElementMetaData() != null)
         {
@@ -665,101 +658,114 @@ public class RDBMSMappingManager implements MappingManager
             // User has defined their own mapping class for this element so use that
             try
             {
-                return clr.classForName(userMappingClassName);
+                mc = clr.classForName(userMappingClassName);
             }
             catch (NucleusException jpe)
             {
                 throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
             }
         }
-
-        boolean serialised = ((mmd.hasCollection() && mmd.getCollection().isSerializedElement()) ||
-            (mmd.hasArray() && mmd.getArray().isSerializedElement()));
-        boolean embeddedPC = (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null);
-        boolean elementPC = ((mmd.hasCollection() && mmd.getCollection().elementIsPersistent()) ||
-            (mmd.hasArray() && mmd.getArray().elementIsPersistent()));
-        boolean embedded = true;
-        if (mmd.hasCollection())
-        {
-            embedded = mmd.getCollection().isEmbeddedElement();
-        }
-        else if (mmd.hasArray())
-        {
-            embedded = mmd.getArray().isEmbeddedElement();
-        }
-
-        Class elementCls = null;
-        if (mmd.hasCollection())
-        {
-            elementCls = clr.classForName(mmd.getCollection().getElementType());
-        }
-        else if (mmd.hasArray())
-        {
-            // Use basic element type rather than any restricted type
-            elementCls = mmd.getType().getComponentType();
-//            elementCls = clr.classForName(mmd.getArray().getElementType());
-        }
-        boolean elementReference = ClassUtils.isReferenceType(elementCls);
-
-        Class mc = null;
-        if (serialised)
-        {
-            if (elementPC)
-            {
-                // Serialised PC element
-                mc = SerialisedElementPCMapping.class;
-            }
-            else if (elementReference)
-            {
-                // Serialised Reference element
-                mc = SerialisedReferenceMapping.class;
-            }
-            else
-            {
-                // Serialised Non-PC element
-                mc = SerialisedMapping.class;
-            }
-        }
-        else if (embedded)
-        {
-            if (embeddedPC)
-            {
-                // Embedded PC type
-                mc = EmbeddedElementPCMapping.class;
-            }
-            else if (elementPC)
-            {
-                // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
-                mc = PersistableMapping.class;
-            }
-            else
-            {
-                // Embedded Non-PC type
-                mc = getMappingClass(elementCls, serialised, embedded, mmd.getFullFieldName());
-            }
-        }
         else
         {
-            // Normal element mapping
-            mc = getMappingClass(elementCls, serialised, embedded, mmd.getFullFieldName());
-            // TODO Allow for other element mappings
-            /*throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() +
-                " of element-type=" + elementCls.getName() + 
-                " when not embedded/serialised - please report this to the developers").setFatal();*/
+            boolean serialised = ((mmd.hasCollection() && mmd.getCollection().isSerializedElement()) ||
+                    (mmd.hasArray() && mmd.getArray().isSerializedElement()));
+            boolean embeddedPC = (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null);
+            boolean elementPC = ((mmd.hasCollection() && mmd.getCollection().elementIsPersistent()) ||
+                    (mmd.hasArray() && mmd.getArray().elementIsPersistent()));
+            boolean embedded = true;
+            if (mmd.hasCollection())
+            {
+                embedded = mmd.getCollection().isEmbeddedElement();
+            }
+            else if (mmd.hasArray())
+            {
+                embedded = mmd.getArray().isEmbeddedElement();
+            }
+
+            Class elementCls = null;
+            if (mmd.hasCollection())
+            {
+                elementCls = clr.classForName(mmd.getCollection().getElementType());
+            }
+            else if (mmd.hasArray())
+            {
+                // Use declared element type rather than any restricted type specified in metadata
+                elementCls = mmd.getType().getComponentType();
+            }
+            boolean elementReference = ClassUtils.isReferenceType(elementCls);
+
+            if (serialised)
+            {
+                if (elementPC)
+                {
+                    // Serialised PC element
+                    mc = SerialisedElementPCMapping.class;
+                }
+                else if (elementReference)
+                {
+                    // Serialised Reference element
+                    mc = SerialisedReferenceMapping.class;
+                }
+                else
+                {
+                    // Serialised Non-PC element
+                    mc = SerialisedMapping.class;
+                }
+            }
+            else if (embedded)
+            {
+                if (embeddedPC)
+                {
+                    // Embedded PC type
+                    mc = EmbeddedElementPCMapping.class;
+                }
+                else if (elementPC)
+                {
+                    // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
+                    mc = PersistableMapping.class;
+                }
+                else
+                {
+                    // Embedded Non-PC type
+                    mc = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                }
+            }
+            else
+            {
+                // Normal element mapping
+                mc = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+            }
         }
 
-        return mc;
+        if (mc != null)
+        {
+            // Create the mapping of the selected type
+            JavaTypeMapping m = null;
+            try
+            {
+                m = (JavaTypeMapping)mc.newInstance();
+                m.setRoleForMember(fieldRole);
+                m.initialize(mmd, table, clr);
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
+        }
+
+        throw new NucleusException("Unable to create mapping for element of collection/array at " + mmd.getFullFieldName() + " - no available mapping");
     }
 
     /**
-     * Convenience accessor for the mapping class of the key mapping for a map of PC keys.
-     * Currently only used where the keys are either serialised or embedded into a join table.
+     * Convenience accessor for the mapping of the key of a map.
+     * Currently only used where the keys are serialised/embedded into a join table.
      * @param table The container
      * @param mmd MetaData for the field containing the map that this key is for
      * @param clr ClassLoader resolver
-     * @return The mapping class
+     * @return The mapping
      */
-    protected Class getKeyMappingClass(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    protected JavaTypeMapping getKeyMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         if (mmd.getMap() == null)
         {
@@ -768,6 +774,7 @@ public class RDBMSMappingManager implements MappingManager
                 " that has no map!").setFatal();
         }
 
+        Class mc = null;
         String userMappingClassName = null;
         if (mmd.getKeyMetaData() != null)
         {
@@ -778,87 +785,102 @@ public class RDBMSMappingManager implements MappingManager
             // User has defined their own mapping class for this key so use that
             try
             {
-                return clr.classForName(userMappingClassName);
+                mc = clr.classForName(userMappingClassName);
             }
             catch (NucleusException jpe)
             {
                 throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
             }
         }
-
-        boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedKey());
-        boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedKey());
-        boolean embeddedPC = (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null);
-        boolean keyPC = (mmd.hasMap() && mmd.getMap().keyIsPersistent());
-        Class keyCls = clr.classForName(mmd.getMap().getKeyType());
-        boolean keyReference = ClassUtils.isReferenceType(keyCls);
-
-        Class mc = null;
-        if (serialised)
-        {
-            if (keyPC)
-            {
-                // Serialised PC key
-                mc = SerialisedKeyPCMapping.class;
-            }
-            else if (keyReference)
-            {
-                // Serialised Reference key
-                mc = SerialisedReferenceMapping.class;
-            }
-            else
-            {
-                // Serialised Non-PC element
-                mc = SerialisedMapping.class;
-            }
-        }
-        else if (embedded)
-        {
-            if (embeddedPC)
-            {
-                // Embedded PC key
-                mc = EmbeddedKeyPCMapping.class;
-            }
-            else if (keyPC)
-            {
-                // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
-                mc = PersistableMapping.class;
-            }
-            else
-            {
-                // Embedded Non-PC type
-                mc = getMappingClass(keyCls, serialised, embedded, mmd.getFullFieldName());
-            }
-        }
         else
         {
-            // Normal key mapping
-            mc = getMappingClass(keyCls, serialised, embedded, mmd.getFullFieldName());
-/*            // TODO Allow for other key mappings
-            throw new NucleusException("Attempt to get key mapping for field " + mmd.getFullFieldName() + 
-                " when not embedded or serialised - please report this to the developers").setFatal();*/
+            boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedKey());
+            boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedKey());
+            boolean embeddedPC = (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null);
+            boolean keyPC = (mmd.hasMap() && mmd.getMap().keyIsPersistent());
+            Class keyCls = clr.classForName(mmd.getMap().getKeyType());
+            boolean keyReference = ClassUtils.isReferenceType(keyCls);
+
+            if (serialised)
+            {
+                if (keyPC)
+                {
+                    // Serialised PC key
+                    mc = SerialisedKeyPCMapping.class;
+                }
+                else if (keyReference)
+                {
+                    // Serialised Reference key
+                    mc = SerialisedReferenceMapping.class;
+                }
+                else
+                {
+                    // Serialised Non-PC element
+                    mc = SerialisedMapping.class;
+                }
+            }
+            else if (embedded)
+            {
+                if (embeddedPC)
+                {
+                    // Embedded PC key
+                    mc = EmbeddedKeyPCMapping.class;
+                }
+                else if (keyPC)
+                {
+                    // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
+                    mc = PersistableMapping.class;
+                }
+                else
+                {
+                    // Embedded Non-PC type
+                    mc = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                }
+            }
+            else
+            {
+                // Normal key mapping
+                mc = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+            }
         }
 
-        return mc;
+        if (mc != null)
+        {
+            // Create the mapping of the selected type
+            JavaTypeMapping m = null;
+            try
+            {
+                m = (JavaTypeMapping)mc.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
+                m.initialize(mmd, table, clr);
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
+        }
+
+        throw new NucleusException("Unable to create mapping for key of map at " + mmd.getFullFieldName() + " - no available mapping");
     }
 
     /**
-     * Convenience accessor for the mapping class of the value mapping for a map of values.
-     * Currently only used where the value are either serialised or embedded into a join table.
+     * Convenience accessor for the mapping of the value for a map.
+     * Currently only used where the value are serialised/embedded into a join table.
      * @param table The container
      * @param mmd MetaData for the field/property containing the map that this value is for
      * @param clr ClassLoader resolver
-     * @return The mapping class
+     * @return The mapping
      */
-    protected Class getValueMappingClass(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    protected JavaTypeMapping getValueMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         if (mmd.getMap() == null)
         {
             // TODO Localise this
-            throw new NucleusException("Attempt to get value mapping for field " + mmd.getFullFieldName() + 
-                " that has no map!").setFatal();
+            throw new NucleusException("Attempt to get value mapping for field " + mmd.getFullFieldName() + " that has no map!").setFatal();
         }
 
+        Class mc = null;
         String userMappingClassName = null;
         if (mmd.getValueMetaData() != null)
         {
@@ -869,68 +891,128 @@ public class RDBMSMappingManager implements MappingManager
             // User has defined their own mapping class for this value so use that
             try
             {
-                return clr.classForName(userMappingClassName);
+                mc = clr.classForName(userMappingClassName);
             }
             catch (NucleusException jpe)
             {
                 throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
             }
         }
-
-        boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedValue());
-        boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedValue());
-        boolean embeddedPC = (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null);
-        boolean valuePC = (mmd.hasMap() && mmd.getMap().valueIsPersistent());
-        Class valueCls = clr.classForName(mmd.getMap().getValueType());
-        boolean valueReference = ClassUtils.isReferenceType(valueCls);
-
-        Class mc = null;
-        if (serialised)
+        else
         {
-            if (valuePC)
+            boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedValue());
+            boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedValue());
+            boolean embeddedPC = (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null);
+            boolean valuePC = (mmd.hasMap() && mmd.getMap().valueIsPersistent());
+            Class valueCls = clr.classForName(mmd.getMap().getValueType());
+            boolean valueReference = ClassUtils.isReferenceType(valueCls);
+
+            if (serialised)
             {
-                // Serialised PC value
-                mc = SerialisedValuePCMapping.class;
+                if (valuePC)
+                {
+                    // Serialised PC value
+                    mc = SerialisedValuePCMapping.class;
+                }
+                else if (valueReference)
+                {
+                    // Serialised Reference value
+                    mc = SerialisedReferenceMapping.class;
+                }
+                else
+                {
+                    // Serialised Non-PC element
+                    mc = SerialisedMapping.class;
+                }
             }
-            else if (valueReference)
+            else if (embedded)
             {
-                // Serialised Reference value
-                mc = SerialisedReferenceMapping.class;
+                if (embeddedPC)
+                {
+                    // Embedded PC key
+                    mc = EmbeddedValuePCMapping.class;
+                }
+                else if (valuePC)
+                {
+                    // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
+                    mc = PersistableMapping.class;
+                }
+                else
+                {
+                    // Embedded Non-PC type
+                    mc = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                }
             }
             else
             {
-                // Serialised Non-PC element
-                mc = SerialisedMapping.class;
+                // Normal value mapping
+                mc = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
             }
         }
-        else if (embedded)
+
+        if (mc != null)
         {
-            if (embeddedPC)
+            // Create the mapping of the selected type
+            JavaTypeMapping m = null;
+            try
             {
-                // Embedded PC key
-                mc = EmbeddedValuePCMapping.class;
+                m = (JavaTypeMapping)mc.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_MAP_VALUE);
+                m.initialize(mmd, table, clr);
+                return m;
             }
-            else if (valuePC)
+            catch (Exception e)
             {
-                // "Embedded" PC type but no <embedded> so dont embed for now. Is this correct?
-                mc = PersistableMapping.class;
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
             }
-            else
-            {
-                // Embedded Non-PC type
-                mc = getMappingClass(valueCls, serialised, embedded, mmd.getFullFieldName());
-            }
+        }
+
+        throw new NucleusException("Unable to create mapping for value of map at " + mmd.getFullFieldName() + " - no available mapping");
+    }
+
+    protected JavaTypeMapping getMappingForTypeConverter(Table table, AbstractMemberMetaData mmd, int fieldRole, TypeConverter typeConv, Class javaType)
+    {
+        // Wrap the TypeConverter with an appropriate mapping
+        Class mc = null;
+        if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == String.class)
+        {
+            mc = TypeConverterStringMapping.class;
+        }
+        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Long.class)
+        {
+            mc = TypeConverterLongMapping.class;
+        }
+        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Timestamp.class)
+        {
+            mc = TypeConverterTimestampMapping.class;
+        }
+        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Time.class)
+        {
+            mc = TypeConverterSqlTimeMapping.class;
+        }
+        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Date.class)
+        {
+            mc = TypeConverterSqlDateMapping.class;
         }
         else
         {
-            // Normal value mapping
-            mc = getMappingClass(valueCls, serialised, embedded, mmd.getFullFieldName());
-/*            // TODO Allow for other value mappings
-            throw new NucleusException("Attempt to get value mapping for field " + mmd.getFullFieldName() + 
-                " when not embedded or serialised - please report this to the developers").setFatal();*/
+            // Fallback to TypeConverterMapping
+            mc = TypeConverterMapping.class;
         }
 
-        return mc;
+        // Create the mapping of the selected type
+        JavaTypeMapping m = null;
+        try
+        {
+            m = (JavaTypeMapping)mc.newInstance();
+            m.setRoleForMember(fieldRole);
+            ((TypeConverterMapping)m).initialize(mmd, table, clr, typeConv);
+            return m;
+        }
+        catch (Exception e)
+        {
+            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+        }
     }
 
     /**
@@ -938,23 +1020,86 @@ public class RDBMSMappingManager implements MappingManager
      * @param javaType java type
      * @return The mapping class to use (by default)
      */
-    protected Class getDefaultJavaTypeMapping(Class javaType)
+    protected Class getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)
     {
-        Class cls = storeMgr.getMappedTypeManager().getMappingType(javaType.getName());        
+        // Check for an explicit mapping
+        Class cls = storeMgr.getMappedTypeManager().getMappingType(javaType.getName());
+
         if (cls == null)
         {
+            // No explicit mapping for this java type, so fall back to TypeConverter if available
+            if (colmds != null && colmds.length > 0)
+            {
+                // TODO Cater for TypeConverters with multiple columns
+                String jdbcType = colmds[0].getJdbcType();
+                if (!StringUtils.isWhitespace(jdbcType))
+                {
+                    // JDBC type specified so don't just take the default
+                    if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                    {
+                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, String.class);
+                        if (conv != null)
+                        {
+                            return TypeConverterStringMapping.class;
+                        }
+                    }
+                    else if (jdbcType.equalsIgnoreCase("integer"))
+                    {
+                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Long.class);
+                        if (conv != null)
+                        {
+                            return TypeConverterLongMapping.class;
+                        }
+                    }
+                    else if (jdbcType.equalsIgnoreCase("timestamp"))
+                    {
+                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Timestamp.class);
+                        if (conv != null)
+                        {
+                            return TypeConverterTimestampMapping.class;
+                        }
+                    }
+                    else if (jdbcType.equalsIgnoreCase("time"))
+                    {
+                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Time.class);
+                        if (conv != null)
+                        {
+                            return TypeConverterSqlTimeMapping.class;
+                        }
+                    }
+                    else if (jdbcType.equalsIgnoreCase("date"))
+                    {
+                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Date.class);
+                        if (conv != null)
+                        {
+                            return TypeConverterSqlDateMapping.class;
+                        }
+                    }
+                }
+            }
+
             TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(javaType);
             if (conv != null)
             {
                 if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
                 {
-                    // Fallback to TypeConverterStringMapping
                     return TypeConverterStringMapping.class;
                 }
                 else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Long.class)
                 {
-                    // Fallback to TypeConverterLongMapping
                     return TypeConverterLongMapping.class;
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Timestamp.class)
+                {
+                    return TypeConverterTimestampMapping.class;
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Time.class)
+                {
+                    return TypeConverterSqlTimeMapping.class;
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Date.class)
+                {
+                    return TypeConverterSqlDateMapping.class;
                 }
                 else
                 {
@@ -1016,8 +1161,7 @@ public class RDBMSMappingManager implements MappingManager
             datastoreMappingsByJavaType.put(javaTypeName,mapping);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054009", javaTypeName, 
-                    jdbcType, sqlType, datastoreMappingType.getName(), "" + dflt));
+                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054009", javaTypeName, jdbcType, sqlType, datastoreMappingType.getName(), "" + dflt));
             }
             
         }
@@ -1049,8 +1193,7 @@ public class RDBMSMappingManager implements MappingManager
             datastoreMappingsByJDBCType.removeKeyValue(mapping.jdbcType, mapping);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054010", 
-                    mapping.javaType, mapping.jdbcType, mapping.sqlType));
+                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054010", mapping.javaType, mapping.jdbcType, mapping.sqlType));
             }
         }
     }
@@ -1064,8 +1207,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param clr ClassLoader resolver to use
      * @return The datastore mapping class
      */
-    protected Class getDatastoreMappingClass(String fieldName, String javaType, String jdbcType, String sqlType, 
-            ClassLoaderResolver clr)
+    protected Class getDatastoreMappingClass(String fieldName, String javaType, String jdbcType, String sqlType, ClassLoaderResolver clr)
     {
         if (javaType == null)
         {
@@ -1239,22 +1381,18 @@ public class RDBMSMappingManager implements MappingManager
             this.jdbcType = jdbcType;
             this.sqlType = sqlType;
         }
-
         public boolean isDefault()
         {
             return isDefault;
         }
-
         public void setDefault(boolean isDefault)
         {
             this.isDefault = isDefault;
         }
-
         public Class getMappingType()
         {
             return javaMappingType;
         }
-
         public void setMappingType(Class type)
         {
             javaMappingType = type;
