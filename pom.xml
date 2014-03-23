@@ -98,12 +98,6 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-        <dependency> <!-- Remove this when we move to Java8 -->
-            <groupId>javax.time</groupId>
-            <artifactId>time-api</artifactId>
-            <version>[0.6, )</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- Required for Oracle support -->
         <dependency>
