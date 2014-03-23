@@ -87,22 +87,22 @@ public class TypeConverterMapping extends SingleFieldMapping
             if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
             {
                 cls = mmd.getType().getComponentType();
-                colmds = mmd.getElementMetaData().getColumnMetaData();
+                colmds = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null);
             }
             else if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
                 cls = clr.classForName(mmd.getCollection().getElementType());
-                colmds = mmd.getElementMetaData().getColumnMetaData();
+                colmds = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null);
             }
             else if (roleForMember == FieldRole.ROLE_MAP_KEY)
             {
                 cls = clr.classForName(mmd.getMap().getKeyType());
-                colmds = mmd.getKeyMetaData().getColumnMetaData();
+                colmds = (mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null);
             }
             else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
             {
                 cls = clr.classForName(mmd.getMap().getValueType());
-                colmds = mmd.getValueMetaData().getColumnMetaData();
+                colmds = (mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null);
             }
 
             if (colmds != null && colmds.length > 0)
