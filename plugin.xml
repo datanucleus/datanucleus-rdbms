@@ -196,7 +196,6 @@ Contributors:
         <mapping java-type="java.lang.Enum" mapping-class="org.datanucleus.store.rdbms.mapping.java.EnumMapping"/>
 
         <!-- "java.awt" types -->
-        <mapping java-type="java.awt.Color" mapping-class="org.datanucleus.store.rdbms.mapping.java.ColorMapping"/>
         <mapping java-type="java.awt.image.BufferedImage" mapping-class="org.datanucleus.store.rdbms.mapping.java.BufferedImageMapping"/>
 
         <!-- "java.io" types -->

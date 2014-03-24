@@ -176,38 +176,63 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
             return null;
         }
 
-        // TODO What if we require primitive array
-        Object[] colValues = new Object[exprIndex.length];
+        Object valuesArr = null;
+        Class[] colTypes = ((MultiColumnConverter)converter).getDatastoreColumnTypes();
+        if (colTypes[0] == int.class)
+        {
+            valuesArr = new int[exprIndex.length];
+        }
+        else if (colTypes[0] == long.class)
+        {
+            valuesArr = new long[exprIndex.length];
+        }
+        else if (colTypes[0] == double.class)
+        {
+            valuesArr = new double[exprIndex.length];
+        }
+        else if (colTypes[0] == float.class)
+        {
+            valuesArr = new double[exprIndex.length];
+        }
+        else if (colTypes[0] == String.class)
+        {
+            valuesArr = new String[exprIndex.length];
+        }
+        // TODO Support other types
+        else
+        {
+            valuesArr = new Object[exprIndex.length];
+        }
         boolean isNull = true;
         for (int i=0;i<exprIndex.length;i++)
         {
             String colJavaType = getJavaTypeForDatastoreMapping(i);
             if (colJavaType.equals("int") || colJavaType.equals("java.lang.Integer"))
             {
-                colValues[i] = getDatastoreMapping(i).getInt(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getInt(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("long") || colJavaType.equals("java.lang.Long"))
             {
-                colValues[i] = getDatastoreMapping(i).getLong(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getLong(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("double") || colJavaType.equals("java.lang.Double"))
             {
-                colValues[i] = getDatastoreMapping(i).getDouble(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getDouble(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("float") || colJavaType.equals("java.lang.Float"))
             {
-                colValues[i] = getDatastoreMapping(i).getFloat(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getFloat(resultSet, exprIndex[i]));
             }
             // TODO Support other types
             else if (colJavaType.equals("java.lang.String"))
             {
-                colValues[i] = getDatastoreMapping(i).getString(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getString(resultSet, exprIndex[i]));
             }
             else
             {
-                colValues[i] = getDatastoreMapping(i).getObject(resultSet, exprIndex[i]);
+                Array.set(valuesArr, i, getDatastoreMapping(i).getObject(resultSet, exprIndex[i]));
             }
-            if (colValues[i] != null)
+            if (isNull && Array.get(valuesArr, i) != null)
             {
                 isNull = false;
             }
@@ -216,6 +241,6 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         {
             return null;
         }
-        return converter.toMemberType(colValues);
+        return converter.toMemberType(valuesArr);
     }
 }
