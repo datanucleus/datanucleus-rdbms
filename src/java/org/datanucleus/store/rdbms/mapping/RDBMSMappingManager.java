@@ -79,6 +79,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.ClassUtils;
@@ -1112,60 +1113,85 @@ public class RDBMSMappingManager implements MappingManager
         if (cls == null)
         {
             // No explicit mapping for this java type, so fall back to TypeConverter if available
+            TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
             if (colmds != null && colmds.length > 0)
             {
-                // TODO Cater for TypeConverters with multiple columns
-                String jdbcType = colmds[0].getJdbcType();
-                if (!StringUtils.isWhitespace(jdbcType))
+                if (colmds.length > 1)
                 {
-                    // JDBC type specified so don't just take the default
-                    if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                    // Find TypeConverter with right number of columns
+                    Collection<TypeConverter> converters = typeMgr.getTypeConvertersForType(javaType);
+                    if (converters != null && !converters.isEmpty())
                     {
-                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, String.class);
-                        if (conv != null)
+                        for (TypeConverter conv : converters)
                         {
-                            return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
+                            if (conv instanceof MultiColumnConverter)
+                            {
+                                if (((MultiColumnConverter)conv).getDatastoreColumnTypes().length == colmds.length)
+                                {
+                                    return new MappingConverterDetails(TypeConverterMultiMapping.class, conv);
+                                }
+                            }
                         }
                     }
-                    else if (jdbcType.equalsIgnoreCase("integer"))
+                }
+                else
+                {
+                    String jdbcType = colmds[0].getJdbcType();
+                    if (!StringUtils.isWhitespace(jdbcType))
                     {
-                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Long.class);
-                        if (conv != null)
+                        // JDBC type specified so don't just take the default
+                        if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
                         {
-                            return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
+                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, String.class);
+                            if (conv != null)
+                            {
+                                return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
+                            }
                         }
-                    }
-                    else if (jdbcType.equalsIgnoreCase("timestamp"))
-                    {
-                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Timestamp.class);
-                        if (conv != null)
+                        else if (jdbcType.equalsIgnoreCase("integer"))
                         {
-                            return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
+                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Long.class);
+                            if (conv != null)
+                            {
+                                return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
+                            }
                         }
-                    }
-                    else if (jdbcType.equalsIgnoreCase("time"))
-                    {
-                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Time.class);
-                        if (conv != null)
+                        else if (jdbcType.equalsIgnoreCase("timestamp"))
                         {
-                            return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
+                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Timestamp.class);
+                            if (conv != null)
+                            {
+                                return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
+                            }
                         }
-                    }
-                    else if (jdbcType.equalsIgnoreCase("date"))
-                    {
-                        TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Date.class);
-                        if (conv != null)
+                        else if (jdbcType.equalsIgnoreCase("time"))
                         {
-                            return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
+                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Time.class);
+                            if (conv != null)
+                            {
+                                return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
+                            }
+                        }
+                        else if (jdbcType.equalsIgnoreCase("date"))
+                        {
+                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Date.class);
+                            if (conv != null)
+                            {
+                                return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
+                            }
                         }
                     }
                 }
             }
 
-            TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(javaType);
+            TypeConverter conv = typeMgr.getDefaultTypeConverterForType(javaType);
             if (conv != null)
             {
-                if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
+                if (conv instanceof MultiColumnConverter)
+                {
+                    return new MappingConverterDetails(TypeConverterMultiMapping.class, conv);
+                }
+                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
                 {
                     return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
                 }
