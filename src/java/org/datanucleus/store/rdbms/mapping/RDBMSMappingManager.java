@@ -69,6 +69,7 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterLongMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
+import org.datanucleus.store.rdbms.mapping.java.TypeConverterMultiMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlDateMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlTimeMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterStringMapping;
@@ -238,8 +239,9 @@ public class RDBMSMappingManager implements MappingManager
         catch (NoTableManagedException ex)
         {
             // Doesn't allow for whether a field is serialised/embedded so they get the default mapping only
-            Class mc = getMappingClass(javaType, serialised, embedded, null, null); // TODO Pass in 4th arg?
+            MappingConverterDetails mcd = getMappingClass(javaType, serialised, embedded, null, null); // TODO Pass in 4th arg?
 
+            Class mc = mcd.mappingClass;
             try
             {
                 JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
@@ -287,8 +289,8 @@ public class RDBMSMappingManager implements MappingManager
      */
     public JavaTypeMapping getMapping(Class javaType, boolean serialised, boolean embedded, String fieldName)
     {
-        Class mc = getMappingClass(javaType, serialised, embedded, null, fieldName); // TODO Pass in 4th arg?
-
+        MappingConverterDetails mcd = getMappingClass(javaType, serialised, embedded, null, fieldName); // TODO Pass in 4th arg?
+        Class mc = mcd.mappingClass;
         try
         {
             JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
@@ -388,6 +390,7 @@ public class RDBMSMappingManager implements MappingManager
 
         AbstractMemberMetaData overrideMmd = null;
 
+        MappingConverterDetails mcd = null;
         Class mc = null;
         String userMappingClassName = mmd.getValueForExtension("mapping-class");
         if (userMappingClassName != null)
@@ -422,28 +425,28 @@ public class RDBMSMappingManager implements MappingManager
             else if (mmd.isSerialized())
             {
                 // Field is marked as serialised then we have no other option - serialise it
-                mc = getMappingClass(mmd.getType(), true, false, null, mmd.getFullFieldName());
+                mcd = getMappingClass(mmd.getType(), true, false, null, mmd.getFullFieldName());
             }
             else if (mmd.getEmbeddedMetaData() != null)
             {
                 // Field has an <embedded> specification so use that
-                mc = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
+                mcd = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
             }
             else if (typeCmd != null && typeCmd.isEmbeddedOnly())
             {
                 // Reference type is declared with embedded only
-                mc = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
+                mcd = getMappingClass(mmd.getType(), false, true, null, mmd.getFullFieldName());
             }
             else if (mmd.isEmbedded()) // TODO Check this since it will push all basic nonPC fields through here
             {
                 // Otherwise, if the field is embedded then we request that it be serialised into the owner table
                 // This is particularly for java.lang.Object which should be "embedded" by default, and hence serialised
-                mc = getMappingClass(mmd.getType(), true, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
+                mcd = getMappingClass(mmd.getType(), true, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
             }
             else
             {
                 // Non-embedded/non-serialised - Just get the basic mapping for the type
-                mc = getMappingClass(mmd.getType(), false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
+                mcd = getMappingClass(mmd.getType(), false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
 
                 if (mmd.getParent() instanceof EmbeddedMetaData && mmd.getRelationType(clr) != RelationType.NONE)
                 {
@@ -456,86 +459,134 @@ public class RDBMSMappingManager implements MappingManager
         }
 
         // Create the mapping of the selected type
-        JavaTypeMapping m = null;
-        try
+        if (mcd != null)
         {
-            m = (JavaTypeMapping)mc.newInstance();
-            m.setRoleForMember(FieldRole.ROLE_FIELD);
-            m.initialize(mmd, table, clr);
-            if (overrideMmd != null)
+            mc = mcd.mappingClass;
+        }
+        if (mc != null && (mcd == null || mcd.typeConverter == null))
+        {
+            try
             {
-                // Note cannot just use this overrideMmd in the initialize(...) call above, a test fails.
-                m.setMemberMetaData(overrideMmd);
+                JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_FIELD);
+                m.initialize(mmd, table, clr);
+                if (overrideMmd != null)
+                {
+                    // Note cannot just use this overrideMmd in the initialize(...) call above, a test fails.
+                    m.setMemberMetaData(overrideMmd);
+                }
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
-        catch (Exception e)
+        else if (mcd != null && mcd.typeConverter != null)
         {
-            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            try
+            {
+                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_FIELD);
+                if (m instanceof TypeConverterMapping)
+                {
+                    ((TypeConverterMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                else if (m instanceof TypeConverterMultiMapping)
+                {
+                    ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                if (overrideMmd != null)
+                {
+                    // Note cannot just use this overrideMmd in the initialize(...) call above, a test fails.
+                    m.setMemberMetaData(overrideMmd);
+                }
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
         }
 
-        return m;
+        throw new NucleusException("Unable to create mapping for member at " + mmd.getFullFieldName() + " - no available mapping");
+    }
+
+    public class MappingConverterDetails
+    {
+        Class mappingClass;
+        TypeConverter typeConverter;
+        public MappingConverterDetails(Class mappingCls)
+        {
+            this.mappingClass = mappingCls;
+        }
+        public MappingConverterDetails(Class mappingCls, TypeConverter typeConv)
+        {
+            this.mappingClass = mappingCls;
+            this.typeConverter = typeConv;
+        }
     }
 
     /**
      * Accessor for the mapping class for the specified type.
      * Provides special handling for interface types and for classes that are being embedded in a field.
      * Refers others to its mapping manager lookup.
-     * @param c Class to query
+     * @param javaType Class to query
      * @param serialised Whether the field is serialised
      * @param embedded Whether the field is embedded
      * @param fieldName The full field name (for logging only)
      * @return The mapping class for the class
      **/
-    protected Class getMappingClass(Class c, boolean serialised, boolean embedded, ColumnMetaData[] colmds, String fieldName)
+    protected MappingConverterDetails getMappingClass(Class javaType, boolean serialised, boolean embedded, ColumnMetaData[] colmds, String fieldName)
     {
         ApiAdapter api = storeMgr.getApiAdapter();
-        if (api.isPersistable(c))
+        if (api.isPersistable(javaType))
         {
             // Persistence Capable field
             if (serialised)
             {
                 // Serialised PC field
-                return SerialisedPCMapping.class;
+                return new MappingConverterDetails(SerialisedPCMapping.class);
             }
             else if (embedded)
             {
                 // Embedded PC field
-                return EmbeddedPCMapping.class;
+                return new MappingConverterDetails(EmbeddedPCMapping.class);
             }
             else
             {
                 // PC field
-                return PersistableMapping.class;
+                return new MappingConverterDetails(PersistableMapping.class);
             }
         }
 
-        if (c.isInterface() && !storeMgr.getMappedTypeManager().isSupportedMappedType(c.getName()))
+        if (javaType.isInterface() && !storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getName()))
         {
             // Interface field
             if (serialised)
             {
                 // Serialised Interface field
-                return SerialisedReferenceMapping.class;
+                return new MappingConverterDetails(SerialisedReferenceMapping.class);
             }
             else if (embedded)
             {
                 // Embedded interface field - just default to an embedded PCMapping!
-                return EmbeddedPCMapping.class;
+                return new MappingConverterDetails(EmbeddedPCMapping.class);
             }
             else
             {
                 // Interface field
-                return InterfaceMapping.class;
+                return new MappingConverterDetails(InterfaceMapping.class);
             }
         }
 
-        if (c == java.lang.Object.class)
+        if (javaType == java.lang.Object.class)
         {
             // Object field
             if (serialised)
             {
                 // Serialised Object field
-                return SerialisedReferenceMapping.class;
+                return new MappingConverterDetails(SerialisedReferenceMapping.class);
             }
             else if (embedded)
             {
@@ -545,71 +596,71 @@ public class RDBMSMappingManager implements MappingManager
             else
             {
                 // Object field as reference to PC object
-                return ObjectMapping.class;
+                return new MappingConverterDetails(ObjectMapping.class);
             }
         }
 
-        if (c.isArray())
+        if (javaType.isArray())
         {
             // Array field
-            if (api.isPersistable(c.getComponentType()))
+            if (api.isPersistable(javaType.getComponentType()))
             {
                 // Array of PC objects
-                return ArrayMapping.class;
+                return new MappingConverterDetails(ArrayMapping.class);
             }
-            else if (c.getComponentType().isInterface() &&
-                !storeMgr.getMappedTypeManager().isSupportedMappedType(c.getComponentType().getName()))
+            else if (javaType.getComponentType().isInterface() &&
+                !storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getComponentType().getName()))
             {
                 // Array of interface objects
-                return ArrayMapping.class;
+                return new MappingConverterDetails(ArrayMapping.class);
             }
-            else if (c.getComponentType() == java.lang.Object.class)
+            else if (javaType.getComponentType() == java.lang.Object.class)
             {
                 // Array of Object reference objects
-                return ArrayMapping.class;
+                return new MappingConverterDetails(ArrayMapping.class);
             }
             // Other array types will be caught by the default mappings
         }
 
         // Find a suitable mapping for the type and column definition (doesn't allow for serialised setting)
-        Class mappingClass = getDefaultJavaTypeMapping(c, colmds);
-        if (mappingClass == null)
+        MappingConverterDetails mcd = getDefaultJavaTypeMapping(javaType, colmds);
+        if (mcd == null || mcd.mappingClass == null)
         {
-            Class superClass = c.getSuperclass();
-            while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && mappingClass == null)
+            Class superClass = javaType.getSuperclass();
+            while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && (mcd == null || mcd.mappingClass == null))
             {
-                mappingClass = getDefaultJavaTypeMapping(superClass, colmds);
+                mcd = getDefaultJavaTypeMapping(superClass, colmds);
                 superClass = superClass.getSuperclass();
             }
         }
-        if (mappingClass == null)
+        if (mcd == null)
         {
-            if (storeMgr.getMappedTypeManager().isSupportedMappedType(c.getName()))
+            if (storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getName()))
             {
                 // "supported" type yet no FCO mapping !
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041001", fieldName, c.getName()));
+                throw new NucleusUserException(LOCALISER_RDBMS.msg("041001", fieldName, javaType.getName()));
             }
             else
             {
-                Class superClass = c; // start in this class
-                while (superClass!=null && !superClass.getName().equals(ClassNameConstants.Object) && mappingClass == null)
+                Class superClass = javaType; // start in this class
+                while (superClass!=null && !superClass.getName().equals(ClassNameConstants.Object) && (mcd == null || mcd.mappingClass == null))
                 {
                     Class[] interfaces = superClass.getInterfaces();
-                    for( int i=0; i<interfaces.length && mappingClass == null; i++)
+                    for( int i=0; i<interfaces.length && (mcd == null || mcd.mappingClass == null); i++)
                     {
-                        mappingClass = getDefaultJavaTypeMapping(interfaces[i], colmds);
+                        mcd = getDefaultJavaTypeMapping(interfaces[i], colmds);
                     }
                     superClass = superClass.getSuperclass();
                 }
-                if (mappingClass == null)
+                if (mcd == null)
                 {
                     //TODO if serialised == false, should we raise an exception?
                     // Treat as serialised
-                    mappingClass = SerialisedMapping.class;
+                    return new MappingConverterDetails(SerialisedMapping.class);
                 }
             }
         }
-        return mappingClass;
+        return mcd;
     }
 
     /**
@@ -647,6 +698,7 @@ public class RDBMSMappingManager implements MappingManager
             }
         }
 
+        MappingConverterDetails mcd = null;
         Class mc = null;
         String userMappingClassName = null;
         if (mmd.getElementMetaData() != null)
@@ -727,17 +779,21 @@ public class RDBMSMappingManager implements MappingManager
                 else
                 {
                     // Embedded Non-PC type
-                    mc = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                    mcd = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
                 }
             }
             else
             {
                 // Normal element mapping
-                mc = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                mcd = getMappingClass(elementCls, serialised, embedded, mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
             }
         }
 
-        if (mc != null)
+        if (mcd != null && mcd.typeConverter == null)
+        {
+            mc = mcd.mappingClass;
+        }
+        if (mc != null && (mcd == null || mcd.typeConverter == null))
         {
             // Create the mapping of the selected type
             JavaTypeMapping m = null;
@@ -746,6 +802,27 @@ public class RDBMSMappingManager implements MappingManager
                 m = (JavaTypeMapping)mc.newInstance();
                 m.setRoleForMember(fieldRole);
                 m.initialize(mmd, table, clr);
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
+        }
+        else if (mcd != null && mcd.typeConverter != null)
+        {
+            try
+            {
+                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                m.setRoleForMember(fieldRole);
+                if (m instanceof TypeConverterMapping)
+                {
+                    ((TypeConverterMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                else if (m instanceof TypeConverterMultiMapping)
+                {
+                    ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
                 return m;
             }
             catch (Exception e)
@@ -774,6 +851,7 @@ public class RDBMSMappingManager implements MappingManager
                 " that has no map!").setFatal();
         }
 
+        MappingConverterDetails mcd = null;
         Class mc = null;
         String userMappingClassName = null;
         if (mmd.getKeyMetaData() != null)
@@ -834,17 +912,21 @@ public class RDBMSMappingManager implements MappingManager
                 else
                 {
                     // Embedded Non-PC type
-                    mc = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                    mcd = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
                 }
             }
             else
             {
                 // Normal key mapping
-                mc = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                mcd = getMappingClass(keyCls, serialised, embedded, mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
             }
         }
 
-        if (mc != null)
+        if (mcd != null && mcd.typeConverter == null)
+        {
+            mc = mcd.mappingClass;
+        }
+        if (mc != null && (mcd == null || mcd.typeConverter == null))
         {
             // Create the mapping of the selected type
             JavaTypeMapping m = null;
@@ -853,6 +935,27 @@ public class RDBMSMappingManager implements MappingManager
                 m = (JavaTypeMapping)mc.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
                 m.initialize(mmd, table, clr);
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
+        }
+        else if (mcd != null && mcd.typeConverter != null)
+        {
+            try
+            {
+                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
+                if (m instanceof TypeConverterMapping)
+                {
+                    ((TypeConverterMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                else if (m instanceof TypeConverterMultiMapping)
+                {
+                    ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
                 return m;
             }
             catch (Exception e)
@@ -880,6 +983,7 @@ public class RDBMSMappingManager implements MappingManager
             throw new NucleusException("Attempt to get value mapping for field " + mmd.getFullFieldName() + " that has no map!").setFatal();
         }
 
+        MappingConverterDetails mcd = null;
         Class mc = null;
         String userMappingClassName = null;
         if (mmd.getValueMetaData() != null)
@@ -940,17 +1044,21 @@ public class RDBMSMappingManager implements MappingManager
                 else
                 {
                     // Embedded Non-PC type
-                    mc = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                    mcd = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
                 }
             }
             else
             {
                 // Normal value mapping
-                mc = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
+                mcd = getMappingClass(valueCls, serialised, embedded, mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null, mmd.getFullFieldName());
             }
         }
 
-        if (mc != null)
+        if (mcd != null && mcd.typeConverter == null)
+        {
+            mc = mcd.mappingClass;
+        }
+        if (mc != null && (mcd == null || mcd.typeConverter == null))
         {
             // Create the mapping of the selected type
             JavaTypeMapping m = null;
@@ -966,53 +1074,29 @@ public class RDBMSMappingManager implements MappingManager
                 throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
+        else if (mcd != null && mcd.typeConverter != null)
+        {
+            try
+            {
+                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                m.setRoleForMember(FieldRole.ROLE_MAP_VALUE);
+                if (m instanceof TypeConverterMapping)
+                {
+                    ((TypeConverterMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                else if (m instanceof TypeConverterMultiMapping)
+                {
+                    ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, mcd.typeConverter);
+                }
+                return m;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            }
+        }
 
         throw new NucleusException("Unable to create mapping for value of map at " + mmd.getFullFieldName() + " - no available mapping");
-    }
-
-    protected JavaTypeMapping getMappingForTypeConverter(Table table, AbstractMemberMetaData mmd, int fieldRole, TypeConverter typeConv, Class javaType)
-    {
-        // Wrap the TypeConverter with an appropriate mapping
-        Class mc = null;
-        if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == String.class)
-        {
-            mc = TypeConverterStringMapping.class;
-        }
-        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Long.class)
-        {
-            mc = TypeConverterLongMapping.class;
-        }
-        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Timestamp.class)
-        {
-            mc = TypeConverterTimestampMapping.class;
-        }
-        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Time.class)
-        {
-            mc = TypeConverterSqlTimeMapping.class;
-        }
-        else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(typeConv, javaType) == Date.class)
-        {
-            mc = TypeConverterSqlDateMapping.class;
-        }
-        else
-        {
-            // Fallback to TypeConverterMapping
-            mc = TypeConverterMapping.class;
-        }
-
-        // Create the mapping of the selected type
-        JavaTypeMapping m = null;
-        try
-        {
-            m = (JavaTypeMapping)mc.newInstance();
-            m.setRoleForMember(fieldRole);
-            ((TypeConverterMapping)m).initialize(mmd, table, clr, typeConv);
-            return m;
-        }
-        catch (Exception e)
-        {
-            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
-        }
     }
 
     /**
@@ -1020,7 +1104,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param javaType java type
      * @return The mapping class to use (by default)
      */
-    protected Class getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)
+    protected MappingConverterDetails getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)
     {
         // Check for an explicit mapping
         Class cls = storeMgr.getMappedTypeManager().getMappingType(javaType.getName());
@@ -1040,7 +1124,7 @@ public class RDBMSMappingManager implements MappingManager
                         TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, String.class);
                         if (conv != null)
                         {
-                            return TypeConverterStringMapping.class;
+                            return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
                         }
                     }
                     else if (jdbcType.equalsIgnoreCase("integer"))
@@ -1048,7 +1132,7 @@ public class RDBMSMappingManager implements MappingManager
                         TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Long.class);
                         if (conv != null)
                         {
-                            return TypeConverterLongMapping.class;
+                            return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
                         }
                     }
                     else if (jdbcType.equalsIgnoreCase("timestamp"))
@@ -1056,7 +1140,7 @@ public class RDBMSMappingManager implements MappingManager
                         TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Timestamp.class);
                         if (conv != null)
                         {
-                            return TypeConverterTimestampMapping.class;
+                            return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
                         }
                     }
                     else if (jdbcType.equalsIgnoreCase("time"))
@@ -1064,7 +1148,7 @@ public class RDBMSMappingManager implements MappingManager
                         TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Time.class);
                         if (conv != null)
                         {
-                            return TypeConverterSqlTimeMapping.class;
+                            return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
                         }
                     }
                     else if (jdbcType.equalsIgnoreCase("date"))
@@ -1072,7 +1156,7 @@ public class RDBMSMappingManager implements MappingManager
                         TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForType(javaType, Date.class);
                         if (conv != null)
                         {
-                            return TypeConverterSqlDateMapping.class;
+                            return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
                         }
                     }
                 }
@@ -1083,35 +1167,35 @@ public class RDBMSMappingManager implements MappingManager
             {
                 if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
                 {
-                    return TypeConverterStringMapping.class;
+                    return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
                 }
                 else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Long.class)
                 {
-                    return TypeConverterLongMapping.class;
+                    return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
                 }
                 else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Timestamp.class)
                 {
-                    return TypeConverterTimestampMapping.class;
+                    return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
                 }
                 else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Time.class)
                 {
-                    return TypeConverterSqlTimeMapping.class;
+                    return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
                 }
                 else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Date.class)
                 {
-                    return TypeConverterSqlDateMapping.class;
+                    return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
                 }
                 else
                 {
                     // Fallback to TypeConverterMapping
-                    return TypeConverterMapping.class;
+                    return new MappingConverterDetails(TypeConverterMapping.class, conv);
                 }
             }
 
             NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041000", javaType.getName()), new Exception());
             return null;
         }
-        return cls;
+        return new MappingConverterDetails(cls);
     }
 
     /**

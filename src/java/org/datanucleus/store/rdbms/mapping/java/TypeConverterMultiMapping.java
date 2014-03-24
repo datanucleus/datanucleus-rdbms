@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2012 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2014 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,13 +26,14 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
 
 /**
- * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter.
+ * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter to multiple columns.
  */
-public class TypeConverterMapping extends SingleFieldMapping
+public class TypeConverterMultiMapping extends SingleFieldMultiMapping
 {
     TypeConverter converter;
 
@@ -60,6 +61,8 @@ public class TypeConverterMapping extends SingleFieldMapping
 
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, TypeConverter conv)
     {
+        super.initialize(mmd, table, clr);
+
         if (mmd.getTypeConverterName() != null)
         {
             // Use specified converter (if found)
@@ -74,7 +77,12 @@ public class TypeConverterMapping extends SingleFieldMapping
             throw new NucleusUserException("Unable to initialise mapping of type " + getClass().getName() + " for field " + mmd.getFullFieldName() + " since no TypeConverter was provided");
         }
 
-        super.initialize(mmd, table, clr);
+        if (!(converter instanceof MultiColumnConverter))
+        {
+            throw new NucleusUserException("Not able to use " + getClass().getName() + " for field " + mmd.getFullFieldName() + 
+                " since provided TypeConverter " + converter + " does not implement MultiColumnConverter");
+        }
+        // TODO Add columns for this converter
     }
 
     /**
