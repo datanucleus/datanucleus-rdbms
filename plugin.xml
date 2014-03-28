@@ -69,12 +69,13 @@ Contributors:
     <extension point="org.datanucleus.store.rdbms.connectionpool">
         <connectionpool-factory name="dbcp-builtin" class-name="org.datanucleus.store.rdbms.connectionpool.DBCPBuiltinConnectionPoolFactory"/>
         <connectionpool-factory name="None" class-name="org.datanucleus.store.rdbms.connectionpool.DefaultConnectionPoolFactory"/>
-	    <connectionpool-factory name="BoneCP" class-name="org.datanucleus.store.rdbms.connectionpool.BoneCPConnectionPoolFactory"/>
-	    <connectionpool-factory name="C3P0" class-name="org.datanucleus.store.rdbms.connectionpool.C3P0ConnectionPoolFactory"/>
-	    <connectionpool-factory name="DBCP" class-name="org.datanucleus.store.rdbms.connectionpool.DBCPConnectionPoolFactory"/>
-	    <connectionpool-factory name="DBCP2" class-name="org.datanucleus.store.rdbms.connectionpool.DBCP2ConnectionPoolFactory"/>
-	    <connectionpool-factory name="Proxool" class-name="org.datanucleus.store.rdbms.connectionpool.ProxoolConnectionPoolFactory"/>
-	    <connectionpool-factory name="Tomcat" class-name="org.datanucleus.store.rdbms.connectionpool.TomcatConnectionPoolFactory"/>
+        <connectionpool-factory name="BoneCP" class-name="org.datanucleus.store.rdbms.connectionpool.BoneCPConnectionPoolFactory"/>
+        <connectionpool-factory name="C3P0" class-name="org.datanucleus.store.rdbms.connectionpool.C3P0ConnectionPoolFactory"/>
+        <connectionpool-factory name="DBCP" class-name="org.datanucleus.store.rdbms.connectionpool.DBCPConnectionPoolFactory"/>
+        <connectionpool-factory name="DBCP2" class-name="org.datanucleus.store.rdbms.connectionpool.DBCP2ConnectionPoolFactory"/>
+        <connectionpool-factory name="Proxool" class-name="org.datanucleus.store.rdbms.connectionpool.ProxoolConnectionPoolFactory"/>
+        <connectionpool-factory name="Tomcat" class-name="org.datanucleus.store.rdbms.connectionpool.TomcatConnectionPoolFactory"/>
+        <connectionpool-factory name="HikariCP" class-name="org.datanucleus.store.rdbms.connectionpool.HikariCPConnectionPoolFactory"/>
     </extension>
 
     <!-- PERSISTENCE PROPERTIES -->
