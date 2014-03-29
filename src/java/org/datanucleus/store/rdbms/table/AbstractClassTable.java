@@ -37,6 +37,7 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -423,7 +424,7 @@ public abstract class AbstractClassTable extends TableImpl
         String typeName = String.class.getName();
         if (colmd != null && colmd.getJdbcType() != null)
         {
-            if (colmd.getJdbcType().equalsIgnoreCase("INTEGER"))
+            if (colmd.getJdbcType() == JdbcType.INTEGER)
             {
                 typeName = Integer.class.getName();
             }

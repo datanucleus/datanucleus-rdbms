@@ -39,6 +39,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -157,15 +158,13 @@ public class ColumnImpl implements Column
     public boolean isUnlimitedLength()
     {
         // TODO Enable the two commented out lines so that we can allow people to have "BLOB(1024)" etc
-        if (columnMetaData.getJdbcType() != null && 
-            columnMetaData.getJdbcType().toLowerCase().indexOf("lob") > 0/* &&
+        if (columnMetaData.getJdbcType() != null && (columnMetaData.getJdbcType() == JdbcType.BLOB || columnMetaData.getJdbcType() == JdbcType.CLOB)/* &&
             !typeInfo.isAllowsPrecisionSpec()*/)
         {
             // Allow for jdbc-type=BLOB/CLOB
             return true;
         }
-        else if (columnMetaData.getSqlType() != null && 
-            columnMetaData.getSqlType().toLowerCase().indexOf("lob") > 0/* &&
+        else if (columnMetaData.getSqlType() != null && columnMetaData.getSqlType().toLowerCase().indexOf("lob") > 0/* &&
             !typeInfo.isAllowsPrecisionSpec()*/)
         {
             // Allow for sql-type=BLOB/CLOB

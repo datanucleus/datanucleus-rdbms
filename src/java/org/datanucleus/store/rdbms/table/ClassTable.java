@@ -853,7 +853,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 IdentifierFactory idFactory = getStoreManager().getIdentifierFactory();
                 DatastoreIdentifier colIdentifier = idFactory.newIdentifier(IdentifierType.COLUMN, colmd.getName());
                 Column col = addColumn(null, colIdentifier, null, colmd);
-                SQLTypeInfo sqlTypeInfo = storeMgr.getSQLTypeInfoForJDBCType(dba.getJDBCTypeForName(colmd.getJdbcType()));
+                SQLTypeInfo sqlTypeInfo = storeMgr.getSQLTypeInfoForJDBCType(dba.getJDBCTypeForName(colmd.getJdbcTypeName()));
                 col.setTypeInfo(sqlTypeInfo);
 
                 if (unmappedColumns == null)

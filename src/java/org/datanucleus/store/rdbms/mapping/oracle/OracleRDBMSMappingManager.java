@@ -77,7 +77,7 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
                 ElementMetaData elemmd = (mmd != null ? mmd.getElementMetaData() : null);
                 if (elemmd != null && elemmd.getColumnMetaData() != null && elemmd.getColumnMetaData().length > 0)
                 {
-                    jdbcType = elemmd.getColumnMetaData()[0].getJdbcType();
+                    jdbcType = elemmd.getColumnMetaData()[0].getJdbcTypeName();
                 }
             }
             else if (fieldRole == FieldRole.ROLE_MAP_KEY)
@@ -85,7 +85,7 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
                 KeyMetaData keymd = (mmd != null ? mmd.getKeyMetaData() : null);
                 if (keymd != null && keymd.getColumnMetaData() != null && keymd.getColumnMetaData().length > 0)
                 {
-                    jdbcType = keymd.getColumnMetaData()[0].getJdbcType();
+                    jdbcType = keymd.getColumnMetaData()[0].getJdbcTypeName();
                 }
             }
             else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
@@ -93,14 +93,14 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
                 ValueMetaData valmd = (mmd != null ? mmd.getValueMetaData() : null);
                 if (valmd != null && valmd.getColumnMetaData() != null && valmd.getColumnMetaData().length > 0)
                 {
-                    jdbcType = valmd.getColumnMetaData()[0].getJdbcType();
+                    jdbcType = valmd.getColumnMetaData()[0].getJdbcTypeName();
                 }
             }
             else
             {
                 if (mmd != null && mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0)
                 {
-                    jdbcType = mmd.getColumnMetaData()[0].getJdbcType();
+                    jdbcType = mmd.getColumnMetaData()[0].getJdbcTypeName();
                 }
             }
 

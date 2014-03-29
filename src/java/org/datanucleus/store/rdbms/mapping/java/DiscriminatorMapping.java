@@ -27,6 +27,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
+import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
@@ -199,9 +200,7 @@ public class DiscriminatorMapping extends SingleFieldMapping
             ColumnMetaData disColmd = dismd.getColumnMetaData();
             if (disColmd != null && disColmd.getJdbcType() != null)
             {
-                if (disColmd.getJdbcType().equalsIgnoreCase("INTEGER") ||
-                    disColmd.getJdbcType().equalsIgnoreCase("BIGINT") ||
-                    disColmd.getJdbcType().equalsIgnoreCase("NUMERIC"))
+                if (MetaDataUtils.isJdbcTypeNumeric(disColmd.getJdbcType()))
                 {
                     return new DiscriminatorLongMapping(table, mapMgr.getMapping(Long.class), dismd);
                 }

@@ -41,6 +41,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.plugin.ConfigurationElement;
@@ -1136,11 +1137,11 @@ public class RDBMSMappingManager implements MappingManager
                 }
                 else
                 {
-                    String jdbcType = colmds[0].getJdbcType();
-                    if (!StringUtils.isWhitespace(jdbcType))
+                    JdbcType jdbcType = colmds[0].getJdbcType();
+                    if (jdbcType != null)
                     {
                         // JDBC type specified so don't just take the default
-                        if (jdbcType.equalsIgnoreCase("varchar") || jdbcType.equalsIgnoreCase("char"))
+                        if (jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CHAR)
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, String.class);
                             if (conv != null)
@@ -1148,7 +1149,7 @@ public class RDBMSMappingManager implements MappingManager
                                 return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
                             }
                         }
-                        else if (jdbcType.equalsIgnoreCase("integer"))
+                        else if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.BIGINT)
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Long.class);
                             if (conv != null)
@@ -1156,7 +1157,7 @@ public class RDBMSMappingManager implements MappingManager
                                 return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
                             }
                         }
-                        else if (jdbcType.equalsIgnoreCase("timestamp"))
+                        else if (jdbcType == JdbcType.TIMESTAMP)
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Timestamp.class);
                             if (conv != null)
@@ -1164,7 +1165,7 @@ public class RDBMSMappingManager implements MappingManager
                                 return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
                             }
                         }
-                        else if (jdbcType.equalsIgnoreCase("time"))
+                        else if (jdbcType == JdbcType.TIME)
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Time.class);
                             if (conv != null)
@@ -1172,7 +1173,7 @@ public class RDBMSMappingManager implements MappingManager
                                 return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
                             }
                         }
-                        else if (jdbcType.equalsIgnoreCase("date"))
+                        else if (jdbcType == JdbcType.DATE)
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Date.class);
                             if (conv != null)
@@ -1543,7 +1544,7 @@ public class RDBMSMappingManager implements MappingManager
                 ColumnMetaData[] colmds = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null);
                 if (colmds != null && colmds.length > 0)
                 {
-                    jdbcType = colmds[index].getJdbcType();
+                    jdbcType = colmds[index].getJdbcTypeName();
                     sqlType = colmds[index].getSqlType();
                 }
                 if (mmd.getCollection() != null && mmd.getCollection().isSerializedElement())
@@ -1561,7 +1562,7 @@ public class RDBMSMappingManager implements MappingManager
                 ColumnMetaData[] colmds = (mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getColumnMetaData() : null);
                 if (colmds != null && colmds.length > 0)
                 {
-                    jdbcType = colmds[index].getJdbcType();
+                    jdbcType = colmds[index].getJdbcTypeName();
                     sqlType = colmds[index].getSqlType();
                 }
                 if (mmd.getMap().isSerializedKey())
@@ -1575,7 +1576,7 @@ public class RDBMSMappingManager implements MappingManager
                 ColumnMetaData[] colmds = (mmd.getValueMetaData() != null ? mmd.getValueMetaData().getColumnMetaData() : null);
                 if (colmds != null && colmds.length > 0)
                 {
-                    jdbcType = colmds[index].getJdbcType();
+                    jdbcType = colmds[index].getJdbcTypeName();
                     sqlType = colmds[index].getSqlType();
                 }
                 if (mmd.getMap().isSerializedValue())
@@ -1589,7 +1590,7 @@ public class RDBMSMappingManager implements MappingManager
                 if (mmd.getColumnMetaData().length > 0)
                 {
                     // Utilise the jdbc and sql types if specified
-                    jdbcType = mmd.getColumnMetaData()[index].getJdbcType();
+                    jdbcType = mmd.getColumnMetaData()[index].getJdbcTypeName();
                     sqlType = mmd.getColumnMetaData()[index].getSqlType();
                 }
                 if (mmd.isSerialized())
@@ -1624,7 +1625,7 @@ public class RDBMSMappingManager implements MappingManager
         if (col != null && col.getColumnMetaData() != null)
         {
             // Utilise the jdbc and sql types if specified
-            jdbcType = col.getColumnMetaData().getJdbcType();
+            jdbcType = col.getColumnMetaData().getJdbcTypeName();
             sqlType = col.getColumnMetaData().getSqlType();
         }
         Class datastoreMappingClass = getDatastoreMappingClass(null, javaType, jdbcType, sqlType, clr);

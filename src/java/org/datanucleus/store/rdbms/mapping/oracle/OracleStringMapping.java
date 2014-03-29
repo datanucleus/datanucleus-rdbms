@@ -24,6 +24,7 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.oracle;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -61,11 +62,11 @@ public class OracleStringMapping extends StringMapping implements MappingCallbac
         }
 
         // Update BLOB/CLOB value
-        if (mmd.getColumnMetaData()[0].getJdbcType().toUpperCase().equals( "BLOB" ))
+        if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.BLOB)
         {
             OracleBlobRDBMSMapping.updateBlobColumn(op, getTable(), getDatastoreMapping(0), value.getBytes());
         }
-        else if (mmd.getColumnMetaData()[0].getJdbcType().toUpperCase().equals( "CLOB" ))
+        else if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.CLOB)
         {
             OracleClobRDBMSMapping.updateClobColumn(op, getTable(), getDatastoreMapping(0), value);
         }
