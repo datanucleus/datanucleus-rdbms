@@ -63,6 +63,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.IndexMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.InterfaceMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.OrderMetaData;
@@ -846,7 +847,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 ColumnMetaData colmd = (ColumnMetaData)colsIter.next();
 
                 // Create a column with the specified name and jdbc-type
-                if (colmd.getJdbcType().equals("VARCHAR") && colmd.getLength() == null)
+                if (colmd.getJdbcType() == JdbcType.VARCHAR && colmd.getLength() == null)
                 {
                     colmd.setLength(storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STRING_DEFAULT_LENGTH));
                 }
@@ -863,8 +864,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057011",
-                        col.toString(), colmd.getJdbcType()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057011", col.toString(), colmd.getJdbcType()));
                 }
                 unmappedColumns.add(col);
             }

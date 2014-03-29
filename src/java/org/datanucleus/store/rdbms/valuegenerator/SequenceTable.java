@@ -26,6 +26,7 @@ import java.util.HashSet;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -93,7 +94,7 @@ public class SequenceTable extends TableImpl
             idFactory.newColumnIdentifier(sequenceNameColumnName), sequenceNameMapping, null);
         colSequenceName.setAsPrimaryKey();
         colSequenceName.getColumnMetaData().setLength(Integer.valueOf("255"));
-        colSequenceName.getColumnMetaData().setJdbcType("VARCHAR");
+        colSequenceName.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 		getStoreManager().getMappingManager().createDatastoreMapping(sequenceNameMapping, colSequenceName, String.class.getName());
 
         // "NEXT_VAL" column

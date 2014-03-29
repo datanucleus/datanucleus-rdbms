@@ -32,6 +32,7 @@ import java.util.HashSet;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -96,7 +97,7 @@ public class SchemaTable extends TableImpl
             idFactory.newColumnIdentifier("CLASS_NAME"), classMapping, null);
         mapMgr.createDatastoreMapping(classMapping, class_column, String.class.getName());
         class_column.getColumnMetaData().setLength(128);
-        class_column.getColumnMetaData().setJdbcType("VARCHAR");
+        class_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
         class_column.setAsPrimaryKey();
 
         tableMapping = mapMgr.getMapping(String.class);
@@ -104,14 +105,14 @@ public class SchemaTable extends TableImpl
             idFactory.newColumnIdentifier("TABLE_NAME"), tableMapping, null);
         mapMgr.createDatastoreMapping(tableMapping, table_column, String.class.getName());
         table_column.getColumnMetaData().setLength(128);
-        table_column.getColumnMetaData().setJdbcType("VARCHAR");
+        table_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 
         typeMapping = mapMgr.getMapping(String.class);
         Column type_column= addColumn(String.class.getName(),
             idFactory.newColumnIdentifier("TYPE"), typeMapping, null);
         mapMgr.createDatastoreMapping(typeMapping, type_column, String.class.getName());
         type_column.getColumnMetaData().setLength(4);
-        type_column.getColumnMetaData().setJdbcType("VARCHAR");
+        type_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 
         // TODO Change type to SMALLINT/BIT
         ownerMapping = mapMgr.getMapping(String.class);
@@ -119,21 +120,21 @@ public class SchemaTable extends TableImpl
             idFactory.newColumnIdentifier("OWNER"), ownerMapping, null);
         mapMgr.createDatastoreMapping(ownerMapping, owner_column, String.class.getName());
         owner_column.getColumnMetaData().setLength(2);
-        owner_column.getColumnMetaData().setJdbcType("VARCHAR");
+        owner_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 
         versionMapping = mapMgr.getMapping(String.class);
         Column version_column = addColumn(String.class.getName(),
             idFactory.newColumnIdentifier("VERSION"), versionMapping, null);
         mapMgr.createDatastoreMapping(versionMapping, version_column, String.class.getName());
         version_column.getColumnMetaData().setLength(20);
-        version_column.getColumnMetaData().setJdbcType("VARCHAR");
+        version_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 
         interfaceNameMapping = mapMgr.getMapping(String.class);
         Column interfaceName_column = addColumn(String.class.getName(),
             idFactory.newColumnIdentifier("INTERFACE_NAME"), interfaceNameMapping, null);
         mapMgr.createDatastoreMapping(interfaceNameMapping, interfaceName_column, String.class.getName());
         interfaceName_column.getColumnMetaData().setLength(255);
-        interfaceName_column.getColumnMetaData().setJdbcType("VARCHAR");
+        interfaceName_column.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
         interfaceName_column.setNullable();
         
         // Set up JDBC statements for supported operations

@@ -46,6 +46,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.ActivityState;
@@ -979,7 +980,7 @@ public class InsertRequest extends Request
                 value = null;
             }
 
-            if (colmd.getJdbcType().equals("VARCHAR") || colmd.getJdbcType().equals("CHAR"))
+            if (MetaDataUtils.isJdbcTypeString(colmd.getJdbcType()))
             {
                 // String-based so add quoting. Do all RDBMS accept single-quote?
                 if (value != null)

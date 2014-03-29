@@ -862,7 +862,7 @@ public class ColumnImpl implements Column
     {
         if (columnMetaData.getJdbcType() == null)
         {
-            columnMetaData.setJdbcType("VARCHAR");
+            columnMetaData.setJdbcType(JdbcType.VARCHAR);
         }
         if (columnMetaData.getLength() == null)
         {

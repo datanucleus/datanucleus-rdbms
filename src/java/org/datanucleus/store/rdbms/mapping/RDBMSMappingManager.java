@@ -42,6 +42,7 @@ import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.JdbcType;
+import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.plugin.ConfigurationElement;
@@ -1141,7 +1142,7 @@ public class RDBMSMappingManager implements MappingManager
                     if (jdbcType != null)
                     {
                         // JDBC type specified so don't just take the default
-                        if (jdbcType == JdbcType.VARCHAR || jdbcType == JdbcType.CHAR)
+                        if (MetaDataUtils.isJdbcTypeString(jdbcType))
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, String.class);
                             if (conv != null)
@@ -1149,7 +1150,7 @@ public class RDBMSMappingManager implements MappingManager
                                 return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
                             }
                         }
-                        else if (jdbcType == JdbcType.INTEGER || jdbcType == JdbcType.BIGINT)
+                        else if (MetaDataUtils.isJdbcTypeNumeric(jdbcType))
                         {
                             TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Long.class);
                             if (conv != null)
