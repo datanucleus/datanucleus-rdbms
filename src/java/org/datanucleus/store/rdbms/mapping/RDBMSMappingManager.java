@@ -171,20 +171,18 @@ public class RDBMSMappingManager implements MappingManager
 
                 if (javaVersion == null || javaVersion.length() < 1)
                 {
-                    // Default to use for all JDKs 1.3+
-                    javaVersion = "1.3";
+                    // Default to use for all JDKs 1.7+
+                    javaVersion = "1.7";
                 }
 
-                if ((JavaUtils.isGreaterEqualsThan(javaVersion) && !javaRestricted) ||
-                        (JavaUtils.isEqualsThan(javaVersion) && javaRestricted))
+                if ((JavaUtils.isGreaterEqualsThan(javaVersion) && !javaRestricted) || (JavaUtils.isEqualsThan(javaVersion) && javaRestricted))
                 {
                     Class mappingType = null;
                     if (!StringUtils.isWhitespace(rdbmsMappingClassName))
                     {
                         try
                         {
-                            mappingType = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), 
-                                rdbmsMappingClassName);
+                            mappingType = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), rdbmsMappingClassName);
                         }
                         catch (NucleusException ne)
                         {
@@ -209,8 +207,7 @@ public class RDBMSMappingManager implements MappingManager
                         {
                             if (includes.isEmpty() || includes.contains(vendorId))
                             {
-                                registerDatastoreMapping(javaName, mappingType, jdbcType, sqlType, 
-                                    defaultForJavaType);
+                                registerDatastoreMapping(javaName, mappingType, jdbcType, sqlType, defaultForJavaType);
                             }
                         }
                     }
@@ -1236,8 +1233,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param sqlType The SQL type that can be used
      * @param dflt Whether this type should be used as the default mapping for this Java type
      */
-    public void registerDatastoreMapping(String javaTypeName, Class datastoreMappingType, String jdbcType, 
-            String sqlType, boolean dflt)
+    public void registerDatastoreMapping(String javaTypeName, Class datastoreMappingType, String jdbcType, String sqlType, boolean dflt)
     {
         boolean mappingRequired = true;
         Collection coll = (Collection)datastoreMappingsByJavaType.get(javaTypeName);
@@ -1656,8 +1652,7 @@ public class RDBMSMappingManager implements MappingManager
         // Take the column MetaData from the component that this mappings role relates to
         ColumnMetaData colmd = null;
         ColumnMetaDataContainer columnContainer = fmd;
-        if (roleForField == FieldRole.ROLE_COLLECTION_ELEMENT ||
-            roleForField == FieldRole.ROLE_ARRAY_ELEMENT)
+        if (roleForField == FieldRole.ROLE_COLLECTION_ELEMENT || roleForField == FieldRole.ROLE_ARRAY_ELEMENT)
         {
             columnContainer = fmd.getElementMetaData();
         }
@@ -1703,26 +1698,22 @@ public class RDBMSMappingManager implements MappingManager
             if (roleForField == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
                 // Join table collection element
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, 
-                    true, FieldRole.ROLE_COLLECTION_ELEMENT);
+                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_COLLECTION_ELEMENT);
             }
             else if (roleForField == FieldRole.ROLE_ARRAY_ELEMENT)
             {
                 // Join table array element
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null,
-                    true, FieldRole.ROLE_ARRAY_ELEMENT);
+                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_ARRAY_ELEMENT);
             }
             else if (roleForField == FieldRole.ROLE_MAP_KEY)
             {
                 // Join table map key
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null,
-                    true, FieldRole.ROLE_MAP_KEY);
+                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_MAP_KEY);
             }
             else if (roleForField == FieldRole.ROLE_MAP_VALUE)
             {
                 // Join table map value
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null,
-                    true, FieldRole.ROLE_MAP_VALUE);
+                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_MAP_VALUE);
             }
             else
             {
@@ -1741,13 +1732,11 @@ public class RDBMSMappingManager implements MappingManager
         {
             // User has specified a name, so try to keep this unmodified
             identifier = idFactory.newColumnIdentifier(colmds[datastoreFieldIndex].getName(), 
-                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), 
-                FieldRole.ROLE_CUSTOM);
+                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), FieldRole.ROLE_CUSTOM);
         }
 
         // Create the column
         col = tbl.addColumn(javaType, identifier, mapping, colmd);
-
         if (fmd.isPrimaryKey())
         {
             col.setAsPrimaryKey();
@@ -1811,27 +1800,27 @@ public class RDBMSMappingManager implements MappingManager
      */
     public Column createColumn(JavaTypeMapping mapping, String javaType, ColumnMetaData colmd)
     {
-        AbstractMemberMetaData fmd = mapping.getMemberMetaData();
+        AbstractMemberMetaData mmd = mapping.getMemberMetaData();
         Table tbl = mapping.getTable();
 
-        Column col;
         if (colmd == null)
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            colmd.setName(fmd.getColumn());
-            fmd.addColumn(colmd);
+            colmd.setName(mmd.getColumn());
+            mmd.addColumn(colmd);
         }
 
+        Column col;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         if (colmd.getName() == null)
         {
             // No name specified, so generate the identifier from the field name
-            DatastoreIdentifier identifier = idFactory.newIdentifier(IdentifierType.COLUMN, fmd.getName());
+            DatastoreIdentifier identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName());
             int i=0;
             while (tbl.hasColumn(identifier))
             {
-                identifier = idFactory.newIdentifier(IdentifierType.COLUMN, fmd.getName() + "_" + i);
+                identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName() + "_" + i);
                 i++;
             }
 
@@ -1843,13 +1832,11 @@ public class RDBMSMappingManager implements MappingManager
             // User has specified a name, so try to keep this unmodified
             col = tbl.addColumn(javaType, 
                 idFactory.newColumnIdentifier(colmd.getName(), 
-                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), 
-                    FieldRole.ROLE_CUSTOM), 
-                mapping, colmd);
+                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), FieldRole.ROLE_CUSTOM), mapping, colmd);
         }
 
-        setColumnNullability(fmd, colmd, col);
-        if (fmd.getNullValue() == NullValue.DEFAULT)
+        setColumnNullability(mmd, colmd, col);
+        if (mmd.getNullValue() == NullValue.DEFAULT)
         {
             // Users default should be applied if a null is to be inserted
             col.setDefaultable();
@@ -1882,10 +1869,8 @@ public class RDBMSMappingManager implements MappingManager
             // No name specified, so generate the identifier from the field name
             AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
             identifier = idFactory.newForeignKeyFieldIdentifier(
-                relatedMmds != null ? relatedMmds[0] : null, 
-                mmd, reference.getIdentifier(), 
-                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), 
-                FieldRole.ROLE_OWNER);
+                relatedMmds != null ? relatedMmds[0] : null, mmd, reference.getIdentifier(), 
+                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), FieldRole.ROLE_OWNER);
             colmd.setName(identifier.getIdentifierName());
         }
         else
