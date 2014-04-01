@@ -281,10 +281,10 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
      * @param orderId The order id to use for this element relation
      * @param executeNow Whether to execute the statement now (and not wait for any batch)
      * @return Whether a row was inserted
-     * @throws SQLException Thrown if an error occurs
+     * @throws MappedDatastoreException Thrown if an error occurs
      */
-    public int[] internalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, 
-            boolean executeNow) throws MappedDatastoreException
+    public int[] internalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
+            throws MappedDatastoreException
     {
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();

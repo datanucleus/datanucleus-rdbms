@@ -42,7 +42,6 @@ import org.datanucleus.util.NucleusLogger;
  * <li><B>orderMapping</B> providing the ordering of the elements.</li>
  * </ul>
  * The primary-key is formed from the ownerMapping and the orderMapping (unless overridden by the user).
- * </p>
  */
 public class ArrayTable extends ElementContainerTable implements DatastoreElementContainer
 {

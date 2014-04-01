@@ -209,10 +209,7 @@ public class H2Adapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to drop the given table.
      * It should return something like:
-     * <p>
-     * <blockquote><pre>
-     * DROP TABLE FOO
-     * </pre></blockquote>
+     * <pre>DROP TABLE FOO</pre>
      *
      * @param table     The table to drop.
      * @return  The text of the SQL statement.

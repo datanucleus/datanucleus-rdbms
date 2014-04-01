@@ -176,7 +176,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * Accessor for the schema name.
      * @param conn The Connection to use
      * @return The schema name used by this connection
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public String getSchemaName(Connection conn)
     throws SQLException
@@ -190,7 +190,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * Accessor for the catalog name.
      * @param conn The Connection to use
      * @return The catalog name used by this connection
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public String getCatalogName(Connection conn)
     throws SQLException
@@ -227,10 +227,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
-     * <p>
-     * <pre>
-     * CREATE [UNIQUE] INDEX FOO_CK ON TBL (COL1 [, COL2])
-     * </pre>
+     * <pre>CREATE [UNIQUE] INDEX FOO_CK ON TBL (COL1 [, COL2])</pre>
      * @param ck An object describing the candidate key.
      * @param factory Identifier factory
      * @return The text of the SQL statement.

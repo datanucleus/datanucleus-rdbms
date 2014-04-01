@@ -23,7 +23,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  * Representation of an expression for an unbound variable.
  * This is used where we have a variable in use in a query and at the point of needing it we
  * haven't yet bound the variable. For example, in the following query
- * <pre>this.names.contains(var) && var == someValue</pre>
+ * <pre>this.names.contains(var) &amp;&amp; var == someValue</pre>
  * in the first clause the "var" is unbound when passing in to the InvokeExpression, so it is passed
  * in as an UnboundExpression, and in that contains() method will be bound to the collection (element)
  * table (a join added).

@@ -45,7 +45,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Representation of a secondary table for a class.
  * Has a primary table that manages the main fields for that class and some fields are defined 
- * (using <field table="...">) to be stored in the secondary table.
+ * (using &lt;field table="..."&gt;) to be stored in the secondary table.
  * Many of the methods in this class defer to the equivalent method in the primary table.
  **/
 public class SecondaryTable extends AbstractClassTable implements SecondaryDatastoreClass

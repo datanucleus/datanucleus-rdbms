@@ -226,7 +226,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
     /**
      * Method to return the CREATE TABLE statement.
      * Versions before 5 need INNODB table type selecting for them.
-     * It seems, MySQL >= 5 still needs innodb in order to support transactions.
+     * It seems, MySQL &ge; 5 still needs innodb in order to support transactions.
      * @param table The table
      * @param columns The columns in the table
      * @param props Properties for controlling the table creation

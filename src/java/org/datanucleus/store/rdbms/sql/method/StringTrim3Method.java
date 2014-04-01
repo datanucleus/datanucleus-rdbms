@@ -27,7 +27,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
  * Method for evaluating {strExpr1}.trim() or "TRIM(BOTH trimChar FROM strExpr1)".
- * Returns a StrignExpression that equates to <pre>TRIM([[BOTH] [<trim_char>] FROM] strExpr)</pre>
+ * Returns a StrignExpression that equates to <pre>TRIM([[BOTH] [{trim_char}] FROM] strExpr)</pre>
  */
 public class StringTrim3Method extends AbstractSQLMethod
 {

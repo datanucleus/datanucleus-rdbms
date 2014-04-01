@@ -783,6 +783,8 @@ public abstract class JavaTypeMapping
     /**
      * Convenience method to return the ColumnMetaData appropriate for this mapping.
      * If the mapping is in a join table then picks the correct component for the column definition.
+     * @param mmd Metadata for the member
+     * @param role The role this mapping plays for the specified member
      * @return The column metadata (if any)
      */
     protected static ColumnMetaData[] getColumnMetaDataForMember(AbstractMemberMetaData mmd, int role)

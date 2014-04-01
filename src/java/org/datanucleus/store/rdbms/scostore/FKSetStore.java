@@ -901,7 +901,7 @@ public class FKSetStore extends AbstractSetStore
      * </PRE>
      * when there is only one element table, and will be
      * <PRE>
-     * UPDATE <TABLE NAME> SET OWNERCOL=NULL [,DISTINGUISHER=NULL]
+     * UPDATE &lt;TABLE NAME&gt; SET OWNERCOL=NULL [,DISTINGUISHER=NULL]
      * WHERE OWNERCOL=?
      * </PRE>
      * when there is more than 1 element table.

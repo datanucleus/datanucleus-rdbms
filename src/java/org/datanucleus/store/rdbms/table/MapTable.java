@@ -74,7 +74,6 @@ import org.datanucleus.util.NucleusLogger;
  * <li><B>orderMapping</B> which may be null, or otherwise stores an index for the keys.
  * This is either to provide uniqueness or ordering (and part of the PK).</li>
  * </ul>
- * </p>
  */
 public class MapTable extends JoinTable implements DatastoreMap
 {
@@ -395,7 +394,7 @@ public class MapTable extends JoinTable implements DatastoreMap
     }
 
     /**
-     * Convenience method to apply the user specification of <primary-key> columns
+     * Convenience method to apply the user specification of &lt;primary-key&gt; columns
      * @param pkmd MetaData for the primary key
      */
     protected void applyUserPrimaryKeySpecification(PrimaryKeyMetaData pkmd)

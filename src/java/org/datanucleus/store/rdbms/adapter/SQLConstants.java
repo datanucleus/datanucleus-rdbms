@@ -21,17 +21,13 @@ package org.datanucleus.store.rdbms.adapter;
 /**
  * Contains various constants from the SQL/92, SQL/99 and SQL 2003 standard.
  *
- * <h4>SQL/92, SQL/99 and SQL 2003 Key Words</h4>
- * A <dfn>key word</dfn> is a word that has one or more meanings in the SQL
- * language itself.
- * Some key words are <dfn>reserved words</dfn>, meaning they cannot be used as
- * a regular identifier.
- * The remaining key words are <dfn>non-reserved</dfn>.
+ * <h3>SQL/92, SQL/99 and SQL 2003 Key Words</h3>
+ * A key word is a word that has one or more meanings in the SQLlanguage itself.
+ * Some key words are reserved words, meaning they cannot be used as a regular identifier.
+ * The remaining key words are non-reserved.
  *
  * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter
- * @version $Revision: 1.3 $
  */
-
 public interface SQLConstants
 {
     /**

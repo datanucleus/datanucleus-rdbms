@@ -81,8 +81,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      * @param fmd FieldMetaData for the field to be mapped (if any)
-     *  
-     * @throws NucleusException
+     * @throws NucleusException if an error occurs
      */
     public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
     {

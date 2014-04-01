@@ -179,6 +179,7 @@ public class TableUtils
 
     /**
      * Convenience method to return the candidate key (if any) for a field.
+     * @param table The table
      * @param umd The Unique MetaData
      * @param fieldMapping Mapping for the field
      * @return The Candidate Key

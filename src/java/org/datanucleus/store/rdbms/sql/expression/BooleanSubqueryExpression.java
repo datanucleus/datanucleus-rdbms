@@ -24,7 +24,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  * The subquery will be a "SELECT 1 FROM ..." resulting in SQL like
  * <pre>{keyword} (SELECT 1 FROM ...)</pre>
  * where the keyword is supplied (e.g EXISTS).
- * e.g <pre>EXISTS (SELECT 1 FROM TBL WHERE TBL.ID = A0.ID)
+ * e.g <pre>EXISTS (SELECT 1 FROM TBL WHERE TBL.ID = A0.ID)</pre>
  */
 public class BooleanSubqueryExpression extends BooleanExpression
 {

@@ -118,6 +118,7 @@ public interface Column
      * given a value by the datastore itself.
      * In RDBMS this would mean that the column is "AUTO_INCREMENT", "SERIAL" or 
      * @param identity True if column is identity
+     * @return The Column
      */
     Column setIdentity(boolean identity);
 
@@ -256,25 +257,25 @@ public interface Column
 
     /**
      * Checks the column definition as a primitive.
-     * @throws ColumnDefinitionException
+     * @throws ColumnDefinitionException if an error occurs
      */
     void checkPrimitive() throws ColumnDefinitionException;
 
     /**
      * Checks the column definition as an integer.
-     * @throws ColumnDefinitionException
+     * @throws ColumnDefinitionException if an error occurs
      */
     void checkInteger() throws ColumnDefinitionException;
 
     /**
      * Checks the column definition as a decimal.
-     * @throws ColumnDefinitionException
+     * @throws ColumnDefinitionException if an error occurs
      */
     void checkDecimal() throws ColumnDefinitionException;
 
     /**
      * Checks the column definition as a string.
-     * @throws ColumnDefinitionException
+     * @throws ColumnDefinitionException if an error occurs
      */
     void checkString() throws ColumnDefinitionException;
 

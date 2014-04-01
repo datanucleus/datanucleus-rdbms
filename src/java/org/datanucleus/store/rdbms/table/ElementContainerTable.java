@@ -181,7 +181,7 @@ public abstract class ElementContainerTable extends JoinTable
     public abstract String getElementType();
 
     /**
-     * Convenience method to apply the user specification of <primary-key> columns
+     * Convenience method to apply the user specification of &lt;primary-key&gt; columns
      * @param pkmd MetaData for the primary key
      */
     protected void applyUserPrimaryKeySpecification(PrimaryKeyMetaData pkmd)

@@ -86,7 +86,7 @@ public class VirtuosoAdapter extends BaseDatastoreAdapter
      * @param schema the schema name.
      * @param table the table name
      * @return a ResultSet with the format @see DatabaseMetaData#getIndexInfo(java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public ResultSet getExistingIndexes(Connection conn, String catalog, String schema, String table) 
     throws SQLException

@@ -71,6 +71,8 @@ public class DriverManagerDataSource implements DataSource
      * Constructor.
      * @param driverName Class name of the JDBC driver.
      * @param url URL of the data source.
+     * @param userName User name
+     * @param password User password
      * @param clr ClassLoaderResolver to use for loading issues
      * @param props Any custom properties for the driver
      */

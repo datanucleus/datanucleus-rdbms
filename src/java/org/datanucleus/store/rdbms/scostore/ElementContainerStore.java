@@ -150,7 +150,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     /** Whether the elements are serialised. */
     protected boolean elementsAreSerialised;
 
-    /** Whether the element is of a persistent-interface (defined using "<interface>") type. */
+    /** Whether the element is of a persistent-interface (defined using "{interface}") type. */
     protected boolean elementIsPersistentInterface = false;
 
     /**

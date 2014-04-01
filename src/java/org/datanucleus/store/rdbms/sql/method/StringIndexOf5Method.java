@@ -37,7 +37,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  * <pre>STRPOS(strExpr1, strExpr2, numExpr1+1)-1</pre>
  * otherwise returns
  * <pre>
- * CASE WHEN (STRPOS(SUBSTR(STR_FIELD, START_POS)) > 0) 
+ * CASE WHEN (STRPOS(SUBSTR(STR_FIELD, START_POS)) &gt; 0) 
  *   THEN (STRPOS(SUBSTR(STR_FIELD, START_POS), STR) -1 + START_POS)
  * ELSE
  *   -1

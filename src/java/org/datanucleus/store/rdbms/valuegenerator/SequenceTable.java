@@ -345,9 +345,8 @@ public class SequenceTable extends TableImpl
     }
 
     /**
-     * Method to delete a sequence
-     *
-     * @param sequenceName
+     * Method to delete a sequence.
+     * @param sequenceName Name of the sequence
      * @param conn Connection to the datastore
      * @throws SQLException Thrown when an error occurs deleting the schema. 
      **/

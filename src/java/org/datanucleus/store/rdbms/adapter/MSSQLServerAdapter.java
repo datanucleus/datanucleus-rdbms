@@ -172,7 +172,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
      * Accessor for the catalog name.
      * @param conn The Connection to use
      * @return The catalog name used by this connection
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public String getCatalogName(Connection conn)
     throws SQLException

@@ -179,7 +179,6 @@ public class InformixAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to add a foreign key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2) CONSTRAINT FOO_FK1
      * ALTER TABLE FOO ADD FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
@@ -205,7 +204,6 @@ public class InformixAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
      * ALTER TABLE FOO ADD UNIQUE (BAZ)

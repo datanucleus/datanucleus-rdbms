@@ -53,7 +53,6 @@ import org.datanucleus.util.NucleusLogger;
  * </ul>
  * Note that with an M-N relation there will be 2 instances of the CollectionTable - one represents the relation
  * from owner to element, and the other for the relation from element to owner.
- * </p>
  */
 public class CollectionTable extends ElementContainerTable implements DatastoreElementContainer
 {
@@ -338,9 +337,8 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
 
     /**
      * Accessor for whether the element is a PersistenceCapable(embedded).
-     * Currently this only defines a PC element as embedded if the MetaData has an <embedded> block.
-     * This may or may not be correct depending on how you interpret the JDO2 spec "embedded-element"
-     * flag.
+     * Currently this only defines a PC element as embedded if the MetaData has an &lt;embedded&gt; block.
+     * This may or may not be correct depending on how you interpret the JDO2 spec "embedded-element" flag.
      * @return Whether the element is PC and is embedded
      */
     public boolean isEmbeddedElementPC()

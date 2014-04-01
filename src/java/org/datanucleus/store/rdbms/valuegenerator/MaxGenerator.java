@@ -32,19 +32,8 @@ import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 
 /**
- * This generator for Relational Databases uses the "select max(column) from
- * table" strategy. The block size is limited to 1. MaxPoidGenerator works
- * with numbers, so clients using this generator must cast the ID to Long *
- * <P>
- * <B>Required user properties</B>
- * </P>
- * <UL>
- * </UL>
- * <P>
- * <B>Optional user properties</B>
- * <UL>
- * </UL>
- * </P>
+ * This generator for Relational Databases uses the "select max(column) from table" strategy. The block size is limited to 1. 
+ * MaxGenerator works with numbers, so clients using this generator must cast the ID to Long.
  */
 public class MaxGenerator extends AbstractRDBMSGenerator
 {

@@ -35,8 +35,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * <p>
- * The representation (mapping) in the Java <sup><font size=-2>TM </font>
- * </sup> programming language of an SQL <code>BLOB</code> value. An SQL
+ * The representation (mapping) in the Java programming language of an SQL <code>BLOB</code> value. An SQL
  * <code>BLOB</code> is a built-in type that stores a Binary Large Object as a
  * column value in a row of a database table. The driver implements
  * <code>Blob</code> using an SQL <code>locator(BLOB)</code>, which means
@@ -52,8 +51,6 @@ import org.datanucleus.util.NucleusLogger;
  * Large Object) value, for materializing a <code>BLOB</code> value on the
  * client, and for determining the position of a pattern of bytes within a
  * <code>BLOB</code> value.
- * <P>
- * This class is new in the JDBC 2.0 API.
  */
 public class BlobImpl implements Blob
 {
@@ -69,7 +66,7 @@ public class BlobImpl implements Blob
     /**
      * Constructor taking a serialised object.
      * @param obj The serialised object.
-     * @throws IOException
+     * @throws IOException if an error occurs
      */
     public BlobImpl(Object obj) throws IOException
     {
@@ -105,6 +102,7 @@ public class BlobImpl implements Blob
     /**
      * Accessor for the Object.
      * @return The object.
+     * @throws SQLException if an error occurs
      */
     public Object getObject()
     throws SQLException
@@ -245,7 +243,7 @@ public class BlobImpl implements Blob
     /**
      * Free the Blob object and releases the resources that it holds.
      * The object is invalid once the free method is called.
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public void free() throws SQLException
     {

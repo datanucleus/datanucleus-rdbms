@@ -42,14 +42,9 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * This generator utilises datastore sequences. It uses a statement like
- * <PRE>"select <sequence>.nextval from dual"</PRE> to get the next value in the
+ * <pre>"select {sequence}.nextval from dual"</pre> to get the next value in the
  * sequence. It is datastore-dependent since there is no RDBMS-independent statement.
  * SequencePoidGenerator works with numbers, so clients using this generator must cast the ID to Long
- * <P>
- * <B>Required user properties</B>
- * <UL>
- * </UL>
- * </P>
  * <P>
  * <B>Optional user properties</B>
  * <UL>

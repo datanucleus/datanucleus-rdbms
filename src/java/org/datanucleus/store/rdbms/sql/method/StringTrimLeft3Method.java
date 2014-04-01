@@ -19,7 +19,7 @@ package org.datanucleus.store.rdbms.sql.method;
 
 /**
  * Method for evaluating {strExpr1}.trimLeft() or "TRIM(LEADING trimChar FROM strExpr1)".
- * Returns a StrignExpression that equates to <pre>TRIM([[LEADING] [<trim_char>] FROM] strExpr)</pre>
+ * Returns a StrignExpression that equates to <pre>TRIM([[LEADING] [{trim_char}] FROM] strExpr)</pre>
  */
 public class StringTrimLeft3Method extends StringTrim3Method
 {

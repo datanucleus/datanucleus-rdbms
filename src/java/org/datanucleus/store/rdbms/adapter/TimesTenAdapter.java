@@ -134,7 +134,6 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
-     * <p/>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_CK (BAZ)
      * ALTER TABLE FOO ADD (BAZ)
@@ -168,7 +167,6 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate SQL to add a foreign key to its table.
      * It should return something like:
-     * <p/>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_FK1 FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
      * ALTER TABLE FOO ADD FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)

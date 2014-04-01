@@ -48,32 +48,31 @@ import org.datanucleus.util.NucleusLogger;
  * <LI><U>sequence-table-basis</U> - Basic for the sequence name (if "sequence-name" not provided). This can be
  * "table" or "class".</LI>
  * </UL>
+ * 
  * <p>
  * The following properties define the table where the identities are generated.
- * </p>
  * <UL>
  * <LI><U>sequence-catalog-name</U> - the catalog name for the table (defaults to the default catalog)</LI>
  * <LI><U>sequence-schema-name</U> - the schema name for the table (defaults to the default schema)</LI>
  * <LI><U>sequence-table-name</U> - the table name for the table (defaults to SEQUENCE_TABLE)</LI>
  * <LI><U>sequence-name-column-name</U> - the name for the column that represent sequence names</LI>
  * <LI><U>sequence-nextval-column-name</U> - the name for the column that represent incrementing sequence values</LI>
- * <UL>
+ * </UL>
+ * 
  * <p>
  * The following properties control the initial value, and the number of ids that are cached (generated) in each call.
- * </p>
  * <UL>
  * <LI><U>key-initial-value</U> - start value (if we have no current value). If not specified and we have
  * no current value then we do a "SELECT max(column-name) FROM table-name" for the column being incremented</LI>
  * <LI><U>key-cache-size</U> - number of unique identifiers to cache (defaults to 5)</LI>
  * </UL>
+ * 
  * <p>
  * The following properties are used when finding the starting point for the identities generated.
- * </p>
  * <UL>
  * <li><U>table-name</U> - name of the table whose column we are generating the value for</li>
  * <li><U>column-name</U> - name of the column that we are generating the value for</li>
  * </UL>
- * </P>
  */
 public final class TableGenerator extends AbstractRDBMSGenerator
 {

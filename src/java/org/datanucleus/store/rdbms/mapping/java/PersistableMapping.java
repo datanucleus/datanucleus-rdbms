@@ -297,7 +297,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 	 * @param ps The Prepared Statement
 	 * @param param The parameter ids in the statement
 	 * @param value The value to put in the statement at these ids
-	 * @throws NotYetFlushedException
+	 * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
 	 */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
@@ -312,7 +312,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      * @param value The value to put in the statement at these ids
      * @param ownerOP ObjectProvider for the owner object
      * @param ownerFieldNumber Field number of this PC object in the owner
-     * @throws NotYetFlushedException
+     * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
      */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
     {

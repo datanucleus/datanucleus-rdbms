@@ -47,15 +47,15 @@ import org.datanucleus.util.StringUtils;
  * return all possible types of candidate. Also allows select of a dummy column to return the
  * type for the part of the UNION that the object came from. Please refer to the specific constructors
  * for the usages.
- * <h3>Supported options</h3>
  * <p>
+ * <h3>Supported options</h3>
  * This generator supports
  * <ul>
  * <li><b>selectNucleusType</b> : adds a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the 
  *     class name.</li>
  * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table
  *     collection.</li>
- * </p>
+ * </ul>
  */
 public class UnionStatementGenerator extends AbstractStatementGenerator
 {

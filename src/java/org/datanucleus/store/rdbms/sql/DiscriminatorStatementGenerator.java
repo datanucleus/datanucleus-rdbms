@@ -42,15 +42,15 @@ import org.datanucleus.store.rdbms.table.Table;
  * Please refer to the specific constructors for the usages.
  * Note that the statement returned by getStatement() has nothing selected, solely providing the
  * basic structure. Column selection should be performed when generating the mapping definition.
- * <h3>Supported options</h3>
  * <p>
+ * <h3>Supported options</h3>
  * This generator supports the following "options" :-
  * <ul>
  * <li><b>restrictDiscriminator</b> : Whether to add a WHERE clause to restrict the discriminator
  *     to only valid values (default="true")</li>
  * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table
  *     collection.</li>
- * </p>
+ * </ul>
  */
 public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
 {

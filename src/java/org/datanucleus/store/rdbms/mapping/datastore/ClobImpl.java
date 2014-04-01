@@ -33,7 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * The mapping in the Java<sup><font size=-2>TM</font></sup> programming language for the SQL <code>CLOB</code> type.
+ * The mapping in the Java programming language for the SQL <code>CLOB</code> type.
  * An SQL <code>CLOB</code> is a built-in type that stores a Character Large Object as a column value
  * in a row of a database table. By default drivers implement a <code>Clob</code> object using an SQL
  * <code>locator(CLOB)</code>, which means that a <code>Clob</code> object contains a logical pointer to the 
@@ -63,7 +63,7 @@ public class ClobImpl implements Clob
     /**
      * Constructor taking a string.
      * @param string The string.
-     * @throws IOException
+     * @throws IOException if an error occurs
      */
     public ClobImpl(String string) throws IOException
     {
@@ -146,7 +146,7 @@ public class ClobImpl implements Clob
     /**
      * Free the Blob object and releases the resources that it holds.
      * The object is invalid once the free method is called.
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public void free() throws SQLException
     {

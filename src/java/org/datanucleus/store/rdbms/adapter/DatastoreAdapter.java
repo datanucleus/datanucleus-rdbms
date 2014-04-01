@@ -377,7 +377,7 @@ public interface DatastoreAdapter
 
     /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.
-     * @return The options (Collection<String>)
+     * @return The options (Collection&lt;String&gt;)
      */
     Collection<String> getSupportedOptions();
 
@@ -641,7 +641,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to drop the given table.
      * It should return something like:
-     * <p>
      * <pre>
      * DROP TABLE FOO CASCADE
      * </pre>
@@ -653,7 +652,7 @@ public interface DatastoreAdapter
 
     /**
      * Method to return the basic SQL for a DELETE TABLE statement.
-     * Returns a String like <code>DELETE FROM tbl t1</code>. Doesn't include any where clause.
+     * Returns a String like <pre>DELETE FROM tbl t1</pre>. Doesn't include any where clause.
      * @param tbl The SQLTable to delete
      * @return The delete table string
      */
@@ -661,7 +660,7 @@ public interface DatastoreAdapter
 
     /**
      * Method to return the basic SQL for an UPDATE TABLE statement.
-     * Returns a String like <code>UPDATE tbl t1 SET x1 = val1</code>. Doesn't include any WHERE clause.
+     * Returns a String like <pre>UPDATE tbl t1 SET x1 = val1</pre>. Doesn't include any WHERE clause.
      * @param tbl The SQLTable to update
      * @param setSQL The SQLText for the SET component
      * @return The update table string
@@ -671,7 +670,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
      * </pre>
@@ -700,7 +698,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to add an index to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * CREATE INDEX FOO_N1 ON FOO (BAR,BAZ)
      * CREATE UNIQUE INDEX FOO_U1 ON FOO (BAR,BAZ)
@@ -719,7 +716,7 @@ public interface DatastoreAdapter
      * @param schema the schema name
      * @param table the table name
      * @return a ResultSet with the format @see DatabaseMetaData#getIndexInfo(java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     ResultSet getExistingIndexes(Connection conn, String catalog, String schema, String table)
     throws SQLException;
@@ -728,7 +725,6 @@ public interface DatastoreAdapter
      * Returns the appropriate SQL to create the given table having the given
      * columns. No column constraints or key definitions should be included.
      * It should return something like:
-     * <p>
      * <pre>
      * CREATE TABLE FOO (BAR VARCHAR(30), BAZ INTEGER)
      * </pre>
@@ -744,7 +740,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a primary key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_PK PRIMARY KEY (BAR)
      * </pre>
@@ -758,7 +753,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a foreign key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_FK1 FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
      * </pre>
@@ -771,7 +765,6 @@ public interface DatastoreAdapter
     /**
      * Returns the appropriate SQL to drop the given view.
      * It should return something like:
-     * <p>
      * <pre>
      * DROP VIEW FOO
      * </pre>

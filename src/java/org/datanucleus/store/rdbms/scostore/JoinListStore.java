@@ -165,7 +165,7 @@ public class JoinListStore extends AbstractListStore
      * Performs the add in 2 steps.
      * <ol>
      * <li>Shift all existing elements into their new positions so we can insert.</li>
-     * <li>Insert all new elements directly at their desired positions>/li>
+     * <li>Insert all new elements directly at their desired positions</li>
      * </ol>
      * Both steps can be batched (separately).
      * @param op The ObjectProvider

@@ -312,14 +312,14 @@ public class OracleAdapter extends BaseDatastoreAdapter
     /**
      * Provide the existing indexes in the database for the table.
      * This is implemented if and only if the datastore has its own way of getting indexes.
-     * In this implementation we provide an alternate method for Oracle JDBC driver < 10.2.0.1.0 only.
+     * In this implementation we provide an alternate method for Oracle JDBC driver &lt; 10.2.0.1.0 only.
      * All other versions of Oracle will use the default. The schemaName MUST BE PROVIDED.
      * @param conn the JDBC connection
      * @param catalog the catalog name
      * @param schema the schema name.
      * @param table the table name
      * @return a ResultSet with the format @see DatabaseMetaData#getIndexInfo(java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public ResultSet getExistingIndexes(Connection conn, String catalog, String schema, String table) 
     throws SQLException

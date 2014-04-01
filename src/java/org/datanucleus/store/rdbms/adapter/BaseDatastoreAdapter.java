@@ -655,7 +655,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.
-     * @return The options (Collection<String>)
+     * @return The options (Collection&lt;String&gt;)
      */
     public Collection<String> getSupportedOptions()
     {
@@ -1157,7 +1157,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param schema the schema name
      * @param table the table name
      * @return a ResultSet with the format @see DatabaseMetaData#getIndexInfo(java.lang.String, java.lang.String, java.lang.String, boolean, boolean)
-     * @throws SQLException
+     * @throws SQLException if an error occurs
      */
     public ResultSet getExistingIndexes(Connection conn, String catalog, String schema, String table) 
     throws SQLException
@@ -1169,7 +1169,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * Returns the appropriate SQL to create the given table having the given
      * columns. No column constraints or key definitions should be included.
      * It should return something like:
-     * <p>
      * <pre>
      * CREATE TABLE FOO ( BAR VARCHAR(30), BAZ INTEGER )
      * </pre>
@@ -1313,7 +1312,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a primary key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_PK PRIMARY KEY (BAR)
      * ALTER TABLE FOO ADD PRIMARY KEY (BAR)
@@ -1339,7 +1337,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
      * ALTER TABLE FOO ADD UNIQUE (BAZ)
@@ -1365,7 +1362,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Returns the appropriate SQL to add a foreign key to its table.
      * It should return something like:
-     * <p>
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_FK1 FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
      * ALTER TABLE FOO ADD FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
@@ -1468,7 +1464,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Returns the appropriate SQL to drop the given table.
      * It should return something like:
-     * <p>
      * <pre>
      * DROP TABLE FOO CASCADE
      * </pre>
@@ -1484,7 +1479,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Returns the appropriate SQL to drop the given view.
      * It should return something like:
-     * <p>
      * <pre>
      * DROP VIEW FOO
      * </pre>
