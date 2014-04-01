@@ -1382,7 +1382,7 @@ public class JPQLQuery extends AbstractJPQLQuery
     /**
      * Set multiple extensions, or use null to clear extensions.
      * Intercepts any settong of in-memory evaluation, so we can throw away any datastore compilation.
-     * @param extensions
+     * @param extensions Query extensions
      */
     public void setExtensions(Map extensions)
     {

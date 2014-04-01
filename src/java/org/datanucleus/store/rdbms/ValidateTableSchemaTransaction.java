@@ -42,8 +42,10 @@ public class ValidateTableSchemaTransaction extends AbstractSchemaTransaction
     protected TableImpl table;
 
     /**
-     * @param rdbmsMgr
-     * @param isolationLevel
+     * Constructor.
+     * @param rdbmsMgr Store Manager
+     * @param isolationLevel Connection isolation level
+     * @param table The table to validate
      */
     public ValidateTableSchemaTransaction(RDBMSStoreManager rdbmsMgr, int isolationLevel, TableImpl table)
     {

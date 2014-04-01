@@ -783,6 +783,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
      * Method to set the connection pooling type (if any).
      * Tries to use any user-provided value if possible, otherwise will fallback to something
      * available in the CLASSPATH (if any), else use the builtin DBCP.
+     * @param storeMgr Store Manager
      * @param requiredPoolingType Pooling type requested by the user
      * @return Pooling type to use (name of a pool type)
      */

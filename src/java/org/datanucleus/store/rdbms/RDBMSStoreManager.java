@@ -615,7 +615,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Returns the primary datastore table serving as backing for the given class. 
-     * If the class is not yet known to the store manager, {@link #addClass}is called
+     * If the class is not yet known to the store manager, {@link #manageClasses} is called
      * to add it. Classes which have inheritance strategy of "new-table" and
      * "superclass-table" will return a table here, whereas "subclass-table" will
      * return null since it doesn't have a table as such.
@@ -1684,8 +1684,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Utility to validate the specified table.
-     * This is useful where we have made an update to the columns in a table and want to
-     * apply the updates to the datastore.
+     * This is useful where we have made an update to the columns in a table and want to apply the updates to the datastore.
+     * @param table The table to validate
      * @param clr The ClassLoaderResolver
      */
     public void validateTable(final TableImpl table, ClassLoaderResolver clr)
@@ -2375,7 +2375,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param conn JDBC connection to the database.
      * @param column the column
      * @return The ColumnInfo objects describing the column.
-     * @throws SQLException
+     * @throws SQLException Thrown if an error occurs
      */
     public RDBMSColumnInfo getColumnInfoForColumnName(Table table, Connection conn, DatastoreIdentifier column)
     throws SQLException
@@ -2399,7 +2399,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @return A list of ColumnInfo objects describing the columns of the table.
      * The list is in the same order as was supplied by getColumns(). If no
      * column info is found for the given table, an empty list is returned.
-     * @throws SQLException
+     * @throws SQLException Thrown if an error occurs
      */
     public List getColumnInfoForTable(Table table, Connection conn)
     throws SQLException
@@ -2435,9 +2435,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Convenience accessor of the Table objects managed in this datastore at this point.
      * @param catalog Name of the catalog to restrict the collection by
      * @param schema Name of the schema to restrict the collection by
-     * @return Collection<Table>
+     * @return Collection of tables
      */
-    public Collection getManagedTables(String catalog, String schema)
+    public Collection<Table> getManagedTables(String catalog, String schema)
     {
         if (storeDataMgr == null)
         {

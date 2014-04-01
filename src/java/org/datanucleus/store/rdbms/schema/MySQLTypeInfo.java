@@ -26,7 +26,8 @@ import java.sql.Types;
 public class MySQLTypeInfo extends SQLTypeInfo
 {
     /**
-     * @param rs
+     * Constructor
+     * @param rs Result set from the database metadata
      */
     public MySQLTypeInfo(ResultSet rs)
     {

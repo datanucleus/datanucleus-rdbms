@@ -42,10 +42,10 @@ import org.datanucleus.util.StringUtils;
 /**
  * Take a ResultSet, and for each row retrieves an object of a specified type.
  * Follows the rules in JDO2 spec [14.6.12] regarding the result class.
+ * 
  * <P>
  * The <B>resultClass</B> will be used to create objects of that type when calling
  * <I>getObject()</I>. The <B>resultClass</B> can be one of the following
- * </P>
  * <UL>
  * <LI>Simple type - String, Long, Integer, Float, Boolean, Byte, Character, Double,
  * Short, BigDecimal, BigInteger, java.util.Date, java.sql.Date, java.sql.Time, java.sql.Timestamp</LI>
@@ -54,7 +54,7 @@ import org.datanucleus.util.StringUtils;
  * <LI>User defined type with either a constructor taking the result set fields,
  * or a default constructor and setting the fields using a put(Object,Object) method, setXXX methods, or public fields</LI>
  * </UL>
- * </P>
+ *
  * <P>
  * Objects of this class are created in 2 distinct situations. The first is where a
  * candidate class is available, and consequently field position mappings are

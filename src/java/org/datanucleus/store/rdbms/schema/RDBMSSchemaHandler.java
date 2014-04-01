@@ -381,7 +381,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param conn Connection to the database.
      * @param table The table/view
      * @return The table type (consistent with the return from DatabaseMetaData.getTables())
-     * @throws NucleusDataStoreException if an error occurs obtaining the information
+     * @throws SQLException if an error occurs obtaining the information
      */
     public String getTableType(Connection conn, Table table)
     throws SQLException

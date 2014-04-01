@@ -38,11 +38,11 @@ import org.datanucleus.util.StringUtils;
  * <PRE>
  * CLASS                 FIELDNUM     MAPPING            TABLE                COLUMN POSITIONS
  * -----------------     --------     --------------     ----------------     ----------------
- * class A           -->          -->                --> TABLE_A              
+ * class A                                               TABLE_A              
  * {
- *    short fieldA;  --> 1        --> ShortMapping   --> COL_FIELDA       --> 1
- *    String fieldB; --> 2        --> StringMapping  --> COL_FIELDB_PART1 --> 2
- *                   -->          -->                --> COL_FIELDB_PART2 --> 3
+ *    short fieldA;      1            ShortMapping       COL_FIELDA           1
+ *    String fieldB;     2            StringMapping      COL_FIELDB_PART1     2
+ *                                                       COL_FIELDB_PART2     3
  *    ...
  * }
  * </PRE>

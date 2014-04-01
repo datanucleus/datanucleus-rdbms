@@ -131,7 +131,6 @@ import org.datanucleus.util.StringUtils;
  * applies if the variable is (finally) bound using the equality operator (e.g var.field == this.field).
  * The extension should be set to "LEFTOUTERJOIN", "INNERJOIN"</li>
  * </ul>
- * </p>
  */
 public class QueryToSQLMapper extends AbstractExpressionEvaluator implements QueryGenerator
 {
@@ -2607,6 +2606,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      * otherwise we get an XXXLiteral of the (declared) type of the parameter
      * @param expr The ParameterExpression
      * @param asLiteral Whether to create a SQLLiteral rather than a parameter literal
+     * @return The processed expression
      */
     protected Object processParameterExpression(ParameterExpression expr, boolean asLiteral)
     {

@@ -184,17 +184,17 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
      * SELECT {clobColumn} FROM TABLE WHERE ID=? FOR UPDATE
      * </pre>
      * and then updates the Clob value returned.
-     * @param sm ObjectProvider of the object
+     * @param op ObjectProvider of the object
      * @param table Table storing the CLOB column
      * @param mapping Datastore mapping for the CLOB column
      * @param value The value to store in the CLOB
-     * @throws NucleusObjectNotFoundException
-     * @throws NucleusDataStoreException
+     * @throws NucleusObjectNotFoundException Thrown if an object is not found
+     * @throws NucleusDataStoreException Thrown if an error occurs in datastore communication
      */
     @SuppressWarnings("deprecation")
-    public static void updateClobColumn(ObjectProvider sm, Table table, DatastoreMapping mapping, String value)
+    public static void updateClobColumn(ObjectProvider op, Table table, DatastoreMapping mapping, String value)
     {
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = op.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
         DatastoreClass classTable = (DatastoreClass)table; // Don't support join tables yet
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -206,7 +206,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
         sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
         StatementClassMapping mappingDefinition = new StatementClassMapping();
-        AbstractClassMetaData cmd = sm.getClassMetaData();
+        AbstractClassMetaData cmd = op.getClassMetaData();
         int inputParamNum = 1;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
@@ -255,15 +255,15 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
 
         String textStmt = sqlStmt.getSelectStatement().toSQL();
 
-        if (sm.isEmbedded())
+        if (op.isEmbedded())
         {
             // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-            ObjectProvider[] embeddedOwners = sm.getEmbeddedOwners();
+            ObjectProvider[] embeddedOwners = op.getEmbeddedOwners();
             if (embeddedOwners != null)
             {
                 // Just use the first owner
                 // TODO Should check if the owner is stored in this table
-                sm = embeddedOwners[0];
+                op = embeddedOwners[0];
             }
         }
 
@@ -286,13 +286,13 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
                         for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                         {
                             classTable.getDatastoreObjectIdMapping().setObject(ec, ps,
-                                datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
+                                datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }
                     else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        sm.provideFields(cmd.getPKMemberPositions(),
-                            storeMgr.getFieldManagerForStatementGeneration(sm, ps, mappingDefinition));
+                        op.provideFields(cmd.getPKMemberPositions(),
+                            storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                     }
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);
@@ -300,7 +300,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
                     {
                         if (!rs.next())
                         {
-                            throw new NucleusObjectNotFoundException("No such database row", sm.getInternalObjectId());
+                            throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
                         }
 
                         DatastoreAdapter dba = storeMgr.getDatastoreAdapter();

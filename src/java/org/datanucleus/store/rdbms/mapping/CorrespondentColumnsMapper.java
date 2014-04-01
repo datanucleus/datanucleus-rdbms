@@ -37,7 +37,7 @@ import org.datanucleus.util.Localiser;
  * association to the mapping at the other side. The 2 sides of the association are
  * referred to as "sideA" and "sideB". The JDO 2 metadata allows definition
  * of the correspondence using the
- * <column name="{column-name}" target="{target-name}"/> syntax.
+ * &lt;column name="{column-name}" target="{target-name}"/&gt; syntax.
  * <P>
  * This means that the column specified on sideA will be mapped to the specified "target"
  * column on sideB. If no target is provided then the first available sideB column

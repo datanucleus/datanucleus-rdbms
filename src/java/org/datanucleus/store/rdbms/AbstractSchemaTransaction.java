@@ -80,6 +80,7 @@ public abstract class AbstractSchemaTransaction
     /**
      * Returns the current connection for the schema transaction. Creates one if needed
      * @return the connection
+     * @throws SQLException thrown when an error occurs getting the connection
      */
     protected Connection getCurrentConnection() 
     throws SQLException 

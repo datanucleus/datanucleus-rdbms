@@ -89,9 +89,6 @@ public class SQLTypeInfo implements StoreSchemaData
     /** Hashcode. Set on first use. */
     private int hash = 0;
 
-    /**
-     * Constructor to create a type info definition from the passed values.
-     */
     public SQLTypeInfo(String typeName,
             short dataType,
             int precision,

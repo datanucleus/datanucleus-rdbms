@@ -59,7 +59,6 @@ import java.util.Map;
  * In this example we have a persistable object as candidate, and it has 2 1-1 relations (field=1, field=2).
  * These are both being retrieved in the same query, hence the sub-mappings. Note that the column(s) of the FK
  * in the owner object is the same as the PK field(s) of the related object.
- * </p>
  */
 public class StatementClassMapping
 {

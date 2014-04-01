@@ -124,7 +124,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
      * @param rs the ResultSet from the query
      * @param param the index in the query
      * @return the object loaded as a byte[]
-     * @throws NucleusDataStoreException
+     * @throws NucleusDataStoreException Thrown if an error occurs in datastore communication
      */
     public Object getObject(ResultSet rs, int param)
     {
@@ -305,8 +305,8 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
      * @param table Table storing the BLOB column
      * @param mapping Datastore mapping for the BLOB column
      * @param bytes The bytes to store in the BLOB
-     * @throws NucleusObjectNotFoundException
-     * @throws NucleusDataStoreException
+     * @throws NucleusObjectNotFoundException thrown if an object isnt found
+     * @throws NucleusDataStoreException thrown if an error occurs in datastore communication
      */
     @SuppressWarnings("deprecation")
     public static void updateBlobColumn(ObjectProvider sm, Table table,

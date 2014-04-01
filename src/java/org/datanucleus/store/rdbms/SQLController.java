@@ -43,7 +43,7 @@ import org.datanucleus.util.StringUtils;
  * be batched and hence give much speed benefit.</li>
  * <li><b>Queries</b> : SELECT statements that can provide flexibility in the capabilities of ResultSet.</li>
  * </ul>
- * </p>
+ * 
  * <p>
  * An "update" statement can be batched. When getting the PreparedStatement the calling method passes in an argument
  * to signify if it can be batched (whether it will use the statement before any other statement can execute), and if so
@@ -53,7 +53,7 @@ import org.datanucleus.util.StringUtils;
  * batched then it will be returned the current statement so that it can populate it with its values. When the statement
  * is ready for processing since it is in the cache the new values are added to the batch. Again the statement could be
  * executed at that point or could continue batching.
- * </p>
+ *
  * <p>
  * Typical (unbatched) invocation would be as follows :-
  * <pre>
@@ -62,6 +62,7 @@ import org.datanucleus.util.StringUtils;
  * sql.executeStatementUpdate(myStmt, ps, true); // Execute now, dont wait
  * sql.closeStatement(ps);
  * </pre>
+ *
  * <p>
  * Typical (batched) invocation would be as follows :-
  * <pre>
@@ -74,9 +75,9 @@ import org.datanucleus.util.StringUtils;
  * sql.executeStatementUpdate(myStmt, ps, false); // Execute later
  * sql.closeStatement(ps);
  * </pre>
+ * 
  * <p>
  * Things to note :-
- * </p>
  * <ul>
  * <li>Batching only takes place if the underlying datastore supports it, and if the maximum batch size is not reached.</li>
  * <li>When ExecutionContext.flush() is called the RDBMSManager will call "processStatementsForConnection"
@@ -379,6 +380,7 @@ public class SQLController
     /**
      * Method to execute a PreparedStatement update.
      * Prints logging information about timings.
+     * @param ec ExecutionContext
      * @param conn The connection (required since the one on PreparedStatement is not always the same so we cant use it)
      * @param stmt The statement text
      * @param ps The Prepared Statement
@@ -512,6 +514,7 @@ public class SQLController
     /**
      * Method to execute a PreparedStatement query, and return the ResultSet.
      * Prints logging information about timings.
+     * @param ec ExecutionContext
      * @param conn The connection (required since the one on PreparedStatement is not always the same so we can't use it)
      * @param stmt The statement text
      * @param ps The Prepared Statement

@@ -534,6 +534,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param javaType Class to query
      * @param serialised Whether the field is serialised
      * @param embedded Whether the field is embedded
+     * @param colmds Metadata for column(s) (optional)
      * @param fieldName The full field name (for logging only)
      * @return The mapping class for the class
      **/
@@ -667,7 +668,8 @@ public class RDBMSMappingManager implements MappingManager
      * Convenience accessor for the element mapping for the element of a collection/array of elements.
      * Currently only used where the collection/array elements are serialised/embedded into a join table.
      * @param table The table
-     * @param mmd MetaData for the collection field/property containing the collection/array of PCs
+     * @param mmd MetaData for the collection member containing the collection/array of PCs
+     * @param fieldRole role of this mapping for this member
      * @param clr ClassLoader resolver
      * @return The mapping
      */
@@ -1102,6 +1104,7 @@ public class RDBMSMappingManager implements MappingManager
     /**
      * Method to return the default java type mapping class for a specified java type.
      * @param javaType java type
+     * @param colmds Metadata for the column(s) (optional)
      * @return The mapping class to use (by default)
      */
     protected MappingConverterDetails getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)

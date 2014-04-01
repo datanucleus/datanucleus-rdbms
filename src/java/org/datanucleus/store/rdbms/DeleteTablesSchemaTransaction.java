@@ -51,8 +51,10 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
     Writer writer;
 
     /**
-     * @param rdbmsMgr
-     * @param isolationLevel
+     * Constructor.
+     * @param rdbmsMgr Store manager
+     * @param isolationLevel Connection isolation level
+     * @param dataMgr StoreData manager
      */
     public DeleteTablesSchemaTransaction(RDBMSStoreManager rdbmsMgr, int isolationLevel, StoreDataManager dataMgr)
     {
