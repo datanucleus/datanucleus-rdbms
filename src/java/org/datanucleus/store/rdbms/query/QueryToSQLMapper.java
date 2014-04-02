@@ -147,6 +147,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     final AbstractClassMetaData candidateCmd;
 
+    final boolean subclasses;
+
     final QueryCompilation compilation;
 
     /** Input parameter values, keyed by the parameter name. Will be null if compiled pre-execution. */
@@ -253,7 +255,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     public QueryToSQLMapper(SQLStatement stmt, QueryCompilation compilation, Map parameters,
             StatementClassMapping resultDefForClass, StatementResultMapping resultDef,
-            AbstractClassMetaData cmd, FetchPlan fetchPlan, ExecutionContext ec, Imports importsDefinition,
+            AbstractClassMetaData cmd, boolean subclasses, FetchPlan fetchPlan, ExecutionContext ec, Imports importsDefinition,
             Set<String> options, Map<String, Object> extensions)
     {
         this.parameters = parameters;
@@ -261,11 +263,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         this.stmt = stmt;
         this.resultDefinitionForClass = resultDefForClass;
         this.resultDefinition = resultDef;
+        this.candidateCmd = cmd;
         this.candidateAlias = compilation.getCandidateAlias();
+        this.subclasses = subclasses;
         this.fetchPlan = fetchPlan;
         this.storeMgr = stmt.getRDBMSManager();
         this.exprFactory = stmt.getRDBMSManager().getSQLExpressionFactory();
-        this.candidateCmd = cmd;
         this.ec = ec;
         this.clr = ec.getClassLoaderResolver();
         this.importsDefinition = importsDefinition;
@@ -787,6 +790,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 fetchPlan.setGroup("all");
             }
 
+            if (subclasses)
+            {
+                // TODO Check for special case of candidate+subclasses stores in same table with discriminator, so select FetchGroup of subclasses also
+            }
+
             if (options.contains(OPTION_SELECT_CANDIDATE_ID_ONLY))
             {
                 SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
@@ -804,7 +812,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, 
                     candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
             }
-            // TODO For special case of candidate and all subclasses in same table, include FetchGroup of subclasses too
             else
             {
                 // Select identity of the candidates since use different base tables
@@ -3355,7 +3362,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             SQLStatement subStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, stmt, subCmd,
                 null, ec, subCompilation.getCandidateClass(), true, "avg(something)", subAlias, null);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(subStmt, subCompilation, parameters,
-                null, subqueryResultMapping, subCmd, fetchPlan, ec, importsDefinition, options,
+                null, subqueryResultMapping, subCmd, true, fetchPlan, ec, importsDefinition, options,
                 extensionsByName);
             sqlMapper.setParentMapper(this);
             sqlMapper.compile();

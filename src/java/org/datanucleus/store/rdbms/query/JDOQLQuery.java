@@ -932,7 +932,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         options.add(QueryToSQLMapper.OPTION_BULK_UPDATE_VERSION);
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters,
             datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
-            candidateCmd, getFetchPlan(), ec, getParsedImports(), options, extensions);
+            candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
         sqlMapper.compile();
         datastoreCompilation.setParameterNameByPosition(sqlMapper.getParameterNameByPosition());
         datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
@@ -1214,7 +1214,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, getFetchPlan(), ec, null, options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1321,7 +1321,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, getFetchPlan(), ec, null, options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 

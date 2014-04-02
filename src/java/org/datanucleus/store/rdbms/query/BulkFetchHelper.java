@@ -140,7 +140,7 @@ public class BulkFetchHelper
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, query.getCompilation(), parameters,
-                null, null, candidateCmd, query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());
+                null, null, candidateCmd, query.isSubclasses(), query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
@@ -173,7 +173,7 @@ public class BulkFetchHelper
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, query.getCompilation(), parameters,
-                null, null, candidateCmd, query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());
+                null, null, candidateCmd, query.isSubclasses(), query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query

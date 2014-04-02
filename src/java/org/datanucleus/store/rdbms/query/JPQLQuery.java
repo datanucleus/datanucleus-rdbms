@@ -858,7 +858,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters,
             datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
-            candidateCmd, getFetchPlan(), ec, null, options, extensions);
+            candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
         sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
         sqlMapper.compile();
         datastoreCompilation.setParameterNameByPosition(sqlMapper.getParameterNameByPosition());
@@ -1010,7 +1010,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, getFetchPlan(), ec, getParsedImports(), options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
@@ -1042,7 +1042,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, getFetchPlan(), ec, getParsedImports(), options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
             sqlMapper.compile();
 
             // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
@@ -1234,7 +1234,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, getFetchPlan(), ec, null, options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1343,7 +1343,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, getFetchPlan(), ec, null, options, extensions);
+                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
