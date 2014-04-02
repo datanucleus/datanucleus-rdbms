@@ -804,11 +804,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, 
                     candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
             }
+            // TODO For special case of candidate and all subclasses in same table, include FetchGroup of subclasses too
             else
             {
                 // Select identity of the candidates since use different base tables
-                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, 
-                    candidateCmd);
+                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
             }
         }
         compileComponent = null;
