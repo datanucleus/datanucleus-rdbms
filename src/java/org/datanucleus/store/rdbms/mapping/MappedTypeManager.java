@@ -162,7 +162,7 @@ public class MappedTypeManager
                 String javaVersion = elems[i].getAttribute("java-version");
                 if (StringUtils.isWhitespace(javaVersion))
                 {
-                    javaVersion = "1.3";
+                    javaVersion = "1.7";
                 }
 
                 if (!mappedTypes.containsKey(javaName)) // Use "priority" attribute to be placed higher in the list
