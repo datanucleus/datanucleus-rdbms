@@ -54,7 +54,6 @@ import org.datanucleus.store.rdbms.connectionpool.ConnectionPool;
 import org.datanucleus.store.rdbms.connectionpool.ConnectionPoolFactory;
 import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.transaction.TransactionUtils;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -837,16 +836,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         if (poolingType == null)
         {
-            if (JavaUtils.isJRE1_6OrAbove())
-            {
-                // Fallback to built-in DBCP (JDK1.6+)
-                poolingType = "dbcp-builtin";
-            }
-            else
-            {
-                // Fallback to None
-                poolingType = "None";
-            }
+            // Fallback to built-in DBCP (JDK1.6+)
+            poolingType = "dbcp-builtin";
         }
         return poolingType;
     }
