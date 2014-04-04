@@ -161,4 +161,9 @@ public abstract class DelegatedExpression extends SQLExpression
     {
         return delegate;
     }
+
+    public boolean isParameter()
+    {
+        return delegate.isParameter();
+    }
 }
