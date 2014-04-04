@@ -912,7 +912,11 @@ Contributors:
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
 
-        <!-- Fallback for types with a Date/String/Long-based converter and no explicit mapping -->
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterExpression"/>
+
+        <!-- Fallback for types with a Date/String/Long-based converter and no explicit mapping. TODO Remove these when TypeConverterExpression above works for all -->
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterStringMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
