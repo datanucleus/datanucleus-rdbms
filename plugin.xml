@@ -915,6 +915,9 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.TypeConverterMultiMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterMultiLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.TypeConverterMultiExpression"/>
     </extension>
 
     <!-- SQL METHODS -->
