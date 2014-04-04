@@ -105,6 +105,11 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         }
     }
 
+    public TypeConverter getTypeConverter()
+    {
+        return converter;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.mapping.JavaTypeMapping#getJavaType()
      */

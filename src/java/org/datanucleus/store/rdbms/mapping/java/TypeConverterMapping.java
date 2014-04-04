@@ -77,6 +77,11 @@ public class TypeConverterMapping extends SingleFieldMapping
         super.initialize(mmd, table, clr);
     }
 
+    public TypeConverter getTypeConverter()
+    {
+        return converter;
+    }
+
     /**
      * Accessor for the name of the java-type actually used when mapping the particular datastore
      * field. This java-type must have an entry in the datastore mappings.
