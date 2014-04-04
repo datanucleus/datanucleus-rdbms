@@ -69,13 +69,8 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedValuePCMapping;
-import org.datanucleus.store.rdbms.mapping.java.TypeConverterLongMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterMultiMapping;
-import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlDateMapping;
-import org.datanucleus.store.rdbms.mapping.java.TypeConverterSqlTimeMapping;
-import org.datanucleus.store.rdbms.mapping.java.TypeConverterStringMapping;
-import org.datanucleus.store.rdbms.mapping.java.TypeConverterTimestampMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -83,7 +78,6 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
@@ -352,27 +346,8 @@ public class RDBMSMappingManager implements MappingManager
 
             if (conv != null)
             {
-                // Converter set, either by name or autoApply, so use the associated mapping
-                // Note that uses TypeConverterStringMapping/TypeConverterLongMapping for use in queries
-                Class mc = null;
-                if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == String.class)
-                {
-                    mc = TypeConverterStringMapping.class;
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Long.class)
-                {
-                    mc = TypeConverterLongMapping.class;
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, mmd.getType()) == Timestamp.class)
-                {
-                    mc = TypeConverterTimestampMapping.class;
-                }
-                else
-                {
-                    mc = TypeConverterMapping.class;
-                }
-
                 // Create the mapping of the selected type
+                Class mc = TypeConverterMapping.class;
                 JavaTypeMapping m = null;
                 try
                 {
@@ -1142,45 +1117,31 @@ public class RDBMSMappingManager implements MappingManager
                     if (jdbcType != null)
                     {
                         // JDBC type specified so don't just take the default
+                        TypeConverter conv = null;
                         if (MetaDataUtils.isJdbcTypeString(jdbcType))
                         {
-                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, String.class);
-                            if (conv != null)
-                            {
-                                return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
-                            }
+                            conv = typeMgr.getTypeConverterForType(javaType, String.class);
                         }
                         else if (MetaDataUtils.isJdbcTypeNumeric(jdbcType))
                         {
-                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Long.class);
-                            if (conv != null)
-                            {
-                                return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
-                            }
+                            conv = typeMgr.getTypeConverterForType(javaType, Long.class);
                         }
                         else if (jdbcType == JdbcType.TIMESTAMP)
                         {
-                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Timestamp.class);
-                            if (conv != null)
-                            {
-                                return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
-                            }
+                            conv = typeMgr.getTypeConverterForType(javaType, Timestamp.class);
                         }
                         else if (jdbcType == JdbcType.TIME)
                         {
-                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Time.class);
-                            if (conv != null)
-                            {
-                                return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
-                            }
+                            conv = typeMgr.getTypeConverterForType(javaType, Time.class);
                         }
                         else if (jdbcType == JdbcType.DATE)
                         {
-                            TypeConverter conv = typeMgr.getTypeConverterForType(javaType, Date.class);
-                            if (conv != null)
-                            {
-                                return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
-                            }
+                            conv = typeMgr.getTypeConverterForType(javaType, Date.class);
+                        }
+
+                        if (conv != null)
+                        {
+                            return new MappingConverterDetails(TypeConverterMapping.class, conv);
                         }
                     }
                 }
@@ -1193,29 +1154,8 @@ public class RDBMSMappingManager implements MappingManager
                 {
                     return new MappingConverterDetails(TypeConverterMultiMapping.class, conv);
                 }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == String.class)
-                {
-                    return new MappingConverterDetails(TypeConverterStringMapping.class, conv);
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Long.class)
-                {
-                    return new MappingConverterDetails(TypeConverterLongMapping.class, conv);
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Timestamp.class)
-                {
-                    return new MappingConverterDetails(TypeConverterTimestampMapping.class, conv);
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Time.class)
-                {
-                    return new MappingConverterDetails(TypeConverterSqlTimeMapping.class, conv);
-                }
-                else if (TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, javaType) == Date.class)
-                {
-                    return new MappingConverterDetails(TypeConverterSqlDateMapping.class, conv);
-                }
                 else
                 {
-                    // Fallback to TypeConverterMapping
                     return new MappingConverterDetails(TypeConverterMapping.class, conv);
                 }
             }
