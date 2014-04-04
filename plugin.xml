@@ -927,6 +927,8 @@ Contributors:
         <sql-method method="asin" evaluator="org.datanucleus.store.rdbms.sql.method.AsinFunction"/>
         <sql-method method="atan" evaluator="org.datanucleus.store.rdbms.sql.method.AtanFunction"/>
         <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
+        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
+        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
         <sql-method method="ceil" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
         <sql-method method="cos" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
         <sql-method method="count" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
@@ -944,6 +946,8 @@ Contributors:
         <sql-method method="ASIN" evaluator="org.datanucleus.store.rdbms.sql.method.AsinFunction"/>
         <sql-method method="ATAN" evaluator="org.datanucleus.store.rdbms.sql.method.AtanFunction"/>
         <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
+        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
+        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
         <sql-method method="CEIL" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
         <sql-method method="COS" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
         <sql-method method="COUNT" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>

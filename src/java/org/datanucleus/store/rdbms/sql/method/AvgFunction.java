@@ -26,7 +26,6 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 
 /**
  * Expression handler to invoke the SQL AVG aggregation function.
@@ -56,13 +55,14 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
         // Set the return type (double, for JDOQL and JPQL)
         Class returnType = Double.class;
-
+        
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
             stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
         {
             // FUNC(argExpr)
             JavaTypeMapping m = getMappingForClass(returnType);
-            return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
+
+             return getAggregateExpression(args, m);
         }
         else
         {
@@ -74,9 +74,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
             JavaTypeMapping mapping =
                 stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-            String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
-            SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
-            ((StringLiteral)aggExpr).generateStatementWithoutQuotes();
+            SQLExpression aggExpr = getAggregateExpression(args, mapping);
             subStmt.select(aggExpr, null);
 
             JavaTypeMapping subqMapping = exprFactory.getMappingForType(returnType, false);
@@ -84,6 +82,11 @@ public class AvgFunction extends SimpleNumericAggregateMethod
             subqExpr.setJavaTypeMapping(subqMapping);
             return subqExpr;
         }
+    }
+
+    protected SQLExpression getAggregateExpression(List args, JavaTypeMapping m)
+    {
+        return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
     }
 
     /* (non-Javadoc)
