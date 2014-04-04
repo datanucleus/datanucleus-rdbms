@@ -929,6 +929,7 @@ Contributors:
         <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
         <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
         <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
+        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="derby"/>
         <sql-method method="ceil" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
         <sql-method method="cos" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
         <sql-method method="count" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
@@ -948,6 +949,7 @@ Contributors:
         <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
         <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
         <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
+        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="derby"/>
         <sql-method method="CEIL" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
         <sql-method method="COS" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
         <sql-method method="COUNT" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
