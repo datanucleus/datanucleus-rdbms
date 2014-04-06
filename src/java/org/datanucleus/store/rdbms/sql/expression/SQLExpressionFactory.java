@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.ConfigurationElement;
@@ -304,8 +305,7 @@ public class SQLExpressionFactory
      * @param args Any arguments to the method call
      * @return The result
      */
-    public SQLExpression invokeMethod(SQLStatement stmt, String className, String methodName,
-            SQLExpression expr, List args)
+    public SQLExpression invokeMethod(SQLStatement stmt, String className, String methodName, SQLExpression expr, List args)
     {
         String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
 
@@ -349,8 +349,16 @@ public class SQLExpressionFactory
                     {
                         if (methodKey.methodName.equals(methodName) && methodKey.datastoreName.equals(datastoreId))
                         {
-                            Class methodCls = clr.classForName(methodKey.clsName);
-                            if (methodCls.isAssignableFrom(cls))
+                            Class methodCls = null;
+                            try
+                            {
+                                methodCls = clr.classForName(methodKey.clsName);
+                            }
+                            catch (ClassNotResolvedException cnre)
+                            {
+                                // Maybe generic array support?
+                            }
+                            if (methodCls != null && methodCls.isAssignableFrom(cls))
                             {
                                 // This one is usable here, for superclass
                                 method = methodByClassMethodName.get(methodKey);
@@ -379,8 +387,16 @@ public class SQLExpressionFactory
                         {
                             if (methodKey.methodName.equals(methodName) && methodKey.datastoreName.equals("ALL"))
                             {
-                                Class methodCls = clr.classForName(methodKey.clsName);
-                                if (methodCls.isAssignableFrom(cls))
+                                Class methodCls = null;
+                                try
+                                {
+                                    methodCls = clr.classForName(methodKey.clsName);
+                                }
+                                catch (ClassNotResolvedException cnre)
+                                {
+                                    // Maybe generic array support?
+                                }
+                                if (methodCls != null && methodCls.isAssignableFrom(cls))
                                 {
                                     // This one is usable here, for superclass
                                     method = methodByClassMethodName.get(methodKey);
