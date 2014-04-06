@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
+import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -34,7 +35,6 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.types.simple.Map;
 
 /**
  * Method for evaluating {mapExpr}.size().
