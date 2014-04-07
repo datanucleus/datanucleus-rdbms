@@ -1140,6 +1140,7 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.CollectionSizeMethod"/>
         <sql-method class="java.util.Collection" method="get"
             evaluator="org.datanucleus.store.rdbms.sql.method.ListGetMethod"/>
+
         <sql-method class="java.util.Date" method="getDay"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDayMethod"/>
         <sql-method class="java.util.Date" method="getDay" datastore="oracle"
@@ -1188,6 +1189,7 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond3Method"/>
         <sql-method class="java.util.Date" method="getSecond" datastore="sqlserver"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond4Method"/>
+
         <sql-method class="java.util.Map" method="containsEntry"
             evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsEntryMethod"/>
         <sql-method class="java.util.Map" method="containsKey"
