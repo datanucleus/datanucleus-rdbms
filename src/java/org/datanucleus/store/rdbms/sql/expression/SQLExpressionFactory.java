@@ -296,8 +296,6 @@ public class SQLExpressionFactory
     /**
      * Accessor for the result of a method call on the supplied expression with the supplied args.
      * Throws a NucleusException is the method is not supported.
-     * Note that if the class name passed in is not for a listed class with that method defined then
-     * will check all remaining defined methods for a superclass. TODO Make more efficient lookups
      * @param stmt SQLStatement that this relates to
      * @param className Class we are invoking the method on
      * @param methodName Name of the method
@@ -306,6 +304,30 @@ public class SQLExpressionFactory
      * @return The result
      */
     public SQLExpression invokeMethod(SQLStatement stmt, String className, String methodName, SQLExpression expr, List args)
+    {
+        SQLMethod method = getMethod(className, methodName, args);
+        if (method != null)
+        {
+            synchronized (method) // Only permit sole usage at any time
+            {
+                method.setStatement(stmt);
+                return method.getExpression(expr, args);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Accessor for the method defined by the class/method names and supplied args.
+     * Throws a NucleusException is the method is not supported.
+     * Note that if the class name passed in is not for a listed class with that method defined then
+     * will check all remaining defined methods for a superclass. TODO Make more efficient lookups
+     * @param className Class we are invoking the method on
+     * @param methodName Name of the method
+     * @param args Any arguments to the method call
+     * @return The method
+     */
+    public SQLMethod getMethod(String className, String methodName, List args)
     {
         String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
 
@@ -321,12 +343,7 @@ public class SQLExpressionFactory
         }
         if (method != null)
         {
-            // Reuse method, setting statement for this usage
-            synchronized (method) // Only permit sole usage at any time
-            {
-                method.setStatement(stmt);
-                return method.getExpression(expr, args);
-            }
+            return method;
         }
 
         // No cached instance of the SQLMethod so find and instantiate it
@@ -364,12 +381,7 @@ public class SQLExpressionFactory
                                 method = methodByClassMethodName.get(methodKey);
                                 if (method != null)
                                 {
-                                    // Reuse method, setting statement for this usage
-                                    synchronized (method) // Only permit sole usage at any time
-                                    {
-                                        method.setStatement(stmt);
-                                        return method.getExpression(expr, args);
-                                    }
+                                    return method;
                                 }
 
                                 className = methodKey.clsName;
@@ -402,12 +414,7 @@ public class SQLExpressionFactory
                                     method = methodByClassMethodName.get(methodKey);
                                     if (method != null)
                                     {
-                                        // Reuse method, setting statement for this usage
-                                        synchronized (method) // Only permit sole usage at any time
-                                        {
-                                            method.setStatement(stmt);
-                                            return method.getExpression(expr, args);
-                                        }
+                                        return method;
                                     }
 
                                     className = methodKey.clsName;
@@ -435,6 +442,7 @@ public class SQLExpressionFactory
             }
         }
 
+        // Fallback to plugin lookup of class+method[+datastore]
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
         String[] attrNames = 
             (datastoreDependent ? new String[] {"class", "method", "datastore"} : new String[] {"class", "method"});
@@ -442,16 +450,14 @@ public class SQLExpressionFactory
             (datastoreDependent ? new String[] {className, methodName, datastoreId} : new String[] {className, methodName});
         try
         {
-            // Use SQLMethod().getExpression(SQLExpression, args)
-            SQLMethod evaluator = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", 
+            method = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", 
                 attrNames, attrValues, "evaluator", new Class[]{}, new Object[]{});
-            evaluator.setStatement(stmt);
+
+            // Register the method
             MethodKey key = getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName);
-            synchronized (evaluator)
-            {
-                methodByClassMethodName.put(key, evaluator);
-                return evaluator.getExpression(expr, args);
-            }
+            methodByClassMethodName.put(key, method);
+
+            return method;
         }
         catch (Exception e)
         {
