@@ -38,7 +38,7 @@ import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.store.types.wrapper.backed.BackedSCO;
+import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.NucleusLogger;
 
 /**
