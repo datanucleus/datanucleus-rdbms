@@ -36,13 +36,12 @@ public class EnumOrdinalMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (expr instanceof EnumLiteral)
         {
             Enum val = (Enum)((EnumLiteral)expr).getValue();
-            return new IntegerLiteral(stmt,
-                exprFactory.getMappingForType(int.class, false), val.ordinal(), null);
+            return new IntegerLiteral(stmt, exprFactory.getMappingForType(int.class, false), val.ordinal(), null);
         }
         else if (expr instanceof EnumExpression)
         {

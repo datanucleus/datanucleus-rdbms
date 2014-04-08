@@ -38,7 +38,7 @@ public class StringToUpperMethod extends SimpleStringMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && !args.isEmpty())
         {

@@ -44,7 +44,7 @@ public class StringMatchesMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() > 2)
         {
@@ -56,7 +56,7 @@ public class StringMatchesMethod extends AbstractSQLMethod
             throw new NucleusException("Incorrect arguments for String.matches(StringExpression)");
         }
 
-        SQLExpression likeExpr = (SQLExpression) args.get(0);
+        SQLExpression likeExpr = args.get(0);
         if (!(likeExpr instanceof StringExpression) &&
             !(likeExpr instanceof CharacterExpression) &&
             !(likeExpr instanceof ParameterLiteral))
@@ -67,7 +67,7 @@ public class StringMatchesMethod extends AbstractSQLMethod
         SQLExpression escapeExpr = null;
         if (args.size() > 1)
         {
-            escapeExpr = (SQLExpression)args.get(1);
+            escapeExpr = args.get(1);
         }
 
         if ((likeExpr instanceof StringLiteral || likeExpr instanceof ParameterLiteral) && likeExpr.isParameter())

@@ -41,7 +41,7 @@ public class StringSubstring3Method extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -51,7 +51,7 @@ public class StringSubstring3Method extends AbstractSQLMethod
         else if (args.size() == 1)
         {
             // {stringExpr}.substring(numExpr1)
-            SQLExpression startExpr = (SQLExpression)args.get(0);
+            SQLExpression startExpr = args.get(0);
             if (!(startExpr instanceof NumericExpression) &&
                 !(startExpr instanceof IntegerLiteral) &&
                 !(startExpr instanceof ParameterLiteral))
@@ -70,13 +70,13 @@ public class StringSubstring3Method extends AbstractSQLMethod
         else
         {
             // {stringExpr}.substring(numExpr1, numExpr2)
-            SQLExpression startExpr = (SQLExpression)args.get(0);
+            SQLExpression startExpr = args.get(0);
             if (!(startExpr instanceof NumericExpression))
             {
                 throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 0,
                     "NumericExpression"));
             }
-            SQLExpression endExpr = (SQLExpression)args.get(1);
+            SQLExpression endExpr = args.get(1);
             if (!(endExpr instanceof NumericExpression))
             {
                 throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 1,

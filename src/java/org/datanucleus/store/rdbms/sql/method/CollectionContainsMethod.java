@@ -61,7 +61,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -70,7 +70,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
         CollectionExpression collExpr = (CollectionExpression)expr;
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
-        SQLExpression elemExpr = (SQLExpression)args.get(0);
+        SQLExpression elemExpr = args.get(0);
         if (elemExpr.isParameter())
         {
             // Element is a parameter so make sure its type is set

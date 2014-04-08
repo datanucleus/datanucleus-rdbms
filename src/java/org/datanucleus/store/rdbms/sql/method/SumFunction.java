@@ -40,7 +40,7 @@ public class SumFunction extends SimpleNumericAggregateMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -48,29 +48,22 @@ public class SumFunction extends SimpleNumericAggregateMethod
             {
                 throw new NucleusException(getFunctionName() + " is only supported with a single argument");
             }
+
+            // Use same java type as the argument
+            SQLExpression argExpr = args.get(0);
             JavaTypeMapping m = null;
-            if (args.get(0) instanceof SQLExpression)
+            Class cls = argExpr.getJavaTypeMapping().getJavaType();
+            if (cls == Integer.class || cls == Short.class || cls == Long.class)
             {
-                // Use same java type as the argument
-                SQLExpression argExpr = (SQLExpression)args.get(0);
-                Class cls = argExpr.getJavaTypeMapping().getJavaType();
-                if (cls == Integer.class || cls == Short.class || cls == Long.class)
-                {
-                    m = getMappingForClass(Long.class);
-                }
-                else if (Number.class.isAssignableFrom(cls))
-                {
-                    m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
-                }
-                else
-                {
-                    throw new NucleusUserException("Cannot perform static SUM with arg of type " + cls.getName());
-                }
+                m = getMappingForClass(Long.class);
+            }
+            else if (Number.class.isAssignableFrom(cls))
+            {
+                m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
             }
             else
             {
-                // Fallback to the type for this aggregate
-                m = getMappingForClass(getClassForMapping());
+                throw new NucleusUserException("Cannot perform static SUM with arg of type " + cls.getName());
             }
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }

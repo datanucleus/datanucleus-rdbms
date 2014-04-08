@@ -46,7 +46,7 @@ public class ListGetMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -64,7 +64,7 @@ public class ListGetMethod extends AbstractSQLMethod
             throw new UnsupportedOperationException("Query contains " + expr + ".get(int) yet the field is not an 'indexed' List!");
         }
 
-        SQLExpression idxExpr = (SQLExpression)args.get(0);
+        SQLExpression idxExpr = args.get(0);
         if (idxExpr instanceof SQLLiteral)
         {
             if (!(((SQLLiteral)idxExpr).getValue() instanceof Number))

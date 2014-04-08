@@ -33,7 +33,7 @@ public interface SQLMethod
      * @param args Arguments passed in
      * @return The SQL expression using the SQL function
      */
-    public SQLExpression getExpression(SQLExpression expr, List args);
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args);
 
     /**
      * Method to set the SQLStatement that we are related to.

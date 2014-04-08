@@ -39,13 +39,13 @@ public class CurrentDateFunction extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
             // Assume that we have something like "CURRENT_DATE()"
-            SQLExpression dateExpr = 
-                new TemporalExpression(stmt, getMappingForClass(getClassForMapping()), getFunctionName(), args);
+            SQLExpression dateExpr = new TemporalExpression(stmt, getMappingForClass(getClassForMapping()), getFunctionName(), args);
+
             // Update the SQL manually since the default is to add brackets after the name
             dateExpr.toSQLText().clearStatement();
             dateExpr.toSQLText().append(getFunctionName());

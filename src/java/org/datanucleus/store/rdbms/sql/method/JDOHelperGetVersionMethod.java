@@ -44,14 +44,14 @@ public class JDOHelperGetVersionMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List args)
+    public SQLExpression getExpression(SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0)
         {
             throw new NucleusUserException("Cannot invoke JDOHelper.getVersion without an argument");
         }
 
-        SQLExpression expr = (SQLExpression)args.get(0);
+        SQLExpression expr = args.get(0);
         if (expr == null)
         {
             throw new NucleusUserException("Cannot invoke JDOHelper.getVersion on null expression");

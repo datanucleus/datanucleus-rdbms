@@ -54,7 +54,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -62,7 +62,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         }
 
         MapExpression mapExpr = (MapExpression)expr;
-        SQLExpression valExpr = (SQLExpression)args.get(0);
+        SQLExpression valExpr = args.get(0);
 
         if (valExpr.isParameter())
         {

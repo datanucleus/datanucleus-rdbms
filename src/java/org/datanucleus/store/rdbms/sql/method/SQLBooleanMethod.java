@@ -37,14 +37,14 @@ public class SQLBooleanMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List args)
+    public SQLExpression getExpression(SQLExpression ignore, List <SQLExpression>args)
     {
         if (args == null || args.size() != 1)
         {
             throw new NucleusUserException("Cannot invoke SQL_boolean() without a string argument");
         }
 
-        SQLExpression expr = (SQLExpression)args.get(0);
+        SQLExpression expr = args.get(0);
         if (!(expr instanceof StringLiteral))
         {
            throw new NucleusUserException("Cannot use SQL_boolean() without string argument");

@@ -38,7 +38,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -51,7 +51,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
             ArrayList funcArgs = new ArrayList();
-            SQLExpression substrExpr = (SQLExpression)args.get(0);
+            SQLExpression substrExpr = args.get(0);
             if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
@@ -63,7 +63,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
             funcArgs.add(expr);
             if (args.size() == 2)
             {
-                SQLExpression fromExpr = (SQLExpression)args.get(1);
+                SQLExpression fromExpr = args.get(1);
                 if (!(fromExpr instanceof NumericExpression))
                 {
                     throw new NucleusException(LOCALISER.msg("060003", "indexOf", "StringExpression", 1,

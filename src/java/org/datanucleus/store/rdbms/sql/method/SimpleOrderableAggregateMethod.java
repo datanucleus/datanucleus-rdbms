@@ -46,7 +46,7 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (expr != null)
         {
@@ -61,33 +61,22 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
             stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
         {
             // FUNC(argExpr)
-            JavaTypeMapping m = null;
-            if (args.get(0) instanceof SQLExpression)
+            // Use same java type as the argument
+            SQLExpression argExpr = args.get(0);
+            JavaTypeMapping m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
+            if (args.get(0) instanceof TemporalExpression)
             {
-                // Use same java type as the argument
-                SQLExpression argExpr = (SQLExpression)args.get(0);
-                m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
-                if (args.get(0) instanceof TemporalExpression)
-                {
-                    return new AggregateTemporalExpression(stmt, m, getFunctionName(), args);
-                }
-                else
-                {
-                    return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
-                }
+                return new AggregateTemporalExpression(stmt, m, getFunctionName(), args);
             }
             else
             {
-                // What is coming through here?
-                // Fallback to the type for this aggregate TODO Allow for temporal types
-                m = getMappingForClass(double.class);
                 return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
             }
         }
         else
         {
             // Handle as Subquery "SELECT AVG(expr) FROM tbl"
-            SQLExpression argExpr = (SQLExpression)args.get(0);
+            SQLExpression argExpr = args.get(0);
             SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
                 argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
             subStmt.setClassLoaderResolver(clr);

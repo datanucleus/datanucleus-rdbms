@@ -34,7 +34,7 @@ public class StringTrim3Method extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 1)
         {
@@ -46,7 +46,7 @@ public class StringTrim3Method extends AbstractSQLMethod
             SQLExpression trimCharExpr = null;
             if (args != null && args.size() > 0)
             {
-                trimCharExpr = (SQLExpression)args.get(0);
+                trimCharExpr = args.get(0);
             }
 
             List trimArgs = new ArrayList();

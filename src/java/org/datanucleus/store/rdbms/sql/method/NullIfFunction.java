@@ -35,7 +35,7 @@ public class NullIfFunction extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -44,7 +44,7 @@ public class NullIfFunction extends AbstractSQLMethod
             // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
             for (int i=0;i<args.size();i++)
             {
-                SQLExpression argExpr = (SQLExpression) args.get(i);
+                SQLExpression argExpr = args.get(i);
                 Class argType = argExpr.getJavaTypeMapping().getJavaType();
                 if (clsLevel < 5 && (argType == double.class || argType == Double.class))
                 {

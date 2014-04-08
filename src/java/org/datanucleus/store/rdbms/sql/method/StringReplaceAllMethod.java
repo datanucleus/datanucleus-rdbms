@@ -36,7 +36,7 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 2)
         {
@@ -46,8 +46,8 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
         else
         {
             // {strExpr}.translate(strExpr1, strExpr2)
-            SQLExpression strExpr1 = (SQLExpression)args.get(0);
-            SQLExpression strExpr2 = (SQLExpression)args.get(1);
+            SQLExpression strExpr1 = args.get(0);
+            SQLExpression strExpr2 = args.get(1);
             if (!(strExpr1 instanceof StringExpression) &&
                 !(strExpr1 instanceof CharacterExpression))
             {

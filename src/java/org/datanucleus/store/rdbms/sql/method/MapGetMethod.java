@@ -52,7 +52,7 @@ public class MapGetMethod extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -60,7 +60,7 @@ public class MapGetMethod extends AbstractSQLMethod
         }
 
         MapExpression mapExpr = (MapExpression)expr;
-        SQLExpression keyValExpr = (SQLExpression)args.get(0);
+        SQLExpression keyValExpr = args.get(0);
         if (keyValExpr instanceof UnboundExpression)
         {
             // TODO Add support for unbound variables (as per CollectionContains)
