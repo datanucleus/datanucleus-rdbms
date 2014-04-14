@@ -1040,9 +1040,9 @@ public class RDBMSMappingManager implements MappingManager
         while (iter.hasNext())
         {
             RDBMSTypeMapping mapping = (RDBMSTypeMapping)iter.next();
-            datastoreMappingsByJavaType.remove(mapping.javaType, mapping);
-            datastoreMappingsBySQLType.remove(mapping.sqlType, mapping);
-            datastoreMappingsByJDBCType.remove(mapping.jdbcType, mapping);
+            datastoreMappingsByJavaType.removeKeyValue(mapping.javaType, mapping);
+            datastoreMappingsBySQLType.removeKeyValue(mapping.sqlType, mapping);
+            datastoreMappingsByJDBCType.removeKeyValue(mapping.jdbcType, mapping);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
                 NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054010", 
