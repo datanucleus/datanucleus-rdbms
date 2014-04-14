@@ -67,7 +67,7 @@ public class StringExpression extends SQLExpression
      * Generates statement as e.g. FUNCTION_NAME(arg[,argN]).
      * @param stmt SQL Statement
      * @param mapping Mapping to use
-     * @param functionName
+     * @param functionName Name of the function
      * @param args ScalarExpression list
      */
     public StringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)

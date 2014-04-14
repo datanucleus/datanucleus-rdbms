@@ -638,6 +638,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * </PRE>
      * @param fieldMapping The mapping for the field to be updated
      * @param ownerMapping The owner mapping
+     * @param valueMapping mapping for the value
      * @param mapTable The map table
      * @return Statement for updating an embedded value in the Set
      */

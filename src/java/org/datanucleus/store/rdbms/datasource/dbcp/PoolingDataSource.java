@@ -121,10 +121,6 @@ public class PoolingDataSource implements DataSource {
         }
     }
 
-    /**
-     * Throws {@link UnsupportedOperationException}
-     * @throws UnsupportedOperationException
-     */
     public Connection getConnection(String uname, String passwd) throws SQLException {
         throw new UnsupportedOperationException();
     }

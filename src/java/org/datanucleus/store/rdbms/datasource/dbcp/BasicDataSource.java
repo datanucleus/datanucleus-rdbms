@@ -41,17 +41,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.impl.GenericObjectPool;
 
 /**
  * <p>Basic implementation of <code>javax.sql.DataSource</code> that is
- * configured via JavaBeans properties.  This is not the only way to
- * combine the <em>commons-dbcp</em> and <em>commons-pool</em> packages,
- * but provides a "one stop shopping" solution for basic requirements.</p>
- * 
- * <p>Users extending this class should take care to use appropriate accessors
- * rather than accessing protected fields directly to ensure thread-safety.</p>
- *
- * @author Glenn L. Nielsen
- * @author Craig R. McClanahan
- * @author Dirk Verbeeck
- * @version $Revision: 895844 $ $Date: 2010-01-04 20:50:04 -0500 (Mon, 04 Jan 2010) $
+ * configured via JavaBeans properties.
  */
 public class BasicDataSource implements DataSource {
     
@@ -230,64 +220,24 @@ public class BasicDataSource implements DataSource {
         this.restartNeeded = true;
     }
 
-    /**
-     * The class loader instance to use to load the JDBC driver. If not
-     * specified, {@link Class#forName(String)} is used to load the JDBC driver.
-     * If specified, {@link Class#forName(String, boolean, ClassLoader)} is
-     * used.
-     */
     protected ClassLoader driverClassLoader = null;
     
-    /**
-     * Returns the class loader specified for loading the JDBC driver. Returns
-     * <code>null</code> if no class loader has been explicitly specified.
-     */
     public synchronized ClassLoader getDriverClassLoader() {
         return this.driverClassLoader;
     }
 
-    /**
-     * <p>Sets the class loader to be used to load the JDBC driver.</p>
-     * <p>
-     * Note: this method currently has no effect once the pool has been
-     * initialized.  The pool is initialized the first time one of the
-     * following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
-     * 
-     * @param driverClassLoader the class loader with which to load the JDBC
-     *                          driver
-     */
     public synchronized void setDriverClassLoader(
             ClassLoader driverClassLoader) {
         this.driverClassLoader = driverClassLoader;
         this.restartNeeded = true;
     }
     
-    /**
-     * The maximum number of active connections that can be allocated from
-     * this pool at the same time, or negative for no limit.
-     */
     protected int maxActive = GenericObjectPool.DEFAULT_MAX_ACTIVE;
 
-    /**
-     * <p>Returns the maximum number of active connections that can be
-     * allocated at the same time.
-     * </p>
-     * <p>A negative number means that there is no limit.</p>
-     * 
-     * @return the maximum number of active connections
-     */
     public synchronized int getMaxActive() {
         return this.maxActive;
     }
 
-    /**
-     * Sets the maximum number of active connections that can be
-     * allocated at the same time. Use a negative value for no limit.
-     * 
-     * @param maxActive the new value for maxActive
-     * @see #getMaxActive()
-     */
     public synchronized void setMaxActive(int maxActive) {
         this.maxActive = maxActive;
         if (connectionPool != null) {
@@ -295,37 +245,12 @@ public class BasicDataSource implements DataSource {
         }
     }
 
-    /**
-     * The maximum number of connections that can remain idle in the
-     * pool, without extra ones being released, or negative for no limit.
-     * If maxIdle is set too low on heavily loaded systems it is possible you
-     * will see connections being closed and almost immediately new connections
-     * being opened. This is a result of the active threads momentarily closing
-     * connections faster than they are opening them, causing the number of idle
-     * connections to rise above maxIdle. The best value for maxIdle for heavily
-     * loaded system will vary but the default is a good starting point.
-     */
     protected int maxIdle = GenericObjectPool.DEFAULT_MAX_IDLE;
 
-    /**
-     * <p>Returns the maximum number of connections that can remain idle in the
-     * pool.
-     * </p>
-     * <p>A negative value indicates that there is no limit</p>
-     * 
-     * @return the maximum number of idle connections
-     */
     public synchronized int getMaxIdle() {
         return this.maxIdle;
     }
 
-    /**
-     * Sets the maximum number of connections that can remain idle in the
-     * pool.
-     * 
-     * @see #getMaxIdle()
-     * @param maxIdle the new value for maxIdle
-     */
     public synchronized void setMaxIdle(int maxIdle) {
         this.maxIdle = maxIdle;
         if (connectionPool != null) {
@@ -333,28 +258,12 @@ public class BasicDataSource implements DataSource {
         }
     }
 
-    /**
-     * The minimum number of active connections that can remain idle in the
-     * pool, without extra ones being created, or 0 to create none.
-     */
     protected int minIdle = GenericObjectPool.DEFAULT_MIN_IDLE;
 
-    /**
-     * Returns the minimum number of idle connections in the pool
-     * 
-     * @return the minimum number of idle connections
-     * @see GenericObjectPool#getMinIdle()
-     */
     public synchronized int getMinIdle() {
         return this.minIdle;
     }
 
-    /**
-     * Sets the minimum number of idle connections in the pool.
-     * 
-     * @param minIdle the new value for minIdle
-     * @see GenericObjectPool#setMinIdle(int)
-     */
     public synchronized void setMinIdle(int minIdle) {
        this.minIdle = minIdle;
        if (connectionPool != null) {
@@ -362,44 +271,17 @@ public class BasicDataSource implements DataSource {
        }
     }
 
-    /**
-     * The initial number of connections that are created when the pool
-     * is started.
-     * 
-     * @since 1.2
-     */
     protected int initialSize = 0;
     
-    /**
-     * Returns the initial size of the connection pool.
-     * 
-     * @return the number of connections created when the pool is initialized
-     */
     public synchronized int getInitialSize() {
         return this.initialSize;
     }
     
-    /**
-     * <p>Sets the initial size of the connection pool.</p>
-     * <p>
-     * Note: this method currently has no effect once the pool has been
-     * initialized.  The pool is initialized the first time one of the
-     * following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
-     * 
-     * @param initialSize the number of connections created when the pool
-     * is initialized
-     */
     public synchronized void setInitialSize(int initialSize) {
         this.initialSize = initialSize;
         this.restartNeeded = true;
     }
 
-    /**
-     * The maximum number of milliseconds that the pool will wait (when there
-     * are no available connections) for a connection to be returned before
-     * throwing an exception, or <= 0 to wait indefinitely.
-     */
     protected long maxWait = GenericObjectPool.DEFAULT_MAX_WAIT;
 
     /**
@@ -1049,17 +931,6 @@ public class BasicDataSource implements DataSource {
     }
 
 
-    /**
-     * <strong>BasicDataSource does NOT support this method. </strong>
-     *
-     * @param user Database user on whose behalf the Connection
-     *   is being made
-     * @param pass The database user's password
-     *
-     * @throws UnsupportedOperationException
-     * @throws SQLException if a database access error occurs
-     * @return nothing - always throws UnsupportedOperationException
-     */
     public Connection getConnection(String user, String pass) throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1067,20 +938,6 @@ public class BasicDataSource implements DataSource {
         // return createDataSource().getConnection(username, password);
     }
 
-
-    /**
-     * <strong>BasicDataSource does NOT support this method. </strong>
-     *
-     * <p>Returns the login timeout (in seconds) for connecting to the database.
-     * </p>
-     * <p>Calls {@link #createDataSource()}, so has the side effect
-     * of initializing the connection pool.</p>
-     *
-     * @throws SQLException if a database access error occurs
-     * @throws UnsupportedOperationException If the DataSource implementation
-     *   does not support the login timeout feature.
-     * @return login timeout in seconds
-     */
     public int getLoginTimeout() throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1089,34 +946,10 @@ public class BasicDataSource implements DataSource {
     }
 
 
-    /**
-     * <p>Returns the log writer being used by this data source.</p>
-     * <p>
-     * Calls {@link #createDataSource()}, so has the side effect
-     * of initializing the connection pool.</p>
-     *
-     * @throws SQLException if a database access error occurs
-     * @return log writer in use
-     */
     public PrintWriter getLogWriter() throws SQLException {
         return createDataSource().getLogWriter();
     }
 
-
-    /**
-     * <strong>BasicDataSource does NOT support this method. </strong>
-     *
-     * <p>Set the login timeout (in seconds) for connecting to the
-     * database.</p>
-     * <p>
-     * Calls {@link #createDataSource()}, so has the side effect
-     * of initializing the connection pool.</p>
-     *
-     * @param loginTimeout The new login timeout, or zero for no timeout
-     * @throws UnsupportedOperationException If the DataSource implementation
-     *   does not support the login timeout feature.
-     * @throws SQLException if a database access error occurs
-     */
     public void setLoginTimeout(int loginTimeout) throws SQLException {
         // This method isn't supported by the PoolingDataSource returned by
         // the createDataSource
@@ -1125,49 +958,20 @@ public class BasicDataSource implements DataSource {
     }
 
 
-    /**
-     * <p>Sets the log writer being used by this data source.</p>
-     * <p>
-     * Calls {@link #createDataSource()}, so has the side effect
-     * of initializing the connection pool.</p>
-     *
-     * @param logWriter The new log writer
-     * @throws SQLException if a database access error occurs
-     */
     public void setLogWriter(PrintWriter logWriter) throws SQLException {
         createDataSource().setLogWriter(logWriter);
         this.logWriter = logWriter;
     }
 
     private AbandonedConfig abandonedConfig;
-
-    /**                       
-     * Flag to remove abandoned connections if they exceed the
-     * removeAbandonedTimout.
-     *
-     * Set to true or false, default false.
-     * If set to true a connection is considered abandoned and eligible
-     * for removal if it has been idle longer than the removeAbandonedTimeout.
-     * Setting this to true can recover db connections from poorly written    
-     * applications which fail to close a connection.
-     * <p>
-     * Abandonded connections are identified and removed when 
-     * {@link #getConnection()} is invoked and the following conditions hold
-     * <ul><li>{@link #getRemoveAbandoned()} = true </li>
-     *     <li>{@link #getNumActive()} > {@link #getMaxActive()} - 3 </li>
-     *     <li>{@link #getNumIdle()} < 2 </li></ul></p>
-     */                                                                   
+                                                                   
     public boolean getRemoveAbandoned() {   
         if (abandonedConfig != null) {
             return abandonedConfig.getRemoveAbandoned();
         }
         return false;
     }                                    
-                                 
-    /**
-     * @param removeAbandoned new removeAbandoned property value
-     * @see #getRemoveAbandoned()
-     */
+           
     public void setRemoveAbandoned(boolean removeAbandoned) {
         if (abandonedConfig == null) {
             abandonedConfig = new AbandonedConfig();
@@ -1175,23 +979,14 @@ public class BasicDataSource implements DataSource {
         abandonedConfig.setRemoveAbandoned(removeAbandoned);
         this.restartNeeded = true;
     }                                                        
-                                               
-    /**
-     * Timeout in seconds before an abandoned connection can be removed.
-     *
-     * Defaults to 300 seconds. 
-     * @return abandoned connection timeout        
-     */                                                                 
+                                                                     
     public int getRemoveAbandonedTimeout() { 
         if (abandonedConfig != null) {
             return abandonedConfig.getRemoveAbandonedTimeout();
         }
         return 300;
     }                                        
-
-    /**
-     * @param removeAbandonedTimeout new removeAbandonedTimeout value
-     */               
+         
     public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
         if (abandonedConfig == null) {
             abandonedConfig = new AbandonedConfig();
@@ -1199,17 +994,7 @@ public class BasicDataSource implements DataSource {
         abandonedConfig.setRemoveAbandonedTimeout(removeAbandonedTimeout);
         this.restartNeeded = true;
     }                                                                  
-                                                             
-    /**
-     * <p>Flag to log stack traces for application code which abandoned
-     * a Statement or Connection.
-     * </p>
-     * <p>Defaults to false.                
-     * </p>                                                            
-     * <p>Logging of abandoned Statements and Connections adds overhead
-     * for every Connection open or new Statement because a stack   
-     * trace has to be generated. </p>
-     */                                                          
+                                                                 
     public boolean getLogAbandoned() {   
         if (abandonedConfig != null) {
             return abandonedConfig.getLogAbandoned();
@@ -1217,9 +1002,6 @@ public class BasicDataSource implements DataSource {
         return false;
     }                                 
 
-    /**
-     * @param logAbandoned new logAbandoned property value
-     */
     public void setLogAbandoned(boolean logAbandoned) {
         if (abandonedConfig == null) {
             abandonedConfig = new AbandonedConfig();
@@ -1228,45 +1010,16 @@ public class BasicDataSource implements DataSource {
         this.restartNeeded = true;
     }
 
-    // --------------------------------------------------------- Public Methods
-
-    /**
-     * Add a custom connection property to the set that will be passed to our
-     * JDBC driver. This <strong>MUST</strong> be called before the first
-     * connection is retrieved (along with all the other configuration
-     * property setters). Calls to this method after the connection pool
-     * has been initialized have no effect.
-     *
-     * @param name Name of the custom connection property
-     * @param value Value of the custom connection property
-     */
     public void addConnectionProperty(String name, String value) {
         connectionProperties.put(name, value);
         this.restartNeeded = true;
     }
 
-    /**
-     * Remove a custom connection property.
-     * 
-     * @param name Name of the custom connection property to remove
-     * @see #addConnectionProperty(String, String)
-     */
     public void removeConnectionProperty(String name) {
         connectionProperties.remove(name);
         this.restartNeeded = true;
     }
 
-    /**
-     * Sets the connection properties passed to driver.connect(...).
-     *
-     * Format of the string must be [propertyName=property;]*
-     *
-     * NOTE - The "user" and "password" properties will be added
-     * explicitly, so they do not need to be included here.
-     *
-     * @param connectionProperties the connection properties used to
-     * create new connections
-     */
     public void setConnectionProperties(String connectionProperties) {
         if (connectionProperties == null) throw new NullPointerException("connectionProperties is null");
 
@@ -1292,22 +1045,6 @@ public class BasicDataSource implements DataSource {
 
     protected boolean closed;
 
-    /**
-     * <p>Closes and releases all idle connections that are currently stored in the connection pool
-     * associated with this data source.</p>
-     *
-     * <p>Connections that are checked out to clients when this method is invoked are not affected.  
-     * When client applications subsequently invoke {@link Connection#close()} to return
-     * these connections to the pool, the underlying JDBC connections are closed.</p>
-     * 
-     * <p>Attempts to acquire connections using {@link #getConnection()} after this method has been
-     * invoked result in SQLExceptions.<p>
-     * 
-     * <p>This method is idempotent - i.e., closing an already closed BasicDataSource has no effect
-     * and does not generate exceptions.</p>
-     * 
-     * @throws SQLException if an error occurs closing idle connections
-     */
     public synchronized void close() throws SQLException {
         closed = true;
         GenericObjectPool oldpool = connectionPool;
@@ -1326,10 +1063,6 @@ public class BasicDataSource implements DataSource {
         }
     }
 
-    /**
-     * If true, this data source is closed and no more connections can be retrieved from this datasource.
-     * @return true, if the data source is closed; false otherwise
-     */
     public synchronized boolean isClosed() {
         return closed;
     }
@@ -1345,21 +1078,6 @@ public class BasicDataSource implements DataSource {
     /* JDBC_4_ANT_KEY_END */
 
         
-    // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * <p>Create (if necessary) and return the internal data source we are
-     * using to manage our connections.</p>
-     *
-     * <p><strong>IMPLEMENTATION NOTE</strong> - It is tempting to use the
-     * "double checked locking" idiom in an attempt to avoid synchronizing
-     * on every single call to this method.  However, this idiom fails to
-     * work correctly in the face of some optimizations that are legal for
-     * a JVM to perform.</p>
-     *
-     * @throws SQLException if the object pool cannot be created.
-     */
     protected synchronized DataSource createDataSource()
         throws SQLException {
         if (closed) {
@@ -1405,10 +1123,6 @@ public class BasicDataSource implements DataSource {
         return dataSource;
     }
 
-    /**
-     * Creates a JDBC connection factory for this datasource.  This method only
-     * exists so subclasses can replace the implementation class.
-     */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
         // Load the JDBC driver class
         Class driverFromCCL = null;
@@ -1482,10 +1196,6 @@ public class BasicDataSource implements DataSource {
         return driverConnectionFactory;
     }
 
-    /**
-     * Creates a connection pool for this datasource.  This method only exists
-     * so subclasses can replace the implementation class.
-     */
     protected void createConnectionPool() {
         // Create an object pool to contain our active connections
         GenericObjectPool gop;
@@ -1508,12 +1218,6 @@ public class BasicDataSource implements DataSource {
         connectionPool = gop;
     }
 
-    /**
-     * Creates the actual data source instance.  This method only exists so
-     * subclasses can replace the implementation class.
-     * 
-     * @throws SQLException if unable to create a datasource instance
-     */
     protected void createDataSourceInstance() throws SQLException {
         PoolingDataSource pds = new PoolingDataSource(connectionPool);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
@@ -1521,15 +1225,6 @@ public class BasicDataSource implements DataSource {
         dataSource = pds;
     }
 
-    /**
-     * Creates the PoolableConnectionFactory and attaches it to the connection pool.  This method only exists
-     * so subclasses can replace the default implementation.
-     * 
-     * @param driverConnectionFactory JDBC connection factory
-     * @param statementPoolFactory statement pool factory (null if statement pooling is turned off)
-     * @param configuration abandoned connection tracking configuration (null if no tracking)
-     * @throws SQLException if an error occurs creating the PoolableConnectionFactory
-     */
     protected void createPoolableConnectionFactory(ConnectionFactory driverConnectionFactory,
             KeyedObjectPoolFactory statementPoolFactory, AbandonedConfig configuration) throws SQLException {
         PoolableConnectionFactory connectionFactory = null;

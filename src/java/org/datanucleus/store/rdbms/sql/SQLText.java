@@ -59,7 +59,7 @@ public class SQLText
 
     /**
      * Constructor
-     * @param initialSQLText 
+     * @param initialSQLText SQL text to start from
      */
     public SQLText(String initialSQLText)
     {

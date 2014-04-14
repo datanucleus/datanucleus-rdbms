@@ -56,13 +56,11 @@ package org.datanucleus.store.rdbms.datasource.dbcp.pool;
  *   be considered active, passive or in a generally consistent state.
  *  </li>
  * </ol>
- * </p>
  * <p>
  * {@link PoolableObjectFactory} must be thread-safe. The only promise
  * an {@link ObjectPool} makes is that the same instance of an object will not
  * be passed to more than one method of a <code>PoolableObjectFactory</code>
  * at a time.
- * </p>
  *
  * @see ObjectPool
  *

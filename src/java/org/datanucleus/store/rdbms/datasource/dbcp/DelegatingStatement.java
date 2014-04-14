@@ -98,22 +98,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         return obj.hashCode();
     }
     
-    /**
-     * If my underlying {@link Statement} is not a
-     * <tt>DelegatingStatement</tt>, returns it,
-     * otherwise recursively invokes this method on
-     * my delegate.
-     * <p>
-     * Hence this method will return the first
-     * delegate that is not a <tt>DelegatingStatement</tt>
-     * or <tt>null</tt> when no non-<tt>DelegatingStatement</tt>
-     * delegate can be found by transversing this chain.
-     * <p>
-     * This method is useful when you may have nested
-     * <tt>DelegatingStatement</tt>s, and you want to make
-     * sure to obtain a "genuine" {@link Statement}.
-     * @see #getDelegate
-     */
     public Statement getInnermostDelegate() {
         Statement s = _stmt;
         while(s != null && s instanceof DelegatingStatement) {
@@ -125,7 +109,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         return s;
     }
 
-    /** Sets my delegate. */
     public void setDelegate(Statement s) {
         _stmt = s;
     }

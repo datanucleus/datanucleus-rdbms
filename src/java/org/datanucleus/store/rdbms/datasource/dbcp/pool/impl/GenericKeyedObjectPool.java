@@ -146,7 +146,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.PoolUtils;
  *   pool before it is eligible for eviction due to idle time.  When
  *   non-positive, no object will be dropped from the pool due to idle time
  *   alone.  This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting
  *   for this parameter is 30 minutes.
  *  </li>
  *  <li>
@@ -155,14 +155,14 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.PoolUtils;
  *   {@link KeyedPoolableObjectFactory#validateObject validateObject} method
  *   during idle object eviction runs.  Objects that fail to validate will be
  *   dropped from the pool. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting
  *   for this parameter is <code>false.</code>
  *  </li>
  *  <li>
  *    {@link #setMinIdle minIdle} sets a target value for the minimum number of
  *    idle objects (per key) that should always be available. If this parameter
  *    is set to a positive number and
- *    <code>timeBetweenEvictionRunsMillis > 0,</code> each time the idle object
+ *    <code>timeBetweenEvictionRunsMillis &gt; 0,</code> each time the idle object
  *    eviction thread runs, it will try to create enough idle instances so that
  *    there will be <code>minIdle</code> idle instances available under each
  *    key. This parameter is also used by {@link #preparePool preparePool}
@@ -796,7 +796,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
     /**
      * Sets the minimum number of idle objects to maintain in each of the keyed
      * pools. This setting has no effect unless
-     * <code>timeBetweenEvictionRunsMillis > 0</code> and attempts to ensure
+     * <code>timeBetweenEvictionRunsMillis &gt; 0</code> and attempts to ensure
      * that each pool has the required minimum number of instances are only
      * made during idle object eviction runs.
      * @param poolSize - The minimum size of the each keyed pool
@@ -811,7 +811,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
     /**
      * Returns the minimum number of idle objects to maintain in each of the keyed
      * pools. This setting has no effect unless
-     * <code>timeBetweenEvictionRunsMillis > 0</code> and attempts to ensure
+     * <code>timeBetweenEvictionRunsMillis &gt; 0</code> and attempts to ensure
      * that each pool has the required minimum number of instances are only
      * made during idle object eviction runs.
      * @return minimum size of the each keyed pool
@@ -1334,7 +1334,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * returned to the idle instance pool, even during its execution. It locks
      * the pool only during instance removal. Additional instances may be returned
      * while removed items are being destroyed.</li>
-     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul></p>
+     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul>
      */
     public void clear() {
         Map toDestroy = new HashMap();
@@ -1530,11 +1530,11 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * key has reached this value, the returning instance is destroyed.</p>
      * 
      * <p>If {@link #getTestOnReturn() testOnReturn} == true, the returning instance is validated before being returned
-     * to the idle instance pool under the given key.  In this case, if validation fails, the instance is destroyed.</p>
+     * to the idle instance pool under the given key.  In this case, if validation fails, the instance is destroyed.
      * 
      * @param key pool key
      * @param obj instance to return to the keyed pool
-     * @throws Exception
+     * @throws Exception if error occurs
      */
     public void returnObject(Object key, Object obj) throws Exception {
         try {
@@ -1699,7 +1699,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * Registers a key for pool control.
      *
      * If <code>populateImmediately</code> is <code>true</code> and
-     * <code>minIdle > 0,</code> the pool under the given key will be
+     * <code>minIdle &gt; 0,</code> the pool under the given key will be
      * populated immediately with <code>minIdle</code> idle instances.
      *
      * @param key - The key to register for pool control.
@@ -1732,9 +1732,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
      * {@link #invalidateObject(Object, Object)} will continue to work, with returned objects
      * destroyed on return.</p>
      * 
-     * <p>Destroys idle instances in the pool by invoking {@link #clear()}.</p> 
+     * <p>Destroys idle instances in the pool by invoking {@link #clear()}.
      * 
-     * @throws Exception
+     * @throws Exception if error occurs
      */
     public void close() throws Exception {
         super.close();

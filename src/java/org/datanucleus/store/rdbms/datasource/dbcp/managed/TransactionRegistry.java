@@ -31,7 +31,6 @@ import javax.transaction.xa.XAResource;
 
 /**
  * TransactionRegistry tracks Connections and XAResources in a transacted environment for a single XAConnectionFactory.
- * </p>
  * The TransactionRegistry hides the details of transaction processing from the existing DBCP pooling code, and gives
  * the ManagedConnection a way to enlist connections in a transaction, allowing for the maximal rescue of DBCP.
  *
@@ -115,10 +114,6 @@ public class TransactionRegistry {
         }
     }
 
-    /**
-     * Unregisters a destroyed connection from {@link TransactionRegistry}
-     * @param connection
-     */
     public synchronized void unregisterConnection(Connection connection) {
         xaResources.remove(connection);
     }

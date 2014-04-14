@@ -84,6 +84,7 @@ public class BackingStoreHelper
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate
+     * @param ecs store
      * @return The next position in the JDBC statement
      */
     public static int populateRelationDiscriminatorInStatement(ExecutionContext ec, PreparedStatement ps, 
@@ -118,6 +119,7 @@ public class BackingStoreHelper
      * @param ps The PreparedStatement
      * @param element The element
      * @param jdbcPosition Position in JDBC statement to populate
+     * @param elementMapping mapping for the element
      * @return The next position in the JDBC statement
      */
     public static int populateElementInStatement(ExecutionContext ec, PreparedStatement ps, Object element, 
@@ -141,6 +143,7 @@ public class BackingStoreHelper
      * @param ps The PreparedStatement
      * @param element The element
      * @param jdbcPosition Position in JDBC statement to populate
+     * @param elementMapping mapping for the element
      * @return The next position in the JDBC statement
      */
     public static int populateElementForWhereClauseInStatement(ExecutionContext ec, PreparedStatement ps, Object element,
@@ -307,6 +310,8 @@ public class BackingStoreHelper
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
      * @param ownerFieldMetaData The meta data for the owner field
+     * @param elementMapping mapping for the element
+     * @param emd Metadata for the element class
      * @param bcs Container store
      * @return The next JDBC position
      */

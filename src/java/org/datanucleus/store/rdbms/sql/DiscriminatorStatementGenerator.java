@@ -42,7 +42,6 @@ import org.datanucleus.store.rdbms.table.Table;
  * Please refer to the specific constructors for the usages.
  * Note that the statement returned by getStatement() has nothing selected, solely providing the
  * basic structure. Column selection should be performed when generating the mapping definition.
- * <p>
  * <h3>Supported options</h3>
  * This generator supports the following "options" :-
  * <ul>
@@ -128,6 +127,7 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
      * The join is INNER JOIN when no nulls are allowed in the collection, and LEFT OUTER JOIN
      * when it allows nulls.
      * @param storeMgr Manager for the datastore
+     * @param clr ClassLoader resolver
      * @param candidateType Base object type(s) that we are looking for
      * @param includeSubclasses Should we include subclasses of this candidate?
      * @param candidateTableAlias Alias to use for the candidate table (optional)

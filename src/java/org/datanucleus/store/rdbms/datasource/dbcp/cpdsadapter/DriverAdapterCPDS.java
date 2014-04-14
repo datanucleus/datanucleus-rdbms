@@ -490,12 +490,6 @@ public class DriverAdapterCPDS
         return driver;
     }
     
-    /**
-     * Set the driver classname.  Setting the driver classname cause the 
-     * driver to be registered with the DriverManager.
-     * @param v  Value to assign to driver.
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setDriver(String v) throws ClassNotFoundException {
         assertInitializationAllowed();
         this.driver = v;
@@ -556,168 +550,65 @@ public class DriverAdapterCPDS
         this.poolPreparedStatements = v;
     }
 
-    /**
-     * The maximum number of active statements that can be allocated from
-     * this pool at the same time, or non-positive for no limit.
-     */
     public int getMaxActive() {
         return (this.maxActive);
     }
 
-    /**
-     * The maximum number of active statements that can be allocated from
-     * this pool at the same time, or non-positive for no limit.
-     * @param maxActive the maximum number of concurrent active statements allowed
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setMaxActive(int maxActive) {
         assertInitializationAllowed();
         this.maxActive = maxActive;
     }
 
-    /**
-     * The maximum number of statements that can remain idle in the
-     * pool, without extra ones being released, or negative for no limit.
-     * @return the value of maxIdle
-     */
     public int getMaxIdle() {
         return (this.maxIdle);
     }
 
-    /**
-     * The maximum number of statements that can remain idle in the
-     * pool, without extra ones being released, or negative for no limit.
-     * 
-     * @param maxIdle The maximum number of statements that can remain idle
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setMaxIdle(int maxIdle) {
         assertInitializationAllowed();
         this.maxIdle = maxIdle;
     }
 
-    /**
-     * Returns the number of milliseconds to sleep between runs of the
-     * idle object evictor thread.
-     * When non-positive, no idle object evictor thread will be
-     * run.
-     * @return the value of the evictor thread timer
-     * @see #setTimeBetweenEvictionRunsMillis(int)
-     */
     public int getTimeBetweenEvictionRunsMillis() {
         return _timeBetweenEvictionRunsMillis;
     }
 
-    /**
-     * Sets the number of milliseconds to sleep between runs of the
-     * idle object evictor thread.
-     * When non-positive, no idle object evictor thread will be
-     * run.
-     * @param timeBetweenEvictionRunsMillis
-     * @see #getTimeBetweenEvictionRunsMillis()
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setTimeBetweenEvictionRunsMillis(
             int timeBetweenEvictionRunsMillis) {
         assertInitializationAllowed();
         _timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
     }
 
-    /**
-     * Returns the number of statements to examine during each run of the
-     * idle object evictor thread (if any).
-     *
-     * *see #setNumTestsPerEvictionRun
-     * *see #setTimeBetweenEvictionRunsMillis
-     */
     public int getNumTestsPerEvictionRun() {
         return _numTestsPerEvictionRun;
     }
 
-    /**
-     * Sets the number of statements to examine during each run of the
-     * idle object evictor thread (if any).
-     * <p>
-     * When a negative value is supplied, <tt>ceil({*link #numIdle})/abs({*link #getNumTestsPerEvictionRun})</tt>
-     * tests will be run.  I.e., when the value is <i>-n</i>, roughly one <i>n</i>th of the
-     * idle objects will be tested per run.
-     * 
-     * @param numTestsPerEvictionRun number of statements to examine per run
-     * @see #getNumTestsPerEvictionRun()
-     * @see #setTimeBetweenEvictionRunsMillis(int)
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         assertInitializationAllowed();
         _numTestsPerEvictionRun = numTestsPerEvictionRun;
     }
 
-    /**
-     * Returns the minimum amount of time a statement may sit idle in the pool
-     * before it is eligible for eviction by the idle object evictor
-     * (if any).
-     *
-     * *see #setMinEvictableIdleTimeMillis
-     * *see #setTimeBetweenEvictionRunsMillis
-     */
     public int getMinEvictableIdleTimeMillis() {
         return _minEvictableIdleTimeMillis;
     }
 
-    /**
-     * Sets the minimum amount of time a statement may sit idle in the pool
-     * before it is eligable for eviction by the idle object evictor
-     * (if any).
-     * When non-positive, no objects will be evicted from the pool
-     * due to idle time alone.
-     * @param minEvictableIdleTimeMillis minimum time to set (in ms)
-     * @see #getMinEvictableIdleTimeMillis()
-     * @see #setTimeBetweenEvictionRunsMillis(int)
-     * @throws IllegalStateException if {@link #getPooledConnection()} has been called
-     */
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
         assertInitializationAllowed();
         _minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
-    
-    /**
-     * Returns the value of the accessToUnderlyingConnectionAllowed property.
-     * 
-     * @return true if access to the underlying is allowed, false otherwise.
-     */
+
     public synchronized boolean isAccessToUnderlyingConnectionAllowed() {
         return this.accessToUnderlyingConnectionAllowed;
     }
 
-    /**
-     * Sets the value of the accessToUnderlyingConnectionAllowed property.
-     * It controls if the PoolGuard allows access to the underlying connection.
-     * (Default: false)
-     * 
-     * @param allow Access to the underlying connection is granted when true.
-     */
     public synchronized void setAccessToUnderlyingConnectionAllowed(boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
     }
-    
-    /**
-     * Returns the maximun number of prepared statements.
-     * 
-     * @return maxPrepartedStatements value
-     * @since 1.2.2
-     */
+
     public int getMaxPreparedStatements()
     {
         return _maxPreparedStatements;
     }
 
-    /**
-     * Sets the maximum number of prepared statements.
-     * @param maxPreparedStatements the new maximum number of prepared 
-     * statements
-     * 
-     * @since 1.2.2
-     */
     public void setMaxPreparedStatements(int maxPreparedStatements)
     {
         _maxPreparedStatements = maxPreparedStatements;

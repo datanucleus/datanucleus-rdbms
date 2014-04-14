@@ -84,7 +84,6 @@ public class DelegatingPreparedStatement extends DelegatingStatement
         }
     }
 
-    /** Sets my delegate. */
     public void setDelegate(PreparedStatement s) {
         super.setDelegate(s);
         _stmt = s;

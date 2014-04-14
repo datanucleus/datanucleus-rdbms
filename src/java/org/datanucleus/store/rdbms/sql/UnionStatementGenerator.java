@@ -47,7 +47,6 @@ import org.datanucleus.util.StringUtils;
  * return all possible types of candidate. Also allows select of a dummy column to return the
  * type for the part of the UNION that the object came from. Please refer to the specific constructors
  * for the usages.
- * <p>
  * <h3>Supported options</h3>
  * This generator supports
  * <ul>

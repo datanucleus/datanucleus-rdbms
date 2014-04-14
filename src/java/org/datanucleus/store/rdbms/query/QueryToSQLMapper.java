@@ -247,6 +247,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      * @param resultDefForClass Definition of results for the statement (populated here)
      * @param resultDef Definition of results if we have a result clause (populated here)
      * @param cmd Metadata for the candidate class
+     * @param subclasses Whether to include subclasses
      * @param fetchPlan Fetch Plan to apply
      * @param ec execution context
      * @param importsDefinition Import definition to use in class lookups (optional)

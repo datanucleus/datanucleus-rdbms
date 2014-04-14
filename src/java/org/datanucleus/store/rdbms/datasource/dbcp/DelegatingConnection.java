@@ -148,9 +148,6 @@ public class DelegatingConnection extends AbandonedTrace
         return getDelegateInternal();
     }
     
-    /**
-     * Should be final but can't be for compatibility with previous releases.
-     */
     protected Connection getDelegateInternal() {
         return _conn;
     }
@@ -204,21 +201,6 @@ public class DelegatingConnection extends AbandonedTrace
     }
 
 
-    /**
-     * If my underlying {@link Connection} is not a
-     * <tt>DelegatingConnection</tt>, returns it,
-     * otherwise recursively invokes this method on
-     * my delegate.
-     * <p>
-     * Hence this method will return the first
-     * delegate that is not a <tt>DelegatingConnection</tt>,
-     * or <tt>null</tt> when no non-<tt>DelegatingConnection</tt>
-     * delegate can be found by traversing this chain.
-     * <p>
-     * This method is useful when you may have nested
-     * <tt>DelegatingConnection</tt>s, and you want to make
-     * sure to obtain a "genuine" {@link Connection}.
-     */
     public Connection getInnermostDelegate() {
         return getInnermostDelegateInternal();
     }
@@ -234,15 +216,10 @@ public class DelegatingConnection extends AbandonedTrace
         return c;
     }
     
-    /** Sets my delegate. */
     public void setDelegate(Connection c) {
         _conn = c;
     }
 
-    /**
-     * Closes the underlying connection, and close
-     * any Statements that were not explicitly closed.
-     */
     public void close() throws SQLException {
         passivate();
         _conn.close();

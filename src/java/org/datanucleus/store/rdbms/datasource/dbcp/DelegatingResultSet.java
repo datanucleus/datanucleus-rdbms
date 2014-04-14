@@ -139,21 +139,6 @@ public class DelegatingResultSet extends AbandonedTrace implements ResultSet {
         return obj.hashCode();
     }
 
-    /**
-     * If my underlying {@link ResultSet} is not a
-     * <tt>DelegatingResultSet</tt>, returns it,
-     * otherwise recursively invokes this method on
-     * my delegate.
-     * <p>
-     * Hence this method will return the first
-     * delegate that is not a <tt>DelegatingResultSet</tt>,
-     * or <tt>null</tt> when no non-<tt>DelegatingResultSet</tt>
-     * delegate can be found by transversing this chain.
-     * <p>
-     * This method is useful when you may have nested
-     * <tt>DelegatingResultSet</tt>s, and you want to make
-     * sure to obtain a "genuine" {@link ResultSet}.
-     */
     public ResultSet getInnermostDelegate() {
         ResultSet r = _res;
         while(r != null && r instanceof DelegatingResultSet) {

@@ -115,9 +115,6 @@ public class PoolableConnection extends DelegatingConnection {
         }
     }
 
-    /**
-     * Actually close my underlying {@link Connection}.
-     */
     public void reallyClose() throws SQLException {
         super.close();
     }

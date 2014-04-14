@@ -156,10 +156,9 @@ public class SoftReferenceObjectPool extends BaseObjectPool implements ObjectPoo
      *   <li>{@link PoolableObjectFactory#validateObject(Object) validation} fails</li>
      *   <li>{@link PoolableObjectFactory#passivateObject(Object) passivation} throws an exception</li>
      * </ul>
-     *</p>
      * 
      * <p>Exceptions passivating or destroying instances are silently swallowed.  Exceptions validating
-     * instances are propagated to the client.</p>
+     * instances are propagated to the client.
      * 
      * @param obj instance to return to the pool
      */

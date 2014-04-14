@@ -89,12 +89,7 @@ public class PoolingDriver implements Driver {
         accessToUnderlyingConnectionAllowed = allow;
     }
 
-    /**
-     * WARNING: This method throws DbcpExceptions (RuntimeExceptions)
-     * and will be replaced by the protected getConnectionPool method.
-     * 
-     * @deprecated This will be removed in a future version of DBCP.
-     */
+    @SuppressWarnings("deprecation")
     public synchronized ObjectPool getPool(String name) {
         try {
             return getConnectionPool(name);

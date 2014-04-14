@@ -30,11 +30,10 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 /**
  * Some databases will use the same type for the return value as the argument, which can be an issue
  * when averaging on integral types since it will drop the decimals.
- * This class will convert the arg to a CAST( <arg> AS double)
+ * This class will convert the arg to a "CAST( {arg} AS double)"
  */
 public class AvgWithCastFunction extends AvgFunction
 {
-    @Override
     protected SQLExpression getAggregateExpression(List args, JavaTypeMapping m)
     {
         Class argType = ((SQLExpression) args.get(0)).getJavaTypeMapping().getJavaType();

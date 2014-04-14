@@ -337,6 +337,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
      * @param conn The connection
      * @param batched Whether we are batching it
      * @param element The element
+     * @param processNow Whether to flush to the datastore now
      * @return Number of datastore records changed (always 0 if batch since nothing yet changed)
      * @throws MappedDatastoreException Thrown if an error occurs
      */

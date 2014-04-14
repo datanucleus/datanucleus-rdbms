@@ -71,9 +71,6 @@ abstract class InstanceKeyObjectFactory
         instanceMap.remove(key);
     }
 
-    /**
-     * Close all pools associated with this class.
-     */
     public static void closeAll() throws Exception {
         //Get iterator to loop over all instances of this datasource.
         Iterator instanceIterator = instanceMap.entrySet().iterator();
@@ -85,10 +82,6 @@ abstract class InstanceKeyObjectFactory
     }
 
 
-    /**
-     * implements ObjectFactory to create an instance of SharedPoolDataSource
-     * or PerUserPoolDataSource
-     */
     public Object getObjectInstance(Object refObj, Name name,
                                     Context context, Hashtable env)
         throws IOException, ClassNotFoundException {
@@ -211,23 +204,11 @@ abstract class InstanceKeyObjectFactory
         }
     }
 
-
-    /**
-     * @return true if and only if className is the value returned
-     * from getClass().getName().toString()
-     */
     protected abstract boolean isCorrectClass(String className);
 
-    /**
-     * Creates an instance of the subclass and sets any properties
-     * contained in the Reference.
-     */
     protected abstract InstanceKeyDataSource getNewInstance(Reference ref)
         throws IOException, ClassNotFoundException;
 
-    /**
-     * used to set some properties saved within a Reference
-     */
     protected static final Object deserialize(byte[] data)
         throws IOException, ClassNotFoundException {
         ObjectInputStream in = null;

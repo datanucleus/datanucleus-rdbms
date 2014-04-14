@@ -85,7 +85,6 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
         }
     }
 
-    /** Sets my delegate. */
     public void setDelegate(CallableStatement s) {
         super.setDelegate(s);
         _stmt = s;

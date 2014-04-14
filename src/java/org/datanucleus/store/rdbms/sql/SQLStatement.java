@@ -956,9 +956,11 @@ public class SQLStatement
      * Will be applied to all unioned statements.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
      * @param sourceMapping Mapping in this table to join from
+     * @param sourceParentMapping mapping for the parent of the source
      * @param target Table to join to
      * @param targetAlias Alias for the target table (if known)
      * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param targetParentMapping mapping for the parent of the target
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      * @param tableGrpName Name of the table group for the target (null implies a new group)
      * @return SQLTable for the target
@@ -1107,6 +1109,7 @@ public class SQLStatement
      * and found out later it could become an INNER JOIN.
      * If the supplied table is not joined via a cross join then does nothing.
      * @param targetSqlTbl The table to drop the cross join for
+     * @return The removed alias
      */
     public String removeCrossJoin(SQLTable targetSqlTbl)
     {
@@ -1349,6 +1352,7 @@ public class SQLStatement
     /**
      * Method to add an AND condition to the WHERE clause.
      * @param expr The condition
+     * @param applyToUnions whether to apply this and to any UNIONs in the statement
      */
     public void whereAnd(BooleanExpression expr, boolean applyToUnions)
     {
@@ -1480,6 +1484,7 @@ public class SQLStatement
      * Mutator for the ordering criteria.
      * @param exprs The expressions to order by
      * @param descending Whether each expression is ascending/descending
+     * @param nullOrders Ordering for nulls (if provided)
      */
     public void setOrdering(SQLExpression[] exprs, boolean[] descending, String[] nullOrders)
     {

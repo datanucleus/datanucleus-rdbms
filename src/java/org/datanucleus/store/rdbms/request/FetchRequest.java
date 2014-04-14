@@ -448,7 +448,9 @@ public class FetchRequest extends Request
      * @param mmds Meta-data for the required fields/properties
      * @param table The table to look for member mappings
      * @param sqlTbl The table in the SQL statement to use for selects
+     * @param mappingDef Mapping definition for the result
      * @param fetchCallbacks Any additional required callbacks are added here
+     * @param clr ClassLoader resolver
      * @return Number of fields being fetched
      */
     protected int processMembersOfClass(SQLStatement sqlStatement, AbstractMemberMetaData[] mmds, 

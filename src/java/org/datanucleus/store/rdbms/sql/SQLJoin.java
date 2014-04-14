@@ -54,6 +54,7 @@ public class SQLJoin
      * Constructor for a join.
      * @param type Type of join (one of the defined types in this class).
      * @param tbl Table to join to (required)
+     * @param joinedTbl Table we join to
      * @param condition Join condition
      */
     public SQLJoin(JoinType type, SQLTable tbl, SQLTable joinedTbl, BooleanExpression condition)

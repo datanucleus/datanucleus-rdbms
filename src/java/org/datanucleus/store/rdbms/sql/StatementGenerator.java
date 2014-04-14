@@ -47,12 +47,14 @@ public interface StatementGenerator
     /**
      * Method to set a property.
      * @param name Name of the property
+     * @return This generator
      */
     StatementGenerator setOption(String name);
 
     /**
      * Method to unset a property.
      * @param name Name of the property
+     * @return This generator
      */
     StatementGenerator unsetOption(String name);
 

@@ -48,7 +48,7 @@ public class CharacterExpression extends SQLExpression
      * and it returns a character.
      * @param stmt SQL Statement
      * @param mapping Mapping to use
-     * @param functionName
+     * @param functionName Name of the function
      * @param args SQLExpression list
      */
     public CharacterExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
@@ -62,7 +62,7 @@ public class CharacterExpression extends SQLExpression
      * and it returns a character.
      * @param stmt SQL Statement
      * @param mapping Mapping to use
-     * @param functionName
+     * @param functionName Name of the function
      * @param args SQLExpression list
      * @param types Optional types list for the args
      */

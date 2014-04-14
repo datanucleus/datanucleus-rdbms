@@ -61,9 +61,9 @@ public class AbandonedObjectPool extends GenericObjectPool {
      * Get a db connection from the pool.
      *
      * If removeAbandoned=true, recovers db connections which
-     * have been idle > removeAbandonedTimeout and
-     * getNumActive() > getMaxActive() - 3 and
-     * getNumIdle() < 2
+     * have been idle &gt; removeAbandonedTimeout and
+     * getNumActive() &gt; getMaxActive() - 3 and
+     * getNumIdle() &lt; 2
      * 
      * @return Object jdbc Connection
      * @throws Exception if an exception occurs retrieving a 

@@ -75,10 +75,10 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
      * the connection auto-commit is turned off.  When the connection is committed or rolled back,
      * the commit or rollback method is called on the connection and then the original auto-commit
      * value is restored.
-     * </p>
+     *
      * The LocalXAResource also respects the connection read-only setting.  If the connection is
      * read-only the commit method will not be called, and the prepare method returns the XA_RDONLY.
-     * </p>
+     * 
      * It is assumed that the wrapper around a managed connection disables the setAutoCommit(),
      * commit(), rollback() and setReadOnly() methods while a transaction is in progress.
      */

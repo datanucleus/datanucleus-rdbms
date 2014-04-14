@@ -40,6 +40,7 @@ public abstract class BaseObjectPool implements ObjectPool {
      * Returns an instance to the pool.
      * 
      * @param obj instance to return to the pool
+     * @throws Exception if an error occurs
      */
     public abstract void returnObject(Object obj) throws Exception;
     
@@ -47,13 +48,13 @@ public abstract class BaseObjectPool implements ObjectPool {
      * <p>Invalidates an object from the pool.</p>
      * 
      * <p>By contract, <code>obj</code> <strong>must</strong> have been obtained
-     * using {@link #borrowObject borrowObject}.<p>
+     * using {@link #borrowObject borrowObject}.
      * 
      * <p>This method should be used when an object that has been borrowed
      * is determined (due to an exception or other problem) to be invalid.</p>
      *
      * @param obj a {@link #borrowObject borrowed} instance to be disposed.
-     * @throws Exception 
+     * @throws Exception if an error occurs
      */
     public abstract void invalidateObject(Object obj) throws Exception;
 
@@ -61,7 +62,7 @@ public abstract class BaseObjectPool implements ObjectPool {
      * Not supported in this base implementation.
      * @return a negative value.
      * 
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if not supported
      */
     public int getNumIdle() throws UnsupportedOperationException {
         return -1;
@@ -71,7 +72,7 @@ public abstract class BaseObjectPool implements ObjectPool {
      * Not supported in this base implementation.
      * @return a negative value.
      * 
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if not supported
      */
     public int getNumActive() throws UnsupportedOperationException {
         return -1;
@@ -80,7 +81,7 @@ public abstract class BaseObjectPool implements ObjectPool {
     /**
      * Not supported in this base implementation.
      * 
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if not supported
      */
     public void clear() throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
@@ -91,7 +92,7 @@ public abstract class BaseObjectPool implements ObjectPool {
      * Always throws an {@link UnsupportedOperationException},
      * subclasses should override this behavior.
      * 
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if not supported
      */
     public void addObject() throws Exception, UnsupportedOperationException {
         throw new UnsupportedOperationException();
@@ -111,8 +112,8 @@ public abstract class BaseObjectPool implements ObjectPool {
      * subclasses should override this behavior.
      * 
      * @param factory the PoolableObjectFactory
-     * @throws UnsupportedOperationException
-     * @throws IllegalStateException
+     * @throws UnsupportedOperationException if an error occurs
+     * @throws IllegalStateException If an error occurs
      * @deprecated to be removed in pool 2.0
      */
     public void setFactory(PoolableObjectFactory factory) throws IllegalStateException, UnsupportedOperationException {

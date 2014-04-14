@@ -747,6 +747,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * [AND DISTINGUISHER=?]
      * ORDER BY INDEXCOL DESC
      * </PRE>
+     * @param element The element to get index of
      * @return The Statement for getting the last item
      */
     protected String getLastIndexOfStmt(Object element)

@@ -460,6 +460,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
      * <PRE>
      * DELETE FROM COLLTABLE WHERE OWNERCOL=? AND ELEMENTCOL = ?
      * </PRE>
+     * @param element The element to remove
      * @return Statement for deleting an item from the Collection.
      */
     protected String getRemoveStmt(Object element)

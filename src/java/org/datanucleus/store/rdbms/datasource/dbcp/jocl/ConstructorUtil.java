@@ -86,9 +86,9 @@ public class ConstructorUtil {
      * @return a new instance of the specified <tt><i>type</i></tt>
      *         using a {@link Constructor} described by the given parameter types
      *         and values.
-     * @exception InstantiationException
-     * @exception IllegalAccessException
-     * @exception InvocationTargetException
+     * @exception InstantiationException if an error occurs
+     * @exception IllegalAccessException if an error occurs
+     * @exception InvocationTargetException if an error occurs
      */
     public static Object invokeConstructor(Class type, Class[] argTypes, Object[] argValues) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         return ConstructorUtil.getConstructor(type,argTypes).newInstance(argValues);

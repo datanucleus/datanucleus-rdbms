@@ -79,87 +79,40 @@ public class SharedPoolDataSource
         InstanceKeyObjectFactory.removeInstance(instanceKey);
     }
 
-    // -------------------------------------------------------------------
-    // Properties
-
-    /**
-     * The maximum number of active connections that can be allocated from
-     * this pool at the same time, or non-positive for no limit.
-     */
     public int getMaxActive() {
         return (this.maxActive);
     }
 
-    /**
-     * The maximum number of active connections that can be allocated from
-     * this pool at the same time, or non-positive for no limit.
-     * The default is 8.
-     */
     public void setMaxActive(int maxActive) {
         assertInitializationAllowed();
         this.maxActive = maxActive;
     }
 
-    /**
-     * The maximum number of active connections that can remain idle in the
-     * pool, without extra ones being released, or negative for no limit.
-     */
     public int getMaxIdle() {
         return (this.maxIdle);
     }
 
-    /**
-     * The maximum number of active connections that can remain idle in the
-     * pool, without extra ones being released, or negative for no limit.
-     * The default is 8.
-     */
     public void setMaxIdle(int maxIdle) {
         assertInitializationAllowed();
         this.maxIdle = maxIdle;
     }
 
-    /**
-     * The maximum number of milliseconds that the pool will wait (when there
-     * are no available connections) for a connection to be returned before
-     * throwing an exception, or -1 to wait indefinitely.  Will fail 
-     * immediately if value is 0.
-     * The default is -1.
-     */
     public int getMaxWait() {
         return (this.maxWait);
     }
 
-    /**
-     * The maximum number of milliseconds that the pool will wait (when there
-     * are no available connections) for a connection to be returned before
-     * throwing an exception, or -1 to wait indefinitely.  Will fail 
-     * immediately if value is 0.
-     * The default is -1.
-     */
     public void setMaxWait(int maxWait) {
         assertInitializationAllowed();
         this.maxWait = maxWait;
     }
 
-    // ----------------------------------------------------------------------
-    // Instrumentation Methods
-
-    /**
-     * Get the number of active connections in the pool.
-     */
     public int getNumActive() {
         return (pool == null) ? 0 : pool.getNumActive();
     }
 
-    /**
-     * Get the number of idle connections in the pool.
-     */
     public int getNumIdle() {
         return (pool == null) ? 0 : pool.getNumIdle();
     }
-
-    // ----------------------------------------------------------------------
-    // Inherited abstract methods
 
     protected PooledConnectionAndInfo 
         getPooledConnectionAndInfo(String username, String password)
@@ -193,11 +146,6 @@ public class SharedPoolDataSource
         return factory;
     }
 
-    /**
-     * Returns a <code>SharedPoolDataSource</code> {@link Reference}.
-     * 
-     * @since 1.2.2
-     */
     public Reference getReference() throws NamingException {
         Reference ref = new Reference(getClass().getName(),
             SharedPoolDataSourceFactory.class.getName(), null);
@@ -249,13 +197,6 @@ public class SharedPoolDataSource
         }
     }
 
-    /**
-     * Supports Serialization interface.
-     *
-     * @param in a <code>java.io.ObjectInputStream</code> value
-     * @exception IOException if an error occurs
-     * @exception ClassNotFoundException if an error occurs
-     */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         try 

@@ -68,6 +68,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
      * lower and mixed case identifiers. 
      * Optionally can truncate the identifier if it exceeds the "getMaxLength()".
      * @param identifierName The Identifier
+     * @return The cased identifier
      */
     protected String toCase(String identifierName)
     {

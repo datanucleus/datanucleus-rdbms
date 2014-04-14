@@ -125,7 +125,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.impl.GenericKeyedObjectP
  *   specifies the minimum amount of time that an object may sit idle in the pool
  *   before it is eligible for eviction due to idle time.  When non-positive, no object
  *   will be dropped from the pool due to idle time alone. This setting has no
- *   effect unless <code>timeBetweenEvictionRunsMillis > 0.</code> The default
+ *   effect unless <code>timeBetweenEvictionRunsMillis &gt; 0.</code> The default
  *   setting for this parameter is 30 minutes.
  *  </li>
  *  <li>
@@ -133,7 +133,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.impl.GenericKeyedObjectP
  *   objects should be validated using the factory's
  *   {@link PoolableObjectFactory#validateObject} method. Objects that fail to
  *   validate will be dropped from the pool. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting for
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting for
  *   this parameter is <code>false.</code>
  *  </li>
  *  <li>
@@ -143,7 +143,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.impl.GenericKeyedObjectP
  *   (if any), with the extra condition that at least "minIdle" object instances
  *   remain in the pool.  When non-positive, no objects will be evicted from the pool
  *   due to idle time alone. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code> and it is superceded by
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code> and it is superceded by
  *   {@link #setMinEvictableIdleTimeMillis <i>minEvictableIdleTimeMillis</i>}
  *   (that is, if <code>minEvictableIdleTimeMillis</code> is positive, then
  *   <code>softMinEvictableIdleTimeMillis</code> is ignored). The default setting for
@@ -153,11 +153,10 @@ import org.datanucleus.store.rdbms.datasource.dbcp.pool.impl.GenericKeyedObjectP
  *   {@link #setNumTestsPerEvictionRun <i>numTestsPerEvictionRun</i>}
  *   determines the number of objects examined in each run of the idle object
  *   evictor. This setting has no effect unless
- *   <code>timeBetweenEvictionRunsMillis > 0.</code>  The default setting for
+ *   <code>timeBetweenEvictionRunsMillis &gt; 0.</code>  The default setting for
  *   this parameter is 3.
  *  </li>
  * </ul>
- * <p>
  * <p>
  * The pool can be configured to behave as a LIFO queue with respect to idle
  * objects - always returning the most recently used object from the pool,
@@ -735,9 +734,9 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
      * Sets the minimum number of objects allowed in the pool
      * before the evictor thread (if active) spawns new objects.
      * Note that no objects are created when
-     * <code>numActive + numIdle >= maxActive.</code>
+     * <code>numActive + numIdle &ge; maxActive.</code>
      * This setting has no effect if the idle object evictor is disabled
-     * (i.e. if <code>timeBetweenEvictionRunsMillis <= 0</code>).
+     * (i.e. if <code>timeBetweenEvictionRunsMillis &le; 0</code>).
      *
      * @param minIdle The minimum number of objects.
      * @see #getMinIdle
@@ -751,7 +750,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
     /**
      * Returns the minimum number of objects allowed in the pool
      * before the evictor thread (if active) spawns new objects.
-     * (Note no objects are created when: numActive + numIdle >= maxActive)
+     * (Note no objects are created when: numActive + numIdle &ge; maxActive)
      *
      * @return The minimum number of objects.
      * @see #setMinIdle
@@ -967,7 +966,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
      * the pool behaves as a FIFO queue - objects are taken from the idle object
      * pool in the order that they are returned to the pool.
      *
-     * @return <code>true</true> if the pool is configured to act as a LIFO queue
+     * @return <code>true</code> if the pool is configured to act as a LIFO queue
      * @since 1.4
      */
      public synchronized boolean getLifo() {
@@ -1278,7 +1277,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
      * returned to the idle instance pool, even during its execution. It locks
      * the pool only during instance removal. Additional instances may be returned
      * while removed items are being destroyed.</li>
-     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul></p>
+     * <li>Exceptions encountered destroying idle instances are swallowed.</li></ul>
      */
     public void clear() {
         List toDestroy = new ArrayList();
@@ -1442,11 +1441,9 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
      * <p>Closes the pool.  Once the pool is closed, {@link #borrowObject()}
      * will fail with IllegalStateException, but {@link #returnObject(Object)} and
      * {@link #invalidateObject(Object)} will continue to work, with returned objects
-     * destroyed on return.</p>
-     * 
-     * <p>Destroys idle instances in the pool by invoking {@link #clear()}.</p> 
-     * 
-     * @throws Exception
+     * destroyed on return.
+     * <p>Destroys idle instances in the pool by invoking {@link #clear()}.
+     * @throws Exception if an error occurs
      */
     public void close() throws Exception {
         super.close();

@@ -139,7 +139,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
     /**
      * Accessor for the data for the classes supported.
      * @return Collection of classes supported (StoreData). Collection of StoreData elements
-     * @throws DatastoreInitialisationException
+     * @throws DatastoreInitialisationException if an error occurs in datastore communication
      */
     public Collection getAllClassData()
     throws DatastoreInitialisationException
