@@ -33,7 +33,7 @@ import org.datanucleus.util.NucleusLogger;
  * Builds on the base AbstractValueGenerator, and providing datastore connection 
  * and StoreManager information.
  */
-public abstract class AbstractRDBMSGenerator extends AbstractDatastoreGenerator
+public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerator<T>
 {
     /** Localiser for messages specific to RDBMS generators. */
     protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
@@ -67,9 +67,9 @@ public abstract class AbstractRDBMSGenerator extends AbstractDatastoreGenerator
      * @param number The number of additional ids required
      * @return the PoidBlock
      */
-    protected ValueGenerationBlock obtainGenerationBlock(int number)
+    protected ValueGenerationBlock<T> obtainGenerationBlock(int number)
     {
-        ValueGenerationBlock block = null;
+        ValueGenerationBlock<T> block = null;
 
         // Try getting the block
         boolean repository_exists=true; // TODO Ultimately this can be removed when "repositoryExists()" is implemented

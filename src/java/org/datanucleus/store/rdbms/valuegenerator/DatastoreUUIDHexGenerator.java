@@ -34,7 +34,7 @@ import org.datanucleus.store.valuegenerator.ValueGenerationException;
 /**
  * Generator for values using datastore-based UUID generation.
  */
-public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator
+public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<String>
 {
     /**
      * Constructor.
@@ -75,11 +75,11 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator
      * @param size Block size
      * @return The reserved block
      */
-    protected synchronized ValueGenerationBlock reserveBlock(long size)
+    protected synchronized ValueGenerationBlock<String> reserveBlock(long size)
     {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        List oid = new ArrayList();
+        List<String> oid = new ArrayList<String>();
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
         SQLController sqlControl = srm.getSQLController();
         try
@@ -93,15 +93,12 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator
             for (int i=1; i<size; i++)
             {
                 rs = sqlControl.executeStatementQuery(null, connection, stmt, ps);
-
-                String nextId;
                 if (rs.next())
                 {
-                    nextId = rs.getString(1);
-                    oid.add(nextId);
+                    oid.add(rs.getString(1));
                 }
             }
-            return new ValueGenerationBlock(oid);
+            return new ValueGenerationBlock<String>(oid);
         }
         catch (SQLException e)
         {

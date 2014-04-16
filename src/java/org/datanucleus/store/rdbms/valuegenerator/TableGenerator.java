@@ -74,7 +74,7 @@ import org.datanucleus.util.NucleusLogger;
  * <li><U>column-name</U> - name of the column that we are generating the value for</li>
  * </UL>
  */
-public final class TableGenerator extends AbstractRDBMSGenerator
+public final class TableGenerator extends AbstractRDBMSGenerator<Long>
 {
     /** Table where we store the identities for each table. */
     private SequenceTable sequenceTable = null;
@@ -164,7 +164,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator
      * @param size Block size
      * @return The reserved block
      */
-    public ValueGenerationBlock reserveBlock(long size)
+    public ValueGenerationBlock<Long> reserveBlock(long size)
     {
         if (size < 1)
         {
@@ -172,7 +172,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator
         }
 
         // search for an ID in the database
-        List oid = new ArrayList();
+        List<Long> oid = new ArrayList<Long>();
         try
         {
             if (sequenceTable == null)
@@ -197,7 +197,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator
             {
                 NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040004", "" + size));
             }
-            return new ValueGenerationBlock(oid);
+            return new ValueGenerationBlock<Long>(oid);
         }
         catch (SQLException e)
         {

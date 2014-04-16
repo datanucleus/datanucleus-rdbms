@@ -41,10 +41,10 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * This generator utilises datastore sequences. It uses a statement like
- * <pre>"select {sequence}.nextval from dual"</pre> to get the next value in the
+ * This generator utilises datastore sequences. 
+ * It uses a statement like <pre>"select {sequence}.nextval from dual"</pre> to get the next value in the
  * sequence. It is datastore-dependent since there is no RDBMS-independent statement.
- * SequencePoidGenerator works with numbers, so clients using this generator must cast the ID to Long
+ * SequenceGenerator works with Longs, so clients using this generator must cast the ID to Long.
  * <P>
  * <B>Optional user properties</B>
  * <UL>
@@ -58,7 +58,7 @@ import org.datanucleus.util.StringUtils;
  * preallocated and stored in memory for faster access</LI>
  * </UL>
  */
-public final class SequenceGenerator extends AbstractRDBMSGenerator
+public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
 {
     /** Name of the sequence that we are creating values for */
     protected String sequenceName = null;
@@ -110,7 +110,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator
      * @param size Block size
      * @return The reserved block
      */
-    protected synchronized ValueGenerationBlock reserveBlock(long size)
+    protected synchronized ValueGenerationBlock<Long> reserveBlock(long size)
     {
         if (size < 1)
         {
@@ -148,7 +148,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator
             {
                 NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040004", "" + size));
             }
-            return new ValueGenerationBlock(oid);
+            return new ValueGenerationBlock<Long>(oid);
         }
         catch (SQLException e)
         {
