@@ -594,7 +594,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             // Embedded type has field-type defined so use that as our embedded type
             embeddedType = ec.getClassLoaderResolver().classForName(mmd.getFieldTypes()[0]);
         }
-        ObjectProvider embOP = ec.newObjectProviderForHollow(embeddedType, (Object)null);
+        ObjectProvider embOP = ec.getNucleusContext().getObjectProviderFactory().newForHollow(ec, embeddedType, null);
         embOP.setPcObjectType(objectType);
         value = embOP.getObject();
 
