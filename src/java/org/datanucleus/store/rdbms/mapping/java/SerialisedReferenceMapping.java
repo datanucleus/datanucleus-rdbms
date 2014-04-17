@@ -71,7 +71,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             ObjectProvider embSM = ec.findObjectProvider(value);
             if (embSM == null || api.getExecutionContext(value) == null)
             {
-                embSM = ec.newObjectProviderForEmbedded(value, false, ownerOP, fieldNumber);
+                embSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, fieldNumber);
             }
         }
 
@@ -131,7 +131,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
             ObjectProvider embSM = ec.findObjectProvider(obj);
             if (embSM == null || api.getExecutionContext(obj) == null)
             {
-                ec.newObjectProviderForEmbedded(obj, false, ownerOP, fieldNumber);
+                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, ownerOP, fieldNumber);
             }
         }
         return obj;

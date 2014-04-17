@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
@@ -42,11 +43,12 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping implements Ma
         ObjectProvider sm = null;
         if (value != null)
         {
-            sm = op.getExecutionContext().findObjectProvider(value);
+            ExecutionContext ec = op.getExecutionContext();
+            sm = ec.findObjectProvider(value);
             if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
             {
                 // Assign a ObjectProvider to the serialised object since none present
-                sm = op.getExecutionContext().newObjectProviderForEmbedded(value, false, op, mmd.getAbsoluteFieldNumber());
+                sm = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, op, mmd.getAbsoluteFieldNumber());
             }
         }
 

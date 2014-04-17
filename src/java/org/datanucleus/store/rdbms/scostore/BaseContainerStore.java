@@ -143,7 +143,7 @@ public abstract class BaseContainerStore implements Store
         ObjectProvider objOP = ec.findObjectProvider(obj);
         if (objOP == null)
         {
-            objOP = ec.newObjectProviderForEmbedded(obj, false, op, ownerMmd.getAbsoluteFieldNumber());
+            objOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, op, ownerMmd.getAbsoluteFieldNumber());
         }
         objOP.setPcObjectType(pcType);
         return objOP;

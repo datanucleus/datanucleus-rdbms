@@ -61,7 +61,7 @@ public class SerialisedPCMapping extends SerialisedMapping
             ObjectProvider embSM = ec.findObjectProvider(value);
             if (embSM == null || ec.getApiAdapter().getExecutionContext(value) == null)
             {
-                embSM = ec.newObjectProviderForEmbedded(value, false, ownerOP, fieldNumber);
+                embSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, fieldNumber);
             }
         }
 
@@ -113,7 +113,7 @@ public class SerialisedPCMapping extends SerialisedMapping
             ObjectProvider embSM = ec.findObjectProvider(obj);
             if (embSM == null || ec.getApiAdapter().getExecutionContext(obj) == null)
             {
-                ec.newObjectProviderForEmbedded(obj, false, ownerOP, fieldNumber);
+                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, ownerOP, fieldNumber);
             }
         }
         return obj;

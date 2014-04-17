@@ -495,7 +495,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             if (embSM == null || api.getExecutionContext(value) == null)
             {
                 // Assign a StateManager to manage our embedded object
-                embSM = ec.newObjectProviderForEmbedded(value, false, ownerOP, ownerFieldNumber);
+                embSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerFieldNumber);
                 embSM.setPcObjectType(objectType);
             }
 
