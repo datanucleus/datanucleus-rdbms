@@ -979,23 +979,23 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 // application-identity
                 // TODO rewrite this to just use metadata to get the PKs of the superclass(es). Any reason why not?
-                DatastoreClass superTable = storeMgr.getDatastoreClass(cmd.getPersistenceCapableSuperclass(), clr);
+                DatastoreClass superTable = storeMgr.getDatastoreClass(cmd.getPersistableSuperclass(), clr);
                 if (isPKInitialized())
                 {
                     // The above call could have triggered a population of the PK here
                     return;
                 }
-                if (superTable == null && cmd.getPersistenceCapableSuperclass() != null)
+                if (superTable == null && cmd.getPersistableSuperclass() != null)
                 {
                     // The superclass doesn't have its own table, so keep going up til we find the next table
                     AbstractClassMetaData supercmd = cmd.getSuperAbstractClassMetaData();
                     while (true)
                     {
-                        if (supercmd.getPersistenceCapableSuperclass() == null)
+                        if (supercmd.getPersistableSuperclass() == null)
                         {
                             break;
                         }
-                        superTable = storeMgr.getDatastoreClass(supercmd.getPersistenceCapableSuperclass(), clr);
+                        superTable = storeMgr.getDatastoreClass(supercmd.getPersistableSuperclass(), clr);
                         if (isPKInitialized())
                         {
                             // The above call could have triggered a population of the PK here

@@ -690,7 +690,7 @@ public final class SQLQuery extends AbstractSQLQuery
             {
                 throw new ClassNotPersistableException(candidateClass.getName());
             }
-            if (cmd.getPersistenceCapableSuperclass() != null)
+            if (cmd.getPersistableSuperclass() != null)
             {
                // throw new PersistentSuperclassNotAllowedException(candidateClass.getName());
             }

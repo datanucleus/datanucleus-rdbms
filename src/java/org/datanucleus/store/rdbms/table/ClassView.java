@@ -90,7 +90,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
         }
 
         // We expect a flat class here to map to a view.
-        if (cmd.getPersistenceCapableSuperclass() != null)
+        if (cmd.getPersistableSuperclass() != null)
         {
             throw new PersistentSuperclassNotAllowedException(cmd.getFullClassName());
         }
