@@ -29,7 +29,7 @@ import org.datanucleus.state.ObjectProvider;
  * Mapping for a serialised reference (Interface/Object) field.
  * Extends SerialisedMapping since that provides the basic serialisation mechanism,
  * adding on the addition of StateManagers to the serialised object whenever it is required
- * (since the object is a PersistenceCapable).
+ * (since the object is a persistable).
  */
 public class SerialisedReferenceMapping extends SerialisedMapping
 {
@@ -94,11 +94,11 @@ public class SerialisedReferenceMapping extends SerialisedMapping
     }
 
     /**
-     * Method to extract the value of the PersistenceCapable from a ResultSet.
+     * Method to extract the value of the persistable from a ResultSet.
      * @param ec execution context
      * @param resultSet The ResultSet
      * @param exprIndex The parameter positions in the result set to use.
-     * @return The (deserialised) PersistenceCapable object
+     * @return The (deserialised) persistable object
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -113,13 +113,13 @@ public class SerialisedReferenceMapping extends SerialisedMapping
     }
 
     /**
-     * Method to extract the value of the PersistenceCapable from a ResultSet.
+     * Method to extract the value of the persistable from a ResultSet.
      * @param ec execution context
      * @param resultSet The ResultSet
      * @param exprIndex The parameter positions in the result set to use.
      * @param ownerOP ObjectProvider for the owning object
      * @param fieldNumber Absolute number of field in owner object
-     * @return The (deserialised) PersistenceCapable object
+     * @return The (deserialised) persistable object
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, ObjectProvider ownerOP, int fieldNumber)
     {

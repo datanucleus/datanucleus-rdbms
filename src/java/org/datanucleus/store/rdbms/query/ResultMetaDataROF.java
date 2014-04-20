@@ -322,7 +322,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param rs The ResultSet
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
-     * @param pcClass PersistenceCapable class
+     * @param pcClass persistable class
      * @param requiresInheritanceCheck Whether we need to check the inheritance level of the returned object
      * @param stmtMappings mappings for the results in the statement
      * @return The object with this application identity
@@ -366,7 +366,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
      * @param oid The object id
-     * @param pcClass The PersistenceCapable class (where we know the instance type required, null if not)
+     * @param pcClass The persistable class (where we know the instance type required, null if not)
      * @param stmtMappings mappings for the results in the statement
      * @return The Object
      */

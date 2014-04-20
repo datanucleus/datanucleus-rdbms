@@ -24,9 +24,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Mapping for a PersistenceCapable object stored in an embedded collection within a
- * PersistenceCapable object. Provides mapping for a single Java type
- * (the element PC type) to multiple datastore columns.
+ * Mapping for a persistable object stored in an embedded collection within a persistable object. 
+ * Provides mapping for a single Java type (the element PC type) to multiple datastore columns.
  */
 public class EmbeddedElementPCMapping extends EmbeddedMapping
 {

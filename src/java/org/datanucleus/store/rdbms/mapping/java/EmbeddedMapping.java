@@ -587,7 +587,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             n++;
         }
 
-        // Create a PersistenceCapable to put the values into
+        // Create a persistable to put the values into
         Class embeddedType = clr.classForName(embCmd.getFullClassName());
         if (mmd.getFieldTypes() != null && mmd.getFieldTypes().length > 0)
         {

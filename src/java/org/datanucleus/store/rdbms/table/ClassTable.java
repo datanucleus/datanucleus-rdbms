@@ -2926,8 +2926,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
     
     /**
-     * Accessor for a mapping for the ID (PersistenceCapable) for this table.
-     * @return The (PersistenceCapable) ID mapping.
+     * Accessor for a mapping for the ID (persistable) for this table.
+     * @return The (persistable) ID mapping.
      */
     public JavaTypeMapping getIdMapping()
     {
@@ -3247,7 +3247,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Utility to throw an exception if the object is not PersistenceCapable.
+     * Utility to throw an exception if the object is not persistable.
      * @param op The ObjectProvider for the object
      */ 
     void assertPCClass(ObjectProvider op)

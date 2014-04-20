@@ -25,7 +25,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Mapping for a serialised PersistenceCapable object.
+ * Mapping for a serialised persistable object.
  * Extends ObjectMapping since that provides the basic serialisation mechanism,
  * adding on the addition of StateManagers to the serialised object whenever it is required.
  */
@@ -84,11 +84,11 @@ public class SerialisedPCMapping extends SerialisedMapping
     }
 
     /**
-     * Method to extract the value of the PersistenceCapable from a ResultSet.
+     * Method to extract the value of the persistable from a ResultSet.
      * @param ec The ExecutionContext
      * @param resultSet The ResultSet
      * @param exprIndex The parameter positions in the result set to use.
-     * @return The (deserialised) PersistenceCapable object
+     * @return The (deserialised) persistable object
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
@@ -96,13 +96,13 @@ public class SerialisedPCMapping extends SerialisedMapping
     }
 
     /**
-     * Method to extract the value of the PersistenceCapable from a ResultSet.
+     * Method to extract the value of the persistable from a ResultSet.
      * @param ec The ExecutionContext
      * @param resultSet The ResultSet
      * @param exprIndex The parameter positions in the result set to use.
      * @param ownerOP ObjectProvider for the owning object
      * @param fieldNumber Absolute number of field in owner object
-     * @return The (deserialised) PersistenceCapable object
+     * @return The (deserialised) persistable object
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, ObjectProvider ownerOP, int fieldNumber)
     {

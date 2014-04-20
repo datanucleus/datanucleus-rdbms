@@ -125,9 +125,9 @@ public abstract class JoinTable extends TableImpl
     }
 
     /**
-     * Accessor for a mapping for the ID (PersistenceCapable) for this table.
+     * Accessor for a mapping for the ID (persistable) for this table.
      * This is not supported by join tables since they don't represent FCOs.
-     * @return The (PersistenceCapable) ID mapping.
+     * @return The (persistable) ID mapping.
      */
     public JavaTypeMapping getIdMapping()
     {

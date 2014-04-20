@@ -70,7 +70,7 @@ public class AppIDObjectIdFieldManager extends AbstractFieldManager
         this.ec = ec;
         this.statement = statement;
 
-        // Save all mappings in the same order, allowing for PersistenceCapableMapping having sub mappings
+        // Save all mappings in the same order, allowing for PersistableMapping having sub mappings
         int numMappings = 0;
         for (int i=0;i<javaTypeMappings.length;i++)
         {

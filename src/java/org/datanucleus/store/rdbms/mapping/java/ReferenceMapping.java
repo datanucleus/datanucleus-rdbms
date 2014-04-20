@@ -55,8 +55,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Mapping for a "reference" type.
- * This can be used for things like interfaces, or Object which are simply a reference to
- * some specific (PersistenceCapable) class. 
+ * This can be used for things like interfaces, or Object which are simply a reference to some specific (persistable) class. 
  * This can be persisted in several ways (see "mappingStrategy") :-
  * <ul>
  * <li>List of possible "implementations" of the reference type where column(s) are created for each 

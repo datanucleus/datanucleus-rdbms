@@ -155,7 +155,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 // Object either already exists, or is not yet being inserted.
                 Object id = api.getIdForObject(value);
 
-                // Check if the PersistenceCapable exists in this datastore
+                // Check if the persistable exists in this datastore
                 boolean requiresPersisting = false;
                 if (ec.getApiAdapter().isDetached(value) && ownerOP != null)
                 {

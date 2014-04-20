@@ -23,7 +23,7 @@ import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
- * Mapping for a serialised PersistenceCapable object being the element of a Collection.
+ * Mapping for a serialised persistable object being the element of a Collection.
  */
 public class SerialisedElementPCMapping extends SerialisedPCMapping
 {

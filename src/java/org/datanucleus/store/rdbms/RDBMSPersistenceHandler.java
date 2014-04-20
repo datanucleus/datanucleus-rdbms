@@ -610,7 +610,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Method to return a persistable object with the specified id. Optional operation for StoreManagers.
-     * Should return a (at least) hollow PersistenceCapable object if the store manager supports the operation.
+     * Should return a (at least) hollow persistable object if the store manager supports the operation.
      * If the StoreManager is managing the in-memory object instantiation (as part of co-managing the object 
      * lifecycle in general), then the StoreManager has to create the object during this call (if it is not 
      * already created). Most relational databases leave the in-memory object instantion to Core, but some 

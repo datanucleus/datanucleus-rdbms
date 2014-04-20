@@ -130,7 +130,7 @@ public interface MappingManager
     Column createColumn(JavaTypeMapping mapping, String javaType, ColumnMetaData colmd);
 
     /**
-     * Method to create a column for a PersistenceCapable mapping.
+     * Method to create a column for a persistable mapping.
      * @param fmd MetaData for the field
      * @param table Table in the datastore
      * @param mapping The java mapping

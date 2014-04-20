@@ -59,7 +59,7 @@ import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
 
 /**
- * ResultObjectFactory that takes a JDBC ResultSet and create a PersistenceCapable object instance for
+ * ResultObjectFactory that takes a JDBC ResultSet and create a persistable object instance for
  * each row in the ResultSet. We use information in the result set to determine the object type; this
  * can be a discriminator column, or can be a special "NucleusType" column defined just for result
  * processing.
@@ -463,7 +463,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param resultSet The ResultSet
      * @param mappingDefinition The mapping info for the result class
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param pcClass PersistenceCapable class
+     * @param pcClass persistable class
      * @param cmd Metadata for the class
      * @param requiresInheritanceCheck Whether we need to check the inheritance level of the returned object
      * @param surrogateVersion Surrogate version if available
@@ -620,7 +620,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
      * @param oid The object id
-     * @param pcClass The PersistenceCapable class (where we know the instance type required, null if not)
+     * @param pcClass The persistable class (where we know the instance type required, null if not)
      * @param cmd Metadata for the class
      * @param surrogateVersion Surrogate version (if applicable)
      * @return The Object

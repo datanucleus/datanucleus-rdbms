@@ -28,7 +28,7 @@ import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 
 /**
- * Mapping for a serialised PersistenceCapable object for Oracle.
+ * Mapping for a serialised persistable object for Oracle.
  */
 public class OracleSerialisedPCMapping extends SerialisedPCMapping implements MappingCallbacks
 {

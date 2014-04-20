@@ -69,8 +69,8 @@ public class ProbeTable extends TableImpl
     }
 
     /**
-     * Accessor for a mapping for the ID (PersistenceCapable) for this table.
-     * @return The (PersistenceCapable) ID mapping.
+     * Accessor for a mapping for the ID (persistable) for this table.
+     * @return The (persistable) ID mapping.
      **/
     public JavaTypeMapping getIdMapping()
     {

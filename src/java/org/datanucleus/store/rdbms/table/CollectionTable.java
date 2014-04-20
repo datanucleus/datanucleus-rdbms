@@ -290,7 +290,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
 
     /**
      * Accessor for whether the element is serialised into this table.
-     * This can be a serialised PersistenceCapable, or a serialised simple type
+     * This can be a serialised persistable, or a serialised simple type
      * @return Whether the element is serialised.
      */
     public boolean isSerialisedElement()
@@ -304,7 +304,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
 
     /**
      * Accessor for whether the element is embedded into this table.
-     * This can be an embedded PersistenceCapable, or an embedded simple type
+     * This can be an embedded persistable, or an embedded simple type
      * @return Whether the element is embedded.
      */
     public boolean isEmbeddedElement()
@@ -322,7 +322,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
     }
 
     /**
-     * Accessor for whether the element is a PersistenceCapable(serialised)
+     * Accessor for whether the element is a persistable(serialised)
      * @return Whether the element is PC and is serialised
      */
     public boolean isSerialisedElementPC()
@@ -336,7 +336,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
     }
 
     /**
-     * Accessor for whether the element is a PersistenceCapable(embedded).
+     * Accessor for whether the element is a persistable(embedded).
      * Currently this only defines a PC element as embedded if the MetaData has an &lt;embedded&gt; block.
      * This may or may not be correct depending on how you interpret the JDO2 spec "embedded-element" flag.
      * @return Whether the element is PC and is embedded

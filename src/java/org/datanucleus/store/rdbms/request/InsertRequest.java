@@ -83,7 +83,7 @@ import org.datanucleus.util.StringUtils;
  * </p>
  * <p>
  * When the InsertRequest starts to populate its statement and it has a PC field, this calls 
- * PersistenceCapableMapping.setObject(). This then checks if the other PC object is yet persistent 
+ * PersistableMapping.setObject(). This then checks if the other PC object is yet persistent 
  * and, if not, will persist it before processing this objects INSERT. This forms the key to 
  * "persistence-by-reachability".
  * </p>

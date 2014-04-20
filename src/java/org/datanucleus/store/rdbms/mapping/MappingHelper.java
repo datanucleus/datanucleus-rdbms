@@ -202,7 +202,7 @@ public class MappingHelper
      * @param param the parameters
      * @param cmd the AbstractClassMetaData
      * @param objectIdClass the object id class
-     * @param pcClass the PersistenceCapable class
+     * @param pcClass the persistable class
      * @return the id
      */
     protected static Object createSingleFieldIdentity(ExecutionContext ec, JavaTypeMapping mapping, final ResultSet rs, 

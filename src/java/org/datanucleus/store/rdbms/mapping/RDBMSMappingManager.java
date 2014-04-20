@@ -1580,7 +1580,7 @@ public class RDBMSMappingManager implements MappingManager
 
     /**
      * Method to create a column for a Java type mapping.
-     * This is NOT used for PersistenceCapable mappings - see method below.
+     * This is NOT used for persistable mappings - see method below.
      * @param mapping Java type mapping for the field
      * @param javaType The type of field being stored in this column
      * @param datastoreFieldIndex Index of the datastore field to use
@@ -1793,7 +1793,7 @@ public class RDBMSMappingManager implements MappingManager
     }
 
     /**
-     * Method to create a datastore field for a PersistenceCapable mapping.
+     * Method to create a datastore field for a persistable mapping.
      * @param mmd MetaData for the field whose mapping it is
      * @param table Datastore class where we create the datastore field
      * @param mapping The Java type for this field

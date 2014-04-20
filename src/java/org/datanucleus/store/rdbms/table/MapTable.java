@@ -446,7 +446,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Accessor for whether the key is embedded into this table.
-     * This can be an embedded PersistenceCapable, or an embedded simple type.
+     * This can be an embedded persistable, or an embedded simple type.
      * @return Whether the key is embedded.
      */
     public boolean isEmbeddedKey()
@@ -465,7 +465,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Accessor for whether the key is serialised into this table.
-     * This can be an serialised PersistenceCapable, or a serialised simple type.
+     * This can be an serialised persistable, or a serialised simple type.
      * @return Whether the key is serialised.
      */
     public boolean isSerialisedKey()
@@ -478,7 +478,7 @@ public class MapTable extends JoinTable implements DatastoreMap
     }
 
     /**
-     * Accessor for whether the key is a PersistenceCapable(serialised)
+     * Accessor for whether the key is a persistable(serialised)
      * @return Whether the key is PC and is serialised
      */
     public boolean isSerialisedKeyPC()
@@ -491,7 +491,7 @@ public class MapTable extends JoinTable implements DatastoreMap
     }
 
     /**
-     * Accessor for whether the key is a PersistenceCapable(embedded)
+     * Accessor for whether the key is a persistable(embedded)
      * @return Whether the key is PC and is embedded
      */
     public boolean isEmbeddedKeyPC()
@@ -510,7 +510,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Accessor for whether the value is embedded into this table.
-     * This can be an embedded PersistenceCapable, or an embedded simple type.
+     * This can be an embedded persistable, or an embedded simple type.
      * @return Whether the value is embedded.
      */
     public boolean isEmbeddedValue()
@@ -529,7 +529,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Accessor for whether the value is serialised into this table.
-     * This can be an serialised PersistenceCapable, or a serialised simple type.
+     * This can be an serialised persistable, or a serialised simple type.
      * @return Whether the value is serialised.
      */
     public boolean isSerialisedValue()
@@ -542,7 +542,7 @@ public class MapTable extends JoinTable implements DatastoreMap
     }
 
     /**
-     * Accessor for whether the value is a PersistenceCapable(serialised)
+     * Accessor for whether the value is a persistable(serialised)
      * @return Whether the value is PC and is serialised
      */
     public boolean isSerialisedValuePC()
@@ -555,7 +555,7 @@ public class MapTable extends JoinTable implements DatastoreMap
     }
 
     /**
-     * Accessor for whether the value is a PersistenceCapable(embedded)
+     * Accessor for whether the value is a persistable(embedded)
      * @return Whether the value is PC and is embedded
      */
     public boolean isEmbeddedValuePC()

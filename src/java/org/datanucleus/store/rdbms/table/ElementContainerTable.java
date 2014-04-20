@@ -59,7 +59,7 @@ import org.datanucleus.util.NucleusLogger;
 public abstract class ElementContainerTable extends JoinTable
 {
     /**
-     * Mapping of an element. This is either a PersistenceCapableMapping to the element table,
+     * Mapping of an element. This is either a PersistableMapping to the element table,
      * or an EmbeddedElementPCMapping (when PC elements are embedded), or a simple mapping (when
      * using non-PC elements), or a SerialisedPCMapping, or a SerialisedReferenceMapping.
      * It will be specified in the MetaData using the &lt;element&gt; tag.
@@ -231,7 +231,7 @@ public abstract class ElementContainerTable extends JoinTable
 
     /**
      * Accessor for the "element" mapping end of the relationship. 
-     * This is used where the element is PersistenceCapable and has its own table (not embedded),
+     * This is used where the element is persistable and has its own table (not embedded),
      * or where the element is a simple type.
      * @return The column mapping for the element.
      */

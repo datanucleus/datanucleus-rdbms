@@ -327,7 +327,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
-     * Populates the PreparedStatement with a null value for the mappings of this PersistenceCapableMapping.
+     * Populates the PreparedStatement with a null value for the mappings of this mapping.
      * @param ec ExecutionContext
      * @param ps the Prepared Statement
      * @param param The parameter ids in the statement
@@ -481,7 +481,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // Object either already exists, or is not yet being inserted.
                 id = api.getIdForObject(value);
 
-                // Check if the PersistenceCapable exists in this datastore
+                // Check if the persistable object exists in this datastore
                 boolean requiresPersisting = false;
                 if (ec.getApiAdapter().isDetached(value) && ownerOP != null)
                 {

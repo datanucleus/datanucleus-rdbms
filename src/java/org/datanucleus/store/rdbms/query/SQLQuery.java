@@ -18,7 +18,7 @@ Contributors:
 2004 Andy Jefferson - changed to allow for null candidate class
 2005 Andy Jefferson - changed to use JDBC parameters
 2005 Andy Jefferson - added timeout support
-2005 Andy Jefferson - changed to use PersistenceCapable candidate class
+2005 Andy Jefferson - changed to use persistable candidate class
 2005 Andy Jefferson - added checks on missing columns to compile step
 2006 Andy Jefferson - implemented executeWithMap taking Integer args
     ...
