@@ -101,7 +101,7 @@ import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
 import org.datanucleus.state.ActivityState;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.state.ReferentialJDOStateManager;
+import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.AbstractStoreManager;
 import org.datanucleus.store.BackedSCOStoreManager;
 import org.datanucleus.store.NucleusConnection;
@@ -572,7 +572,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public String getDefaultObjectProviderClassName()
     {
-        return ReferentialJDOStateManager.class.getName();
+        return ReferentialStateManagerImpl.class.getName();
     }
 
     /**
