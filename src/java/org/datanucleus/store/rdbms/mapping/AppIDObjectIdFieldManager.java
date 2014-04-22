@@ -235,7 +235,7 @@ public class AppIDObjectIdFieldManager extends AbstractFieldManager
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(value))
         {
-            api.copyPkFieldsToPersistableObjectFromId(value, api.getObjectState(value), this);
+            api.copyPkFieldsToPersistableObjectFromId(value, api.getIdForObject(value), this);
         }
         else
         {
