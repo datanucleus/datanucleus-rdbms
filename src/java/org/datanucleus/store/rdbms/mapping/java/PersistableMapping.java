@@ -38,7 +38,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -286,8 +285,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            OID oid = (OID)nucleusCtx.getApiAdapter().getIdForObject(value);
-            return oid != null ? oid.getKeyValue() : null;
+            Object id = nucleusCtx.getApiAdapter().getIdForObject(value);
+            return id != null ? IdentityUtils.getTargetKeyForDatastoreIdentity(id) : null;
         }
         return null;
     }
@@ -608,18 +607,18 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // If the field doesn't map to any datastore fields (e.g remote FK), omit the set process
                 if (getNumberOfDatastoreMappings() > 0)
                 {
-                    if (id instanceof OID)
+                    if (IdentityUtils.isDatastoreIdentity(id))
                     {
-                        OID oid = (OID)id;
+                        Object idKey = IdentityUtils.getTargetKeyForDatastoreIdentity(id);
                         try
                         {
                             // Try as a Long
-                            getDatastoreMapping(0).setObject(ps, param[0], oid.getKeyValue());
+                            getDatastoreMapping(0).setObject(ps, param[0], idKey);
                         }
                         catch (Exception e)
                         {
                             // Must be a String
-                            getDatastoreMapping(0).setObject(ps, param[0], oid.getKeyValue().toString());
+                            getDatastoreMapping(0).setObject(ps, param[0], idKey.toString());
                         }
                     }
                     else

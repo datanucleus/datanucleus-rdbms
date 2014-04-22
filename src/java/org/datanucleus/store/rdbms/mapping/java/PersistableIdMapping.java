@@ -24,7 +24,6 @@ import java.sql.ResultSet;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.util.ClassUtils;
 
 /**
@@ -88,7 +87,7 @@ public class PersistableIdMapping extends PersistableMapping
             cmd = ec.getMetaDataManager().getMetaDataForClass(getType(),ec.getClassLoaderResolver());
         }
 
-        if (value instanceof OID)
+        if (IdentityUtils.isDatastoreIdentity(value))
         {
             if (getJavaTypeMapping()[0] instanceof OIDMapping)
             {
@@ -96,7 +95,7 @@ public class PersistableIdMapping extends PersistableMapping
             }
             else
             {
-                Object key = ((OID)value).getKeyValue();
+                Object key = IdentityUtils.getTargetKeyForDatastoreIdentity(value);
                 if (key instanceof String)
                 {
                     getJavaTypeMapping()[0].setString(ec, ps, param, (String)key);

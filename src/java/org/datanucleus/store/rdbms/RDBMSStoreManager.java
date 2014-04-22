@@ -84,9 +84,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.flush.FlushOrdered;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.SCOID;
-import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -1726,11 +1724,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Really ought to be for a single inheritance tree (hence one element in the List) but we allow for
         // a user reusing their PK class in multiple trees
         List<AbstractClassMetaData> rootCmds = new ArrayList<AbstractClassMetaData>();
-        if (id instanceof OID)
+        if (IdentityUtils.isDatastoreIdentity(id))
         {
             // Datastore Identity, so identity is an OID, and the object is of the target class or a subclass
-            OID oid = (OID) id;
-            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(oid.getTargetClassName(), clr);
+            String className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
@@ -1740,7 +1738,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         else if (IdentityUtils.isSingleFieldIdentity(id))
         {
             // Using SingleFieldIdentity so can assume that object is of the target class or a subclass
-            String className = ((SingleFieldId)id).getTargetClassName();
+            String className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))

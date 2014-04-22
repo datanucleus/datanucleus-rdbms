@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
@@ -387,10 +386,10 @@ public class LocateBulkRequest extends BulkRequest
                 StatementMappingIndex idx = resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                 JavaTypeMapping idMapping = idx.getMapping();
                 key = idMapping.getObject(ec, rs, idx.getColumnPositions());
-                if (key instanceof OID)
+                if (IdentityUtils.isDatastoreIdentity(key))
                 {
                     // If mapping is OIDMapping then returns an OID rather than the column value
-                    key = ((OID)key).getKeyValue();
+                    key = IdentityUtils.getTargetKeyForDatastoreIdentity(key);
                 }
             }
             else if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -454,7 +453,7 @@ public class LocateBulkRequest extends BulkRequest
                 Object opId = missingOp.getInternalObjectId();
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    Object opKey = ((OID)opId).getKeyValue();
+                    Object opKey = IdentityUtils.getTargetKeyForDatastoreIdentity(opId);
                     if (opKey.getClass() != key.getClass())
                     {
                         opKey = TypeConversionHelper.convertTo(opKey, key.getClass());

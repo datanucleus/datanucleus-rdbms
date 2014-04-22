@@ -27,8 +27,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
-import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
@@ -343,12 +341,12 @@ public class ExpressionUtils
             BooleanExpression bExpr = null;
             boolean secondIsLiteral = (expr2 instanceof ObjectLiteral);
             Object value = (!secondIsLiteral ? ((ObjectLiteral)expr1).getValue() : ((ObjectLiteral)expr2).getValue());
-            if (value instanceof OID)
+            if (IdentityUtils.isDatastoreIdentity(value))
             {
                 // Object is an OID
-                NucleusLogger.GENERAL.info(">> ExprUtils.getEqualityExpr (datastore-id) type=" + ((OID)value).getKeyValue().getClass());
-                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(((OID)value).getKeyValue().getClass(), false); // TODO Is this correct, the type is the PK field type
-                SQLExpression oidLit = exprFactory.newLiteral(stmt, m, ((OID)value).getKeyValue());
+                Object valueKey = IdentityUtils.getTargetKeyForDatastoreIdentity(value);
+                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(valueKey.getClass(), false); // TODO Is this correct, the type is the PK field type
+                SQLExpression oidLit = exprFactory.newLiteral(stmt, m, valueKey);
                 if (equals)
                 {
                     return (secondIsLiteral ? expr1.subExprs.getExpression(0).eq(oidLit) : expr2.subExprs.getExpression(0).eq(oidLit));
@@ -361,9 +359,10 @@ public class ExpressionUtils
             else if (IdentityUtils.isSingleFieldIdentity(value))
             {
                 // Object is SingleFieldIdentity
-                NucleusLogger.GENERAL.info(">> ExprUtils.getEqualityExpr (singlefield-id) type=" + ((SingleFieldId)value).getTargetClass());
-                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(((SingleFieldId)value).getTargetClass(), false); // TODO See above, the type here is the object type
-                SQLExpression oidLit = exprFactory.newLiteral(stmt, m, IdentityUtils.getTargetKeyForSingleFieldIdentity(value));
+                Object valueKey = IdentityUtils.getTargetKeyForSingleFieldIdentity(value);
+                // This used to use ((SingleFieldId)value).getTargetClass() for some reason, which contradicts the above datastore id method
+                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(valueKey.getClass(), false);
+                SQLExpression oidLit = exprFactory.newLiteral(stmt, m, valueKey);
                 if (equals)
                 {
                     return (secondIsLiteral ? expr1.subExprs.getExpression(0).eq(oidLit) : expr2.subExprs.getExpression(0).eq(oidLit));
@@ -484,7 +483,7 @@ public class ExpressionUtils
                         // Datastore identity
                         SQLExpression source = (secondIsLiteral ? expr1.subExprs.getExpression(0) : expr2.subExprs.getExpression(0));
                         JavaTypeMapping mapping = (secondIsLiteral ? expr1.mapping : expr2.mapping);
-                        OID objectId = (OID)api.getIdForObject(value);
+                        Object objectId = api.getIdForObject(value);
                         if (objectId == null)
                         {
                             // PC object with no id (embedded, or transient maybe)
@@ -497,9 +496,9 @@ public class ExpressionUtils
                         }
                         else
                         {
-                            JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(
-                                objectId.getKeyValue().getClass(), false);
-                            SQLExpression oidExpr = exprFactory.newLiteral(stmt, m, objectId.getKeyValue());
+                            Object objectIdKey = IdentityUtils.getTargetKeyForDatastoreIdentity(objectId);
+                            JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(objectIdKey.getClass(), false);
+                            SQLExpression oidExpr = exprFactory.newLiteral(stmt, m, objectIdKey);
                             if (equals)
                             {
                                 return source.eq(oidExpr);

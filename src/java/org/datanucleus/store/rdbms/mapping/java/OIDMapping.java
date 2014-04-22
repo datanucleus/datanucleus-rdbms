@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.state.ObjectProvider;
@@ -54,11 +55,11 @@ public class OIDMapping extends SingleFieldMapping
         else
         {
             ApiAdapter api = ec.getApiAdapter();
-            OID oid;
+            Object id;
             if (api.isPersistable(value))
             {
-                oid = (OID) api.getIdForObject(value);
-                if (oid == null)
+                id = api.getIdForObject(value);
+                if (id == null)
                 {
                     if (ec.isInserting(value))
                     {
@@ -74,22 +75,23 @@ public class OIDMapping extends SingleFieldMapping
                         ec.flushInternal(false);
                     }
                 }
-                oid = (OID) api.getIdForObject(value);
+                id = api.getIdForObject(value);
             }
             else
             {
-                oid = (OID) value;
+                id = value;
             }
 
+            Object idKey = IdentityUtils.getTargetKeyForDatastoreIdentity(id);
             try
             {
                 // Try as a Long
-                getDatastoreMapping(0).setObject(ps,param[0],oid.getKeyValue());
+                getDatastoreMapping(0).setObject(ps,param[0], idKey);
             }
             catch (Exception e)
             {
                 // Must be a String
-                getDatastoreMapping(0).setObject(ps,param[0],oid.getKeyValue().toString());
+                getDatastoreMapping(0).setObject(ps,param[0], idKey.toString());
             }
         }
     }

@@ -25,7 +25,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.identity.OID;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
@@ -328,7 +328,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 value = javaTypeMappings[i].getObject(ec, rs, posMapping);
                 if (value != null)
                 {
-                    if (value instanceof OID)
+                    if (IdentityUtils.isDatastoreIdentity(value))
                     {
                         // What situation is this catering for exactly ?
                         Column col = null;
@@ -341,7 +341,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                             col = javaTypeMappings[i].getDatastoreMapping(0).getColumn();
                         }
                         String className = col.getStoredJavaType();
-                        value = OIDFactory.getInstance(ec.getNucleusContext(), className, ((OID)value).getKeyValue());
+                        value = OIDFactory.getInstance(ec.getNucleusContext(), className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
                         return ec.findObject(value, false, true, null);
                     }
                     else if (ec.getClassLoaderResolver().classForName(getType()).isAssignableFrom(value.getClass()))                

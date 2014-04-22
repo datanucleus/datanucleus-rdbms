@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.expression;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.identity.OID;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -90,12 +90,11 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
         {
             objClassName = mapping.getType();
         }
-        else if (value instanceof OID)
+        else if (IdentityUtils.isDatastoreIdentity(value))
         {
-            objClassName = ((OID)value).getTargetClassName();
+            objClassName = IdentityUtils.getTargetClassNameForIdentitySimple(value);
         }
-        AbstractClassMetaData cmd =
-            storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(objClassName, clr);
+        AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(objClassName, clr);
         if (cmd != null)
         {
             // Literal representing a persistable object (or its identity)
@@ -106,8 +105,7 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
                 if (parameterName == null && mapping instanceof PersistableMapping)
                 {
                     // Literal is a persistable object
-                    Object colValue = ((PersistableMapping)mapping).getValueForDatastoreMapping(
-                        stmt.getRDBMSManager().getNucleusContext(), i, value);
+                    Object colValue = ((PersistableMapping)mapping).getValueForDatastoreMapping(stmt.getRDBMSManager().getNucleusContext(), i, value);
                     colExpr = new ColumnExpression(stmt, colValue);
                 }
                 else

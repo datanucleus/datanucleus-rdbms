@@ -30,7 +30,6 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -671,7 +670,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 }
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    refString = definer + ":" + ((OID)op.getInternalObjectId()).getKeyValue();
+                    refString = definer + ":" + IdentityUtils.getTargetKeyForDatastoreIdentity(op.getInternalObjectId());
                 }
                 else
                 {
