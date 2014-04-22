@@ -37,6 +37,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -624,9 +625,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     else
                     {
                         boolean fieldsSet = false;
-                        if (api.isSingleFieldIdentity(id) && javaTypeMappings.length > 1)
+                        if (IdentityUtils.isSingleFieldIdentity(id) && javaTypeMappings.length > 1)
                         {
-                            Object key = api.getTargetKeyForSingleFieldIdentity(id);
+                            Object key = IdentityUtils.getTargetKeyForSingleFieldIdentity(id);
                             AbstractClassMetaData keyCmd = ec.getMetaDataManager().getMetaDataForClass(key.getClass(), clr);
                             if (keyCmd != null && keyCmd.getIdentityType() == IdentityType.NONDURABLE)
                             {

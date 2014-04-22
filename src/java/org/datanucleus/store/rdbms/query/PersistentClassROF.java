@@ -39,6 +39,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
+import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
@@ -390,7 +391,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             if (oid != null)
             {
                 Object id = oid;
-                if (!pcClassForObject.getName().equals(oid.getPcClass()))
+                if (!pcClassForObject.getName().equals(oid.getTargetClassName()))
                 {
                     // Get an OID for the right inheritance level
                     id = OIDFactory.getInstance(ec.getNucleusContext(), pcClassForObject.getName(), oid.getKeyValue());
@@ -469,16 +470,14 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param surrogateVersion Surrogate version if available
      * @return The object with this application identity
      */
-    private Object getObjectForApplicationId(final ExecutionContext ec, final ResultSet resultSet,
-            final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
-            Class pcClass, final AbstractClassMetaData cmd, boolean requiresInheritanceCheck,
-            final Object surrogateVersion)
+    private Object getObjectForApplicationId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
+            final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, boolean requiresInheritanceCheck, final Object surrogateVersion)
     {
         Object id = getIdentityForResultSetRow(storeMgr, resultSet, mappingDefinition, ec, cmd, pcClass, requiresInheritanceCheck);
-        if (ec.getApiAdapter().isSingleFieldIdentity(id))
+        if (IdentityUtils.isSingleFieldIdentity(id))
         {
             // Any single-field identity will have the precise target class determined above, so use it
-            pcClass = ec.getApiAdapter().getTargetClassForSingleFieldIdentity(id);
+            pcClass = ((SingleFieldId)id).getTargetClass();
         }
 
         return ec.findObject(id, new FieldValues()
@@ -575,7 +574,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             OID oid = (OID)mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
             if (oid != null)
             {
-                if (!pcClass.getName().equals(oid.getPcClass()))
+                if (!pcClass.getName().equals(oid.getTargetClassName()))
                 {
                     // Get an OID for the right inheritance level
                     oid = OIDFactory.getInstance(ec.getNucleusContext(), pcClass.getName(), oid.getKeyValue());

@@ -220,10 +220,10 @@ public class MappingHelper
             else
             {
                 // Make sure the key type is correct for the type of SingleFieldIdentity
-                Class keyType = ec.getApiAdapter().getKeyTypeForSingleFieldIdentityType(objectIdClass);
+                Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
                 idObj = ClassUtils.convertValue(idObj, keyType);
             }
-            return ec.getApiAdapter().getNewSingleFieldIdentity(objectIdClass, pcClass, idObj);
+            return IdentityUtils.getNewSingleFieldIdentity(objectIdClass, pcClass, idObj);
         }
         catch (Exception e)
         {
@@ -271,7 +271,7 @@ public class MappingHelper
                         // Oracle 10g returns BigDecimal for NUMBER columns, resulting in IllegalArgumentException 
                         // when reflective setter is invoked for incompatible field type
                         // (see http://www.jpox.org/servlet/jira/browse/CORE-2624)
-                        Class keyType = ec.getApiAdapter().getKeyTypeForSingleFieldIdentityType(field.getType());
+                        Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(field.getType());
                         obj = ClassUtils.convertValue(bigDecimal, keyType);
                         if (!bigDecimal.subtract(new BigDecimal("" + obj)).equals(new BigDecimal("0")))
                         {

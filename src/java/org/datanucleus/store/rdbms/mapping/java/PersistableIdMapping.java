@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.util.ClassUtils;
 
@@ -106,9 +107,9 @@ public class PersistableIdMapping extends PersistableMapping
                 }
             }
         }
-        else if (ec.getApiAdapter().isSingleFieldIdentity(value))
+        else if (IdentityUtils.isSingleFieldIdentity(value))
         {
-            Object key = ec.getApiAdapter().getTargetKeyForSingleFieldIdentity(value);
+            Object key = IdentityUtils.getTargetKeyForSingleFieldIdentity(value);
             if (key instanceof String)
             {
                 getJavaTypeMapping()[0].setString(ec, ps, param, (String)key);

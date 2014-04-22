@@ -92,7 +92,7 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
         }
         else if (value instanceof OID)
         {
-            objClassName = ((OID)value).getPcClass();
+            objClassName = ((OID)value).getTargetClassName();
         }
         AbstractClassMetaData cmd =
             storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(objClassName, clr);

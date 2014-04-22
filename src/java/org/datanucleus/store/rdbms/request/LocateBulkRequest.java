@@ -469,7 +469,7 @@ public class LocateBulkRequest extends BulkRequest
                 {
                     if (cmd.usesSingleFieldIdentityClass())
                     {
-                        Object opKey = ec.getApiAdapter().getTargetKeyForSingleFieldIdentity(opId);
+                        Object opKey = IdentityUtils.getTargetKeyForSingleFieldIdentity(opId);
                         if (opKey.equals(key))
                         {
                             op = missingOp;

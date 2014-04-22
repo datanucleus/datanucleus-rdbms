@@ -29,6 +29,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -743,7 +744,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
         }
         else if (refCmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            id = ec.getApiAdapter().getNewApplicationIdentityObjectId(ec.getClassLoaderResolver(), refCmd, refId);
+            id = IdentityUtils.getNewApplicationIdentityObjectId(ec.getClassLoaderResolver(), refCmd, refId);
         }
 
         // Retrieve the referenced object with this id
