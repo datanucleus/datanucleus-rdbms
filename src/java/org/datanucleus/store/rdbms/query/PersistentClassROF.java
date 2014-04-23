@@ -38,7 +38,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.OIDFactory;
-import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
@@ -474,7 +473,7 @@ public final class PersistentClassROF implements ResultObjectFactory
         if (IdentityUtils.isSingleFieldIdentity(id))
         {
             // Any single-field identity will have the precise target class determined above, so use it
-            pcClass = ((SingleFieldId)id).getTargetClass();
+            pcClass = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentitySimple(id));
         }
 
         return ec.findObject(id, new FieldValues()
