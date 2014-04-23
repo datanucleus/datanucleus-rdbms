@@ -345,7 +345,7 @@ public class ExpressionUtils
             {
                 // Object is an OID
                 Object valueKey = IdentityUtils.getTargetKeyForDatastoreIdentity(value);
-                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(valueKey.getClass(), false); // TODO Is this correct, the type is the PK field type
+                JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(valueKey.getClass(), false);
                 SQLExpression oidLit = exprFactory.newLiteral(stmt, m, valueKey);
                 if (equals)
                 {
