@@ -37,7 +37,6 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
 import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.identity.SingleFieldId;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -387,14 +386,13 @@ public final class PersistentClassROF implements ResultObjectFactory
             StatementMappingIndex datastoreIdMapping =
                 stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
-            OID oid = (OID)mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
-            if (oid != null)
+            Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
+            if (id != null)
             {
-                Object id = oid;
-                if (!pcClassForObject.getName().equals(oid.getTargetClassName()))
+                if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
                     // Get an OID for the right inheritance level
-                    id = OIDFactory.getInstance(ec.getNucleusContext(), pcClassForObject.getName(), oid.getKeyValue());
+                    id = OIDFactory.getInstance(ec.getNucleusContext(), pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
 
                 if (warnMsg != null)
@@ -408,8 +406,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 }
                 else
                 {
-                    obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, 
-                        id, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
+                    obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, id, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
                 }
             }
         }
@@ -571,21 +568,21 @@ public final class PersistentClassROF implements ResultObjectFactory
             StatementMappingIndex datastoreIdMapping =
                 mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
-            OID oid = (OID)mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
-            if (oid != null)
+            Object id = mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
+            if (id != null)
             {
-                if (!pcClass.getName().equals(oid.getTargetClassName()))
+                if (!pcClass.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
                     // Get an OID for the right inheritance level
-                    oid = OIDFactory.getInstance(ec.getNucleusContext(), pcClass.getName(), oid.getKeyValue());
+                    id = OIDFactory.getInstance(ec.getNucleusContext(), pcClass.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
             }
             if (inheritanceCheck)
             {
                 // Check if this identity exists in the cache(s)
-                if (ec.hasIdentityInCache(oid))
+                if (ec.hasIdentityInCache(id))
                 {
-                    return oid;
+                    return id;
                 }
 
                 // Check if this id for any known subclasses is in the cache to save searching
@@ -594,19 +591,19 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     for (int i=0;i<subclasses.length;i++)
                     {
-                        oid = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], oid.getKeyValue());
-                        if (ec.hasIdentityInCache(oid))
+                        id = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                        if (ec.hasIdentityInCache(id))
                         {
-                            return oid;
+                            return id;
                         }
                     }
                 }
 
                 // Check the inheritance with the store manager (may involve a trip to the datastore)
-                String className = ec.getStoreManager().getClassNameForObjectID(oid, ec.getClassLoaderResolver(), ec);
-                return OIDFactory.getInstance(ec.getNucleusContext(), className, oid.getKeyValue());
+                String className = ec.getStoreManager().getClassNameForObjectID(id, ec.getClassLoaderResolver(), ec);
+                return OIDFactory.getInstance(ec.getNucleusContext(), className, IdentityUtils.getTargetKeyForDatastoreIdentity(id));
             }
-            return oid;
+            return id;
         }
         return null;
     }
