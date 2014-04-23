@@ -79,7 +79,7 @@ import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.OIDMapping;
+import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -3281,7 +3281,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     ctrArgTypes[i] = ((NewObjectExpression)sqlExpr).getNewClass();
                 }
-                else if (sqlExpr.getJavaTypeMapping() instanceof OIDMapping ||
+                else if (sqlExpr.getJavaTypeMapping() instanceof DatastoreIdMapping ||
                         sqlExpr.getJavaTypeMapping() instanceof PersistableMapping)
                 {
                     ctrArgTypes[i] = clr.classForName(sqlExpr.getJavaTypeMapping().getType());

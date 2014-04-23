@@ -30,7 +30,6 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -733,17 +732,17 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             if (mappingStrategy == ID_MAPPING)
             {
                 // refId is the OID.toString() form
-                id = OIDFactory.getInstance(ec.getNucleusContext(), refId);
+                id = ec.getNucleusContext().getIdentityManager().getDatastoreId(refId);
             }
             else if (mappingStrategy == XCALIA_MAPPING)
             {
                 // refId is simply the OID key in this case
-                id = OIDFactory.getInstance(ec.getNucleusContext(), refCmd.getFullClassName(), refId);
+                id = ec.getNucleusContext().getIdentityManager().getDatastoreId(refCmd.getFullClassName(), refId);
             }
         }
         else if (refCmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            id = IdentityUtils.getNewApplicationIdentityObjectId(ec.getClassLoaderResolver(), refCmd, refId);
+            id = ec.getNucleusContext().getIdentityManager().getApplicationId(ec.getClassLoaderResolver(), refCmd, refId);
         }
 
         // Retrieve the referenced object with this id

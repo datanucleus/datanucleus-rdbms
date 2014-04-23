@@ -26,7 +26,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.OIDMapping;
+import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.scostore.Store;
@@ -123,7 +123,7 @@ public abstract class BaseContainerStore implements Store
     protected boolean isEmbeddedMapping(JavaTypeMapping mapping)
     {
         return !InterfaceMapping.class.isAssignableFrom(mapping.getClass()) &&
-               !OIDMapping.class.isAssignableFrom(mapping.getClass()) &&
+               !DatastoreIdMapping.class.isAssignableFrom(mapping.getClass()) &&
                !PersistableMapping.class.isAssignableFrom(mapping.getClass());
     }
 

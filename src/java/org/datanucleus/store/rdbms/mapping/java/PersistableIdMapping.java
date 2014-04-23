@@ -89,7 +89,7 @@ public class PersistableIdMapping extends PersistableMapping
 
         if (IdentityUtils.isDatastoreIdentity(value))
         {
-            if (getJavaTypeMapping()[0] instanceof OIDMapping)
+            if (getJavaTypeMapping()[0] instanceof DatastoreIdMapping)
             {
                 getJavaTypeMapping()[0].setObject(ec, ps, param, value);
             }

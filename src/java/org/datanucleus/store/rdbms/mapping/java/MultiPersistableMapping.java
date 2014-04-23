@@ -26,7 +26,6 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
@@ -341,7 +340,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                             col = javaTypeMappings[i].getDatastoreMapping(0).getColumn();
                         }
                         String className = col.getStoredJavaType();
-                        value = OIDFactory.getInstance(ec.getNucleusContext(), className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
+                        value = ec.getNucleusContext().getIdentityManager().getDatastoreId(className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
                         return ec.findObject(value, false, true, null);
                     }
                     else if (ec.getClassLoaderResolver().classForName(getType()).isAssignableFrom(value.getClass()))                

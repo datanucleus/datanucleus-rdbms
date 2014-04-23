@@ -27,7 +27,6 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
@@ -112,7 +111,7 @@ public class MappingHelper
 
         if (oid != null)
         {
-            oid = OIDFactory.getInstance(ec.getNucleusContext(), mapping.getType(), oid);
+            oid = ec.getNucleusContext().getIdentityManager().getDatastoreId(mapping.getType(), oid);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041034",oid));
@@ -223,7 +222,7 @@ public class MappingHelper
                 Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
                 idObj = ClassUtils.convertValue(idObj, keyType);
             }
-            return IdentityUtils.getNewSingleFieldIdentity(objectIdClass, pcClass, idObj);
+            return ec.getNucleusContext().getIdentityManager().getSingleFieldId(objectIdClass, pcClass, idObj);
         }
         catch (Exception e)
         {

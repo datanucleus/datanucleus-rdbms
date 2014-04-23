@@ -25,7 +25,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.table.Table;
@@ -183,7 +182,7 @@ public class InterfaceMapping extends ReferenceMapping
                         {
                             className = mapping.getDatastoreMapping(0).getColumn().getStoredJavaType();
                         }
-                        value = OIDFactory.getInstance(ec.getNucleusContext(), className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
+                        value = ec.getNucleusContext().getIdentityManager().getDatastoreId(className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
                         return ec.findObject(value, false, true, null);
                     }
                     else if (ec.getClassLoaderResolver().classForName(getType()).isAssignableFrom(value.getClass()))               	

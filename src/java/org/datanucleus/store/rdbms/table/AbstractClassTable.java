@@ -28,7 +28,7 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.identity.OID;
+import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -45,7 +45,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.OIDMapping;
+import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -319,7 +319,7 @@ public abstract class AbstractClassTable extends TableImpl
     void addDatastoreId(ColumnMetaData columnMetaData, DatastoreClass refTable, AbstractClassMetaData cmd)
     {
         // Create the mapping, setting its table
-        datastoreIDMapping = new OIDMapping();
+        datastoreIDMapping = new DatastoreIdMapping();
         datastoreIDMapping.setTable(this);
         datastoreIDMapping.initialize(storeMgr, cmd.getFullClassName());
 
@@ -339,17 +339,17 @@ public abstract class AbstractClassTable extends TableImpl
             if (refTable != null)
             {
                 colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(refTable.getIdentifier().getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(OID.class), FieldRole.ROLE_OWNER).getIdentifierName());
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_OWNER).getIdentifierName());
             }
             else
             {
                 colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(identifier.getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(OID.class), FieldRole.ROLE_NONE).getIdentifierName());
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_NONE).getIdentifierName());
             }
         }
 
         // Add the datastore identity column as the PK
-        Column idColumn = addColumn(OID.class.getName(), 
+        Column idColumn = addColumn(DatastoreId.class.getName(), 
             storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIDMapping, colmd);
         idColumn.setAsPrimaryKey();
 

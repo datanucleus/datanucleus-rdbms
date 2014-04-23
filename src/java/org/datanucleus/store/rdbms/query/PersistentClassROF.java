@@ -37,7 +37,6 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
@@ -391,7 +390,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
                     // Get an OID for the right inheritance level
-                    id = OIDFactory.getInstance(ec.getNucleusContext(), pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                    id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
 
                 if (warnMsg != null)
@@ -573,7 +572,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (!pcClass.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
                     // Get an OID for the right inheritance level
-                    id = OIDFactory.getInstance(ec.getNucleusContext(), pcClass.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                    id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClass.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
             }
             if (inheritanceCheck)
@@ -590,7 +589,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     for (int i=0;i<subclasses.length;i++)
                     {
-                        id = OIDFactory.getInstance(ec.getNucleusContext(), subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                        id = ec.getNucleusContext().getIdentityManager().getDatastoreId(subclasses[i], IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                         if (ec.hasIdentityInCache(id))
                         {
                             return id;
@@ -600,7 +599,7 @@ public final class PersistentClassROF implements ResultObjectFactory
 
                 // Check the inheritance with the store manager (may involve a trip to the datastore)
                 String className = ec.getStoreManager().getClassNameForObjectID(id, ec.getClassLoaderResolver(), ec);
-                return OIDFactory.getInstance(ec.getNucleusContext(), className, IdentityUtils.getTargetKeyForDatastoreIdentity(id));
+                return ec.getNucleusContext().getIdentityManager().getDatastoreId(className, IdentityUtils.getTargetKeyForDatastoreIdentity(id));
             }
             return id;
         }

@@ -28,8 +28,7 @@ import java.sql.ResultSet;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.identity.IdentityUtils;
-import org.datanucleus.identity.OID;
-import org.datanucleus.identity.OIDFactory;
+import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.util.NucleusLogger;
@@ -37,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Mapping for datastore identity "field".
  */
-public class OIDMapping extends SingleFieldMapping
+public class DatastoreIdMapping extends SingleFieldMapping
 {
     /**
      * Mutator for the OID in the datastore
@@ -125,7 +124,7 @@ public class OIDMapping extends SingleFieldMapping
 
         if (value != null)
         {
-            value = OIDFactory.getInstance(ec.getNucleusContext(), getType(), value);
+            value = ec.getNucleusContext().getIdentityManager().getDatastoreId(getType(), value);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041034",value));
@@ -137,6 +136,6 @@ public class OIDMapping extends SingleFieldMapping
 
     public Class getJavaType()
     {
-        return OID.class;
+        return DatastoreId.class;
     }
 }

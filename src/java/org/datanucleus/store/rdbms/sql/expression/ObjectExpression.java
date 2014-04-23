@@ -25,7 +25,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.identity.OIDFactory;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
@@ -159,7 +158,7 @@ public class ObjectExpression extends SQLExpression
                     {
                         try
                         {
-                            Object id = OIDFactory.getInstance(stmt.getRDBMSManager().getNucleusContext(), oidString);
+                            Object id = stmt.getRDBMSManager().getNucleusContext().getIdentityManager().getDatastoreId(oidString);
                             if (id == null)
                             {
                                 // TODO Implement this comparison with the key value

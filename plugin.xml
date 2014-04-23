@@ -268,7 +268,8 @@ Contributors:
         <mapping java-type="java.util.Vector" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
 
         <!-- DataNucleus types -->
-        <mapping java-type="org.datanucleus.identity.OID" mapping-class="org.datanucleus.store.rdbms.mapping.java.OIDMapping"/>
+        <mapping java-type="org.datanucleus.identity.DatastoreId" mapping-class="org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping"/>
+
         <mapping java-type="org.datanucleus.store.types.backed.ArrayList" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
         <mapping java-type="org.datanucleus.store.types.backed.Collection" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
         <mapping java-type="org.datanucleus.store.types.backed.HashMap" mapping-class="org.datanucleus.store.rdbms.mapping.java.MapMapping"/>
@@ -746,30 +747,30 @@ Contributors:
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BinaryStreamRDBMSMapping">
         </mapping>
 
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="BIGINT" sql-type="BIGINT" default="true"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="BIGINT" sql-type="BIGINT" default="true"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="INTEGER" sql-type="INTEGER" default="false"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INTEGER" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="CHAR" sql-type="CHAR" default="false"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="CHAR" sql-type="CHAR" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="INTEGER" sql-type="INT" default="true"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INT" default="true"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="sapdb"/>
             <includes vendor-id="sqlserver"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.OID" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
@@ -851,7 +852,7 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.NumberMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OIDMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.ObjectLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.ObjectExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.PersistableMapping" 
