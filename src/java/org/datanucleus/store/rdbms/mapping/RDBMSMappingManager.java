@@ -79,7 +79,6 @@ import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MultiMap;
 import org.datanucleus.util.NucleusLogger;
@@ -142,8 +141,6 @@ public class RDBMSMappingManager implements MappingManager
                 String jdbcType = elems[i].getAttribute("jdbc-type");
                 String sqlType = elems[i].getAttribute("sql-type");
                 String defaultJava = elems[i].getAttribute("default");
-                String javaVersion = elems[i].getAttribute("java-version");
-                String javaVersionRestricted = elems[i].getAttribute("java-version-restricted");
 
                 boolean defaultForJavaType = false;
                 if (defaultJava != null)
@@ -154,55 +151,37 @@ public class RDBMSMappingManager implements MappingManager
                     }
                 }
 
-                boolean javaRestricted = false;
-                if (javaVersionRestricted != null)
+                Class mappingType = null;
+                if (!StringUtils.isWhitespace(rdbmsMappingClassName))
                 {
-                    if (javaVersionRestricted.equalsIgnoreCase("true"))
+                    try
                     {
-                        javaRestricted = Boolean.TRUE.booleanValue();
+                        mappingType = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), rdbmsMappingClassName);
                     }
-                }
-
-                if (javaVersion == null || javaVersion.length() < 1)
-                {
-                    // Default to use for all JDKs 1.7+
-                    javaVersion = "1.7";
-                }
-
-                if ((JavaUtils.isGreaterEqualsThan(javaVersion) && !javaRestricted) || (JavaUtils.isEqualsThan(javaVersion) && javaRestricted))
-                {
-                    Class mappingType = null;
-                    if (!StringUtils.isWhitespace(rdbmsMappingClassName))
+                    catch (NucleusException ne)
                     {
-                        try
+                        NucleusLogger.DATASTORE.error(LOCALISER_RDBMS.msg("041013", rdbmsMappingClassName));
+                    }
+                    Set includes = new HashSet();
+                    Set excludes = new HashSet();
+                    ConfigurationElement[] childElm = elems[i].getChildren();
+                    for (int j=0; j<childElm.length; j++)
+                    {
+                        if (childElm[j].getName().equals("includes"))
                         {
-                            mappingType = mgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), rdbmsMappingClassName);
+                            includes.add(childElm[j].getAttribute("vendor-id"));
                         }
-                        catch (NucleusException ne)
+                        else if (childElm[j].getName().equals("excludes"))
                         {
-                            NucleusLogger.DATASTORE.error(LOCALISER_RDBMS.msg("041013", rdbmsMappingClassName));
+                            excludes.add(childElm[j].getAttribute("vendor-id"));
                         }
-                        Set includes = new HashSet();
-                        Set excludes = new HashSet();
-                        ConfigurationElement[] childElm = elems[i].getChildren();
-                        for (int j=0; j<childElm.length; j++)
-                        {
-                            if (childElm[j].getName().equals("includes"))
-                            {
-                                includes.add(childElm[j].getAttribute("vendor-id"));
-                            }
-                            else if (childElm[j].getName().equals("excludes"))
-                            {
-                                excludes.add(childElm[j].getAttribute("vendor-id"));
-                            }
-                        }
+                    }
 
-                        if (!excludes.contains(vendorId))
+                    if (!excludes.contains(vendorId))
+                    {
+                        if (includes.isEmpty() || includes.contains(vendorId))
                         {
-                            if (includes.isEmpty() || includes.contains(vendorId))
-                            {
-                                registerDatastoreMapping(javaName, mappingType, jdbcType, sqlType, defaultForJavaType);
-                            }
+                            registerDatastoreMapping(javaName, mappingType, jdbcType, sqlType, defaultForJavaType);
                         }
                     }
                 }

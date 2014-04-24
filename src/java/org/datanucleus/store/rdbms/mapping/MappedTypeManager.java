@@ -29,7 +29,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.types.TypeManager;
-import org.datanucleus.util.JavaUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -153,22 +152,11 @@ public class MappedTypeManager
             {
                 String javaName = elems[i].getAttribute("java-type").trim();
                 String mappingClassName = elems[i].getAttribute("mapping-class");
-                String javaVersionRestrict = elems[i].getAttribute("java-version-restricted");
-                boolean javaRestricted = false;
-                if (javaVersionRestrict != null && javaVersionRestrict.equalsIgnoreCase("true"))
-                {
-                    javaRestricted = Boolean.TRUE.booleanValue();
-                }
-                String javaVersion = elems[i].getAttribute("java-version");
-                if (StringUtils.isWhitespace(javaVersion))
-                {
-                    javaVersion = "1.7";
-                }
 
                 if (!mappedTypes.containsKey(javaName)) // Use "priority" attribute to be placed higher in the list
                 {
                     addMappedType(mgr, elems[i].getExtension().getPlugin().getSymbolicName(), javaName, 
-                        mappingClassName, javaVersion, javaRestricted, clr);
+                        mappingClassName, clr);
                 }
             }
         }
@@ -214,49 +202,43 @@ public class MappedTypeManager
      * @param pluginId the plug-in id
      * @param className Name of the class to add
      * @param mappingClassName The Java mapping type
-     * @param javaVersion the minimum java version required at runtime to add this type
-     * @param javaRestricted if this type is restricted only to the specified java version
      * @param clr the ClassLoaderResolver
      */
     private void addMappedType(PluginManager mgr, String pluginId, String className, String mappingClassName,
-            String javaVersion, boolean javaRestricted, ClassLoaderResolver clr)
+            ClassLoaderResolver clr)
     {
         if (className == null)
         {
             return;
         }
 
-        if ((JavaUtils.isGreaterEqualsThan(javaVersion) && !javaRestricted) ||
-            (JavaUtils.isEqualsThan(javaVersion) && javaRestricted))
+        Class mappingType = null;
+        if (!StringUtils.isWhitespace(mappingClassName))
         {
-            Class mappingType = null;
-            if (!StringUtils.isWhitespace(mappingClassName))
-            {
-                try
-                {
-                    mappingType = mgr.loadClass(pluginId,mappingClassName);
-                }
-                catch (NucleusException jpe)
-                {
-                    NucleusLogger.PERSISTENCE.error(LOCALISER.msg("016004", mappingClassName));
-                    return;
-                }
-            }
-
-            Class cls = null;
             try
             {
-                cls = clr.classForName(className);
+                mappingType = mgr.loadClass(pluginId,mappingClassName);
             }
-            catch (Exception e)
+            catch (NucleusException jpe)
             {
-                // Class not found so ignore. Should log this
+                NucleusLogger.PERSISTENCE.error(LOCALISER.msg("016004", mappingClassName));
+                return;
             }
-            if (cls != null)
-            {
-                MappedType type = new MappedType(cls, mappingType);
-                mappedTypes.put(className, type);
-            }
+        }
+
+        Class cls = null;
+        try
+        {
+            cls = clr.classForName(className);
+        }
+        catch (Exception e)
+        {
+            // Class not found so ignore. Should log this
+        }
+        if (cls != null)
+        {
+            MappedType type = new MappedType(cls, mappingType);
+            mappedTypes.put(className, type);
         }
     }
 
