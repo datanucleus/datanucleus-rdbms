@@ -1,0 +1,355 @@
+[schematool] 17:32:53,496 (main) INFO [JPOX.SchemaTool] - SybaseAdapter : Adaptive Server Enterprise version=Adaptive Server Enterprise/15.0.1/EBF 13825/P/ia64/HP-UX B.11.23/ase1501/2379/64-bit/FBO/Tue Aug 15 04:12:57 2006, major=15, minor=0, revision=13825411
+[schematool] Identifier Names : UPPERCASE
+[schematool] Driver name=jConnect (TM) for JDBC (TM), version=jConnect (TM) for JDBC(TM)/6.05(Build 25984)/P/EBF13730/JDK14/Mon Jul 17 9:09:06 2006, major=6, minor=0
+[schematool] Identifier Max Lengths : Table=30 Column=30 Constraint=30 Index=30 Delimeters="
+[schematool] Identifier Support in DDL : catalog=true schema=true
+[schematool] SybaseAdapter : Adaptive Server Enterprise version=Adaptive Server Enterprise/15.0.1/EBF 13825/P/ia64/HP-UX B.11.23/ase1501/2379/64-bit/FBO/Tue Aug 15 04:12:57 2006, major=15, minor=0, revision=13825411
+[schematool] Identifier Names : UPPERCASE
+[schematool] Driver name=jConnect (TM) for JDBC (TM), version=jConnect (TM) for JDBC(TM)/6.05(Build 25984)/P/EBF13730/JDK14/Mon Jul 17 9:09:06 2006, major=6, minor=0
+[schematool] Identifier Max Lengths : Table=30 Column=30 Constraint=30 Index=30 Delimeters="
+[schematool] Identifier Support in DDL : catalog=true schema=true
+
+[schematool] JPOX SchemaTool : Database Type Info
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = binary
+[schematool] jdbcTypeName = Types.BINARY
+[schematool] dataType = -2
+[schematool] precision = 4096
+[schematool] literalPrefix = 0x
+[schematool] literalSuffix = null
+[schematool] createParams = length
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = binary
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = int
+[schematool] jdbcTypeName = Types.INTEGER
+[schematool] dataType = 4
+[schematool] precision = 10
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = int
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = float
+[schematool] jdbcTypeName = Types.DOUBLE
+[schematool] dataType = 8
+[schematool] precision = 8
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = float
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = text
+[schematool] jdbcTypeName = Types.LONGVARCHAR
+[schematool] dataType = -1
+[schematool] precision = 2147483647
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 1
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = text
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = decimal
+[schematool] jdbcTypeName = Types.DECIMAL
+[schematool] dataType = 3
+[schematool] precision = 38
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = precision,scale
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = decimal
+[schematool] minimumScale = 0
+[schematool] maximumScale = 38
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = date
+[schematool] jdbcTypeName = Types.DATE
+[schematool] dataType = 91
+[schematool] precision = 10
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = date
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = real
+[schematool] jdbcTypeName = Types.REAL
+[schematool] dataType = 7
+[schematool] precision = 7
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = real
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = longsysname
+[schematool] jdbcTypeName = Types.VARCHAR
+[schematool] dataType = 12
+[schematool] precision = 255
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = longsysname
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = bigint
+[schematool] jdbcTypeName = Types.BIGINT
+[schematool] dataType = -5
+[schematool] precision = 19
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = bigint
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = numeric
+[schematool] jdbcTypeName = Types.NUMERIC
+[schematool] dataType = 2
+[schematool] precision = 38
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = precision,scale
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = numeric
+[schematool] minimumScale = 0
+[schematool] maximumScale = 38
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = extended type
+[schematool] jdbcTypeName = Types.OTHER
+[schematool] dataType = 1111
+[schematool] precision = 2147483647
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 1
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = java.lang.Object
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = time
+[schematool] jdbcTypeName = Types.TIME
+[schematool] dataType = 92
+[schematool] precision = 12
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = time
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = image
+[schematool] jdbcTypeName = Types.LONGVARBINARY
+[schematool] dataType = -4
+[schematool] precision = 2147483647
+[schematool] literalPrefix = 0x
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 1
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = image
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = char
+[schematool] jdbcTypeName = Types.CHAR
+[schematool] dataType = 1
+[schematool] precision = 4096
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = length
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = char
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = datetime
+[schematool] jdbcTypeName = Types.TIMESTAMP
+[schematool] dataType = 93
+[schematool] precision = 23
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = datetime
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = varbinary
+[schematool] jdbcTypeName = Types.VARBINARY
+[schematool] dataType = -3
+[schematool] precision = 4096
+[schematool] literalPrefix = 0x
+[schematool] literalSuffix = null
+[schematool] createParams = max length
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = varbinary
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = bit
+[schematool] jdbcTypeName = Types.BIT
+[schematool] dataType = -7
+[schematool] precision = 1
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 0
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = bit
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+
+[schematool] org.jpox.store.rdbms.typeinfo.TypeInfo
+[schematool] typeName = smallint
+[schematool] jdbcTypeName = Types.SMALLINT
+[schematool] dataType = 5
+[schematool] precision = 5
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 2
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = smallint
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+

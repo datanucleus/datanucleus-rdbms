@@ -1,0 +1,346 @@
+Adapter : org.jpox.store.rdbms.adapter.MySQLAdapter
+Datastore : name="MySQL" version="5.0.18-Max-log" (major=5, minor=0, revision=18)
+Driver : name="MySQL-AB JDBC Driver" version="mysql-connector-java-5.0.3 ( $Date: 2006/08/22 05:33:29 $, $Revision: 1.1 $ )" (major=5, minor=0)
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = INTEGER
+jdbcTypeName = INTEGER
+dataType = 4
+precision = 10
+literalPrefix =
+literalSuffix =
+createParams = [(M)] [UNSIGNED] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = true
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = INTEGER
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = TINYINT
+jdbcTypeName = TINYINT
+dataType = -6
+precision = 3
+literalPrefix =
+literalSuffix =
+createParams = [(M)] [UNSIGNED] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = true
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = TINYINT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = DOUBLE
+jdbcTypeName = DOUBLE
+dataType = 8
+precision = 17
+literalPrefix =
+literalSuffix =
+createParams = [(M,D)] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = DOUBLE
+minimumScale = -308
+maximumScale = 308
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = MEDIUMBLOB
+jdbcTypeName = BLOB
+dataType = 2004
+precision = 2147483647
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = MEDIUMBLOB
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = LONG VARCHAR
+jdbcTypeName = LONGVARCHAR
+dataType = -1
+precision = 16777215
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = LONG VARCHAR
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = MEDIUMTEXT
+jdbcTypeName = CLOB
+dataType = 2005
+precision = 2147483647
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = MEDIUMTEXT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = DECIMAL
+jdbcTypeName = DECIMAL
+dataType = 3
+precision = 17
+literalPrefix =
+literalSuffix =
+createParams = [(M[,D])] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = DECIMAL
+minimumScale = -308
+maximumScale = 308
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = DATE
+jdbcTypeName = DATE
+dataType = 91
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = DATE
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = VARCHAR(M) BINARY
+jdbcTypeName = VARCHAR
+dataType = 12
+precision = 255
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = VARCHAR
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = BIGINT
+jdbcTypeName = BIGINT
+dataType = -5
+precision = 19
+literalPrefix =
+literalSuffix =
+createParams = [(M)] [UNSIGNED] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = true
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = BIGINT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = NUMERIC
+jdbcTypeName = NUMERIC
+dataType = 2
+precision = 17
+literalPrefix =
+literalSuffix =
+createParams = [(M[,D])] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = NUMERIC
+minimumScale = -308
+maximumScale = 308
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = TIME
+jdbcTypeName = TIME
+dataType = 92
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = TIME
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = LONG VARBINARY
+jdbcTypeName = LONGVARBINARY
+dataType = -4
+precision = 16777215
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = LONG VARBINARY
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = FLOAT
+jdbcTypeName = FLOAT
+dataType = 6
+precision = 10
+literalPrefix =
+literalSuffix =
+createParams = [(M,D)] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = FLOAT
+minimumScale = -38
+maximumScale = 38
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = CHAR(M) BINARY
+jdbcTypeName = CHAR
+dataType = 1
+precision = 255
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = CHAR
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = DATETIME
+jdbcTypeName = TIMESTAMP
+dataType = 93
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = DATETIME
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = BIT
+jdbcTypeName = BIT
+dataType = -7
+precision = 1
+literalPrefix =
+literalSuffix =
+createParams =
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = BIT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+typeName = SMALLINT
+jdbcTypeName = SMALLINT
+dataType = 5
+precision = 5
+literalPrefix =
+literalSuffix =
+createParams = [(M)] [UNSIGNED] [ZEROFILL]
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = true
+fixedPrecScale = false
+autoIncrement = true
+localTypeName = SMALLINT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10

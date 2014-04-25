@@ -1,0 +1,898 @@
+[schematool] DB2Adapter : DB2 UDB for AS/400 version=05.02.0000 V5R2m0, major=5, minor=0, revision=0
+[schematool] Identifier Names supported : UPPERCASE "MixedCase"
+[schematool] Driver name=AS/400 Toolbox for Java JDBC Driver, version=5.0, major=5, minor=0
+[schematool] Identifier Max Lengths : Table=128 Constraints=18 Index=18 Column=30 Delimeters="
+[schematool] Identifier Support in DDL : catalog=false schema=true
+[schematool] JPOX SchemaTool : Database Type Info
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = CHAR() FOR BIT DATA
+[schematool] jdbcTypeName = Types.BINARY
+[schematool] dataType = -2
+[schematool] precision = 32765
+[schematool] literalPrefix = X'
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = CHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = INTEGER
+[schematool] jdbcTypeName = Types.INTEGER
+[schematool] dataType = 4
+[schematool] precision = 10
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = INTEGER
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = DOUBLE
+[schematool] jdbcTypeName = Types.DOUBLE
+[schematool] dataType = 8
+[schematool] precision = 53
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = FLOAT
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 2
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = BLOB
+[schematool] jdbcTypeName = Types.BLOB
+[schematool] dataType = 2004
+[schematool] precision = 2147483646
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = BLOB
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = LONG VARCHAR
+[schematool] jdbcTypeName = Types.LONGVARCHAR
+[schematool] dataType = -1
+[schematool] precision = 32739
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = LONG VARCHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = CLOB
+[schematool] jdbcTypeName = Types.CLOB
+[schematool] dataType = 2005
+[schematool] precision = 2147483646
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = CLOB
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = DECIMAL
+[schematool] jdbcTypeName = Types.DECIMAL
+[schematool] dataType = 3
+[schematool] precision = 31
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = PRECISION,SCALE
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = DECIMAL
+[schematool] minimumScale = 0
+[schematool] maximumScale = 31
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = DATE
+[schematool] jdbcTypeName = Types.DATE
+[schematool] dataType = 91
+[schematool] precision = 10
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = DATE
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = REAL
+[schematool] jdbcTypeName = Types.REAL
+[schematool] dataType = 7
+[schematool] precision = 24
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = REAL
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 2
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = VARCHAR
+[schematool] jdbcTypeName = Types.VARCHAR
+[schematool] dataType = 12
+[schematool] precision = 32739
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = VARCHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = BIGINT
+[schematool] jdbcTypeName = Types.BIGINT
+[schematool] dataType = -5
+[schematool] precision = 19
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = BIGINT
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = NUMERIC
+[schematool] jdbcTypeName = Types.NUMERIC
+[schematool] dataType = 2
+[schematool] precision = 31
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = PRECISION,SCALE
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = NUMERIC
+[schematool] minimumScale = 0
+[schematool] maximumScale = 31
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = LONG VARCHAR FOR BIT DATA
+[schematool] jdbcTypeName = Types.LONGVARBINARY
+[schematool] dataType = -4
+[schematool] precision = 32739
+[schematool] literalPrefix = X'
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = LONG VARCHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = TIME
+[schematool] jdbcTypeName = Types.TIME
+[schematool] dataType = 92
+[schematool] precision = 8
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = TIME
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = DATALINK
+[schematool] jdbcTypeName = Unrecognized type (70)
+[schematool] dataType = 70
+[schematool] precision = 32717
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams =
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = DATALINK
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = FLOAT
+[schematool] jdbcTypeName = Types.FLOAT
+[schematool] dataType = 6
+[schematool] precision = 53
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = FLOAT
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 2
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = CHAR
+[schematool] jdbcTypeName = Types.CHAR
+[schematool] dataType = 1
+[schematool] precision = 32765
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = CHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = VARCHAR() FOR BIT DATA
+[schematool] jdbcTypeName = Types.VARBINARY
+[schematool] dataType = -3
+[schematool] precision = 32739
+[schematool] literalPrefix = X'
+[schematool] literalSuffix = '
+[schematool] createParams = MAX LENGTH
+[schematool] nullable = 1
+[schematool] caseSensitive = true
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = VARCHAR
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 0
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = TIMESTAMP
+[schematool] jdbcTypeName = Types.TIMESTAMP
+[schematool] dataType = 93
+[schematool] precision = 26
+[schematool] literalPrefix = '
+[schematool] literalSuffix = '
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = true
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = TIMESTAMP
+[schematool] minimumScale = 6
+[schematool] maximumScale = 6
+[schematool] numPrecRadix = 10
+[schematool] org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+[schematool] typeName = SMALLINT
+[schematool] jdbcTypeName = Types.SMALLINT
+[schematool] dataType = 5
+[schematool] precision = 5
+[schematool] literalPrefix = null
+[schematool] literalSuffix = null
+[schematool] createParams = null
+[schematool] nullable = 1
+[schematool] caseSensitive = false
+[schematool] searchable = 3
+[schematool] unsignedAttribute = false
+[schematool] fixedPrecScale = false
+[schematool] autoIncrement = false
+[schematool] localTypeName = SMALLINT
+[schematool] minimumScale = 0
+[schematool] maximumScale = 0
+[schematool] numPrecRadix = 10
+[schematool] JPOX SchemaTool : Database Keywords
+[schematool] INDEX
+[schematool] MAP
+[schematool] FETCH
+[schematool] PCTFREE
+[schematool] DSNHATTR
+[schematool] INTO
+[schematool] ORDINALITY
+[schematool] BUFFERPOOL
+[schematool] NUMBER
+[schematool] DEFINITION
+[schematool] METHOD
+[schematool] RENAME
+[schematool] COLUMN_NAME
+[schematool] MODE
+[schematool] ATOMIC
+[schematool] CALLED
+[schematool] VIEW
+[schematool] LOCALTIMESTAMP
+[schematool] ALIAS
+[schematool] UNCOMMITTED
+[schematool] LINKTYPE
+[schematool] COLLATION_NAME
+[schematool] PACKAGE
+[schematool] CONNECT
+[schematool] TIMEZONE_MINUTE
+[schematool] BINARY
+[schematool] DB2SQL
+[schematool] CONTINUE
+[schematool] CONSTRAINT_SCHEMA
+[schematool] CONSTRAINT
+[schematool] COBOL
+[schematool] DETERMINISTIC
+[schematool] SELECT
+[schematool] MODULE
+[schematool] FIELDPROC
+[schematool] CONNECTION
+[schematool] NUMERIC
+[schematool] LOCKSIZE
+[schematool] GO
+[schematool] SESSION
+[schematool] UNION
+[schematool] LC_CTYPE
+[schematool] SYSPROC
+[schematool] NONE
+[schematool] FINAL
+[schematool] OBID
+[schematool] UPDATE
+[schematool] ZONE
+[schematool] NULLS
+[schematool] SCALE
+[schematool] LOCATORS
+[schematool] ARE
+[schematool] ANY
+[schematool] EQUALS
+[schematool] BOOLEAN
+[schematool] ALLOW
+[schematool] SESSION_USER
+[schematool] SECURITY
+[schematool] NULL
+[schematool] DIAGNOSTICS
+[schematool] NAMED
+[schematool] SCRATCHPAD
+[schematool] SET
+[schematool] MESSAGE_TEXT
+[schematool] INDICATOR
+[schematool] DAY
+[schematool] UNIQUE
+[schematool] PATH
+[schematool] TYPE
+[schematool] PUBLIC
+[schematool] LONG
+[schematool] NULLABLE
+[schematool] INPUT
+[schematool] EXPLAIN
+[schematool] ELSEIF
+[schematool] NOMINVALUE
+[schematool] LAST
+[schematool] FLOAT
+[schematool] VALUES
+[schematool] NUMPARTS
+[schematool] OLD
+[schematool] OUT
+[schematool] QYERYNO
+[schematool] OR
+[schematool] PROGRAM
+[schematool] AFTER
+[schematool] FULL
+[schematool] INTEGER
+[schematool] PRIVILEGES
+[schematool] CORRESPONDING
+[schematool] RESULT_SET_LOCATOR
+[schematool] RELEASE
+[schematool] SQLERROR
+[schematool] CONNECTION_NAME
+[schematool] AUXILIARY
+[schematool] ESCAPE
+[schematool] CURRENT_TRANSFORM_GROUP_FOR_TYPE
+[schematool] MUMPS
+[schematool] EXIT
+[schematool] CURRENT_DATE
+[schematool] CYCLE
+[schematool] PIECESIZE
+[schematool] REAL
+[schematool] SUM
+[schematool] CONDITION_NUMBER
+[schematool] WHENEVER
+[schematool] CHARACTER_LENGTH
+[schematool] FROM
+[schematool] NODENUMBER
+[schematool] DELETE
+[schematool] MAX
+[schematool] NULLIF
+[schematool] INCLUDING
+[schematool] JAR
+[schematool] DO
+[schematool] CONSTRAINT_CATALOG
+[schematool] SUBSTRING
+[schematool] ONLY
+[schematool] CURRENT_TIME
+[schematool] MATCH
+[schematool] LIKE
+[schematool] COMMIT
+[schematool] NATIONAL
+[schematool] SMALLINT
+[schematool] SQLWARNING
+[schematool] IF
+[schematool] CALL
+[schematool] DISCONNECT
+[schematool] FOR
+[schematool] LOCALTIME
+[schematool] MODIFIES
+[schematool] PRESERVE
+[schematool] DEFAULT
+[schematool] DISALLOW
+[schematool] AVG
+[schematool] CURSOR
+[schematool] BEFORE
+[schematool] DEREF
+[schematool] NOT
+[schematool] DEFAULTS
+[schematool] PAGES
+[schematool] ISOBID
+[schematool] OPTION
+[schematool] INSENSITIVE
+[schematool] ENCODING
+[schematool] UNDO
+[schematool] AUDIT
+[schematool] TREAT
+[schematool] ASENSITIVE
+[schematool] RETURNED_SQLSTATE
+[schematool] SUBMULTISET
+[schematool] USAGE
+[schematool] VOLUMES
+[schematool] GENERAL
+[schematool] FORTRAN
+[schematool] PART
+[schematool] AND
+[schematool] SERIALIZABLE
+[schematool] CASCADED
+[schematool] FUNCTION
+[schematool] FILE
+[schematool] GLOBAL
+[schematool] ROLLBACK
+[schematool] END-EXEC1
+[schematool] DATE
+[schematool] BETWEEN
+[schematool] BOTH
+[schematool] WLM
+[schematool] FREE
+[schematool] VALIDPROC
+[schematool] INTERSECT
+[schematool] AT
+[schematool] DISTINCT
+[schematool] DBA
+[schematool] CACHE
+[schematool] YEARS
+[schematool] SYSTEM_USER
+[schematool] PRIOR
+[schematool] SECQTY
+[schematool] TRANSLATE
+[schematool] NEW
+[schematool] ASSOCIATE
+[schematool] DATA
+[schematool] SERVER_NAME
+[schematool] GRAPHIC
+[schematool] DB2GENERAL
+[schematool] SCROLL
+[schematool] CASE
+[schematool] ITERATE
+[schematool] TABLE
+[schematool] DEALLOCATE
+[schematool] SQLCODE
+[schematool] KEY
+[schematool] SIMPLE
+[schematool] NODENAME
+[schematool] PSID
+[schematool] LOCK
+[schematool] COLUMN
+[schematool] NAME
+[schematool] EACH
+[schematool] CREATE
+[schematool] WHERE
+[schematool] CHARACTER_SET_NAME
+[schematool] WITHOUT
+[schematool] MICROSECONDS
+[schematool] USING
+[schematool] LEADING
+[schematool] INITIALLY
+[schematool] TIMEZONE_HOUR
+[schematool] INTEGRITY
+[schematool] CHAR_LENGTH
+[schematool] CURSOR_NAME
+[schematool] PAGE
+[schematool] MONTHS
+[schematool] VALUE
+[schematool] DECIMAL
+[schematool] COLLATION_CATALOG
+[schematool] SUBCLASS_ORIGIN
+[schematool] DATETIME_INTERVAL_CODE
+[schematool] EXEC
+[schematool] TRANSLATION
+[schematool] MERGE
+[schematool] GROUP
+[schematool] IDENTITY
+[schematool] SCOPE
+[schematool] FENCED
+[schematool] VARIANT
+[schematool] RUN
+[schematool] TEMPORARY
+[schematool] RESULT
+[schematool] MINUTES
+[schematool] OUTER
+[schematool] GROUPING
+[schematool] SYNONYM
+[schematool] SQL
+[schematool] CATALOG_NAME
+[schematool] UNDER
+[schematool] SPECIFIC
+[schematool] ROLLUP
+[schematool] CLUSTER
+[schematool] APPLICATION
+[schematool] BLOB
+[schematool] IMMEDIATE
+[schematool] USER
+[schematool] SHARE
+[schematool] NO
+[schematool] STORPOOL
+[schematool] ALLOCATE
+[schematool] ROUTINE
+[schematool] COLLATION
+[schematool] VARIABLE
+[schematool] NAMES
+[schematool] SQLID
+[schematool] CLOSE
+[schematool] PARAMETER
+[schematool] OVERRIDING
+[schematool] REVOKE
+[schematool] MESSAGE_OCTET_LENGTH
+[schematool] CLASS_ORIGIN
+[schematool] COLLID
+[schematool] COLLATION_SCHEMA
+[schematool] EXISTS
+[schematool] CURRENT_TIMESTAMP
+[schematool] SPECIFICTYPE
+[schematool] END
+[schematool] DAYS
+[schematool] WORK
+[schematool] SCHEDULE
+[schematool] CURRENT_TIMEZONE
+[schematool] SAVEPOINT
+[schematool] NATURAL
+[schematool] ASYMMETRIC
+[schematool] INCREMENT
+[schematool] RESTART
+[schematool] STORES
+[schematool] ACCESS
+[schematool] CCSID
+[schematool] ON
+[schematool] RECURSIVE
+[schematool] STATISTICS
+[schematool] RELATIVE
+[schematool] ORDER
+[schematool] COLLATE
+[schematool] SIMILAR
+[schematool] GET
+[schematool] SYSTEM
+[schematool] CONDITION
+[schematool] FOUND
+[schematool] CHARACTER_SET_CATALOG
+[schematool] UNTIL
+[schematool] MONTH
+[schematool] DESC
+[schematool] DECLARE
+[schematool] TRIM
+[schematool] PREPARE
+[schematool] BREADTH
+[schematool] MAXVALUE
+[schematool] ASSERTION
+[schematool] PRIMARY
+[schematool] RANGE
+[schematool] FILTER
+[schematool] WHEN
+[schematool] OVER
+[schematool] CURRENT_ROLE
+[schematool] COMMAND_FUNCTION
+[schematool] EXCLUSIVE
+[schematool] YEAR
+[schematool] ABSOLUTE
+[schematool] SYMMETRIC
+[schematool] CATALOG
+[schematool] SOURCE
+[schematool] REPEAT
+[schematool] OPTIMIZE
+[schematool] CURRENT_DEFAULT_TRANSFORM_GROUP
+[schematool] STATIC
+[schematool] TIME
+[schematool] NHEADER
+[schematool] CONSTRAINT_NAME
+[schematool] PLAN
+[schematool] ALTER
+[schematool] ELSE
+[schematool] SENSITIVE
+[schematool] BIGINT
+[schematool] COUNT
+[schematool] DYNAMIC
+[schematool] UNNEST
+[schematool] HAVING
+[schematool] SYSIBM
+[schematool] TRUE
+[schematool] ADD
+[schematool] CURRENT_LC_PATH
+[schematool] SEARCH
+[schematool] RESET
+[schematool] UNKNOWN
+[schematool] GRANT
+[schematool] MINUTE
+[schematool] NEW_TABLE
+[schematool] OUTPUT
+[schematool] PARTITION
+[schematool] DATABASE
+[schematool] EXTERNAL
+[schematool] RESIGNAL
+[schematool] COLLECTION
+[schematool] RESTRICT
+[schematool] CUBE
+[schematool] CAST
+[schematool] PROCEDURE
+[schematool] LOCATOR
+[schematool] LABEL
+[schematool] EXECUTE
+[schematool] GOTO
+[schematool] EXCEPT
+[schematool] COALESCE
+[schematool] END-EXEC
+[schematool] MESSAGE_LENGTH
+[schematool] TIMESTAMP
+[schematool] BY
+[schematool] STANDARD
+[schematool] SECOND
+[schematool] POSITION
+[schematool] INT
+[schematool] DESCRIBE
+[schematool] UNNAMED
+[schematool] DYNAMIC_FUNCTION
+[schematool] CURRENT_PATH
+[schematool] CHARACTER
+[schematool] TRAILING
+[schematool] JOIN
+[schematool] RESOURCE
+[schematool] HANDLER
+[schematool] QUERYNO
+[schematool] WHILE
+[schematool] LATERAL
+[schematool] DESCRIPTOR
+[schematool] DEFERRABLE
+[schematool] CURRENT_LC_CTYPE
+[schematool] RETURNED_OCTET_LENGTH
+[schematool] DSSIZE
+[schematool] COMMENT
+[schematool] TABLESAMPLE
+[schematool] PRECISION
+[schematool] WITH
+[schematool] IN
+[schematool] SOME
+[schematool] CLOB
+[schematool] DROP
+[schematool] NEXT
+[schematool] DEC
+[schematool] PARTIAL
+[schematool] RETURN
+[schematool] NCLOB
+[schematool] PASCAL
+[schematool] SQLSTATE
+[schematool] INOUT
+[schematool] EDITPROC
+[schematool] RECOVERY
+[schematool] REPEATABLE
+[schematool] READ
+[schematool] EXCEPTION
+[schematool] DBINFO
+[schematool] INTERVAL
+[schematool] STATE
+[schematool] DB2GENRL
+[schematool] WITHIN
+[schematool] ELEMENT
+[schematool] SECONDS
+[schematool] AS
+[schematool] ARRAY
+[schematool] OPTIMIZATION
+[schematool] MORE
+[schematool] DOUBLE
+[schematool] GENERATED
+[schematool] DEPTH
+[schematool] ADA
+[schematool] FALSE
+[schematool] LOCKMAX
+[schematool] ERASE
+[schematool] THEN
+[schematool] LOCALE
+[schematool] REF
+[schematool] FOREIGN
+[schematool] AUTHORIZATION
+[schematool] MULTISET
+[schematool] DATETIME_INTERVAL_PRECISION
+[schematool] PRIVATE
+[schematool] TO
+[schematool] JAVA
+[schematool] LOCAL
+[schematool] CURRENT_SERVER
+[schematool] RIGHT
+[schematool] CONCAT
+[schematool] TABLE_NAME
+[schematool] TRIGGER
+[schematool] LANGUAGE
+[schematool] CONSTRAINTS
+[schematool] LEVEL
+[schematool] COUNT_BIG
+[schematool] SCHEMA
+[schematool] EXCLUDING
+[schematool] NOCYCLE
+[schematool] MEMBER
+[schematool] SPACE
+[schematool] CASCADE
+[schematool] CHAR
+[schematool] NCHAR
+[schematool] WRITE
+[schematool] LOOP
+[schematool] NOORDER
+[schematool] OF
+[schematool] RRN
+[schematool] LOWER
+[schematool] HOLD
+[schematool] WINDOW
+[schematool] VARCHAR
+[schematool] OLD_TABLE
+[schematool] CURRENT_USER
+[schematool] PCTINDEX
+[schematool] SCHEMA_NAME
+[schematool] DEFERRED
+[schematool] PRIQTY
+[schematool] SECTION
+[schematool] C
+[schematool] OPEN
+[schematool] STYLE
+[schematool] REFERENCES
+[schematool] CHECK
+[schematool] FIRST
+[schematool] DOMAIN
+[schematool] PAD
+[schematool] ALL
+[schematool] INSERT
+[schematool] VARYING
+[schematool] STOGROUP
+[schematool] SIGNAL
+[schematool] MICROSECOND
+[schematool] CARDINALITY
+[schematool] SYSFUN
+[schematool] CURRENT
+[schematool] ROW_COUNT
+[schematool] INNER
+[schematool] MINVALUE
+[schematool] ROWS
+[schematool] SUBPAGES
+[schematool] PLI
+[schematool] BIT
+[schematool] NOMAXVALUE
+[schematool] CAPTURE
+[schematool] SETS
+[schematool] CHARACTER_SET_SCHEMA
+[schematool] TABLESPACE
+[schematool] BIT_LENGTH
+[schematool] START
+[schematool] CONTAINS
+[schematool] NOCACHE
+[schematool] LEFT
+[schematool] ASUTIME
+[schematool] OCTET_LENGTH
+[schematool] REFERENCING
+[schematool] OBJECT
+[schematool] OVERLAPS
+[schematool] RETURNED_LENGTH
+[schematool] INHERIT
+[schematool] SQLEXCEPTION
+[schematool] VCAT
+[schematool] READS
+[schematool] ISOLATION
+[schematool] STAY
+[schematool] AUX
+[schematool] LENGTH
+[schematool] IS
+[schematool] ACTION
+[schematool] MIN
+[schematool] ASC
+[schematool] RETURNS
+[schematool] BEGIN
+[schematool] DBSPACE
+[schematool] HOUR
+[schematool] CONSTRUCTOR
+[schematool] HOURS
+[schematool] CONVERT
+[schematool] LEAVE
+[schematool] UPPER
+[schematool] EXTRACT
+[schematool] CROSS
+[schematool] SIZE
+[schematool] LARGE
+[schematool] COMMITTED
+[schematool] IDENTIFIED
+[schematool] ROLE
+[schematool] TRANSACTION
+[schematool] ROW

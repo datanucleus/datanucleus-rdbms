@@ -1,0 +1,1001 @@
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.DB2Adapter
+Datastore : name="DB2/LINUX" version="SQL09071" (major=9, minor=7, revision=0)
+Driver : name="IBM DB2 JDBC Universal Driver Architecture" version="3.58.82" (major=3, minor=58)
+===================================================
+
+Database TypeInfo
+JDBC Type=null sqlTypes=XML, DEFAULT
+SQLTypeInfo :   typeName          = XML
+  jdbcTypeName      = null
+  dataType          = 2009
+  precision         = 2147483647
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=BLOB sqlTypes=BLOB, DEFAULT
+SQLTypeInfo :   typeName          = BLOB
+  jdbcTypeName      = BLOB
+  dataType          = 2004
+  precision         = 2147483647
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=CLOB sqlTypes=CLOB, DBCLOB, DEFAULT
+SQLTypeInfo :   typeName          = CLOB
+  jdbcTypeName      = CLOB
+  dataType          = 2005
+  precision         = 2147483647
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=TIMESTAMP sqlTypes=TIMESTAMP, DEFAULT
+SQLTypeInfo :   typeName          = TIMESTAMP
+  jdbcTypeName      = TIMESTAMP
+  dataType          = 93
+  precision         = 32
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 12
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=TIME sqlTypes=TIME, DEFAULT
+SQLTypeInfo :   typeName          = TIME
+  jdbcTypeName      = TIME
+  dataType          = 92
+  precision         = 8
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=DATE sqlTypes=DATE, DEFAULT
+SQLTypeInfo :   typeName          = DATE
+  jdbcTypeName      = DATE
+  dataType          = 91
+  precision         = 10
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=OTHER sqlTypes=DECFLOAT, XML, DEFAULT
+SQLTypeInfo :   typeName          = DECFLOAT
+  jdbcTypeName      = OTHER
+  dataType          = 1111
+  precision         = 34
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = PRECISION
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=VARCHAR sqlTypes=VARCHAR, VARGRAPHIC, DEFAULT
+SQLTypeInfo :   typeName          = VARCHAR
+  jdbcTypeName      = VARCHAR
+  dataType          = 12
+  precision         = 4000
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=DECIMAL sqlTypes=DECIMAL, DEFAULT
+SQLTypeInfo :   typeName          = DECIMAL
+  jdbcTypeName      = DECIMAL
+  dataType          = 3
+  precision         = 31
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = PRECISION,SCALE
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 31
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=NUMERIC sqlTypes=NUMERIC, DEFAULT
+SQLTypeInfo :   typeName          = NUMERIC
+  jdbcTypeName      = NUMERIC
+  dataType          = 2
+  precision         = 31
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = PRECISION,SCALE
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 31
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=CHAR sqlTypes=CHAR, DEFAULT, GRAPHIC
+SQLTypeInfo :   typeName          = CHAR
+  jdbcTypeName      = CHAR
+  dataType          = 1
+  precision         = 254
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=BINARY sqlTypes=CHAR () FOR BIT DATA, DEFAULT
+SQLTypeInfo :   typeName          = CHAR () FOR BIT DATA
+  jdbcTypeName      = BINARY
+  dataType          = -2
+  precision         = 254
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=REAL sqlTypes=REAL, DEFAULT
+SQLTypeInfo :   typeName          = REAL
+  jdbcTypeName      = REAL
+  dataType          = 7
+  precision         = 24
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 2
+  allowsPrecisionSpec = true
+
+JDBC Type=FLOAT sqlTypes=FLOAT, DEFAULT
+SQLTypeInfo :   typeName          = FLOAT
+  jdbcTypeName      = FLOAT
+  dataType          = 6
+  precision         = 53
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=LONGVARCHAR sqlTypes=LONG VARCHAR, LONG VARGRAPHIC, DEFAULT
+SQLTypeInfo :   typeName          = LONG VARCHAR
+  jdbcTypeName      = LONGVARCHAR
+  dataType          = -1
+  precision         = 32700
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=LONGVARBINARY sqlTypes=LONG VARCHAR FOR BIT DATA, DEFAULT
+SQLTypeInfo :   typeName          = LONG VARCHAR FOR BIT DATA
+  jdbcTypeName      = LONGVARBINARY
+  dataType          = -4
+  precision         = 32700
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 0
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=SMALLINT sqlTypes=DEFAULT, SMALLINT
+SQLTypeInfo :   typeName          = SMALLINT
+  jdbcTypeName      = SMALLINT
+  dataType          = 5
+  precision         = 5
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = true
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=VARBINARY sqlTypes=VARCHAR () FOR BIT DATA, DEFAULT
+SQLTypeInfo :   typeName          = VARCHAR () FOR BIT DATA
+  jdbcTypeName      = VARBINARY
+  dataType          = -3
+  precision         = 32762
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = LENGTH
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+JDBC Type=INTEGER sqlTypes=INTEGER, DEFAULT
+SQLTypeInfo :   typeName          = INTEGER
+  jdbcTypeName      = INTEGER
+  dataType          = 4
+  precision         = 10
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = true
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=BIGINT sqlTypes=BIGINT, DEFAULT
+SQLTypeInfo :   typeName          = BIGINT
+  jdbcTypeName      = BIGINT
+  dataType          = -5
+  precision         = 20
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = true
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=BIT sqlTypes=DEFAULT, SMALLINT
+SQLTypeInfo :   typeName          = SMALLINT
+  jdbcTypeName      = SMALLINT
+  dataType          = 5
+  precision         = 5
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = true
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=DOUBLE sqlTypes=DOUBLE, DEFAULT
+SQLTypeInfo :   typeName          = DOUBLE
+  jdbcTypeName      = DOUBLE
+  dataType          = 8
+  precision         = 53
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 2
+  allowsPrecisionSpec = true
+
+JDBC Type=DISTINCT sqlTypes=DISTINCT, DEFAULT
+SQLTypeInfo :   typeName          = DISTINCT
+  jdbcTypeName      = DISTINCT
+  dataType          = 2001
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 0
+  caseSensitive     = false
+  searchable        = 0
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+  allowsPrecisionSpec = true
+
+
+Database Keywords
+PACKAGE
+FUNCTION
+MULTISET
+CASCADED
+ROW
+PRECISION
+SERVER_NAME
+DO
+EDITPROC
+UNDO
+EXCEPT
+QYERYNO
+CONSTRAINT_CATALOG
+FINAL
+CREATE
+ARE
+TIMEZONE_MINUTE
+LOOP
+RETURN
+ELEMENT
+OPTIMIZATION
+GET
+CHARACTER_SET_CATALOG
+GRAPHIC
+SUBCLASS_ORIGIN
+ASC
+PRESERVE
+GROUPING
+C
+STATIC
+TRANSACTION
+COBOL
+DBINFO
+DB2GENERAL
+CATALOG
+INT
+VALUE
+FILE
+TRANSLATE
+DEPTH
+TABLESAMPLE
+RESTRICT
+LEADING
+CARDINALITY
+STOGROUP
+RESIGNAL
+INTERSECT
+GROUP
+GENERAL
+FETCH
+MONTHS
+CURRENT_ROLE
+ALIAS
+DESCRIBE
+USER
+SEARCH
+SYSTEM_USER
+LOWER
+COMMAND_FUNCTION
+GO
+CONSTRAINT
+CONSTRUCTOR
+TIMEZONE_HOUR
+VCAT
+ALTER
+DYNAMIC_FUNCTION
+CURRENT_USER
+NCHAR
+CLOB
+CURRENT_TIMEZONE
+TABLE
+SOURCE
+VARCHAR
+SESSION_USER
+MICROSECONDS
+FLOAT
+COLLATION_CATALOG
+SUM
+CURRENT_PATH
+CHAR_LENGTH
+AT
+DESCRIPTOR
+AS
+CURRENT_LC_PATH
+MAXVALUE
+AVG
+LEFT
+ROW_COUNT
+ZONE
+DEFINITION
+COLLATION_NAME
+CONNECTION_NAME
+NOORDER
+MODE
+AUX
+RETURNS
+LIKE
+COLLATE
+OUTER
+BY
+DEFERRABLE
+COUNT_BIG
+WHENEVER
+SERIALIZABLE
+NOMINVALUE
+MERGE
+INHERIT
+ASUTIME
+UNCOMMITTED
+RIGHT
+EXEC
+HAVING
+SESSION
+MODULE
+DAYS
+OPTIMIZE
+LC_CTYPE
+ITERATE
+DATABASE
+PLI
+SUBPAGES
+SQLCODE
+ROWS
+CHARACTER_SET_NAME
+VALIDPROC
+LOCALE
+ROUTINE
+LARGE
+NATURAL
+LONG
+PUBLIC
+HOURS
+DSSIZE
+RETURNED_LENGTH
+RESET
+CHAR
+NEW
+MODIFIES
+COUNT
+BIT_LENGTH
+DAY
+EQUALS
+RELEASE
+EXPLAIN
+OVERRIDING
+LEAVE
+ESCAPE
+SYSTEM
+CONNECT
+PATH
+CURRENT_SERVER
+DOUBLE
+CAPTURE
+EACH
+COMMENT
+NHEADER
+SELECT
+INTO
+ARRAY
+EXCEPTION
+EXIT
+COALESCE
+SECOND
+CCSID
+ROLE
+SECTION
+PRIVATE
+MUMPS
+NULL
+WITHOUT
+PAD
+NO
+ON
+MATCH
+SENSITIVE
+DELETE
+NUMERIC
+OF
+CHARACTER_SET_SCHEMA
+RESULT_SET_LOCATOR
+SCALE
+ORDINALITY
+SPECIFIC
+CUBE
+NATIONAL
+CALLED
+STATISTICS
+OR
+SYSFUN
+FILTER
+CATALOG_NAME
+FALSE
+PCTFREE
+CURSOR
+OUTPUT
+CURRENT_DATE
+TIMESTAMP
+ATOMIC
+UPPER
+CONSTRAINTS
+DEC
+WHERE
+NULLIF
+MEMBER
+NUMPARTS
+YEAR
+MAX
+DEFERRED
+CURSOR_NAME
+PRIQTY
+SPACE
+RESOURCE
+CROSS
+LOCATORS
+USAGE
+LENGTH
+IF
+MESSAGE_TEXT
+BOOLEAN
+IN
+LOCATOR
+REFERENCES
+IS
+PARTITION
+SOME
+NODENAME
+NOMAXVALUE
+NODENUMBER
+NEXT
+COLLECTION
+SUBMULTISET
+WITH
+INITIALLY
+DB2GENRL
+GRANT
+CONVERT
+END-EXEC
+DB2SQL
+DEFAULT
+LOCKSIZE
+TRANSLATION
+WRITE
+PROCEDURE
+LOCALTIME
+DOMAIN
+ASSOCIATE
+NOCYCLE
+SUBSTRING
+REF
+ELSEIF
+INCREMENT
+REPEATABLE
+DBA
+LABEL
+MAP
+FOUND
+IMMEDIATE
+CLUSTER
+WINDOW
+GLOBAL
+MINUTE
+INCLUDING
+RECOVERY
+SQLID
+OLD_TABLE
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+COLLATION_SCHEMA
+CONTAINS
+JAR
+STAY
+DEREF
+CONDITION
+NOT
+COLLID
+CACHE
+FOREIGN
+PRIVILEGES
+MONTH
+CHARACTER
+ACTION
+TYPE
+NEW_TABLE
+USING
+BEGIN
+GOTO
+HANDLER
+BLOB
+BUFFERPOOL
+KEY
+ALLOW
+ELSE
+ADA
+NUMBER
+TRAILING
+COMMITTED
+RECURSIVE
+VARIANT
+ROLLBACK
+BREADTH
+TABLESPACE
+REAL
+RETURNED_OCTET_LENGTH
+LANGUAGE
+PLAN
+MORE
+LEVEL
+OUT
+READ
+INSENSITIVE
+NONE
+AUXILIARY
+TRIM
+STYLE
+WITHIN
+REPEAT
+CALL
+COLUMN_NAME
+END
+SIZE
+DYNAMIC
+RENAME
+ERASE
+OPTION
+IDENTITY
+SECQTY
+MICROSECOND
+APPLICATION
+AUDIT
+SCHEDULE
+EXECUTE
+ONLY
+PART
+ASSERTION
+INPUT
+SYSIBM
+ASYMMETRIC
+POSITION
+ASENSITIVE
+NCLOB
+INOUT
+TIME
+FREE
+THEN
+COLLATION
+SQLEXCEPTION
+NULLABLE
+COLUMN
+SIGNAL
+ACCESS
+END-EXEC1
+EXISTS
+DISALLOW
+STANDARD
+DATETIME_INTERVAL_CODE
+PCTINDEX
+ADD
+INTEGER
+STATE
+SCRATCHPAD
+TO
+DISCONNECT
+OVERLAPS
+SCHEMA_NAME
+CHARACTER_LENGTH
+SET
+RESULT
+RELATIVE
+MIN
+HOUR
+UNION
+CURRENT
+MINUTES
+NULLS
+COMMIT
+SCHEMA
+CLOSE
+DECIMAL
+DROP
+BIGINT
+WHEN
+READS
+DECLARE
+START
+PROGRAM
+BIT
+REVOKE
+BETWEEN
+PSID
+QUERYNO
+PRIOR
+FIRST
+CAST
+LINKTYPE
+PREPARE
+EXTERNAL
+ALLOCATE
+WHILE
+SETS
+CONSTRAINT_NAME
+DETERMINISTIC
+SYSPROC
+VARYING
+CONSTRAINT_SCHEMA
+CURRENT_TIME
+TRIGGER
+CASE
+SPECIFICTYPE
+ENCODING
+SQLERROR
+DEALLOCATE
+CASCADE
+VOLUMES
+STORES
+TABLE_NAME
+SQL
+CONNECTION
+STORPOOL
+NAME
+FULL
+INSERT
+SQLWARNING
+CURRENT_LC_CTYPE
+SAVEPOINT
+PARAMETER
+CURRENT_DEFAULT_TRANSFORM_GROUP
+BOTH
+SYMMETRIC
+SHARE
+OBID
+CLASS_ORIGIN
+PAGES
+DSNHATTR
+LAST
+SYNONYM
+WORK
+ISOBID
+UNIQUE
+LOCKMAX
+VIEW
+CONCAT
+JAVA
+NOCACHE
+ROLLUP
+OLD
+RESTART
+PRIMARY
+LOCAL
+MESSAGE_LENGTH
+EXCLUDING
+YEARS
+PASCAL
+NAMES
+FIELDPROC
+VARIABLE
+FENCED
+UNTIL
+NAMED
+CHECK
+FROM
+DISTINCT
+TEMPORARY
+UNNEST
+SIMPLE
+RRN
+OVER
+DIAGNOSTICS
+FORTRAN
+DATETIME_INTERVAL_PRECISION
+INNER
+GENERATED
+ORDER
+AUTHORIZATION
+CYCLE
+UPDATE
+SQLSTATE
+FOR
+SECONDS
+HOLD
+EXCLUSIVE
+AND
+IDENTIFIED
+SCROLL
+LOCALTIMESTAMP
+INTERVAL
+LOCK
+OCTET_LENGTH
+RETURNED_SQLSTATE
+INDEX
+UNDER
+MINVALUE
+UNKNOWN
+SCOPE
+DBSPACE
+CONTINUE
+OBJECT
+WLM
+ALL
+PIECESIZE
+EXTRACT
+CURRENT_TIMESTAMP
+INTEGRITY
+SECURITY
+PARTIAL
+ISOLATION
+LATERAL
+INDICATOR
+VALUES
+RANGE
+BEFORE
+AFTER
+TRUE
+JOIN
+SIMILAR
+CORRESPONDING
+REFERENCING
+DEFAULTS
+OPEN
+RUN
+PAGE
+ANY
+UNNAMED
+CONDITION_NUMBER
+MESSAGE_OCTET_LENGTH
+DESC
+BINARY
+DATE
+ABSOLUTE
+METHOD
+TREAT
+DATA
+SMALLINT
+

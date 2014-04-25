@@ -1,0 +1,295 @@
+MSSQLServerAdapter : Microsoft SQL Server version=Microsoft SQL Server 2000 - 8.00.760 (Intel X86)
+Dec 17 2002 14:22:05
+Copyright (c) 1988-2003 Microsoft Corporation
+Personal Edition on Windows NT 5.1 (Build 2600: Service Pack 2)
+, major=2000, minor=0, revision=-1
+Identifier Names supported : MixedCase "MixedCase"
+Driver name=SQLServer, version=2.2.0040, major=2, minor=2
+Identifier Max Lengths : Table=128 Constraints=128 Index=128 Column=128 Delimeters="
+Identifier Support in DDL : catalog=true schema=true
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = binary
+jdbcTypeName = Types.BINARY
+dataType = -2
+precision = 8000
+literalPrefix = 0x
+literalSuffix = null
+createParams = length
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = binary
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = int
+jdbcTypeName = Types.INTEGER
+dataType = 4
+precision = 10
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = int
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = text
+jdbcTypeName = Types.LONGVARCHAR
+dataType = -1
+precision = 2147483647
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = text
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = decimal
+jdbcTypeName = Types.DECIMAL
+dataType = 3
+precision = 38
+literalPrefix = null
+literalSuffix = null
+createParams = precision,scale
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = decimal
+minimumScale = 0
+maximumScale = 38
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = real
+jdbcTypeName = Types.REAL
+dataType = 7
+precision = 24
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = real
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 2
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = varchar
+jdbcTypeName = Types.VARCHAR
+dataType = 12
+precision = 8000
+literalPrefix = '
+literalSuffix = '
+createParams = max length
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = varchar
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = bigint
+jdbcTypeName = Types.BIGINT
+dataType = -5
+precision = 19
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = bigint
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = numeric
+jdbcTypeName = Types.NUMERIC
+dataType = 2
+precision = 38
+literalPrefix = null
+literalSuffix = null
+createParams = precision,scale
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = numeric
+minimumScale = 0
+maximumScale = 38
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = image
+jdbcTypeName = Types.LONGVARBINARY
+dataType = -4
+precision = 2147483647
+literalPrefix = 0x
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = image
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = float
+jdbcTypeName = Types.FLOAT
+dataType = 6
+precision = 53
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = float
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 2
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = char
+jdbcTypeName = Types.CHAR
+dataType = 1
+precision = 8000
+literalPrefix = '
+literalSuffix = '
+createParams = length
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = char
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = datetime
+jdbcTypeName = Types.TIMESTAMP
+dataType = 93
+precision = 23
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = datetime
+minimumScale = 3
+maximumScale = 3
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = varbinary
+jdbcTypeName = Types.VARBINARY
+dataType = -3
+precision = 8000
+literalPrefix = 0x
+literalSuffix = null
+createParams = max length
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = varbinary
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = bit
+jdbcTypeName = Types.BIT
+dataType = -7
+precision = 1
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = bit
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+typeName = smallint
+jdbcTypeName = Types.SMALLINT
+dataType = 5
+precision = 5
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = smallint
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10

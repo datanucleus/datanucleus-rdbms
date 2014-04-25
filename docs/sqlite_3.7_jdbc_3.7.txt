@@ -1,0 +1,554 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Building DataNucleus TestSamples
+[INFO]    task-segment: [clean, compile, datanucleus:schema-dbinfo]
+[INFO] ------------------------------------------------------------------------
+[INFO] [clean:clean {execution: default-clean}]
+[INFO] Deleting directory /home/andy/work/test/sqlite_test/target
+[INFO] Deleting file-set: /home/andy/work/test/sqlite_test (included: [*.log, testDB, test.xls, test.ods, test.ooxml, test.xml], excluded: [])
+[INFO] [resources:resources {execution: default-resources}]
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 0 resource
+[INFO] skip non existing resourceDirectory /home/andy/work/test/sqlite_test/src/conf
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource to META-INF
+[INFO] [compiler:compile {execution: default-compile}]
+[INFO] Compiling 2 source files to /home/andy/work/test/sqlite_test/target/classes
+[INFO] [datanucleus:enhance {execution: default}]
+[INFO] DataNucleus Enhancer (version 3.0.0.m6) : Enhancement of classes
+DataNucleus Enhancer completed with success for 1 classes. Timings : input=207 ms, enhance=119 ms, total=326 ms. Consult the log for full details
+
+[INFO] [datanucleus:schema-dbinfo {execution: default-cli}]
+[INFO] DataNucleus SchemaTool : Database information
+DataNucleus SchemaTool : Classpath
+>>  /usr/local/maven2-repository/org/datanucleus/datanucleus-core/3.0.0-m6-SNAPSHOT/datanucleus-core-3.0.0-m6-SNAPSHOT.jar
+>>  /usr/local/maven2-repository/org/datanucleus/datanucleus-enhancer/3.0.0-m6-SNAPSHOT/datanucleus-enhancer-3.0.0-m6-SNAPSHOT.jar
+>>  /usr/local/maven2-repository/asm/asm/3.3.1/asm-3.3.1.jar
+>>  /usr/local/maven2-repository/javax/jdo/jdo-api/3.1-SNAPSHOT/jdo-api-3.1-SNAPSHOT.jar
+>>  /usr/local/maven2-repository/javax/transaction/transaction-api/1.1/transaction-api-1.1.jar
+>>  /usr/local/maven2-repository/org/apache/geronimo/specs/geronimo-jpa_2.0_spec/1.0/geronimo-jpa_2.0_spec-1.0.jar
+>>  /usr/local/maven2-repository/org/codehaus/plexus/plexus-utils/1.2/plexus-utils-1.2.jar
+>>  /usr/local/apache-maven-2.2.1/lib/maven-2.2.1-uber.jar
+>>  /home/andy/work/test/sqlite_test/target/classes
+>>  /usr/local/maven2-repository/org/datanucleus/datanucleus-api-jdo/3.0.0-m6-SNAPSHOT/datanucleus-api-jdo-3.0.0-m6-SNAPSHOT.jar
+>>  /usr/local/maven2-repository/org/datanucleus/datanucleus-rdbms/3.0.0-m6-SNAPSHOT/datanucleus-rdbms-3.0.0-m6-SNAPSHOT.jar
+>>  /usr/local/maven2-repository/log4j/log4j/1.2.8/log4j-1.2.8.jar
+>>  /usr/local/maven2-repository/org/xerial/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar
+
+DataNucleus SchemaTool : Persistence Properties
+>>  datanucleus.autocreatecolumns=true
+>>  datanucleus.autocreateschema=true
+>>  datanucleus.autostartmechanism=None
+>>  datanucleus.connectiondrivername=org.sqlite.JDBC
+>>  datanucleus.connectionurl=jdbc:sqlite:test.db
+>>  datanucleus.rdbms.sqlparamvaluesinbrackets=true
+>>  datanucleus.rdbms.stringdefaultlength=255
+>>  datanucleus.transactionisolation=serializable
+
+StoreManager : "rdbms" using the URL "jdbc:sqlite:test.db" - options=read-write, 
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.SQLiteAdapter
+Datastore : name="SQLite" version="3.7.2" (major=3, minor=0, revision=2)
+Driver : name="SQLiteJDBC" version="native" (major=1, minor=1)
+===================================================
+
+Database TypeInfo
+JDBC Type=NULL sqlTypes=NULL, DEFAULT
+SQLTypeInfo :   typeName          = NULL
+  jdbcTypeName      = NULL
+  dataType          = 0
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=REAL sqlTypes=REAL, DEFAULT
+SQLTypeInfo :   typeName          = REAL
+  jdbcTypeName      = REAL
+  dataType          = 7
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=BLOB sqlTypes=BLOB, DEFAULT
+SQLTypeInfo :   typeName          = BLOB
+  jdbcTypeName      = BLOB
+  dataType          = 2004
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=INTEGER sqlTypes=INTEGER, DEFAULT
+SQLTypeInfo :   typeName          = INTEGER
+  jdbcTypeName      = INTEGER
+  dataType          = 4
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+JDBC Type=VARCHAR sqlTypes=TEXT, DEFAULT
+SQLTypeInfo :   typeName          = TEXT
+  jdbcTypeName      = VARCHAR
+  dataType          = 12
+  precision         = 0
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = null
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+  allowsPrecisionSpec = true
+
+
+Database Keywords
+FUNCTION
+MULTISET
+CASCADED
+ROW
+PRECISION
+SERVER_NAME
+DO
+UNDO
+EXCEPT
+CONSTRAINT_CATALOG
+CREATE
+ARE
+TIMEZONE_MINUTE
+LOOP
+RETURN
+ELEMENT
+GET
+CHARACTER_SET_CATALOG
+SUBCLASS_ORIGIN
+ASC
+PRESERVE
+GROUPING
+C
+STATIC
+TRANSACTION
+COBOL
+CATALOG
+INT
+VALUE
+TRANSLATE
+DEPTH
+TABLESAMPLE
+RESTRICT
+LEADING
+RESIGNAL
+INTERSECT
+GROUP
+GENERAL
+FETCH
+CURRENT_ROLE
+DESCRIBE
+USER
+SEARCH
+SYSTEM_USER
+LOWER
+COMMAND_FUNCTION
+GO
+CONSTRAINT
+CONSTRUCTOR
+TIMEZONE_HOUR
+ALTER
+DYNAMIC_FUNCTION
+CURRENT_USER
+NCHAR
+CLOB
+TABLE
+VARCHAR
+SESSION_USER
+FLOAT
+COLLATION_CATALOG
+SUM
+CURRENT_PATH
+CHAR_LENGTH
+AT
+DESCRIPTOR
+AS
+AVG
+LEFT
+ROW_COUNT
+ZONE
+COLLATION_NAME
+CONNECTION_NAME
+RETURNS
+LIKE
+COLLATE
+OUTER
+BY
+DEFERRABLE
+WHENEVER
+SERIALIZABLE
+MERGE
+UNCOMMITTED
+RIGHT
+EXEC
+HAVING
+SESSION
+MODULE
+ITERATE
+PLI
+SQLCODE
+ROWS
+CHARACTER_SET_NAME
+ROUTINE
+LARGE
+NATURAL
+PUBLIC
+RETURNED_LENGTH
+CHAR
+NEW
+MODIFIES
+COUNT
+BIT_LENGTH
+DAY
+EQUALS
+RELEASE
+LEAVE
+ESCAPE
+SYSTEM
+CONNECT
+PATH
+DOUBLE
+EACH
+SELECT
+INTO
+ARRAY
+EXCEPTION
+EXIT
+COALESCE
+SECOND
+ROLE
+SECTION
+MUMPS
+NULL
+WITHOUT
+PAD
+NO
+ON
+MATCH
+SENSITIVE
+DELETE
+NUMERIC
+OF
+CHARACTER_SET_SCHEMA
+SCALE
+ORDINALITY
+SPECIFIC
+CUBE
+NATIONAL
+CALLED
+OR
+FILTER
+CATALOG_NAME
+FALSE
+CURSOR
+OUTPUT
+CURRENT_DATE
+TIMESTAMP
+ATOMIC
+UPPER
+CONSTRAINTS
+DEC
+WHERE
+NULLIF
+MEMBER
+YEAR
+MAX
+DEFERRED
+CURSOR_NAME
+SPACE
+CROSS
+USAGE
+LENGTH
+IF
+MESSAGE_TEXT
+BOOLEAN
+IN
+LOCATOR
+REFERENCES
+IS
+PARTITION
+SOME
+NEXT
+SUBMULTISET
+WITH
+INITIALLY
+GRANT
+CONVERT
+END-EXEC
+DEFAULT
+TRANSLATION
+WRITE
+PROCEDURE
+LOCALTIME
+DOMAIN
+SUBSTRING
+REF
+ELSEIF
+REPEATABLE
+MAP
+FOUND
+IMMEDIATE
+WINDOW
+GLOBAL
+MINUTE
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+COLLATION_SCHEMA
+DEREF
+CONDITION
+NOT
+FOREIGN
+PRIVILEGES
+MONTH
+CHARACTER
+ACTION
+TYPE
+USING
+BEGIN
+GOTO
+HANDLER
+BLOB
+KEY
+ELSE
+ADA
+NUMBER
+TRAILING
+COMMITTED
+RECURSIVE
+ROLLBACK
+BREADTH
+REAL
+RETURNED_OCTET_LENGTH
+LANGUAGE
+MORE
+LEVEL
+OUT
+READ
+INSENSITIVE
+NONE
+TRIM
+WITHIN
+REPEAT
+CALL
+COLUMN_NAME
+END
+SIZE
+DYNAMIC
+OPTION
+IDENTITY
+EXECUTE
+ONLY
+ASSERTION
+INPUT
+ASYMMETRIC
+POSITION
+ASENSITIVE
+NCLOB
+INOUT
+TIME
+FREE
+THEN
+COLLATION
+SQLEXCEPTION
+NULLABLE
+COLUMN
+SIGNAL
+EXISTS
+DATETIME_INTERVAL_CODE
+ADD
+INTEGER
+STATE
+TO
+DISCONNECT
+OVERLAPS
+SCHEMA_NAME
+CHARACTER_LENGTH
+SET
+RESULT
+RELATIVE
+MIN
+HOUR
+UNION
+CURRENT
+COMMIT
+SCHEMA
+CLOSE
+DECIMAL
+DROP
+BIGINT
+WHEN
+READS
+DECLARE
+START
+BIT
+REVOKE
+BETWEEN
+PRIOR
+FIRST
+CAST
+PREPARE
+EXTERNAL
+ALLOCATE
+WHILE
+SETS
+CONSTRAINT_NAME
+DETERMINISTIC
+VARYING
+CONSTRAINT_SCHEMA
+CURRENT_TIME
+TRIGGER
+CASE
+SPECIFICTYPE
+SQLERROR
+DEALLOCATE
+CASCADE
+TABLE_NAME
+SQL
+CONNECTION
+NAME
+FULL
+INSERT
+SQLWARNING
+SAVEPOINT
+PARAMETER
+CURRENT_DEFAULT_TRANSFORM_GROUP
+BOTH
+SYMMETRIC
+CLASS_ORIGIN
+LAST
+WORK
+UNIQUE
+VIEW
+ROLLUP
+OLD
+PRIMARY
+LOCAL
+MESSAGE_LENGTH
+PASCAL
+NAMES
+UNTIL
+CHECK
+FROM
+DISTINCT
+TEMPORARY
+UNNEST
+OVER
+DIAGNOSTICS
+FORTRAN
+DATETIME_INTERVAL_PRECISION
+INNER
+ORDER
+AUTHORIZATION
+CYCLE
+UPDATE
+SQLSTATE
+FOR
+HOLD
+AND
+SCROLL
+LOCALTIMESTAMP
+INTERVAL
+OCTET_LENGTH
+RETURNED_SQLSTATE
+UNDER
+UNKNOWN
+SCOPE
+CONTINUE
+OBJECT
+ALL
+EXTRACT
+CURRENT_TIMESTAMP
+PARTIAL
+ISOLATION
+LATERAL
+INDICATOR
+VALUES
+RANGE
+BEFORE
+AFTER
+TRUE
+JOIN
+SIMILAR
+CORRESPONDING
+REFERENCING
+OPEN
+ANY
+UNNAMED
+CONDITION_NUMBER
+MESSAGE_OCTET_LENGTH
+DESC
+BINARY
+DATE
+ABSOLUTE
+METHOD
+TREAT
+DATA
+SMALLINT
+
+SchemaTool completed successfully
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESSFUL
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 5 seconds
+[INFO] Finished at: Sat Jul 02 09:20:15 BST 2011
+[INFO] Final Memory: 14M/494M
+[INFO] ------------------------------------------------------------------------

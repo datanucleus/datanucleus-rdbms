@@ -1,0 +1,329 @@
+SybaseAdapter : Adaptive Server Enterprise version=Adaptive Server Enterprise/12.5.2/EBF 12053 ESD#2/P/Sun_svr4/OS 5.8/ase1252/1844/32-bit/FBO/Thu Aug 12 23:07:03 2004, major=12, minor=5, revision=22053
+Identifier Names : UPPERCASE 
+Driver name=jConnect (TM) for JDBC (TM), version=jConnect (TM) for JDBC(TM)/5.5(Build 25137)/P/EBF10000/JDK12/Sun Jan  6 21:57:04 2002, major=5, minor=5
+Identifier Max Lengths : Table=30  Column=30  Constraint=30  Index=30  Delimeters="
+Identifier Support in DDL : catalog=true  schema=true
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = binary
+  jdbcTypeName      = Types.BINARY
+  dataType          = -2
+  precision         = 2048
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = binary
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = dt_Atsz
+  jdbcTypeName      = Types.INTEGER
+  dataType          = 4
+  precision         = 10
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = dt_Atsz
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = double precision
+  jdbcTypeName      = Types.DOUBLE
+  dataType          = 8
+  precision         = 15
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = double precision
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = text
+  jdbcTypeName      = Types.LONGVARCHAR
+  dataType          = -1
+  precision         = 2147483647
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = text
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = decimal
+  jdbcTypeName      = Types.DECIMAL
+  dataType          = 3
+  precision         = 38
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = precision,scale
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = decimal
+  minimumScale      = 0
+  maximumScale      = 38
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = date
+  jdbcTypeName      = Types.DATE
+  dataType          = 91
+  precision         = 10
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = date
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = real
+  jdbcTypeName      = Types.REAL
+  dataType          = 7
+  precision         = 7
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = real
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = dt_Adcd
+  jdbcTypeName      = Types.VARCHAR
+  dataType          = 12
+  precision         = 10
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = dt_Adcd
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = dt_Ahnd
+  jdbcTypeName      = Types.NUMERIC
+  dataType          = 2
+  precision         = 38
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = dt_Ahnd
+  minimumScale      = 0
+  maximumScale      = 38
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = extended type
+  jdbcTypeName      = Types.OTHER
+  dataType          = 1111
+  precision         = 2147483647
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = java.lang.Object
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = time
+  jdbcTypeName      = Types.TIME
+  dataType          = 92
+  precision         = 12
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = time
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = dt_Xmld
+  jdbcTypeName      = Types.LONGVARBINARY
+  dataType          = -4
+  precision         = 2147483647
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = dt_Xmld
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = char
+  jdbcTypeName      = Types.CHAR
+  dataType          = 1
+  precision         = 2048
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = length
+  nullable          = 1
+  caseSensitive     = true
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = char
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = datetime
+  jdbcTypeName      = Types.TIMESTAMP
+  dataType          = 93
+  precision         = 23
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = datetime
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = varbinary
+  jdbcTypeName      = Types.VARBINARY
+  dataType          = -3
+  precision         = 2048
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = max length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = varbinary
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = bit
+  jdbcTypeName      = Types.BIT
+  dataType          = -7
+  precision         = 1
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 0
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = bit
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = smallint
+  jdbcTypeName      = Types.SMALLINT
+  dataType          = 5
+  precision         = 5
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = smallint
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0

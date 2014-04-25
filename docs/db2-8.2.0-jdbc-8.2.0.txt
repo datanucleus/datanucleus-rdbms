@@ -1,0 +1,405 @@
+DB2Adapter : DB2/NT version=08.02.0000, major=8, minor=2, revision=0
+Identifier Names supported : UPPERCASE
+Driver name=IBM DB2 JDBC 2.0 Type 2, version=08.02.0000, major=8, minor=1
+Identifier Max Lengths : Table=128 Constraints=18 Index=18 Column=30 Delimeters="
+Identifier Support in DDL : catalog=false schema=true
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = CHAR () FOR BIT DATA
+jdbcTypeName = Types.BINARY
+dataType = -2
+precision = 254
+literalPrefix = '
+literalSuffix = '
+createParams = LENGTH
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = INTEGER
+jdbcTypeName = Types.INTEGER
+dataType = 4
+precision = 10
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = DOUBLE
+jdbcTypeName = Types.DOUBLE
+dataType = 8
+precision = 53
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 2
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = BLOB
+jdbcTypeName = Types.BLOB
+dataType = 2004
+precision = 2147483647
+literalPrefix = null
+literalSuffix = null
+createParams = LENGTH
+nullable = 1
+caseSensitive = false
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = LONG VARCHAR
+jdbcTypeName = Types.LONGVARCHAR
+dataType = -1
+precision = 32700
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = CLOB
+jdbcTypeName = Types.CLOB
+dataType = 2005
+precision = 2147483647
+literalPrefix = '
+literalSuffix = '
+createParams = LENGTH
+nullable = 1
+caseSensitive = true
+searchable = 1
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = DECIMAL
+jdbcTypeName = Types.DECIMAL
+dataType = 3
+precision = 31
+literalPrefix = null
+literalSuffix = null
+createParams = PRECISION,SCALE
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 31
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = DATE
+jdbcTypeName = Types.DATE
+dataType = 91
+precision = 10
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = REAL
+jdbcTypeName = Types.REAL
+dataType = 7
+precision = 24
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 2
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = VARCHAR
+jdbcTypeName = Types.VARCHAR
+dataType = 12
+precision = 32672
+literalPrefix = '
+literalSuffix = '
+createParams = LENGTH
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = BIGINT
+jdbcTypeName = Types.BIGINT
+dataType = -5
+precision = 20
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = DISTINCT
+jdbcTypeName = Types.DISTINCT
+dataType = 2001
+precision = 0
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 0
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = NUMERIC
+jdbcTypeName = Types.NUMERIC
+dataType = 2
+precision = 31
+literalPrefix = null
+literalSuffix = null
+createParams = PRECISION,SCALE
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 31
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = TIME
+jdbcTypeName = Types.TIME
+dataType = 92
+precision = 8
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = LONG VARCHAR FOR BIT DATA
+jdbcTypeName = Types.LONGVARBINARY
+dataType = -4
+precision = 32700
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = DATALINK
+jdbcTypeName = Unrecognized type (70)
+dataType = 70
+precision = 254
+literalPrefix = null
+literalSuffix = null
+createParams =
+nullable = 1
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = FLOAT
+jdbcTypeName = Types.FLOAT
+dataType = 6
+precision = 53
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = CHAR
+jdbcTypeName = Types.CHAR
+dataType = 1
+precision = 254
+literalPrefix = '
+literalSuffix = '
+createParams = LENGTH
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = TIMESTAMP
+jdbcTypeName = Types.TIMESTAMP
+dataType = 93
+precision = 26
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 6
+maximumScale = 6
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = VARCHAR () FOR BIT DATA
+jdbcTypeName = Types.VARBINARY
+dataType = -3
+precision = 32672
+literalPrefix = '
+literalSuffix = '
+createParams = LENGTH
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 0
+
+org.jpox.store.rdbms.typeinfo.DB2TypeInfo
+typeName = SMALLINT
+jdbcTypeName = Types.SMALLINT
+dataType = 5
+precision = 5
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 2
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = null
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10

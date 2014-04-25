@@ -1,0 +1,727 @@
+    [java] PostgreSQLAdapter : PostgreSQL version=8.0.8, major=8, minor=0, revision=8
+    [java] Identifier Names : "UPPERCASE" 
+    [java] Driver name=PostgreSQL Native Driver, version=PostgreSQL 8.1 JDBC3 with SSL (build 405), major=8, minor=1
+    [java] Identifier Max Lengths : Table=63  Column=63  Constraint=63  Index=63  Delimeters="
+    [java] Identifier Support in DDL : catalog=false  schema=true
+    [java] 
+    [java] JPOX SchemaTool : Database Type Info
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = int4
+    [java]   jdbcTypeName      = Types.INTEGER
+    [java]   dataType          = 4
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = _money
+    [java]   jdbcTypeName      = Types.ARRAY
+    [java]   dataType          = 2003
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = float8
+    [java]   jdbcTypeName      = Types.DOUBLE
+    [java]   dataType          = 8
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = text
+    [java]   jdbcTypeName      = Types.LONGVARCHAR
+    [java]   dataType          = -1
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = date
+    [java]   jdbcTypeName      = Types.DATE
+    [java]   dataType          = 91
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = float4
+    [java]   jdbcTypeName      = Types.REAL
+    [java]   dataType          = 7
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = varchar
+    [java]   jdbcTypeName      = Types.VARCHAR
+    [java]   dataType          = 12
+    [java]   precision         = 65000
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = int8
+    [java]   jdbcTypeName      = Types.BIGINT
+    [java]   dataType          = -5
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = numeric
+    [java]   jdbcTypeName      = Types.NUMERIC
+    [java]   dataType          = 2
+    [java]   precision         = 64
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = bytea
+    [java]   jdbcTypeName      = Types.LONGVARBINARY
+    [java]   dataType          = -4
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = time
+    [java]   jdbcTypeName      = Types.TIME
+    [java]   dataType          = 92
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.TypeInfo
+    [java]   typeName          = char
+    [java]   jdbcTypeName      = Types.CHAR
+    [java]   dataType          = 1
+    [java]   precision         = 65000
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = char
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = timestamptz
+    [java]   jdbcTypeName      = Types.TIMESTAMP
+    [java]   dataType          = 93
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = bool
+    [java]   jdbcTypeName      = Types.BIT
+    [java]   dataType          = -7
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.PostgreSQLTypeInfo
+    [java]   typeName          = int2
+    [java]   jdbcTypeName      = Types.SMALLINT
+    [java]   dataType          = 5
+    [java]   precision         = 9
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 0
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = null
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] 
+    [java] JPOX SchemaTool : Database Keywords
+    [java] INDEX
+    [java] MAP
+    [java] FETCH
+    [java] INTO
+    [java] ORDINALITY
+    [java] NUMBER
+    [java] ABORT
+    [java] FORWARD
+    [java] STORE
+    [java] METHOD
+    [java] RENAME
+    [java] COLUMN_NAME
+    [java] ATOMIC
+    [java] CALLED
+    [java] VIEW
+    [java] LOCALTIMESTAMP
+    [java] UNCOMMITTED
+    [java] COLLATION_NAME
+    [java] CONNECT
+    [java] TIMEZONE_MINUTE
+    [java] BINARY
+    [java] CONTINUE
+    [java] CONSTRAINT_SCHEMA
+    [java] CONSTRAINT
+    [java] COBOL
+    [java] DETERMINISTIC
+    [java] DELIMITERS
+    [java] SELECT
+    [java] MODULE
+    [java] VERSION
+    [java] CONNECTION
+    [java] NUMERIC
+    [java] GO
+    [java] SESSION
+    [java] UNION
+    [java] NONE
+    [java] NOTNULL
+    [java] UPDATE
+    [java] ZONE
+    [java] SCALE
+    [java] ARE
+    [java] ANY
+    [java] EQUALS
+    [java] BOOLEAN
+    [java] SESSION_USER
+    [java] NULL
+    [java] DIAGNOSTICS
+    [java] SET
+    [java] MESSAGE_TEXT
+    [java] INDICATOR
+    [java] DAY
+    [java] UNIQUE
+    [java] PATH
+    [java] TYPE
+    [java] PUBLIC
+    [java] STDIN
+    [java] NULLABLE
+    [java] INPUT
+    [java] EXPLAIN
+    [java] ELSEIF
+    [java] LAST
+    [java] FLOAT
+    [java] VALUES
+    [java] OLD
+    [java] OUT
+    [java] OR
+    [java] AFTER
+    [java] FULL
+    [java] RECIPE
+    [java] INTEGER
+    [java] PRIVILEGES
+    [java] CORRESPONDING
+    [java] RELEASE
+    [java] SQLERROR
+    [java] CONNECTION_NAME
+    [java] ESCAPE
+    [java] CURRENT_TRANSFORM_GROUP_FOR_TYPE
+    [java] MUMPS
+    [java] EXIT
+    [java] CURRENT_DATE
+    [java] CYCLE
+    [java] REAL
+    [java] SUM
+    [java] CONDITION_NUMBER
+    [java] WHENEVER
+    [java] CHARACTER_LENGTH
+    [java] FROM
+    [java] DELETE
+    [java] LIGHT
+    [java] MAX
+    [java] NULLIF
+    [java] DO
+    [java] CONSTRAINT_CATALOG
+    [java] SUBSTRING
+    [java] ONLY
+    [java] CURRENT_TIME
+    [java] MATCH
+    [java] LIKE
+    [java] COMMIT
+    [java] PLACING
+    [java] NATIONAL
+    [java] SMALLINT
+    [java] SQLWARNING
+    [java] IF
+    [java] CALL
+    [java] DISCONNECT
+    [java] FOR
+    [java] LOCALTIME
+    [java] MODIFIES
+    [java] PRESERVE
+    [java] DEFAULT
+    [java] AVG
+    [java] CURSOR
+    [java] BEFORE
+    [java] DEREF
+    [java] NOT
+    [java] OPTION
+    [java] INSENSITIVE
+    [java] UNDO
+    [java] TREAT
+    [java] ASENSITIVE
+    [java] RETURNED_SQLSTATE
+    [java] ACL
+    [java] SUBMULTISET
+    [java] USAGE
+    [java] GENERAL
+    [java] FORTRAN
+    [java] AND
+    [java] SERIALIZABLE
+    [java] CASCADED
+    [java] FUNCTION
+    [java] GLOBAL
+    [java] ROLLBACK
+    [java] DATE
+    [java] BETWEEN
+    [java] ARCHIVE
+    [java] BOTH
+    [java] FREE
+    [java] INTERSECT
+    [java] AT
+    [java] DISTINCT
+    [java] SYSTEM_USER
+    [java] PRIOR
+    [java] TRANSLATE
+    [java] NEW
+    [java] DATA
+    [java] ANALYZE
+    [java] SERVER_NAME
+    [java] SCROLL
+    [java] CASE
+    [java] ITERATE
+    [java] TABLE
+    [java] DEALLOCATE
+    [java] SQLCODE
+    [java] KEY
+    [java] COLUMN
+    [java] NAME
+    [java] EACH
+    [java] CREATE
+    [java] WHERE
+    [java] AGGREGATE
+    [java] COPY
+    [java] CHARACTER_SET_NAME
+    [java] WITHOUT
+    [java] USING
+    [java] LEADING
+    [java] INITIALLY
+    [java] TIMEZONE_HOUR
+    [java] CHAR_LENGTH
+    [java] CURSOR_NAME
+    [java] VALUE
+    [java] DECIMAL
+    [java] COLLATION_CATALOG
+    [java] SUBCLASS_ORIGIN
+    [java] DATETIME_INTERVAL_CODE
+    [java] EXEC
+    [java] TRANSLATION
+    [java] MERGE
+    [java] GROUP
+    [java] IDENTITY
+    [java] SCOPE
+    [java] TEMPORARY
+    [java] RESULT
+    [java] OUTER
+    [java] GROUPING
+    [java] SQL
+    [java] CATALOG_NAME
+    [java] UNDER
+    [java] VACUUM
+    [java] SPECIFIC
+    [java] ROLLUP
+    [java] CLUSTER
+    [java] BLOB
+    [java] IMMEDIATE
+    [java] USER
+    [java] NO
+    [java] ALLOCATE
+    [java] ROUTINE
+    [java] COLLATION
+    [java] DELIMITER
+    [java] ILIKE
+    [java] NAMES
+    [java] ISNULL
+    [java] CLOSE
+    [java] PARAMETER
+    [java] REVOKE
+    [java] MESSAGE_OCTET_LENGTH
+    [java] CLASS_ORIGIN
+    [java] COLLATION_SCHEMA
+    [java] EXISTS
+    [java] CURRENT_TIMESTAMP
+    [java] SPECIFICTYPE
+    [java] FREEZE
+    [java] END
+    [java] WORK
+    [java] SAVEPOINT
+    [java] NATURAL
+    [java] ASYMMETRIC
+    [java] ON
+    [java] RECURSIVE
+    [java] RELATIVE
+    [java] ORDER
+    [java] COLLATE
+    [java] SIMILAR
+    [java] STDOUT
+    [java] GET
+    [java] CHANGE
+    [java] SYSTEM
+    [java] CONDITION
+    [java] FOUND
+    [java] CHARACTER_SET_CATALOG
+    [java] UNTIL
+    [java] MONTH
+    [java] DESC
+    [java] ARCH_STORE
+    [java] DECLARE
+    [java] TRIM
+    [java] PREPARE
+    [java] BREADTH
+    [java] ASSERTION
+    [java] PRIMARY
+    [java] RANGE
+    [java] FILTER
+    [java] WHEN
+    [java] OVER
+    [java] CURRENT_ROLE
+    [java] COMMAND_FUNCTION
+    [java] YEAR
+    [java] EXTEND
+    [java] ABSOLUTE
+    [java] SYMMETRIC
+    [java] CATALOG
+    [java] REPEAT
+    [java] ANALYSE
+    [java] CURRENT_DEFAULT_TRANSFORM_GROUP
+    [java] STATIC
+    [java] TIME
+    [java] CONSTRAINT_NAME
+    [java] ALTER
+    [java] ELSE
+    [java] SENSITIVE
+    [java] BIGINT
+    [java] COUNT
+    [java] DYNAMIC
+    [java] UNNEST
+    [java] HAVING
+    [java] TRUE
+    [java] ADD
+    [java] SEARCH
+    [java] UNKNOWN
+    [java] GRANT
+    [java] MINUTE
+    [java] OUTPUT
+    [java] PARTITION
+    [java] DATABASE
+    [java] EXTERNAL
+    [java] RESIGNAL
+    [java] LOAD
+    [java] RESTRICT
+    [java] CUBE
+    [java] CAST
+    [java] PROCEDURE
+    [java] LOCATOR
+    [java] EXECUTE
+    [java] GOTO
+    [java] EXCEPT
+    [java] COALESCE
+    [java] END-EXEC
+    [java] INHERITS
+    [java] MESSAGE_LENGTH
+    [java] TIMESTAMP
+    [java] BY
+    [java] SECOND
+    [java] POSITION
+    [java] INT
+    [java] DESCRIBE
+    [java] UNNAMED
+    [java] DYNAMIC_FUNCTION
+    [java] CURRENT_PATH
+    [java] CHARACTER
+    [java] TRAILING
+    [java] JOIN
+    [java] HANDLER
+    [java] WHILE
+    [java] LATERAL
+    [java] DESCRIPTOR
+    [java] DEFERRABLE
+    [java] RETURNED_OCTET_LENGTH
+    [java] TABLESAMPLE
+    [java] PRECISION
+    [java] WITH
+    [java] IN
+    [java] SOME
+    [java] CLOB
+    [java] DROP
+    [java] NEXT
+    [java] DEC
+    [java] PARTIAL
+    [java] RETURN
+    [java] NCLOB
+    [java] PASCAL
+    [java] SQLSTATE
+    [java] INOUT
+    [java] REPEATABLE
+    [java] RETRIEVE
+    [java] READ
+    [java] EXCEPTION
+    [java] INTERVAL
+    [java] STATE
+    [java] WITHIN
+    [java] ELEMENT
+    [java] OIDS
+    [java] AS
+    [java] ARRAY
+    [java] MORE
+    [java] DOUBLE
+    [java] LISTEN
+    [java] DEPTH
+    [java] ADA
+    [java] FALSE
+    [java] THEN
+    [java] REF
+    [java] FOREIGN
+    [java] AUTHORIZATION
+    [java] MULTISET
+    [java] DATETIME_INTERVAL_PRECISION
+    [java] NOTIFY
+    [java] TO
+    [java] LOCAL
+    [java] RIGHT
+    [java] TABLE_NAME
+    [java] TRIGGER
+    [java] LANGUAGE
+    [java] CONSTRAINTS
+    [java] LEVEL
+    [java] SCHEMA
+    [java] MEMBER
+    [java] SETOF
+    [java] SPACE
+    [java] CASCADE
+    [java] HEAVY
+    [java] CHAR
+    [java] NCHAR
+    [java] WRITE
+    [java] LOOP
+    [java] OF
+    [java] LOWER
+    [java] HOLD
+    [java] WINDOW
+    [java] VARCHAR
+    [java] CURRENT_USER
+    [java] SCHEMA_NAME
+    [java] DEFERRED
+    [java] SECTION
+    [java] C
+    [java] OPEN
+    [java] REFERENCES
+    [java] CHECK
+    [java] BACKWARD
+    [java] FIRST
+    [java] DOMAIN
+    [java] PAD
+    [java] ALL
+    [java] INSERT
+    [java] VARYING
+    [java] SIGNAL
+    [java] CURRENT
+    [java] ROW_COUNT
+    [java] INNER
+    [java] ROWS
+    [java] RULE
+    [java] PLI
+    [java] BIT
+    [java] VERBOSE
+    [java] SETS
+    [java] CHARACTER_SET_SCHEMA
+    [java] BIT_LENGTH
+    [java] START
+    [java] LEFT
+    [java] PURGE
+    [java] OCTET_LENGTH
+    [java] REFERENCING
+    [java] OBJECT
+    [java] OVERLAPS
+    [java] RETURNED_LENGTH
+    [java] SQLEXCEPTION
+    [java] READS
+    [java] ISOLATION
+    [java] NOTHING
+    [java] LENGTH
+    [java] IS
+    [java] OFFSET
+    [java] REPLACE
+    [java] APPEND
+    [java] ACTION
+    [java] MIN
+    [java] ASC
+    [java] RETURNS
+    [java] BEGIN
+    [java] HOUR
+    [java] CONSTRUCTOR
+    [java] CONVERT
+    [java] LEAVE
+    [java] UPPER
+    [java] EXTRACT
+    [java] CROSS
+    [java] SIZE
+    [java] LARGE
+    [java] COMMITTED
+    [java] ROLE
+    [java] TRANSACTION
+    [java] ROW
+

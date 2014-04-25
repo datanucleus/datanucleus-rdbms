@@ -1,0 +1,831 @@
+    [java] MySQLAdapter : MySQL version=4.1.12, major=4, minor=1, revision=12
+    [java] Identifier Names : UPPERCASE 
+    [java] Driver name=MySQL-AB JDBC Driver, version=mysql-connector-java-3.0.16-ga ( $Date: 2006/07/25 09:04:26 $, $Revision: 1.1 $ ), major=3, minor=0
+    [java] Identifier Max Lengths : Table=64  Column=64  Constraint=64  Index=64  Delimeters=`
+    [java] Identifier Support in DDL : catalog=false  schema=false
+    [java] 
+    [java] JPOX SchemaTool : Database Type Info
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = INTEGER
+    [java]   jdbcTypeName      = Types.INTEGER
+    [java]   dataType          = 4
+    [java]   precision         = 10
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = true
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = INTEGER
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = TINYINT
+    [java]   jdbcTypeName      = Types.TINYINT
+    [java]   dataType          = -6
+    [java]   precision         = 3
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = true
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = TINYINT
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = DOUBLE
+    [java]   jdbcTypeName      = Types.DOUBLE
+    [java]   dataType          = 8
+    [java]   precision         = 17
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M,D)] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = DOUBLE
+    [java]   minimumScale      = -308
+    [java]   maximumScale      = 308
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.TypeInfo
+    [java]   typeName          = MEDIUMBLOB
+    [java]   jdbcTypeName      = Types.BLOB
+    [java]   dataType          = 2004
+    [java]   precision         = 2147483647
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 1
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = MEDIUMBLOB
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 0
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = LONG VARCHAR
+    [java]   jdbcTypeName      = Types.LONGVARCHAR
+    [java]   dataType          = -1
+    [java]   precision         = 16777215
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = LONG VARCHAR
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.TypeInfo
+    [java]   typeName          = MEDIUMTEXT
+    [java]   jdbcTypeName      = Types.CLOB
+    [java]   dataType          = 2005
+    [java]   precision         = 2147483647
+    [java]   literalPrefix     = null
+    [java]   literalSuffix     = null
+    [java]   createParams      = null
+    [java]   nullable          = 1
+    [java]   caseSensitive     = true
+    [java]   searchable        = 1
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = MEDIUMTEXT
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 0
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = DECIMAL
+    [java]   jdbcTypeName      = Types.DECIMAL
+    [java]   dataType          = 3
+    [java]   precision         = 17
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M[,D])] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = DECIMAL
+    [java]   minimumScale      = -308
+    [java]   maximumScale      = 308
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = DATE
+    [java]   jdbcTypeName      = Types.DATE
+    [java]   dataType          = 91
+    [java]   precision         = 0
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = DATE
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = VARCHAR(M) BINARY
+    [java]   jdbcTypeName      = Types.VARCHAR
+    [java]   dataType          = 12
+    [java]   precision         = 255
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = VARCHAR
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = BIGINT
+    [java]   jdbcTypeName      = Types.BIGINT
+    [java]   dataType          = -5
+    [java]   precision         = 19
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = true
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = BIGINT
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = NUMERIC
+    [java]   jdbcTypeName      = Types.NUMERIC
+    [java]   dataType          = 2
+    [java]   precision         = 17
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M[,D])] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = NUMERIC
+    [java]   minimumScale      = -308
+    [java]   maximumScale      = 308
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = TIME
+    [java]   jdbcTypeName      = Types.TIME
+    [java]   dataType          = 92
+    [java]   precision         = 0
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = TIME
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = LONG VARBINARY
+    [java]   jdbcTypeName      = Types.LONGVARBINARY
+    [java]   dataType          = -4
+    [java]   precision         = 16777215
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = true
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = LONG VARBINARY
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = FLOAT
+    [java]   jdbcTypeName      = Types.FLOAT
+    [java]   dataType          = 6
+    [java]   precision         = 10
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M,D)] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = FLOAT
+    [java]   minimumScale      = -38
+    [java]   maximumScale      = 38
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = CHAR(M) BINARY
+    [java]   jdbcTypeName      = Types.CHAR
+    [java]   dataType          = 1
+    [java]   precision         = 255
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = CHAR
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = DATETIME
+    [java]   jdbcTypeName      = Types.TIMESTAMP
+    [java]   dataType          = 93
+    [java]   precision         = 0
+    [java]   literalPrefix     = '
+    [java]   literalSuffix     = '
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = DATETIME
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = BIT
+    [java]   jdbcTypeName      = Types.BIT
+    [java]   dataType          = -7
+    [java]   precision         = 1
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = 
+    [java]   nullable          = 1
+    [java]   caseSensitive     = true
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = false
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = false
+    [java]   localTypeName     = BIT
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] org.jpox.store.rdbms.typeinfo.MySQLTypeInfo
+    [java]   typeName          = SMALLINT
+    [java]   jdbcTypeName      = Types.SMALLINT
+    [java]   dataType          = 5
+    [java]   precision         = 5
+    [java]   literalPrefix     = 
+    [java]   literalSuffix     = 
+    [java]   createParams      = [(M)] [UNSIGNED] [ZEROFILL]
+    [java]   nullable          = 1
+    [java]   caseSensitive     = false
+    [java]   searchable        = 3
+    [java]   unsignedAttribute = true
+    [java]   fixedPrecScale    = false
+    [java]   autoIncrement     = true
+    [java]   localTypeName     = SMALLINT
+    [java]   minimumScale      = 0
+    [java]   maximumScale      = 0
+    [java]   numPrecRadix      = 10
+    [java] 
+    [java] 
+    [java] JPOX SchemaTool : Database Keywords
+    [java] INDEX
+    [java] MAP
+    [java] FETCH
+    [java] HASH
+    [java] INTO
+    [java] ORDINALITY
+    [java] NUMBER
+    [java] METHOD
+    [java] RENAME
+    [java] COLUMN_NAME
+    [java] ATOMIC
+    [java] REGEXP
+    [java] CALLED
+    [java] VIEW
+    [java] LOCALTIMESTAMP
+    [java] SSL
+    [java] UNCOMMITTED
+    [java] COLLATION_NAME
+    [java] CONNECT
+    [java] TIMEZONE_MINUTE
+    [java] BINARY
+    [java] CONTINUE
+    [java] CONSTRAINT_SCHEMA
+    [java] CONSTRAINT
+    [java] COBOL
+    [java] DETERMINISTIC
+    [java] ERRORS
+    [java] SELECT
+    [java] MODULE
+    [java] CONNECTION
+    [java] NUMERIC
+    [java] GO
+    [java] SESSION
+    [java] UNION
+    [java] MINUTE_SECOND
+    [java] NONE
+    [java] UPDATE
+    [java] ZONE
+    [java] SCALE
+    [java] ARE
+    [java] ANY
+    [java] EQUALS
+    [java] BOOLEAN
+    [java] SESSION_USER
+    [java] OUTFILE
+    [java] TINYINT
+    [java] XOR
+    [java] NULL
+    [java] DIAGNOSTICS
+    [java] TEXT
+    [java] SET
+    [java] MESSAGE_TEXT
+    [java] INDICATOR
+    [java] LONGBLOB
+    [java] DAY
+    [java] UNIQUE
+    [java] PATH
+    [java] TYPE
+    [java] PUBLIC
+    [java] LONG
+    [java] NULLABLE
+    [java] INPUT
+    [java] EXPLAIN
+    [java] ELSEIF
+    [java] LAST
+    [java] FLOAT
+    [java] UNLOCK
+    [java] VALUES
+    [java] OLD
+    [java] OUT
+    [java] MRG_MYISAM
+    [java] OR
+    [java] AFTER
+    [java] FULL
+    [java] INTEGER
+    [java] PRIVILEGES
+    [java] CORRESPONDING
+    [java] RELEASE
+    [java] SQLERROR
+    [java] HOUR_MINUTE
+    [java] SQL_BIG_RESULT
+    [java] CONNECTION_NAME
+    [java] ESCAPE
+    [java] CURRENT_TRANSFORM_GROUP_FOR_TYPE
+    [java] MUMPS
+    [java] STARTING
+    [java] EXIT
+    [java] CURRENT_DATE
+    [java] CYCLE
+    [java] REAL
+    [java] SUM
+    [java] CONDITION_NUMBER
+    [java] WHENEVER
+    [java] CHARACTER_LENGTH
+    [java] FROM
+    [java] DELETE
+    [java] MAX
+    [java] NULLIF
+    [java] DO
+    [java] CONSTRAINT_CATALOG
+    [java] SUBSTRING
+    [java] ONLY
+    [java] CURRENT_TIME
+    [java] MATCH
+    [java] LIKE
+    [java] COMMIT
+    [java] NATIONAL
+    [java] DISTINCTROW
+    [java] SMALLINT
+    [java] SQLWARNING
+    [java] IF
+    [java] CALL
+    [java] DISCONNECT
+    [java] FOR
+    [java] LOCALTIME
+    [java] MODIFIES
+    [java] PRESERVE
+    [java] DEFAULT
+    [java] AVG
+    [java] CURSOR
+    [java] HIGH_PRIORITY
+    [java] BEFORE
+    [java] DEREF
+    [java] NOT
+    [java] OPTION
+    [java] LIMIT
+    [java] INSENSITIVE
+    [java] UNDO
+    [java] TREAT
+    [java] ASENSITIVE
+    [java] RETURNED_SQLSTATE
+    [java] SUBMULTISET
+    [java] USAGE
+    [java] USER_RESOURCES
+    [java] GENERAL
+    [java] FORTRAN
+    [java] STRIPED
+    [java] DAY_HOUR
+    [java] AND
+    [java] SERIALIZABLE
+    [java] CASCADED
+    [java] FUNCTION
+    [java] GLOBAL
+    [java] SPATIAL
+    [java] ROLLBACK
+    [java] DATE
+    [java] BETWEEN
+    [java] BOTH
+    [java] FREE
+    [java] MEDIUMTEXT
+    [java] INTERSECT
+    [java] AT
+    [java] INNODB
+    [java] DISTINCT
+    [java] SYSTEM_USER
+    [java] INFILE
+    [java] PRIOR
+    [java] BDB
+    [java] TRANSLATE
+    [java] NEW
+    [java] DATA
+    [java] ANALYZE
+    [java] SERVER_NAME
+    [java] YEAR_MONTH
+    [java] SCROLL
+    [java] CASE
+    [java] ITERATE
+    [java] TABLE
+    [java] DEALLOCATE
+    [java] SQLCODE
+    [java] COLUMNS
+    [java] KEY
+    [java] LOCK
+    [java] COLUMN
+    [java] NAME
+    [java] EACH
+    [java] CREATE
+    [java] WHERE
+    [java] CHARACTER_SET_NAME
+    [java] WITHOUT
+    [java] USING
+    [java] LEADING
+    [java] INITIALLY
+    [java] TIMEZONE_HOUR
+    [java] CHAR_LENGTH
+    [java] CURSOR_NAME
+    [java] MIDDLEINT
+    [java] VALUE
+    [java] RLIKE
+    [java] DECIMAL
+    [java] COLLATION_CATALOG
+    [java] SUBCLASS_ORIGIN
+    [java] DATETIME_INTERVAL_CODE
+    [java] OPTIONALLY
+    [java] EXEC
+    [java] VARBINARY
+    [java] TRANSLATION
+    [java] MERGE
+    [java] GROUP
+    [java] IDENTITY
+    [java] LINES
+    [java] SCOPE
+    [java] SONAME
+    [java] DAY_MINUTE
+    [java] TEMPORARY
+    [java] RESULT
+    [java] OUTER
+    [java] GROUPING
+    [java] ENUM
+    [java] SHOW
+    [java] SQL
+    [java] CATALOG_NAME
+    [java] UNDER
+    [java] SPECIFIC
+    [java] ROLLUP
+    [java] BLOB
+    [java] IMMEDIATE
+    [java] USER
+    [java] NO
+    [java] ALLOCATE
+    [java] ROUTINE
+    [java] COLLATION
+    [java] SQL_SMALL_RESULT
+    [java] NAMES
+    [java] CLOSE
+    [java] PARAMETER
+    [java] MASTER_SERVER_ID
+    [java] REVOKE
+    [java] MESSAGE_OCTET_LENGTH
+    [java] CLASS_ORIGIN
+    [java] COLLATION_SCHEMA
+    [java] EXISTS
+    [java] CURRENT_TIMESTAMP
+    [java] SPECIFICTYPE
+    [java] END
+    [java] WORK
+    [java] SAVEPOINT
+    [java] NATURAL
+    [java] ASYMMETRIC
+    [java] ESCAPED
+    [java] TYPES
+    [java] TERMINATED
+    [java] ON
+    [java] RECURSIVE
+    [java] TINYBLOB
+    [java] RELATIVE
+    [java] ORDER
+    [java] COLLATE
+    [java] SIMILAR
+    [java] GET
+    [java] CHANGE
+    [java] SYSTEM
+    [java] CONDITION
+    [java] FOUND
+    [java] CHARACTER_SET_CATALOG
+    [java] UNTIL
+    [java] MONTH
+    [java] DESC
+    [java] DECLARE
+    [java] TRIM
+    [java] PREPARE
+    [java] UNSIGNED
+    [java] BREADTH
+    [java] ASSERTION
+    [java] PRIMARY
+    [java] RANGE
+    [java] FILTER
+    [java] WHEN
+    [java] DELAYED
+    [java] OVER
+    [java] CURRENT_ROLE
+    [java] COMMAND_FUNCTION
+    [java] YEAR
+    [java] ABSOLUTE
+    [java] SYMMETRIC
+    [java] CATALOG
+    [java] REPEAT
+    [java] OPTIMIZE
+    [java] CURRENT_DEFAULT_TRANSFORM_GROUP
+    [java] STATIC
+    [java] TIME
+    [java] CONSTRAINT_NAME
+    [java] ALTER
+    [java] ELSE
+    [java] SENSITIVE
+    [java] BIGINT
+    [java] COUNT
+    [java] DYNAMIC
+    [java] UNNEST
+    [java] GEOMETRY
+    [java] HAVING
+    [java] KILL
+    [java] TRUE
+    [java] ADD
+    [java] SEARCH
+    [java] UNKNOWN
+    [java] KEYS
+    [java] GRANT
+    [java] MINUTE
+    [java] OUTPUT
+    [java] LONGTEXT
+    [java] PARTITION
+    [java] DATABASE
+    [java] EXTERNAL
+    [java] RESIGNAL
+    [java] TABLES
+    [java] LOAD
+    [java] RESTRICT
+    [java] CUBE
+    [java] CAST
+    [java] PROCEDURE
+    [java] LOCATOR
+    [java] EXECUTE
+    [java] MOD
+    [java] SQL_CALC_FOUND_ROWS
+    [java] GOTO
+    [java] EXCEPT
+    [java] COALESCE
+    [java] END-EXEC
+    [java] MESSAGE_LENGTH
+    [java] TIMESTAMP
+    [java] BY
+    [java] SECOND
+    [java] POSITION
+    [java] INT
+    [java] DESCRIBE
+    [java] IGNORE
+    [java] UNNAMED
+    [java] USE
+    [java] DYNAMIC_FUNCTION
+    [java] CURRENT_PATH
+    [java] CHARACTER
+    [java] TRAILING
+    [java] JOIN
+    [java] STRAIGHT_JOIN
+    [java] HANDLER
+    [java] MEDIUMINT
+    [java] RTREE
+    [java] WHILE
+    [java] LATERAL
+    [java] DESCRIPTOR
+    [java] DEFERRABLE
+    [java] RETURNED_OCTET_LENGTH
+    [java] TABLESAMPLE
+    [java] PRECISION
+    [java] WITH
+    [java] IN
+    [java] SOME
+    [java] CLOB
+    [java] DROP
+    [java] DAY_SECOND
+    [java] NEXT
+    [java] DEC
+    [java] PARTIAL
+    [java] RETURN
+    [java] MEDIUMBLOB
+    [java] NCLOB
+    [java] PASCAL
+    [java] SQLSTATE
+    [java] INOUT
+    [java] REPEATABLE
+    [java] READ
+    [java] EXCEPTION
+    [java] INTERVAL
+    [java] STATE
+    [java] WITHIN
+    [java] ELEMENT
+    [java] AS
+    [java] FULLTEXT
+    [java] ARRAY
+    [java] MORE
+    [java] DOUBLE
+    [java] DEPTH
+    [java] ADA
+    [java] FALSE
+    [java] AUTO_INCREMENT
+    [java] ZEROFILL
+    [java] THEN
+    [java] REF
+    [java] FOREIGN
+    [java] AUTHORIZATION
+    [java] MULTISET
+    [java] DATETIME_INTERVAL_PRECISION
+    [java] TO
+    [java] LOCAL
+    [java] RIGHT
+    [java] TABLE_NAME
+    [java] TRIGGER
+    [java] LANGUAGE
+    [java] CONSTRAINTS
+    [java] LEVEL
+    [java] SCHEMA
+    [java] MEMBER
+    [java] SPACE
+    [java] CASCADE
+    [java] CHAR
+    [java] NCHAR
+    [java] WRITE
+    [java] LOOP
+    [java] OF
+    [java] LOWER
+    [java] HOLD
+    [java] WINDOW
+    [java] VARCHAR
+    [java] CURRENT_USER
+    [java] SCHEMA_NAME
+    [java] DEFERRED
+    [java] SECTION
+    [java] C
+    [java] HELP
+    [java] OPEN
+    [java] REFERENCES
+    [java] CHECK
+    [java] FIRST
+    [java] DOMAIN
+    [java] PAD
+    [java] DIV
+    [java] ALL
+    [java] INSERT
+    [java] VARYING
+    [java] FIELDS
+    [java] SIGNAL
+    [java] TINYTEXT
+    [java] CURRENT
+    [java] ROW_COUNT
+    [java] INNER
+    [java] ROWS
+    [java] PLI
+    [java] DATABASES
+    [java] BIT
+    [java] SETS
+    [java] CHARACTER_SET_SCHEMA
+    [java] BIT_LENGTH
+    [java] START
+    [java] ENCLOSED
+    [java] LEFT
+    [java] PURGE
+    [java] FORCE
+    [java] OCTET_LENGTH
+    [java] REFERENCING
+    [java] OBJECT
+    [java] OVERLAPS
+    [java] RETURNED_LENGTH
+    [java] SQLEXCEPTION
+    [java] HOUR_SECOND
+    [java] READS
+    [java] ISOLATION
+    [java] LENGTH
+    [java] IS
+    [java] REQUIRE
+    [java] LOW_PRIORITY
+    [java] REPLACE
+    [java] ACTION
+    [java] MIN
+    [java] ASC
+    [java] RETURNS
+    [java] VARCHARACTER
+    [java] BEGIN
+    [java] BTREE
+    [java] HOUR
+    [java] CONSTRUCTOR
+    [java] CONVERT
+    [java] LEAVE
+    [java] BERKELEYDB
+    [java] UPPER
+    [java] EXTRACT
+    [java] CROSS
+    [java] SIZE
+    [java] LARGE
+    [java] COMMITTED
+    [java] WARNINGS
+    [java] ROLE
+    [java] TRANSACTION
+    [java] ROW
+    [java] 
+    [java] SchemaTool completed successfully
+BUILD SUCCESSFUL
+Total time: 7 seconds
+Finished at: Tue Jul 25 10:56:13 CEST 2006
+

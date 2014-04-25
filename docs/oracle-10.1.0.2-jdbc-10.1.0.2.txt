@@ -1,0 +1,482 @@
+OracleAdapter : Oracle version=Oracle Database 10g Enterprise Edition Release 10.1.0.2.0 - Production
+With the Partitioning, OLAP and Data Mining options, major=10, minor=1, revision=0
+Identifier Names supported : UPPERCASE "MixedCase"
+Driver name=Oracle JDBC driver, version=10.1.0.2.0, major=10, minor=1
+Identifier Max Lengths : Table=30 Constraints=30 Index=30 Column=30 Delimeters="
+Identifier Support in DDL : catalog=false schema=true
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.TINYINT
+dataType = -6
+precision = 3
+literalPrefix = null
+literalSuffix = null
+createParams = (3)
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = REAL
+jdbcTypeName = Types.REAL
+dataType = 7
+precision = 63
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = REAL
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = TIMESTAMP WITH TIME ZONE
+jdbcTypeName = Unrecognized type (-101)
+dataType = -101
+precision = 13
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = TIMESTAMP WITH TIME ZONE
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.BIGINT
+dataType = -5
+precision = 38
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = REF
+jdbcTypeName = Types.REF
+dataType = 2006
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = REF
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = FLOAT
+jdbcTypeName = Types.FLOAT
+dataType = 6
+precision = 63
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = FLOAT
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = CHAR
+jdbcTypeName = Types.CHAR
+dataType = 1
+precision = 2000
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = CHAR
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = INTERVALDS
+jdbcTypeName = Unrecognized type (-104)
+dataType = -104
+precision = 4
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = INTERVALDS
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = RAW
+jdbcTypeName = Types.VARBINARY
+dataType = -3
+precision = 2000
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = RAW
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = TIMESTAMP
+jdbcTypeName = Types.TIMESTAMP
+dataType = 93
+precision = 11
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = TIMESTAMP
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = INTERVALYM
+jdbcTypeName = Unrecognized type (-103)
+dataType = -103
+precision = 5
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = INTERVALYM
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.INTEGER
+dataType = 4
+precision = 10
+literalPrefix = null
+literalSuffix = null
+createParams = (10)
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = ARRAY
+jdbcTypeName = Types.ARRAY
+dataType = 2003
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = ARRAY
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = TIMESTAMP WITH LOCAL TIME ZONE
+jdbcTypeName = Unrecognized type (-102)
+dataType = -102
+precision = 11
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = TIMESTAMP WITH LOCAL TIME ZONE
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = BLOB
+jdbcTypeName = Types.BLOB
+dataType = 2004
+precision = -1
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = BLOB
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = LONG
+jdbcTypeName = Types.LONGVARCHAR
+dataType = -1
+precision = 2147483647
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = LONG
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = CLOB
+jdbcTypeName = Types.CLOB
+dataType = 2005
+precision = -1
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = CLOB
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = DATE
+jdbcTypeName = Types.DATE
+dataType = 91
+precision = 7
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = DATE
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = VARCHAR2
+jdbcTypeName = Types.VARCHAR
+dataType = 12
+precision = 4000
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = VARCHAR2
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.NUMERIC
+dataType = 2
+precision = 38
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = LONG RAW
+jdbcTypeName = Types.LONGVARBINARY
+dataType = -4
+precision = 2147483647
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = LONG RAW
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = DATE
+jdbcTypeName = Types.TIME
+dataType = 92
+precision = 7
+literalPrefix = null
+literalSuffix = null
+createParams = null
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = DATE
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = STRUCT
+jdbcTypeName = Types.STRUCT
+dataType = 2002
+precision = 0
+literalPrefix = '
+literalSuffix = '
+createParams = null
+nullable = 1
+caseSensitive = true
+searchable = 0
+unsignedAttribute = false
+fixedPrecScale = false
+autoIncrement = false
+localTypeName = STRUCT
+minimumScale = 0
+maximumScale = 0
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.BIT
+dataType = -7
+precision = 1
+literalPrefix = null
+literalSuffix = null
+createParams = (1)
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+typeName = NUMBER
+jdbcTypeName = Types.SMALLINT
+dataType = 5
+precision = 5
+literalPrefix = null
+literalSuffix = null
+createParams = (5)
+nullable = 1
+caseSensitive = false
+searchable = 3
+unsignedAttribute = false
+fixedPrecScale = true
+autoIncrement = false
+localTypeName = NUMBER
+minimumScale = -84
+maximumScale = 127
+numPrecRadix = 10

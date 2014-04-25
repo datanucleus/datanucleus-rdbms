@@ -1,0 +1,790 @@
+MSSQLServerAdapter : Microsoft SQL Server version=08.00.0818, major=8, minor=0, revision=818
+Identifier Names : UPPERCASE 
+Driver name=jTDS Type 4 JDBC Driver for MS SQL Server and Sybase, version=1.2, major=1, minor=2
+Identifier Max Lengths : Table=128  Column=128  Constraint=128  Index=128  Delimeters="
+Identifier Support in DDL : catalog=true  schema=true
+
+JPOX SchemaTool : Database Type Info
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = binary
+  jdbcTypeName      = Types.BINARY
+  dataType          = -2
+  precision         = 8000
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = binary
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = int
+  jdbcTypeName      = Types.INTEGER
+  dataType          = 4
+  precision         = 10
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = int
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = float
+  jdbcTypeName      = Types.DOUBLE
+  dataType          = 8
+  precision         = 53
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = float
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 2
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = image
+  jdbcTypeName      = Types.BLOB
+  dataType          = 2004
+  precision         = 2147483647
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 0
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = image
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = ntext
+  jdbcTypeName      = Types.CLOB
+  dataType          = 2005
+  precision         = 1073741823
+  literalPrefix     = N'
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 1
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = ntext
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = decimal
+  jdbcTypeName      = Types.DECIMAL
+  dataType          = 3
+  precision         = 38
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = precision,scale
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = decimal
+  minimumScale      = 0
+  maximumScale      = 38
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = real
+  jdbcTypeName      = Types.REAL
+  dataType          = 7
+  precision         = 24
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = real
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 2
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = varchar
+  jdbcTypeName      = Types.VARCHAR
+  dataType          = 12
+  precision         = 8000
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = max length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = varchar
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = bigint
+  jdbcTypeName      = Types.BIGINT
+  dataType          = -5
+  precision         = 19
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = bigint
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = numeric
+  jdbcTypeName      = Types.NUMERIC
+  dataType          = 2
+  precision         = 38
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = precision,scale
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = numeric
+  minimumScale      = 0
+  maximumScale      = 38
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.TypeInfo
+  typeName          = UNIQUEIDENTIFIER
+  jdbcTypeName      = Types.CHAR
+  dataType          = 1
+  precision         = 36
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = UNIQUEIDENTIFIER
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = char
+  jdbcTypeName      = Types.CHAR
+  dataType          = 1
+  precision         = 8000
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = char
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = varbinary
+  jdbcTypeName      = Types.VARBINARY
+  dataType          = -3
+  precision         = 8000
+  literalPrefix     = 0x
+  literalSuffix     = null
+  createParams      = max length
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = varbinary
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = datetime
+  jdbcTypeName      = Types.TIMESTAMP
+  dataType          = 93
+  precision         = 23
+  literalPrefix     = '
+  literalSuffix     = '
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 3
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = datetime
+  minimumScale      = 3
+  maximumScale      = 3
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = bit
+  jdbcTypeName      = Types.BIT
+  dataType          = -7
+  precision         = 1
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = bit
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 0
+
+org.jpox.store.rdbms.typeinfo.MSSQLTypeInfo
+  typeName          = smallint
+  jdbcTypeName      = Types.SMALLINT
+  dataType          = 5
+  precision         = 5
+  literalPrefix     = null
+  literalSuffix     = null
+  createParams      = null
+  nullable          = 1
+  caseSensitive     = false
+  searchable        = 2
+  unsignedAttribute = false
+  fixedPrecScale    = false
+  autoIncrement     = false
+  localTypeName     = smallint
+  minimumScale      = 0
+  maximumScale      = 0
+  numPrecRadix      = 10
+
+
+JPOX SchemaTool : Database Keywords
+INDEX
+MAP
+FETCH
+INTO
+ORDINALITY
+NUMBER
+METHOD
+OPENXML
+COLUMN_NAME
+ATOMIC
+CALLED
+TEXTSIZE
+VIEW
+LOCALTIMESTAMP
+UNCOMMITTED
+COLLATION_NAME
+CONNECT
+TIMEZONE_MINUTE
+BINARY
+CONTINUE
+CONSTRAINT_SCHEMA
+CONSTRAINT
+COBOL
+DETERMINISTIC
+TOP
+IDENTITY_INSERT
+SELECT
+MODULE
+CONNECTION
+PROC
+UPDATETEXT
+OPENDATASOURCE
+NUMERIC
+GO
+SESSION
+UNION
+NONE
+UPDATE
+ZONE
+SCALE
+ARE
+ANY
+EQUALS
+BOOLEAN
+SESSION_USER
+ROWCOUNT
+NULL
+DIAGNOSTICS
+SET
+MESSAGE_TEXT
+INDICATOR
+DAY
+UNIQUE
+NUMERIC_TRUNCATION
+PATH
+TYPE
+PUBLIC
+NULLABLE
+TRAN
+INPUT
+ELSEIF
+LAST
+CONTROLROW
+FLOAT
+VALUES
+OLD
+OUT
+OR
+AFTER
+FULL
+INTEGER
+PRIVILEGES
+CORRESPONDING
+RELEASE
+BROWSE
+SQLERROR
+CONNECTION_NAME
+ESCAPE
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+MUMPS
+EXIT
+CURRENT_DATE
+CYCLE
+REAL
+SUM
+CONDITION_NUMBER
+WHENEVER
+CHARACTER_LENGTH
+FROM
+UNPARTITION
+DELETE
+TSEQUAL
+MAX
+NULLIF
+DO
+CONSTRAINT_CATALOG
+SUBSTRING
+ONLY
+CURRENT_TIME
+LINENO
+MATCH
+LIKE
+COMMIT
+NATIONAL
+SMALLINT
+SQLWARNING
+IF
+MIRROREXIT
+CALL
+DISCONNECT
+FOR
+LOCALTIME
+MODIFIES
+PRESERVE
+DEFAULT
+AVG
+CURSOR
+BEFORE
+DEREF
+NOT
+OPTION
+ERROREXIT
+INSENSITIVE
+UNDO
+TREAT
+RECONFIGURE
+ASENSITIVE
+RETURNED_SQLSTATE
+FREETEXT
+SUBMULTISET
+USAGE
+GENERAL
+CLUSTERED
+SAVE
+FORTRAN
+CHECKPOINT
+AND
+SERIALIZABLE
+CASCADED
+FUNCTION
+FILE
+GLOBAL
+ROLLBACK
+DATE
+HOLDLOCK
+USED_PGS
+BETWEEN
+BOTH
+FREE
+DBCC
+INTERSECT
+AT
+DISTINCT
+SYSTEM_USER
+SYB_TERMINATE
+PRIOR
+TRANSLATE
+NEW
+DATA
+USER_OPTION
+SERVER_NAME
+READTEXT
+SCROLL
+CONTAINSTABLE
+CASE
+ITERATE
+TABLE
+DEALLOCATE
+SQLCODE
+KEY
+COLUMN
+NAME
+ERRORDATA
+EACH
+CREATE
+WHERE
+CHARACTER_SET_NAME
+WITHOUT
+USING
+LEADING
+INITIALLY
+TIMEZONE_HOUR
+NONCLUSTERED
+CHAR_LENGTH
+FREETEXTTABLE
+CURSOR_NAME
+BACKUP
+VALUE
+DECIMAL
+COLLATION_CATALOG
+SUBCLASS_ORIGIN
+DATETIME_INTERVAL_CODE
+EXEC
+TRANSLATION
+MERGE
+GROUP
+IDENTITY
+CHAR_CONVERT
+SCOPE
+SETUSER
+REPLICATION
+TEMPORARY
+RESULT
+OUTER
+GROUPING
+SQL
+CATALOG_NAME
+ARITH_OVERFLOW
+UNDER
+SPECIFIC
+ROLLUP
+BLOB
+IMMEDIATE
+USER
+TRUNCATE
+NO
+RAISERROR
+ALLOCATE
+ROUTINE
+COLLATION
+NAMES
+CLOSE
+PARAMETER
+ROWCNT
+REVOKE
+MESSAGE_OCTET_LENGTH
+CLASS_ORIGIN
+COLLATION_SCHEMA
+EXISTS
+CURRENT_TIMESTAMP
+SPECIFICTYPE
+END
+STRIPE
+WORK
+SAVEPOINT
+NATURAL
+ASYMMETRIC
+ON
+RECURSIVE
+STATISTICS
+RELATIVE
+ORDER
+COLLATE
+SIMILAR
+GET
+WRITETEXT
+SYSTEM
+CONDITION
+FOUND
+CHARACTER_SET_CATALOG
+UNTIL
+MONTH
+DESC
+DECLARE
+TRIM
+PREPARE
+BREADTH
+ASSERTION
+PRIMARY
+RANGE
+FILTER
+WHEN
+OVER
+CURRENT_ROLE
+COMMAND_FUNCTION
+YEAR
+ABSOLUTE
+SYMMETRIC
+CATALOG
+DUMP
+REPEAT
+CURRENT_DEFAULT_TRANSFORM_GROUP
+STATIC
+DISK
+TIME
+CONSTRAINT_NAME
+PLAN
+ALTER
+ENDTRAN
+ELSE
+SENSITIVE
+BIGINT
+COUNT
+DYNAMIC
+UNNEST
+HAVING
+KILL
+TRUE
+ADD
+SEARCH
+UNKNOWN
+GRANT
+MINUTE
+OUTPUT
+PERCENT
+PARTITION
+DATABASE
+RESERVED_PGS
+EXTERNAL
+RESIGNAL
+LOAD
+RESTRICT
+CUBE
+CAST
+PROCEDURE
+LOCATOR
+EXECUTE
+GOTO
+EXCEPT
+COALESCE
+DUMMY
+END-EXEC
+BULK
+MESSAGE_LENGTH
+TIMESTAMP
+BY
+SECOND
+POSITION
+INT
+DESCRIBE
+UNNAMED
+USE
+DYNAMIC_FUNCTION
+CURRENT_PATH
+CHARACTER
+OPENQUERY
+TRAILING
+JOIN
+HANDLER
+PROCESSEXIT
+WHILE
+LATERAL
+DESCRIPTOR
+DEFERRABLE
+NOHOLDLOCK
+DATA_PGS
+RETURNED_OCTET_LENGTH
+TABLESAMPLE
+PRECISION
+WITH
+IN
+SOME
+CLOB
+DROP
+NOCHECK
+PRINT
+NEXT
+DEC
+PARTIAL
+RETURN
+NCLOB
+PASCAL
+SQLSTATE
+WAITFOR
+INOUT
+REPEATABLE
+DISTRIBUTED
+READ
+EXCEPTION
+INTERVAL
+STATE
+WITHIN
+ELEMENT
+CONFIRM
+AS
+ARRAY
+MORE
+DOUBLE
+DEPTH
+ADA
+FALSE
+FILLFACTOR
+THEN
+REF
+MAX_ROWS_PER_PAGE
+FOREIGN
+AUTHORIZATION
+MULTISET
+DATETIME_INTERVAL_PRECISION
+ROWGUIDCOL
+ONCE
+TO
+LOCAL
+RIGHT
+TABLE_NAME
+TRIGGER
+LANGUAGE
+CONSTRAINTS
+LEVEL
+SCHEMA
+MEMBER
+OPENROWSET
+SPACE
+SHARED
+CASCADE
+DENY
+CHAR
+NCHAR
+WRITE
+LOOP
+OF
+LOWER
+HOLD
+RESTORE
+WINDOW
+VARCHAR
+CURRENT_USER
+SCHEMA_NAME
+DEFERRED
+OFF
+SECTION
+C
+SYB_RESTREE
+TEMP
+OPEN
+REFERENCES
+CHECK
+BREAK
+FIRST
+DOMAIN
+PAD
+ALL
+MIRROR
+INSERT
+VARYING
+SIGNAL
+CURRENT
+ROW_COUNT
+INNER
+ROWS
+RULE
+PLI
+IDENTITYCOL
+ONLINE
+BIT
+SETS
+CHARACTER_SET_SCHEMA
+BIT_LENGTH
+START
+CONTAINS
+LEFT
+OCTET_LENGTH
+REFERENCING
+PERMANENT
+OBJECT
+OVERLAPS
+RETURNED_LENGTH
+SQLEXCEPTION
+PERM
+READS
+ISOLATION
+LENGTH
+IS
+REPLACE
+SHUTDOWN
+ACTION
+MIN
+ASC
+RETURNS
+BEGIN
+HOUR
+CONSTRUCTOR
+COMPUTE
+CONVERT
+LEAVE
+UPPER
+SYB_IDENTITY
+EXTRACT
+CROSS
+ERRLVL
+SIZE
+LARGE
+COMMITTED
+OFFSETS
+ROLE
+TRANSACTION
+ROW
