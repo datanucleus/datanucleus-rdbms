@@ -2275,7 +2275,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method defining which value-strategy to use when the user specifies "native".
      * @return Should be overridden by all store managers that have other behaviour.
      */
-    protected String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
     {
         if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY))
         {
