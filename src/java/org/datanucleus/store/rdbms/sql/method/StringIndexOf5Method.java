@@ -32,7 +32,8 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
- * Method for evaluating {strExpr1}.indexOf(strExpr2[,pos]).
+ * Method for evaluating {strExpr1}.indexOf(strExpr2[,pos]) for PostgreSQL.
+ * Note that this will not work if there is subsequent addition/subtraction of this value, but PostgreSQL doesn't have a simple function for this.
  * If pos is not specified then returns a NumericExpression equating to
  * <pre>STRPOS(strExpr1, strExpr2, numExpr1+1)-1</pre>
  * otherwise returns
