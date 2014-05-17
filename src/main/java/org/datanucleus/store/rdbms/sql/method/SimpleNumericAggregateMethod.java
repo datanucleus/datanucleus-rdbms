@@ -60,7 +60,7 @@ public abstract class SimpleNumericAggregateMethod extends AbstractSQLMethod
             // FUNC(argExpr)
             // Use same java type as the argument
             SQLExpression argExpr = args.get(0);
-            JavaTypeMapping m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
+            JavaTypeMapping m = argExpr.getJavaTypeMapping();
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }
         else

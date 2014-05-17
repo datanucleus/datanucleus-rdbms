@@ -63,8 +63,8 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
             // FUNC(argExpr)
             // Use same java type as the argument
             SQLExpression argExpr = args.get(0);
-            JavaTypeMapping m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
-            if (args.get(0) instanceof TemporalExpression)
+            JavaTypeMapping m = argExpr.getJavaTypeMapping();
+            if (argExpr instanceof TemporalExpression)
             {
                 return new AggregateTemporalExpression(stmt, m, getFunctionName(), args);
             }
@@ -77,12 +77,10 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
         {
             // Handle as Subquery "SELECT AVG(expr) FROM tbl"
             SQLExpression argExpr = args.get(0);
-            SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
-                argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
+            SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
             subStmt.setClassLoaderResolver(clr);
 
-            JavaTypeMapping mapping =
-                stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+            JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
             String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
             SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
             ((StringLiteral)aggExpr).generateStatementWithoutQuotes();
