@@ -532,7 +532,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     else if (updateExpr.getRight() instanceof ParameterExpression)
                     {
-                        processParameterExpression((ParameterExpression)updateExpr.getRight());
+                        ParameterExpression paramExpr = (ParameterExpression)updateExpr.getRight();
+                        paramMappingForName.put(paramExpr.getId(), leftSqlExpr.getJavaTypeMapping());
+                        processParameterExpression(paramExpr);
                         rightSqlExpr = stack.pop();
                     }
                     else if (updateExpr.getRight() instanceof PrimaryExpression)

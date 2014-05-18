@@ -31,18 +31,17 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Maps the class fields of a GregorianCalendar to datastore field(s).
- * JPOX traditionally supported this as mapping to 2 datastore fields (timestamp millisecs and timezone).
- * Here we also support it as mapping to a single datastore field (timestamp).
+ * Maps the class fields of a GregorianCalendar to column(s).
+ * We default to a single column (timestamp), but allow the option of persisting to 2 columns (timestamp millisecs and timezone).
+ * JPOX traditionally supported persistence to 2 columns.
  */
 public class GregorianCalendarMapping extends SingleFieldMultiMapping
 {
-    boolean singleColumn = false;
-
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.mapping.JavaTypeMapping#initialize(AbstractMemberMetaData, DatastoreContainerObject, ClassLoaderResolver)
      */
@@ -63,11 +62,19 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
 
     protected void addColumns()
     {
-        if (mmd!= null && mmd.hasExtension("calendar-one-column") && 
-            mmd.getValueForExtension("calendar-one-column").equals("true"))
+        boolean singleColumn = true;
+        if (mmd != null)
         {
-            // If this mapping is created via a query we assume multiple columns currently
-            singleColumn = true;
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+            if (colmds != null && colmds.length == 2)
+            {
+                // 2 columns specified so use that handling
+                singleColumn = false;
+            }
+            else if (mmd.hasExtension("calendar-one-column") && mmd.getValueForExtension("calendar-one-column").equals("false"))
+            {
+                singleColumn = false;
+            }
         }
 
         if (singleColumn)
@@ -100,7 +107,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
      */
     public String getJavaTypeForDatastoreMapping(int index)
     {
-        if (singleColumn)
+        if (getNumberOfDatastoreMappings() == 1)
         {
             // (Timestamp) implementation
             return ClassNameConstants.JAVA_SQL_TIMESTAMP;
@@ -129,7 +136,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
      */
     public Object getValueForDatastoreMapping(NucleusContext nucleusCtx, int index, Object value)
     {
-        if (singleColumn)
+        if (getNumberOfDatastoreMappings() == 1)
         {
             return value;
         }
@@ -152,7 +159,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         GregorianCalendar cal = (GregorianCalendar) value;
-        if (singleColumn)
+        if (getNumberOfDatastoreMappings() == 1)
         {
             // (Timestamp) implementation
             Timestamp ts = null;
@@ -198,7 +205,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             // Do nothing
         }
 
-        if (singleColumn)
+        if (getNumberOfDatastoreMappings() == 1)
         {
             Timestamp ts = (Timestamp)getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
             GregorianCalendar cal = new GregorianCalendar();
