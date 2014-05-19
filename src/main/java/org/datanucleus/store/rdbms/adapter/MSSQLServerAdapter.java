@@ -519,10 +519,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         }
 
         StringBuilder str = new StringBuilder();
-        if (offset > 0)
-        {
-            str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
-        }
+        str.append("OFFSET " + offset + (offset == 1 ? " ROW " : " ROWS "));
         if (count > 0)
         {
             str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
