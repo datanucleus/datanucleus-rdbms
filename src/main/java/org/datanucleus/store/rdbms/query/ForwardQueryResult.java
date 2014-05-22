@@ -246,7 +246,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         if (resultIds != null)
         {
             // Cache the results with the QueryManager
-            query.getQueryManager().addDatastoreQueryResult(query, query.getInputParameters(), resultIds);
+            query.getQueryManager().addQueryResult(query, query.getInputParameters(), resultIds);
             resultIds = null;
         }
     }

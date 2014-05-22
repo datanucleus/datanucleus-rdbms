@@ -327,7 +327,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                 Object resultId = resultIds.get(position);
                 ids.add(resultId);
             }
-            query.getQueryManager().addDatastoreQueryResult(query, query.getInputParameters(), ids);
+            query.getQueryManager().addQueryResult(query, query.getInputParameters(), ids);
         }
         resultIds = null;
     }

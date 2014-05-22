@@ -528,7 +528,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         else if (type == Query.SELECT)
         {
             // Query results are cached, so return those
-            List<Object> cachedResults = getQueryManager().getDatastoreQueryResult(this, parameters);
+            List<Object> cachedResults = getQueryManager().getQueryResult(this, parameters);
             if (cachedResults != null)
             {
                 return new CandidateIdsQueryResult(this, cachedResults);
