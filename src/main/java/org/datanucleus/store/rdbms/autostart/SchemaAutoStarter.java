@@ -47,9 +47,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SchemaAutoStarter extends AbstractAutoStartMechanism
 {
-    private static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     protected SchemaTable schemaTable = null;
 
     protected RDBMSStoreManager storeMgr = null;
@@ -102,13 +99,13 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         catch (Exception e)
         {
             // Validation error - table is different to what we expect
-            NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("049001",storeMgr.getSchemaName(),e));
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getSchemaName(),e));
 
             try
             {
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER_RDBMS.msg("049002",this.schemaTable.toString()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("049002",this.schemaTable.toString()));
                 }
 
                 try
@@ -127,7 +124,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
             }
             catch (Exception e2)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("049001",storeMgr.getSchemaName(),e2));
+                NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049001",storeMgr.getSchemaName(),e2));
             }
         }
         finally
@@ -154,14 +151,14 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
             }
             catch (SQLException sqe2)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("049000",sqe2));
+                NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049000",sqe2));
                 //TODO in case of exception should we throw a Fatal Exception???
             }
             return data;
         }
         catch (Exception e)
         {
-            throw new DatastoreInitialisationException(LOCALISER_RDBMS.msg("049010",e),e);
+            throw new DatastoreInitialisationException(Localiser.msg("049010",e),e);
         }
     }
 
@@ -172,7 +169,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
     {
         if (mconn == null)
         {
-            throw new NucleusException(LOCALISER_RDBMS.msg("049008")).setFatal();
+            throw new NucleusException(Localiser.msg("049008")).setFatal();
         }
     }
 
@@ -183,7 +180,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
     {
         if (mconn != null)
         {
-            throw new NucleusException(LOCALISER_RDBMS.msg("049009")).setFatal();
+            throw new NucleusException(Localiser.msg("049009")).setFatal();
         }
     }
     
@@ -209,7 +206,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         }
         catch (NucleusException sqe2)
         {
-            NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("050005",sqe2));
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050005",sqe2));
         }
     }    
     
@@ -236,7 +233,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         }
         catch (SQLException sqe2)
         {
-            String msg = LOCALISER_RDBMS.msg("049003", data.getName(), sqe2);
+            String msg = Localiser.msg("049003", data.getName(), sqe2);
             NucleusLogger.DATASTORE_SCHEMA.error(msg);
             throw new NucleusDataStoreException(msg, sqe2);
         }
@@ -255,7 +252,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         }
         catch (SQLException sqe2)
         {
-            NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("049005", class_name, sqe2));
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049005", class_name, sqe2));
         }
     }
 
@@ -271,7 +268,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         }
         catch (SQLException sqe2)
         {
-            NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("049006", sqe2));
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("049006", sqe2));
         }
     }
 
@@ -281,6 +278,6 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
      */
     public String getStorageDescription()
     {
-        return LOCALISER_RDBMS.msg("049007", this.schemaTable.toString());
+        return Localiser.msg("049007", this.schemaTable.toString());
     }
 }

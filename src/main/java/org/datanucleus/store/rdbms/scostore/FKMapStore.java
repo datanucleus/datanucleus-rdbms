@@ -69,6 +69,7 @@ import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * RDBMS-specific implementation of an {@link MapStore} where either the value has a FK to the owner (and the key
@@ -111,7 +112,7 @@ public class FKMapStore extends AbstractMapStore
         if (mapmd == null)
         {
             // No <map> specified for this field!
-            throw new NucleusUserException(LOCALISER.msg("056002", mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056002", mmd.getFullFieldName()));
         }
 
         // Check whether we store the key in the value, or the value in the key
@@ -123,7 +124,7 @@ public class FKMapStore extends AbstractMapStore
         else if (mmd.getValueMetaData() != null && mmd.getValueMetaData().getMappedBy() == null)
         {
             // No mapped-by specified on either key or value so we dont know what to do with this relation!
-            throw new NucleusUserException(LOCALISER.msg("056071", mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056071", mmd.getFullFieldName()));
         }
         else
         {
@@ -140,12 +141,12 @@ public class FKMapStore extends AbstractMapStore
         if (keyStoredInValue && !api.isPersistable(valueClass))
         {
             // key stored in value but value is not PC!
-            throw new NucleusUserException(LOCALISER.msg("056072", mmd.getFullFieldName(), valueType));
+            throw new NucleusUserException(Localiser.msg("056072", mmd.getFullFieldName(), valueType));
         }
         if (!keyStoredInValue && !api.isPersistable(keyClass))
         {
             // value stored in key but key is not PC!
-            throw new NucleusUserException(LOCALISER.msg("056073", mmd.getFullFieldName(), keyType));
+            throw new NucleusUserException(Localiser.msg("056073", mmd.getFullFieldName(), keyType));
         }
 
         String ownerFieldName = mmd.getMappedBy();
@@ -156,7 +157,7 @@ public class FKMapStore extends AbstractMapStore
             if (vmd == null)
             {
                 // Value has no MetaData!
-                throw new NucleusUserException(LOCALISER.msg("056070", valueType, mmd.getFullFieldName()));
+                throw new NucleusUserException(Localiser.msg("056070", valueType, mmd.getFullFieldName()));
             }
 
             valueTable = storeMgr.getDatastoreClass(valueType, clr);
@@ -170,14 +171,14 @@ public class FKMapStore extends AbstractMapStore
                 AbstractMemberMetaData vofmd = vmd.getMetaDataForMember(ownerFieldName);
                 if (vofmd == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056067", mmd.getFullFieldName(), 
+                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
                         ownerFieldName, valueClass.getName()));
                 }
 
                 // Check that the type of the value "mapped-by" field is consistent with the owner type
                 if (!clr.isAssignableFrom(vofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056068", mmd.getFullFieldName(),
+                    throw new NucleusUserException(Localiser.msg("056068", mmd.getFullFieldName(),
                         vofmd.getFullFieldName(), vofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
                 }
 
@@ -185,12 +186,12 @@ public class FKMapStore extends AbstractMapStore
                 ownerMapping = valueTable.getMemberMapping(vofmd);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
+                    throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
                         mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType, ownerFieldName));
                 }
                 if (isEmbeddedMapping(ownerMapping))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056055",
+                    throw new NucleusUserException(Localiser.msg("056055",
                         ownerFieldName, valueType, vofmd.getTypeName(), mmd.getClassName()));
                 }
             }
@@ -201,14 +202,14 @@ public class FKMapStore extends AbstractMapStore
                 ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056056", 
+                    throw new NucleusUserException(Localiser.msg("056056", 
                         mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType));
                 }
             }
 
             if (mmd.getKeyMetaData() == null || mmd.getKeyMetaData().getMappedBy() == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056050", valueClass.getName()));
+                throw new NucleusUserException(Localiser.msg("056050", valueClass.getName()));
             }
 
             AbstractMemberMetaData vkfmd = null;
@@ -220,18 +221,18 @@ public class FKMapStore extends AbstractMapStore
                 vkfmd = (vkCmd != null ? vkCmd.getMetaDataForMember(key_field_name) : null);
                 if (vkfmd == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056052", valueClass.getName(), key_field_name));
+                    throw new NucleusUserException(Localiser.msg("056052", valueClass.getName(), key_field_name));
                 }
             }
             if (vkfmd == null)
             {
-                throw new ClassDefinitionException(LOCALISER.msg("056050", mmd.getFullFieldName()));
+                throw new ClassDefinitionException(Localiser.msg("056050", mmd.getFullFieldName()));
             }
 
             // Check that the key type is correct for the declared type
             if (!ClassUtils.typesAreCompatible(vkfmd.getType(), keyType, clr))
             {
-                throw new NucleusUserException(LOCALISER.msg("056051", 
+                throw new NucleusUserException(Localiser.msg("056051", 
                     mmd.getFullFieldName(), keyType, vkfmd.getType().getName()));
             }
 
@@ -241,7 +242,7 @@ public class FKMapStore extends AbstractMapStore
             keyMapping = valueTable.getMemberMapping(vmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
             if (keyMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056053", 
+                throw new NucleusUserException(Localiser.msg("056053", 
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType, keyFieldName));
             }
 
@@ -268,7 +269,7 @@ public class FKMapStore extends AbstractMapStore
             if (kmd == null)
             {
                 // Key has no MetaData!
-                throw new NucleusUserException(LOCALISER.msg("056069", keyType, mmd.getFullFieldName()));
+                throw new NucleusUserException(Localiser.msg("056069", keyType, mmd.getFullFieldName()));
             }
 
             // TODO This should be called keyvalueTable or something and not valueTable
@@ -283,14 +284,14 @@ public class FKMapStore extends AbstractMapStore
                 AbstractMemberMetaData kofmd = kmd.getMetaDataForMember(ownerFieldName);
                 if (kofmd == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056067", mmd.getFullFieldName(), 
+                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
                         ownerFieldName, keyClass.getName()));
                 }
 
                 // Check that the type of the key "mapped-by" field is consistent with the owner type
                 if (!ClassUtils.typesAreCompatible(kofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName(), clr))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056068", mmd.getFullFieldName(),
+                    throw new NucleusUserException(Localiser.msg("056068", mmd.getFullFieldName(),
                         kofmd.getFullFieldName(), kofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
                 }
 
@@ -298,12 +299,12 @@ public class FKMapStore extends AbstractMapStore
                 ownerMapping = valueTable.getMemberMapping(kofmd);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
+                    throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
                         mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType, ownerFieldName));
                 }
                 if (isEmbeddedMapping(ownerMapping))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056055",
+                    throw new NucleusUserException(Localiser.msg("056055",
                         ownerFieldName, keyType, kofmd.getTypeName(), mmd.getClassName()));
                 }
             }
@@ -314,14 +315,14 @@ public class FKMapStore extends AbstractMapStore
                 ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056056", 
+                    throw new NucleusUserException(Localiser.msg("056056", 
                         mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType));
                 }
             }
 
             if (mmd.getValueMetaData() == null || mmd.getValueMetaData().getMappedBy() == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056057", keyClass.getName()));
+                throw new NucleusUserException(Localiser.msg("056057", keyClass.getName()));
             }
 
             AbstractMemberMetaData vkfmd = null;
@@ -333,18 +334,18 @@ public class FKMapStore extends AbstractMapStore
                 vkfmd = (vkCmd != null ? vkCmd.getMetaDataForMember(value_field_name) : null);
                 if (vkfmd == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("056059", keyClass.getName(), value_field_name));
+                    throw new NucleusUserException(Localiser.msg("056059", keyClass.getName(), value_field_name));
                 }
             }
             if (vkfmd == null)
             {
-                throw new ClassDefinitionException(LOCALISER.msg("056057", mmd.getFullFieldName()));
+                throw new ClassDefinitionException(Localiser.msg("056057", mmd.getFullFieldName()));
             }
 
             // Check that the value type is consistent with the declared type
             if (!ClassUtils.typesAreCompatible(vkfmd.getType(), valueType, clr))
             {
-                throw new NucleusUserException(LOCALISER.msg("056058", 
+                throw new NucleusUserException(Localiser.msg("056058", 
                     mmd.getFullFieldName(), valueType, vkfmd.getType().getName()));
             }
 
@@ -354,7 +355,7 @@ public class FKMapStore extends AbstractMapStore
             valueMapping = valueTable.getMemberMapping(kmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
             if (valueMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056054", 
+                throw new NucleusUserException(Localiser.msg("056054", 
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType, valueFieldName));
             }
 
@@ -429,7 +430,7 @@ public class FKMapStore extends AbstractMapStore
     {
         if (value == null)
         {
-            throw new NullPointerException(LOCALISER.msg("056063"));
+            throw new NullPointerException(Localiser.msg("056063"));
         }
 
         super.validateValueType(clr, value);
@@ -483,7 +484,7 @@ public class FKMapStore extends AbstractMapStore
                      */
                     if (ec != ec.getApiAdapter().getExecutionContext(newValue))
                     {
-                        throw new NucleusUserException(LOCALISER.msg("RDBMS.SCO.Map.WriteValueInvalidWithDifferentPM"), ec.getApiAdapter().getIdForObject(newValue));
+                        throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.WriteValueInvalidWithDifferentPM"), ec.getApiAdapter().getIdForObject(newValue));
                     }
 
                     ObjectProvider vsm = ec.findObjectProvider(newValue);
@@ -569,7 +570,7 @@ public class FKMapStore extends AbstractMapStore
                      */
                     if (ec != ec.getApiAdapter().getExecutionContext(newKey))
                     {
-                        throw new NucleusUserException(LOCALISER.msg("056060"),
+                        throw new NucleusUserException(Localiser.msg("056060"),
                             ec.getApiAdapter().getIdForObject(newKey));
                     }
 
@@ -1031,7 +1032,7 @@ public class FKMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056027",updateFkStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056027",updateFkStmt),e);
         }
 
         return retval;
@@ -1085,7 +1086,7 @@ public class FKMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056027",updateFkStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056027",updateFkStmt),e);
         }
 
         return retval;
@@ -1215,7 +1216,7 @@ public class FKMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056014", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056014", stmt), e);
         }
         return value;
     }

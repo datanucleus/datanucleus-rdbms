@@ -33,7 +33,6 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.ClassUtils;
@@ -45,13 +44,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class MappingHelper
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Convenience method to return an array of positions for datastore columns for the supplied
      * mapping and the initial position value. For example if the mapping has a single datastore
@@ -114,7 +106,7 @@ public class MappingHelper
             oid = ec.getNucleusContext().getIdentityManager().getDatastoreId(mapping.getType(), oid);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041034",oid));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041034",oid));
             }
         }
 
@@ -214,7 +206,7 @@ public class MappingHelper
             Object idObj = mapping.getStoreManager().getResultValueAtPosition(rs, mapping, paramNumber);
             if (idObj == null)
             {
-                throw new NucleusException(LOCALISER.msg("041039")).setFatal();
+                throw new NucleusException(Localiser.msg("041039")).setFatal();
             }
             else
             {
@@ -226,7 +218,7 @@ public class MappingHelper
         }
         catch (Exception e)
         {
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("041036", cmd.getObjectidClass(), e));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("041036", cmd.getObjectidClass(), e));
             return null;
         }
     }
@@ -287,7 +279,7 @@ public class MappingHelper
         catch (Exception e)
         {
             AbstractMemberMetaData mmd = mapping.getMemberMetaData();
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("041037",
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("041037",
                 cmd.getObjectidClass(), mmd == null ? null : mmd.getName(), fieldValue, e));
             return null;
         }

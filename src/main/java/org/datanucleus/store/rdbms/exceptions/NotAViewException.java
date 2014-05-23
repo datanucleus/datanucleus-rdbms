@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -28,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NotAViewException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a not-a-view exception.
      * @param viewName Name of the view that is of the wrong type.
@@ -38,6 +34,6 @@ public class NotAViewException extends DatastoreValidationException
      */
     public NotAViewException(String viewName, String type)
     {
-        super(LOCALISER_RDBMS.msg("020013", viewName, type));
+        super(Localiser.msg("020013", viewName, type));
     }
 }

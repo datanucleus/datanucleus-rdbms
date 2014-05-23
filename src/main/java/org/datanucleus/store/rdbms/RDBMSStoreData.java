@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.ViewImpl;
+import org.datanucleus.util.Localiser;
 
 /**
  * Representation of a class (FCO) / field (SCO) that is persisted to an RDBMS table.
@@ -199,16 +200,16 @@ public class RDBMSStoreData extends StoreData
         if (metadata instanceof ClassMetaData)
         {
             ClassMetaData cmd = (ClassMetaData)metadata;
-            return LOCALISER.msg("035004", name, tableName != null ? tableName : "(none)",
+            return Localiser.msg("035004", name, tableName != null ? tableName : "(none)",
                 cmd.getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {
-            return LOCALISER.msg("035005", name, tableName);
+            return Localiser.msg("035005", name, tableName);
         }
         else
         {
-            return LOCALISER.msg("035004", name, tableName);
+            return Localiser.msg("035004", name, tableName);
         }
     }
 }

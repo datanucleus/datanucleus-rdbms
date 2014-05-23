@@ -68,6 +68,7 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.PersistableRelationStore;
 import org.datanucleus.store.types.SCOCollection;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -214,7 +215,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             refDatastoreMapping.getColumn().getIdentifier());
                         if (colmd == null)
                         {
-                            throw new NucleusUserException(LOCALISER_RDBMS.msg("041038",
+                            throw new NucleusUserException(Localiser.msg("041038",
                                 refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
                         }
 
@@ -411,7 +412,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         ApiAdapter api = ec.getApiAdapter();
         if (!api.isPersistable(value))
         {
-            throw new NucleusException(LOCALISER_RDBMS.msg("041016", value.getClass(), value)).setFatal();
+            throw new NucleusException(Localiser.msg("041016", value.getClass(), value)).setFatal();
         }
 
         ObjectProvider valueOP = ec.findObjectProvider(value);
@@ -538,7 +539,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     ExecutionContext pcEC = ec.getApiAdapter().getExecutionContext(value);
                     if (pcEC != null && ec != pcEC)
                     {
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("041015"), id);
+                        throw new NucleusUserException(Localiser.msg("041015"), id);
                     }
                 }
 
@@ -551,14 +552,14 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         // Related PC object not persistent, but cant do cascade-persist so throw exception
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007006", mmd.getFullFieldName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
                         }
                         throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), value);
                     }
 
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007007", mmd != null ? mmd.getFullFieldName() : null));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd != null ? mmd.getFullFieldName() : null));
                     }
 
                     try
@@ -765,7 +766,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // Managed Relations : Other side not set so update it in memory
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041018",
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("041018",
                         op.getObjectAsPrintable(), mmd.getFullFieldName(),
                         StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName()));
                 }
@@ -774,7 +775,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             else if (relatedValue != op.getObject())
             {
                 // Managed Relations : Other side is inconsistent so throw exception
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041020",
+                throw new NucleusUserException(Localiser.msg("041020",
                         op.getObjectAsPrintable(), mmd.getFullFieldName(),
                         StringUtils.toJVMIDString(pc),
                         StringUtils.toJVMIDString(relatedValue)));
@@ -794,7 +795,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     boolean contained = relatedColl.contains(op.getObject());
                     if (!contained)
                     {
-                        NucleusLogger.PERSISTENCE.info(LOCALISER_RDBMS.msg("041022",
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("041022",
                                 op.getObjectAsPrintable(), mmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc), relatedMmds[0].getFullFieldName()));
                         // TODO Enable this. CUrrently causes issues with
@@ -987,7 +988,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041019",
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041019",
                                     StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName(),
                                     op.getObjectAsPrintable()));
                             }

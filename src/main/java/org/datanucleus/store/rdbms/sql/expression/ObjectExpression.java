@@ -71,10 +71,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ObjectExpression extends SQLExpression
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER_CORE = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructor for an SQL expression for a (field) mapping in a specified table.
      * @param stmt The statement
@@ -499,7 +495,7 @@ public class ObjectExpression extends SQLExpression
         }
         if (type == null)
         {
-            throw new NucleusUserException(LOCALISER_CORE.msg("037017", castClassName));
+            throw new NucleusUserException(Localiser.msg("037017", castClassName));
         }
 
         // Extract type of this object and check obvious conditions
@@ -601,7 +597,7 @@ public class ObjectExpression extends SQLExpression
         }
         if (type == null)
         {
-            throw new NucleusUserException(LOCALISER_CORE.msg("037016", instanceofClassName));
+            throw new NucleusUserException(Localiser.msg("037016", instanceofClassName));
         }
 
         // Extract type of member and check obvious conditions
@@ -695,7 +691,7 @@ public class ObjectExpression extends SQLExpression
                     // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
                     if (cmds.length > 1)
                     {
-                        NucleusLogger.QUERY.warn(LOCALISER_CORE.msg("037006",
+                        NucleusLogger.QUERY.warn(Localiser.msg("037006",
                             mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
                     }
                     memberTable = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
@@ -703,7 +699,7 @@ public class ObjectExpression extends SQLExpression
                 else
                 {
                     // No subclasses with tables to join to, so throw a user error
-                    throw new NucleusUserException(LOCALISER_CORE.msg("037005", 
+                    throw new NucleusUserException(Localiser.msg("037005", 
                         mapping.getMemberMetaData().getFullFieldName()));
                 }
             }
@@ -786,7 +782,7 @@ public class ObjectExpression extends SQLExpression
                         // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
                         if (cmds.length > 1)
                         {
-                            NucleusLogger.QUERY.warn(LOCALISER_CORE.msg("037006",
+                            NucleusLogger.QUERY.warn(Localiser.msg("037006",
                                 mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
                         }
                         table = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
@@ -794,7 +790,7 @@ public class ObjectExpression extends SQLExpression
                     else
                     {
                         // No subclasses with tables to join to, so throw a user error
-                        throw new NucleusUserException(LOCALISER_CORE.msg("037005",
+                        throw new NucleusUserException(Localiser.msg("037005",
                             mapping.getMemberMetaData().getFullFieldName()));
                     }
                 }

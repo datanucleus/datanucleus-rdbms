@@ -19,19 +19,14 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>UnexpectedColumnException</tt> is thrown if an unexpected column is
  * encountered in the database during schema validation.
- * @version $Revision: 1.3 $ 
  */
 public class UnexpectedColumnException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a unexpected column exception.
      * @param table_name The table in which the column was found.
@@ -41,6 +36,6 @@ public class UnexpectedColumnException extends DatastoreValidationException
      */
     public UnexpectedColumnException(String table_name, String column_name, String schema_name, String catalog_name)
     {
-        super(LOCALISER_RDBMS.msg("020024",column_name,table_name,schema_name, catalog_name));
+        super(Localiser.msg("020024",column_name,table_name,schema_name, catalog_name));
     }
 }

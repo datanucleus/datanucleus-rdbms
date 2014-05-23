@@ -88,10 +88,6 @@ import org.datanucleus.util.StringUtils;
  */
 public final class SQLQuery extends AbstractSQLQuery
 {
-    /** Localiser of messages. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** State variable for the compilation state */
     protected transient boolean isCompiled = false;
 
@@ -190,7 +186,7 @@ public final class SQLQuery extends AbstractSQLQuery
         compiledSQL = generateQueryStatement();
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(LOCALISER.msg("059012", compiledSQL));
+            NucleusLogger.QUERY.debug(Localiser.msg("059012", compiledSQL));
         }
 
         isCompiled = true;
@@ -207,8 +203,7 @@ public final class SQLQuery extends AbstractSQLQuery
     {
         if (parameters.size() != (parameterNames != null ? parameterNames.length : 0))
         {
-            throw new NucleusUserException(LOCALISER_RDBMS.msg("059019", 
-                "" + parameterNames.length,"" + parameters.size()));
+            throw new NucleusUserException(Localiser.msg("059019", "" + parameterNames.length,"" + parameters.size()));
         }
 
         if (type == BULK_DELETE || type == BULK_UPDATE)
@@ -248,7 +243,7 @@ public final class SQLQuery extends AbstractSQLQuery
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
+                throw new NucleusDataStoreException(Localiser.msg("059025", compiledSQL), e);
             }
         }
         else if (type == SELECT)
@@ -364,7 +359,7 @@ public final class SQLQuery extends AbstractSQLQuery
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
+                throw new NucleusDataStoreException(Localiser.msg("059025", compiledSQL), e);
             }
             return qr;
         }
@@ -412,7 +407,7 @@ public final class SQLQuery extends AbstractSQLQuery
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("059025", compiledSQL), e);
+                throw new NucleusDataStoreException(Localiser.msg("059025", compiledSQL), e);
             }
             return true;
         }
@@ -501,7 +496,7 @@ public final class SQLQuery extends AbstractSQLQuery
         if (columnFieldNumberMap.size() == 0)
         {
             // None of the fields in the class have columns in the datastore table!
-            throw new NucleusUserException(LOCALISER.msg("059030", candidateClass.getName())).setFatal();
+            throw new NucleusUserException(Localiser.msg("059030", candidateClass.getName())).setFatal();
         }
 
         // Generate id column field information for later checking the id is present
@@ -709,7 +704,7 @@ public final class SQLQuery extends AbstractSQLQuery
 
                 if (selectedColumns == null || selectedColumns.length == 0)
                 {
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("059003", compiledSQL));
+                    throw new NucleusUserException(Localiser.msg("059003", compiledSQL));
                 }
                 if (selectedColumns.length == 1 && selectedColumns[0].trim().equals("*"))
                 {
@@ -790,19 +785,19 @@ public final class SQLQuery extends AbstractSQLQuery
 
                 if (discrimMissing)
                 {
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("059014", 
+                    throw new NucleusUserException(Localiser.msg("059014", 
                         compiledSQL, candidateClass.getName(), discriminatorColName));
                 }
                 if (versionMissing)
                 {
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("059015", 
+                    throw new NucleusUserException(Localiser.msg("059015", 
                         compiledSQL, candidateClass.getName(), versionColName));
                 }
                 for (int i = 0; i < idColMissing.length; i++)
                 {
                     if (idColMissing[i])
                     {
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("059013", 
+                        throw new NucleusUserException(Localiser.msg("059013", 
                             compiledSQL, candidateClass.getName(), idColNames[i]));
                     }
                 }

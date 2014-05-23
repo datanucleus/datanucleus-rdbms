@@ -38,10 +38,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractSchemaTransaction
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     protected RDBMSStoreManager rdbmsMgr;
 
     protected final int isolationLevel;
@@ -91,7 +87,7 @@ public abstract class AbstractSchemaTransaction
             conn = (Connection) mconn.getConnection();
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER_RDBMS.msg("050057", StringUtils.toJVMIDString(conn),
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050057", StringUtils.toJVMIDString(conn),
                     TransactionUtils.getNameForTransactionIsolationLevel(isolationLevel)));
             }
         }
@@ -136,7 +132,7 @@ public abstract class AbstractSchemaTransaction
                                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                                         {
                                             NucleusLogger.DATASTORE_SCHEMA.debug(
-                                                LOCALISER_RDBMS.msg("050053", StringUtils.toJVMIDString(conn)));
+                                                Localiser.msg("050053", StringUtils.toJVMIDString(conn)));
                                         }
                                         conn.commit();
                                     }
@@ -145,7 +141,7 @@ public abstract class AbstractSchemaTransaction
                                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                                         {
                                             NucleusLogger.DATASTORE_SCHEMA.debug(
-                                                LOCALISER_RDBMS.msg("050054", StringUtils.toJVMIDString(conn)));
+                                                Localiser.msg("050054", StringUtils.toJVMIDString(conn)));
                                         }
                                         conn.rollback();
                                     }
@@ -161,7 +157,7 @@ public abstract class AbstractSchemaTransaction
                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                         {
                             NucleusLogger.DATASTORE_SCHEMA.debug(
-                                LOCALISER_RDBMS.msg("050055", StringUtils.toJVMIDString(conn)));
+                                Localiser.msg("050055", StringUtils.toJVMIDString(conn)));
                         }
                         mconn.release();
 
@@ -174,7 +170,7 @@ public abstract class AbstractSchemaTransaction
             {
                 if (++attempts >= maxRetries)
                 {
-                    throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("050056", this), e);
+                    throw new NucleusDataStoreException(Localiser.msg("050056", this), e);
                 }
             }
         }

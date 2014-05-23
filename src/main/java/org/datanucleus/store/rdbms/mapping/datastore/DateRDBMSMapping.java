@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping of a DATE RDBMS type.
@@ -102,7 +103,7 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","java.sql.Date","" + value), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","java.sql.Date","" + value), e);
         }
     }
 
@@ -114,7 +115,7 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","java.sql.Date","" + param), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","java.sql.Date","" + param), e);
         }
     }
 

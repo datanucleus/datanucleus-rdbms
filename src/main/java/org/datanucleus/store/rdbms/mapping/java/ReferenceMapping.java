@@ -65,10 +65,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class ReferenceMapping extends MultiPersistableMapping implements MappingCallbacks
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER_MAPPED = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Each implementation has its own column(s) as a FK to the related table. */
     public static final int PER_IMPLEMENTATION_MAPPING = 0;
 
@@ -362,11 +358,11 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             Class type = clr.classForName(implTypes[i]);
             if (type == null)
             {
-                throw new NucleusUserException(LOCALISER_MAPPED.msg("020189", mmd.getTypeName(), implTypes[i]));
+                throw new NucleusUserException(Localiser.msg("020189", mmd.getTypeName(), implTypes[i]));
             }
             else if (type.isInterface())
             {
-                throw new NucleusUserException(LOCALISER_MAPPED.msg("020190", mmd.getFullFieldName(), 
+                throw new NucleusUserException(Localiser.msg("020190", mmd.getFullFieldName(), 
                     mmd.getTypeName(), implTypes[i]));
             }
 
@@ -474,7 +470,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 {
                     if (columnMetaData.length < colPos+m.getNumberOfDatastoreMappings())
                     {
-                        throw new NucleusUserException(LOCALISER_MAPPED.msg("020186", 
+                        throw new NucleusUserException(Localiser.msg("020186", 
                             mmd.getFullFieldName(), "" + columnMetaData.length, 
                             "" + (colPos + m.getNumberOfDatastoreMappings())));
                     }
@@ -489,7 +485,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
                 if (NucleusLogger.DATASTORE.isInfoEnabled())
                 {
-                    NucleusLogger.DATASTORE.info(LOCALISER_MAPPED.msg("020188", implClass, mmd.getName()));
+                    NucleusLogger.DATASTORE.info(Localiser.msg("020188", implClass, mmd.getName()));
                 }
             }
         }

@@ -62,6 +62,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -254,7 +255,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("055002", "Object", "" + param, column, sqle.getMessage()), sqle);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, sqle.getMessage()), sqle);
         }
 
         return obj;

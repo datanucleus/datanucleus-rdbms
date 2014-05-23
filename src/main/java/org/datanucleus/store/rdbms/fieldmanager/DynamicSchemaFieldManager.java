@@ -35,7 +35,6 @@ import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -45,10 +44,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class DynamicSchemaFieldManager extends AbstractFieldManager
 {
-    /** Localiser for internationalisation. */
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Manager for the RDBMS datastore. */
     RDBMSStoreManager rdbmsMgr;
 

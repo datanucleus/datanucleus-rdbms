@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -214,7 +215,7 @@ public abstract class ElementContainerTable extends JoinTable
 
             if (!found)
             {
-                throw new NucleusUserException(LOCALISER.msg("057040", toString(), colName));
+                throw new NucleusUserException(Localiser.msg("057040", toString(), colName));
             }
         }
     }

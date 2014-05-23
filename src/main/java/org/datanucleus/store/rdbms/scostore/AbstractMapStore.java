@@ -50,6 +50,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * Abstract representation of the backing store for a Map.
@@ -237,7 +238,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056019",containsValueStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056019",containsValueStmt),e);
         }
 
         return exists;
@@ -289,12 +290,12 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         if (key == null && !allowNulls)
         {
             // Nulls not allowed and key is null
-            throw new NullPointerException(LOCALISER.msg("056062"));
+            throw new NullPointerException(Localiser.msg("056062"));
         }
 
         if (key != null && !clr.isAssignableFrom(keyType, key.getClass()))
         {
-            throw new ClassCastException(LOCALISER.msg("056064", key.getClass().getName(), keyType));
+            throw new ClassCastException(Localiser.msg("056064", key.getClass().getName(), keyType));
         }
     }
 
@@ -308,12 +309,12 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         if (value == null && !allowNulls)
         {
             // Nulls not allowed and value is null
-            throw new NullPointerException(LOCALISER.msg("056063"));
+            throw new NullPointerException(Localiser.msg("056063"));
         }
         
         if (value != null && !clr.isAssignableFrom(valueType, value.getClass()))
         {
-            throw new ClassCastException(LOCALISER.msg("056065", value.getClass().getName(), valueType));
+            throw new ClassCastException(Localiser.msg("056065", value.getClass().getName(), valueType));
         }
     }
 
@@ -569,7 +570,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         catch (SQLException e)
         {
             e.printStackTrace();
-            throw new NucleusDataStoreException(LOCALISER.msg("056011", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056011", stmt), e);
         }
         return modified;
     }
@@ -719,7 +720,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         catch (SQLException e)
         {
             e.printStackTrace();
-            throw new NucleusDataStoreException(LOCALISER.msg("056010", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056010", stmt), e);
         }
         return modified;
     }

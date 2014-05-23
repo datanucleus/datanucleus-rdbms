@@ -24,6 +24,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL COALESCE function.
@@ -76,7 +77,7 @@ public class CoalesceFunction extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", "COALESCE", expr));
+            throw new NucleusException(Localiser.msg("060002", "COALESCE", expr));
         }
     }
 }

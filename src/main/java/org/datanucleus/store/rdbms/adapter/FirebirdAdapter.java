@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Provides methods for adapting SQL language elements to the Firebird database.
@@ -100,7 +101,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -119,7 +120,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt=new StringBuilder("SELECT GEN_ID(");

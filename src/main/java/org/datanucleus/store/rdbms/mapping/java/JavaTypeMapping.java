@@ -47,13 +47,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class JavaTypeMapping
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** MetaData for the field/property that we are mapping. Null when it applies to a query parameter. */
     protected AbstractMemberMetaData mmd;
 
@@ -485,7 +478,7 @@ public abstract class JavaTypeMapping
      */
     protected String failureMessage(String method)
     {
-        return LOCALISER_RDBMS.msg("041004",getClass().getName(),method);
+        return Localiser.msg("041004",getClass().getName(),method);
     }
 
     // ------------------- Accessors & Mutators for datastore access -----------------------

@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -249,7 +250,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -272,7 +273,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("SELECT NEXT VALUE FOR ");
         stmt.append(sequence_name);

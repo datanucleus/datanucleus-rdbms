@@ -36,6 +36,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -105,7 +106,7 @@ public class PersistableJoinTable extends JoinTable
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;

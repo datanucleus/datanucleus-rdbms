@@ -43,6 +43,7 @@ import org.datanucleus.store.query.NoQueryResultsException;
 import org.datanucleus.store.query.QueryNotUniqueException;
 import org.datanucleus.store.query.QueryResult;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -596,7 +597,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("059027", procedureName), e);
+            throw new NucleusDataStoreException(Localiser.msg("059027", procedureName), e);
         }
     }
 

@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.schema.naming.NamingCase;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -124,7 +125,7 @@ public class ProbeTable extends TableImpl
         {
             if (!rs.next())
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("057027",identifier));
+                throw new NucleusDataStoreException(Localiser.msg("057027",identifier));
             }
 
             schemaDetails[0] = rs.getString(1);
@@ -138,11 +139,11 @@ public class ProbeTable extends TableImpl
         // Log any failures in this process due to the database adapter
         if (schemaDetails[0] == null)
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057026"));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057026"));
         }
         if (schemaDetails[1] == null)
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057025"));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057025"));
         }
 
         return schemaDetails;

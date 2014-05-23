@@ -20,20 +20,14 @@ package org.datanucleus.store.rdbms.sql.method;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
-import org.datanucleus.util.Localiser;
 
 /**
  * Abstract implementation of an SQLMethod. Provides localisation and convenience methods where required.
  */
 public abstract class AbstractSQLMethod implements SQLMethod
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     protected SQLStatement stmt;
     protected SQLExpressionFactory exprFactory;
     protected ClassLoaderResolver clr;

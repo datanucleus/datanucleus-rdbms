@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
@@ -52,10 +51,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ExpressionUtils
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Method to return a numeric expression for the supplied SQL expression.
      * Makes use of the RDBMS function to convert to a numeric.
@@ -457,7 +452,7 @@ public class ExpressionUtils
                                 for (int i=0; i<expr1.subExprs.size(); i++)
                                 {
                                     // Query should return nothing (so just do "(1 = 0)")
-                                    NucleusLogger.QUERY.warn(LOCALISER.msg("037003", value));
+                                    NucleusLogger.QUERY.warn(Localiser.msg("037003", value));
                                     bExpr = exprFactory.newLiteral(stmt, expr1.mapping, false).eq(exprFactory.newLiteral(stmt, expr1.mapping, true));
                                     // It is arguable that we should compare the id with null (as below)
                                     /*bExpr = expr.eq(new NullLiteral(qs));*/
@@ -468,7 +463,7 @@ public class ExpressionUtils
                                 for (int i=0; i<expr2.subExprs.size(); i++)
                                 {
                                     // Query should return nothing (so just do "(1 = 0)")
-                                    NucleusLogger.QUERY.warn(LOCALISER.msg("037003", value));
+                                    NucleusLogger.QUERY.warn(Localiser.msg("037003", value));
                                     bExpr = exprFactory.newLiteral(stmt, expr2.mapping, false).eq(exprFactory.newLiteral(stmt, expr2.mapping, true));
                                     // It is arguable that we should compare the id with null (as below)
                                     /*bExpr = expr.eq(new NullLiteral(qs));*/
@@ -488,7 +483,7 @@ public class ExpressionUtils
                         {
                             // PC object with no id (embedded, or transient maybe)
                             // Query should return nothing (so just do "(1 = 0)")
-                            NucleusLogger.QUERY.warn(LOCALISER.msg("037003", value));
+                            NucleusLogger.QUERY.warn(Localiser.msg("037003", value));
                             // TODO Allow for !equals
                             return exprFactory.newLiteral(stmt, mapping, false).eq(exprFactory.newLiteral(stmt, mapping, true));
                             // It is arguable that we should compare the id with null (as below)

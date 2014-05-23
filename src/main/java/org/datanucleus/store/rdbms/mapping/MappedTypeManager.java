@@ -39,9 +39,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class MappedTypeManager
 {
-    private static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     protected final NucleusContext nucleusCtx;
 
     protected final ClassLoaderResolver clr;
@@ -221,7 +218,7 @@ public class MappedTypeManager
             }
             catch (NucleusException jpe)
             {
-                NucleusLogger.PERSISTENCE.error(LOCALISER.msg("016004", mappingClassName));
+                NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", mappingClassName));
                 return;
             }
         }
@@ -271,7 +268,7 @@ public class MappedTypeManager
                         mappedTypes.put(cls.getName(), type);
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016001", cls.getName(), type.cls.getName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
                         }
                         return type;
                     }
@@ -284,7 +281,7 @@ public class MappedTypeManager
                         mappedTypes.put(cls.getName(), type);
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("016001", cls.getName(), type.cls.getName()));
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
                         }
                         return type;
                     }

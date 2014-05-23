@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.util.Localiser;
 
 /**
  * Provides methods for adapting SQL language elements to the SAPDB/MaxDB database.
@@ -108,7 +109,7 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -151,7 +152,7 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt=new StringBuilder("SELECT ");

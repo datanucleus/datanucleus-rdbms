@@ -39,6 +39,7 @@ import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.wrappers.backed.BackedSCO;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -93,7 +94,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Field doesnt support cascade-persist so no reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007006", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
             // Check for any persistable keys/values that arent persistent
@@ -127,7 +128,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007007", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
             }
 
             if (value.size() > 0)
@@ -209,13 +210,13 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // User doesnt want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007008", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007009", mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
         }
 
         // Update the datastore with this value of map (clear old entries and add new ones)

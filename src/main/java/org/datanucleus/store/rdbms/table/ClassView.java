@@ -46,6 +46,7 @@ import org.datanucleus.store.rdbms.exceptions.ViewDefinitionException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
 import org.datanucleus.util.NucleusLogger;
 
@@ -82,7 +83,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
         if (cmd.getIdentityType() == IdentityType.APPLICATION || cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            throw new NucleusUserException(LOCALISER.msg("031005", cmd.getFullClassName(), cmd.getIdentityType()));
+            throw new NucleusUserException(Localiser.msg("031005", cmd.getFullClassName(), cmd.getIdentityType()));
         }
         else if (cmd.getIdentityType() == IdentityType.NONDURABLE)
         {
@@ -134,14 +135,14 @@ public class ClassView extends ViewImpl implements DatastoreClass
             }
             else if (fmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
             {
-                throw new NucleusException(LOCALISER.msg("031006", 
+                throw new NucleusException(Localiser.msg("031006", 
                     cmd.getFullClassName(), fmd.getName(), fmd.getPersistenceModifier())).setFatal();
             }
         }
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;
@@ -164,7 +165,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
                 public void onParameterMacro(MacroString.ParameterMacro pm)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("031009", cmd.getFullClassName(), pm));
+                    throw new NucleusUserException(Localiser.msg("031009", cmd.getFullClassName(), pm));
                 }
             }, clr
         );

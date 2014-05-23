@@ -83,10 +83,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ResultMetaDataROF implements ResultObjectFactory
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     RDBMSStoreManager storeMgr;
 
     /** MetaData defining the result from the Query. */
@@ -279,7 +275,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 }
                 catch (SQLException sqe)
                 {
-                    String msg = LOCALISER.msg("059027", sqe.getMessage());
+                    String msg = Localiser.msg("059027", sqe.getMessage());
                     NucleusLogger.QUERY.error(msg);
                     throw new NucleusUserException(msg, sqe);
                 }

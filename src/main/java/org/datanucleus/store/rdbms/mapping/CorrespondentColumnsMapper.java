@@ -26,7 +26,6 @@ import java.util.Map;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MultiMapping;
@@ -48,10 +47,6 @@ import org.datanucleus.util.Localiser;
  */
 public class CorrespondentColumnsMapper
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Map of the ColumnMetaData for each column keyed by the sideB identifier name. */
     private final Map<DatastoreIdentifier, ColumnMetaData> columnMetaDataBySideBIdentifier = new HashMap();
 
@@ -93,7 +88,7 @@ public class CorrespondentColumnsMapper
             // Check if too many columns have been defined
             if (noOfUserColumns > mappingSideB.getNumberOfDatastoreMappings())
             {
-                throw new NucleusUserException(LOCALISER.msg("020003", 
+                throw new NucleusUserException(Localiser.msg("020003", 
                     columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfDatastoreMappings())).setFatal();
             }
 
@@ -150,7 +145,7 @@ public class CorrespondentColumnsMapper
                     // Check for invalid sideB column
                     if (!targetExists)
                     {
-                        throw new NucleusUserException(LOCALISER.msg("020004", 
+                        throw new NucleusUserException(Localiser.msg("020004", 
                             columnsName, colmds[i].getName(), targetColumnName)).setFatal();
                     }
                 }
@@ -190,7 +185,7 @@ public class CorrespondentColumnsMapper
                 }
                 if (sideBidentifier == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("020005", 
+                    throw new NucleusUserException(Localiser.msg("020005", 
                         columnsName, "" + i)).setFatal();
                 }
 
@@ -251,7 +246,7 @@ public class CorrespondentColumnsMapper
             // Check if too many columns have been defined
             if (noOfUserColumns > mappingSideB.getNumberOfDatastoreMappings())
             {
-                throw new NucleusUserException(LOCALISER.msg("020003", 
+                throw new NucleusUserException(Localiser.msg("020003", 
                     columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfDatastoreMappings())).setFatal();
             }
 
@@ -307,7 +302,7 @@ public class CorrespondentColumnsMapper
                     // Check for invalid sideB column
                     if (!targetExists)
                     {
-                        throw new NucleusUserException(LOCALISER.msg("020004", 
+                        throw new NucleusUserException(Localiser.msg("020004", 
                             columnsName, colmds[i].getName(), targetColumnName)).setFatal();
                     }
                 }
@@ -347,7 +342,7 @@ public class CorrespondentColumnsMapper
                 }
                 if (sideBidentifier == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("020005", 
+                    throw new NucleusUserException(Localiser.msg("020005", 
                         columnsName, "" + i)).setFatal();
                 }
 
@@ -394,7 +389,7 @@ public class CorrespondentColumnsMapper
     {
         if (columnMetaDataBySideBIdentifier.put(identifier, colmd) != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("020006", identifier, columnsName)).setFatal();
+            throw new NucleusUserException(Localiser.msg("020006", identifier, columnsName)).setFatal();
         }
     }
 }

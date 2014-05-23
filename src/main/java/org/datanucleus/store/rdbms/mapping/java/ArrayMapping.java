@@ -28,6 +28,7 @@ import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.scostore.ArrayStore;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -98,7 +99,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // Field doesnt support cascade-persist so no reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007006", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
             // Check for any persistable keys/values that arent persistent
@@ -121,7 +122,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007007", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
             }
 
             // Insert the array
@@ -239,13 +240,13 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007008", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007009", mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
         }
 
         // Update the datastore

@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -284,7 +285,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -328,7 +329,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("VALUES NEXTVAL FOR ");
         stmt.append(sequence_name);

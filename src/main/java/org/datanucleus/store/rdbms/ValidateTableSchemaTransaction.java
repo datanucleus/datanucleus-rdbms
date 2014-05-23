@@ -34,10 +34,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ValidateTableSchemaTransaction extends AbstractSchemaTransaction
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Table to be validated. */
     protected TableImpl table;
 
@@ -81,6 +77,6 @@ public class ValidateTableSchemaTransaction extends AbstractSchemaTransaction
      */
     public String toString()
     {
-        return LOCALISER.msg("050048", table, rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
+        return Localiser.msg("050048", table, rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
     }
 }

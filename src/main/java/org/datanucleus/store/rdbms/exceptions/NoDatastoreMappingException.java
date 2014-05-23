@@ -20,7 +20,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -30,9 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NoDatastoreMappingException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a no datastore mapping exception.
      *
@@ -40,6 +36,6 @@ public class NoDatastoreMappingException extends NucleusUserException
      */
     public NoDatastoreMappingException(String fieldName)
     {
-        super(LOCALISER.msg("020001",fieldName));
+        super(Localiser.msg("020001",fieldName));
     }
 }

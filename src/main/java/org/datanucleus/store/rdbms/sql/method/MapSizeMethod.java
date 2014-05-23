@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {mapExpr}.size().
@@ -55,7 +56,7 @@ public class MapSizeMethod extends AbstractSQLMethod
     {
         if (args != null && args.size() > 0)
         {
-            throw new NucleusException(LOCALISER.msg("060015", "size", "MapExpression"));
+            throw new NucleusException(Localiser.msg("060015", "size", "MapExpression"));
         }
 
         if (expr instanceof MapLiteral)

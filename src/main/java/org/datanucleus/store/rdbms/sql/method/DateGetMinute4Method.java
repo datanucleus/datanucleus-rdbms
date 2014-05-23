@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {dateExpr}.getMinute() using MSSQL.
@@ -41,7 +42,7 @@ public class DateGetMinute4Method extends AbstractSQLMethod
     {
         if (!(expr instanceof TemporalExpression))
         {
-            throw new NucleusException(LOCALISER.msg("060001", "getMinute()", expr));
+            throw new NucleusException(Localiser.msg("060001", "getMinute()", expr));
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();

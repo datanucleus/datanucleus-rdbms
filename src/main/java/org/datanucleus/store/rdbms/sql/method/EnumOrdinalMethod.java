@@ -26,6 +26,7 @@ import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.EnumLiteral;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to evaluate {enumExpression}.ordinal().
@@ -58,7 +59,7 @@ public class EnumOrdinalMethod extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060001", "ordinal", expr));
+            throw new NucleusException(Localiser.msg("060001", "ordinal", expr));
         }
     }
 }

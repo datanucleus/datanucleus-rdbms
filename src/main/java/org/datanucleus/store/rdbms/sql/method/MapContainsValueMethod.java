@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.sql.expression.MapLiteral.MapValueLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -58,7 +59,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
-            throw new NucleusException(LOCALISER.msg("060016", "containsValue", "MapExpression", 1));
+            throw new NucleusException(Localiser.msg("060016", "containsValue", "MapExpression", 1));
         }
 
         MapExpression mapExpr = (MapExpression)expr;

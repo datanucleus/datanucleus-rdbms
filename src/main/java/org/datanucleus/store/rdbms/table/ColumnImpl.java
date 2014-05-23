@@ -63,10 +63,6 @@ import org.datanucleus.util.StringUtils;
  */ 
 public class ColumnImpl implements Column
 {
-    /** Localisation of messages. */
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     private static final byte PK = (byte) (1<<0); // Part of PK?
     private static final byte NULLABLE = (byte) (1<<1); // Column can store nulls?
     private static final byte UNIQUE = (byte) (1<<2); // Values are unique?
@@ -352,7 +348,7 @@ public class ColumnImpl implements Column
             }
             else if (sqlPrecision > 0 && !typeInfo.isAllowsPrecisionSpec())
             {
-                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("020183", this.toString()));
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("020183", this.toString()));
             }
 
             int lParenIdx = typeSpec.toString().indexOf('(');
@@ -367,7 +363,7 @@ public class ColumnImpl implements Column
                 }
                 else if (rParenIdx == lParenIdx + 1)
                 {
-                    throw new ColumnDefinitionException(LOCALISER.msg("020184", this.toString()));
+                    throw new ColumnDefinitionException(Localiser.msg("020184", this.toString()));
                 }
             }
             else if (precSpec.length() > 0)
@@ -574,7 +570,7 @@ public class ColumnImpl implements Column
                     case 'Y' :
                         if (!isNullable())
                         {
-                            NucleusLogger.DATASTORE.warn(LOCALISER.msg("020025", this));
+                            NucleusLogger.DATASTORE.warn(Localiser.msg("020025", this));
                         }
                         break;
 

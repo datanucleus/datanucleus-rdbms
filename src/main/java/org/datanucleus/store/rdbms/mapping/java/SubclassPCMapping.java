@@ -28,6 +28,7 @@ import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.rdbms.table.ColumnCreator;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -79,7 +80,7 @@ public class SubclassPCMapping extends MultiPersistableMapping
                 storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
             if (refCmd.getInheritanceMetaData().getStrategy() != InheritanceStrategy.SUBCLASS_TABLE)
             {
-                throw new NucleusUserException(LOCALISER.msg("020185", mmd.getFullFieldName()));
+                throw new NucleusUserException(Localiser.msg("020185", mmd.getFullFieldName()));
             }
             AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(refCmd, clr);
 
@@ -108,7 +109,7 @@ public class SubclassPCMapping extends MultiPersistableMapping
                 {
                     if (mmd.getColumnMetaData().length < colPos+m.getNumberOfDatastoreMappings())
                     {
-                        throw new NucleusUserException(LOCALISER.msg("020186", 
+                        throw new NucleusUserException(Localiser.msg("020186", 
                             mmd.getFullFieldName(), "" + mmd.getColumnMetaData().length, 
                             "" + (colPos + m.getNumberOfDatastoreMappings())));
                     }
@@ -124,7 +125,7 @@ public class SubclassPCMapping extends MultiPersistableMapping
 
                 if (NucleusLogger.DATASTORE.isInfoEnabled())
                 {
-                    NucleusLogger.DATASTORE.info(LOCALISER.msg("020187", type, mmd.getName()));
+                    NucleusLogger.DATASTORE.info(Localiser.msg("020187", type, mmd.getName()));
                 }
             }
         }

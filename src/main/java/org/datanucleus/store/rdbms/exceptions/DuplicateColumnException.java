@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -28,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public class DuplicateColumnException extends NucleusException
 {
-    private static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Column that cannot be created because it conflicts with existing column with same identifier. */
     private Column conflictingColumn;
 
@@ -42,12 +38,10 @@ public class DuplicateColumnException extends NucleusException
      */
     public DuplicateColumnException(String tableName, Column col1, Column col2)
     {
-        super(LOCALISER.msg("020007", col1.getIdentifier(), tableName,
-            col1.getMemberMetaData() == null ?
-                LOCALISER.msg("020008") :
+        super(Localiser.msg("020007", col1.getIdentifier(), tableName,
+            col1.getMemberMetaData() == null ? Localiser.msg("020008") :
                 (col1.getMemberMetaData() != null ? col1.getMemberMetaData().getFullFieldName() : null),
-            col2.getMemberMetaData() == null ?
-                LOCALISER.msg("020008") :
+            col2.getMemberMetaData() == null ? Localiser.msg("020008") :
                 (col2.getMemberMetaData() != null ? col2.getMemberMetaData().getFullFieldName() : null)));
         this.conflictingColumn = col2;
         setFatal();

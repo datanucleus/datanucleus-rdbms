@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -30,9 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public class WrongPrimaryKeyException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a wrong primary key exception.
      * @param table_name The table having the wrong primary key.
@@ -41,6 +37,6 @@ public class WrongPrimaryKeyException extends DatastoreValidationException
      */
     public WrongPrimaryKeyException(String table_name, String expected_pk, String actual_pks)
     {
-        super(LOCALISER_RDBMS.msg("020020",table_name,expected_pk,actual_pks));
+        super(Localiser.msg("020020",table_name,expected_pk,actual_pks));
     }
 }

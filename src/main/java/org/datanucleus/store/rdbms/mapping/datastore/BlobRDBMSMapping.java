@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping of a BLOB RDBMS type.
@@ -103,7 +104,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
             }
             catch (SQLException sqle2)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object", "" + param, column, sqle2.getMessage()), sqle2);
+                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, sqle2.getMessage()), sqle2);
             }
         }
 
@@ -163,11 +164,11 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "String", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "String", "" + value, column, e.getMessage()), e);
         }
         catch (IOException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "String", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "String", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -197,7 +198,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002", "String", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "String", "" + param, column, e.getMessage()), e);
         }
 
         return value;

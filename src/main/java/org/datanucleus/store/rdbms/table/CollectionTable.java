@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -145,7 +146,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 if (relType == RelationType.MANY_TO_MANY_BI)
                 {
                     // Don't support M-N using indexed List
-                    throw new NucleusUserException(LOCALISER.msg("020002", mmd.getFullFieldName())).setFatal();
+                    throw new NucleusUserException(Localiser.msg("020002", mmd.getFullFieldName())).setFatal();
                 }
             }
         }
@@ -273,7 +274,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;

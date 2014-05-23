@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
@@ -34,9 +33,6 @@ import org.datanucleus.util.Localiser;
  */
 public class MissingColumnException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a missing column exception.
      * @param table The table in which column(s) were missing.
@@ -44,7 +40,7 @@ public class MissingColumnException extends DatastoreValidationException
      */
     public MissingColumnException(Table table, Collection columns)
     {
-        super(LOCALISER_RDBMS.msg("020010",table.toString(),getColumnNameList(columns)));
+        super(Localiser.msg("020010",table.toString(),getColumnNameList(columns)));
     }
 
     private static String getColumnNameList(Collection columns)

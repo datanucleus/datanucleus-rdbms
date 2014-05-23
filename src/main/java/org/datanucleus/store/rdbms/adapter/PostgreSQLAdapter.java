@@ -42,6 +42,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -189,7 +190,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             if (!info.getTypeName().equalsIgnoreCase(psql_type_name))
             {
                 // We don't support this JDBC type using *this* PostgreSQL SQL type
-                NucleusLogger.DATASTORE.debug(LOCALISER.msg("051007", info.getTypeName(), 
+                NucleusLogger.DATASTORE.debug(Localiser.msg("051007", info.getTypeName(), 
                     getNameForJDBCType(info.getDataType())));
                 return null;
             }
@@ -463,7 +464,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -506,7 +507,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt=new StringBuilder("SELECT nextval('");

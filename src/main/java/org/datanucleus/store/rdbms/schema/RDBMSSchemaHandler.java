@@ -60,10 +60,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Time within which column info is valid (millisecs). Set to 5 mins. */
     protected final long COLUMN_INFO_EXPIRATION_MS = 5*60*1000;
 
@@ -927,11 +923,11 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         {
             if (tableInfo == null || tableInfo.getNumberOfChildren() == 0)
             {
-                NucleusLogger.DATASTORE_SCHEMA.info(LOCALISER.msg("050030", tableName));
+                NucleusLogger.DATASTORE_SCHEMA.info(Localiser.msg("050030", tableName));
             }
             else
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050032", 
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050032", 
                     tableName, "" + tableInfo.getNumberOfChildren()));
             }
         }
@@ -1007,7 +1003,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 String tableName = getIdentifierForUseWithDatabaseMetaData((String)tableNames.iterator().next());
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050028", 
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", 
                         tableName, catalogName, schemaName));
                 }
                 rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, tableName, null);
@@ -1017,7 +1013,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 // Multiple tables so just retrieve all for this catalog/schema
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050028", 
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", 
                         StringUtils.collectionToString(tableNames), catalogName, schemaName));
                 }
                 rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
@@ -1112,7 +1108,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050029", catalog, schema,
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050029", catalog, schema,
                 "" + tablesProcessed.size(), "" + (System.currentTimeMillis() - now.longValue())));
         }
     }

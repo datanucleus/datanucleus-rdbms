@@ -28,7 +28,6 @@ import org.datanucleus.state.AppIdObjectIdFieldConsumer;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
-import org.datanucleus.util.Localiser;
 
 /**
  * Parameter setter class to deal with application identity.
@@ -36,10 +35,6 @@ import org.datanucleus.util.Localiser;
  */
 public class AppIDObjectIdFieldManager extends AbstractFieldManager
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Parameter positions in the PreparedStatement. */
     private int[] params;
 

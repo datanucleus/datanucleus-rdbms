@@ -91,9 +91,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class RDBMSMappingManager implements MappingManager
 {
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     protected final RDBMSStoreManager storeMgr;
 
     protected final ClassLoaderResolver clr;
@@ -160,7 +157,7 @@ public class RDBMSMappingManager implements MappingManager
                     }
                     catch (NucleusException ne)
                     {
-                        NucleusLogger.DATASTORE.error(LOCALISER_RDBMS.msg("041013", rdbmsMappingClassName));
+                        NucleusLogger.DATASTORE.error(Localiser.msg("041013", rdbmsMappingClassName));
                     }
                     Set includes = new HashSet();
                     Set excludes = new HashSet();
@@ -233,7 +230,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
     }
@@ -272,7 +269,7 @@ public class RDBMSMappingManager implements MappingManager
         }
         catch (Exception e)
         {
-            throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+            throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
         }
     }
 
@@ -337,7 +334,7 @@ public class RDBMSMappingManager implements MappingManager
                 }
                 catch (Exception e)
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                    throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
                 }
             }
         }
@@ -356,7 +353,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (NucleusException ne)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", mmd.getFullFieldName(), userMappingClassName)).setFatal();
+                throw new NucleusUserException(Localiser.msg("041014", mmd.getFullFieldName(), userMappingClassName)).setFatal();
             }
         }
         else
@@ -433,7 +430,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
         else if (mcd != null && mcd.typeConverter != null)
@@ -459,7 +456,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
 
@@ -546,7 +543,7 @@ public class RDBMSMappingManager implements MappingManager
             else if (embedded)
             {
                 // Embedded Object field - do we ever want to support this ? I think not ;-)
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041042", fieldName)).setFatal();
+                throw new NucleusUserException(Localiser.msg("041042", fieldName)).setFatal();
             }
             else
             {
@@ -593,7 +590,7 @@ public class RDBMSMappingManager implements MappingManager
             if (storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getName()))
             {
                 // "supported" type yet no FCO mapping !
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041001", fieldName, javaType.getName()));
+                throw new NucleusUserException(Localiser.msg("041001", fieldName, javaType.getName()));
             }
             else
             {
@@ -670,7 +667,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (NucleusException jpe)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
+                throw new NucleusUserException(Localiser.msg("041014", userMappingClassName)).setFatal();
             }
         }
         else
@@ -762,7 +759,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
         else if (mcd != null && mcd.typeConverter != null)
@@ -783,7 +780,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
 
@@ -823,7 +820,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (NucleusException jpe)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
+                throw new NucleusUserException(Localiser.msg("041014", userMappingClassName)).setFatal();
             }
         }
         else
@@ -895,7 +892,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
         else if (mcd != null && mcd.typeConverter != null)
@@ -916,7 +913,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
 
@@ -955,7 +952,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (NucleusException jpe)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("041014", userMappingClassName)).setFatal();
+                throw new NucleusUserException(Localiser.msg("041014", userMappingClassName)).setFatal();
             }
         }
         else
@@ -1027,7 +1024,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
         else if (mcd != null && mcd.typeConverter != null)
@@ -1048,7 +1045,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
             }
         }
 
@@ -1139,7 +1136,7 @@ public class RDBMSMappingManager implements MappingManager
                 }
             }
 
-            NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041000", javaType.getName()), new Exception());
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("041000", javaType.getName()), new Exception());
             return null;
         }
         return new MappingConverterDetails(cls);
@@ -1191,7 +1188,7 @@ public class RDBMSMappingManager implements MappingManager
             datastoreMappingsByJavaType.put(javaTypeName,mapping);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054009", javaTypeName, jdbcType, sqlType, datastoreMappingType.getName(), "" + dflt));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("054009", javaTypeName, jdbcType, sqlType, datastoreMappingType.getName(), "" + dflt));
             }
             
         }
@@ -1223,7 +1220,7 @@ public class RDBMSMappingManager implements MappingManager
             datastoreMappingsByJDBCType.removeKeyValue(mapping.jdbcType, mapping);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER_RDBMS.msg("054010", mapping.javaType, mapping.jdbcType, mapping.sqlType));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("054010", mapping.javaType, mapping.jdbcType, mapping.sqlType));
             }
         }
     }
@@ -1259,21 +1256,21 @@ public class RDBMSMappingManager implements MappingManager
                 {
                     if (fieldName != null)
                     {
-                        throw new NucleusException(LOCALISER_RDBMS.msg("054001", javaType, sqlType, fieldName)).setFatal();
+                        throw new NucleusException(Localiser.msg("054001", javaType, sqlType, fieldName)).setFatal();
                     }
                     else
                     {
-                        throw new NucleusException(LOCALISER_RDBMS.msg("054000", javaType, sqlType)).setFatal();
+                        throw new NucleusException(Localiser.msg("054000", javaType, sqlType)).setFatal();
                     }
                 }
 
                 if (fieldName != null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.info(LOCALISER_RDBMS.msg("054012", javaType, sqlType, fieldName, jdbcType));
+                    NucleusLogger.DATASTORE_SCHEMA.info(Localiser.msg("054012", javaType, sqlType, fieldName, jdbcType));
                 }
                 else
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.info(LOCALISER_RDBMS.msg("054011", javaType, sqlType, jdbcType));
+                    NucleusLogger.DATASTORE_SCHEMA.info(Localiser.msg("054011", javaType, sqlType, jdbcType));
                 }
             }
             else
@@ -1299,11 +1296,11 @@ public class RDBMSMappingManager implements MappingManager
             {
                 if (fieldName != null)
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("054003", javaType, jdbcType, fieldName)).setFatal();
+                    throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("054002", javaType, jdbcType)).setFatal();
+                    throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
                 }
             }
 
@@ -1323,11 +1320,11 @@ public class RDBMSMappingManager implements MappingManager
                 // This JDBC type is supported but not for persisting this java type
                 if (fieldName != null)
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("054003", javaType, jdbcType, fieldName)).setFatal();
+                    throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("054002", javaType, jdbcType)).setFatal();
+                    throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
                 }
             }
         }
@@ -1383,12 +1380,12 @@ public class RDBMSMappingManager implements MappingManager
         {
             if (fieldName != null)
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("054005",
+                throw new NucleusException(Localiser.msg("054005",
                     javaType, jdbcType, sqlType, fieldName)).setFatal();
             }
             else
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("054004",
+                throw new NucleusException(Localiser.msg("054004",
                     javaType, jdbcType, sqlType)).setFatal();
             }
         }

@@ -43,10 +43,6 @@ import org.datanucleus.util.Localiser;
  */
 public final class ColumnCreator
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Private constructor to prevent instantiation.
      */
@@ -164,7 +160,7 @@ public final class ColumnCreator
                 AbstractClassMetaData[] ownerCmds = storeMgr.getClassesManagingTableForClass(ownerCmd, clr);
                 if (ownerCmds == null || ownerCmds.length == 0)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("057023", javaType.getName())).setFatal();
+                    throw new NucleusUserException(Localiser.msg("057023", javaType.getName())).setFatal();
                 }
                 // Use the first one since they should all have the same id column(s)
                 destinationTable = storeMgr.getDatastoreClass(ownerCmds[0].getFullClassName(), clr);

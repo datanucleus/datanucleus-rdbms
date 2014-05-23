@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -140,7 +141,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
             }
             catch (SQLException sqle)
             {
-                NucleusLogger.DATASTORE.warn(LOCALISER.msg("051027", sqle));
+                NucleusLogger.DATASTORE.warn(Localiser.msg("051027", sqle));
             }
 
             // Matches Function
@@ -160,7 +161,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
             }
             catch (SQLException sqle)
             {
-                NucleusLogger.DATASTORE.warn(LOCALISER.msg("051027", sqle));
+                NucleusLogger.DATASTORE.warn(Localiser.msg("051027", sqle));
             }
 
             st.close();
@@ -423,7 +424,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -454,7 +455,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         }
         if (cache_size != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051023"));
+            throw new NucleusUserException(Localiser.msg("051023"));
         }
 
         return stmt.toString();
@@ -469,7 +470,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("VALUES NEXT VALUE FOR ");
         stmt.append(sequence_name);

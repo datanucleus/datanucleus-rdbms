@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -27,13 +26,9 @@ import org.datanucleus.util.Localiser;
  * that define a view are missing or invalid.
  *
  * @see org.datanucleus.store.rdbms.table.ClassView
- * @version $Revision: 1.2 $ 
  */
 public class ViewDefinitionException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a class definition exception with the specified detail
      * message.
@@ -42,7 +37,7 @@ public class ViewDefinitionException extends NucleusUserException
      */
     public ViewDefinitionException(String className, String viewDef)
     {
-        super(LOCALISER.msg("020017",className,viewDef));
+        super(Localiser.msg("020017",className,viewDef));
         setFatal();
     }
 }

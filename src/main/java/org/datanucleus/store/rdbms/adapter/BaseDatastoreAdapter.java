@@ -90,12 +90,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class BaseDatastoreAdapter implements DatastoreAdapter
 {
-    protected static final Localiser LOCALISER_BASE = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     protected Map<Integer, String> supportedJdbcTypesById = new HashMap();
     protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap();
 
@@ -421,7 +415,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("051004"), e);
+            throw new NucleusDataStoreException(Localiser.msg("051004"), e);
         }
 
         supportedOptions.add(RESULTSET_TYPE_FORWARD_ONLY);
@@ -974,7 +968,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public String getCatalogName(Connection conn)
     throws SQLException
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051015",datastoreProductName,datastoreProductVersion));
+        throw new UnsupportedOperationException(Localiser.msg("051015",datastoreProductName,datastoreProductVersion));
     }
 
     /**
@@ -986,7 +980,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public String getSchemaName(Connection conn)
     throws SQLException
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051016",datastoreProductName,datastoreProductVersion));
+        throw new UnsupportedOperationException(Localiser.msg("051016",datastoreProductName,datastoreProductVersion));
     }
 
     /**
@@ -1075,7 +1069,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      **/
     public String getAutoIncrementStmt(Table table, String columnName)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051019"));
+        throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
 
     /**
@@ -1085,7 +1079,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      **/
     public String getAutoIncrementKeyword()
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051019"));
+        throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
 
     /**
@@ -1095,7 +1089,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      **/
     public boolean isIdentityFieldDataType(String typeName)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051019"));
+        throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
 
     /**
@@ -1133,7 +1127,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                                         Integer start,Integer increment,
                                         Integer cache_size)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051020"));
+        throw new UnsupportedOperationException(Localiser.msg("051020"));
     }
 
     /**
@@ -1144,7 +1138,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      **/
     public String getSequenceNextStmt(String sequence_name)
     {
-        throw new UnsupportedOperationException(LOCALISER.msg("051020"));
+        throw new UnsupportedOperationException(Localiser.msg("051020"));
     }
 
     /**

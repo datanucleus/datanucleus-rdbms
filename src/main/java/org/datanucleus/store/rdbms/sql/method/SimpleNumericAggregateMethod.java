@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke an SQL aggregated function.
@@ -47,7 +48,7 @@ public abstract class SimpleNumericAggregateMethod extends AbstractSQLMethod
     {
         if (expr != null)
         {
-            throw new NucleusException(LOCALISER.msg("060002", getFunctionName(), expr));
+            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
         }
         if (args == null || args.size() != 1)
         {

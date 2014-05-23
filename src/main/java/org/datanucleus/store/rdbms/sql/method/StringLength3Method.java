@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to evaluate {stringExpression}.length().
@@ -54,7 +55,7 @@ public class StringLength3Method extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060001", "length", expr));
+            throw new NucleusException(Localiser.msg("060001", "length", expr));
         }
     }
 }

@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -73,13 +74,13 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
             {
                 // Some datastores (e.g Postgresql) dont allow persistence of 0x0 ("\0") so use a space
                 value = ' ';
-                NucleusLogger.DATASTORE.warn(LOCALISER_RDBMS.msg("055008"));
+                NucleusLogger.DATASTORE.warn(Localiser.msg("055008"));
             }
             ps.setNString(param, Character.valueOf(value).toString());
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "char",
+            throw new NucleusDataStoreException(Localiser.msg("055001", "char",
                 "" + value, column, e.getMessage()), e);
         }
     }
@@ -100,7 +101,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","char","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","char","" + param, column, e.getMessage()), e);
         }
         return value;
     }
@@ -156,7 +157,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                         String action = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STRING_LENGTH_EXCEEDED_ACTION);
                         if (action.equals("EXCEPTION"))
                         {
-                            throw new NucleusUserException(LOCALISER_RDBMS.msg("055007", 
+                            throw new NucleusUserException(Localiser.msg("055007", 
                                 value, column.getIdentifier().toString(), "" + colLength.intValue())).setFatal();
                         }
                         else if (action.equals("TRUNCATE"))
@@ -170,7 +171,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","String","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","String","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -223,7 +224,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","String","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","String","" + param, column, e.getMessage()), e);
         }
     }
 
@@ -241,7 +242,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","boolean","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","boolean","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -264,7 +265,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                 {
                     if (rs.wasNull())
                     {
-                        throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                        throw new NullValueException(Localiser.msg("055003",column));
                     }
                 }
                 return false;
@@ -280,12 +281,12 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
             }
             else
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055003",column));
+                throw new NucleusDataStoreException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","boolean","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","boolean","" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -350,7 +351,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","Object","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -386,7 +387,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                     }
                     else
                     {
-                        throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055003",column));
+                        throw new NucleusDataStoreException(Localiser.msg("055003",column));
                     }
                 }
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_CHARACTER))
@@ -418,11 +419,11 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","Object","" + param, column, e.getMessage()), e);
         }
         catch (ParseException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","Object","" + param, column, e.getMessage()), e);
         }
 
         return value;

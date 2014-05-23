@@ -24,6 +24,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL SUM aggregation function.
@@ -69,7 +70,7 @@ public class SumFunction extends SimpleNumericAggregateMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", getFunctionName(), expr));
+            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
         }
     }
 

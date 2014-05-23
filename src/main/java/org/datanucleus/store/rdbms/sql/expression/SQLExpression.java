@@ -26,11 +26,9 @@ import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.Expression.Operator;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
-import org.datanucleus.util.Localiser;
 
 /**
  * Base expression for SQL.
@@ -43,10 +41,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class SQLExpression
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** The SQL statement that this is part of. */
     protected SQLStatement stmt;
 

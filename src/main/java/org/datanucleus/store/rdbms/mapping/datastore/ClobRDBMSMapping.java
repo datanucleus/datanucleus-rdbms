@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping of a Clob RDBMS type.
@@ -96,11 +97,11 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object", "" + value, column, e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + value, column, e.getMessage()), e);
             }
             catch (IOException e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object", "" + value, column, e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + value, column, e.getMessage()), e);
             }
         }
     }
@@ -155,11 +156,11 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object", "" + param, column, e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
             }
             catch (IOException e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object", "" + param, column, e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
             }
             
             return value;

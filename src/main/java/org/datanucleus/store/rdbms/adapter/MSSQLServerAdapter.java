@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -548,7 +549,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -596,7 +597,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         // Do we need to quote the sequence name here?

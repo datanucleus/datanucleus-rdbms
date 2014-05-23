@@ -19,20 +19,14 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>PrimaryKeyColumnNotAllowedException</tt> is thrown if an attempt is
  * made to add a primary key column to a view.
- *
- * @version $Revision: 1.2 $ 
  */
 public class PrimaryKeyColumnNotAllowedException extends NucleusException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a primary key not allowed exception.
      * @param viewName Name of the view being initialized.
@@ -40,7 +34,7 @@ public class PrimaryKeyColumnNotAllowedException extends NucleusException
      */
     public PrimaryKeyColumnNotAllowedException(String viewName, String columnName)
     {
-        super(LOCALISER.msg("020014",viewName,columnName));
+        super(Localiser.msg("020014",viewName,columnName));
         setFatal();
     }
 }

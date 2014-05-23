@@ -69,6 +69,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -172,7 +173,7 @@ public class InsertRequest extends Request
         pkFieldNumbers = consumer.getPrimaryKeyFieldNumbers();
         if (table.getIdentityType() == IdentityType.APPLICATION && pkFieldNumbers.length < 1 && !hasIdentityColumn)
         {
-	        throw new NucleusException(LOCALISER.msg("052200", cmd.getFullClassName())).setFatal();
+	        throw new NucleusException(Localiser.msg("052200", cmd.getFullClassName())).setFatal();
         }
         insertFieldNumbers = consumer.getInsertFieldNumbers();
         retrievedStmtMappings = consumer.getReachableStatementMappings();
@@ -200,7 +201,7 @@ public class InsertRequest extends Request
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are inserting
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052207", op.getObjectAsPrintable(), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052207", op.getObjectAsPrintable(), table));
         }
 
         try
@@ -415,7 +416,7 @@ public class InsertRequest extends Request
                         Object newId = getInsertedDatastoreIdentity(ec, sqlControl, op, mconn, ps);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052206",
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206",
                                 op.getObjectAsPrintable(), newId));
                         }
                         op.setPostStoreNewObjectId(newId);
@@ -426,7 +427,7 @@ public class InsertRequest extends Request
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052222",
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222",
                                 op.getObjectAsPrintable(),
                                 ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                         }
@@ -495,7 +496,7 @@ public class InsertRequest extends Request
         }
         catch (SQLException e)
         {
-            String msg = LOCALISER.msg("052208", op.getObjectAsPrintable(), insertStmt, e.getMessage());
+            String msg = Localiser.msg("052208", op.getObjectAsPrintable(), insertStmt, e.getMessage());
             NucleusLogger.DATASTORE_PERSIST.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(e);
@@ -514,7 +515,7 @@ public class InsertRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052209", op.getObjectAsPrintable(),
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", op.getObjectAsPrintable(),
                         ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postInsert(op);
@@ -612,7 +613,7 @@ public class InsertRequest extends Request
 
         if (datastoreId == null)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("052205", this.table));
+            throw new NucleusDataStoreException(Localiser.msg("052205", this.table));
         }
 
         return datastoreId;

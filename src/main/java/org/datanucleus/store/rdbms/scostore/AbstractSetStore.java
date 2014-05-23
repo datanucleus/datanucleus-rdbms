@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.scostore.SetStore;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -99,7 +100,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         catch (MappedDatastoreException e)
         {
             NucleusLogger.DATASTORE.error(e);
-            String msg = LOCALISER.msg("056009", e.getMessage());
+            String msg = Localiser.msg("056009", e.getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, e);
         }
@@ -181,7 +182,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         if (!exceptions.isEmpty())
         {
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't persist
-            String msg = LOCALISER.msg("056009", ((Exception) exceptions.get(0)).getMessage());
+            String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
         }
@@ -324,7 +325,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         if (!exceptions.isEmpty())
         {
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't remove
-            String msg = LOCALISER.msg("056012", ((Exception) exceptions.get(0)).getMessage());
+            String msg = Localiser.msg("056012", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
         }
@@ -414,7 +415,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         catch (SQLException e)
         {
             NucleusLogger.DATASTORE.error(e);
-            String msg = LOCALISER.msg("056012",removeStmt);
+            String msg = Localiser.msg("056012",removeStmt);
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, e);
         }

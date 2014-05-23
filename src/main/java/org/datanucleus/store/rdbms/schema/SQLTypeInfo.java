@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -32,9 +31,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SQLTypeInfo implements StoreSchemaData
 {
-    private static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** The RDBMS-specific name for this data type. */
     protected String typeName;
 
@@ -248,7 +244,7 @@ public class SQLTypeInfo implements StoreSchemaData
 
         if (actual == Types.OTHER)
         {
-            NucleusLogger.DATASTORE.warn(LOCALISER.msg("020191", actual));
+            NucleusLogger.DATASTORE.warn(Localiser.msg("020191", actual));
             return true;
         }
         

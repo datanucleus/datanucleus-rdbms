@@ -36,9 +36,6 @@ import org.datanucleus.util.Localiser;
  */
 public final class DatastoreMappingFactory
 {
-    private static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Private constructor to prevent instantiation. */
     private DatastoreMappingFactory()
     {
@@ -78,17 +75,17 @@ public final class DatastoreMappingFactory
             }
             catch (InvocationTargetException e)
             {
-                throw new NucleusException(LOCALISER.msg("041009", mappingClass.getName(), 
+                throw new NucleusException(Localiser.msg("041009", mappingClass.getName(), 
                     e.getTargetException()), e.getTargetException()).setFatal();
             }
             catch (Exception e)
             {
-                throw new NucleusException(LOCALISER.msg("041009", mappingClass.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mappingClass.getName(), e), e).setFatal();
             }
         }
         catch (NoSuchMethodException nsme)
         {
-            throw new NucleusException(LOCALISER.msg("041007", JavaTypeMapping.class, RDBMSStoreManager.class, 
+            throw new NucleusException(Localiser.msg("041007", JavaTypeMapping.class, RDBMSStoreManager.class, 
                 Column.class, mappingClass.getName())).setFatal();
         }
         return (DatastoreMapping) obj;

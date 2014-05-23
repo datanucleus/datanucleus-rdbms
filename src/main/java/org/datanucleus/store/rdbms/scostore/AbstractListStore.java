@@ -46,6 +46,7 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.scostore.ListStore;
+import org.datanucleus.util.Localiser;
 
 /**
  * Abstract representation of a backing store for a List.
@@ -462,7 +463,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
 
                         if (i < elements.size())
                         {
-                            throw new NucleusDataStoreException(LOCALISER.msg("056023", stmt));
+                            throw new NucleusDataStoreException(Localiser.msg("056023", stmt));
                         }
                         JDBCUtils.logWarnings(rs);
                     }
@@ -483,7 +484,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056017", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056017", stmt), e);
         }
 
         return indices;
@@ -547,7 +548,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056017", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056017", stmt), e);
         }
     }
 
@@ -617,11 +618,11 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056012", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056012", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056012", stmt), e);
         }
     }
 

@@ -20,11 +20,9 @@ Contributors:
 package org.datanucleus.store.rdbms.request;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.util.Localiser;
 
 /**
  * Base class representing a request to perform an action on the datastore.
@@ -32,10 +30,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class Request
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     protected DatastoreClass table;
     protected PrimaryKey key;
 

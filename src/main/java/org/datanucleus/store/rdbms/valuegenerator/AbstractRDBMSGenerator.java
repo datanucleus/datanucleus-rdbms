@@ -21,7 +21,6 @@ package org.datanucleus.store.rdbms.valuegenerator;
 import java.util.Properties;
 
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
@@ -35,10 +34,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerator<T>
 {
-    /** Localiser for messages specific to RDBMS generators. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Connection to the datastore. */
     protected ManagedConnection connection;
 
@@ -104,7 +99,7 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
             }
             catch (ValueGenerationException poidex)
             {
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040003", poidex.getMessage()));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", poidex.getMessage()));
                 if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
                 {
                     NucleusLogger.VALUEGENERATION.debug("Caught exception", poidex);
@@ -122,7 +117,7 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
             }
             catch (RuntimeException ex)
             {
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040003", ex.getMessage()));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", ex.getMessage()));
                 if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
                 {
                     NucleusLogger.VALUEGENERATION.debug("Caught exception", ex);
@@ -158,10 +153,10 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
                     connection = connectionProvider.retrieveConnection();
                 }
 
-                NucleusLogger.VALUEGENERATION.info(LOCALISER.msg("040005"));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040005"));
                 if (!createRepository())
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("040002"));
+                    throw new ValueGenerationException(Localiser.msg("040002"));
                 }
                 else
                 {

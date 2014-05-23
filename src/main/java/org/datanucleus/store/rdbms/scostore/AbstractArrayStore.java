@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.scostore.ArrayStore;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -177,7 +178,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
         {
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which
             // record(s) didn't persist
-            String msg = LOCALISER.msg("056009", ((Exception) exceptions.get(0)).getMessage());
+            String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, 
                 (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
@@ -220,7 +221,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056009", e.getMessage()), e.getCause());
+            throw new NucleusDataStoreException(Localiser.msg("056009", e.getMessage()), e.getCause());
         }
 
         return modified;
@@ -267,7 +268,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056013", clearStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
         }
     }
 

@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * RDBMS-specific implementation of a Join ArrayStore
@@ -113,7 +114,7 @@ public class JoinArrayStore extends AbstractArrayStore
                         elementInfo = getElementInformationForClass();
                         if (elementInfo != null && elementInfo.length > 1)
                         {
-                            throw new NucleusUserException(LOCALISER.msg("056045", 
+                            throw new NucleusUserException(Localiser.msg("056045", 
                                 ownerMemberMetaData.getFullFieldName()));
                         }
                     }
@@ -232,11 +233,11 @@ public class JoinArrayStore extends AbstractArrayStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
     }
 

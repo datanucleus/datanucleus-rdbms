@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -64,7 +65,7 @@ public abstract class JoinTable extends TableImpl
 
         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.NONE)
         {
-            throw new NucleusException(LOCALISER.msg("057006", mmd.getName())).setFatal();
+            throw new NucleusException(Localiser.msg("057006", mmd.getName())).setFatal();
         }
     }
 
@@ -165,7 +166,7 @@ public abstract class JoinTable extends TableImpl
                 }
                 datastoreMappingTypes.append(mapping.getDatastoreMapping(i).getClass().getName());
             }
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("057010",
+            NucleusLogger.DATASTORE.debug(Localiser.msg("057010",
                 mmd.getFullFieldName(), columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
         }
     }

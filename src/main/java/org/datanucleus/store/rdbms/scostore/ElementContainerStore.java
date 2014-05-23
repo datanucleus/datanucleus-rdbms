@@ -45,6 +45,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * Representation of the store of an element-based container.
@@ -348,7 +349,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         if (!elementIsPersistentInterface &&
             !validateElementType(ec.getClassLoaderResolver(), element))
         {
-            throw new ClassCastException(LOCALISER.msg("056033", element.getClass().getName(), 
+            throw new ClassCastException(Localiser.msg("056033", element.getClass().getName(), 
                 ownerMemberMetaData.getFullFieldName(), elementType));
         }
 
@@ -363,7 +364,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             if (elementSM != null && elementSM.isEmbedded())
             {
                 // Element is already with ObjectProvider and is embedded in another field!
-                throw new NucleusUserException(LOCALISER.msg("056028", 
+                throw new NucleusUserException(Localiser.msg("056028", 
                     ownerMemberMetaData.getFullFieldName(), element));
             }
 
@@ -568,7 +569,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056013", clearStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
         }
     }
 
@@ -645,7 +646,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     {
                         if (!rs.next())
                         {
-                            throw new NucleusDataStoreException(LOCALISER.msg("056007", sizeStmt));
+                            throw new NucleusDataStoreException(Localiser.msg("056007", sizeStmt));
                         }
 
                         numRows = rs.getInt(1);
@@ -668,7 +669,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056007", sizeStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056007", sizeStmt), e);
         }
 
         return numRows;

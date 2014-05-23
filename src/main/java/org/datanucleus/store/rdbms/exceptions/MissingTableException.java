@@ -19,20 +19,14 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>MissingTableException</tt> is thrown if an expected table is
  * not found in the database during schema validation.
- *
- * @version $Revision: 1.2 $ 
  */
 public class MissingTableException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a missing table exception.
      * @param catalogName Catalog name which the table was searched.
@@ -41,6 +35,6 @@ public class MissingTableException extends DatastoreValidationException
      */
     public MissingTableException(String catalogName, String schemaName, String tableName)
     {
-        super(LOCALISER_RDBMS.msg("020011", catalogName, schemaName, tableName));
+        super(Localiser.msg("020011", catalogName, schemaName, tableName));
     }
 }

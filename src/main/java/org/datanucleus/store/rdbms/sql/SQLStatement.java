@@ -87,10 +87,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SQLStatement
 {
-    /** Localisation for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Map of SQLTable naming instance keyed by the name of the naming scheme. */
     protected static final Map<String, SQLTableNamer> tableNamerByName = new HashMap();
 
@@ -1490,7 +1486,7 @@ public class SQLStatement
     {
         if (exprs != null && descending != null && exprs.length != descending.length)
         {
-            throw new NucleusException(LOCALISER.msg("052503", "" + exprs.length, "" + descending.length)).setFatal();
+            throw new NucleusException(Localiser.msg("052503", "" + exprs.length, "" + descending.length)).setFatal();
         }
 
         invalidateStatement();
@@ -1652,7 +1648,7 @@ public class SQLStatement
             // Add on any UNIONed statements
             if (!dba.supportsOption(DatastoreAdapter.UNION_SYNTAX))
             {
-                throw new NucleusException(LOCALISER.msg("052504", "UNION")).setFatal();
+                throw new NucleusException(Localiser.msg("052504", "UNION")).setFatal();
             }
 
             Iterator<SQLStatement> unionIter = unions.iterator();
@@ -1696,7 +1692,7 @@ public class SQLStatement
             // Add any required locking based on the RDBMS capability
             if (distinct && !dba.supportsOption(DatastoreAdapter.DISTINCT_WITH_SELECT_FOR_UPDATE))
             {
-                NucleusLogger.QUERY.warn(LOCALISER.msg("052502"));
+                NucleusLogger.QUERY.warn(Localiser.msg("052502"));
             }
             else
             {

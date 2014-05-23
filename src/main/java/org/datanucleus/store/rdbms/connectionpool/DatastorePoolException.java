@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.connectionpool;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -26,10 +25,6 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastorePoolException extends NucleusException
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructor.
      * @param poolName Name of the connection pool
@@ -39,6 +34,6 @@ public class DatastorePoolException extends NucleusException
      */
     public DatastorePoolException(String poolName, String driverName, String url, Exception nested)
     {
-        super(LOCALISER.msg("047002", poolName, driverName, url, nested.getMessage()), nested);
+        super(Localiser.msg("047002", poolName, driverName, url, nested.getMessage()), nested);
     }
 }

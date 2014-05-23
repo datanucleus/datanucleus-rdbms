@@ -63,10 +63,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class RDBMSQueryUtils extends QueryUtils
 {
-    /** Localiser of messages. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Convenience method that takes a result set that contains a discriminator column and returns
      * the class name that it represents.
@@ -182,7 +178,7 @@ public class RDBMSQueryUtils extends QueryUtils
             (!rsTypeString.equals("scroll-sensitive") && !rsTypeString.equals("forward-only") &&
              !rsTypeString.equals("scroll-insensitive")))
         {
-            throw new NucleusUserException(LOCALISER.msg("052510"));
+            throw new NucleusUserException(Localiser.msg("052510"));
         }
         if (rsTypeString != null)
         {
@@ -210,7 +206,7 @@ public class RDBMSQueryUtils extends QueryUtils
         if (rsConcurrencyString != null &&
             (!rsConcurrencyString.equals("read-only") && !rsConcurrencyString.equals("updateable")))
         {
-            throw new NucleusUserException(LOCALISER.msg("052511"));
+            throw new NucleusUserException(Localiser.msg("052511"));
         }
 
         SQLController sqlControl = ((RDBMSStoreManager)query.getStoreManager()).getSQLController();
@@ -262,7 +258,7 @@ public class RDBMSQueryUtils extends QueryUtils
             fetchDir = (String)fetchDirExt;
             if (!fetchDir.equals("forward") && !fetchDir.equals("reverse") && !fetchDir.equals("unknown"))
             {
-                throw new NucleusUserException(LOCALISER.msg("052512"));
+                throw new NucleusUserException(Localiser.msg("052512"));
             }
         }
 

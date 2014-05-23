@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -52,10 +51,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class DatastoreAdapterFactory
 {
-    /** Localisation of messages */
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Accessor for the RDBMSAdapterFactory.
      * @return The manager of type information
@@ -93,7 +88,7 @@ public class DatastoreAdapterFactory
         if (adapter == null)
         {
             // Nothing suitable found so warn the user and continue with the generic adapter
-            NucleusLogger.DATASTORE.warn(LOCALISER.msg("051000"));
+            NucleusLogger.DATASTORE.warn(Localiser.msg("051000"));
             adapter = new BaseDatastoreAdapter(metadata);
         }
 
@@ -125,13 +120,13 @@ public class DatastoreAdapterFactory
                 productName = metadata.getDatabaseProductName();
                 if (productName == null)
                 {
-                    NucleusLogger.DATASTORE.error(LOCALISER.msg("051024"));
+                    NucleusLogger.DATASTORE.error(Localiser.msg("051024"));
                     return null;
                 }
             }
             catch (SQLException sqe)
             {
-                NucleusLogger.DATASTORE.error(LOCALISER.msg("051025", sqe));
+                NucleusLogger.DATASTORE.error(Localiser.msg("051025", sqe));
                 return null;
             }
         }
@@ -165,18 +160,18 @@ public class DatastoreAdapterFactory
             }
             catch (Exception e)
             {
-                NucleusLogger.DATASTORE.error(LOCALISER.msg("051026", adapterClassName, e));
+                NucleusLogger.DATASTORE.error(Localiser.msg("051026", adapterClassName, e));
                 return null;
             }
         }
         catch (ClassNotResolvedException ex)
         {
-            NucleusLogger.DATASTORE.error(LOCALISER.msg("051026", adapterClassName, ex));
+            NucleusLogger.DATASTORE.error(Localiser.msg("051026", adapterClassName, ex));
             return null;
         }
         catch (NoSuchMethodException nsme)
         {
-            NucleusLogger.DATASTORE.error(LOCALISER.msg("051026", adapterClassName, nsme));
+            NucleusLogger.DATASTORE.error(Localiser.msg("051026", adapterClassName, nsme));
             return null;
         }
 

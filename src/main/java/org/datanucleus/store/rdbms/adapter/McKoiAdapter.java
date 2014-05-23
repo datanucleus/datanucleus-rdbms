@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.transaction.TransactionIsolation;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -198,7 +199,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -237,7 +238,7 @@ public class McKoiAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("SELECT ");
         stmt.append(" NEXTVAL('"+sequence_name+"') ");

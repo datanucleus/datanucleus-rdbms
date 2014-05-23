@@ -40,6 +40,7 @@ import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -69,7 +70,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         super(tableName, storeMgr);
         if (primaryTable == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("057045", tableName.getIdentifierName()));
+            throw new NucleusUserException(Localiser.msg("057045", tableName.getIdentifierName()));
         }
         this.primaryTable = primaryTable;
         this.joinMetaData = jmd;
@@ -122,7 +123,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         state = TABLE_STATE_INITIALIZED;
     }

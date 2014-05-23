@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr1}.endsWith(strExpr2[, numExpr]).
@@ -43,7 +44,7 @@ public class StringEndsWithMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "endsWith", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
         else
@@ -53,7 +54,7 @@ public class StringEndsWithMethod extends AbstractSQLMethod
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "endsWith", "StringExpression", 0,
+                throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
             }
             if (args.size() > 1)

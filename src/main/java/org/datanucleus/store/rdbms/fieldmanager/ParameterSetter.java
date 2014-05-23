@@ -35,7 +35,6 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -43,9 +42,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ParameterSetter extends AbstractFieldManager
 {
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader()); 
-
     protected final ObjectProvider op;
     protected final ExecutionContext ec;
     protected final PreparedStatement statement;
@@ -150,7 +146,7 @@ public class ParameterSetter extends AbstractFieldManager
         StatementMappingIndex mapIdx = stmtMappings.getMappingForMemberPosition(fieldNumber);
         if (value == null && mapIdx.getMapping().getMemberMetaData().getNullValue() == NullValue.EXCEPTION)
         {
-            throw new NucleusUserException(LOCALISER.msg("052400",
+            throw new NucleusUserException(Localiser.msg("052400",
                 mapIdx.getMapping().getMemberMetaData().getFullFieldName()));
         }
         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
@@ -165,8 +161,7 @@ public class ParameterSetter extends AbstractFieldManager
         StatementMappingIndex mapIdx = stmtMappings.getMappingForMemberPosition(fieldNumber);
         if (value == null && mapIdx.getMapping().getMemberMetaData().getNullValue() == NullValue.EXCEPTION)
         {
-            throw new NucleusUserException(LOCALISER.msg("052400",
-                mapIdx.getMapping().getMemberMetaData().getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("052400", mapIdx.getMapping().getMemberMetaData().getFullFieldName()));
         }
 
         try

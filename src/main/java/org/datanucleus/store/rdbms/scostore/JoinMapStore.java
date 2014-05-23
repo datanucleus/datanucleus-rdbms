@@ -63,6 +63,7 @@ import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -123,7 +124,7 @@ public class JoinMapStore extends AbstractMapStore
         Class value_class=clr.classForName(valueType);
         if (ClassUtils.isReferenceType(value_class))
         {
-            NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("056066", 
+            NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", 
                 ownerMemberMetaData.getFullFieldName(), value_class.getName()));
             vmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class,null,clr);
             if (vmd != null)
@@ -228,7 +229,7 @@ public class JoinMapStore extends AbstractMapStore
             }
             catch (MappedDatastoreException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("056016", e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
             }
         }
 
@@ -257,7 +258,7 @@ public class JoinMapStore extends AbstractMapStore
             }
             catch (MappedDatastoreException mde)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("056016", mde.getMessage()), mde);
+                throw new NucleusDataStoreException(Localiser.msg("056016", mde.getMessage()), mde);
             }
         }
     }
@@ -312,7 +313,7 @@ public class JoinMapStore extends AbstractMapStore
             }
             catch (MappedDatastoreException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("056016", e.getMessage()), e);
+                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
             }
         }
 
@@ -771,7 +772,7 @@ public class JoinMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056014", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056014", stmt), e);
         }
         return value;
     }
@@ -918,7 +919,7 @@ public class JoinMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056013",clearStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056013",clearStmt),e);
         }
     }
 
@@ -951,7 +952,7 @@ public class JoinMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056012",removeStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056012",removeStmt),e);
         }
     }
 
@@ -1135,7 +1136,7 @@ public class JoinMapStore extends AbstractMapStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056020",getMaxAdapterColumnIdStmt()),e);
+            throw new NucleusDataStoreException(Localiser.msg("056020",getMaxAdapterColumnIdStmt()),e);
         }
 
         return nextID;

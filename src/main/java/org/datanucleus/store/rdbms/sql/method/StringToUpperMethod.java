@@ -22,6 +22,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL UPPER function.
@@ -42,7 +43,7 @@ public class StringToUpperMethod extends SimpleStringMethod
     {
         if (args != null && !args.isEmpty())
         {
-            throw new NucleusException(LOCALISER.msg("060015", "toUpperCase", "StringExpression"));
+            throw new NucleusException(Localiser.msg("060015", "toUpperCase", "StringExpression"));
         }
 
         if (!expr.isParameter() && expr instanceof StringLiteral)

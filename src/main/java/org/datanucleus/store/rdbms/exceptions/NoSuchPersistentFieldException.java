@@ -28,9 +28,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NoSuchPersistentFieldException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a no such persistent field exception.
      *
@@ -39,7 +36,7 @@ public class NoSuchPersistentFieldException extends NucleusUserException
      */
     public NoSuchPersistentFieldException(String className, String fieldName)
     {
-        super(LOCALISER.msg("018009",fieldName,className));
+        super(Localiser.msg("018009",fieldName,className));
     }
 
     /**
@@ -50,6 +47,6 @@ public class NoSuchPersistentFieldException extends NucleusUserException
      */
     public NoSuchPersistentFieldException(String className, int fieldNumber)
     {
-        super(LOCALISER.msg("018010","" + fieldNumber,className));
+        super(Localiser.msg("018010","" + fieldNumber,className));
     }
 }

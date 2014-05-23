@@ -26,6 +26,7 @@ import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr}.charAt(numExpr).
@@ -44,7 +45,7 @@ public class StringCharAtMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "charAt", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
                 "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
         else
@@ -55,7 +56,7 @@ public class StringCharAtMethod extends AbstractSQLMethod
                 !(startExpr instanceof IntegerLiteral) &&
                 !(startExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "charAt", "StringExpression", 0,
+                throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
                     "NumericExpression/IntegerLiteral/ParameterLiteral"));
             }
 

@@ -23,6 +23,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL CURRENT_TIME function.
@@ -53,7 +54,7 @@ public class CurrentTimeFunction extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", getFunctionName(), expr));
+            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
         }
     }
 

@@ -19,19 +19,14 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>WrongScaleException</tt> is thrown if a column is detected to have
  * the wrong scale in the database during schema validation.
- * @version $Revision: 1.3 $ 
  */
 public class WrongScaleException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a wrong scale exception.
      * @param columnName Name of the column having the wrong scale.
@@ -40,7 +35,7 @@ public class WrongScaleException extends DatastoreValidationException
      */
     public WrongScaleException(String columnName, int expectedScale, int actualScale)
     {
-        super(LOCALISER_RDBMS.msg("020021",columnName,"" + actualScale,"" + expectedScale));
+        super(Localiser.msg("020021",columnName,"" + actualScale,"" + expectedScale));
     }
 
     /**
@@ -52,7 +47,7 @@ public class WrongScaleException extends DatastoreValidationException
      */
     public WrongScaleException(String columnName, int expectedScale, int actualScale, String fieldName)
     {
-        super(LOCALISER_RDBMS.msg("020022",columnName,"" + actualScale,"" + expectedScale, fieldName));
+        super(Localiser.msg("020022",columnName,"" + actualScale,"" + expectedScale, fieldName));
     }
 
 }

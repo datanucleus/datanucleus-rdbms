@@ -23,6 +23,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke an SQL String function that takes in an expression.
@@ -57,7 +58,7 @@ public abstract class SimpleStringMethod extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", getFunctionName(), expr));
+            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
         }
     }
 }

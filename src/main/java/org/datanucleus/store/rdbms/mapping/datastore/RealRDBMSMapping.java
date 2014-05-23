@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping of a REAL RDBMS type.
@@ -78,7 +79,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","float","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","float","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -93,7 +94,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (rs.wasNull())
                 {
-                    throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                    throw new NullValueException(Localiser.msg("055003",column));
                 }
             }
         }
@@ -109,7 +110,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
                 {
                     if (rs.wasNull())
                     {
-                        throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                        throw new NullValueException(Localiser.msg("055003",column));
                     }
                 }
             }
@@ -121,7 +122,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
                 }
                 catch (SQLException e2)
                 {
-                    throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","float","" + param, column, e.getMessage()), e);
+                    throw new NucleusDataStoreException(Localiser.msg("055002","float","" + param, column, e.getMessage()), e);
                 }
             }
         }
@@ -144,7 +145,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","Object","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -169,7 +170,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
                 {
                     if (rs.wasNull())
                     {
-                        throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                        throw new NullValueException(Localiser.msg("055003",column));
                     }
                 }
             }
@@ -181,7 +182,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
                 }
                 catch (SQLException e2)
                 {
-                    throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002", "Object", "" + param, column, e.getMessage()), e);
+                    throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, e.getMessage()), e);
                 }
             }
         }

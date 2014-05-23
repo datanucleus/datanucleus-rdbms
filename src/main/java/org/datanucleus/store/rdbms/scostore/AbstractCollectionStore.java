@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.CollectionStore;
+import org.datanucleus.util.Localiser;
 
 /**
  * Abstract representation of a store of a Collection.
@@ -213,7 +214,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         {
             e.printStackTrace();
             // TODO Update this localised message to reflect that it is the update of an embedded element
-            throw new NucleusDataStoreException(LOCALISER.msg("056009", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
         }
         return modified;
     }
@@ -415,7 +416,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056008", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056008", stmt), e);
         }
         return retval;
     }

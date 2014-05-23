@@ -28,9 +28,6 @@ import org.datanucleus.util.Localiser;
  */
 public class TooManyIndicesException extends NucleusDataStoreException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a too-many-indices exception.
      * @param dba the database adapter
@@ -38,7 +35,7 @@ public class TooManyIndicesException extends NucleusDataStoreException
      */
     public TooManyIndicesException(DatastoreAdapter dba, String tableName)
     {
-        super(LOCALISER.msg("020016","" + dba.getMaxIndexes(), tableName));
+        super(Localiser.msg("020016","" + dba.getMaxIndexes(), tableName));
         setFatal();
     }
 }

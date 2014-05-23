@@ -134,9 +134,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class QueryToSQLMapper extends AbstractExpressionEvaluator implements QueryGenerator
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     public static final String OPTION_CASE_INSENSITIVE = "CASE_INSENSITIVE";
     public static final String OPTION_EXPLICIT_JOINS = "EXPLICIT_JOINS";
     public static final String OPTION_BULK_UPDATE_VERSION = "BULK_UPDATE_VERSION";
@@ -788,7 +785,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 // Nondurable identity cases have no "id" for later fetching so get all fields now
                 if (NucleusLogger.QUERY.isDebugEnabled())
                 {
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("052520", candidateCmd.getFullClassName()));
+                    NucleusLogger.QUERY.debug(Localiser.msg("052520", candidateCmd.getFullClassName()));
                 }
                 fetchPlan.setGroup("all");
             }
@@ -836,7 +833,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             if (m instanceof AbstractContainerMapping)
             {
-                throw new NucleusUserException(LOCALISER.msg("021213"));
+                throw new NucleusUserException(Localiser.msg("021213"));
             }
         }
     }
@@ -875,7 +872,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (!(havingEval instanceof BooleanExpression))
             {
                 // Non-boolean having clause should be user exception
-                throw new NucleusUserException(LOCALISER.msg("021051", havingExpr));
+                throw new NucleusUserException(Localiser.msg("021051", havingExpr));
             }
             stmt.setHaving((BooleanExpression)havingEval);
             compileComponent = null;
@@ -2338,7 +2335,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 if (mmd == null)
                 {
                     // Not valid member name
-                    throw new NucleusUserException(LOCALISER.msg("021062", component, cmd.getFullClassName()));
+                    throw new NucleusUserException(Localiser.msg("021062", component, cmd.getFullClassName()));
                 }
                 else if (mmd.getPersistenceModifier() != FieldPersistenceModifier.PERSISTENT)
                 {
@@ -2712,7 +2709,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     if (!QueryUtils.queryParameterTypesAreCompatible(expr.getSymbol().getValueType(), paramValue.getClass()))
                     {
-                        throw new QueryCompilerSyntaxException(LOCALISER.msg("021118", expr.getId(),
+                        throw new QueryCompilerSyntaxException(Localiser.msg("021118", expr.getId(),
                             expr.getSymbol().getValueType().getName(), paramValue.getClass().getName()));
                     }
                     if (expr.getSymbol().getValueType() != paramValue.getClass())
@@ -3299,7 +3296,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Constructor ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes);
             if (ctr == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("021033", className,
+                throw new NucleusUserException(Localiser.msg("021033", className,
                     StringUtils.objectArrayToString(ctrArgTypes)));
             }
         }

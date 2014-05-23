@@ -64,9 +64,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ConnectionFactoryImpl extends AbstractConnectionFactory
 {
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Datasources. */
     DataSource[] dataSources;
 
@@ -98,7 +95,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             // Close any DataNucleus-created connection pool
             if (NucleusLogger.CONNECTION.isDebugEnabled())
             {
-                NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("047010", resourceType));
+                NucleusLogger.CONNECTION.debug(Localiser.msg("047010", resourceType));
             }
             pool.close();
         }
@@ -132,7 +129,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             dataSources = generateDataSources(storeMgr, connDS, connJNDI, resourceType, requiredPoolingType, connURL);
             if (dataSources == null)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("047009", "transactional")).setFatal();
+                throw new NucleusUserException(Localiser.msg("047009", "transactional")).setFatal();
             }
         }
         else
@@ -167,7 +164,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             }
             if (dataSources == null)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("047009", "non-transactional")).setFatal();
+                throw new NucleusUserException(Localiser.msg("047009", "non-transactional")).setFatal();
             }
         }
     }
@@ -232,7 +229,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 if (connPoolFactory == null)
                 {
                     // User has specified a pool plugin that has not registered
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("047003", poolingType)).setFatal();
+                    throw new NucleusUserException(Localiser.msg("047003", poolingType)).setFatal();
                 }
 
                 // Create the ConnectionPool and get the DataSource
@@ -240,24 +237,24 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 dataSources[0] = pool.getDataSource();
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(LOCALISER_RDBMS.msg("047008", resourceType, poolingType));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("047008", resourceType, poolingType));
                 }
             }
             catch (ClassNotFoundException cnfe)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("047003", poolingType), cnfe).setFatal();
+                throw new NucleusUserException(Localiser.msg("047003", poolingType), cnfe).setFatal();
             }
             catch (Exception e)
             {
                 if (e instanceof InvocationTargetException)
                 {
                     InvocationTargetException ite = (InvocationTargetException)e;
-                    throw new NucleusException(LOCALISER_RDBMS.msg("047004", poolingType,
+                    throw new NucleusException(Localiser.msg("047004", poolingType,
                         ite.getTargetException().getMessage()), ite.getTargetException()).setFatal();
                 }
                 else
                 {
-                    throw new NucleusException(LOCALISER_RDBMS.msg("047004", poolingType,
+                    throw new NucleusException(Localiser.msg("047004", poolingType,
                         e.getMessage()),e).setFatal();
                 }
             }
@@ -321,7 +318,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 if (connProvider == null)
                 {
                     // No provider with this name (missing plugin ?)
-                    throw new NucleusException(LOCALISER_RDBMS.msg("050000",
+                    throw new NucleusException(Localiser.msg("050000",
                         storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME))).setFatal();
                 }
                 connProvider.setFailOnError(storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_FAIL_ON_ERROR));
@@ -329,7 +326,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             catch (Exception e)
             {
                 // Error creating provider
-                throw new NucleusException(LOCALISER_RDBMS.msg("050001",
+                throw new NucleusException(Localiser.msg("050001",
                     storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME), e.getMessage()), e).setFatal();
             }
         }
@@ -356,7 +353,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         this.needsCommitting = false;
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009015", this.toString()));
+                            NucleusLogger.CONNECTION.debug(Localiser.msg("009015", this.toString()));
                         }
                         conn.commit();
                     }
@@ -454,13 +451,13 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                 }
                                 else
                                 {
-                                    NucleusLogger.CONNECTION.warn(LOCALISER_RDBMS.msg("051008", reqdIsolationLevel));
+                                    NucleusLogger.CONNECTION.warn(Localiser.msg("051008", reqdIsolationLevel));
                                 }
                             }
 
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009012", this.toString(),
+                                NucleusLogger.CONNECTION.debug(Localiser.msg("009012", this.toString(),
                                     TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel),
                                     cnx.getAutoCommit()));
                             }
@@ -495,7 +492,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
                                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                                 {
-                                    NucleusLogger.CONNECTION.debug(LOCALISER.msg("009013", this.toString()));
+                                    NucleusLogger.CONNECTION.debug(Localiser.msg("009013", this.toString()));
                                 }
                             }
                         }
@@ -506,13 +503,13 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         cnx = dataSources[0].getConnection();
                         if (cnx == null)
                         {
-                            String msg = LOCALISER.msg("009010", dataSources[0]);
+                            String msg = Localiser.msg("009010", dataSources[0]);
                             NucleusLogger.CONNECTION.error(msg);
                             throw new NucleusDataStoreException(msg);
                         }
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(LOCALISER.msg("009011", this.toString()));
+                            NucleusLogger.CONNECTION.debug(Localiser.msg("009011", this.toString()));
                         }
                     }
                 }
@@ -558,7 +555,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                             needsCommitting = false;
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009015", this.toString()));
+                                NucleusLogger.CONNECTION.debug(Localiser.msg("009015", this.toString()));
                             }
                         }
                     }
@@ -575,7 +572,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         {
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009013", this.toString()));
+                                NucleusLogger.CONNECTION.debug(Localiser.msg("009013", this.toString()));
                             }
                             conn.close();
                         }
@@ -583,7 +580,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         {
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
-                                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009014", this.toString()));
+                                NucleusLogger.CONNECTION.debug(Localiser.msg("009014", this.toString()));
                             }
                         }
                     }
@@ -747,7 +744,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             }
             catch (SQLException e)
             {
-                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009020", mconn.toString(), xid.toString(), onePhase));
+                NucleusLogger.CONNECTION.debug(Localiser.msg("009020", mconn.toString(), xid.toString(), onePhase));
                 XAException xe = new XAException(StringUtils.getStringFromStackTrace(e));
                 xe.initCause(e);
                 throw xe;
@@ -764,7 +761,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             }
             catch (SQLException e)
             {
-                NucleusLogger.CONNECTION.debug(LOCALISER.msg("009022", mconn.toString(), xid.toString()));
+                NucleusLogger.CONNECTION.debug(Localiser.msg("009022", mconn.toString(), xid.toString()));
                 XAException xe = new XAException(StringUtils.getStringFromStackTrace(e));
                 xe.initCause(e);
                 throw xe;

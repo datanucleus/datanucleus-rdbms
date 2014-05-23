@@ -34,9 +34,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JDBCUtils
 {
-    private static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Method to return the "subprotocol" for a JDBC URL.
      * A JDBC URL is made up of
@@ -60,7 +57,7 @@ public class JDBCUtils
     {
         while (warning != null)
         {
-            NucleusLogger.DATASTORE.warn(LOCALISER.msg("052700", warning.getMessage()));
+            NucleusLogger.DATASTORE.warn(Localiser.msg("052700", warning.getMessage()));
             warning = warning.getNextWarning();
         }
     }
@@ -77,7 +74,7 @@ public class JDBCUtils
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("052701",conn),e);
+            throw new NucleusDataStoreException(Localiser.msg("052701",conn),e);
         }
     }
 
@@ -93,7 +90,7 @@ public class JDBCUtils
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("052702",stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("052702",stmt), e);
         }
     }
 
@@ -109,7 +106,7 @@ public class JDBCUtils
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("052703",rs), e);
+            throw new NucleusDataStoreException(Localiser.msg("052703",rs), e);
         }
     }
 }

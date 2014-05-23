@@ -50,6 +50,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -272,7 +273,7 @@ public class LocateBulkRequest extends BulkRequest
                 }
                 str.append(ops[i].getInternalObjectId());
             }
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052223", str.toString(), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052223", str.toString(), table));
         }
 
         ExecutionContext ec = ops[0].getExecutionContext();
@@ -353,7 +354,7 @@ public class LocateBulkRequest extends BulkRequest
         }
         catch (SQLException sqle)
         {
-            String msg = LOCALISER.msg("052220", ops[0].getObjectAsPrintable(), statement, sqle.getMessage());
+            String msg = Localiser.msg("052220", ops[0].getObjectAsPrintable(), statement, sqle.getMessage());
             NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(sqle);

@@ -57,6 +57,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -241,7 +242,7 @@ public class UpdateRequest extends Request
                 }
 
                 // Debug information about what we are updating
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052214", 
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", 
                     op.getObjectAsPrintable(), fieldStr.toString(), table));
             }
 
@@ -358,7 +359,7 @@ public class UpdateRequest extends Request
                             if (currentVersion == null)
                             {
                                 // Somehow the version is not set on this object (not read in ?) so report the bug
-                                String msg = LOCALISER.msg("052201", op.getInternalObjectId(), table);
+                                String msg = Localiser.msg("052201", op.getInternalObjectId(), table);
                                 NucleusLogger.PERSISTENCE.error(msg);
                                 throw new NucleusException(msg);
                             }
@@ -376,7 +377,7 @@ public class UpdateRequest extends Request
                         {
                             // No object updated so either object disappeared or failed optimistic version checks
                             // TODO Batching : when we use batching here we need to process these somehow
-                            String msg = LOCALISER.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
+                            String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
                                 "" + currentVersion);
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusOptimisticException(msg, op.getObject());
@@ -394,7 +395,7 @@ public class UpdateRequest extends Request
             }
             catch (SQLException e)
             {
-                String msg = LOCALISER.msg("052215", op.getObjectAsPrintable(), stmt, StringUtils.getStringFromStackTrace(e));
+                String msg = Localiser.msg("052215", op.getObjectAsPrintable(), stmt, StringUtils.getStringFromStackTrace(e));
                 NucleusLogger.DATASTORE_PERSIST.error(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(e);
@@ -413,7 +414,7 @@ public class UpdateRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052216", op.getObjectAsPrintable(),
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", op.getObjectAsPrintable(),
                         ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postUpdate(op);

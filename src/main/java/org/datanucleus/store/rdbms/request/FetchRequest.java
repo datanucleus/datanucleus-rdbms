@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -280,7 +281,7 @@ public class FetchRequest extends Request
         if (fieldsToFetch != null && NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052218", op.getObjectAsPrintable(),
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", op.getObjectAsPrintable(),
                 fieldsToFetch, table));
         }
 
@@ -351,7 +352,7 @@ public class FetchRequest extends Request
                             {
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_RETRIEVE.info(LOCALISER.msg("050018",
+                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018",
                                         op.getInternalObjectId()));
                                 }
                                 throw new NucleusObjectNotFoundException("No such database row",
@@ -400,8 +401,7 @@ public class FetchRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = LOCALISER.msg("052219", 
-                    op.getObjectAsPrintable(), statement, sqle.getMessage());
+                String msg = Localiser.msg("052219", op.getObjectAsPrintable(), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);

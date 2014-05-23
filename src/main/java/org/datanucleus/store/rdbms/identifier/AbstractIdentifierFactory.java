@@ -40,10 +40,6 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractIdentifierFactory implements IdentifierFactory
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     public static final int CASE_PRESERVE = 1;
     public static final int CASE_UPPER = 2;
     public static final int CASE_LOWER = 3;
@@ -159,17 +155,17 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE))
                 {
                     namingCase = NamingCase.LOWER_CASE;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","UPPERCASE", "LOWERCASE"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001","UPPERCASE", "LOWERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE_QUOTED))
                 {
                     namingCase = NamingCase.LOWER_CASE_QUOTED;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","UPPERCASE", "LOWERCASEQUOTED"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001","UPPERCASE", "LOWERCASEQUOTED"));
                 }
                 else
                 {
                     // Should never happen since we've tried all options
-                    throw new NucleusUserException(LOCALISER.msg("039002", "UPPERCASE")).setFatal();
+                    throw new NucleusUserException(Localiser.msg("039002", "UPPERCASE")).setFatal();
                 }
             }
         }
@@ -198,17 +194,17 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
                 {
                     namingCase = NamingCase.UPPER_CASE;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","LOWERCASE", "UPPERCASE"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001","LOWERCASE", "UPPERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE_QUOTED))
                 {
                     namingCase = NamingCase.UPPER_CASE_QUOTED;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","LOWERCASE", "UPPERCASEQUOTED"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001","LOWERCASE", "UPPERCASEQUOTED"));
                 }
                 else
                 {
                     // Should never happen since we've tried all options
-                    throw new NucleusUserException(LOCALISER.msg("039002", "LOWERCASE")).setFatal();
+                    throw new NucleusUserException(Localiser.msg("039002", "LOWERCASE")).setFatal();
                 }
             }
         }
@@ -229,34 +225,34 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE))
                 {
                     namingCase = NamingCase.LOWER_CASE;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001","MIXEDCASE", "LOWERCASE"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001","MIXEDCASE", "LOWERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_LOWERCASE_QUOTED))
                 {
                     namingCase = NamingCase.LOWER_CASE_QUOTED;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "LOWERCASEQUOTED"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001", "MIXEDCASE", "LOWERCASEQUOTED"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE))
                 {
                     namingCase = NamingCase.UPPER_CASE;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "UPPERCASE"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001", "MIXEDCASE", "UPPERCASE"));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_UPPERCASE_QUOTED))
                 {
                     namingCase = NamingCase.UPPER_CASE_QUOTED;
-                    NucleusLogger.PERSISTENCE.warn(LOCALISER.msg("039001", "MIXEDCASE", "UPPERCASEQUOTED"));
+                    NucleusLogger.PERSISTENCE.warn(Localiser.msg("039001", "MIXEDCASE", "UPPERCASEQUOTED"));
                 }
                 else
                 {
                     // Should never happen since we've tried all options
-                    throw new NucleusUserException(LOCALISER.msg("039002", "MIXEDCASE")).setFatal();
+                    throw new NucleusUserException(Localiser.msg("039002", "MIXEDCASE")).setFatal();
                 }
             }
         }
         else
         {
             // Case not supported
-            throw new NucleusUserException(LOCALISER.msg("039000", userIdentifierCase)).setFatal();
+            throw new NucleusUserException(Localiser.msg("039000", userIdentifierCase)).setFatal();
         }
 
         // Save the default catalog/schema - in a valid case (may be user input)

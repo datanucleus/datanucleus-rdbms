@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -174,7 +175,7 @@ public class DeleteRequest extends Request
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are deleting
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052210", op.getObjectAsPrintable(), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052210", op.getObjectAsPrintable(), table));
         }
 
         // Process all related fields first
@@ -186,7 +187,7 @@ public class DeleteRequest extends Request
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052212", op.getObjectAsPrintable(),
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", op.getObjectAsPrintable(),
                     ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
             }
             callbacks[i].preDelete(op);
@@ -306,7 +307,7 @@ public class DeleteRequest extends Request
                         if (currentVersion == null)
                         {
                             // Somehow the version is not set on this object (not read in ?) so report the bug
-                            String msg = LOCALISER.msg("052202", op.getInternalObjectId(), table);
+                            String msg = Localiser.msg("052202", op.getInternalObjectId(), table);
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusException(msg);
                         }
@@ -322,7 +323,7 @@ public class DeleteRequest extends Request
                     if (optimisticChecks && rcs[0] == 0)
                     {
                         // No object deleted so either object disappeared or failed optimistic version checks
-                        String msg = LOCALISER.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
+                        String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
                             "" + op.getTransactionalVersion());
                         NucleusLogger.DATASTORE.error(msg);
                         throw new NucleusOptimisticException(msg, op.getObject());
@@ -351,7 +352,7 @@ public class DeleteRequest extends Request
         }
         catch (SQLException e)
         {
-            String msg = LOCALISER.msg("052211", op.getObjectAsPrintable(), stmt, e.getMessage());
+            String msg = Localiser.msg("052211", op.getObjectAsPrintable(), stmt, e.getMessage());
             NucleusLogger.DATASTORE_PERSIST.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(e);
@@ -372,7 +373,7 @@ public class DeleteRequest extends Request
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("052217", op.getObjectAsPrintable(), fmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", op.getObjectAsPrintable(), fmd.getFullFieldName()));
         }
 
         RDBMSStoreManager storeMgr = table.getStoreManager();

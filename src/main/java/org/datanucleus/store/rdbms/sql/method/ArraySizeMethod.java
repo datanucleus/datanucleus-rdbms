@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {arrExpr1}.size().
@@ -53,7 +54,7 @@ public class ArraySizeMethod extends AbstractSQLMethod
     {
         if (args != null && args.size() > 0)
         {
-            throw new NucleusException(LOCALISER.msg("060015", "size/length", "ArrayExpression"));
+            throw new NucleusException(Localiser.msg("060015", "size/length", "ArrayExpression"));
         }
 
         if (expr instanceof ArrayLiteral)

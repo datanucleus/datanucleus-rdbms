@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -30,9 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public class NoTableManagedException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a no table managed exception.
      * @param className Name of the class on which the operation requiring a
@@ -40,6 +36,6 @@ public class NoTableManagedException extends NucleusUserException
      */
     public NoTableManagedException(String className)
     {
-        super(LOCALISER.msg("020000",className));
+        super(Localiser.msg("020000",className));
     }
 }

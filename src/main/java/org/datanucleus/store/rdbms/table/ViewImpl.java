@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -105,7 +106,7 @@ public abstract class ViewImpl extends AbstractTable
         long startTime = System.currentTimeMillis();
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("031004",this));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("031004",this));
         }
 
         // Validate the column(s)
@@ -150,7 +151,7 @@ public abstract class ViewImpl extends AbstractTable
         state = TABLE_STATE_VALIDATED;
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("045000", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("045000", (System.currentTimeMillis() - startTime)));
         }
 
         return false;

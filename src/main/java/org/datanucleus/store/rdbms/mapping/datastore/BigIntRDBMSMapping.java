@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -89,7 +90,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "int", "" + value), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "int", "" + value), e);
         }
     }
 
@@ -105,13 +106,13 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (rs.wasNull())
                 {
-                    throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                    throw new NullValueException(Localiser.msg("055003",column));
                 }
             }
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002", "int", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "int", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -125,7 +126,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "long", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "long", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -141,13 +142,13 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (rs.wasNull())
                 {
-                    throw new NullValueException(LOCALISER_RDBMS.msg("055003",column));
+                    throw new NullValueException(Localiser.msg("055003",column));
                 }
             }
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002", "long", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "long", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -217,7 +218,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "Long", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "Long", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -262,7 +263,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            String msg = LOCALISER_RDBMS.msg("055002", "Long", "" + param, column, e.getMessage());
+            String msg = Localiser.msg("055002", "Long", "" + param, column, e.getMessage());
             throw new NucleusDataStoreException(msg, e);
         }
 

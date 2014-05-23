@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.method.AbstractSQLMethod;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr}.substring(numExpr1 [,numExpr2]).
@@ -47,7 +48,7 @@ public class StringSubstring4Method extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
                 "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
         else if (args.size() == 1)
@@ -58,7 +59,7 @@ public class StringSubstring4Method extends AbstractSQLMethod
                 !(startExpr instanceof IntegerLiteral) &&
                 !(startExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 0,
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
                     "NumericExpression/IntegerLiteral/ParameterLiteral"));
             }
 
@@ -82,13 +83,13 @@ public class StringSubstring4Method extends AbstractSQLMethod
             SQLExpression startExpr = args.get(0);
             if (!(startExpr instanceof NumericExpression))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 0,
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
                     "NumericExpression"));
             }
             SQLExpression endExpr = args.get(1);
             if (!(endExpr instanceof NumericExpression))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "substring", "StringExpression", 1,
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 1,
                     "NumericExpression"));
             }
 

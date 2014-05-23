@@ -106,6 +106,7 @@ import org.datanucleus.store.rdbms.mapping.java.VersionTimestampMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
 import org.datanucleus.util.NucleusLogger;
 
@@ -197,7 +198,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (cmd.getInheritanceMetaData().getStrategy() != InheritanceStrategy.NEW_TABLE &&
             cmd.getInheritanceMetaData().getStrategy() != InheritanceStrategy.COMPLETE_TABLE)
         {
-            throw new NucleusUserException(LOCALISER.msg("057003", cmd.getFullClassName(),
+            throw new NucleusUserException(Localiser.msg("057003", cmd.getFullClassName(),
                 cmd.getInheritanceMetaData().getStrategy().toString())).setFatal();
         }
 
@@ -369,7 +370,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;
@@ -395,7 +396,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     
                     public void onParameterMacro(MacroString.ParameterMacro pm)
                     {
-                        throw new NucleusUserException(LOCALISER.msg("057033", cmd.getFullClassName(), pm));
+                        throw new NucleusUserException(Localiser.msg("057033", cmd.getFullClassName(), pm));
                     }
                 }, clr
             );
@@ -420,7 +421,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     {
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057024", toString(), theCmd.getFullClassName(), 
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057024", toString(), theCmd.getFullClassName(), 
                 theCmd.getInheritanceMetaData().getStrategy().toString()));
         }
 
@@ -526,7 +527,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     }
                                     datastoreMappingTypes.append(fieldMapping.getDatastoreMapping(i).getClass().getName());
                                 }
-                                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057010",
+                                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
                                     mmd.getFullFieldName(), columnsStr.toString(), fieldMapping.getClass().getName(), datastoreMappingTypes.toString()));
                             }
                         }
@@ -627,7 +628,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     }
                     else if (mmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
                     {
-                        throw new NucleusException(LOCALISER.msg("057006",mmd.getName())).setFatal();
+                        throw new NucleusException(Localiser.msg("057006",mmd.getName())).setFatal();
                     }
 
                     // Calculate if we need a FK adding due to a 1-N (FK) relationship
@@ -702,12 +703,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     // Elements that are reference types or non-PC will come through here
                                     if (mmd.hasCollection())
                                     {
-                                        NucleusLogger.METADATA.warn(LOCALISER.msg("057016", 
+                                        NucleusLogger.METADATA.warn(Localiser.msg("057016", 
                                             theCmd.getFullClassName(), mmd.getCollection().getElementType()));
                                     }
                                     else
                                     {
-                                        NucleusLogger.METADATA.warn(LOCALISER.msg("057014", 
+                                        NucleusLogger.METADATA.warn(Localiser.msg("057014", 
                                             theCmd.getFullClassName(), mmd.getType().getComponentType().getName()));
                                     }
                                 }
@@ -755,7 +756,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 if (valueCmd == null)
                                 {
                                     // Interface elements will come through here and java.lang.String and others as well
-                                    NucleusLogger.METADATA.warn(LOCALISER.msg("057018", 
+                                    NucleusLogger.METADATA.warn(Localiser.msg("057018", 
                                         theCmd.getFullClassName(), mmd.getMap().getValueType()));
                                 }
                                 else
@@ -793,7 +794,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 if (keyCmd == null)
                                 {
                                     // Interface elements will come through here and java.lang.String and others as well
-                                    NucleusLogger.METADATA.warn(LOCALISER.msg("057019", 
+                                    NucleusLogger.METADATA.warn(Localiser.msg("057019", 
                                         theCmd.getFullClassName(), mmd.getMap().getKeyType()));
                                 }
                                 else
@@ -864,7 +865,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057011", col.toString(), colmd.getJdbcType()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057011", col.toString(), colmd.getJdbcType()));
                 }
                 unmappedColumns.add(col);
             }
@@ -930,14 +931,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
                         else if (mmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
                         {
-                            throw new NucleusException(LOCALISER.msg("057006", mmd.getName())).setFatal();
+                            throw new NucleusException(Localiser.msg("057006", mmd.getName())).setFatal();
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
                         if ((mmd.getValueStrategy() == IdentityStrategy.IDENTITY) && 
                             !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
-                            throw new NucleusException(LOCALISER.msg("057020",
+                            throw new NucleusException(Localiser.msg("057020",
                                 cmd.getFullClassName(), mmd.getName())).setFatal();
                         }
                     }
@@ -957,14 +958,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
                         else if (fmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
                         {
-                            throw new NucleusException(LOCALISER.msg("057006",fmd.getName())).setFatal();
+                            throw new NucleusException(Localiser.msg("057006",fmd.getName())).setFatal();
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
                         if ((fmd.getValueStrategy() == IdentityStrategy.IDENTITY) && 
                             !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
-                            throw new NucleusException(LOCALISER.msg("057020",
+                            throw new NucleusException(Localiser.msg("057020",
                                 cmd.getFullClassName(), fmd.getName())).setFatal();
                         }
                     }
@@ -1057,7 +1058,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
                                 else if (fmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
                                 {
-                                    throw new NucleusException(LOCALISER.msg("057006",fmd.getName())).setFatal();
+                                    throw new NucleusException(Localiser.msg("057006",fmd.getName())).setFatal();
                                 }
                             }
                         }
@@ -1254,7 +1255,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             AbstractMemberMetaData fmd = managedCmd.getMetaDataForMember(ownerFmd.getMappedBy());
                             if (fmd == null)
                             {
-                                throw new NucleusUserException(LOCALISER.msg("057036",
+                                throw new NucleusUserException(Localiser.msg("057036",
                                     ownerFmd.getMappedBy(), managedCmd.getFullClassName(), ownerFmd.getFullFieldName()));
                             }
 
@@ -1367,7 +1368,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refDatastoreMapping.getColumn().getIdentifier());
                                     if (colmd == null)
                                     {
-                                        throw new NucleusUserException(LOCALISER.msg("057035",
+                                        throw new NucleusUserException(Localiser.msg("057035",
                                             refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
                                     }
 
@@ -2098,7 +2099,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 Column col = columnsByName.get(colName);
                 if (col == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058001", toString(), index.getName(), columnName));
+                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058001", toString(), index.getName(), columnName));
                     break;
                 }
                 else
@@ -2126,7 +2127,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         else
         {
             // We can't have an index of no columns
-            NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058002", toString(), index.getName()));
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058002", toString(), index.getName()));
             return null;
         }
 
@@ -2330,7 +2331,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (fkmd.getTable() == null)
         {
             // Can't create a FK if we don't know where it goes to
-            NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058105", acmd.getFullClassName()));
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058105", acmd.getFullClassName()));
             return null;
         }
         DatastoreIdentifier tableId = storeMgr.getIdentifierFactory().newTableIdentifier(fkmd.getTable());
@@ -2338,7 +2339,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (refTable == null)
         {
             // TODO Go to the datastore and query for this table to get the columns of the PK
-            NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058106", acmd.getFullClassName(),
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058106", acmd.getFullClassName(),
                 fkmd.getTable()));
             return null;
         }
@@ -2359,7 +2360,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 Column sourceCol = columnsByName.get(colId);
                 if (sourceCol == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058107",
+                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058107",
                         acmd.getFullClassName(), fkmd.getTable(), colmds[i].getName(), toString()));
                     return null;
                 }
@@ -2387,7 +2388,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (sourceCols.size() != targetCols.size())
         {
             // Different number of cols in this table and target table
-            NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058108",
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058108",
                 acmd.getFullClassName(), fkmd.getTable(), "" + sourceCols.size(), "" + targetCols.size()));
         }
 
@@ -2519,7 +2520,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 Column col = columnsByName.get(colName);
                 if (col == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058202", 
+                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058202", 
                         toString(), ck.getName(), columnName));
                     break;
                 }
@@ -2554,7 +2555,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         else
         {
             // We can't have an index of no columns
-            NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058203", 
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058203", 
                 toString(), ck.getName()));
             return null;
         }
@@ -2719,7 +2720,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             if (mfmd == null)
             {
                 // "mapped-by" refers to a field in our class that doesnt exist!
-                throw new NucleusUserException(LOCALISER.msg("057036",
+                throw new NucleusUserException(Localiser.msg("057036",
                     map_field_name, cmd.getFullClassName(), ownerMmd.getFullFieldName()));                       
             }
 
@@ -2751,7 +2752,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     }
                     if (kmd == null)
                     {
-                        throw new ClassDefinitionException(LOCALISER.msg("057007", 
+                        throw new ClassDefinitionException(Localiser.msg("057007", 
                             mfmd.getFullFieldName(), key_field_name));
                     }
 
@@ -2793,7 +2794,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
                                 else
                                 {
-                                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("057041", 
+                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057041", 
                                         ownerMmd.getName()));
                                 }
                             }
@@ -2805,7 +2806,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 // so you may get keys/values appearing in the other relation that shouldn't be.
                                 // Logged as a WARNING for now. 
                                 // If there is a situation where this should throw an exception, please update this AND COMMENT WHY.
-                                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("057012", 
+                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012", 
                                     mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
                             }
                         }
@@ -2822,7 +2823,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     }
                     if (vmd == null)
                     {
-                        throw new ClassDefinitionException(LOCALISER.msg("057008", mfmd));
+                        throw new ClassDefinitionException(Localiser.msg("057008", mfmd));
                     }
 
                     JavaTypeMapping ownerMapping = getMemberMapping(map_field_name);
@@ -2863,7 +2864,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
                                 else
                                 {
-                                    NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("057042", 
+                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057042", 
                                         ownerMmd.getName()));
                                 }
                             }
@@ -2875,7 +2876,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 // so you may get keys/values appearing in the other relation that shouldn't be.
                                 // Logged as a WARNING for now. 
                                 // If there is a situation where this should throw an exception, please update this AND COMMENT WHY.
-                                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("057012",
+                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012",
                                     mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
                             }
                         }
@@ -2884,7 +2885,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 else
                 {
                     // We can only have either the key stored in the value or the value stored in the key but nothing else!
-                    throw new ClassDefinitionException(LOCALISER.msg("057009", ownerMmd.getFullFieldName()));
+                    throw new ClassDefinitionException(Localiser.msg("057009", ownerMmd.getFullFieldName()));
                 }
             }
         }
@@ -3256,7 +3257,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         if (!op.getExecutionContext().getClassLoaderResolver().isAssignableFrom(cmd.getFullClassName(),c))
         {
-            throw new NucleusException(LOCALISER.msg("057013",cmd.getFullClassName(),c)).setFatal();
+            throw new NucleusException(Localiser.msg("057013",cmd.getFullClassName(),c)).setFatal();
         }
     }
 
@@ -3290,12 +3291,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 JavaTypeMapping orderMapping = getMemberMapping(omd.getMappedBy());
                 if (orderMapping == null)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("057021", 
+                    throw new NucleusUserException(Localiser.msg("057021", 
                         mmd.getFullFieldName(), omd.getMappedBy()));
                 }
                 if (!(orderMapping instanceof IntegerMapping) && !(orderMapping instanceof LongMapping))
                 {
-                    throw new NucleusUserException(LOCALISER.msg("057022", 
+                    throw new NucleusUserException(Localiser.msg("057022", 
                         mmd.getFullFieldName(), omd.getMappedBy()));
                 }
                 return orderMapping;

@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.OracleTypeInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for an Oracle XMLType type.
@@ -84,7 +85,7 @@ public class XMLTypeRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","String","" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","String","" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -118,7 +119,7 @@ public class XMLTypeRDBMSMapping extends CharRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","String","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","String","" + value, column, e.getMessage()), e);
         }
     }
 }

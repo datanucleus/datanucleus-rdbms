@@ -44,6 +44,7 @@ import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -487,7 +488,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             ApiAdapter api = ec.getApiAdapter();
             if (!api.isPersistable(value))
             {
-                throw new NucleusException(LOCALISER_RDBMS.msg("041016", value.getClass(), value)).setFatal();
+                throw new NucleusException(Localiser.msg("041016", value.getClass(), value)).setFatal();
             }
 
             AbstractClassMetaData embCmd = ec.getMetaDataManager().getMetaDataForClass(value.getClass(), ec.getClassLoaderResolver());

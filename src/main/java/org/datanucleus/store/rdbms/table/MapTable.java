@@ -56,6 +56,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -117,7 +118,7 @@ public class MapTable extends JoinTable implements DatastoreMap
         MapMetaData mapmd = mmd.getMap();
         if (mapmd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("057017",mmd));
+            throw new NucleusUserException(Localiser.msg("057017",mmd));
         }
 
         PrimaryKeyMetaData pkmd = (mmd.getJoinMetaData() != null ? mmd.getJoinMetaData().getPrimaryKeyMetaData() : null);
@@ -387,7 +388,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057023", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057023", this));
         }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;
@@ -439,7 +440,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             
             if (!found)
             {
-                throw new NucleusUserException(LOCALISER.msg("057040", toString(), colName));
+                throw new NucleusUserException(Localiser.msg("057040", toString(), colName));
             }
         }
     }

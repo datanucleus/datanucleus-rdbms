@@ -32,7 +32,6 @@ import javax.sql.DataSource;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
@@ -47,9 +46,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class DriverManagerDataSource implements DataSource
 {
-    private static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Name of the database driver. */
     private final String driverName;
 
@@ -100,7 +96,7 @@ public class DriverManagerDataSource implements DataSource
                 }
                 catch (Exception e2)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("047006", driverName), e).setFatal();
+                    throw new NucleusUserException(Localiser.msg("047006", driverName), e).setFatal();
                 }
             }
         }
@@ -117,7 +113,7 @@ public class DriverManagerDataSource implements DataSource
         if (StringUtils.isWhitespace(driverName))
         {
             // User didnt bother specifying the JDBC driver
-            throw new NucleusUserException(LOCALISER.msg("047007"));
+            throw new NucleusUserException(Localiser.msg("047007"));
         }
 
         return getConnection(this.userName, this.password);
@@ -163,7 +159,7 @@ public class DriverManagerDataSource implements DataSource
             }
             catch (Exception e2)
             {
-                throw new NucleusUserException(LOCALISER.msg("047006", driverName), e).setFatal();
+                throw new NucleusUserException(Localiser.msg("047006", driverName), e).setFatal();
             }
         }
     }

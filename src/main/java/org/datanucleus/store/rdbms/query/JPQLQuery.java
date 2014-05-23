@@ -87,6 +87,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -320,7 +321,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             {
                                 if (mmd.hasCollection() || mmd.hasMap() || mmd.hasArray())
                                 {
-                                    throw new NucleusUserException(LOCALISER.msg("021213"));
+                                    throw new NucleusUserException(Localiser.msg("021213"));
                                 }
                             }
                         }
@@ -342,7 +343,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             if (resultMapping.getNumberOfResultExpressions() > 1)
                             {
                                 // Invalid number of result expressions
-                                throw new NucleusUserException(LOCALISER.msg("021201", resultClass.getName()));
+                                throw new NucleusUserException(Localiser.msg("021201", resultClass.getName()));
                             }
 
                             Object stmtMap = resultMapping.getMappingForResultExpression(0);
@@ -365,7 +366,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             if (!typeConsistent)
                             {
                                 // Inconsistent expression type not matching the result class type
-                                throw new NucleusUserException(LOCALISER.msg("021202", resultClass.getName(), exprType));
+                                throw new NucleusUserException(Localiser.msg("021202", resultClass.getName(), exprType));
                             }
                         }
                         else if (QueryUtils.resultClassIsUserType(resultClass.getName()))
@@ -388,7 +389,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             if (ctr == null && !ClassUtils.hasDefaultConstructor(resultClass))
                             {
                                 // No valid constructor found!
-                                throw new NucleusUserException(LOCALISER.msg("021205", resultClass.getName()));
+                                throw new NucleusUserException(Localiser.msg("021205", resultClass.getName()));
                             }
                             else if (ctr == null)
                             {
@@ -421,7 +422,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                                 if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && 
                                                         !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
                                                 {
-                                                    throw new NucleusUserException(LOCALISER.msg("021211", 
+                                                    throw new NucleusUserException(Localiser.msg("021211", 
                                                         fieldName, fieldType.getName(), resultFieldType.getName()));
                                                 }
                                                 if (!Modifier.isPublic(fld.getModifiers()))
@@ -444,7 +445,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                                     Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
                                                     if (putMethod == null)
                                                     {
-                                                        throw new NucleusUserException(LOCALISER.msg("021212", 
+                                                        throw new NucleusUserException(Localiser.msg("021212", 
                                                             resultClass.getName(), fieldName));
                                                     }
                                                 }
@@ -466,7 +467,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021085", this, datastoreCompilation.getSQL()));
+                NucleusLogger.QUERY.debug(Localiser.msg("021085", this, datastoreCompilation.getSQL()));
             }
 
             boolean hasParams = false;
@@ -483,7 +484,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             {
                 // Some parameters had their clauses evaluated during compilation so the query
                 // didn't gain any parameters, so don't cache it
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021075"));
+                NucleusLogger.QUERY.debug(Localiser.msg("021075"));
             }
             else
             {
@@ -543,7 +544,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021046", getLanguage(), getSingleStringQuery(),
+                NucleusLogger.QUERY.debug(Localiser.msg("021046", getLanguage(), getSingleStringQuery(),
                     null));
             }
 
@@ -656,7 +657,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                     }
                                     catch (SQLException e)
                                     {
-                                        throw new NucleusDataStoreException(LOCALISER.msg("056006", iterStmtSQL), e);
+                                        throw new NucleusDataStoreException(Localiser.msg("056006", iterStmtSQL), e);
                                     }
                                 }
                             }
@@ -763,12 +764,12 @@ public class JPQLQuery extends AbstractJPQLQuery
                 {
                     throw new QueryTimeoutException("Query has been timed out", sqle);
                 }
-                throw new NucleusException(LOCALISER.msg("021042", datastoreCompilation.getSQL()), sqle);
+                throw new NucleusException(Localiser.msg("021042", datastoreCompilation.getSQL()), sqle);
             }
 
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(LOCALISER.msg("021074", getLanguage(), 
+                NucleusLogger.QUERY.debug(Localiser.msg("021074", getLanguage(), 
                     "" + (System.currentTimeMillis() - startTime)));
             }
 
@@ -835,7 +836,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             startTime = System.currentTimeMillis();
-            NucleusLogger.QUERY.debug(LOCALISER.msg("021083", getLanguage(), toString()));
+            NucleusLogger.QUERY.debug(Localiser.msg("021083", getLanguage(), toString()));
         }
 
         if (result != null)
@@ -960,7 +961,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
-            NucleusLogger.QUERY.debug(LOCALISER.msg("021084", getLanguage(), System.currentTimeMillis()-startTime));
+            NucleusLogger.QUERY.debug(Localiser.msg("021084", getLanguage(), System.currentTimeMillis()-startTime));
         }
     }
 

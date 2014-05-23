@@ -19,19 +19,14 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>WrongPrecisionException</tt> is thrown if a column is detected to have
  * the wrong precision in the database during schema validation.
- * @version $Revision: 1.3 $ 
  */
 public class WrongPrecisionException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a wrong precision exception.
      *
@@ -41,7 +36,7 @@ public class WrongPrecisionException extends DatastoreValidationException
      */
     public WrongPrecisionException(String columnName, int expectedPrecision, int actualPrecision)
     {
-        super(LOCALISER_RDBMS.msg("020018", columnName, "" + actualPrecision,"" + expectedPrecision));
+        super(Localiser.msg("020018", columnName, "" + actualPrecision,"" + expectedPrecision));
     }
     
     /**
@@ -54,6 +49,6 @@ public class WrongPrecisionException extends DatastoreValidationException
      */
     public WrongPrecisionException(String columnName, int expectedPrecision, int actualPrecision, String fieldName)
     {
-        super(LOCALISER_RDBMS.msg("020019", columnName, "" + actualPrecision,"" + expectedPrecision, fieldName));
+        super(Localiser.msg("020019", columnName, "" + actualPrecision,"" + expectedPrecision, fieldName));
     }    
 }

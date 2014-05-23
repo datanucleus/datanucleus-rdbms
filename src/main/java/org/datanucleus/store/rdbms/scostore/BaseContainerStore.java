@@ -30,7 +30,6 @@ import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.scostore.Store;
-import org.datanucleus.util.Localiser;
 
 /**
  * Base class for all mapped container stores (collections, maps, arrays).
@@ -38,10 +37,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class BaseContainerStore implements Store
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Manager for the store. */
     protected RDBMSStoreManager storeMgr;
 

@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -31,9 +30,6 @@ import org.datanucleus.util.Localiser;
  */
 public class IncompatibleDataTypeException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs an incompatible data type exception.
      * @param column        The column having an incompatible data type.
@@ -42,7 +38,7 @@ public class IncompatibleDataTypeException extends DatastoreValidationException
      */
     public IncompatibleDataTypeException(Column column, int expectedType, int actualType)
     {
-        super(LOCALISER_RDBMS.msg("020009", column, 
+        super(Localiser.msg("020009", column, 
             column.getStoreManager().getDatastoreAdapter().getNameForJDBCType(actualType), 
             column.getStoreManager().getDatastoreAdapter().getNameForJDBCType(expectedType)));
     }

@@ -42,6 +42,7 @@ import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {mapExpr}.get(keyExpr).
@@ -56,7 +57,7 @@ public class MapGetMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
-            throw new NucleusException(LOCALISER.msg("060016", "get", "MapExpression", 1));
+            throw new NucleusException(Localiser.msg("060016", "get", "MapExpression", 1));
         }
 
         MapExpression mapExpr = (MapExpression)expr;

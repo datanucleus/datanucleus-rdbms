@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -83,7 +84,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("040006",properties.get("key-increment-by")));
+                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-increment-by")));
                 }
             }
             else if (properties.get("key-cache-size") != null)
@@ -95,12 +96,12 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-cache-size")));
                 }
             }
             if (properties.get("sequence-name") == null)
             {
-                throw new ValueGenerationException(LOCALISER.msg("040007",properties.get("sequence-name")));
+                throw new ValueGenerationException(Localiser.msg("040007",properties.get("sequence-name")));
             }
         }
     }
@@ -146,13 +147,13 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             }
             if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
             {
-                NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040004", "" + size));
+                NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
             }
             return new ValueGenerationBlock<Long>(oid);
         }
         catch (SQLException e)
         {
-            throw new ValueGenerationException(LOCALISER_RDBMS.msg("061001", e.getMessage()), e);
+            throw new ValueGenerationException(Localiser.msg("061001", e.getMessage()), e);
         }
         finally
         {
@@ -268,7 +269,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
 
         if (!srm.getSchemaHandler().isAutoCreateTables())
         {
-            throw new NucleusUserException(LOCALISER.msg("040010", getSequenceName()));
+            throw new NucleusUserException(Localiser.msg("040010", getSequenceName()));
         }
 
         Integer min = properties.containsKey("key-min-value") ? 
@@ -290,7 +291,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         catch (SQLException e)
         {
             NucleusLogger.DATASTORE.error(e);
-            throw new ValueGenerationException(LOCALISER_RDBMS.msg("061000",e.getMessage()) + stmt);
+            throw new ValueGenerationException(Localiser.msg("061000",e.getMessage()) + stmt);
         }
         finally
         {

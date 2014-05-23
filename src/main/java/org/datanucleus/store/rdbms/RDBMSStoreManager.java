@@ -205,9 +205,10 @@ import org.datanucleus.util.StringUtils;
 public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCOStoreManager, SchemaAwareStoreManager,
     SchemaScriptAwareStoreManager
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
+    static
+    {
+        Localiser.registerBundle("org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
+    }
 
     /** Adapter for the datastore being used. */
     protected DatastoreAdapter dba;
@@ -304,7 +305,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 //somehow we haven't got an exception from the JDBC driver
                 //to troubleshoot the user should telnet to ip/port of database and check if he can open a connection
                 //this may be due to security / firewall things.
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("050007"));
+                throw new NucleusDataStoreException(Localiser.msg("050007"));
             }
 
             try
@@ -320,7 +321,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     if (!dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS))
                     {
-                        NucleusLogger.DATASTORE.warn(LOCALISER_RDBMS.msg("050002",
+                        NucleusLogger.DATASTORE.warn(Localiser.msg("050002",
                             getStringProperty(PropertyNames.PROPERTY_MAPPING_CATALOG)));
                     }
                     else
@@ -332,7 +333,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     if (!dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS))
                     {
-                        NucleusLogger.DATASTORE.warn(LOCALISER_RDBMS.msg("050003",
+                        NucleusLogger.DATASTORE.warn(Localiser.msg("050003",
                             getStringProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA)));
                     }
                     else
@@ -350,7 +351,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     String validSchemaName = identifierFactory.getIdentifierInAdapterCase(schemaName);
                     if (!validSchemaName.equals(schemaName))
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER_RDBMS.msg("020192", "schema", schemaName, validSchemaName));
+                        NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("020192", "schema", schemaName, validSchemaName));
                         schemaName = validSchemaName;
                     }
                 }
@@ -359,7 +360,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     String validCatalogName = identifierFactory.getIdentifierInAdapterCase(catalogName);
                     if (!validCatalogName.equals(catalogName))
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER_RDBMS.msg("020192", "catalog", catalogName, validCatalogName));
+                        NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("020192", "catalog", catalogName, validCatalogName));
                         catalogName = validCatalogName;
                     }
                 }
@@ -408,14 +409,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         catch (NucleusException ne)
         {
-            NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("050004"), ne);
+            NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050004"), ne);
             throw ne.setFatal();
         }
         catch (Exception e1)
         {
             // Unknown type of exception so wrap it in a NucleusUserException for later handling
-            String msg = LOCALISER_RDBMS.msg("050004") + ' ' + 
-                LOCALISER_RDBMS.msg("050006") + ' ' + LOCALISER_RDBMS.msg("048000",e1);
+            String msg = Localiser.msg("050004") + ' ' + 
+                Localiser.msg("050006") + ' ' + Localiser.msg("048000",e1);
             NucleusLogger.DATASTORE_SCHEMA.error(msg, e1);
             throw new NucleusUserException(msg, e1).setFatal();
         }
@@ -447,7 +448,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             "name", idFactoryName, "class-name");
         if (idFactoryClassName == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("039003", idFactoryName)).setFatal();
+            throw new NucleusUserException(Localiser.msg("039003", idFactoryName)).setFatal();
         }
 
         try
@@ -492,12 +493,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         catch (ClassNotFoundException cnfe)
         {
-            throw new NucleusUserException(LOCALISER.msg("039004", idFactoryName, idFactoryClassName), cnfe).setFatal();
+            throw new NucleusUserException(Localiser.msg("039004", idFactoryName, idFactoryClassName), cnfe).setFatal();
         }
         catch (Exception e)
         {
             NucleusLogger.PERSISTENCE.error("Exception creating IdentifierFactory", e);
-            throw new NucleusException(LOCALISER.msg("039005", idFactoryClassName), e).setFatal();
+            throw new NucleusException(Localiser.msg("039005", idFactoryClassName), e).setFatal();
         }
     }
 
@@ -630,7 +631,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         DatastoreClass ct = null;
         if (className == null)
         {
-            NucleusLogger.PERSISTENCE.error(LOCALISER.msg("032015"));
+            NucleusLogger.PERSISTENCE.error(Localiser.msg("032015"));
             return null;
         }
 
@@ -1446,8 +1447,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 catch (SQLException e)
                 {
-                    String msg = LOCALISER_RDBMS.msg("050005", e.getMessage()) + ' ' + 
-                            LOCALISER_RDBMS.msg("050006");
+                    String msg = Localiser.msg("050005", e.getMessage()) + ' ' + 
+                            Localiser.msg("050006");
                     NucleusLogger.DATASTORE_SCHEMA.warn(msg);
                     // This is only logged as a warning since if the JDBC driver has some issue creating the ProbeTable we would be stuck
                     // We need to allow SchemaTool "dbinfo" mode to work in all circumstances.
@@ -1550,7 +1551,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             catch (SQLException sqle)
             {
-                String msg = LOCALISER_RDBMS.msg("050052", sqle.getMessage());
+                String msg = Localiser.msg("050052", sqle.getMessage());
                 NucleusLogger.DATASTORE.warn(msg, sqle);
                 throw new NucleusUserException(msg, sqle).setFatal();
             }
@@ -1568,7 +1569,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         catch (SQLException sqle)
         {
-            String msg = LOCALISER_RDBMS.msg("050052", sqle.getMessage());
+            String msg = Localiser.msg("050052", sqle.getMessage());
             NucleusLogger.DATASTORE.warn(msg, sqle);
             throw new NucleusException(msg, sqle).setFatal();
         }
@@ -1732,7 +1733,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("050022", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("050022", id, cmd.getFullClassName()));
             }
         }
         else if (IdentityUtils.isSingleFieldIdentity(id))
@@ -1743,7 +1744,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("050022", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("050022", id, cmd.getFullClassName()));
             }
         }
         else
@@ -2022,7 +2023,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                         catch (NucleusException e)
                         {
-                            String msg = LOCALISER_RDBMS.msg("050025", e);
+                            String msg = Localiser.msg("050025", e);
                             NucleusLogger.VALUEGENERATION.error(msg);
                             throw new NucleusDataStoreException(msg, e);
                         }
@@ -2243,7 +2244,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         DatastoreClass t = getDatastoreClass(cmd.getFullClassName(), clr);
         if (t == null && cmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
         {
-            throw new NucleusUserException(LOCALISER.msg("032013", cmd.getFullClassName()));
+            throw new NucleusUserException(Localiser.msg("032013", cmd.getFullClassName()));
         }
 
         if (fieldNumber>=0)
@@ -2336,7 +2337,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (jdbcTypeInfo.getNumberOfChildren() == 0)
         {
             // No sql-type for this jdbc-type so unsupported
-            throw new UnsupportedDataTypeException(LOCALISER.msg("051005", dba.getNameForJDBCType(jdbcType)));
+            throw new UnsupportedDataTypeException(Localiser.msg("051005", dba.getNameForJDBCType(jdbcType)));
         }
 
         SQLTypeInfo sqlTypeInfo = (SQLTypeInfo) jdbcTypeInfo.getChild(sqlType != null ? sqlType : "DEFAULT");
@@ -2493,12 +2494,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             if (!(ct instanceof ClassTable))
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("050034", im.className));
+                throw new NucleusUserException(Localiser.msg("050034", im.className));
             }
 
             if (im.subfieldName != null)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("050035", im.className, im.fieldName, im.subfieldName));
+                throw new NucleusUserException(Localiser.msg("050035", im.className, im.fieldName, im.subfieldName));
             }
             m = ((Table) ct).getIdMapping();
         }
@@ -2535,7 +2536,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     else
                     {
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("050036", im.subfieldName, im));
+                        throw new NucleusUserException(Localiser.msg("050036", im.subfieldName, im));
                     }
                 }
                 else if (t instanceof MapTable)
@@ -2555,12 +2556,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     else
                     {
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("050037", im.subfieldName, im));
+                        throw new NucleusUserException(Localiser.msg("050037", im.subfieldName, im));
                     }
                 }
                 else
                 {
-                    throw new NucleusUserException(LOCALISER_RDBMS.msg("050035", im.className, im.fieldName, im.subfieldName));
+                    throw new NucleusUserException(Localiser.msg("050035", im.className, im.fieldName, im.subfieldName));
                 }
             }
         }
@@ -2708,7 +2709,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     else
                     {
                         // No information given for what is stored in what, so throw it back to the user to fix the input :-)
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("050050", mmd.getFullFieldName()));
+                        throw new NucleusUserException(Localiser.msg("050050", mmd.getFullFieldName()));
                     }
                 }
                 else if (mmd.hasArray())
@@ -2735,7 +2736,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
 
                 // Trap all non-PC elements that haven't had a join table specified but need one
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("050049",
+                throw new NucleusUserException(Localiser.msg("050049",
                     mmd.getFullFieldName(), mmd.toString()));
             }
         }
@@ -2750,7 +2751,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Create a new join table for the container
         if (classAdder == null)
         {
-            throw new IllegalStateException(LOCALISER_RDBMS.msg("050016"));
+            throw new IllegalStateException(Localiser.msg("050016"));
         }
 
         if (mmd.getType().isArray())
@@ -2844,7 +2845,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          */
         public String toString()
         {
-            return LOCALISER_RDBMS.msg("050038", catalogName, schemaName);
+            return Localiser.msg("050038", catalogName, schemaName);
         }
 
         /**
@@ -2966,7 +2967,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                     }
                                     if (superData == null)
                                     {
-                                        String msg = LOCALISER_RDBMS.msg("050013",
+                                        String msg = Localiser.msg("050013",
                                             cmd.getFullClassName());
                                         NucleusLogger.PERSISTENCE.error(msg);
                                         throw new NucleusUserException(msg);
@@ -3051,7 +3052,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                             if (!in_same_tree)
                             {
-                                String error_msg = LOCALISER_RDBMS.msg("050021", cmd.getFullClassName(), 
+                                String error_msg = Localiser.msg("050021", cmd.getFullClassName(), 
                                     cmd.getObjectidClass(), sample_class_in_other_tree);
                                 NucleusLogger.DATASTORE.error(error_msg);
                                 throw new NucleusUserException(error_msg);
@@ -3063,7 +3064,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (cmd.isEmbeddedOnly())
                 {
                     // Nothing to do. Only persisted as SCO.
-                    NucleusLogger.DATASTORE.info(LOCALISER.msg("032012", cmd.getFullClassName()));
+                    NucleusLogger.DATASTORE.info(Localiser.msg("032012", cmd.getFullClassName()));
                 }
                 else
                 {
@@ -3114,7 +3115,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             // Give a warning and then create a new instance of the table (mapped to the same datastore object)
                             if (existingClass != null)
                             {
-                                String msg = LOCALISER_RDBMS.msg("050015", cmd.getFullClassName(), 
+                                String msg = Localiser.msg("050015", cmd.getFullClassName(), 
                                     tableName.getIdentifierName(), existingClass);
                                 NucleusLogger.DATASTORE.warn(msg);
                             }
@@ -3165,7 +3166,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                         else
                         {
-                            String msg = LOCALISER_RDBMS.msg("050013", cmd.getFullClassName());
+                            String msg = Localiser.msg("050013", cmd.getFullClassName());
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusUserException(msg);
                         }
@@ -3237,7 +3238,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 catch (SQLException sqle)
                 {
-                    String msg = LOCALISER_RDBMS.msg("050044", sqle);
+                    String msg = Localiser.msg("050044", sqle);
                     NucleusLogger.DATASTORE_SCHEMA.error(msg);
                     throw new NucleusDataStoreException(msg, sqle);
                 }
@@ -3249,7 +3250,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     else
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.error(LOCALISER_RDBMS.msg("050044", e));
+                        NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
                     }
                     throw new NucleusException(e.toString(), e).setFatal();
                 }
@@ -3619,16 +3620,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     Throwable exc = (Throwable)errorsIter.next();
                     if (getSchemaHandler().isAutoCreateWarnOnError())
                     {
-                        NucleusLogger.DATASTORE.warn(LOCALISER_RDBMS.msg("050044", exc));
+                        NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
                     }
                     else
                     {
-                        NucleusLogger.DATASTORE.error(LOCALISER_RDBMS.msg("050044", exc));
+                        NucleusLogger.DATASTORE.error(Localiser.msg("050044", exc));
                     }
                 }
                 if (!getSchemaHandler().isAutoCreateWarnOnError())
                 {
-                    throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("050043"), 
+                    throw new NucleusDataStoreException(Localiser.msg("050043"), 
                         (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
                 }
             }
@@ -3646,7 +3647,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER_RDBMS.msg("050040"));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050040"));
             }
 
             // Tables, table constraints, and views get removed in the reverse order from which they were created.
@@ -3679,7 +3680,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             catch (Exception e)
             {
-                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER_RDBMS.msg("050041", e));
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("050041", e));
             }
 
             // AutoStarter - Remove all classes from the supported list that were added in this pass.
@@ -4061,7 +4062,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         else
         {
-            String msg = LOCALISER.msg(false, "014039");
+            String msg = Localiser.msg("014039");
             NucleusLogger.DATASTORE_SCHEMA.error(msg);
             System.out.println(msg);
 
@@ -4385,7 +4386,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         else
         {
-            String msg = LOCALISER.msg(false, "014039");
+            String msg = Localiser.msg("014039");
             NucleusLogger.DATASTORE_SCHEMA.error(msg);
             System.out.println(msg);
 
@@ -4406,7 +4407,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         else
         {
-            String msg = LOCALISER.msg(false, "014039");
+            String msg = Localiser.msg("014039");
             NucleusLogger.DATASTORE_SCHEMA.error(msg);
             System.out.println(msg);
 

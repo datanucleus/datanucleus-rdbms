@@ -20,7 +20,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.util.Localiser;
 
 /**
  * A <tt>ClassDefinitionException</tt> is thrown if the settings of a
@@ -28,9 +27,6 @@ import org.datanucleus.util.Localiser;
  */
 public class ClassDefinitionException extends NucleusUserException
 {
-    protected static final Localiser LOCALISER = Localiser.getInstance("org.datanucleus.Localisation",
-        org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a class definition exception with no specific detail
      * message.

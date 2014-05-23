@@ -22,6 +22,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr1}.equals(strExpr2).
@@ -36,7 +37,7 @@ public class StringEqualsMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() != 1)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "endsWith", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 

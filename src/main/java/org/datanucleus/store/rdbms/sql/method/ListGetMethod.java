@@ -36,6 +36,7 @@ import org.datanucleus.store.rdbms.sql.expression.SubqueryExpression;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {listExpr}.get(idxExpr).
@@ -50,7 +51,7 @@ public class ListGetMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
-            throw new NucleusException(LOCALISER.msg("060016", "get", "CollectionExpression", 1));
+            throw new NucleusException(Localiser.msg("060016", "get", "CollectionExpression", 1));
         }
 
         CollectionExpression listExpr = (CollectionExpression)expr;

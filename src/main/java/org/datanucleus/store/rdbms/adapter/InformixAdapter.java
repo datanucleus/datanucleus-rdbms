@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -81,7 +82,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
             }
             catch (SQLException e)
             {
-                NucleusLogger.DATASTORE.warn(LOCALISER.msg("051027",e));
+                NucleusLogger.DATASTORE.warn(Localiser.msg("051027",e));
             }
             try
             {
@@ -89,7 +90,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
             }
             catch (SQLException e)
             {
-                NucleusLogger.DATASTORE.warn(LOCALISER.msg("051027",e));
+                NucleusLogger.DATASTORE.warn(Localiser.msg("051027",e));
             }
             st.close();
         }

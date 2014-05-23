@@ -28,6 +28,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.java.BitSetMapping;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
@@ -56,7 +57,7 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
                 // Serialised field so just perform basic Java serialisation for retrieval
                 if (!(value instanceof Serializable))
                 {
-                    throw new NucleusDataStoreException(LOCALISER.msg("055005", value.getClass().getName()));
+                    throw new NucleusDataStoreException(Localiser.msg("055005", value.getClass().getName()));
                 }
                 BlobImpl b = new BlobImpl(value);
                 bytes = b.getBytes(0, (int) b.length());
@@ -70,7 +71,7 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
                 // Fall back to just perform Java serialisation for storage
                 if (!(value instanceof Serializable))
                 {
-                    throw new NucleusDataStoreException(LOCALISER.msg("055005", value.getClass().getName()));
+                    throw new NucleusDataStoreException(Localiser.msg("055005", value.getClass().getName()));
                 }
                 BlobImpl b = new BlobImpl(value);
                 bytes = b.getBytes(0, (int) b.length());
@@ -78,7 +79,7 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("055001", "Object", "" + value, mmd, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "Object", "" + value, mmd, e.getMessage()), e);
         }
         catch (IOException e1)
         {

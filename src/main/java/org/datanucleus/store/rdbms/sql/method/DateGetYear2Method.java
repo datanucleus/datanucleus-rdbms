@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {dateExpr}.getYear().
@@ -41,7 +42,7 @@ public class DateGetYear2Method extends AbstractSQLMethod
     {
         if (!(expr instanceof TemporalExpression))
         {
-            throw new NucleusException(LOCALISER.msg("060001", "getYear()", expr));
+            throw new NucleusException(Localiser.msg("060001", "getYear()", expr));
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();

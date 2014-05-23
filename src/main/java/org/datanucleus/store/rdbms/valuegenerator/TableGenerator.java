@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -111,7 +112,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("Sequence040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("Sequence040006",properties.get("key-cache-size")));
                 }
             }
             if (properties.get("key-initial-value") != null)
@@ -195,13 +196,13 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
             }
             if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
             {
-                NucleusLogger.VALUEGENERATION.debug(LOCALISER.msg("040004", "" + size));
+                NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
             }
             return new ValueGenerationBlock<Long>(oid);
         }
         catch (SQLException e)
         {
-            throw new ValueGenerationException(LOCALISER_RDBMS.msg("061001",e.getMessage()));
+            throw new ValueGenerationException(Localiser.msg("061001",e.getMessage()));
         }
     }
 
@@ -257,7 +258,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
         if (!srm.getSchemaHandler().isAutoCreateTables())
         {
-            throw new NucleusUserException(LOCALISER.msg("040011", sequenceTable));
+            throw new NucleusUserException(Localiser.msg("040011", sequenceTable));
         }
 
         try

@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Generator for values using datastore-based UUID generation.
@@ -55,7 +56,7 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(LOCALISER.msg("040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-cache-size")));
                 }
             }
         }
@@ -102,7 +103,7 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
         }
         catch (SQLException e)
         {
-            throw new ValueGenerationException(LOCALISER.msg("040008",e.getMessage()));
+            throw new ValueGenerationException(Localiser.msg("040008",e.getMessage()));
         }
         finally
         {

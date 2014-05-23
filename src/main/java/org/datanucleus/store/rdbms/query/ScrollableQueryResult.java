@@ -40,6 +40,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.WeakValueMap;
@@ -268,7 +269,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         catch (SQLException sqe)
         {
             throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(
-                LOCALISER.msg("052601", sqe.getMessage()), sqe);
+                Localiser.msg("052601", sqe.getMessage()), sqe);
         }
     }
 
@@ -295,7 +296,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         if (loadResultsAtCommit && isOpen())
         {
             // Query connection closing message
-            NucleusLogger.QUERY.info(LOCALISER.msg("052606", query.toString()));
+            NucleusLogger.QUERY.info(Localiser.msg("052606", query.toString()));
 
             if (endIndex < 0)
             {
@@ -433,7 +434,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                 if (!isOpen())
                 {
                     // Spec 14.6.7 Calling next() on closed Query will throw NoSuchElementException
-                    throw new NoSuchElementException(LOCALISER.msg("052600"));
+                    throw new NoSuchElementException(Localiser.msg("052600"));
                 }
 
                 if (!hasNext())
@@ -468,7 +469,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                 if (!isOpen())
                 {
                     // Spec 14.6.7 Calling previous() on closed Query will throw NoSuchElementException
-                    throw new NoSuchElementException(LOCALISER.msg("052600"));
+                    throw new NoSuchElementException(Localiser.msg("052600"));
                 }
 
                 if (!hasPrevious())
@@ -553,7 +554,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             catch (SQLException sqle)
             {
                 throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(
-                    LOCALISER.msg("052601", sqle.getMessage()), sqle);
+                    Localiser.msg("052601", sqle.getMessage()), sqle);
             }
 
             if (applyRangeChecks)

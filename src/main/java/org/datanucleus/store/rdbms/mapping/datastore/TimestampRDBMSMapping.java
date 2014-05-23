@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
@@ -157,7 +158,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001", "Timestamp", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "Timestamp", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -204,7 +205,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
             }
             catch (SQLException nestedEx)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002", "Timestamp", "" + param, column, e.getMessage()), nestedEx);
+                throw new NucleusDataStoreException(Localiser.msg("055002", "Timestamp", "" + param, column, e.getMessage()), nestedEx);
             }
         }
 

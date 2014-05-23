@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.connectionpool;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -26,16 +25,12 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastoreDriverNotFoundException extends NucleusException
 {
-    /** Localisation of messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructor.
      * @param driverClassName Class name for the datastore driver
      */
     public DatastoreDriverNotFoundException(String driverClassName)
     {
-        super(LOCALISER.msg("047000", driverClassName));
+        super(Localiser.msg("047000", driverClassName));
     }
 }

@@ -38,6 +38,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 
 /**
  * Provides methods for adapting SQL language elements to the Hypersonic SQL Server database.
@@ -415,7 +416,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -430,7 +431,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         }
         if (max != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051022"));
+            throw new NucleusUserException(Localiser.msg("051022"));
         }
         if (increment != null)
         {
@@ -438,7 +439,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         }
         if (cache_size != null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051023"));
+            throw new NucleusUserException(Localiser.msg("051023"));
         }
 
         return stmt.toString();
@@ -453,7 +454,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("CALL NEXT VALUE FOR ");
         stmt.append(sequence_name);

@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.util.Localiser;
 
 /**
  * Class defining a table for storing generated values for use with TableGenerator.
@@ -267,7 +268,7 @@ public class SequenceTable extends TableImpl
         }
         catch (SQLException e)
         {
-           throw new ValueGenerationException(LOCALISER.msg("061001", e.getMessage()),e);
+           throw new ValueGenerationException(Localiser.msg("061001", e.getMessage()),e);
         }
         finally
         {

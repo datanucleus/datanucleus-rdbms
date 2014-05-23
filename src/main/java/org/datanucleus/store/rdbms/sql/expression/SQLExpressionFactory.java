@@ -48,10 +48,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SQLExpressionFactory
 {
-    /** Localiser for messages */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     RDBMSStoreManager storeMgr;
 
     ClassLoaderResolver clr;
@@ -190,7 +186,7 @@ public class SQLExpressionFactory
                 "expression-class", EXPR_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
             {
-                throw new NucleusException(LOCALISER.msg("060004", mapping.getClass().getName()));
+                throw new NucleusException(Localiser.msg("060004", mapping.getClass().getName()));
             }
 
             expressionClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
@@ -198,7 +194,7 @@ public class SQLExpressionFactory
         }
         catch (Exception e)
         {
-            String msg = LOCALISER.msg("060005", mapping.getClass().getName());
+            String msg = Localiser.msg("060005", mapping.getClass().getName());
             NucleusLogger.QUERY.error(msg, e);
             throw new NucleusException(msg, e);
         }
@@ -240,7 +236,7 @@ public class SQLExpressionFactory
                     "literal-class", LIT_CREATION_ARG_TYPES, args);
                 if (sqlExpr == null)
                 {
-                    throw new NucleusException(LOCALISER.msg("060006", mapping.getClass().getName()));
+                    throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
                 }
 
                 literalClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
@@ -250,7 +246,7 @@ public class SQLExpressionFactory
         catch (Exception e)
         {
             NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mapping.getClass().getName(), e);
-            throw new NucleusException(LOCALISER.msg("060007", mapping.getClass().getName()));
+            throw new NucleusException(Localiser.msg("060007", mapping.getClass().getName()));
         }
     }
 
@@ -281,7 +277,7 @@ public class SQLExpressionFactory
                     "literal-class", LIT_CREATION_ARG_TYPES, args);
                 if (sqlExpr == null)
                 {
-                    throw new NucleusException(LOCALISER.msg("060006", mapping.getClass().getName()));
+                    throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
                 }
                 return sqlExpr;
             }
@@ -289,7 +285,7 @@ public class SQLExpressionFactory
         catch (Exception e)
         {
             NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mapping.getClass().getName(), e);
-            throw new NucleusException(LOCALISER.msg("060007", mapping.getClass().getName()));
+            throw new NucleusException(Localiser.msg("060007", mapping.getClass().getName()));
         }
     }
 
@@ -432,11 +428,11 @@ public class SQLExpressionFactory
                 {
                     if (className != null)
                     {
-                        throw new NucleusUserException(LOCALISER.msg("060008", methodName, className));
+                        throw new NucleusUserException(Localiser.msg("060008", methodName, className));
                     }
                     else
                     {
-                        throw new NucleusUserException(LOCALISER.msg("060009", methodName));
+                        throw new NucleusUserException(Localiser.msg("060009", methodName));
                     }
                 }
             }
@@ -461,7 +457,7 @@ public class SQLExpressionFactory
         }
         catch (Exception e)
         {
-            throw new NucleusUserException(LOCALISER.msg("060011", "class=" + className + " method=" + methodName), e);
+            throw new NucleusUserException(Localiser.msg("060011", "class=" + className + " method=" + methodName), e);
         }
     }
 
@@ -518,7 +514,7 @@ public class SQLExpressionFactory
         }
         catch (Exception e)
         {
-            throw new NucleusUserException(LOCALISER.msg("060011", "operation=" + name), e);
+            throw new NucleusUserException(Localiser.msg("060011", "operation=" + name), e);
         }
     }
 

@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -31,9 +30,6 @@ import org.datanucleus.util.Localiser;
  */
 public class PersistentSuperclassNotAllowedException extends ClassDefinitionException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a persistent-superclass-not-allowed exception.
      *
@@ -41,6 +37,6 @@ public class PersistentSuperclassNotAllowedException extends ClassDefinitionExce
      */
     public PersistentSuperclassNotAllowedException(String className)
     {
-        super(LOCALISER_RDBMS.msg("020023",className));
+        super(Localiser.msg("020023",className));
     }
 }

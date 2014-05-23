@@ -23,6 +23,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL COUNT aggregation function.
@@ -58,7 +59,7 @@ public class CountFunction extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", "COUNT", expr));
+            throw new NucleusException(Localiser.msg("060002", "COUNT", expr));
         }
     }
 }

@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler for JPQL "INDEX" expression to return the index of an element.
@@ -86,7 +87,7 @@ public class IndexFunction extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060002", "INDEX", ignore));
+            throw new NucleusException(Localiser.msg("060002", "INDEX", ignore));
         }
     }
 }

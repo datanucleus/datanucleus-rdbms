@@ -36,6 +36,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
@@ -93,7 +94,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (SQLException sqle)
             {
-				throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object", "" + param, column, sqle.getMessage()),sqle);
+				throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + param, column, sqle.getMessage()),sqle);
             }
         }
         else
@@ -106,7 +107,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
                     // Serialised field so just perform basic Java serialisation for retrieval
                     if (!(value instanceof Serializable))
                     {
-                        throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055005", value.getClass().getName()));
+                        throw new NucleusDataStoreException(Localiser.msg("055005", value.getClass().getName()));
                     }
                     BlobImpl b = new BlobImpl(value);
                     ps.setBytes(param, b.getBytes(0, (int) b.length()));
@@ -220,7 +221,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
                     // Fall back to just perform Java serialisation for storage
                     if (!(value instanceof Serializable))
                     {
-                        throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055005", value.getClass().getName()));
+                        throw new NucleusDataStoreException(Localiser.msg("055005", value.getClass().getName()));
                     }
                     BlobImpl b = new BlobImpl(value);
                     ps.setBytes(param, b.getBytes(0, (int) b.length()));
@@ -228,7 +229,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (Exception e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055001","Object","" + value, column, e.getMessage()),e);
+                throw new NucleusDataStoreException(Localiser.msg("055001","Object","" + value, column, e.getMessage()),e);
             }
         }
     }
@@ -336,7 +337,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (IOException e)
             {
-                throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object", "" + param, column, e.getMessage()),e);
+                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()),e);
             }
         }
         else
@@ -371,7 +372,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(LOCALISER_RDBMS.msg("055002","Object", "" + param, column, sqle.getMessage()),sqle);
+            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, sqle.getMessage()),sqle);
         }
         if (bytes == null)
         {

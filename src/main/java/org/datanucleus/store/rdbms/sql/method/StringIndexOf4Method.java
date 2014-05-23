@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr1}.indexOf(strExpr2[,pos]).
@@ -42,7 +43,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "indexOf", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
         else
@@ -56,7 +57,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "indexOf", "StringExpression", 0,
+                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
             }
             funcArgs.add(substrExpr);
@@ -66,7 +67,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
                 SQLExpression fromExpr = args.get(1);
                 if (!(fromExpr instanceof NumericExpression))
                 {
-                    throw new NucleusException(LOCALISER.msg("060003", "indexOf", "StringExpression", 1,
+                    throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
                         "NumericExpression"));
                 }
                 // Add 1 to the passed in value so that it is of origin 1 to be compatible with CHARINDEX

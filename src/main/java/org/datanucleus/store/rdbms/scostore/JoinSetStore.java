@@ -62,6 +62,7 @@ import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.store.types.SCOMtoN;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -248,7 +249,7 @@ public class JoinSetStore extends AbstractSetStore
             // TODO Maybe this check should only apply when not the OWNER of the relation
             if (((SCOMtoN)elementColl).contains(ownerOP.getObject())/* && ownerMemberMetaData.getMappedBy() != null*/)
             {
-                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
@@ -261,7 +262,7 @@ public class JoinSetStore extends AbstractSetStore
             // have SCO's to use contains() on
             if (locate(ownerOP, element))
             {
-                NucleusLogger.DATASTORE.info(LOCALISER.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
@@ -292,7 +293,7 @@ public class JoinSetStore extends AbstractSetStore
                 if (elementOwner == null)
                 {
                     // No owner, so correct it
-                    NucleusLogger.PERSISTENCE.info(LOCALISER.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
+                    NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
                             .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject())));
                     elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
                 }
@@ -300,7 +301,7 @@ public class JoinSetStore extends AbstractSetStore
                 {
                     // Owner of the element is neither this container nor being attached
                     // Inconsistent owner, so throw exception
-                    throw new NucleusUserException(LOCALISER.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData
+                    throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData
                             .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject()), StringUtils.toJVMIDString(elementOwner)));
                 }
             }
@@ -344,7 +345,7 @@ public class JoinSetStore extends AbstractSetStore
             catch (MappedDatastoreException e)
             {
                 NucleusLogger.DATASTORE.error(e);
-                String msg = LOCALISER.msg("056009", e.getMessage());
+                String msg = Localiser.msg("056009", e.getMessage());
                 NucleusLogger.DATASTORE.error(msg);
                 throw new NucleusDataStoreException(msg, e);
             }
@@ -390,7 +391,7 @@ public class JoinSetStore extends AbstractSetStore
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(LOCALISER.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
                                 .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject())));
                         elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
                     }
@@ -398,7 +399,7 @@ public class JoinSetStore extends AbstractSetStore
                     {
                         // Owner of the element is neither this container nor its referenced object
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(LOCALISER.msg("056038", op.getObjectAsPrintable(),
+                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(),
                             ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject()), StringUtils
                                     .toJVMIDString(elementOwner)));
                     }
@@ -466,7 +467,7 @@ public class JoinSetStore extends AbstractSetStore
         {
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which
             // record(s) didn't persist
-            String msg = LOCALISER.msg("056009", ((Exception) exceptions.get(0)).getMessage());
+            String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
         }
@@ -552,7 +553,7 @@ public class JoinSetStore extends AbstractSetStore
         catch (SQLException e)
         {
             NucleusLogger.DATASTORE.error(e);
-            throw new NucleusDataStoreException(LOCALISER.msg("056012", removeAllStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056012", removeAllStmt), e);
         }
         return modified;
     }
@@ -686,7 +687,7 @@ public class JoinSetStore extends AbstractSetStore
         catch (SQLException e)
         {
             NucleusLogger.DATASTORE.error(e);
-            throw new NucleusDataStoreException(LOCALISER.msg("RDBMS.SCO.LocateRequestFailed", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("RDBMS.SCO.LocateRequestFailed", stmt), e);
         }
         return exists;
     }
@@ -895,7 +896,7 @@ public class JoinSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056020", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056020", stmt), e);
         }
 
         return nextID;
@@ -1001,11 +1002,11 @@ public class JoinSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
     }
 

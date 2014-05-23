@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.RegularExpressionConverter;
 
 /**
@@ -61,7 +62,7 @@ public class StringMatchesMethod extends AbstractSQLMethod
             !(likeExpr instanceof CharacterExpression) &&
             !(likeExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(LOCALISER.msg("060003", "like/matches", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "like/matches", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
         SQLExpression escapeExpr = null;
@@ -133,7 +134,7 @@ public class StringMatchesMethod extends AbstractSQLMethod
         }
         else
         {
-            throw new NucleusException(LOCALISER.msg("060001", "matches", expr));
+            throw new NucleusException(Localiser.msg("060001", "matches", expr));
         }
     }
 

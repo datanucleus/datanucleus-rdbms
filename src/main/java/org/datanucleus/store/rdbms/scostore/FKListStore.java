@@ -64,6 +64,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -98,7 +99,7 @@ public class FKListStore extends AbstractListStore
         CollectionMetaData colmd = mmd.getCollection();
         if (colmd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("056001", mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056001", mmd.getFullFieldName()));
         }
 
         // Load the element class
@@ -122,17 +123,17 @@ public class FKListStore extends AbstractListStore
         }
         if (emd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("056003", element_class.getName(), mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
         elementInfo = getElementInformationForClass();
         if (elementInfo != null && elementInfo.length > 1)
         {
-            throw new NucleusUserException(LOCALISER.msg("056031", ownerMemberMetaData.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056031", ownerMemberMetaData.getFullFieldName()));
         }
         else if (elementInfo == null || elementInfo.length == 0)
         {
-            throw new NucleusUserException(LOCALISER.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
+            throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
         }
 
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
@@ -148,14 +149,14 @@ public class FKListStore extends AbstractListStore
             AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mappedByFieldName);
             if (eofmd == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056024", mmd.getFullFieldName(), 
+                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), 
                     mappedByFieldName, element_class.getName()));
             }
 
             // Check that the type of the element "mapped-by" field is consistent with the owner type
             if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
             {
-                throw new NucleusUserException(LOCALISER.msg("056025", mmd.getFullFieldName(), 
+                throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(), 
                     eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
             }
 
@@ -164,12 +165,12 @@ public class FKListStore extends AbstractListStore
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056029",
+                throw new NucleusUserException(Localiser.msg("056029",
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
             }
             if (isEmbeddedMapping(ownerMapping))
             {
-                throw new NucleusUserException(LOCALISER.msg("056026",
+                throw new NucleusUserException(Localiser.msg("056026",
                     ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
             }
         }
@@ -181,7 +182,7 @@ public class FKListStore extends AbstractListStore
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056030", 
+                throw new NucleusUserException(Localiser.msg("056030", 
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
             }
         }
@@ -195,7 +196,7 @@ public class FKListStore extends AbstractListStore
         if (orderMapping == null && indexedList)
         {
             // "Indexed List" but no order mapping present!
-            throw new NucleusUserException(LOCALISER.msg("056041", 
+            throw new NucleusUserException(Localiser.msg("056041", 
                 mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
         }
 
@@ -296,7 +297,7 @@ public class FKListStore extends AbstractListStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056015", setStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056015", setStmt), e);
         }
 
         // Dependent field
@@ -399,7 +400,7 @@ public class FKListStore extends AbstractListStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056027", updateFkStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056027", updateFkStmt), e);
         }
 
         return retval;
@@ -535,7 +536,7 @@ public class FKListStore extends AbstractListStore
             catch (MappedDatastoreException e)
             {
                 // An error was encountered during the shift process so abort here
-                throw new NucleusDataStoreException(LOCALISER.msg("056009", e.getMessage()), e.getCause());
+                throw new NucleusDataStoreException(Localiser.msg("056009", e.getMessage()), e.getCause());
             }
         }
 
@@ -632,7 +633,7 @@ public class FKListStore extends AbstractListStore
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
                         NucleusLogger.PERSISTENCE.debug(
-                            LOCALISER.msg("055010",
+                            Localiser.msg("055010",
                                 ownerSM.toPrintableID(),
                                 ownerMemberMetaData.getFullFieldName(),
                                 StringUtils.toJVMIDString(element)));
@@ -666,12 +667,12 @@ public class FKListStore extends AbstractListStore
         boolean nullify = false;
         if (ownerMapping.isNullable() && orderMapping != null && orderMapping.isNullable())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("056043"));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("056043"));
             nullify = true;
         }
         else
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("056042"));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("056042"));
         }
 
         String stmt;
@@ -708,7 +709,7 @@ public class FKListStore extends AbstractListStore
         if (dependent)
         {
             // Elements are dependent and can't exist on their own, so delete them all
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("056034"));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("056034"));
             deleteElements = true;
         }
         else
@@ -716,19 +717,19 @@ public class FKListStore extends AbstractListStore
             if (ownerMapping.isNullable() && orderMapping == null)
             {
                 // Field is not dependent, and nullable so we null the FK
-                NucleusLogger.DATASTORE.debug(LOCALISER.msg("056036"));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("056036"));
                 deleteElements = false;
             }
             else if (ownerMapping.isNullable() && orderMapping != null && orderMapping.isNullable())
             {
                 // Field is not dependent, and nullable so we null the FK
-                NucleusLogger.DATASTORE.debug(LOCALISER.msg("056036"));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("056036"));
                 deleteElements = false;
             }
             else
             {
                 // Field is not dependent, and not nullable so we just delete the elements
-                NucleusLogger.DATASTORE.debug(LOCALISER.msg("056035"));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("056035"));
                 deleteElements = true;
             }
         }
@@ -790,7 +791,7 @@ public class FKListStore extends AbstractListStore
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("056013", clearNullifyStmt), e);
+                throw new NucleusDataStoreException(Localiser.msg("056013", clearNullifyStmt), e);
             }
         }
     }
@@ -888,7 +889,7 @@ public class FKListStore extends AbstractListStore
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(LOCALISER.msg("056037",
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037",
                             op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(esm.getObject())));
                         esm.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
@@ -897,7 +898,7 @@ public class FKListStore extends AbstractListStore
                     {
                         // Owner of the element is neither this container nor is it being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(LOCALISER.msg("056038",
+                        throw new NucleusUserException(Localiser.msg("056038",
                             op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(esm.getObject()),
                             StringUtils.toJVMIDString(currentOwner)));
@@ -1020,11 +1021,11 @@ public class FKListStore extends AbstractListStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
     }
 

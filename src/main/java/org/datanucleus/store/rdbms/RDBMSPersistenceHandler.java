@@ -62,10 +62,6 @@ import org.datanucleus.util.SoftValueMap;
  */
 public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** The cache of database requests. Access is synchronized on the map object itself. */
     private Map<RequestIdentifier, Request> requestsByID = Collections.synchronizedMap(new SoftValueMap());
 
@@ -129,9 +125,9 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         {
             if (op.getClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
             {
-                throw new NucleusUserException(LOCALISER_RDBMS.msg("032013", className));
+                throw new NucleusUserException(Localiser.msg("032013", className));
             }
-            throw new NucleusException(LOCALISER_RDBMS.msg("032014", className, 
+            throw new NucleusException(Localiser.msg("032014", className, 
                 op.getClassMetaData().getInheritanceMetaData().getStrategy())).setFatal();
         }
 

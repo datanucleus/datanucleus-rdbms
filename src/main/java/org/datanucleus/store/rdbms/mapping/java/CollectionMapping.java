@@ -37,6 +37,7 @@ import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.wrappers.backed.BackedSCO;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -87,7 +88,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Field doesnt support cascade-persist so no reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007006", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
             // Check for any persistable elements that arent persistent
@@ -107,7 +108,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007007", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
             }
 
             // Check if some elements need attaching
@@ -199,7 +200,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
 
             if (sco.getOwner() != null)
             {
-                throw new NucleusException(LOCALISER.msg("CollectionMapping.WrongOwnerError")).setFatal();
+                throw new NucleusException(Localiser.msg("CollectionMapping.WrongOwnerError")).setFatal();
             }
         }
 
@@ -209,13 +210,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007008", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("007009", mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
         }
 
         CollectionStore backingStore = ((CollectionStore) storeMgr.getBackingStoreForField(

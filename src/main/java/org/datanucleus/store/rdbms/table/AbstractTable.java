@@ -77,10 +77,6 @@ public abstract class AbstractTable implements Table
     /** Table object has been validated. */
     static final protected int TABLE_STATE_VALIDATED = 4;
 
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Manager for this table. */
     protected final RDBMSStoreManager storeMgr;
 
@@ -282,7 +278,7 @@ public abstract class AbstractTable implements Table
                 if (md == null)
                 {
                     // ColumnMetaData for existing column has no parent class somehow!
-                    throw new NucleusUserException(LOCALISER.msg("057043",
+                    throw new NucleusUserException(Localiser.msg("057043",
                         name.getIdentifierName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
                 md = md.getParent();
@@ -296,7 +292,7 @@ public abstract class AbstractTable implements Table
                 if (dupMd == null)
                 {
                     // ColumnMetaData for required column has no parent class somehow!
-                    throw new NucleusUserException(LOCALISER.msg("057044",
+                    throw new NucleusUserException(Localiser.msg("057044",
                         name.getIdentifierName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
             }
@@ -417,7 +413,7 @@ public abstract class AbstractTable implements Table
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057029", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057029", this));
         }
 
         List createStmts = getSQLCreateStatements(null);
@@ -438,7 +434,7 @@ public abstract class AbstractTable implements Table
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057030", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057030", this));
         }
 
         executeDdlStatementList(getSQLDropStatements(), conn);
@@ -605,7 +601,7 @@ public abstract class AbstractTable implements Table
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057034", col));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057034", col));
         }
     }
     
@@ -636,7 +632,7 @@ public abstract class AbstractTable implements Table
     {
         if (isPKInitialized())
         {
-            throw new IllegalStateException(LOCALISER.msg("057000",this));
+            throw new IllegalStateException(Localiser.msg("057000",this));
         }
     }
 
@@ -644,7 +640,7 @@ public abstract class AbstractTable implements Table
     {
         if (isInitialized())
         {
-            throw new IllegalStateException(LOCALISER.msg("057000",this));
+            throw new IllegalStateException(Localiser.msg("057000",this));
         }
     }
 
@@ -652,7 +648,7 @@ public abstract class AbstractTable implements Table
     {
         if (!isInitialized())
         {
-            throw new IllegalStateException(LOCALISER.msg("057001",this));
+            throw new IllegalStateException(Localiser.msg("057001",this));
         }
     }
 
@@ -660,7 +656,7 @@ public abstract class AbstractTable implements Table
     {
         if (!isInitializedModified())
         {
-            throw new IllegalStateException(LOCALISER.msg("RDBMS.Table.UnmodifiedError",this));
+            throw new IllegalStateException(Localiser.msg("RDBMS.Table.UnmodifiedError",this));
         }
     }
     
@@ -668,7 +664,7 @@ public abstract class AbstractTable implements Table
     {
         if (!isPKInitialized())
         {
-            throw new IllegalStateException(LOCALISER.msg("057001",this));
+            throw new IllegalStateException(Localiser.msg("057001",this));
         }
     }
 
@@ -676,7 +672,7 @@ public abstract class AbstractTable implements Table
     {
         if (!isValidated())
         {
-            throw new IllegalStateException(LOCALISER.msg("057002",this));
+            throw new IllegalStateException(Localiser.msg("057002",this));
         }
     }
     
@@ -713,7 +709,7 @@ public abstract class AbstractTable implements Table
         }
         catch (SQLException sqe)
         {
-            NucleusLogger.DATASTORE.error(LOCALISER.msg("057028",stmtText,sqe));
+            NucleusLogger.DATASTORE.error(Localiser.msg("057028",stmtText,sqe));
             throw sqe;
         }
         finally
@@ -760,7 +756,7 @@ public abstract class AbstractTable implements Table
             stmt.execute(stmtText);
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("045000",(System.currentTimeMillis() - startTime)));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("045000",(System.currentTimeMillis() - startTime)));
             }
         }
 

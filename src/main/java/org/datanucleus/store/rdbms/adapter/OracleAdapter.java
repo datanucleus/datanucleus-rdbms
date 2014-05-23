@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -418,7 +419,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
@@ -461,7 +462,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
     {
         if (sequence_name == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("051028"));
+            throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("SELECT ");
         stmt.append(sequence_name);
@@ -536,7 +537,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         }
         else
         {
-            NucleusLogger.DATASTORE.warn(LOCALISER.msg("020191", typeName));
+            NucleusLogger.DATASTORE.warn(Localiser.msg("020191", typeName));
             dataType = Types.OTHER;
         }
 
@@ -660,7 +661,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
             !sqlExpr.getJavaTypeMapping().getDatastoreMapping(0).isStringBased())
         {
             // Oracle 8 or earlier don't support ORDER BY on non-String based booleans ? (came from TJDO)
-            throw new NucleusException(LOCALISER.msg("052505")).setFatal();
+            throw new NucleusException(Localiser.msg("052505")).setFatal();
         }
         else
         {

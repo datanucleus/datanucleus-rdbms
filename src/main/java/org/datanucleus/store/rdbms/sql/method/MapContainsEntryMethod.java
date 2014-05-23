@@ -40,6 +40,7 @@ import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -55,7 +56,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() != 2)
         {
-            throw new NucleusException(LOCALISER.msg("060016", "containsValue", "MapExpression", 2));
+            throw new NucleusException(Localiser.msg("060016", "containsValue", "MapExpression", 2));
         }
 
         MapExpression mapExpr = (MapExpression)expr;

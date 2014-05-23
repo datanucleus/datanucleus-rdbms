@@ -60,6 +60,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -91,7 +92,7 @@ public class FKSetStore extends AbstractSetStore
         CollectionMetaData colmd = mmd.getCollection();
         if (colmd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("056001", mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056001", mmd.getFullFieldName()));
         }
 
         // Load the element class
@@ -123,13 +124,13 @@ public class FKSetStore extends AbstractSetStore
         }
         if (emd == null)
         {
-            throw new NucleusUserException(LOCALISER.msg("056003", element_class.getName(), mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
         elementInfo = getElementInformationForClass();
         if (elementInfo == null || elementInfo.length == 0)
         {
-            throw new NucleusUserException(LOCALISER.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
+            throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
         }
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
         elementsAreEmbedded = false; // Can't embed element when using FK relation
@@ -143,7 +144,7 @@ public class FKSetStore extends AbstractSetStore
             AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mmd.getMappedBy());
             if (eofmd == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056024", mmd.getFullFieldName(),
+                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(),
                     mmd.getMappedBy(), element_class.getName()));
             }
 
@@ -155,7 +156,7 @@ public class FKSetStore extends AbstractSetStore
             /*
             if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
             {
-                throw new NucleusUserException(LOCALISER.msg("056025", mmd.getFullFieldName(),
+                throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(),
                     eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
             }
             */
@@ -169,12 +170,12 @@ public class FKSetStore extends AbstractSetStore
             }
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056029",
+                throw new NucleusUserException(Localiser.msg("056029",
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
             }
             if (isEmbeddedMapping(ownerMapping))
             {
-                throw new NucleusUserException(LOCALISER.msg("056026",
+                throw new NucleusUserException(Localiser.msg("056026",
                     ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
             }
         }
@@ -186,7 +187,7 @@ public class FKSetStore extends AbstractSetStore
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(LOCALISER.msg("056030", 
+                throw new NucleusUserException(Localiser.msg("056030", 
                     mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
             }
         }
@@ -304,7 +305,7 @@ public class FKSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056027", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056027", stmt), e);
         }
 
         return retval;
@@ -386,7 +387,7 @@ public class FKSetStore extends AbstractSetStore
         if (element == null)
         {
             // Sets allow no duplicates
-            throw new NucleusUserException(LOCALISER.msg("056039"));
+            throw new NucleusUserException(Localiser.msg("056039"));
         }
 
         // Make sure that the element is persisted in the datastore (reachability)
@@ -464,7 +465,7 @@ public class FKSetStore extends AbstractSetStore
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(LOCALISER.msg("056037",
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037",
                             op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject())));
                         elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
@@ -486,7 +487,7 @@ public class FKSetStore extends AbstractSetStore
                         else if (op.getReferencedPC() == null)
                         {
                             // Not being attached so must be inconsistent owner, so throw exception
-                            throw new NucleusUserException(LOCALISER.msg("056038",
+                            throw new NucleusUserException(Localiser.msg("056038",
                                 op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                                 StringUtils.toJVMIDString(elementOP.getObject()),
                                 StringUtils.toJVMIDString(currentOwner)));
@@ -536,7 +537,7 @@ public class FKSetStore extends AbstractSetStore
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("055009", op.getObjectAsPrintable(),
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", op.getObjectAsPrintable(),
                         ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                 }
 
@@ -716,7 +717,7 @@ public class FKSetStore extends AbstractSetStore
             // Elements are dependent and can't exist on their own, so delete them all
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE.debug(LOCALISER.msg("056034"));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("056034"));
             }
             delete = true;
         }
@@ -727,7 +728,7 @@ public class FKSetStore extends AbstractSetStore
                 // Field is not dependent, but is nullable so we null the FK
                 if (NucleusLogger.DATASTORE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE.debug(LOCALISER.msg("056036"));
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("056036"));
                 }
                 delete = false;
             }
@@ -736,7 +737,7 @@ public class FKSetStore extends AbstractSetStore
                 // Field is not dependent, and is not nullable so we just delete the elements
                 if (NucleusLogger.DATASTORE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE.debug(LOCALISER.msg("056035"));
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("056035"));
                 }
                 delete = true;
             }
@@ -765,7 +766,7 @@ public class FKSetStore extends AbstractSetStore
                     // Null the owner of the element
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("055010",
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010",
                             op.getObjectAsPrintable(),
                             ownerMemberMetaData.getFullFieldName(),
                             StringUtils.toJVMIDString(element)));
@@ -887,7 +888,7 @@ public class FKSetStore extends AbstractSetStore
             }
             catch (SQLException e)
             {
-                throw new NucleusDataStoreException(LOCALISER.msg("056013",stmt),e);
+                throw new NucleusDataStoreException(Localiser.msg("056013",stmt),e);
             }
         }
     }
@@ -1130,11 +1131,11 @@ public class FKSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
     }
 

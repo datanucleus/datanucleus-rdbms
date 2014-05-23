@@ -42,10 +42,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     StoreDataManager storeDataMgr = null;
 
     Writer writer;
@@ -78,7 +74,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             boolean success = true;
             try
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050045", 
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", 
                     rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
 
                 Map baseTablesByName = new HashMap();
@@ -88,7 +84,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     RDBMSStoreData data = (RDBMSStoreData) i.next();
                     if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("050046",data.getName()));
+                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050046",data.getName()));
                     }
 
                     // If the class has a table/view to remove, add it to the list
@@ -189,7 +185,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             catch (Exception e)
             {
                 success = false;
-                String errorMsg = LOCALISER.msg("050047", e);
+                String errorMsg = Localiser.msg("050047", e);
                 NucleusLogger.DATASTORE_SCHEMA.error(errorMsg);
                 throw new NucleusUserException(errorMsg, e);
             }
@@ -205,6 +201,6 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
      */
     public String toString()
     {
-        return LOCALISER.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
+        return Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName());
     }
 }

@@ -25,6 +25,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr}.replaceAll(strExpr1, strExpr2).
@@ -40,7 +41,7 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() != 2)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "replaceAll", "StringExpression", 2,
+            throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 2,
                 "StringExpression/CharacterExpression"));
         }
         else
@@ -51,13 +52,13 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
             if (!(strExpr1 instanceof StringExpression) &&
                 !(strExpr1 instanceof CharacterExpression))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "replaceAll", "StringExpression", 1,
+                throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 1,
                     "StringExpression/CharacterExpression"));
             }
             if (!(strExpr2 instanceof StringExpression) &&
                 !(strExpr2 instanceof CharacterExpression))
             {
-                throw new NucleusException(LOCALISER.msg("060003", "replaceAll", "StringExpression", 2,
+                throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 2,
                     "StringExpression/CharacterExpression"));
             }
 

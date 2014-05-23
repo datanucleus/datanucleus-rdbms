@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
 import org.datanucleus.transaction.TransactionUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -118,7 +119,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                     }
                     catch (NucleusException e)
                     {
-                        NucleusLogger.PERSISTENCE.error(LOCALISER.msg("017007", e));
+                        NucleusLogger.PERSISTENCE.error(Localiser.msg("017007", e));
                         throw e;
                     }
                 }
@@ -142,7 +143,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(LOCALISER.msg("017003", seqMetaData.getName(), valueGeneratorName));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("017003", seqMetaData.getName(), valueGeneratorName));
         }
     }
 }

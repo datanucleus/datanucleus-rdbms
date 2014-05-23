@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {collExpr1}.isEmpty().
@@ -46,7 +47,7 @@ public class CollectionIsEmptyMethod extends AbstractSQLMethod
     {
         if (args != null && args.size() > 0)
         {
-            throw new NucleusException(LOCALISER.msg("060015", "isEmpty", "CollectionExpression"));
+            throw new NucleusException(Localiser.msg("060015", "isEmpty", "CollectionExpression"));
         }
 
         if (expr instanceof CollectionLiteral)

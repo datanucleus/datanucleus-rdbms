@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * RDBMS-specific implementation of a SetStore for map keys.
@@ -288,11 +289,11 @@ class MapKeySetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }
     }
 

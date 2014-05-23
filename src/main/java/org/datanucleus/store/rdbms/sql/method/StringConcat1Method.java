@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.method.AbstractSQLMethod;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {strExpr}.concat(strExpr1s).
@@ -44,7 +45,7 @@ public class StringConcat1Method extends AbstractSQLMethod
     {
         if (args == null || args.size() != 1)
         {
-            throw new NucleusException(LOCALISER.msg("060003", "concat", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0,
                 "StringExpression/CharacterExpression/Parameter"));
         }
             
@@ -53,7 +54,7 @@ public class StringConcat1Method extends AbstractSQLMethod
                 !(otherExpr instanceof CharacterExpression) &&
                 !(otherExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(LOCALISER.msg("060003", "concat", "StringExpression", 0,
+            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0,
                 "StringExpression/CharacterExpression/Parameter"));
         }
         

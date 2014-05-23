@@ -36,12 +36,6 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractDatastoreMapping implements DatastoreMapping
 {
-    protected static final Localiser LOCALISER_RDBMS = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /** Mapping of the Java type. */
     protected final JavaTypeMapping mapping;
 
@@ -163,7 +157,7 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
         SQLTypeInfo typeInfo = getTypeInfo();
         if (typeInfo == null)
         {
-            throw new UnsupportedDataTypeException(LOCALISER_RDBMS.msg("055000",column));
+            throw new UnsupportedDataTypeException(Localiser.msg("055000",column));
         }
     
         if (column != null)
@@ -205,8 +199,7 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
      */
     protected String failureMessage(String method, int position, Exception e)
     {
-        return LOCALISER_RDBMS.msg("041050", getClass().getName() + "." + method,
-            position, column, e.getMessage());
+        return Localiser.msg("041050", getClass().getName() + "." + method, position, column, e.getMessage());
     }
 
     /**
@@ -218,8 +211,7 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
      */
     protected String failureMessage(String method, Object value, Exception e)
     {
-        return LOCALISER_RDBMS.msg("041050", getClass().getName() + "." + method,
-            value, column, e.getMessage());
+        return Localiser.msg("041050", getClass().getName() + "." + method, value, column, e.getMessage());
     }
 
     public void setBoolean(PreparedStatement ps, int exprIndex, boolean value)
@@ -374,7 +366,6 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
      **/
     protected String failureMessage(String method)
     {
-        return LOCALISER_RDBMS.msg("041005",getClass().getName(), method,
-            mapping.getMemberMetaData().getFullFieldName());
+        return Localiser.msg("041005",getClass().getName(), method, mapping.getMemberMetaData().getFullFieldName());
     }
 }

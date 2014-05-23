@@ -38,6 +38,7 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.scostore.ElementContainerStore;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -167,7 +168,7 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
                 }
                 catch (SQLException e)
                 {
-                    NucleusLogger.DATASTORE.error(LOCALISER.msg("052605",e));
+                    NucleusLogger.DATASTORE.error(Localiser.msg("052605",e));
                 }
                 finally
                 {
@@ -267,7 +268,7 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
                 }
                 catch (SQLException e)
                 {
-                    NucleusLogger.DATASTORE.error(LOCALISER.msg("052605",e));
+                    NucleusLogger.DATASTORE.error(Localiser.msg("052605",e));
                 }
                 finally
                 {

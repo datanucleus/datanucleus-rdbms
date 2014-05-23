@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for Oracle CLOB type.
@@ -166,7 +167,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(LOCALISER.msg("055001","String", "" + param), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","String", "" + param), e);
         }
 
         return value;

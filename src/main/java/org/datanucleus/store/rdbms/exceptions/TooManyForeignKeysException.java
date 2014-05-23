@@ -29,9 +29,6 @@ import org.datanucleus.util.Localiser;
  */
 public class TooManyForeignKeysException extends NucleusDataStoreException
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     /**
      * Constructs a too-many-foreign-keys exception.
      * @param dba the database adapter
@@ -39,7 +36,7 @@ public class TooManyForeignKeysException extends NucleusDataStoreException
      */
     public TooManyForeignKeysException(DatastoreAdapter dba, String table_name)
     {
-        super(LOCALISER.msg("020015","" + dba.getMaxForeignKeys(),table_name));
+        super(Localiser.msg("020015","" + dba.getMaxForeignKeys(),table_name));
         setFatal();
     }
 }

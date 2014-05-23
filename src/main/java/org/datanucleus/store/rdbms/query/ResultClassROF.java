@@ -64,9 +64,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class ResultClassROF implements ResultObjectFactory
 {
-    protected static final Localiser LOCALISER=Localiser.getInstance(
-        "org.datanucleus.Localisation", org.datanucleus.ClassConstants.NUCLEUS_CONTEXT_LOADER);
-
     private final RDBMSStoreManager storeMgr;
 
     /** The result class that we should create for each row of results. */
@@ -312,7 +309,7 @@ public class ResultClassROF implements ResultObjectFactory
             }
             catch (SQLException sqe)
             {
-                String msg = LOCALISER.msg("021043", sqe.getMessage());
+                String msg = Localiser.msg("021043", sqe.getMessage());
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
             }
@@ -335,7 +332,7 @@ public class ResultClassROF implements ResultObjectFactory
             else if (fieldValues.length == 1 && !resultClass.isAssignableFrom(fieldValues[0].getClass()))
             {
                 // Simple object is not assignable to the ResultClass so throw an error
-                String msg = LOCALISER.msg("021202",
+                String msg = Localiser.msg("021202",
                     resultClass.getName(), fieldValues[0].getClass().getName());
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
@@ -375,7 +372,7 @@ public class ResultClassROF implements ResultObjectFactory
                             ctr_arg_types[i] = null;
                         }
                     }
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021206",
+                    NucleusLogger.QUERY.debug(Localiser.msg("021206",
                         resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
                 }
                 else
@@ -390,7 +387,7 @@ public class ResultClassROF implements ResultObjectFactory
                         Class javaType = stmtMappings[i].getMapping().getJavaType();
                         str.append(javaType.getName());
                     }
-                    NucleusLogger.QUERY.debug(LOCALISER.msg("021206",
+                    NucleusLogger.QUERY.debug(Localiser.msg("021206",
                         resultClass.getName(), str.toString()));
                 }
             }
@@ -403,7 +400,7 @@ public class ResultClassROF implements ResultObjectFactory
         }
 
         // Impossible to satisfy the resultClass requirements so throw exception
-        String msg = LOCALISER.msg("021203",resultClass.getName());
+        String msg = Localiser.msg("021203",resultClass.getName());
         NucleusLogger.QUERY.error(msg);
         throw new NucleusUserException(msg);
     }
@@ -478,7 +475,7 @@ public class ResultClassROF implements ResultObjectFactory
                 }
                 str.append(")");
 
-                throw new NucleusUserException(LOCALISER.msg("037013", str.toString()));
+                throw new NucleusUserException(Localiser.msg("037013", str.toString()));
             }
 
             try
@@ -487,7 +484,7 @@ public class ResultClassROF implements ResultObjectFactory
             }
             catch (Exception e)
             {
-                throw new NucleusUserException(LOCALISER.msg("037015", newMap.getObjectClass().getName(), e));
+                throw new NucleusUserException(Localiser.msg("037015", newMap.getObjectClass().getName(), e));
             }
         }
 
@@ -507,8 +504,7 @@ public class ResultClassROF implements ResultObjectFactory
             if (!field.isSynthetic() 
                     && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null)
             {
-                throw new NucleusUserException(LOCALISER.msg("021210",
-                    field.getName()));
+                throw new NucleusUserException(Localiser.msg("021210", field.getName()));
             }
         }
         if (cls.getSuperclass() != null)

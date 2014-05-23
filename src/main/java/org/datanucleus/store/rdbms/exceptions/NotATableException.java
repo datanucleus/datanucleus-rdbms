@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.exceptions;
 
 import org.datanucleus.store.exceptions.DatastoreValidationException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -27,13 +26,9 @@ import org.datanucleus.util.Localiser;
  * table should be a table but is found not to be in the database.
  *
  * @see org.datanucleus.store.rdbms.table.TableImpl
- * @version $Revision: 1.3 $ 
  */
 public class NotATableException extends DatastoreValidationException
 {
-    private static final Localiser LOCALISER_RDBMS=Localiser.getInstance("org.datanucleus.store.rdbms.Localisation",
-        RDBMSStoreManager.class.getClassLoader());
-
     /**
      * Constructs a not-a-table exception.
      * @param tableName Name of the table that is of the wrong type.
@@ -41,6 +36,6 @@ public class NotATableException extends DatastoreValidationException
      */
     public NotATableException(String tableName, String type)
     {
-        super(LOCALISER_RDBMS.msg("020012", tableName, type));
+        super(Localiser.msg("020012", tableName, type));
     }
 }

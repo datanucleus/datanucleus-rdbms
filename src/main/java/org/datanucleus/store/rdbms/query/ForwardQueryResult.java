@@ -39,6 +39,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -229,7 +230,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         }
         catch (SQLException e)
         {
-            throw ec.getApiAdapter().getDataStoreExceptionForException(LOCALISER.msg("052601",e.getMessage()), e);
+            throw ec.getApiAdapter().getDataStoreExceptionForException(Localiser.msg("052601",e.getMessage()), e);
         }
 
         return nextElement;
@@ -275,7 +276,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         if (loadResultsAtCommit && isOpen() && moreResultSetRows)
         {
             // Query connection closing message
-            NucleusLogger.QUERY.info(LOCALISER.msg("052606", query.toString()));
+            NucleusLogger.QUERY.info(Localiser.msg("052606", query.toString()));
 
             try
             {
@@ -377,7 +378,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
                 if (!isOpen())
                 {
                     // Spec 14.6.7 Calling next() on closed Query will throw NoSuchElementException
-                    throw new NoSuchElementException(LOCALISER.msg("052600"));
+                    throw new NoSuchElementException(Localiser.msg("052600"));
                 }
                 if (candidates != null && currentElement != null)
                 {
@@ -410,7 +411,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
 
                     return currentElement;
                 }
-                throw new NoSuchElementException(LOCALISER.msg("052602"));
+                throw new NoSuchElementException(Localiser.msg("052602"));
             }
         }
 

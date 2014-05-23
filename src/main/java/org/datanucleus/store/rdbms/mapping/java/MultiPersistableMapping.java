@@ -33,6 +33,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -139,7 +140,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
         {
             // as required by the JDO spec, a ClassCastException is thrown since not valid implementation
             // TODO Change this to a multiple field mapping localised message
-            throw new ClassCastException(LOCALISER_RDBMS.msg("041044",
+            throw new ClassCastException(Localiser.msg("041044",
                 mmd != null ? mmd.getFullFieldName() : "", getType(), value.getClass().getName()));
         }
 
@@ -171,7 +172,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                     ExecutionContext valueEC = api.getExecutionContext(value);
                     if (valueEC != null && ec != valueEC)
                     {
-                        throw new NucleusUserException(LOCALISER_RDBMS.msg("041015"), id);
+                        throw new NucleusUserException(Localiser.msg("041015"), id);
                     }
                 }
 

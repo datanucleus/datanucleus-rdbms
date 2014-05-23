@@ -25,6 +25,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.expression.ArrayLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {arrExpr1}.isEmpty().
@@ -42,7 +43,7 @@ public class ArrayIsEmptyMethod extends AbstractSQLMethod
     {
         if (args != null && args.size() > 0)
         {
-            throw new NucleusException(LOCALISER.msg("060015", "isEmpty", "ArrayExpression"));
+            throw new NucleusException(Localiser.msg("060015", "isEmpty", "ArrayExpression"));
         }
 
         if (expr instanceof ArrayLiteral)

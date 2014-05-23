@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -209,8 +210,7 @@ public class LocateRequest extends Request
                         {
                             if (!rs.next())
                             {
-                                NucleusLogger.DATASTORE_RETRIEVE.info(LOCALISER.msg("050018",
-                                    op.getInternalObjectId()));
+                                NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", op.getInternalObjectId()));
                                 throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
                             }
                         }
@@ -231,7 +231,7 @@ public class LocateRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = LOCALISER.msg("052220", op.getObjectAsPrintable(), statement, sqle.getMessage());
+                String msg = Localiser.msg("052220", op.getObjectAsPrintable(), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);

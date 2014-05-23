@@ -39,6 +39,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for a field that represents a container of objects, such as a List,
@@ -67,7 +68,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
 
         if (mmd.getContainer() == null)
         {
-            throw new NucleusUserException(LOCALISER_RDBMS.msg("041023", mmd.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("041023", mmd.getFullFieldName()));
         }
 
         if (!containerIsStoredInSingleColumn())

@@ -26,6 +26,7 @@ import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
+import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {dateExpr}.getMonth().
@@ -40,7 +41,7 @@ public class DateGetMonthMethod extends AbstractSQLMethod
     {
         if (!(expr instanceof TemporalExpression))
         {
-            throw new NucleusException(LOCALISER.msg("060001", "getMonth()", expr));
+            throw new NucleusException(Localiser.msg("060001", "getMonth()", expr));
         }
 
         ArrayList funcArgs = new ArrayList();

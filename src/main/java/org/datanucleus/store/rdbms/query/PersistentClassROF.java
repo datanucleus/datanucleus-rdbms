@@ -64,10 +64,6 @@ import org.datanucleus.util.StringUtils;
  */
 public final class PersistentClassROF implements ResultObjectFactory
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     protected final RDBMSStoreManager storeMgr;
 
     /** Metadata for the persistent class. */
@@ -237,12 +233,12 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Only one possible subclass, so use that
                     pcClassForObject = concreteSubclass;
-                    NucleusLogger.DATASTORE_RETRIEVE.warn(LOCALISER.msg("052300", 
+                    NucleusLogger.DATASTORE_RETRIEVE.warn(Localiser.msg("052300", 
                         pcClassForObject.getName(), concreteSubclass.getName()));
                 }
                 else if (numConcreteSubclasses == 0)
                 {
-                    throw new NucleusUserException(LOCALISER.msg("052301", pcClassForObject.getName()));
+                    throw new NucleusUserException(Localiser.msg("052301", pcClassForObject.getName()));
                 }
                 else
                 {

@@ -86,10 +86,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class SQLController
 {
-    /** Localiser for messages. */
-    protected static final Localiser LOCALISER = Localiser.getInstance(
-        "org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
-
     /** Whether batching is supported for this controller (datastore). */
     protected boolean supportsBatching = false;
 
@@ -219,7 +215,7 @@ public class SQLController
                                 state.processable = false; // Have to wait til we process this part til processable again
                                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052100", 
+                                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052100", 
                                         stmtText, "" + state.batchSize));
                                 }
                                 return state.stmt;
@@ -229,7 +225,7 @@ public class SQLController
                                 // Reached max batch size so process it now and start again for this one
                                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052101", state.stmtText));
+                                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052101", state.stmtText));
                                 }
                                 processConnectionStatement(conn);
                             }
@@ -248,7 +244,7 @@ public class SQLController
                         // The current statement is being batched so we cant batch this since cant process the current statement now
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052102", state.stmtText, stmtText));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052102", state.stmtText, stmtText));
                         }
                         batchable = false;
                     }
@@ -268,7 +264,7 @@ public class SQLController
         }
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("052109", ps, StringUtils.toJVMIDString(c)));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("052109", ps, StringUtils.toJVMIDString(c)));
         }
 
         if (batchable && supportsBatching)
@@ -276,7 +272,7 @@ public class SQLController
             // This statement is batchable so save it as the current batchable
             if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052103", stmtText));
+                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052103", stmtText));
             }
             ConnectionStatementState state = new ConnectionStatementState();
             state.stmt = ps;
@@ -364,7 +360,7 @@ public class SQLController
         }
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("052110", StringUtils.toJVMIDString(ps)));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("052110", StringUtils.toJVMIDString(ps)));
         }
 
         if (!jdbcStatements)
@@ -399,7 +395,7 @@ public class SQLController
                 // Mark as processable
                 if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("052104", state.stmtText, "" + state.batchSize));
+                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052104", state.stmtText, "" + state.batchSize));
                 }
                 state.processable = true;
                 state.stmt.addBatch();
@@ -448,7 +444,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("045001",
+            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045001",
                 "" + (System.currentTimeMillis() - startTime), "" + ind,
                 StringUtils.toJVMIDString(ps)));
         }
@@ -504,7 +500,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_PERSIST.debug(LOCALISER.msg("045002",
+            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045002",
                 "" + (System.currentTimeMillis() - startTime), StringUtils.toJVMIDString(ps)));
         }
 
@@ -539,7 +535,7 @@ public class SQLController
                     // Current wait statement is not processable now so leave it in wait state
                     if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER.msg("052106", state.stmtText, stmt));
+                        NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("052106", state.stmtText, stmt));
                     }
                 }
             }
@@ -569,7 +565,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_RETRIEVE.debug(LOCALISER.msg("045000", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("045000", (System.currentTimeMillis() - startTime)));
         }
 
         return rs;
@@ -621,7 +617,7 @@ public class SQLController
             {
                 if (NucleusLogger.DATASTORE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE.debug(LOCALISER.msg("052110", StringUtils.toJVMIDString(ps)));
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("052110", StringUtils.toJVMIDString(ps)));
                 }
                 ps.close();
             } 
@@ -688,7 +684,7 @@ public class SQLController
 
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(LOCALISER.msg("045001",""+(System.currentTimeMillis() - startTime),
+            NucleusLogger.DATASTORE.debug(Localiser.msg("045001",""+(System.currentTimeMillis() - startTime),
                 StringUtils.intArrayToString(ind), StringUtils.toJVMIDString(state.stmt)));
         }
 
@@ -763,7 +759,7 @@ public class SQLController
                         }
                     }
 
-                    throw new NucleusDataStoreException(LOCALISER.msg("052108"), e);
+                    throw new NucleusDataStoreException(Localiser.msg("052108"), e);
                 }
             }
             public void transactionPreClose(){}

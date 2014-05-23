@@ -31,6 +31,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -127,7 +128,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
             value = ec.getNucleusContext().getIdentityManager().getDatastoreId(getType(), value);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(LOCALISER_RDBMS.msg("041034",value));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041034",value));
             }
         }
 

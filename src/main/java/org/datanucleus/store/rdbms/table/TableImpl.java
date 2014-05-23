@@ -67,6 +67,7 @@ import org.datanucleus.store.rdbms.schema.RDBMSTableFKInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSTableIndexInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSTablePKInfo;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -165,7 +166,7 @@ public abstract class TableImpl extends AbstractTable
         long startTime = System.currentTimeMillis();
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057032", this));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057032", this));
         }
 
         // Validate the column(s)
@@ -191,7 +192,7 @@ public abstract class TableImpl extends AbstractTable
         state = TABLE_STATE_VALIDATED;
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("045000", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("045000", (System.currentTimeMillis() - startTime)));
         }
 
         return false;
@@ -251,7 +252,7 @@ public abstract class TableImpl extends AbstractTable
                     Column col = (Column)entry.getValue();
                     String addColStmt = dba.getAddColumnStatement(this, col);
                     stmts.add(addColStmt);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057031", col.getIdentifier(), this.toString()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057031", col.getIdentifier(), this.toString()));
                 }
 
                 try
@@ -461,7 +462,7 @@ public abstract class TableImpl extends AbstractTable
             numActualFKs = actualForeignKeysByName.size();
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058103", "" + numActualFKs, this));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058103", "" + numActualFKs, this));
             }
         }
 
@@ -479,14 +480,14 @@ public abstract class TableImpl extends AbstractTable
                 {
                     if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058104", "" + numActualFKs,this));
+                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058104", "" + numActualFKs,this));
                     }
                 }
             }
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058101",
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058101",
                     this, stmtsByFKName.values()));
             }
         }
@@ -518,7 +519,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058100",
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058100",
                         fkName, getCatalogName(), getSchemaName()));
                 }
 
@@ -583,7 +584,7 @@ public abstract class TableImpl extends AbstractTable
             }
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058004", "" + numActualIdxs, this));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058004", "" + numActualIdxs, this));
             }
         }
 
@@ -601,14 +602,14 @@ public abstract class TableImpl extends AbstractTable
                 {
                     if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058005", "" + numActualIdxs, this));
+                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058005", "" + numActualIdxs, this));
                     }
                 }
             }
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058003",
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058003",
                     this, stmtsByIdxName.values()));
             }
         }
@@ -639,7 +640,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058000", 
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058000", 
                         idxName, getCatalogName(), getSchemaName()));
                 }
 
@@ -695,7 +696,7 @@ public abstract class TableImpl extends AbstractTable
             numActualCKs = actualCandidateKeysByName.size();
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058204", "" + numActualCKs, this));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058204", "" + numActualCKs, this));
             }
         }
 
@@ -714,7 +715,7 @@ public abstract class TableImpl extends AbstractTable
                 {
                     if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058205", 
+                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058205", 
                             "" + numActualCKs,this));
                     }
                 }
@@ -722,7 +723,7 @@ public abstract class TableImpl extends AbstractTable
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(LOCALISER.msg("058201",
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058201",
                     this, stmtsByCKName.values()));
             }
         }
@@ -754,7 +755,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058200",
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058200",
                         ckName, getCatalogName(), getSchemaName()));
                 }
 
@@ -823,7 +824,7 @@ public abstract class TableImpl extends AbstractTable
         {
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("058102", "" + numFKs, this));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058102", "" + numFKs, this));
             }
             iter = fkNames.iterator();
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();

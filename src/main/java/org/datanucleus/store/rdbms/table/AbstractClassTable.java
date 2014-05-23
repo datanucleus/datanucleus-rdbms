@@ -50,6 +50,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.AbstractGenerator;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -405,7 +406,7 @@ public abstract class AbstractClassTable extends TableImpl
         // Check if auto-increment and that it is supported by this RDBMS
         if (idColumn.isIdentity() && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
         {
-            throw new NucleusException(LOCALISER.msg("057020", 
+            throw new NucleusException(Localiser.msg("057020", 
                 cmd.getFullClassName(), "datastore-identity")).setFatal();
         }
     }
@@ -477,7 +478,7 @@ public abstract class AbstractClassTable extends TableImpl
                 }
                 datastoreMappingTypes.append(fieldMapping.getDatastoreMapping(i).getClass().getName());
             }
-            NucleusLogger.DATASTORE_SCHEMA.debug(LOCALISER.msg("057010",
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
                 mmd.getFullFieldName(), columnsStr.toString(), fieldMapping.getClass().getName(), datastoreMappingTypes.toString()));
         }
 
