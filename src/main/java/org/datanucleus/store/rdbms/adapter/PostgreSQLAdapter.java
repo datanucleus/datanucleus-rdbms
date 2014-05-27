@@ -166,8 +166,9 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             psqlTypes.put("" + Types.SMALLINT, "int2");
             psqlTypes.put("" + Types.TIME, "time");
             psqlTypes.put("" + Types.VARCHAR, "varchar");
-            // TODO Enable Types.OTHER and remove this
-            psqlTypes.put("" + Types.OTHER, "***TOTALRUBBISH***");
+
+            // TODO Enable alternative OTHER types
+            psqlTypes.put("" + Types.OTHER, "uuid");
 
             // PostgreSQL provides 2 types for "char" mappings - "char" and "bpchar". PostgreSQL recommend
             // bpchar for default usage, but sadly you cannot say "bpchar(200)" in an SQL statement. Due to
