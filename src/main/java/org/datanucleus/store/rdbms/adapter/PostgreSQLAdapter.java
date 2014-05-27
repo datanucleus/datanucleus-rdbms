@@ -70,20 +70,15 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             // TODO Localise this message
             throw new NucleusDataStoreException("PostgreSQL version is " + datastoreMajorVersion + '.' + datastoreMinorVersion + ", 7.0 or later required");
         }
-        else if (datastoreMajorVersion == 7)
+        else if (datastoreMajorVersion == 7 && datastoreMinorVersion <= 2)
         {
-            if (datastoreMinorVersion <= 2)
-            {
-                // The driver correctly reports the max table name length as 32.
-                // However, constraint names are apparently limited to 31.  In
-                // this case we get better looking names by simply treating them
-                // all as limited to 31.
-                --maxTableNameLength;
-                --maxConstraintNameLength;
-                --maxIndexNameLength;
-            }
+            // The driver correctly reports the max table name length as 32.
+            // However, constraint names are apparently limited to 31.  In this case we get better looking names by simply treating them all as limited to 31.
+            --maxTableNameLength;
+            --maxConstraintNameLength;
+            --maxIndexNameLength;
         }
-        
+
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(POSTGRESQL_RESERVED_WORDS));
 
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
@@ -95,8 +90,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
         supportedOptions.remove(DISTINCT_WITH_SELECT_FOR_UPDATE);
         supportedOptions.remove(PERSIST_OF_UNASSIGNED_CHAR);
-        if (datastoreMajorVersion < 7 ||
-            (datastoreMajorVersion == 7 && datastoreMinorVersion < 2))
+        if (datastoreMajorVersion < 7 || (datastoreMajorVersion == 7 && datastoreMinorVersion < 2))
         {
             supportedOptions.remove(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         }
@@ -120,22 +114,21 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         super.initialiseTypes(handler, mconn);
 
-        // Add on any missing JDBC types
-        // If PostgreSQL JDBC driver doesn't provide info for CHAR type we fake it as "char" (e.g PSQL 8.1.405)
-        SQLTypeInfo sqlType = new PostgresqlTypeInfo(
-            "char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3,
-            false, false, false, "char", (short)0, (short)0, 10);
+        // Add on any missing JDBC types when not available from driver
+
+        // Not present in PSQL 8.1.405
+        SQLTypeInfo sqlType = new PostgresqlTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
-        sqlType = new PostgresqlTypeInfo(
-            "text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3,
-            false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgresqlTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new PostgresqlTypeInfo(
-            "BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3,
-            false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgresqlTypeInfo("BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
+
+        // Not present in PSQL 9.2.8
+        sqlType = new PostgresqlTypeInfo("bool", (short)Types.BOOLEAN, 0, null, null, null, 1, false, (short)3, true, false, false, "bool", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
     }
 
     /**
@@ -173,6 +166,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             psqlTypes.put("" + Types.SMALLINT, "int2");
             psqlTypes.put("" + Types.TIME, "time");
             psqlTypes.put("" + Types.VARCHAR, "varchar");
+            // TODO Enable Types.OTHER and remove this
             psqlTypes.put("" + Types.OTHER, "***TOTALRUBBISH***");
 
             // PostgreSQL provides 2 types for "char" mappings - "char" and "bpchar". PostgreSQL recommend
@@ -190,8 +184,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             if (!info.getTypeName().equalsIgnoreCase(psql_type_name))
             {
                 // We don't support this JDBC type using *this* PostgreSQL SQL type
-                NucleusLogger.DATASTORE.debug(Localiser.msg("051007", info.getTypeName(), 
-                    getNameForJDBCType(info.getDataType())));
+                NucleusLogger.DATASTORE.debug(Localiser.msg("051007", info.getTypeName(), getNameForJDBCType(info.getDataType())));
                 return null;
             }
         }
@@ -344,8 +337,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         String idxIdentifier = factory.getIdentifierInAdapterCase(idx.getName());
         return 
-           "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + 
-           " ON " + idx.getTable().toString() + ' ' +
+           "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + " ON " + idx.getTable().toString() + ' ' +
            idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
     }
 
@@ -544,27 +536,47 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      */
     public String getRangeByLimitEndOfStatementClause(long offset, long count)
     {
-        // TODO PostgreSQL supports SQL 2008 standard OFFSET/FETCH keywords now (see DerbyAdapter/MSSQLServerAdapter for required code)
-        String str = "";
-        if (count > 0)
+        if (offset <= 0 && count <= 0)
         {
-            str += "LIMIT " + count + " ";
+            return "";
         }
-        if (offset >= 0)
+
+        if (datastoreMajorVersion < 8 || (datastoreMajorVersion == 8 && datastoreMinorVersion <= 3))
         {
-            str += "OFFSET " + offset + " ";
+            String str = "";
+            if (count > 0)
+            {
+                str += "LIMIT " + count + " ";
+            }
+            if (offset >= 0)
+            {
+                str += "OFFSET " + offset + " ";
+            }
+            return str;
         }
-        return str;
+        else
+        {
+            // Use SQL 2008 standard OFFSET/FETCH keywords
+            StringBuilder str = new StringBuilder();
+            if (offset > 0)
+            {
+                str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
+            }
+            if (count > 0)
+            {
+                str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
+            }
+            return str.toString();
+        }
     }
 
     /**
      * The character for escaping patterns.
      * @return Escape character(s)
-     **/
+     */
     public String getEscapePatternExpression()
     {
-        if (datastoreMajorVersion > 8 ||
-            (datastoreMajorVersion == 8 && datastoreMinorVersion >= 3))
+        if (datastoreMajorVersion > 8 || (datastoreMajorVersion == 8 && datastoreMinorVersion >= 3))
         {
             return "ESCAPE E'\\\\'";
         }
