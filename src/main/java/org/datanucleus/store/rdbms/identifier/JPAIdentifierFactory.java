@@ -294,7 +294,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
      * @return The DatastoreIdentifier
      */
     public DatastoreIdentifier newReferenceFieldIdentifier(AbstractMemberMetaData refMetaData, 
-            AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, int fieldRole)
+            AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, FieldRole fieldRole)
     {
         String key = "[" + refMetaData.getFullFieldName() + "][" + implMetaData.getFullClassName() + "][" + implIdentifier.getIdentifierName() + "]";
         DatastoreIdentifier identifier = references.get(key);
@@ -329,7 +329,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
      * @return The identifier.
      */
     public DatastoreIdentifier newJoinTableFieldIdentifier(AbstractMemberMetaData ownerFmd, 
-            AbstractMemberMetaData relatedFmd, DatastoreIdentifier destinationId, boolean embedded, int fieldRole)
+            AbstractMemberMetaData relatedFmd, DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole)
     {
         DatastoreIdentifier identifier = null;
 
@@ -370,7 +370,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole);
+                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
             }
         }
         else
@@ -410,7 +410,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole);
+                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
             }
         }
 
@@ -428,18 +428,18 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
      * @return The identifier
      */
     public DatastoreIdentifier newForeignKeyFieldIdentifier(AbstractMemberMetaData ownerFmd, AbstractMemberMetaData relatedFmd,
-            DatastoreIdentifier destinationId, boolean embedded, int fieldRole)
+            DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole)
     {
         if (relatedFmd != null)
         {
             // Bidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
             }
             else
             {
@@ -451,12 +451,12 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
                 // FK field (FK collection/array/list/map)
-                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole);
+                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {
                 // Order field for FK (FK list)
-                return newColumnIdentifier(ownerFmd.getName() + ".IDX", embedded, fieldRole);
+                return newColumnIdentifier(ownerFmd.getName() + ".IDX", embedded, fieldRole, false);
             }
             else
             {
@@ -612,7 +612,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
      * @param embedded Whether the column is stored embedded
      * @return The suffix (e.g _ID for id columns).
      **/
-    protected String getColumnIdentifierSuffix(int role, boolean embedded)
+    protected String getColumnIdentifierSuffix(FieldRole role, boolean embedded)
     {
         String suffix = "";
         if (role == FieldRole.ROLE_NONE)

@@ -592,18 +592,19 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      * @param javaName The java field name
      * @param embedded Whether the identifier is for a field embedded
      * @param fieldRole The role to be performed by this column e.g FK, Index ?
+     * @param custom Whether this has a user-defined name
      * @return The DatastoreIdentifier
      */
-    public DatastoreIdentifier newColumnIdentifier(String javaName, boolean embedded, int fieldRole)
+    public DatastoreIdentifier newColumnIdentifier(String javaName, boolean embedded, FieldRole fieldRole, boolean custom)
     {
         DatastoreIdentifier identifier = null;
         String key = "[" + (javaName == null ? "" : javaName) + "][" + embedded + "][" + fieldRole; // TODO Change this to a string form of fieldRole
         identifier = columns.get(key);
         if (identifier == null)
         {
-            if (fieldRole == FieldRole.ROLE_CUSTOM)
+            if (custom)
             {
-                // If the user has provided a name (CUSTOM) so dont need to generate it and dont need a suffix
+                // If the user has provided a name (CUSTOM) so dont need to generate it and don't need a suffix
                 String baseID = truncate(javaName, dba.getDatastoreIdentifierMaxLength(IdentifierType.COLUMN));
                 identifier = new ColumnIdentifier(this, baseID);
             }
@@ -751,7 +752,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      * @param embedded Whether the column is stored embedded
      * @return The suffix (e.g _ID for id columns).
      **/
-    protected abstract String getColumnIdentifierSuffix(int role, boolean embedded);
+    protected abstract String getColumnIdentifierSuffix(FieldRole role, boolean embedded);
 
     /**
      * Generate a datastore identifier from a Java identifier.

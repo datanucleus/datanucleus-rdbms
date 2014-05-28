@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.identifier;
 
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.naming.NamingCase;
@@ -98,9 +99,10 @@ public interface IdentifierFactory
      * @param javaName The java field name
      * @param embedded Whether the identifier is for a field embedded
      * @param fieldRole The role to be performed by this column e.g FK, Index ?
+     * @param custom Whether this has a user-defined name
      * @return The DatastoreIdentifier
      */
-    DatastoreIdentifier newColumnIdentifier(String javaName, boolean embedded, int fieldRole);
+    DatastoreIdentifier newColumnIdentifier(String javaName, boolean embedded, FieldRole fieldRole, boolean custom);
 
     /**
      * Method to generate an identifier name for reference field, based on the metadata for the
@@ -113,7 +115,7 @@ public interface IdentifierFactory
      * @return The DatastoreIdentifier
      */
     DatastoreIdentifier newReferenceFieldIdentifier(AbstractMemberMetaData refMetaData, 
-            AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, int fieldRole);
+            AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, FieldRole fieldRole);
 
     /**
      * Method to return an identifier for a discriminator datastore field.
@@ -149,7 +151,7 @@ public interface IdentifierFactory
      * @return The identifier.
      */
     DatastoreIdentifier newJoinTableFieldIdentifier(AbstractMemberMetaData ownerFmd, AbstractMemberMetaData relatedFmd,
-            DatastoreIdentifier destinationId, boolean embedded, int fieldRole);
+            DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole);
 
     /**
      * Method to generate a FK/FK-index field identifier. 
@@ -162,7 +164,7 @@ public interface IdentifierFactory
      * @return The identifier
      */
     DatastoreIdentifier newForeignKeyFieldIdentifier(AbstractMemberMetaData ownerFmd, AbstractMemberMetaData relatedFmd,
-            DatastoreIdentifier destinationId, boolean embedded, int fieldRole);
+            DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole);
 
     /**
      * Method to return an identifier for an index (ordering) datastore field.

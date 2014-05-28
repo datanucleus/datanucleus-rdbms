@@ -340,12 +340,12 @@ public abstract class AbstractClassTable extends TableImpl
             if (refTable != null)
             {
                 colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(refTable.getIdentifier().getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_OWNER).getIdentifierName());
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_OWNER, false).getIdentifierName());
             }
             else
             {
                 colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(identifier.getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_NONE).getIdentifierName());
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_NONE, false).getIdentifierName());
             }
         }
 

@@ -477,8 +477,7 @@ public final class SQLQuery extends AbstractSQLQuery
                     else
                     {
                         columnName = storeMgr.getIdentifierFactory().newColumnIdentifier(
-                            fieldName, ec.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fieldType), 
-                            FieldRole.ROLE_NONE).getIdentifierName();
+                            fieldName, ec.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fieldType), FieldRole.ROLE_NONE, false).getIdentifierName();
                         columnFieldNumberMap.put(columnName, Integer.valueOf(fieldNumber));
                     }
                 }

@@ -22,6 +22,7 @@ package org.datanucleus.store.rdbms.mapping;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -51,8 +52,7 @@ public interface MappingManager
      * @param column The column
      * @return The datastore mapping
      */
-    DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData fmd, int index, 
-            Column column);
+    DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData fmd, int index, Column column);
 
     /**
      * Method to create the datastore mapping for a particular column and java type.
@@ -91,8 +91,7 @@ public interface MappingManager
      * @param clr ClassLoader resolver
      * @return The mapping
      */
-    JavaTypeMapping getMappingWithDatastoreMapping(Class c, boolean serialised, boolean embedded, 
-            ClassLoaderResolver clr);
+    JavaTypeMapping getMappingWithDatastoreMapping(Class c, boolean serialised, boolean embedded, ClassLoaderResolver clr);
 
     /**
      * Accessor for the mapping for the field of the specified table.
@@ -105,8 +104,7 @@ public interface MappingManager
      * @param fieldRole Role that this mapping plays for the field/property
      * @return The mapping for the field.
      */
-    JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, 
-            ClassLoaderResolver clr, int fieldRole);
+    JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, FieldRole fieldRole);
 
     // ----------------------------------------- Datastore Types ---------------------------------------------
 
@@ -139,6 +137,5 @@ public interface MappingManager
      * @param clr ClassLoader resolver
      * @return The column
      */
-    Column createColumn(AbstractMemberMetaData fmd, Table table, 
-            JavaTypeMapping mapping, ColumnMetaData colmd, Column referenceCol, ClassLoaderResolver clr);
+    Column createColumn(AbstractMemberMetaData fmd, Table table, JavaTypeMapping mapping, ColumnMetaData colmd, Column referenceCol, ClassLoaderResolver clr);
 }

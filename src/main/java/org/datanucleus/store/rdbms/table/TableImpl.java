@@ -42,7 +42,6 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -219,9 +218,9 @@ public abstract class TableImpl extends AbstractTable
         {
             RDBMSColumnInfo ci = (RDBMSColumnInfo) i.next();
 
-            // Create an identifier to use for the real column - use "CUSTOM" because we dont want truncation
+            // Create an identifier to use for the real column - use "CUSTOM" because we don't want truncation
             DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(ci.getColumnName(), 
-                this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(String.class), FieldRole.ROLE_CUSTOM);
+                this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(String.class), null, true);
             Column col = (Column) unvalidated.get(colName);
             if (col != null)
             {

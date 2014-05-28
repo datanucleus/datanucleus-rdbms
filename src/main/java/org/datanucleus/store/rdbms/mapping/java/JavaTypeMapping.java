@@ -54,7 +54,7 @@ public abstract class JavaTypeMapping
      * Role of the mapping for the field. Whether it is for the field as a whole, or element of
      * a collection field (in a join table), or key/value of a map field (in a join table).
      */
-    protected int roleForMember = FieldRole.ROLE_NONE;
+    protected FieldRole roleForMember = FieldRole.ROLE_NONE;
 
     /** The Datastore mappings for this Java type. */
     protected DatastoreMapping[] datastoreMappings = new DatastoreMapping[0];
@@ -212,7 +212,7 @@ public abstract class JavaTypeMapping
      * Accessor for the role of this mapping for the field/property.
      * @return Role of this mapping for the field/property
      */
-    public int getRoleForMember()
+    public FieldRole getRoleForMember()
     {
         return roleForMember;
     }
@@ -222,7 +222,7 @@ public abstract class JavaTypeMapping
      * Should be called before initialize().
      * @param role Role for field/property.
      */
-    public void setRoleForMember(int role)
+    public void setRoleForMember(FieldRole role)
     {
         roleForMember = role;
     }
@@ -778,7 +778,7 @@ public abstract class JavaTypeMapping
      * @param role The role this mapping plays for the specified member
      * @return The column metadata (if any)
      */
-    protected static ColumnMetaData[] getColumnMetaDataForMember(AbstractMemberMetaData mmd, int role)
+    protected static ColumnMetaData[] getColumnMetaDataForMember(AbstractMemberMetaData mmd, FieldRole role)
     {
         if (mmd == null)
         {

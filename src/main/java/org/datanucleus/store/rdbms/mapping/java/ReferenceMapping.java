@@ -273,7 +273,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param fieldRole Role of this field
      * @return The field type name
      */
-    private String getReferenceFieldType(int fieldRole)
+    private String getReferenceFieldType(FieldRole fieldRole)
     {
         String fieldTypeName = mmd.getTypeName();
         if (mmd.getFieldTypes() != null && mmd.getFieldTypes().length == 1)
@@ -308,7 +308,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * This call ColumnCreator.createColumnsForField for each implementation class of the reference.
      */
     void createPerImplementationColumnsForReferenceField(boolean pk, boolean nullable, boolean serialised, 
-            boolean embedded, int fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr)
+            boolean embedded, FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr)
     {
         if (this instanceof InterfaceMapping && mmd != null && mmd.hasExtension("implementation-classes"))
         {
@@ -320,8 +320,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
         String[] implTypes = null;
         try
         {
-            implTypes = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, 
-                fieldRole, clr, storeMgr.getMetaDataManager());
+            implTypes = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, fieldRole, clr, storeMgr.getMetaDataManager());
         }
         catch (NucleusUserException nue)
         {

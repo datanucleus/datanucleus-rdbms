@@ -283,7 +283,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param fieldRole Role that this mapping plays for the field
      * @return The mapping for the member.
      */
-    public JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int fieldRole)
+    public JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, FieldRole fieldRole)
     {
         if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT || fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
         {
@@ -624,7 +624,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param clr ClassLoader resolver
      * @return The mapping
      */
-    protected JavaTypeMapping getElementMapping(Table table, AbstractMemberMetaData mmd, int fieldRole, ClassLoaderResolver clr)
+    protected JavaTypeMapping getElementMapping(Table table, AbstractMemberMetaData mmd, FieldRole fieldRole, ClassLoaderResolver clr)
     {
         if (!mmd.hasCollection() && !mmd.hasArray())
         {
@@ -1565,7 +1565,7 @@ public class RDBMSMappingManager implements MappingManager
     public Column createColumn(JavaTypeMapping mapping, String javaType, int datastoreFieldIndex)
     {
         AbstractMemberMetaData fmd = mapping.getMemberMetaData();
-        int roleForField = mapping.getRoleForMember();
+        FieldRole roleForField = mapping.getRoleForMember();
         Table tbl = mapping.getTable();
 
         // Take the column MetaData from the component that this mappings role relates to
@@ -1651,7 +1651,7 @@ public class RDBMSMappingManager implements MappingManager
         {
             // User has specified a name, so try to keep this unmodified
             identifier = idFactory.newColumnIdentifier(colmds[datastoreFieldIndex].getName(), 
-                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), FieldRole.ROLE_CUSTOM);
+                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), null, true);
         }
 
         // Create the column
@@ -1751,7 +1751,7 @@ public class RDBMSMappingManager implements MappingManager
             // User has specified a name, so try to keep this unmodified
             col = tbl.addColumn(javaType, 
                 idFactory.newColumnIdentifier(colmd.getName(), 
-                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), FieldRole.ROLE_CUSTOM), mapping, colmd);
+                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true), mapping, colmd);
         }
 
         setColumnNullability(mmd, colmd, col);
@@ -1795,7 +1795,7 @@ public class RDBMSMappingManager implements MappingManager
         else
         {
             // User has specified a name, so try to keep this unmodified
-            identifier = idFactory.newColumnIdentifier(colmd.getName(), false, FieldRole.ROLE_CUSTOM);
+            identifier = idFactory.newColumnIdentifier(colmd.getName(), false, null, true);
         }
         Column col = table.addColumn(mmd.getType().getName(), identifier, mapping, colmd);
 

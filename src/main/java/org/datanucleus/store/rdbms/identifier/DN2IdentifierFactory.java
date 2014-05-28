@@ -79,7 +79,7 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
      * @return The identifier.
      */
     public DatastoreIdentifier newJoinTableFieldIdentifier(AbstractMemberMetaData ownerFmd, AbstractMemberMetaData relatedFmd,
-            DatastoreIdentifier destinationId, boolean embedded, int fieldRole)
+            DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole)
     {
         if (destinationId != null)
         {
@@ -96,7 +96,7 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
                     fieldRole = FieldRole.ROLE_COLLECTION_ELEMENT;
                 }
             }
-            return newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole);
+            return newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
         }
         else
         {
@@ -134,18 +134,17 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
      * @param fieldRole The role to be performed by this column e.g owner, index ?
      * @return The identifier
      */
-    public DatastoreIdentifier newForeignKeyFieldIdentifier(AbstractMemberMetaData ownerFmd, DatastoreIdentifier destinationId,
-            boolean embedded, int fieldRole)
+    public DatastoreIdentifier newForeignKeyFieldIdentifier(AbstractMemberMetaData ownerFmd, DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole)
     {
         if (fieldRole == FieldRole.ROLE_OWNER)
         {
             // FK field (FK collection/array/list/map)
-            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole);
+            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
         }
         else if (fieldRole == FieldRole.ROLE_INDEX)
         {
             // Order field for FK (FK list)
-            return newColumnIdentifier(ownerFmd.getName(), embedded, fieldRole);
+            return newColumnIdentifier(ownerFmd.getName(), embedded, fieldRole, false);
         }
         else
         {

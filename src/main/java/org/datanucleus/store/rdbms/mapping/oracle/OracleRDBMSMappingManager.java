@@ -60,7 +60,7 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
      * @param fieldRole Role of this column for the field (e.g collection element)
      * @return The mapping class to use
      */
-    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, int fieldRole)
+    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
     {
         // Override some mappings with Oracle-specific mappings
         if (mappingClass.equals(BitSetMapping.class))

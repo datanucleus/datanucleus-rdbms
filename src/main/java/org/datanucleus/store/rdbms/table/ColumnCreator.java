@@ -27,6 +27,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.DuplicateColumnException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -102,7 +103,7 @@ public final class ColumnCreator
      */
     public static JavaTypeMapping createColumnsForJoinTables(Class javaType, AbstractMemberMetaData mmd,
             ColumnMetaData[] columnMetaData, RDBMSStoreManager storeMgr, Table table,
-            boolean primaryKey, boolean nullable, int fieldRole, ClassLoaderResolver clr)
+            boolean primaryKey, boolean nullable, FieldRole fieldRole, ClassLoaderResolver clr)
     {
         // Collection<PC>, Map<PC>, PC[]
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(javaType, false, false, 
@@ -134,7 +135,7 @@ public final class ColumnCreator
     public static JavaTypeMapping createColumnsForField(Class javaType, JavaTypeMapping mapping,
             Table table, RDBMSStoreManager storeMgr, AbstractMemberMetaData mmd,
             boolean isPrimaryKey, boolean isNullable, boolean serialised, boolean embedded,
-            int fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr, boolean isReferenceField)
+            FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr, boolean isReferenceField)
     {
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         if (mapping instanceof ReferenceMapping ||
