@@ -22,6 +22,7 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Discriminator using a Long delegate.
+ * This extends DiscriminatorMapping so that we can have different expression/literal for numeric discriminators.
  */
 public final class DiscriminatorLongMapping extends DiscriminatorMapping
 {

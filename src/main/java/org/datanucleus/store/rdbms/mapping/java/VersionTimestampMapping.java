@@ -21,6 +21,7 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Version using a Timestamp delegate.
+ * This extends VersionMapping so that we can have different expression/literal for temporal versions.
  */
 public final class VersionTimestampMapping extends VersionMapping
 {

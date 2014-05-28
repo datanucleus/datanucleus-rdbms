@@ -21,6 +21,7 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Version using a Long delegate.
+ * This extends VersionMapping so that we can have different expression/literal for numeric versions.
  */
 public final class VersionLongMapping extends VersionMapping
 {
