@@ -172,7 +172,7 @@ public abstract class JavaTypeMapping
     /**
      * Method to set the metadata of the member for which this mapping applies.
      * For use where the mapping was created for a particular type (using the 
-     * initialize(DatastoreAdapter, String) and we now have the member that it applies for.
+     * initialize(StoreManager, String) and we now have the member that it applies for.
      * @param mmd Field/Property MetaData
      */
     public void setMemberMetaData(AbstractMemberMetaData mmd)
@@ -180,9 +180,41 @@ public abstract class JavaTypeMapping
         this.mmd = mmd;
     }
 
+    /**
+     * Accessor for the MetaData of the field/property being mapped. Will be null if this mapping is for a literal in a query.
+     * @return Returns the metadata for the field or property
+     */
+    public AbstractMemberMetaData getMemberMetaData()
+    {
+        return mmd;
+    }
+
+    public RDBMSStoreManager getStoreManager()
+    {
+        return storeMgr;
+    }
+
     public void setTable(Table table)
     {
         this.table = table;
+    }
+
+    /**
+     * Accessor for the table. Will be null if this mapping is for a literal in a query.
+     * @return The datastore class containing this mapped field.
+     */
+    public Table getTable()
+    {
+        return table;
+    }
+
+    /**
+     * Accessor for the role of this mapping for the field/property.
+     * @return Role of this mapping for the field/property
+     */
+    public int getRoleForMember()
+    {
+        return roleForMember;
     }
 
     /**
@@ -208,25 +240,6 @@ public abstract class JavaTypeMapping
     public void setAbsFieldNumber(int num)
     {
         absFieldNumber = num;
-    }
-
-    /**
-     * Accessor for the MetaData of the field/property to be mapped.
-     * Will be null if this mapping is for a literal in a query.
-     * @return Returns the metadata for the field or property
-     */
-    public AbstractMemberMetaData getMemberMetaData()
-    {
-        return mmd;
-    }
-
-    /**
-     * Accessor for the role of this mapping for the field/property.
-     * @return Role of this mapping for the field/property
-     */
-    public int getRoleForMember()
-    {
-        return roleForMember;
     }
 
     /**
@@ -321,16 +334,6 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Accessor for the datastore class (e.g in an RDBMS context, the Table).
-     * Will be null if this mapping is for a literal in a query.
-     * @return The datastore class containing this mapped field.
-     */
-    public Table getTable()
-    {
-        return table;
-    }
-
-    /**
      * Accessor for a datastore mapping
      * @param index The id of the mapping
      * @return The datastore mapping
@@ -338,6 +341,28 @@ public abstract class JavaTypeMapping
     public DatastoreMapping getDatastoreMapping(int index)
     {
         return datastoreMappings[index];
+    }
+
+    /**
+     * Method to add a datastore mapping
+     * @param datastoreMapping The datastore mapping
+     */
+    public void addDatastoreMapping(DatastoreMapping datastoreMapping)
+    {
+        DatastoreMapping[] dm = datastoreMappings;
+        datastoreMappings = new DatastoreMapping[datastoreMappings.length+1];
+        System.arraycopy(dm, 0, datastoreMappings, 0, dm.length);
+        datastoreMappings[dm.length] = datastoreMapping;
+    }
+
+    /**
+     * Accessor for the number of datastore mappings.
+     * This typically equates to the number of columns
+     * @return the number of datastore mappings
+     */
+    public int getNumberOfDatastoreMappings()
+    {
+        return datastoreMappings.length;
     }
 
     /**
@@ -372,33 +397,6 @@ public abstract class JavaTypeMapping
     public void setReferenceMapping(JavaTypeMapping referenceMapping)
     {
         this.referenceMapping = referenceMapping; 
-    }
-
-    /**
-     * Method to add a datastore mapping
-     * @param datastoreMapping The datastore mapping
-     */
-    public void addDatastoreMapping(DatastoreMapping datastoreMapping)
-    {
-        DatastoreMapping[] dm = datastoreMappings;
-        datastoreMappings = new DatastoreMapping[datastoreMappings.length+1];
-        System.arraycopy(dm, 0, datastoreMappings, 0, dm.length);
-        datastoreMappings[dm.length] = datastoreMapping;
-    }
-
-    /**
-     * Acessor for the number of datastore mappings.
-     * This typically equates to the number of columns
-     * @return the number of datastore mappings
-     */
-    public int getNumberOfDatastoreMappings()
-    {
-        return datastoreMappings.length;
-    }
-
-    public RDBMSStoreManager getStoreManager()
-    {
-        return storeMgr;
     }
 
     /**
