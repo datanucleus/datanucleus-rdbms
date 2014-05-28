@@ -126,9 +126,13 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         sqlType = new PostgresqlTypeInfo("BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
-        // Not present in PSQL 9.2.8
+        // Not present in PSQL 9.2.8 - just mirror what BIT does
         sqlType = new PostgresqlTypeInfo("bool", (short)Types.BOOLEAN, 0, null, null, null, 1, false, (short)3, true, false, false, "bool", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
+
+        // Not present in PSQL 9.2.8 - just mirror what SMALLINT does
+        sqlType = new PostgresqlTypeInfo("int2", (short)Types.TINYINT, 0, null, null, null, 1, false, (short)3, false, false, false, "int2", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
     }
 
     /**

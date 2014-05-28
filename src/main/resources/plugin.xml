@@ -303,7 +303,7 @@ Contributors:
     Informix : JDBC DOUBLE not supported
     Oracle : JDBC DOUBLE not supported
     Pointbase : JDBC BIT not supported
-    PostgreSQL : JDBC TINYINT, DECIMAL, FLOAT not supported
+    PostgreSQL : JDBC DECIMAL, FLOAT not supported
     MaxDB/SAPDB : JDBC TINYINT, BIT, BIGINT, NUMERIC not supported, SQL INT types are alias to the SQL INTEGER type
     Sybase : JDBC FLOAT, BIGINT not supported, SQL INT types are alias to the SQL INTEGER type
     NuoDB : TINYINT not supported
@@ -332,7 +332,6 @@ Contributors:
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
-            <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
@@ -360,7 +359,6 @@ Contributors:
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
-            <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
@@ -479,7 +477,6 @@ Contributors:
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
-            <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
@@ -529,7 +526,6 @@ Contributors:
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
-            <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
@@ -562,7 +558,6 @@ Contributors:
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
-            <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
