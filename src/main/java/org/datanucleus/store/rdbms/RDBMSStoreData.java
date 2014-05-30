@@ -35,6 +35,15 @@ import org.datanucleus.util.Localiser;
  */
 public class RDBMSStoreData extends StoreData
 {
+    protected String tableName = null;
+
+    protected DatastoreIdentifier tableIdentifier = null;
+
+    protected boolean tableOwner = true;
+
+    // TODO Remove this when org.datanucleus.store.rdbms.table.Table implements org.datanucleus.store.schema.table.Table
+    protected Table rdbmsTable = null;
+
     /**
      * Constructor. To be used when creating for the start mechanism.
      * @param name Name of the class/field
@@ -47,8 +56,8 @@ public class RDBMSStoreData extends StoreData
     public RDBMSStoreData(String name, String tableName, boolean tableOwner, int type, String interfaceName)
     {
         super(name, null, type, interfaceName);
-        addProperty("table", tableName);
-        addProperty("table-owner", tableOwner ? "true" : "false");
+        this.tableName = tableName;
+        this.tableOwner = tableOwner;
     }
 
     /**
@@ -61,12 +70,12 @@ public class RDBMSStoreData extends StoreData
     {
         super(cmd.getFullClassName(), cmd, FCO_TYPE, null);
 
-        addProperty("table", (table != null ? table.toString() : null));
-        addProperty("table-owner", tableOwner ? "true" : "false");
+        this.tableOwner = tableOwner;
         if (table != null)
         {
-            addProperty("tableObject", table);
-            addProperty("tableId", table.getIdentifier());
+            this.rdbmsTable = table;
+            this.tableName = table.toString();
+            this.tableIdentifier = table.getIdentifier();
         }
 
         String interfaces = null;
@@ -85,7 +94,7 @@ public class RDBMSStoreData extends StoreData
                 }
                 interfaces += cmd.getImplementsMetaData()[i].getName();
             }
-            addProperty("interface-name", interfaces);
+            this.interfaceName = interfaces;
         }
     }
 
@@ -102,16 +111,16 @@ public class RDBMSStoreData extends StoreData
         {
             throw new NullPointerException("table should not be null");
         }
-        addProperty("table", table.toString());
-        addProperty("table-owner", "true");
-        addProperty("tableObject", table);
-        addProperty("tableId", table.getIdentifier());
+        this.rdbmsTable = table;
+        this.tableName = table.toString();
+        this.tableOwner = true;
+        this.tableIdentifier = table.getIdentifier();
 
         String interfaceName = 
             (table.getStoreManager().getMetaDataManager().isPersistentInterface(mmd.getType().getName()) ? mmd.getType().getName() : null);
         if (interfaceName != null)
         {
-            addProperty("interface-name", interfaceName);
+            this.interfaceName = interfaceName;
         }
     }
 
@@ -121,12 +130,7 @@ public class RDBMSStoreData extends StoreData
      */
     public boolean mapsToView()
     {
-        Table table = getTable();
-        if (table == null)
-        {
-            return false;
-        }
-        return (table instanceof ViewImpl);
+        return rdbmsTable != null ? rdbmsTable instanceof ViewImpl : false;
     }
 
     /**
@@ -135,7 +139,7 @@ public class RDBMSStoreData extends StoreData
      */
     public String getTableName()
     {
-        return (String)properties.get("table");
+        return tableName;
     }
 
     /**
@@ -144,7 +148,7 @@ public class RDBMSStoreData extends StoreData
      */
     public boolean isTableOwner()
     {
-        return ((String)properties.get("table-owner")).equals("true");
+        return tableOwner;
     }
 
     /**
@@ -153,16 +157,16 @@ public class RDBMSStoreData extends StoreData
      */
     public boolean hasTable()
     {
-        return properties.get("table") != null;
+        return tableName != null;
     }
 
     /**
      * Accessor for the Table details.
      * @return The Table
      */
-    public Table getTable()
+    public Table getRDBMSTable()
     {
-        return (Table)properties.get("tableObject");
+        return rdbmsTable;
     }
 
     /**
@@ -171,21 +175,20 @@ public class RDBMSStoreData extends StoreData
      */
     public DatastoreIdentifier getDatastoreIdentifier()
     {
-        return (DatastoreIdentifier)properties.get("tableId");
+        return tableIdentifier;
     }
 
     /**
-     * Convenience to set the table. To be used in cases where the table isn't known
-     * until after the initial create
+     * Convenience to set the table. To be used in cases where the table isn't known until after the initial create
      * @param table The table
      */
     public void setDatastoreContainerObject(DatastoreClass table)
     {
         if (table != null)
         {
-            addProperty("table", table.toString());
-            addProperty("tableObject", table);
-            addProperty("tableId", table.getIdentifier());
+            this.rdbmsTable = table;
+            this.tableName = table.toString();
+            this.tableIdentifier = table.getIdentifier();
         }
     }
 
@@ -195,13 +198,11 @@ public class RDBMSStoreData extends StoreData
      */
     public String toString()
     {
-        String tableName = (String)properties.get("table");
         MetaData metadata = getMetaData();
         if (metadata instanceof ClassMetaData)
         {
             ClassMetaData cmd = (ClassMetaData)metadata;
-            return Localiser.msg("035004", name, tableName != null ? tableName : "(none)",
-                cmd.getInheritanceMetaData().getStrategy().toString());
+            return Localiser.msg("035004", name, tableName != null ? tableName : "(none)", cmd.getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {
