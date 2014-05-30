@@ -234,7 +234,7 @@ public abstract class AbstractClassTable extends TableImpl
                 //probably due to invalid metadata defined by the user
                 throw new NucleusUserException("Cannot find mapping for field " + mmd.getFullFieldName()+
                     " in table " + refTable.toString() + " " +
-                    StringUtils.objectArrayToString(refTable.getColumns()));
+                    StringUtils.objectArrayToString(refTable.getColumnsArray()));
             }
 
             JavaTypeMapping masterMapping = storeMgr.getMappingManager().getMapping(clr.classForName(mapping.getType()));
@@ -292,7 +292,7 @@ public abstract class AbstractClassTable extends TableImpl
                 {
                     refColumn.copyConfigurationTo(idColumn);
                 }
-                idColumn.setAsPrimaryKey();
+                idColumn.setPrimaryKey();
 
                 // Set the column type based on the field.getType()
                 getStoreManager().getMappingManager().createDatastoreMapping(m, idColumn, refColumn.getJavaTypeMapping().getType());
@@ -352,7 +352,7 @@ public abstract class AbstractClassTable extends TableImpl
         // Add the datastore identity column as the PK
         Column idColumn = addColumn(DatastoreId.class.getName(), 
             storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIDMapping, colmd);
-        idColumn.setAsPrimaryKey();
+        idColumn.setPrimaryKey();
 
         // Set the identity column type based on the IdentityStrategy
         String strategyName = cmd.getIdentityMetaData().getValueStrategy().toString();

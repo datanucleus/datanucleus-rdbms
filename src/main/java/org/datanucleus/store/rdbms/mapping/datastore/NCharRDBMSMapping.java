@@ -198,7 +198,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
             }
             else
             {
-                if (column.getJdbcType() == Types.CHAR && 
+                if (column.getJdbcTypeNumber() == Types.CHAR && 
                     getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
                 {
                     // String has likely been padded with spaces at the end by the datastore so trim trailing whitespace

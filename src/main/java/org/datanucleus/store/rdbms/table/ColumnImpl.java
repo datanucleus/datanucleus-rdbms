@@ -52,6 +52,8 @@ import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.schema.naming.ColumnType;
+import org.datanucleus.store.schema.table.MemberColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -106,8 +108,7 @@ public class ColumnImpl implements Column
      * @param identifier The identifier of the column (in the datastore).
      * @param colmd The ColumnMetaData for this column
      */
-    public ColumnImpl(Table table, String javaType, DatastoreIdentifier identifier, 
-            ColumnMetaData colmd)
+    public ColumnImpl(Table table, String javaType, DatastoreIdentifier identifier, ColumnMetaData colmd)
     {
         this.table = table;
         this.storedJavaType = javaType;
@@ -132,20 +133,101 @@ public class ColumnImpl implements Column
         if (columnMetaData.getAllowsNull() != null && columnMetaData.isAllowsNull())
         {
             // MetaData requires it to be nullable
-            setNullable();
+            setNullable(true);
         }
 
         // Uniqueness
         if (columnMetaData.getUnique())
         {
             // MetaData requires it to be unique
-            setUnique();
+            setUnique(true);
         }
 
         wrapperFunction = new String[3];
 		wrapperFunction[WRAPPER_FUNCTION_SELECT]= "?";
 		wrapperFunction[WRAPPER_FUNCTION_INSERT]= "?";
 		wrapperFunction[WRAPPER_FUNCTION_UPDATE]= "?";
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getName()
+     */
+    @Override
+    public String getName()
+    {
+        return identifier.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getMemberColumnMapping()
+     */
+    @Override
+    public MemberColumnMapping getMemberColumnMapping()
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getColumnType()
+     */
+    @Override
+    public ColumnType getColumnType()
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setJdbcType(org.datanucleus.metadata.JdbcType)
+     */
+    @Override
+    public Column setJdbcType(JdbcType jdbcType)
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getJdbcType()
+     */
+    @Override
+    public JdbcType getJdbcType()
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setTypeName(java.lang.String)
+     */
+    @Override
+    public Column setTypeName(String type)
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getTypeName()
+     */
+    @Override
+    public String getTypeName()
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setPosition(int)
+     */
+    @Override
+    public Column setPosition(int pos)
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#getPosition()
+     */
+    @Override
+    public int getPosition()
+    {
+        throw new UnsupportedOperationException("Not supported on this Column");
     }
 
     /* (non-Javadoc)
@@ -186,9 +268,9 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#getDatastoreContainerObject()
+     * @see org.datanucleus.store.rdbms.table.Column#getTable()
      */
-    public Table getTable()   
+    public Table getTable()
     {
         return table;
     }
@@ -236,7 +318,7 @@ public class ColumnImpl implements Column
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getJdbcType()
      */
-    public int getJdbcType()
+    public int getJdbcTypeNumber()
     {
         return typeInfo.getDataType();
     }
@@ -485,7 +567,7 @@ public class ColumnImpl implements Column
         String column_default = ci.getColumnDef();
         if (column_default != null)
         {
-            setDefaultValue(column_default.replace("'", "").replace("\"", "").replace(")", "").replace("(", ""));
+            setDefaultable(column_default.replace("'", "").replace("\"", "").replace(")", "").replace("(", ""));
         }
 
         // TODO Make sure that this lines up with the defaultValue when set.
@@ -630,39 +712,55 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setAsPrimaryKey()
+     * @see org.datanucleus.store.schema.table.Column#setPrimaryKey()
      */
-    public final void setAsPrimaryKey()
+    public final Column setPrimaryKey()
     {
         flags |= PK;
         //primary keys cannot be null
         flags &= ~NULLABLE;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setNullable()
-     */
-    public final Column setNullable()
-    {
-        flags |= NULLABLE;
         return this;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setDefaultable()
+     * @see org.datanucleus.store.schema.table.Column#setNullable(boolean)
      */
-    public final Column setDefaultable()
+    public final Column setNullable(boolean flag)
+    {
+        if (flag)
+        {
+            flags |= NULLABLE;
+        }
+        else
+        {
+            flags &= ~NULLABLE;
+        }
+        return this;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Column#setDefaultable(java.lang.Object)
+     */
+    public final Column setDefaultable(Object defaultValue)
     {
         flags |= DEFAULTABLE;
+        this.defaultValue = defaultValue;
         return this;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setUnique()
+     * @see org.datanucleus.store.schema.table.Column#setUnique(boolean)
      */
-    public final Column setUnique()
+    public final Column setUnique(boolean flag)
     {
-        flags |= UNIQUE;
+        if (flag)
+        {
+            flags |= UNIQUE;
+        }
+        else
+        {
+            flags &= ~UNIQUE;
+        }
         return this;
     }
 
@@ -747,14 +845,6 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setDefaultValue(java.lang.Object)
-     */
-    public void setDefaultValue(Object object)
-    {
-        defaultValue = object;
-    }
-
-    /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getColumnMetaData()
      */
     public final ColumnMetaData getColumnMetaData()
@@ -813,12 +903,12 @@ public class ColumnImpl implements Column
         if (colmd.getAllowsNull() != null && colmd.isAllowsNull())
         {
             // MetaData requires it to be nullable
-            setNullable();
+            setNullable(true);
         }
         if (colmd.getUnique())
         {
             // MetaData requires it to be unique
-            setUnique();
+            setUnique(true);
         }
     }
 

@@ -33,10 +33,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.MetaData;
@@ -50,6 +52,7 @@ import org.datanucleus.store.rdbms.exceptions.MissingTableException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
+import org.datanucleus.store.schema.table.MemberColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -153,13 +156,131 @@ public abstract class AbstractTable implements Table
         return state == TABLE_STATE_INITIALIZED_MODIFIED;
     }
 
-    /**
-     * Accessor for the Store Manager.
-     * @return Store Manager
-     **/
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getStoreManager()
+     */
+    @Override
     public RDBMSStoreManager getStoreManager()
     {
         return storeMgr;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getName()
+     */
+    @Override
+    public String getName()
+    {
+        return identifier.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getClassMetaData()
+     */
+    @Override
+    public AbstractClassMetaData getClassMetaData()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getNumberOfColumns()
+     */
+    @Override
+    public int getNumberOfColumns()
+    {
+        return columns.size();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getColumns()
+     */
+    @Override
+    public List<org.datanucleus.store.schema.table.Column> getColumns()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getColumnForPosition(int)
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getColumnForPosition(int pos)
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getDatastoreIdColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getDatastoreIdColumn()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getVersionColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getVersionColumn()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getDiscriminatorColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getDiscriminatorColumn()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getMultitenancyColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getMultitenancyColumn()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getColumnForName(java.lang.String)
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getColumnForName(String name)
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappingForMember(org.datanucleus.metadata.AbstractMemberMetaData)
+     */
+    @Override
+    public MemberColumnMapping getMemberColumnMappingForMember(AbstractMemberMetaData mmd)
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappingForEmbeddedMember(java.util.List)
+     */
+    @Override
+    public MemberColumnMapping getMemberColumnMappingForEmbeddedMember(List<AbstractMemberMetaData> mmds)
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getMemberColumnMappings()
+     */
+    @Override
+    public Set<MemberColumnMapping> getMemberColumnMappings()
+    {
+        throw new UnsupportedOperationException("Not supported on this table");
     }
 
     /**
@@ -250,8 +371,7 @@ public abstract class AbstractTable implements Table
      * @return the new Column
      * @throws DuplicateColumnException if a column already exists with same name and not a supported situation.
      */
-    public synchronized Column addColumn(String storedJavaType, DatastoreIdentifier name, 
-            JavaTypeMapping mapping, ColumnMetaData colmd)
+    public synchronized Column addColumn(String storedJavaType, DatastoreIdentifier name, JavaTypeMapping mapping, ColumnMetaData colmd)
     {
         // TODO If already initialized and this is called we should check if exists in current representation
         // then check if exists in datastore, and then create it if necessary
@@ -395,7 +515,7 @@ public abstract class AbstractTable implements Table
      * Accessor for the columns infered from the java and metadata files.
      * @return the columns
      */
-    public Column[] getColumns()
+    public Column[] getColumnsArray()
     {
         return columns.toArray(new Column[columns.size()]);
     }

@@ -124,7 +124,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = elementMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -186,7 +186,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 // Non-PC, so depends if the element column can be used as part of a PK
                 // TODO This assumes the elementMapping has a single column but what if it is Color with 4 cols?
                 Column elementCol = elementMapping.getDatastoreMapping(0).getColumn();
-                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
+                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcTypeNumber()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
                     orderRequired = true;
@@ -259,14 +259,14 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK
-                    orderMapping.getDatastoreMapping(0).getColumn().setAsPrimaryKey();
+                    orderMapping.getDatastoreMapping(0).getColumn().setPrimaryKey();
                 }
                 else
                 {
                     // No order column specified so owner+element are the PK
                     for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
                     {
-                        elementMapping.getDatastoreMapping(i).getColumn().setAsPrimaryKey();
+                        elementMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
                     }
                 }
             }

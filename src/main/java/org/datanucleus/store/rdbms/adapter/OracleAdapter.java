@@ -702,7 +702,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         for (int i=0;i<m.getNumberOfDatastoreMappings();i++)
         {
             Column col = m.getDatastoreMapping(i).getColumn();
-            if (col.getJdbcType() == Types.CLOB || col.getJdbcType() == Types.BLOB)
+            if (col.getJdbcTypeNumber() == Types.CLOB || col.getJdbcTypeNumber() == Types.BLOB)
             {
                 // "java.sql.SQLException: ORA-00932: inconsistent datatypes: expected - got CLOB"
                 if (stmt.isDistinct())

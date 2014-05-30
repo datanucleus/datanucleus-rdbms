@@ -469,7 +469,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         for (int i=0;i<m.getNumberOfDatastoreMappings();i++)
         {
             Column col = m.getDatastoreMapping(i).getColumn();
-            if (col.getJdbcType() == Types.CLOB || col.getJdbcType() == Types.BLOB)
+            if (col.getJdbcTypeNumber() == Types.CLOB || col.getJdbcTypeNumber() == Types.BLOB)
             {
                 // "The ... data type cannot be selected as DISTINCT because it is not comparable."
                 if (stmt.isDistinct())

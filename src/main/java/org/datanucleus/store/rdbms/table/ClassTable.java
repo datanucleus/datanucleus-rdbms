@@ -565,7 +565,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         NucleusLogger.DATASTORE_SCHEMA.debug("Member " + mmd.getFullFieldName() +
                                             " uses superclass-table yet the field is not marked as nullable " +
                                             " nor does it have a default value, so setting the column as nullable");
-                                        col.setNullable();
+                                        col.setNullable(true);
                                     }
                                 }
                             }
@@ -1394,7 +1394,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
                                     {
                                         // User either wants it nullable, or haven't specified anything, so make it nullable
-                                        refColumn.setNullable();
+                                        refColumn.setNullable(true);
                                     }
 
                                     fkMapping.addDatastoreMapping(getStoreManager().getMappingManager().createDatastoreMapping(mapping, refColumn, refDatastoreMapping.getJavaTypeMapping().getJavaType().getName()));
@@ -1817,7 +1817,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Package-level access to restrict to other table types only.
      * @return The (primary) class MetaData
      **/
-    ClassMetaData getClassMetaData()
+    public ClassMetaData getClassMetaData()
     {
         return cmd;
     }
@@ -3322,7 +3322,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
         {
             // User either wants it nullable, or havent specified anything, so make it nullable
-            column.setNullable();
+            column.setNullable(true);
         }
 
         storeMgr.getMappingManager().createDatastoreMapping(indexMapping, column, indexType.getName());

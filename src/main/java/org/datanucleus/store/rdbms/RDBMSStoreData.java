@@ -41,9 +41,6 @@ public class RDBMSStoreData extends StoreData
 
     protected boolean tableOwner = true;
 
-    // TODO Remove this when org.datanucleus.store.rdbms.table.Table implements org.datanucleus.store.schema.table.Table
-    protected Table rdbmsTable = null;
-
     /**
      * Constructor. To be used when creating for the start mechanism.
      * @param name Name of the class/field
@@ -73,7 +70,7 @@ public class RDBMSStoreData extends StoreData
         this.tableOwner = tableOwner;
         if (table != null)
         {
-            this.rdbmsTable = table;
+            this.table = table;
             this.tableName = table.toString();
             this.tableIdentifier = table.getIdentifier();
         }
@@ -111,7 +108,7 @@ public class RDBMSStoreData extends StoreData
         {
             throw new NullPointerException("table should not be null");
         }
-        this.rdbmsTable = table;
+        this.table = table;
         this.tableName = table.toString();
         this.tableOwner = true;
         this.tableIdentifier = table.getIdentifier();
@@ -130,7 +127,7 @@ public class RDBMSStoreData extends StoreData
      */
     public boolean mapsToView()
     {
-        return rdbmsTable != null ? rdbmsTable instanceof ViewImpl : false;
+        return table != null ? table instanceof ViewImpl : false;
     }
 
     /**
@@ -161,15 +158,6 @@ public class RDBMSStoreData extends StoreData
     }
 
     /**
-     * Accessor for the Table details.
-     * @return The Table
-     */
-    public Table getRDBMSTable()
-    {
-        return rdbmsTable;
-    }
-
-    /**
      * Accessor for the identifier for the table.
      * @return The table identifier
      */
@@ -186,7 +174,7 @@ public class RDBMSStoreData extends StoreData
     {
         if (table != null)
         {
-            this.rdbmsTable = table;
+            this.table = table;
             this.tableName = table.toString();
             this.tableIdentifier = table.getIdentifier();
         }

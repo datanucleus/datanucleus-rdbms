@@ -50,12 +50,8 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
  * <LI>exists() - whether the external representation exists</LI>
  * </UL>
  */
-public interface Table
+public interface Table extends org.datanucleus.store.schema.table.Table
 {
-    /**
-     * Accessor for the StoreManager for this table.
-     * @return The StoreManager.
-     */
     RDBMSStoreManager getStoreManager();
 
     /**
@@ -63,18 +59,6 @@ public interface Table
      * @return The identifier.
      */
     DatastoreIdentifier getIdentifier();
-
-    /**
-     * Accessor for the Catalog name for this table.
-     * @return The Catalog name.
-     */
-    String getCatalogName();
-
-    /**
-     * Accessor for the Schema name for this table.
-     * @return The Schema name.
-     */
-    String getSchemaName();
 
     /**
      * Method to add a new column to the internal representation.
@@ -105,7 +89,7 @@ public interface Table
      * Accessor for the columns for this table.
      * @return the columns
      */
-    Column[] getColumns();
+    Column[] getColumnsArray();
 
     /**
      * Accessor for the ID mapping of this container object.
@@ -194,8 +178,7 @@ public interface Table
      * @return Whether it  validates successfully
      * @throws SQLException Thrown if an error occurrs in the validation
      */
-    boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, 
-            Collection autoCreateErrors) 
+    boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors) 
     throws SQLException;
 
     /**

@@ -601,7 +601,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             StoreData sd = storeDataMgr.get(mmd);
             if (sd != null && sd instanceof RDBMSStoreData)
             {
-                return ((RDBMSStoreData)sd).getRDBMSTable();
+                return (Table) sd.getTable();
             }
             else
             {
@@ -641,7 +641,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             StoreData sd = storeDataMgr.get(className);
             if (sd != null && sd instanceof RDBMSStoreData)
             {
-                ct = (DatastoreClass) ((RDBMSStoreData)sd).getRDBMSTable();
+                ct = (DatastoreClass)sd.getTable();
                 if (ct != null)
                 {
                     // Class known about
@@ -685,7 +685,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (sd != null && sd instanceof RDBMSStoreData)
                 {
                     classKnown = true;
-                    ct = (DatastoreClass) ((RDBMSStoreData)sd).getRDBMSTable();
+                    ct = (DatastoreClass)sd.getTable();
                 }
             }
             finally
@@ -724,7 +724,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     RDBMSStoreData tsd = (RDBMSStoreData)sd;
                     if (tsd.hasTable() && tsd.getDatastoreIdentifier().equals(name))
                     {
-                        return (DatastoreClass) tsd.getRDBMSTable();
+                        return (DatastoreClass) tsd.getTable();
                     }
                 }
             }
@@ -2444,14 +2444,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return Collections.EMPTY_SET;
         }
 
-        Collection<Table> tables = new HashSet();
+        Collection tables = new HashSet();
         for (Iterator<StoreData> i = storeDataMgr.getManagedStoreData().iterator(); i.hasNext();)
         {
             RDBMSStoreData sd = (RDBMSStoreData) i.next();
-            if (sd.getRDBMSTable() != null)
+            if (sd.getTable() != null)
             {
                 // Catalog/Schema match if either managed table not set, or input requirements not set
-                DatastoreIdentifier identifier = sd.getRDBMSTable().getIdentifier();
+                DatastoreIdentifier identifier = ((Table)sd.getTable()).getIdentifier();
                 boolean catalogMatches = true;
                 boolean schemaMatches = true;
                 if (catalog != null && identifier.getCatalogName() != null &&
@@ -2466,7 +2466,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 if (catalogMatches && schemaMatches)
                 {
-                    tables.add(sd.getRDBMSTable());
+                    tables.add(sd.getTable());
                 }
             }
         }
@@ -2946,7 +2946,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     while (addedIter.hasNext())
                     {
                         RDBMSStoreData data = addedIter.next();
-                        if (data.getRDBMSTable() == null && data.isFCO())
+                        if (data.getTable() == null && data.isFCO())
                         {
                             AbstractClassMetaData cmd = (AbstractClassMetaData) data.getMetaData();
                             InheritanceMetaData imd = cmd.getInheritanceMetaData();
@@ -2956,8 +2956,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                 DatastoreClass superTable = null;
                                 if (managingCmds != null && managingCmds.length == 1)
                                 {
-                                    RDBMSStoreData superData =
-                                        (RDBMSStoreData) storeDataMgr.get(managingCmds[0].getFullClassName());
+                                    RDBMSStoreData superData = (RDBMSStoreData) storeDataMgr.get(managingCmds[0].getFullClassName());
 
                                     // Assert that managing class is in the set of storeDataByClass
                                     if (superData == null)
@@ -2967,12 +2966,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                     }
                                     if (superData == null)
                                     {
-                                        String msg = Localiser.msg("050013",
-                                            cmd.getFullClassName());
+                                        String msg = Localiser.msg("050013", cmd.getFullClassName());
                                         NucleusLogger.PERSISTENCE.error(msg);
                                         throw new NucleusUserException(msg);
                                     }
-                                    superTable = (DatastoreClass) superData.getRDBMSTable();
+                                    superTable = (DatastoreClass) superData.getTable();
                                     data.setDatastoreContainerObject(superTable);
                                 }
                             }
@@ -3159,7 +3157,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             if (superData != null)
                             {
                                 // Specify the table if it already exists
-                                superTable = superData.getRDBMSTable();
+                                superTable = (Table) superData.getTable();
                             }
                             sdNew = new RDBMSStoreData(cmd, superTable, false);
                             registerStoreData(sdNew);
@@ -3301,7 +3299,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     if (currentStoreData.hasTable())
                     {
                         // Class has a table so we have work to do
-                        Table t = currentStoreData.getRDBMSTable();
+                        Table t = (Table) currentStoreData.getTable();
                         if (t instanceof DatastoreClass)
                         {
                             ((RDBMSPersistenceHandler)persistenceHandler).removeRequestsForTable((DatastoreClass)t);

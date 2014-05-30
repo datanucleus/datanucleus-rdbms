@@ -92,11 +92,11 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     {
                         if (data.mapsToView())
                         {
-                            viewsByName.put(data.getDatastoreIdentifier(), data.getRDBMSTable());
+                            viewsByName.put(data.getDatastoreIdentifier(), data.getTable());
                         }
                         else
                         {
-                            baseTablesByName.put(data.getDatastoreIdentifier(), data.getRDBMSTable());
+                            baseTablesByName.put(data.getDatastoreIdentifier(), data.getTable());
                         }
                     }
                 }

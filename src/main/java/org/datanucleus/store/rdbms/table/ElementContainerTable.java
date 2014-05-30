@@ -196,7 +196,7 @@ public abstract class ElementContainerTable extends JoinTable
             {
                 if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
                 {
-                    ownerMapping.getDatastoreMapping(j).getColumn().setAsPrimaryKey();
+                    ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                     found = true;
                 }
             }
@@ -207,7 +207,7 @@ public abstract class ElementContainerTable extends JoinTable
                 {
                     if (elementMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
                     {
-                        elementMapping.getDatastoreMapping(j).getColumn().setAsPrimaryKey();
+                        elementMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }

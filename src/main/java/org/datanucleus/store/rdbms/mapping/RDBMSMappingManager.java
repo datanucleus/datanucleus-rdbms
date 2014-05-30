@@ -1658,7 +1658,7 @@ public class RDBMSMappingManager implements MappingManager
         col = tbl.addColumn(javaType, identifier, mapping, colmd);
         if (fmd.isPrimaryKey())
         {
-            col.setAsPrimaryKey();
+            col.setPrimaryKey();
         }
 
         if (!(fmd.getParent() instanceof AbstractClassMetaData))
@@ -1698,11 +1698,7 @@ public class RDBMSMappingManager implements MappingManager
         if (fmd.getNullValue() == NullValue.DEFAULT)
         {
             // Users default should be applied if a null is to be inserted
-            col.setDefaultable();
-            if (colmd.getDefaultValue() != null)
-            {
-                col.setDefaultValue(colmd.getDefaultValue());
-            }
+            col.setDefaultable(colmd.getDefaultValue());
         }
 
         return col;
@@ -1758,11 +1754,7 @@ public class RDBMSMappingManager implements MappingManager
         if (mmd.getNullValue() == NullValue.DEFAULT)
         {
             // Users default should be applied if a null is to be inserted
-            col.setDefaultable();
-            if (colmd.getDefaultValue() != null)
-            {
-                col.setDefaultValue(colmd.getDefaultValue());
-            }
+            col.setDefaultable(colmd.getDefaultValue());
         }
 
         return col;
@@ -1804,7 +1796,7 @@ public class RDBMSMappingManager implements MappingManager
 
         if (mmd.isPrimaryKey())
         {
-            col.setAsPrimaryKey();
+            col.setPrimaryKey();
         }
 
         if (!(mmd.getParent() instanceof AbstractClassMetaData))
@@ -1840,11 +1832,7 @@ public class RDBMSMappingManager implements MappingManager
         if (mmd.getNullValue() == NullValue.DEFAULT)
         {
             // Users default should be applied if a null is to be inserted
-            col.setDefaultable();
-            if (colmd.getDefaultValue() != null)
-            {
-                col.setDefaultValue(colmd.getDefaultValue());
-            }
+            col.setDefaultable(colmd.getDefaultValue());
         }
 
         return col;        
@@ -1882,7 +1870,7 @@ public class RDBMSMappingManager implements MappingManager
             }
             if (colmd.isAllowsNull())
             {
-                col.setNullable();
+                col.setNullable(true);
             }
         }
         // Set the nullability of the column in the datastore
@@ -1890,7 +1878,7 @@ public class RDBMSMappingManager implements MappingManager
         {
             if (colmd.isAllowsNull())
             {
-                col.setNullable();
+                col.setNullable(true);
             }
         }
         else if (mmd.isPrimaryKey())
@@ -1899,7 +1887,7 @@ public class RDBMSMappingManager implements MappingManager
         }
         else if (!mmd.getType().isPrimitive() && mmd.getNullValue() != NullValue.EXCEPTION)
         {
-            col.setNullable();
+            col.setNullable(true);
         }
     }
 }

@@ -30,22 +30,23 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 /**
  * Interface for a column in an RDBMS datastore.
  */
-public interface Column
+public interface Column extends org.datanucleus.store.schema.table.Column
 {
-    /** wrapper function select **/
     public static final int WRAPPER_FUNCTION_SELECT = 0;
-
-    /** wrapper function insert **/
     public static final int WRAPPER_FUNCTION_INSERT = 1;
-
-    /** wrapper function update **/
     public static final int WRAPPER_FUNCTION_UPDATE = 2;
 
     /**
-     * Accessor for the StoreManager for this table.
+     * Accessor for the StoreManager for this column.
      * @return The StoreManager.
      */
     RDBMSStoreManager getStoreManager();
+
+    /**
+     * Accessor for the table for this column
+     * @return The table
+     */
+    Table getTable();
 
     /**
      * Accessor for the type of data stored in this field.
@@ -66,57 +67,9 @@ public interface Column
     DatastoreIdentifier getIdentifier();
 
     /**
-     * Mutator to make the field the primary key.
-     */
-    void setAsPrimaryKey();
-
-    /**
-     * Accessor for whether the field is the primary key in the datastore.
-     * @return whether the field is (part of) the primary key
-     */
-    boolean isPrimaryKey();
-
-    /**
-     * Mutator for the nullability of the datastore field.
-     * @return The datastore field with the updated info
-     */
-    Column setNullable();
-
-    /**
-     * Accessor for whether the field is nullable in the datastore.
-     * @return whether the field is nullable
-     */
-    boolean isNullable();
-
-    /**
-     * Mutator for the defaultability of the datastore field.
-     * @return The datastore field with the updated info
-     */
-    Column setDefaultable(); 
-
-    /**
-     * Accessor for whether the column is defaultable.
-     * @return whether the column is defaultable
-     */
-    boolean isDefaultable();
-
-    /**
-     * Mutator for the uniqueness of the column.
-     * @return The datastore field with the updated info
-     */
-    Column setUnique();
-
-    /**
-     * Accessor for whether the column is unique.
-     * @return whether the column is unique
-     */
-    boolean isUnique();
-
-    /**
      * Mutator for whether we set this column as an identity column.
-     * An "identity" column is typically treated differently in the datastore being
-     * given a value by the datastore itself.
-     * In RDBMS this would mean that the column is "AUTO_INCREMENT", "SERIAL" or 
+     * An "identity" column is typically treated differently in the datastore being given a value by the datastore itself.
+     * In RDBMS this would mean that the column is "AUTO_INCREMENT", "SERIAL" etc
      * @param identity True if column is identity
      * @return The Column
      */
@@ -127,18 +80,6 @@ public interface Column
      * @return true if column is identity.
      */
     boolean isIdentity();
-
-    /**
-     * Mutator for the default Value
-     * @param object default value
-     */
-    void setDefaultValue(Object object);
-
-    /**
-     * Accessor for the default Value
-     * @return the default value
-     */
-    Object getDefaultValue();
 
     /**
      * Method to associate this datastore field with its mapping.
@@ -170,13 +111,7 @@ public interface Column
      * @return The JavaTypeMapping
      */
     JavaTypeMapping getJavaTypeMapping();
-    
-    /**
-     * Accessor for the table for this column
-     * @return The table
-     */
-    Table getTable();
-    
+
     /**
      * Wraps the column name with a FUNCTION.
      * <PRE>example: SQRT(?) generates: SQRT(columnName)</PRE>
@@ -217,10 +152,11 @@ public interface Column
     SQLTypeInfo getTypeInfo();
 
     /**
-     * Accessor for the JDBC type being used for this Column
+     * Accessor for the JDBC type number being used for this Column
+     * TODO Drop this and use getJdbcType from superclass
      * @return The JDBC data type
      */
-    int getJdbcType();
+    int getJdbcTypeNumber();
 
     /**
      * Accessor for the SQL definition of this column.

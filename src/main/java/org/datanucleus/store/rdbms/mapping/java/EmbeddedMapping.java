@@ -307,7 +307,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     Column col = datastoreMapping.getColumn();
                     if (col != null)
                     {
-                        col.setAsPrimaryKey();
+                        col.setPrimaryKey();
                     }
                 }
             }

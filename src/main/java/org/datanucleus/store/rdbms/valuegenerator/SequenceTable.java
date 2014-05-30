@@ -91,17 +91,15 @@ public class SequenceTable extends TableImpl
 
         // "SEQUENCE_NAME" column
         sequenceNameMapping = storeMgr.getMappingManager().getMapping(String.class);
-        Column colSequenceName = addColumn(String.class.getName(),
-            idFactory.newColumnIdentifier(sequenceNameColumnName), sequenceNameMapping, null);
-        colSequenceName.setAsPrimaryKey();
+        Column colSequenceName = addColumn(String.class.getName(), idFactory.newColumnIdentifier(sequenceNameColumnName), sequenceNameMapping, null);
+        colSequenceName.setPrimaryKey();
         colSequenceName.getColumnMetaData().setLength(Integer.valueOf("255"));
         colSequenceName.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
 		getStoreManager().getMappingManager().createDatastoreMapping(sequenceNameMapping, colSequenceName, String.class.getName());
 
         // "NEXT_VAL" column
         nextValMapping = storeMgr.getMappingManager().getMapping(Long.class);
-        Column colNextVal = addColumn(Long.class.getName(),
-            idFactory.newColumnIdentifier(nextValColumnName), nextValMapping, null);
+        Column colNextVal = addColumn(Long.class.getName(), idFactory.newColumnIdentifier(nextValColumnName), nextValMapping, null);
 		getStoreManager().getMappingManager().createDatastoreMapping(nextValMapping, colNextVal, Long.class.getName());
 
         // Set up JDBC statements for supported operations

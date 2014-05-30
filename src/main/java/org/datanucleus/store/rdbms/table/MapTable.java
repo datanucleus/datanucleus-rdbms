@@ -163,7 +163,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = keyMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -195,7 +195,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = keyMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -222,7 +222,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 for (int i=0;i<valueMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = valueMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -254,7 +254,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 for (int i=0;i<valueMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = valueMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -300,7 +300,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 // Non-PC, so depends if the key column can be used as part of a PK
                 // TODO This assumes the keyMapping has a single column but what if it is Color with 4 cols?
                 Column elementCol = keyMapping.getDatastoreMapping(0).getColumn();
-                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
+                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcTypeNumber()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
                     orderRequired = true;
@@ -373,14 +373,14 @@ public class MapTable extends JoinTable implements DatastoreMap
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK
-                    orderMapping.getDatastoreMapping(0).getColumn().setAsPrimaryKey();
+                    orderMapping.getDatastoreMapping(0).getColumn().setPrimaryKey();
                 }
                 else
                 {
                     // No order column specified so owner+key are the PK
                     for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
                     {
-                        keyMapping.getDatastoreMapping(i).getColumn().setAsPrimaryKey();
+                        keyMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
                     }
                 }
             }
@@ -409,7 +409,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             {
                 if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
                 {
-                    ownerMapping.getDatastoreMapping(j).getColumn().setAsPrimaryKey();
+                    ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                     found = true;
                 }
             }
@@ -420,7 +420,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 {
                     if (keyMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
                     {
-                        keyMapping.getDatastoreMapping(j).getColumn().setAsPrimaryKey();
+                        keyMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }
@@ -432,7 +432,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 {
                     if (valueMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
                     {
-                        valueMapping.getDatastoreMapping(j).getColumn().setAsPrimaryKey();
+                        valueMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }

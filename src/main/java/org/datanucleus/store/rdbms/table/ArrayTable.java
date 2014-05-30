@@ -82,7 +82,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
                 for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
                 {
                     Column elementCol = elementMapping.getDatastoreMapping(i).getColumn();
-                    elementCol.setNullable();
+                    elementCol.setNullable(true);
                 }
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())

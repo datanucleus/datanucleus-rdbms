@@ -88,8 +88,7 @@ public class DiscriminatorMapping extends SingleFieldMapping
         }
 
         Column column = table.addColumn(getType(), id, this, dismd.getColumnMetaData());
-        table.getStoreManager().getMappingManager().createDatastoreMapping(delegate, column, 
-            getType());
+        table.getStoreManager().getMappingManager().createDatastoreMapping(delegate, column, getType());
     }
 
     /**

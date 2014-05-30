@@ -81,7 +81,7 @@ public final class ColumnCreator
         storeMgr.getMappingManager().createDatastoreMapping(mapping, column, mapping.getJavaType().getName());
         if (pk)
         {
-            column.setAsPrimaryKey();
+            column.setPrimaryKey();
         }
 
         return column;
@@ -221,11 +221,11 @@ public final class ColumnCreator
                         m.getDatastoreMapping(i).getColumn().copyConfigurationTo(column);
                         if (isPrimaryKey)
                         {
-                            column.setAsPrimaryKey();
+                            column.setPrimaryKey();
                         }
                         if (isNullable)
                         {
-                            column.setNullable();
+                            column.setNullable(true);
                         }
 
                         storeMgr.getMappingManager().createDatastoreMapping(refDatastoreMapping, column, 
@@ -267,7 +267,7 @@ public final class ColumnCreator
 
             if (isNullable)
             {
-                column.setNullable();
+                column.setNullable(true);
             }
         }
 

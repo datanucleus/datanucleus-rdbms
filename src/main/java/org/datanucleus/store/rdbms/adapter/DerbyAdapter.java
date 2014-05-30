@@ -335,7 +335,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         for (int i=0;i<m.getNumberOfDatastoreMappings();i++)
         {
             Column col = m.getDatastoreMapping(i).getColumn();
-            if (col.getJdbcType() == Types.CLOB || col.getJdbcType() == Types.BLOB)
+            if (col.getJdbcTypeNumber() == Types.CLOB || col.getJdbcTypeNumber() == Types.BLOB)
             {
                 // ERROR X0X67: Columns of type 'CLOB'/'BLOB' may not be used in 
                 // CREATE INDEX, ORDER BY, GROUP BY, UNION, INTERSECT, EXCEPT or DISTINCT
