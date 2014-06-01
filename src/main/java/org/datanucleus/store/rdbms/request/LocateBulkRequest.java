@@ -95,7 +95,7 @@ public class LocateBulkRequest extends BulkRequest
         // a). PK fields
         if (table.getIdentityType() == IdentityType.DATASTORE)
         {
-            JavaTypeMapping datastoreIdMapping = table.getDatastoreObjectIdMapping();
+            JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
             SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
                 datastoreIdMapping);
             int[] cols = sqlStatement.select(expr, null);
@@ -187,7 +187,7 @@ public class LocateBulkRequest extends BulkRequest
             if (table.getIdentityType() == IdentityType.DATASTORE)
             {
                 // Datastore identity value for input
-                JavaTypeMapping datastoreIdMapping = table.getDatastoreObjectIdMapping();
+                JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
                     datastoreIdMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
@@ -311,7 +311,7 @@ public class LocateBulkRequest extends BulkRequest
                                 StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int j=0;j<datastoreIdx.getNumberOfParameterOccurrences();j++)
                             {
-                                table.getDatastoreObjectIdMapping().setObject(ec, ps,
+                                table.getDatastoreIdMapping().setObject(ec, ps,
                                     datastoreIdx.getParameterPositionsForOccurrence(j), ops[i].getInternalObjectId());
                             }
                         }

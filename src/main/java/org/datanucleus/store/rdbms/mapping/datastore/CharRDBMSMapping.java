@@ -33,6 +33,7 @@ import java.util.Calendar;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.NullValueException;
@@ -302,8 +303,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-                if (column.getJdbcTypeNumber() == Types.CHAR && 
-                    getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
+                if (column.getJdbcType() == JdbcType.CHAR && getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
                 {
                     // String has likely been padded with spaces at the end by the datastore so trim trailing whitespace
                     int numPaddingChars = 0;

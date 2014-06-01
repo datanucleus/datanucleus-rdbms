@@ -273,7 +273,7 @@ public class DeleteRequest extends Request
                         StatementMappingIndex mapIdx = mappingStatementIndex.getWhereDatastoreId();
                         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            table.getDatastoreObjectIdMapping().setObject(ec, ps,
+                            table.getDatastoreIdMapping().setObject(ec, ps,
                                 mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }

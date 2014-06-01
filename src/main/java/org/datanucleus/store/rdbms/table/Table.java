@@ -69,7 +69,7 @@ public interface Table extends org.datanucleus.store.schema.table.Table
      * @return The new Column
      */
     Column addColumn(String storedJavaType, DatastoreIdentifier name, JavaTypeMapping mapping, ColumnMetaData colmd);
-    
+
     /**
      * Checks if there is a column for the identifier
      * @param identifier the identifier of the column

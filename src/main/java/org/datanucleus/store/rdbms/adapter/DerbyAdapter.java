@@ -24,10 +24,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -335,7 +335,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         for (int i=0;i<m.getNumberOfDatastoreMappings();i++)
         {
             Column col = m.getDatastoreMapping(i).getColumn();
-            if (col.getJdbcTypeNumber() == Types.CLOB || col.getJdbcTypeNumber() == Types.BLOB)
+            if (col.getJdbcType() == JdbcType.CLOB || col.getJdbcType() == JdbcType.BLOB)
             {
                 // ERROR X0X67: Columns of type 'CLOB'/'BLOB' may not be used in 
                 // CREATE INDEX, ORDER BY, GROUP BY, UNION, INTERSECT, EXCEPT or DISTINCT

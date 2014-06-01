@@ -330,7 +330,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore identity value for input
-            JavaTypeMapping datastoreIdMapping = classTable.getDatastoreObjectIdMapping();
+            JavaTypeMapping datastoreIdMapping = classTable.getDatastoreIdMapping();
             SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
                 datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
@@ -403,7 +403,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
                             StatementClassMapping.MEMBER_DATASTORE_ID);
                         for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            classTable.getDatastoreObjectIdMapping().setObject(ec, ps,
+                            classTable.getDatastoreIdMapping().setObject(ec, ps,
                                 datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                         }
                     }

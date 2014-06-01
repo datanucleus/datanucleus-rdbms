@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
@@ -257,7 +258,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * @param datatype The JDBC type
      * @return Whether it is permitted in the PK
      */
-    public boolean isValidPrimaryKeyType(int datatype)
+    public boolean isValidPrimaryKeyType(JdbcType datatype)
     {
         return true;
     }

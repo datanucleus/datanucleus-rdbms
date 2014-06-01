@@ -28,6 +28,7 @@ import java.sql.Types;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
@@ -469,7 +470,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         for (int i=0;i<m.getNumberOfDatastoreMappings();i++)
         {
             Column col = m.getDatastoreMapping(i).getColumn();
-            if (col.getJdbcTypeNumber() == Types.CLOB || col.getJdbcTypeNumber() == Types.BLOB)
+            if (col.getJdbcType() == JdbcType.CLOB || col.getJdbcType() == JdbcType.BLOB)
             {
                 // "The ... data type cannot be selected as DISTINCT because it is not comparable."
                 if (stmt.isDistinct())

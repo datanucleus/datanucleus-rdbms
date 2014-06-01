@@ -191,7 +191,7 @@ public class ColumnImpl implements Column
     @Override
     public JdbcType getJdbcType()
     {
-        throw new UnsupportedOperationException("Not supported on this Column");
+        return JdbcType.getEnumByValue(typeInfo.getDataType());
     }
 
     /* (non-Javadoc)
@@ -209,7 +209,7 @@ public class ColumnImpl implements Column
     @Override
     public String getTypeName()
     {
-        throw new UnsupportedOperationException("Not supported on this Column");
+        return typeInfo.getTypeName();
     }
 
     /* (non-Javadoc)
@@ -308,6 +308,18 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.table.Column#setTypeInfo(org.datanucleus.store.rdbms.schema.SQLTypeInfo)
+     */
+    public final Column setTypeInfo(SQLTypeInfo typeInfo)
+    {
+        if (this.typeInfo == null)
+        {
+            this.typeInfo = typeInfo;
+        }
+        return this;
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getTypeInfo()
      */
     public final SQLTypeInfo getTypeInfo()
@@ -315,14 +327,6 @@ public class ColumnImpl implements Column
         return typeInfo;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#getJdbcType()
-     */
-    public int getJdbcTypeNumber()
-    {
-        return typeInfo.getDataType();
-    }
-    
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getStoreManager()
      */
@@ -538,8 +542,7 @@ public class ColumnImpl implements Column
         }
 
         // Quote any character types (CHAR, VARCHAR, BLOB, CLOB)
-        if (typeInfo.getTypeName().toUpperCase().indexOf("CHAR") >= 0 ||
-            typeInfo.getTypeName().toUpperCase().indexOf("LOB") >= 0)
+        if (typeInfo.getTypeName().toUpperCase().indexOf("CHAR") >= 0 || typeInfo.getTypeName().toUpperCase().indexOf("LOB") >= 0)
         {
             // NOTE We use single quote here but would be better to take
             // some character from the DatabaseMetaData. The "identifierQuoteString"
@@ -548,8 +551,7 @@ public class ColumnImpl implements Column
         }
         else if (typeInfo.getTypeName().toUpperCase().indexOf("BIT") == 0)
         {
-            if (columnMetaData.getDefaultValue().equalsIgnoreCase("true") || 
-                columnMetaData.getDefaultValue().equalsIgnoreCase("false"))
+            if (columnMetaData.getDefaultValue().equalsIgnoreCase("true") || columnMetaData.getDefaultValue().equalsIgnoreCase("false"))
             {
                 // Quote any "true"/"false" values for BITs
                 return "DEFAULT '" + columnMetaData.getDefaultValue() + "'";
@@ -627,18 +629,15 @@ public class ColumnImpl implements Column
                 {
                     if (columnMetaData.getScale().intValue() != actualScale)
                     {
-                        if (this.columnMetaData.getParent() != null && 
-                            (this.columnMetaData.getParent() instanceof AbstractMemberMetaData))
+                        if (this.columnMetaData.getParent() != null && this.columnMetaData.getParent() instanceof AbstractMemberMetaData)
                         {
                             //includes the field name in error msg
-                            throw new WrongScaleException(this.toString(), 
-                                columnMetaData.getScale().intValue(), actualScale, 
+                            throw new WrongScaleException(this.toString(), columnMetaData.getScale().intValue(), actualScale, 
                                 ((AbstractMemberMetaData)this.columnMetaData.getParent()).getFullFieldName());
                         }
                         else
                         {
-                            throw new WrongScaleException(this.toString(), 
-                                columnMetaData.getScale().intValue(), actualScale);
+                            throw new WrongScaleException(this.toString(), columnMetaData.getScale().intValue(), actualScale);
                         }
                     }
                 }
@@ -688,18 +687,6 @@ public class ColumnImpl implements Column
                 //ignore this validation step
             }
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setTypeInfo(org.datanucleus.store.rdbms.schema.SQLTypeInfo)
-     */
-    public final Column setTypeInfo(SQLTypeInfo typeInfo)
-    {
-		if (this.typeInfo == null)
-		{
-			this.typeInfo = typeInfo;
-		}
-        return this;
     }
 
     /* (non-Javadoc)
@@ -865,14 +852,14 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setColumnMetaData(org.datanucleus.metadata.ColumnMetaData)
+     * @see org.datanucleus.store.schema.table.Column#setColumnMetaData(org.datanucleus.metadata.ColumnMetaData)
      */
-    public void setColumnMetaData(ColumnMetaData colmd)
+    public Column setColumnMetaData(ColumnMetaData colmd)
     {
         if (colmd == null)
         {
             // Nothing to do since no definition of requirements
-            return;
+            return this;
         }
 
         if (colmd.getJdbcType() != null)
@@ -910,6 +897,7 @@ public class ColumnImpl implements Column
             // MetaData requires it to be unique
             setUnique(true);
         }
+        return this;
     }
 
     /* (non-Javadoc)

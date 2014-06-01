@@ -43,6 +43,7 @@ import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -919,11 +920,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param datatype The JDBC type.
      * @return Whether it is valid for use in the PK
      */
-    public boolean isValidPrimaryKeyType(int datatype)
+    public boolean isValidPrimaryKeyType(JdbcType datatype)
     {
         // This is temporary since some RDBMS allow indexing of Blob/Clob/LongVarBinary
         // TODO Transfer to individual adapters
-        if (datatype == Types.BLOB || datatype == Types.CLOB || datatype == Types.LONGVARBINARY)
+        if (datatype == JdbcType.BLOB || datatype == JdbcType.CLOB || datatype == JdbcType.LONGVARBINARY)
         {
             return false;
         }

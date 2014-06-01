@@ -186,7 +186,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 // Non-PC, so depends if the element column can be used as part of a PK
                 // TODO This assumes the elementMapping has a single column but what if it is Color with 4 cols?
                 Column elementCol = elementMapping.getDatastoreMapping(0).getColumn();
-                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcTypeNumber()))
+                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
                     orderRequired = true;

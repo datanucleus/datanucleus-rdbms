@@ -233,7 +233,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * Returns null since we dont use datastore identity for views.
      * @return Datastore identity ID mapping
      */
-    public JavaTypeMapping getDatastoreObjectIdMapping()
+    public JavaTypeMapping getDatastoreIdMapping()
     {
         return null;
     }

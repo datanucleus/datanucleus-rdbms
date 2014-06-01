@@ -325,7 +325,7 @@ public class UpdateRequest extends Request
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getWhereDatastoreId();
                             for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreObjectIdMapping().setObject(ec, ps,
+                                table.getDatastoreIdMapping().setObject(ec, ps,
                                     mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }

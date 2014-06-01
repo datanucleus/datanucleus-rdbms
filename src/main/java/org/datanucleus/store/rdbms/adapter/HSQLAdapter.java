@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
@@ -377,13 +378,9 @@ public class HSQLAdapter extends BaseDatastoreAdapter
      * @param datatype The JDBC type
      * @return Whether it is permitted in the PK
      */
-    public boolean isValidPrimaryKeyType(int datatype)
+    public boolean isValidPrimaryKeyType(JdbcType datatype)
     {
-        if (datatype == Types.BLOB ||
-            datatype == Types.CLOB ||
-            datatype == Types.LONGVARBINARY ||
-            datatype == Types.OTHER ||
-            datatype == Types.LONGVARCHAR)
+        if (datatype == JdbcType.BLOB || datatype == JdbcType.CLOB || datatype == JdbcType.LONGVARBINARY || datatype == JdbcType.OTHER || datatype == JdbcType.LONGVARCHAR)
         {
             return false;
         }

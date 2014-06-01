@@ -357,8 +357,7 @@ public abstract class TableImpl extends AbstractTable
         }
         else
         {
-            if (actualPKs.size() != 1 ||
-                !actualPKs.values().contains(expectedPK))
+            if (actualPKs.size() != 1 || !actualPKs.values().contains(expectedPK))
             {
                 throw new WrongPrimaryKeyException(this.toString(), expectedPK.toString(), StringUtils.collectionToString(actualPKs.values()));
             }
@@ -485,8 +484,7 @@ public abstract class TableImpl extends AbstractTable
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058101",
-                    this, stmtsByFKName.values()));
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058101", this, stmtsByFKName.values()));
             }
         }
         return dbWasModified;
@@ -517,8 +515,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058100",
-                        fkName, getCatalogName(), getSchemaName()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058100", fkName, getCatalogName(), getSchemaName()));
                 }
 
                 try
@@ -607,8 +604,7 @@ public abstract class TableImpl extends AbstractTable
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058003",
-                    this, stmtsByIdxName.values()));
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058003", this, stmtsByIdxName.values()));
             }
         }
         return dbWasModified;
@@ -638,8 +634,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058000", 
-                        idxName, getCatalogName(), getSchemaName()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058000", idxName, getCatalogName(), getSchemaName()));
                 }
 
                 try
@@ -713,16 +708,14 @@ public abstract class TableImpl extends AbstractTable
                 {
                     if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058205", 
-                            "" + numActualCKs,this));
+                        NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058205", "" + numActualCKs,this));
                     }
                 }
             }
             else
             {
                 // We support existing schemas so don't raise an exception.
-                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058201",
-                    this, stmtsByCKName.values()));
+                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058201", this, stmtsByCKName.values()));
             }
         }
 
@@ -753,8 +746,7 @@ public abstract class TableImpl extends AbstractTable
                 String stmtText = (String) e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058200",
-                        ckName, getCatalogName(), getSchemaName()));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058200", ckName, getCatalogName(), getSchemaName()));
                 }
 
                 try
@@ -804,8 +796,7 @@ public abstract class TableImpl extends AbstractTable
          */
         HashSet fkNames = new HashSet();
         StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-        RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", 
-            new Object[] {this});
+        RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
         Iterator iter = fkInfo.getChildren().iterator();
         while (iter.hasNext())
         {
@@ -906,7 +897,6 @@ public abstract class TableImpl extends AbstractTable
     protected List getExpectedCandidateKeys()
     {
         assertIsInitialized();
-
         ArrayList candidateKeys = new ArrayList();
         return candidateKeys;
     }
@@ -931,10 +921,10 @@ public abstract class TableImpl extends AbstractTable
          * This greatly decreases deadlock probability e.g. on Oracle.
          */
         PrimaryKey pk = getPrimaryKey();
-        Iterator i = getExpectedForeignKeys(clr).iterator();
+        Iterator<ForeignKey> i = getExpectedForeignKeys(clr).iterator();
         while (i.hasNext())
         {
-            ForeignKey fk = (ForeignKey) i.next();
+            ForeignKey fk = i.next();
             if (!pk.getColumnList().equals(fk.getColumnList()))
             {
                 indices.add(new Index(fk));
@@ -953,7 +943,7 @@ public abstract class TableImpl extends AbstractTable
     private Map getExistingPrimaryKeys(Connection conn)
     throws SQLException
     {
-        HashMap primaryKeysByName = new HashMap();
+        Map<DatastoreIdentifier, PrimaryKey> primaryKeysByName = new HashMap();
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
@@ -976,7 +966,7 @@ public abstract class TableImpl extends AbstractTable
                     pkIdentifier = idFactory.newIdentifier(IdentifierType.COLUMN, pkName);
                 }
     
-                PrimaryKey pk = (PrimaryKey) primaryKeysByName.get(pkIdentifier);
+                PrimaryKey pk = primaryKeysByName.get(pkIdentifier);
                 if (pk == null)
                 {
                     pk = new PrimaryKey(this);
@@ -1013,8 +1003,7 @@ public abstract class TableImpl extends AbstractTable
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-            RDBMSTableFKInfo tableFkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", 
-                new Object[] {this});
+            RDBMSTableFKInfo tableFkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
             Iterator fksIter = tableFkInfo.getChildren().iterator();
             while (fksIter.hasNext())
             {
@@ -1041,8 +1030,7 @@ public abstract class TableImpl extends AbstractTable
                 }
     
                 String pkTableName = (String)fkInfo.getProperty("pk_table_name");
-                DatastoreClass refTable = storeMgr.getDatastoreClass(
-                    idFactory.newTableIdentifier(pkTableName));
+                DatastoreClass refTable = storeMgr.getDatastoreClass(idFactory.newTableIdentifier(pkTableName));
                 if (refTable != null)
                 {
                     String fkColumnName = (String)fkInfo.getProperty("fk_column_name");
@@ -1079,8 +1067,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", 
-                new Object[] {this});
+            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())
@@ -1109,8 +1096,7 @@ public abstract class TableImpl extends AbstractTable
     
                     // Set the column
                     int colSeq = ((Short)indexInfo.getProperty("ordinal_position")).shortValue() - 1;
-                    DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, 
-                        (String)indexInfo.getProperty("column_name"));
+                    DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, (String)indexInfo.getProperty("column_name"));
                     Column col = columnsByName.get(colName);
                     if (col != null)
                     {
@@ -1137,8 +1123,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", 
-                new Object[] {this});
+            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())
@@ -1152,8 +1137,7 @@ public abstract class TableImpl extends AbstractTable
                 }
     
                 String indexName = (String)indexInfo.getProperty("index_name");
-                DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, 
-                    indexName);
+                DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, indexName);
                 Index idx = (Index) indicesByName.get(indexIdentifier);
                 if (idx == null)
                 {
@@ -1165,8 +1149,7 @@ public abstract class TableImpl extends AbstractTable
     
                 // Set the column
                 int colSeq = ((Short)indexInfo.getProperty("ordinal_position")).shortValue() - 1;
-                DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, 
-                    (String)indexInfo.getProperty("column_name"));
+                DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, (String)indexInfo.getProperty("column_name"));
                 Column col = columnsByName.get(colName);
                 if (col != null)
                 {
@@ -1189,10 +1172,10 @@ public abstract class TableImpl extends AbstractTable
         Column[] cols = null;
 
         // Pass 1 : populate positions defined in metadata as vendor extension "index"
-        Iterator<Column> iter = columns.iterator();
+        Iterator<org.datanucleus.store.schema.table.Column> iter = columns.iterator();
         while (iter.hasNext())
         {
-            Column col = iter.next();
+            Column col = (Column)iter.next();
             ColumnMetaData colmd = col.getColumnMetaData();
             Integer colPos = (colmd != null ? colmd.getPosition() : null);
             if (colPos != null)
@@ -1206,8 +1189,7 @@ public abstract class TableImpl extends AbstractTable
                     }
                     if (cols[index] != null)
                     {
-                        throw new NucleusUserException("Column index " + index +
-                            " has been specified multiple times : " + cols[index] + " and " + col);
+                        throw new NucleusUserException("Column index " + index + " has been specified multiple times : " + cols[index] + " and " + col);
                     }
                     cols[index] = col;
                 }
@@ -1220,7 +1202,7 @@ public abstract class TableImpl extends AbstractTable
             iter = columns.iterator();
             while (iter.hasNext())
             {
-                Column col = iter.next();
+                Column col = (Column)iter.next();
                 ColumnMetaData colmd = col.getColumnMetaData();
                 Integer colPos = (colmd != null ? colmd.getPosition() : null);
                 if (colPos == null)
@@ -1364,8 +1346,7 @@ public abstract class TableImpl extends AbstractTable
             {
                 Index actualIdx = (Index) i.next();
                 String actualName = idFactory.getIdentifierInAdapterCase(actualIdx.getName()); // Allow for DB returning no quotes
-                if (actualName.equals(reqdName) &&
-                        actualIdx.getTable().getIdentifier().toString().equals(requiredIdx.getTable().getIdentifier().toString()))
+                if (actualName.equals(reqdName) && actualIdx.getTable().getIdentifier().toString().equals(requiredIdx.getTable().getIdentifier().toString()))
                 {
                     // There already is an index of that name for the same table in the actual list so not needed
                     return false;

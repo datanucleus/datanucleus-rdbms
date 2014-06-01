@@ -624,7 +624,7 @@ public final class SQLQuery extends AbstractSQLQuery
         }
         if (datastoreIndex != null)
         {
-            StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(table.getDatastoreObjectIdMapping());
+            StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(table.getDatastoreIdMapping());
             datastoreMappingIdx.setColumnPositions(datastoreIndex);
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreMappingIdx);
         }

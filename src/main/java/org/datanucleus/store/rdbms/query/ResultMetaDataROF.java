@@ -164,15 +164,15 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     boolean found = false;
                     if (acmd.getIdentityType() == IdentityType.DATASTORE)
                     {
-                        Column df = dc.getDatastoreObjectIdMapping().getDatastoreMapping(0).getColumn();
+                        Column df = dc.getDatastoreIdMapping().getDatastoreMapping(0).getColumn();
                         if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                         {
                             //add +1 because result sets in jdbc starts with 1
                             int datastoreIdentityExpressionIndex = j+1;
                             //get object id if datastore identifier
-                            if (dc.getDatastoreObjectIdMapping() != null)
+                            if (dc.getDatastoreIdMapping() != null)
                             {
-                                id = dc.getDatastoreObjectIdMapping().getObject(ec, rs, 
+                                id = dc.getDatastoreIdMapping().getObject(ec, rs, 
                                     new int[] {datastoreIdentityExpressionIndex});
                             }
                             found=true;

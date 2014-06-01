@@ -178,7 +178,7 @@ public class FetchRequest extends Request
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore identity value for input
-            JavaTypeMapping datastoreIdMapping = table.getDatastoreObjectIdMapping();
+            JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
             SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
                 datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
@@ -333,7 +333,7 @@ public class FetchRequest extends Request
                                 StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreObjectIdMapping().setObject(ec, ps,
+                                table.getDatastoreIdMapping().setObject(ec, ps,
                                     datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }

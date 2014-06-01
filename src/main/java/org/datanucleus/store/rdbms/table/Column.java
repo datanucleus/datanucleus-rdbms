@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.table;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -94,19 +93,6 @@ public interface Column extends org.datanucleus.store.schema.table.Column
     DatastoreMapping getDatastoreMapping();
 
     /**
-     * Method to set the MetaData for this datastore field.
-     * Should only be called before completion of initialisation.
-     * @param md The MetaData
-     */
-    void setColumnMetaData(ColumnMetaData md);
-
-    /**
-     * Access the metadata definition defining this column.
-     * @return the MetaData
-     */
-    ColumnMetaData getColumnMetaData();
-
-    /**
      * Accessor for the JavaTypeMapping for the field/property that owns this column.
      * @return The JavaTypeMapping
      */
@@ -150,13 +136,6 @@ public interface Column extends org.datanucleus.store.schema.table.Column
      * @return The type info
      */
     SQLTypeInfo getTypeInfo();
-
-    /**
-     * Accessor for the JDBC type number being used for this Column
-     * TODO Drop this and use getJdbcType from superclass
-     * @return The JDBC data type
-     */
-    int getJdbcTypeNumber();
 
     /**
      * Accessor for the SQL definition of this column.

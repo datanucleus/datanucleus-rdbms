@@ -277,15 +277,13 @@ public abstract class AbstractClassTable extends TableImpl
                     // User has provided a name for this column
                     // Currently we only use the column namings from the users definition but we could easily
                     // take more of their details.
-                    idColumn = addColumn(refColumn.getStoredJavaType(),
-                        storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, userdefinedColumn.getName()),
+                    idColumn = addColumn(refColumn.getStoredJavaType(), storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, userdefinedColumn.getName()),
                         m, refColumn.getColumnMetaData());
                 }
                 else
                 {
                     // No name provided so take same as superclass
-                    idColumn = addColumn(refColumn.getStoredJavaType(), refColumn.getIdentifier(),
-                        m, refColumn.getColumnMetaData());
+                    idColumn = addColumn(refColumn.getStoredJavaType(), refColumn.getIdentifier(), m, refColumn.getColumnMetaData());
                 }
                 if (mapping.getDatastoreMapping(j).getColumn().getColumnMetaData() != null)
                 {
@@ -366,16 +364,14 @@ public abstract class AbstractClassTable extends TableImpl
         {
             // Create generator so we can find the generated type
             // a). Try as unique generator first
-            AbstractGenerator generator = (AbstractGenerator)
-                storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+            AbstractGenerator generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
                     "org.datanucleus.store_valuegenerator", 
                     new String[] {"name", "unique"}, new String[] {strategyName, "true"},
                     "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
             if (generator == null)
             {
                 // b). Try as datastore-specific generator
-                generator = (AbstractGenerator)
-                    storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
                     "org.datanucleus.store_valuegenerator",
                     new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
                     "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
@@ -387,8 +383,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
         catch (Exception e)
         {
-            NucleusLogger.VALUEGENERATION.warn("Error retrieving storage class for value-generator " + 
-                strategyName + " " + e.getMessage());
+            NucleusLogger.VALUEGENERATION.warn("Error retrieving storage class for value-generator " + strategyName + " " + e.getMessage());
         }
         storeMgr.getMappingManager().createDatastoreMapping(datastoreIDMapping, idColumn, valueGeneratedType.getName());
 
@@ -405,8 +400,7 @@ public abstract class AbstractClassTable extends TableImpl
         // Check if auto-increment and that it is supported by this RDBMS
         if (idColumn.isIdentity() && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
         {
-            throw new NucleusException(Localiser.msg("057020", 
-                cmd.getFullClassName(), "datastore-identity")).setFatal();
+            throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), "datastore-identity")).setFatal();
         }
     }
 
@@ -507,14 +501,23 @@ public abstract class AbstractClassTable extends TableImpl
     // -------------------------- Mapping Accessors --------------------------------
 
     /**
-     * Accessor for a mapping for the datastore ID (OID) for this table.
-     * @return The (OID) mapping.
+     * Accessor for a mapping for the datastore ID for this table.
+     * @return The datastoreId mapping.
      */
-    public JavaTypeMapping getDatastoreObjectIdMapping()
+    public JavaTypeMapping getDatastoreIdMapping()
     {
         assertIsInitialized();
-
         return datastoreIDMapping;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getDatastoreIdColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getDatastoreIdColumn()
+    {
+        assertIsInitialized();
+        return datastoreIDMapping != null ? datastoreIDMapping.getDatastoreMapping(0).getColumn() : null;
     }
 
     /**
@@ -529,6 +532,15 @@ public abstract class AbstractClassTable extends TableImpl
         return versionMapping;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getVersionColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getVersionColumn()
+    {
+        return versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn() : null;
+    }
+
     /**
      * Accessor for the discriminator mapping specified.
      * @return The mapping for the discriminator column
@@ -538,9 +550,27 @@ public abstract class AbstractClassTable extends TableImpl
         return discriminatorMapping;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getDiscriminatorColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getDiscriminatorColumn()
+    {
+        return discriminatorMapping != null ? discriminatorMapping.getDatastoreMapping(0).getColumn() : null;
+    }
+
     public JavaTypeMapping getMultitenancyMapping()
     {
         return tenantMapping;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getMultitenancyColumn()
+     */
+    @Override
+    public org.datanucleus.store.schema.table.Column getMultitenancyColumn()
+    {
+        return tenantMapping != null ? tenantMapping.getDatastoreMapping(0).getColumn() : null;
     }
 
     /**
@@ -553,7 +583,7 @@ public abstract class AbstractClassTable extends TableImpl
 
         if (getIdentityType() == IdentityType.DATASTORE)
         {
-            consumer.consumeMapping(getDatastoreObjectIdMapping(), MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+            consumer.consumeMapping(getDatastoreIdMapping(), MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
         }
     }
 

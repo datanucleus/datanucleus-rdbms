@@ -300,7 +300,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 // Non-PC, so depends if the key column can be used as part of a PK
                 // TODO This assumes the keyMapping has a single column but what if it is Color with 4 cols?
                 Column elementCol = keyMapping.getDatastoreMapping(0).getColumn();
-                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcTypeNumber()))
+                if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
                     orderRequired = true;

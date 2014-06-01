@@ -258,7 +258,7 @@ public class InsertRequest extends Request
                         if (!table.isObjectIdDatastoreAttributed() || !table.isBaseDatastoreClass())
                         {
                             int[] paramNumber = {IDPARAMNUMBER};
-                            table.getDatastoreObjectIdMapping().setObject(ec, ps, paramNumber, op.getInternalObjectId());
+                            table.getDatastoreIdMapping().setObject(ec, ps, paramNumber, op.getInternalObjectId());
                         }
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)

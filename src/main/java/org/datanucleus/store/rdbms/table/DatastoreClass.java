@@ -122,10 +122,10 @@ public interface DatastoreClass extends Table
     // --------------------------- Mapping Access ------------------------------
 
     /**
-     * Accessor for a mapping for the datastore ID (OID) for this object.
-     * @return The (OID) mapping.
+     * Accessor for a mapping for the datastore ID for this object.
+     * @return The datastoreId mapping.
      */
-    JavaTypeMapping getDatastoreObjectIdMapping();
+    JavaTypeMapping getDatastoreIdMapping();
 
     /**
      * Accessor for the mapping for the specified member name.

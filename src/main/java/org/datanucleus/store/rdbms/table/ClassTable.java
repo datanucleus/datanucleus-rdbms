@@ -1601,7 +1601,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
         for (int i=0; i<columns.size(); i++)
         {
-            Column col = columns.get(i);
+            Column col = (Column)columns.get(i);
             if (col.isPrimaryKey() && col.isIdentity())
             {
                 return true;

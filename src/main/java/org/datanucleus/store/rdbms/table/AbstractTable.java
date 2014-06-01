@@ -94,7 +94,7 @@ public abstract class AbstractTable implements Table
     protected int state = TABLE_STATE_NEW;
 
     /** Columns for this table. */
-    protected List<Column> columns = new ArrayList();
+    protected List<org.datanucleus.store.schema.table.Column> columns = new ArrayList();
 
     /** Index to the columns, keyed by name. TODO Key this by the column name, not its identifier. */
     protected Map<DatastoreIdentifier, Column> columnsByName = new HashMap();
@@ -107,8 +107,7 @@ public abstract class AbstractTable implements Table
     private final int hashCode;
     
     /**
-     * Constructor taking the table name and the RDBMSManager managing this
-     * table.
+     * Constructor taking the table name and the RDBMSManager managing this table.
      * @param identifier Name of the table
      * @param storeMgr The RDBMS Manager
      */
@@ -175,13 +174,44 @@ public abstract class AbstractTable implements Table
         return identifier.toString();
     }
 
+    /**
+     * Accessor for the Catalog Name.
+     * This will be part of the fully qualified name IF the user has specified
+     * the catalog in the MetaData, OR if they have specified the catalog in the PMF.
+     * @return Catalog Name
+     **/
+    public String getCatalogName()
+    {
+        return identifier.getCatalogName();
+    }
+
+    /**
+     * Accessor for the Schema Name.
+     * This will be part of the fully qualified name IF the user has specified
+     * the schema in the MetaData, OR if they have specified the schema in the PMF.
+     * @return Schema Name
+     **/
+    public String getSchemaName()
+    {
+        return identifier.getSchemaName();
+    }
+
+    /**
+     * Accessor for the SQL identifier (the table name).
+     * @return The name
+     **/
+    public DatastoreIdentifier getIdentifier()
+    {
+        return identifier;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.schema.table.Table#getClassMetaData()
      */
     @Override
     public AbstractClassMetaData getClassMetaData()
     {
-        // TODO Auto-generated method stub
+        // Will be overridden by tables relating to classes
         return null;
     }
 
@@ -200,7 +230,7 @@ public abstract class AbstractTable implements Table
     @Override
     public List<org.datanucleus.store.schema.table.Column> getColumns()
     {
-        throw new UnsupportedOperationException("Not supported on this table");
+        return columns;
     }
 
     /* (non-Javadoc)
@@ -282,37 +312,6 @@ public abstract class AbstractTable implements Table
     public Set<MemberColumnMapping> getMemberColumnMappings()
     {
         throw new UnsupportedOperationException("Not supported on this table");
-    }
-
-    /**
-     * Accessor for the Catalog Name.
-     * This will be part of the fully qualified name IF the user has specified
-     * the catalog in the MetaData, OR if they have specified the catalog in the PMF.
-     * @return Catalog Name
-     **/
-    public String getCatalogName()
-    {
-        return identifier.getCatalogName();
-    }
-
-    /**
-     * Accessor for the Schema Name.
-     * This will be part of the fully qualified name IF the user has specified
-     * the schema in the MetaData, OR if they have specified the schema in the PMF.
-     * @return Schema Name
-     **/
-    public String getSchemaName()
-    {
-        return identifier.getSchemaName();
-    }
-
-    /**
-     * Accessor for the SQL identifier (the table name).
-     * @return The name
-     **/
-    public DatastoreIdentifier getIdentifier()
-    {
-        return identifier;
     }
 
     /**
@@ -399,8 +398,7 @@ public abstract class AbstractTable implements Table
                 if (md == null)
                 {
                     // ColumnMetaData for existing column has no parent class somehow!
-                    throw new NucleusUserException(Localiser.msg("057043",
-                        name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
+                    throw new NucleusUserException(Localiser.msg("057043", name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
                 md = md.getParent();
             }

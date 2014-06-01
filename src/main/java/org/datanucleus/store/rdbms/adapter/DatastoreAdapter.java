@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -685,7 +686,7 @@ public interface DatastoreAdapter
      * @param datatype The JDBC type.
      * @return Whether it is valid for use in the PK
      */
-    boolean isValidPrimaryKeyType(int datatype);
+    boolean isValidPrimaryKeyType(JdbcType datatype);
     
     /**
      * Accessor for the SQL statement to add a column to a table.

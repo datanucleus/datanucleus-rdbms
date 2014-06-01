@@ -451,7 +451,7 @@ public class SQLStatementHelper
         if (candidateCmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore-identity surrogate column
-            JavaTypeMapping idMapping = candidateTbl.getDatastoreObjectIdMapping();
+            JavaTypeMapping idMapping = candidateTbl.getDatastoreIdMapping();
             int[] colNumbers = stmt.select(stmt.getPrimaryTable(), idMapping, "DN_DATASTOREID", false);
             if (mappingDefinition != null)
             {
@@ -583,7 +583,7 @@ public class SQLStatementHelper
         if (sourceCmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore-identity surrogate column
-            JavaTypeMapping idMapping = sourceTbl.getDatastoreObjectIdMapping();
+            JavaTypeMapping idMapping = sourceTbl.getDatastoreIdMapping();
             int[] colNumbers = stmt.select(sourceSqlTbl, idMapping, null);
             if (mappingDefinition != null)
             {
