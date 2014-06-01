@@ -233,8 +233,7 @@ public abstract class AbstractClassTable extends TableImpl
             {
                 //probably due to invalid metadata defined by the user
                 throw new NucleusUserException("Cannot find mapping for field " + mmd.getFullFieldName()+
-                    " in table " + refTable.toString() + " " +
-                    StringUtils.objectArrayToString(refTable.getColumnsArray()));
+                    " in table " + refTable.toString() + " " + StringUtils.collectionToString(refTable.getColumns()));
             }
 
             JavaTypeMapping masterMapping = storeMgr.getMappingManager().getMapping(clr.classForName(mapping.getType()));

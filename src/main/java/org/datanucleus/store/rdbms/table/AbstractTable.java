@@ -511,15 +511,6 @@ public abstract class AbstractTable implements Table
 	    return columnsByName.get(identifier);
 	}
 
-	/**
-     * Accessor for the columns infered from the java and metadata files.
-     * @return the columns
-     */
-    public Column[] getColumnsArray()
-    {
-        return columns.toArray(new Column[columns.size()]);
-    }
-    
     /**
      * Method to create this table.
      * @param conn Connection to the datastore.

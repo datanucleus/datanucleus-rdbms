@@ -34,7 +34,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 
 /**
- * Representation of a table in a datastore.
+ * Representation of a table in an RDBMS.
  * <P>
  * There are 2 aspects to a table. The first is the internal representation, provided here.
  * This has a state. The second aspect to the table is its external (datastore) representation.
@@ -84,12 +84,6 @@ public interface Table extends org.datanucleus.store.schema.table.Table
      * @return The column
      */
     Column getColumn(DatastoreIdentifier identifier);
-
-    /**
-     * Accessor for the columns for this table.
-     * @return the columns
-     */
-    Column[] getColumnsArray();
 
     /**
      * Accessor for the ID mapping of this container object.
