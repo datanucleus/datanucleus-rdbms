@@ -96,7 +96,7 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
                     fieldRole = FieldRole.ROLE_COLLECTION_ELEMENT;
                 }
             }
-            return newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
+            return newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
         }
         else
         {
@@ -139,7 +139,7 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
         if (fieldRole == FieldRole.ROLE_OWNER)
         {
             // FK field (FK collection/array/list/map)
-            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
         }
         else if (fieldRole == FieldRole.ROLE_INDEX)
         {

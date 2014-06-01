@@ -338,13 +338,13 @@ public abstract class AbstractClassTable extends TableImpl
             // Provide default column naming if none is defined
             if (refTable != null)
             {
-                colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(refTable.getIdentifier().getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_OWNER, false).getIdentifierName());
+                colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(refTable.getIdentifier().getName(), 
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_OWNER, false).getName());
             }
             else
             {
-                colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(identifier.getIdentifierName(), 
-                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_NONE, false).getIdentifierName());
+                colmd.setName(storeMgr.getIdentifierFactory().newColumnIdentifier(identifier.getName(), 
+                    this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(DatastoreId.class), FieldRole.ROLE_NONE, false).getName());
             }
         }
 

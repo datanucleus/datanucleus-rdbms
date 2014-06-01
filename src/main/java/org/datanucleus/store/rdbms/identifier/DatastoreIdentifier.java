@@ -24,32 +24,32 @@ package org.datanucleus.store.rdbms.identifier;
 public interface DatastoreIdentifier
 {
     /**
-     * Provides the identifier with no quotes.
+     * Provides the name (with no quotes).
      * @return The name
      */
-    String getIdentifierName();
+    String getName();
 
     /**
-     * Sets the catalog name
-     * @param catalogName The catalog name
+     * Sets the catalog
+     * @param catalogName The catalog
      */
     void setCatalogName(String catalogName);
 
     /**
-     * Sets the schema name
-     * @param schemaName The schema name
+     * Sets the schema
+     * @param schemaName The schema
      */
     void setSchemaName(String schemaName);
 
     /**
-     * Accessor for the catalog name
-     * @return The catalog name
+     * Accessor for the catalog
+     * @return The catalog
      */
     String getCatalogName();
 
     /**
-     * Accessor for the schema name
-     * @return The schema name
+     * Accessor for the schema
+     * @return The schema
      */
     String getSchemaName();
 

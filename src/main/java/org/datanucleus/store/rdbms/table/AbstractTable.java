@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -95,8 +96,8 @@ public abstract class AbstractTable implements Table
     /** Columns for this table. */
     protected List<Column> columns = new ArrayList();
 
-    /** Index to the columns, keyed by name. */
-    protected HashMap<DatastoreIdentifier, Column> columnsByName = new HashMap();
+    /** Index to the columns, keyed by name. TODO Key this by the column name, not its identifier. */
+    protected Map<DatastoreIdentifier, Column> columnsByName = new HashMap();
 
     /** Fully qualified name of this table. */
     private String fullyQualifiedName;
@@ -399,7 +400,7 @@ public abstract class AbstractTable implements Table
                 {
                     // ColumnMetaData for existing column has no parent class somehow!
                     throw new NucleusUserException(Localiser.msg("057043",
-                        name.getIdentifierName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
+                        name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
                 md = md.getParent();
             }
@@ -413,7 +414,7 @@ public abstract class AbstractTable implements Table
                 {
                     // ColumnMetaData for required column has no parent class somehow!
                     throw new NucleusUserException(Localiser.msg("057044",
-                        name.getIdentifierName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
+                        name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
             }
 
@@ -688,7 +689,7 @@ public abstract class AbstractTable implements Table
             schema = schema.replace(dba.getIdentifierQuoteString(), "");
         }
 
-        String table = identifier.getIdentifierName();
+        String table = identifier.getName();
         table = table.replace(dba.getIdentifierQuoteString(), "");
 
         DatastoreIdentifier di = storeMgr.getIdentifierFactory().newTableIdentifier(table);

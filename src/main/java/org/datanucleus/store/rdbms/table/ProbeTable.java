@@ -94,7 +94,7 @@ public class ProbeTable extends TableImpl
         // Make sure the table name is in the correct case.
         // This is required by RDBMS such as PostgreSQL which allow creation in one format yet
         // actually store it in another.
-        String table_name = identifier.getIdentifierName();
+        String table_name = identifier.getName();
         if (storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE ||
             storeMgr.getIdentifierFactory().getNamingCase() == NamingCase.LOWER_CASE_QUOTED)
         {

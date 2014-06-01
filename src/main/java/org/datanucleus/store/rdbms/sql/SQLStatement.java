@@ -678,7 +678,7 @@ public class SQLStatement
      */
     public SQLTable getTable(String alias)
     {
-        if (alias.equals(primaryTable.alias.getIdentifierName()))
+        if (alias.equals(primaryTable.alias.getName()))
         {
             return primaryTable;
         }
@@ -1122,8 +1122,8 @@ public class SQLStatement
             {
                 joinIter.remove();
                 requiresJoinReorder = true;
-                tables.remove(join.getTable().alias.getIdentifierName());
-                String removedAliasName = join.getTable().alias.getIdentifierName();
+                tables.remove(join.getTable().alias.getName());
+                String removedAliasName = join.getTable().alias.getName();
 
                 if (unions != null)
                 {
@@ -1190,7 +1190,7 @@ public class SQLStatement
         }
 
         // Add the table to the referenced tables for this statement
-        tables.put(targetTable.alias.getIdentifierName(), targetTable);
+        tables.put(targetTable.alias.getName(), targetTable);
 
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping,

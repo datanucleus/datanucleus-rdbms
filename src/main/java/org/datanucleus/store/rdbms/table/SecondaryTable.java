@@ -70,7 +70,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         super(tableName, storeMgr);
         if (primaryTable == null)
         {
-            throw new NucleusUserException(Localiser.msg("057045", tableName.getIdentifierName()));
+            throw new NucleusUserException(Localiser.msg("057045", tableName.getName()));
         }
         this.primaryTable = primaryTable;
         this.joinMetaData = jmd;
@@ -81,7 +81,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
             JoinMetaData[] joins = this.primaryTable.getClassMetaData().getJoinMetaData();
             for (int i=0; i<joins.length; i++)
             {
-                if (tableName.getIdentifierName().equals(joins[i].getTable()))
+                if (tableName.getName().equals(joins[i].getTable()))
                 {
                     //found a join table with same name as this table name
                     this.joinMetaData = joins[i];

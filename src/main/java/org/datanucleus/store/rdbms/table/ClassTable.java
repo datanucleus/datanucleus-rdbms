@@ -2406,7 +2406,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     for (int j=0;j<targetCols.size();j++)
                     {
                         Column targetCol = (Column)targetCols.get(j);
-                        if (targetCol.getIdentifier().getIdentifierName().equalsIgnoreCase(targetColName))
+                        if (targetCol.getIdentifier().getName().equalsIgnoreCase(targetColName))
                         {
                             // Found the required column
                             target = targetCol;
@@ -2678,7 +2678,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         {
             DatastoreIdentifier ckName = idFactory.newCandidateKeyIdentifier(this, ++ckNum);
             CandidateKey ck = cks.next();
-            ck.setName(ckName.getIdentifierName());
+            ck.setName(ckName.getName());
 
             String ckSql = dba.getAddCandidateKeyStatement(ck, idFactory);
             if (ckSql != null)

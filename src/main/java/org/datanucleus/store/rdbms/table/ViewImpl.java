@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -110,24 +111,22 @@ public abstract class ViewImpl extends AbstractTable
         }
 
         // Validate the column(s)
-        HashMap unvalidated = new HashMap(columnsByName);
+        Map<String, Column> unvalidated = new HashMap(columnsByName);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {
             RDBMSColumnInfo ci = (RDBMSColumnInfo)i.next();
-            DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, ci.getColumnName());
-            Column col = (Column)unvalidated.get(colName);
+            Column col = unvalidated.get(ci.getColumnName());
             if (col == null)
             {
+                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, ci.getColumnName());
                 if (!hasColumnName(colName))
                 {
-                    throw new UnexpectedColumnException(this.toString(),colName.getIdentifierName(), this.getSchemaName(), this.getCatalogName());
+                    throw new UnexpectedColumnException(this.toString(), ci.getColumnName(), this.getSchemaName(), this.getCatalogName());
                 }
  
                 /*
-                 * Otherwise it's a duplicate column name in the
-                 * metadata and we ignore it.  Cloudscape is known to
-                 * do this, although I think that's probably a bug.
+                 * Otherwise it's a duplicate column name in the metadata and we ignore it.  Cloudscape is known to do this, although I think that's probably a bug.
                  */
             }
             else
@@ -135,11 +134,11 @@ public abstract class ViewImpl extends AbstractTable
                 if (validateColumnStructure)
                 {
                     col.validate(ci);
-                    unvalidated.remove(colName);
+                    unvalidated.remove(ci.getColumnName());
                 }
                 else
                 {
-                    unvalidated.remove(colName);
+                    unvalidated.remove(ci.getColumnName());
                 }
             }
         }

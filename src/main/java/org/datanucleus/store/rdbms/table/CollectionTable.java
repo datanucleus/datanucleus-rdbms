@@ -216,7 +216,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                     {
                         // No column name so use default
                         DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
-                        orderColmd.setName(id.getIdentifierName());
+                        orderColmd.setName(id.getName());
                     }
                 }
             }
@@ -234,7 +234,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                     // No column name so use default
                     DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
                     orderColmd = new ColumnMetaData();
-                    orderColmd.setName(id.getIdentifierName());
+                    orderColmd.setName(id.getName());
                 }
             }
             orderMapping = storeMgr.getMappingManager().getMapping(int.class); // JDO2 spec [18.5] order column is assumed to be "int"

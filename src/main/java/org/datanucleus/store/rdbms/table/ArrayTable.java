@@ -121,7 +121,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             // No column name so use default
             DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
             colmd = new ColumnMetaData();
-            colmd.setName(id.getIdentifierName());
+            colmd.setName(id.getName());
         }
         orderMapping = storeMgr.getMappingManager().getMapping(int.class); // JDO2 spec [18.5] order column is assumed to be "int"
         ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, colmd, pkRequired && !pkColsSpecified);

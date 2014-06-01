@@ -332,7 +332,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, FieldRole fieldRole)
     {
         DatastoreIdentifier identifier = null;
-        String key = "[" + refMetaData.getFullFieldName() + "][" + implMetaData.getFullClassName() + "][" + implIdentifier.getIdentifierName() + "]";
+        String key = "[" + refMetaData.getFullFieldName() + "][" + implMetaData.getFullClassName() + "][" + implIdentifier.getName() + "]";
         identifier = references.get(key);
         if (identifier == null)
         {
@@ -344,7 +344,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             {
                 implementationName = implementationName.substring(dot+1);
             }
-            String name = referenceName + "." + implementationName + "." + implIdentifier.getIdentifierName();
+            String name = referenceName + "." + implementationName + "." + implIdentifier.getName();
 
             // Set the SQL identifier adding any truncation as necessary
             String suffix = getColumnIdentifierSuffix(fieldRole, embedded);
@@ -386,7 +386,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                     fieldRole = FieldRole.ROLE_COLLECTION_ELEMENT;
                 }
             }
-            return newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
+            return newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
         }
         else
         {
@@ -437,11 +437,11 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             // Bidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else
             {
@@ -453,7 +453,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
                 // FK field (FK collection/array/list/map)
-                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {

@@ -330,7 +330,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                     {
                         // No column name so use default
                         DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
-                        orderColmd.setName(id.getIdentifierName());
+                        orderColmd.setName(id.getName());
                     }
                 }
             }
@@ -348,7 +348,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                     // No column name so use default
                     DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
                     orderColmd = new ColumnMetaData();
-                    orderColmd.setName(id.getIdentifierName());
+                    orderColmd.setName(id.getName());
                 }
             }
             orderMapping = storeMgr.getMappingManager().getMapping(int.class); // JDO2 spec [18.5] order column is assumed to be "int"
@@ -407,7 +407,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             boolean found = false;
             for (int j=0;j<ownerMapping.getNumberOfDatastoreMappings();j++)
             {
-                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
+                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
                 {
                     ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                     found = true;
@@ -418,7 +418,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             {
                 for (int j=0;j<keyMapping.getNumberOfDatastoreMappings();j++)
                 {
-                    if (keyMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
+                    if (keyMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
                         keyMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;
@@ -430,7 +430,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             {
                 for (int j=0;j<valueMapping.getNumberOfDatastoreMappings();j++)
                 {
-                    if (valueMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
+                    if (valueMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
                         valueMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;

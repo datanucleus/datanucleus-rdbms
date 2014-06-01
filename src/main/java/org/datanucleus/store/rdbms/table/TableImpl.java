@@ -199,8 +199,7 @@ public abstract class TableImpl extends AbstractTable
 
     /**
      * Utility to validate the columns of the table.
-     * Will throw a MissingColumnException if a column is not found (and
-     * is not required to auto create it)
+     * Will throw a MissingColumnException if a column is not found (and is not required to auto create it)
      * @param conn Connection to use for validation
      * @param validateColumnStructure Whether to validate down to the structure of the columns, or just their existence
      * @param autoCreate Whether to auto create any missing columns
@@ -211,7 +210,7 @@ public abstract class TableImpl extends AbstractTable
     public boolean validateColumns(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors)
     throws SQLException
     {
-        HashMap unvalidated = new HashMap(columnsByName);
+        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByName);
         List tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
         Iterator i = tableColInfo.iterator();
         while (i.hasNext())
@@ -221,7 +220,7 @@ public abstract class TableImpl extends AbstractTable
             // Create an identifier to use for the real column - use "CUSTOM" because we don't want truncation
             DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(ci.getColumnName(), 
                 this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(String.class), null, true);
-            Column col = (Column) unvalidated.get(colName);
+            Column col = unvalidated.get(colName);
             if (col != null)
             {
                 if (validateColumnStructure)
@@ -322,13 +321,13 @@ public abstract class TableImpl extends AbstractTable
     public void initializeColumnInfoFromDatastore(Connection conn)
     throws SQLException
     {
-        HashMap columns = new HashMap(columnsByName);
+        Map<DatastoreIdentifier, Column> columns = new HashMap(columnsByName);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {
             RDBMSColumnInfo ci = (RDBMSColumnInfo) i.next();
             DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, ci.getColumnName());
-            Column col = (Column) columns.get(colName);
+            Column col = columns.get(colName);
             if (col != null)
             {
                 col.initializeColumnInfoFromDatastore(ci);
@@ -981,7 +980,7 @@ public abstract class TableImpl extends AbstractTable
                 if (pk == null)
                 {
                     pk = new PrimaryKey(this);
-                    pk.setName(pkIdentifier.getIdentifierName());
+                    pk.setName(pkIdentifier.getName());
                     primaryKeysByName.put(pkIdentifier, pk);
                 }
     
@@ -992,7 +991,7 @@ public abstract class TableImpl extends AbstractTable
     
                 if (col == null)
                 {
-                    throw new UnexpectedColumnException(this.toString(), colIdentifier.getIdentifierName(), this.getSchemaName(), this.getCatalogName());
+                    throw new UnexpectedColumnException(this.toString(), colIdentifier.getName(), this.getSchemaName(), this.getCatalogName());
                 }
                 pk.setColumn(keySeq, col);
             }
@@ -1037,7 +1036,7 @@ public abstract class TableImpl extends AbstractTable
                 if (fk == null)
                 {
                     fk = new ForeignKey(initiallyDeferred);
-                    fk.setName(fkIdentifier.getIdentifierName());
+                    fk.setName(fkIdentifier.getName());
                     foreignKeysByName.put(fkIdentifier, fk);
                 }
     
@@ -1291,7 +1290,7 @@ public abstract class TableImpl extends AbstractTable
                         fkName = idFactory.newForeignKeyIdentifier(this, n++);
                     }
                     while (actualForeignKeysByName.containsKey(fkName));
-                    fk.setName(fkName.getIdentifierName());
+                    fk.setName(fkName.getName());
                 }
                 String stmtText = dba.getAddForeignKeyStatement(fk, idFactory);
                 if (stmtText != null)
@@ -1334,7 +1333,7 @@ public abstract class TableImpl extends AbstractTable
                         ckName = idFactory.newCandidateKeyIdentifier(this, n++);
                     }
                     while (actualCandidateKeysByName.containsKey(ckName));
-                    ck.setName(ckName.getIdentifierName());
+                    ck.setName(ckName.getName());
                 }
                 String stmtText = dba.getAddCandidateKeyStatement(ck, idFactory);
                 if (stmtText != null)
@@ -1418,7 +1417,7 @@ public abstract class TableImpl extends AbstractTable
                     do
                     {
                         idxName = idFactory.newIndexIdentifier(this, idx.getUnique(), n++);
-                        idx.setName(idxName.getIdentifierName());
+                        idx.setName(idxName.getName());
                     }
                     while (actualIndicesByName.containsKey(idxName));
                 }

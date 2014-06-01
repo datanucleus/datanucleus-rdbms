@@ -50,7 +50,7 @@ public class SQLTableAlphaNamer implements SQLTableNamer
             boolean nameClashes = true;
             while (nameClashes)
             {
-                if (stmt.primaryTable != null && stmt.primaryTable.alias.getIdentifierName().equalsIgnoreCase(groupLetters))
+                if (stmt.primaryTable != null && stmt.primaryTable.alias.getName().equalsIgnoreCase(groupLetters))
                 {
                     // Clashes with primary table of statement (assume case-insensitive)
                     number++;

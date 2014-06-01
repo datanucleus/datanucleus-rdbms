@@ -117,7 +117,7 @@ public class CorrespondentColumnsMapper
                         {
                             if (sideBidMappings[j].getMemberMetaData().getName().equals(targetFieldName))
                             {
-                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getIdentifierName();
+                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getName();
                                 break;
                             }
                         }
@@ -131,7 +131,7 @@ public class CorrespondentColumnsMapper
                     for (int j = 0; j < sideBidentifiers.length; j++)
                     {
                         // This allows for case incorrectness in the specified name
-                        if (sideBidentifiers[j].getIdentifierName().equalsIgnoreCase(targetColumnName) &&
+                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) &&
                             !sideButilised[j])
                         {
                             putColumn(sideBidentifiers[j], colmds[i]);
@@ -274,7 +274,7 @@ public class CorrespondentColumnsMapper
                         {
                             if (sideBidMappings[j].getMemberMetaData().getName().equals(targetFieldName))
                             {
-                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getIdentifierName();
+                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getName();
                                 break;
                             }
                         }
@@ -288,7 +288,7 @@ public class CorrespondentColumnsMapper
                     for (int j = 0; j < sideBidentifiers.length; j++)
                     {
                         // This allows for case incorrectness in the specified name
-                        if (sideBidentifiers[j].getIdentifierName().equalsIgnoreCase(targetColumnName) &&
+                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) &&
                             !sideButilised[j])
                         {
                             putColumn(sideBidentifiers[j], colmds[i]);

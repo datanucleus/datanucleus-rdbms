@@ -165,7 +165,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     if (acmd.getIdentityType() == IdentityType.DATASTORE)
                     {
                         Column df = dc.getDatastoreObjectIdMapping().getDatastoreMapping(0).getColumn();
-                        if (df.getIdentifier().getIdentifierName().equalsIgnoreCase(columnNames[j]))
+                        if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                         {
                             //add +1 because result sets in jdbc starts with 1
                             int datastoreIdentityExpressionIndex = j+1;
@@ -197,7 +197,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                             for(int l=0; l<mapping.getDatastoreMappings().length && !found; l++)
                             {
                                 Column df = mapping.getDatastoreMapping(l).getColumn();
-                                if (df.getIdentifier().getIdentifierName().equalsIgnoreCase(columnNames[j]))
+                                if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                                 {
                                     fieldColumns.put(columnNames[j], apmd);
                                     columnsInThisType.add(columnNames[j]);

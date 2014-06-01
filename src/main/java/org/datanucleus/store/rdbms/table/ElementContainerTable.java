@@ -194,7 +194,7 @@ public abstract class ElementContainerTable extends JoinTable
             boolean found = false;
             for (int j=0;j<ownerMapping.getNumberOfDatastoreMappings();j++)
             {
-                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
+                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
                 {
                     ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                     found = true;
@@ -205,7 +205,7 @@ public abstract class ElementContainerTable extends JoinTable
             {
                 for (int j=0;j<elementMapping.getNumberOfDatastoreMappings();j++)
                 {
-                    if (elementMapping.getDatastoreMapping(j).getColumn().getIdentifier().getIdentifierName().equals(colName))
+                    if (elementMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
                         elementMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
                         found = true;

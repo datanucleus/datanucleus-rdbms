@@ -64,7 +64,7 @@ public class VersionMapping extends SingleFieldMapping
             // No column name so generate a default
             id = idFactory.newVersionFieldIdentifier();
             colmd = new ColumnMetaData();
-            colmd.setName(id.getIdentifierName());
+            colmd.setName(id.getName());
             table.getVersionMetaData().setColumnMetaData(colmd);
         }
         else
@@ -75,7 +75,7 @@ public class VersionMapping extends SingleFieldMapping
             {
                 // No name defined so create one and set it
                 id = idFactory.newVersionFieldIdentifier();
-                colmd.setName(id.getIdentifierName());
+                colmd.setName(id.getName());
             }
             else
             {

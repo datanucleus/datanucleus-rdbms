@@ -386,10 +386,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
-        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
+        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getIdentifierName();
+        String tableName = table.getIdentifier().getName();
         if (c[0] != null)
         {
             catalogName = c[0];
@@ -506,10 +506,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     {
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
-        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
+        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getIdentifierName();
+        String tableName = table.getIdentifier().getName();
         if (c[0] != null)
         {
             catalogName = c[0];
@@ -582,10 +582,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     {
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
-        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getIdentifierName());
+        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getIdentifierName();
+        String tableName = table.getIdentifier().getName();
         if (c[0] != null)
         {
             catalogName = c[0];
@@ -659,10 +659,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), 
-            table.getIdentifier().getIdentifierName());
+            table.getIdentifier().getName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getIdentifierName();
+        String tableName = table.getIdentifier().getName();
         if (c[0] != null)
         {
             catalogName = c[0];
@@ -845,10 +845,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      */
     protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, Table table)
     {
-        String[] c = splitTableIdentifierName(getDatastoreAdapter().getCatalogSeparator(), table.getIdentifier().getIdentifierName());
+        String[] c = splitTableIdentifierName(getDatastoreAdapter().getCatalogSeparator(), table.getIdentifier().getName());
         String catalogName = table.getCatalogName();
         String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getIdentifierName();
+        String tableName = table.getIdentifier().getName();
         if (c[0] != null)
         {
             catalogName = c[0];
@@ -911,7 +911,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             while (iter.hasNext())
             {
                 Table tbl = (Table)iter.next();
-                tableNames.add(insensitiveIdentifiers ? tbl.getIdentifier().getIdentifierName().toLowerCase() : tbl.getIdentifier().getIdentifierName());
+                tableNames.add(insensitiveIdentifiers ? tbl.getIdentifier().getName().toLowerCase() : tbl.getIdentifier().getName());
             }
         }
         tableNames.add(insensitiveIdentifiers ? tableName.toLowerCase() : tableName);

@@ -67,7 +67,7 @@ public class DiscriminatorMapping extends SingleFieldMapping
             // No column name so generate a default
             id = idFactory.newDiscriminatorFieldIdentifier();
             ColumnMetaData colmd = new ColumnMetaData();
-            colmd.setName(id.getIdentifierName());
+            colmd.setName(id.getName());
             dismd.setColumnMetaData(colmd);
         }
         else
@@ -78,7 +78,7 @@ public class DiscriminatorMapping extends SingleFieldMapping
             {
                 // No name defined so create one and set it
                 id = idFactory.newDiscriminatorFieldIdentifier();
-                colmd.setName(id.getIdentifierName());
+                colmd.setName(id.getName());
             }
             else
             {

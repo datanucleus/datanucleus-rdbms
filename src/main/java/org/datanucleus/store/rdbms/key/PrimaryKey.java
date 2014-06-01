@@ -34,7 +34,7 @@ public class PrimaryKey extends CandidateKey
     public PrimaryKey(Table table)
     {
         super(table);
-        name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getIdentifierName();
+        name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getName();
     }
 
     public boolean equals(Object obj)

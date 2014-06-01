@@ -296,7 +296,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
     public DatastoreIdentifier newReferenceFieldIdentifier(AbstractMemberMetaData refMetaData, 
             AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, FieldRole fieldRole)
     {
-        String key = "[" + refMetaData.getFullFieldName() + "][" + implMetaData.getFullClassName() + "][" + implIdentifier.getIdentifierName() + "]";
+        String key = "[" + refMetaData.getFullFieldName() + "][" + implMetaData.getFullClassName() + "][" + implIdentifier.getName() + "]";
         DatastoreIdentifier identifier = references.get(key);
         if (identifier == null)
         {
@@ -308,7 +308,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             {
                 implementationName = implementationName.substring(dot+1);
             }
-            String name = referenceName + "." + implementationName + "." + implIdentifier.getIdentifierName();
+            String name = referenceName + "." + implementationName + "." + implIdentifier.getName();
 
             // Set the SQL identifier adding any truncation as necessary
             String datastoreID = generateIdentifierNameForJavaName(name);
@@ -338,7 +338,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Bidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                identifier = newColumnIdentifier(relatedFmd.getName() + getWordSeparator() + destinationId.getIdentifierName());
+                identifier = newColumnIdentifier(relatedFmd.getName() + getWordSeparator() + destinationId.getName());
             }
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
@@ -348,7 +348,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 if (destinationId != null)
                 {
                     // FK to other table
-                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getIdentifierName());
+                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getName());
                 }
                 else
                 {
@@ -370,7 +370,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
+                identifier = newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
             }
         }
         else
@@ -378,7 +378,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Unidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                identifier = newColumnIdentifier(ownerFmd.getClassName(false) + getWordSeparator() + destinationId.getIdentifierName());
+                identifier = newColumnIdentifier(ownerFmd.getClassName(false) + getWordSeparator() + destinationId.getName());
             }
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
@@ -388,7 +388,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 if (destinationId != null)
                 {
                     // FK to other table
-                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getIdentifierName());
+                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getName());
                 }
                 else
                 {
@@ -410,7 +410,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getIdentifierName(), embedded, fieldRole, false);
+                identifier = newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
             }
         }
 
@@ -435,11 +435,11 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Bidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {
-                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(relatedFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else
             {
@@ -451,7 +451,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
                 // FK field (FK collection/array/list/map)
-                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getIdentifierName(), embedded, fieldRole, false);
+                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
             }
             else if (fieldRole == FieldRole.ROLE_INDEX)
             {

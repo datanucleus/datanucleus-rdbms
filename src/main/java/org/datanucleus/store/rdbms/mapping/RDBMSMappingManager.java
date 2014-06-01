@@ -1645,7 +1645,7 @@ public class RDBMSMappingManager implements MappingManager
                 }
             }
 
-            colmd.setName(identifier.getIdentifierName());
+            colmd.setName(identifier.getName());
         }
         else
         {
@@ -1739,7 +1739,7 @@ public class RDBMSMappingManager implements MappingManager
                 i++;
             }
 
-            colmd.setName(identifier.getIdentifierName());
+            colmd.setName(identifier.getName());
             col = tbl.addColumn(javaType, identifier, mapping, colmd);
         }
         else
@@ -1782,7 +1782,7 @@ public class RDBMSMappingManager implements MappingManager
             identifier = idFactory.newForeignKeyFieldIdentifier(
                 relatedMmds != null ? relatedMmds[0] : null, mmd, reference.getIdentifier(), 
                 storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), FieldRole.ROLE_OWNER);
-            colmd.setName(identifier.getIdentifierName());
+            colmd.setName(identifier.getName());
         }
         else
         {

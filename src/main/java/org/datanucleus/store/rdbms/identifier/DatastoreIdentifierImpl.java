@@ -39,13 +39,13 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     /** Datastore Identifier factory. */
     protected final IdentifierFactory factory;
 
-    /** The identifier name. */
-    protected String identifierName;
+    /** The name. */
+    protected String name;
 
-    /** catalog name. **/
+    /** catalog */
     protected String catalogName;
-    
-    /** schema/owner name. **/
+
+    /** schema */
     protected String schemaName;
 
     /** String representation to reduce number of times the toString is constructed **/
@@ -60,7 +60,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     {
         this.dba = factory.getDatastoreAdapter();
         this.factory = factory;
-        this.identifierName = toCase(sqlIdentifier);
+        this.name = toCase(sqlIdentifier);
     }
 
     /**
@@ -86,17 +86,17 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     }
 
     /**
-     * Accessor for the identifier name part of the identifier.
-     * @return identifier name
+     * Accessor for the name.
+     * @return The name
      */
-    public String getIdentifierName()
+    public String getName()
     {
-        return identifierName;
+        return name;
     }
 
     /**
-     * Sets the catalog name
-     * @param catalogName The catalog name
+     * Sets the catalog
+     * @param catalogName The catalog
      */
     public void setCatalogName(String catalogName)
     {
@@ -104,8 +104,8 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     }
     
     /**
-     * Sets the schema name
-     * @param schemaName The schema name
+     * Sets the schema
+     * @param schemaName The schema
      */
     public void setSchemaName(String schemaName)
     {
@@ -113,8 +113,8 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     }
 
     /**
-     * Accessor for the catalog name
-     * @return The catalog name
+     * Accessor for the catalog
+     * @return The catalog
      */
     public String getCatalogName()
     {
@@ -122,8 +122,8 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     }
 
     /**
-     * Accessor for the schema name
-     * @return The schema name
+     * Accessor for the schema
+     * @return The schema
      */
     public String getSchemaName()
     {
@@ -136,7 +136,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
      */
     public int hashCode()
     {
-        return identifierName.hashCode();
+        return name.hashCode();
     }
 
     /**
@@ -163,7 +163,7 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
         }
 
         DatastoreIdentifierImpl id = (DatastoreIdentifierImpl)obj;
-        return this.identifierName.equals(id.identifierName) &&
+        return this.name.equals(id.name) &&
                (this.schemaName == null ? true : (id.schemaName == null || this.schemaName.equals(id.schemaName))) &&
                (this.catalogName == null ? true : (id.catalogName == null || this.catalogName.equals(id.catalogName)));
     }
@@ -181,10 +181,10 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
     
             // Note that by adding on the quotes here we assume that the limits on the size of
             // the SQLIdentifier are not including the quotes. This may or may not be correct
-            if (dba.isReservedKeyword(identifierName))
+            if (dba.isReservedKeyword(name))
             {
                 // Identifier should be quoted since its a SQL keyword
-                toString = identifierQuoteString + identifierName + identifierQuoteString;
+                toString = identifierQuoteString + name + identifierQuoteString;
             }
             else
             {
@@ -193,11 +193,11 @@ public class DatastoreIdentifierImpl implements DatastoreIdentifier
                     factory.getNamingCase() == NamingCase.UPPER_CASE_QUOTED)
                 {
                     // Identifier should be quoted since our case requires it
-                    toString = identifierQuoteString + identifierName + identifierQuoteString;
+                    toString = identifierQuoteString + name + identifierQuoteString;
                 }
                 else
                 {
-                    toString = identifierName;
+                    toString = name;
                 }
             }
         }

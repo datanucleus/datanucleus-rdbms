@@ -503,7 +503,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      */
     public DatastoreIdentifier newIdentifier(DatastoreIdentifier identifier, String suffix)
     {
-        String newId = identifier.getIdentifierName() + getWordSeparator() + suffix;
+        String newId = identifier.getName() + getWordSeparator() + suffix;
         if (identifier instanceof TableIdentifier)
         {
             newId = truncate(newId, dba.getDatastoreIdentifierMaxLength(IdentifierType.TABLE));
@@ -652,7 +652,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         {
             String suffix = getWordSeparator() + "PK";
             int maxLength = dba.getDatastoreIdentifierMaxLength(IdentifierType.PRIMARY_KEY);
-            String baseID = truncate(table.getIdentifier().getIdentifierName(), maxLength - suffix.length());
+            String baseID = truncate(table.getIdentifier().getName(), maxLength - suffix.length());
             identifier = new PrimaryKeyIdentifier(this, baseID + suffix);
             primarykeys.put(key, identifier);
         }
@@ -674,7 +674,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         {
             String suffix = getWordSeparator() + "U" + seq;
             int maxLength = dba.getDatastoreIdentifierMaxLength(IdentifierType.CANDIDATE_KEY);
-            String baseID = truncate(table.getIdentifier().getIdentifierName(), maxLength - suffix.length());
+            String baseID = truncate(table.getIdentifier().getName(), maxLength - suffix.length());
             identifier = new CandidateKeyIdentifier(this, baseID + suffix);
             candidates.put(key, identifier);
         }
@@ -708,7 +708,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 throw new TooManyForeignKeysException(dba, table.toString());
             }
             int maxLength = dba.getDatastoreIdentifierMaxLength(IdentifierType.FOREIGN_KEY);
-            String baseID = truncate(table.getIdentifier().getIdentifierName(), maxLength - suffix.length());
+            String baseID = truncate(table.getIdentifier().getName(), maxLength - suffix.length());
             identifier = new ForeignKeyIdentifier(this, baseID + suffix);
             foreignkeys.put(key, identifier);
         }
@@ -739,7 +739,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 throw new TooManyIndicesException(dba, table.toString());
             }
             int maxLength = dba.getDatastoreIdentifierMaxLength(IdentifierType.INDEX);
-            String baseID = truncate(table.getIdentifier().getIdentifierName(), maxLength - suffix.length());
+            String baseID = truncate(table.getIdentifier().getName(), maxLength - suffix.length());
             identifier = new IndexIdentifier(this, baseID + suffix);
             indexes.put(key, identifier);
         }

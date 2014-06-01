@@ -2381,7 +2381,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     throws SQLException
     {
         RDBMSColumnInfo colInfo = (RDBMSColumnInfo)schemaHandler.getSchemaData(
-            conn, "column", new Object[] {table, column.getIdentifierName()});
+            conn, "column", new Object[] {table, column.getName()});
         return colInfo;
     }
 
@@ -3114,7 +3114,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             if (existingClass != null)
                             {
                                 String msg = Localiser.msg("050015", cmd.getFullClassName(), 
-                                    tableName.getIdentifierName(), existingClass);
+                                    tableName.getName(), existingClass);
                                 NucleusLogger.DATASTORE.warn(msg);
                             }
                         }
@@ -3557,11 +3557,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             for (int i=0; i<newTables.size(); i++)
             {
                 Table t1 = newTables.get(i);
-                if (map.containsKey(t1.getIdentifier().getIdentifierName()))
+                if (map.containsKey(t1.getIdentifier().getName()))
                 {
                     return true;
                 }
-                map.put(t1.getIdentifier().getIdentifierName(), t1);
+                map.put(t1.getIdentifier().getName(), t1);
             }
             return false;
         }
