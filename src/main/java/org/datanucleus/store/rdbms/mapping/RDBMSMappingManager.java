@@ -800,8 +800,7 @@ public class RDBMSMappingManager implements MappingManager
         if (mmd.getMap() == null)
         {
             // TODO Localise this
-            throw new NucleusException("Attempt to get key mapping for field " + mmd.getFullFieldName() + 
-                " that has no map!").setFatal();
+            throw new NucleusException("Attempt to get key mapping for field " + mmd.getFullFieldName() + " that has no map!").setFatal();
         }
 
         MappingConverterDetails mcd = null;
@@ -1331,7 +1330,9 @@ public class RDBMSMappingManager implements MappingManager
 
         if (datastoreMapping == null)
         {
-            // No specified type so get the best for this java-type (if primitve then use the wrapper java-type)
+            // TODO If table exists we should look at sql-type of the column and choose mapping for that
+
+            // No specified type so get the best for this java-type (if primitive then use the wrapper java-type)
             // Use wrapper type instead of primitive type since primitives have no java-type entries for datastore mappings
             String type = ClassUtils.getWrapperTypeNameForPrimitiveTypeName(javaType);
             Collection mappings = (Collection)datastoreMappingsByJavaType.get(type);
@@ -1434,8 +1435,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param column The column
      * @return The datastore mapping
      */
-    public DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, 
-            Column column)
+    public DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, Column column)
     {
         Class datastoreMappingClass = null;
 
@@ -1444,8 +1444,7 @@ public class RDBMSMappingManager implements MappingManager
             // Use "datastore-mapping-class" extension if provided
             if (mmd.getColumnMetaData()[index].hasExtension("datastore-mapping-class"))
             {
-                datastoreMappingClass = clr.classForName(
-                    mmd.getColumnMetaData()[index].getValueForExtension("datastore-mapping-class"));
+                datastoreMappingClass = clr.classForName(mmd.getColumnMetaData()[index].getValueForExtension("datastore-mapping-class"));
             }
         }
         if (datastoreMappingClass == null)
@@ -1745,8 +1744,7 @@ public class RDBMSMappingManager implements MappingManager
         else
         {
             // User has specified a name, so try to keep this unmodified
-            col = tbl.addColumn(javaType, 
-                idFactory.newColumnIdentifier(colmd.getName(), 
+            col = tbl.addColumn(javaType, idFactory.newColumnIdentifier(colmd.getName(), 
                     storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true), mapping, colmd);
         }
 
@@ -1770,8 +1768,7 @@ public class RDBMSMappingManager implements MappingManager
      * @param clr ClassLoader resolver
      * @return The column
      */
-    public Column createColumn(AbstractMemberMetaData mmd, Table table,
-        JavaTypeMapping mapping, ColumnMetaData colmd, Column reference, ClassLoaderResolver clr)
+    public Column createColumn(AbstractMemberMetaData mmd, Table table, JavaTypeMapping mapping, ColumnMetaData colmd, Column reference, ClassLoaderResolver clr)
     {
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         DatastoreIdentifier identifier = null;
@@ -1779,8 +1776,7 @@ public class RDBMSMappingManager implements MappingManager
         {
             // No name specified, so generate the identifier from the field name
             AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
-            identifier = idFactory.newForeignKeyFieldIdentifier(
-                relatedMmds != null ? relatedMmds[0] : null, mmd, reference.getIdentifier(), 
+            identifier = idFactory.newForeignKeyFieldIdentifier(relatedMmds != null ? relatedMmds[0] : null, mmd, reference.getIdentifier(), 
                 storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), FieldRole.ROLE_OWNER);
             colmd.setName(identifier.getName());
         }
