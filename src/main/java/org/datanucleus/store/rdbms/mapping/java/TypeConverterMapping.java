@@ -26,6 +26,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
 
@@ -80,6 +81,19 @@ public class TypeConverterMapping extends SingleFieldMapping
     public TypeConverter getTypeConverter()
     {
         return converter;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getDefaultLength(int)
+     */
+    @Override
+    public int getDefaultLength(int index)
+    {
+        if (converter instanceof ColumnLengthDefiningTypeConverter)
+        {
+            return ((ColumnLengthDefiningTypeConverter) converter).getDefaultColumnLength(index);
+        }
+        return super.getDefaultLength(index);
     }
 
     /**
