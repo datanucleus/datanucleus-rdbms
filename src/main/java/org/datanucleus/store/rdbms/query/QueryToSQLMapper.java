@@ -18,15 +18,16 @@ Contributors:
 package org.datanucleus.store.rdbms.query;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -191,7 +192,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     CompilationComponent compileComponent;
 
     /** Stack of expressions, used for compilation of the query into SQL. */
-    Stack<SQLExpression> stack = new Stack();
+    Deque<SQLExpression> stack = new ArrayDeque<SQLExpression>();
 
     /** Map of SQLTable/mapping keyed by the name of the primary that it relates to. */
     Map<String, SQLTableMapping> sqlTableByPrimary = new HashMap<String, SQLTableMapping>();
