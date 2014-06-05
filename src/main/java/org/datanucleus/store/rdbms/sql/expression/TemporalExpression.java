@@ -27,7 +27,7 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 
 /**
  * Representation of temporal objects in java query languages.
- * Can be used for anything based on java.util.Date.
+ * Can be used for anything based on java.util.Date (this includes java.time.* since they convert to java.util.Date types at the datastore).
  */
 public class TemporalExpression extends SQLExpression
 {
@@ -65,6 +65,11 @@ public class TemporalExpression extends SQLExpression
     public TemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args, List types)
     {
         super(stmt, mapping, functionName, args, types);
+    }
+
+    protected TemporalExpression(SQLExpression expr1, Expression.DyadicOperator op, SQLExpression expr2)
+    {
+        super(expr1, op, expr2);
     }
 
     public BooleanExpression eq(SQLExpression expr)
@@ -176,9 +181,44 @@ public class TemporalExpression extends SQLExpression
         return new BooleanExpression(this, not ? Expression.OP_NOTIN : Expression.OP_IN, expr);
     }
 
+    public SQLExpression add(SQLExpression expr)
+    {
+        if (expr instanceof TemporalExpression)
+        {
+            return new TemporalExpression(this, Expression.OP_ADD, expr).encloseInParentheses();
+        }
+        else if (expr instanceof DelegatedExpression)
+        {
+            SQLExpression delegate = ((DelegatedExpression)expr).getDelegate();
+            if (delegate instanceof TemporalExpression)
+            {
+                return new TemporalExpression(this, Expression.OP_ADD, delegate).encloseInParentheses();
+            }
+        }
+
+        return super.add(expr);
+    }
+
+    public SQLExpression sub(SQLExpression expr)
+    {
+        if (expr instanceof TemporalExpression)
+        {
+            return new TemporalExpression(this, Expression.OP_SUB, expr).encloseInParentheses();
+        }
+        else if (expr instanceof DelegatedExpression)
+        {
+            SQLExpression delegate = ((DelegatedExpression)expr).getDelegate();
+            if (delegate instanceof TemporalExpression)
+            {
+                return new TemporalExpression(this, Expression.OP_SUB, delegate).encloseInParentheses();
+            }
+        }
+
+        return super.sub(expr);
+    }
+
     public SQLExpression invoke(String methodName, List args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Date.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Date.class.getName(), methodName, this, args);
     }
 }

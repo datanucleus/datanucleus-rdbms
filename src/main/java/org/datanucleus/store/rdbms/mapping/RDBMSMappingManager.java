@@ -1563,24 +1563,24 @@ public class RDBMSMappingManager implements MappingManager
      */
     public Column createColumn(JavaTypeMapping mapping, String javaType, int datastoreFieldIndex)
     {
-        AbstractMemberMetaData fmd = mapping.getMemberMetaData();
+        AbstractMemberMetaData mmd = mapping.getMemberMetaData();
         FieldRole roleForField = mapping.getRoleForMember();
         Table tbl = mapping.getTable();
 
         // Take the column MetaData from the component that this mappings role relates to
         ColumnMetaData colmd = null;
-        ColumnMetaDataContainer columnContainer = fmd;
+        ColumnMetaDataContainer columnContainer = mmd;
         if (roleForField == FieldRole.ROLE_COLLECTION_ELEMENT || roleForField == FieldRole.ROLE_ARRAY_ELEMENT)
         {
-            columnContainer = fmd.getElementMetaData();
+            columnContainer = mmd.getElementMetaData();
         }
         else if (roleForField == FieldRole.ROLE_MAP_KEY)
         {
-            columnContainer = fmd.getKeyMetaData();
+            columnContainer = mmd.getKeyMetaData();
         }
         else if (roleForField == FieldRole.ROLE_MAP_VALUE)
         {
-            columnContainer= fmd.getValueMetaData();
+            columnContainer= mmd.getValueMetaData();
         }
 
         Column col;
@@ -1594,7 +1594,10 @@ public class RDBMSMappingManager implements MappingManager
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            colmd.setName(fmd.getColumn());
+            if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > datastoreFieldIndex)
+            {
+                colmd.setName(mmd.getColumnMetaData()[datastoreFieldIndex].getName());
+            }
             if (columnContainer != null)
             {
                 columnContainer.addColumn(colmd);
@@ -1616,30 +1619,30 @@ public class RDBMSMappingManager implements MappingManager
             if (roleForField == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
                 // Join table collection element
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_COLLECTION_ELEMENT);
+                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, true, FieldRole.ROLE_COLLECTION_ELEMENT);
             }
             else if (roleForField == FieldRole.ROLE_ARRAY_ELEMENT)
             {
                 // Join table array element
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_ARRAY_ELEMENT);
+                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, true, FieldRole.ROLE_ARRAY_ELEMENT);
             }
             else if (roleForField == FieldRole.ROLE_MAP_KEY)
             {
                 // Join table map key
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_MAP_KEY);
+                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, true, FieldRole.ROLE_MAP_KEY);
             }
             else if (roleForField == FieldRole.ROLE_MAP_VALUE)
             {
                 // Join table map value
-                identifier = idFactory.newJoinTableFieldIdentifier(fmd, null, null, true, FieldRole.ROLE_MAP_VALUE);
+                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, true, FieldRole.ROLE_MAP_VALUE);
             }
             else
             {
-                identifier = idFactory.newIdentifier(IdentifierType.COLUMN, fmd.getName());
+                identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName());
                 int i=0;
                 while (tbl.hasColumn(identifier))
                 {
-                    identifier = idFactory.newIdentifier(IdentifierType.COLUMN, fmd.getName() + "_" + i);
+                    identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName() + "_" + i);
                     i++;
                 }
             }
@@ -1650,28 +1653,27 @@ public class RDBMSMappingManager implements MappingManager
         {
             // User has specified a name, so try to keep this unmodified
             identifier = idFactory.newColumnIdentifier(colmds[datastoreFieldIndex].getName(), 
-                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(fmd.getType()), null, true);
+                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true);
         }
 
         // Create the column
         col = tbl.addColumn(javaType, identifier, mapping, colmd);
-        if (fmd.isPrimaryKey())
+        if (mmd.isPrimaryKey())
         {
             col.setPrimaryKey();
         }
 
-        if (!(fmd.getParent() instanceof AbstractClassMetaData))
+        if (!(mmd.getParent() instanceof AbstractClassMetaData))
         {
             // Embedded so cant be datastore-attributed
         }
         else
         {
-            if (storeMgr.isStrategyDatastoreAttributed(fmd.getAbstractClassMetaData(), fmd.getAbsoluteFieldNumber()))
+            if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()))
             {
                 if (tbl instanceof DatastoreClass)
                 {
-                    if ((fmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || 
-                            !fmd.isPrimaryKey())
+                    if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
                     {
                         // Increment any PK field if we are in base class, and increment any other field
                         col.setIdentity(true);
@@ -1680,21 +1682,21 @@ public class RDBMSMappingManager implements MappingManager
             }
         }
 
-        if (fmd.getValueForExtension("select-function") != null)
+        if (mmd.getValueForExtension("select-function") != null)
         {
-            col.setWrapperFunction(fmd.getValueForExtension("select-function"),Column.WRAPPER_FUNCTION_SELECT);
+            col.setWrapperFunction(mmd.getValueForExtension("select-function"),Column.WRAPPER_FUNCTION_SELECT);
         }
-        if (fmd.getValueForExtension("insert-function") != null)
+        if (mmd.getValueForExtension("insert-function") != null)
         {
-            col.setWrapperFunction(fmd.getValueForExtension("insert-function"),Column.WRAPPER_FUNCTION_INSERT);
+            col.setWrapperFunction(mmd.getValueForExtension("insert-function"),Column.WRAPPER_FUNCTION_INSERT);
         }
-        if (fmd.getValueForExtension("update-function") != null)
+        if (mmd.getValueForExtension("update-function") != null)
         {
-            col.setWrapperFunction(fmd.getValueForExtension("update-function"),Column.WRAPPER_FUNCTION_UPDATE);
+            col.setWrapperFunction(mmd.getValueForExtension("update-function"),Column.WRAPPER_FUNCTION_UPDATE);
         }
 
-        setColumnNullability(fmd, colmd, col);
-        if (fmd.getNullValue() == NullValue.DEFAULT)
+        setColumnNullability(mmd, colmd, col);
+        if (mmd.getNullValue() == NullValue.DEFAULT)
         {
             // Users default should be applied if a null is to be inserted
             col.setDefaultable(colmd.getDefaultValue());
@@ -1721,7 +1723,10 @@ public class RDBMSMappingManager implements MappingManager
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            colmd.setName(mmd.getColumn());
+            if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length == 1)
+            {
+                colmd.setName(mmd.getColumnMetaData()[0].getName());
+            }
             mmd.addColumn(colmd);
         }
 
