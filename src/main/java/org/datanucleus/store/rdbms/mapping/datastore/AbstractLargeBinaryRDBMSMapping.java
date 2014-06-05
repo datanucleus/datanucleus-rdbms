@@ -58,17 +58,17 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
      */
     public AbstractLargeBinaryRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
-		super(storeMgr, mapping);
-		column = col;
-		initialize();
-	}
+        super(storeMgr, mapping);
+        column = col;
+        initialize();
+    }
 
     /**
      * Initialisation method, initialising the type info.
      */
     protected void initialize()
     {
-		initTypeInfo();
+        initTypeInfo();
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (SQLException sqle)
             {
-				throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + param, column, sqle.getMessage()),sqle);
+                throw new NucleusDataStoreException(Localiser.msg("055001", "Object", "" + param, column, sqle.getMessage()), sqle);
             }
         }
         else
@@ -229,7 +229,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (Exception e)
             {
-                throw new NucleusDataStoreException(Localiser.msg("055001","Object","" + value, column, e.getMessage()),e);
+                throw new NucleusDataStoreException(Localiser.msg("055001", "Object", "" + value, column, e.getMessage()), e);
             }
         }
     }
@@ -323,13 +323,12 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         {
             return TypeConversionHelper.getBigIntegerArrayFromByteArray(bytes);
         }
-        else if (getJavaTypeMapping().getJavaType() != null &&
-            getJavaTypeMapping().getJavaType().getName().equals(java.util.BitSet.class.getName()))
+        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals(java.util.BitSet.class.getName()))
         {
             return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
         }
-        else if (getJavaTypeMapping().getJavaType() != null &&
-                getJavaTypeMapping().getJavaType().getName().equals(java.awt.image.BufferedImage.class.getName()))
+        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName()
+                .equals(java.awt.image.BufferedImage.class.getName()))
         {
             try
             {
@@ -337,7 +336,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
             }
             catch (IOException e)
             {
-                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()),e);
+                throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, e.getMessage()), e);
             }
         }
         else
@@ -372,7 +371,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, sqle.getMessage()),sqle);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, sqle.getMessage()), sqle);
         }
         if (bytes == null)
         {
@@ -403,6 +402,6 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
     public String getString(ResultSet resultSet, int exprIndex)
     {
         Object obj = getObject(resultSet, exprIndex);
-        return (String)obj;
+        return (String) obj;
     }
 }

@@ -621,7 +621,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             {
                 return (Connection) this.conn;
             }
-            else if (this.conn != null && this.conn instanceof XAConnection)
+            else if (this.conn != null && this.conn instanceof XAConnection) // TODO How is this possible? this.conn is only set in getConnection to java.sql.Connection
             {
                 try
                 {

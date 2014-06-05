@@ -118,8 +118,8 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
     }
 
     /**
-     * Accessor for the string to put in any retrieval datastore statement for this field.
-     * In RDBMS, this is typically a ? to be used in JDBC statements.
+     * Accessor for the string to put in any retrieval datastore statement for this field. In RDBMS, this is
+     * typically a ? to be used in JDBC statements.
      * @return The input parameter
      */
     public String getInsertionInputParameter()
@@ -128,8 +128,8 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
     }
 
     /**
-     * Accessor for the string to put in any update datastore statements for this field.
-     * In RDBMS, this is typically a ? to be used in JDBC statements.
+     * Accessor for the string to put in any update datastore statements for this field. In RDBMS, this is
+     * typically a ? to be used in JDBC statements.
      * @return The input parameter.
      */
     public String getUpdateInputParameter()
@@ -147,19 +147,17 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
     }
 
     /**
-     * Sets the TypeInfo for the columns of the Mapping.
-     * Mappings using two or more columns using different TypeInfo(s) should
-     * overwrite this method to appropriate set the TypeInfo (SQL type) for
-     * all the columns
+     * Sets the TypeInfo for the columns of the Mapping. Mappings using two or more columns using different
+     * TypeInfo(s) should overwrite this method to appropriate set the TypeInfo (SQL type) for all the columns
      */
     protected void initTypeInfo()
     {
         SQLTypeInfo typeInfo = getTypeInfo();
         if (typeInfo == null)
         {
-            throw new UnsupportedDataTypeException(Localiser.msg("055000",column));
+            throw new UnsupportedDataTypeException(Localiser.msg("055000", column));
         }
-    
+
         if (column != null)
         {
             column.setTypeInfo(typeInfo);
@@ -172,17 +170,15 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
         {
             return true;
         }
-    
+
         if (!(obj instanceof AbstractDatastoreMapping))
         {
             return false;
         }
-    
-        AbstractDatastoreMapping cm = (AbstractDatastoreMapping)obj;
-    
-        return getClass().equals(cm.getClass()) &&
-            storeMgr.equals(cm.storeMgr) &&
-            (column == null ? cm.column == null : column.equals(cm.column));
+
+        AbstractDatastoreMapping cm = (AbstractDatastoreMapping) obj;
+
+        return getClass().equals(cm.getClass()) && storeMgr.equals(cm.storeMgr) && (column == null ? cm.column == null : column.equals(cm.column));
     }
 
     public int hashCode()
@@ -366,6 +362,6 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
      **/
     protected String failureMessage(String method)
     {
-        return Localiser.msg("041005",getClass().getName(), method, mapping.getMemberMetaData().getFullFieldName());
+        return Localiser.msg("041005", getClass().getName(), method, mapping.getMemberMetaData().getFullFieldName());
     }
 }

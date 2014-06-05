@@ -54,8 +54,8 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
      */
     public BlobRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
-		super(mapping, storeMgr, col);
-	}
+        super(mapping, storeMgr, col);
+    }
 
     /**
      * Accessor for the RDBMS BLOB type being represented.
@@ -70,8 +70,10 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
         return storeMgr.getSQLTypeInfoForJDBCType(Types.BLOB);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.AbstractLargeBinaryRDBMSMapping#getObject(java.lang.Object, int)
+    /*
+     * (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.mapping.AbstractLargeBinaryRDBMSMapping#getObject(java.lang.Object,
+     * int)
      */
     @Override
     public Object getObject(ResultSet rs, int param)
@@ -96,7 +98,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                 {
                     return null;
                 }
-                bytes = blob.getBytes(1, (int)blob.length());
+                bytes = blob.getBytes(1, (int) blob.length());
                 if (bytes == null)
                 {
                     return null;
@@ -104,15 +106,17 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
             }
             catch (SQLException sqle2)
             {
-                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, sqle2.getMessage()), sqle2);
+                throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, sqle2.getMessage()), sqle2);
             }
         }
 
         return getObjectForBytes(bytes, param);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.AbstractLargeBinaryRDBMSMapping#setObject(java.lang.Object, int, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.mapping.AbstractLargeBinaryRDBMSMapping#setObject(java.lang.Object,
+     * int, java.lang.Object)
      */
     @Override
     public void setObject(PreparedStatement ps, int param, Object value)
@@ -131,11 +135,11 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                 {
                     if (column.isDefaultable() && column.getDefaultValue() != null)
                     {
-                        ps.setString(param,column.getDefaultValue().toString().trim());
+                        ps.setString(param, column.getDefaultValue().toString().trim());
                     }
                     else
                     {
-                        ps.setNull(param,getTypeInfo().getDataType());
+                        ps.setNull(param, getTypeInfo().getDataType());
                     }
                 }
                 else
@@ -149,11 +153,11 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                 {
                     if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
                     {
-                        ps.setBlob(param,new BlobImpl(column.getDefaultValue().toString().trim()));
+                        ps.setBlob(param, new BlobImpl(column.getDefaultValue().toString().trim()));
                     }
                     else
                     {
-                        ps.setNull(param,getTypeInfo().getDataType());
+                        ps.setNull(param, getTypeInfo().getDataType());
                     }
                 }
                 else
@@ -188,11 +192,11 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                 if (bytes == null)
                 {
                     value = null;
-                }      
+                }
                 else
                 {
                     BlobImpl blob = new BlobImpl(bytes);
-                    value = (String)blob.getObject();
+                    value = (String) blob.getObject();
                 }
             }
         }

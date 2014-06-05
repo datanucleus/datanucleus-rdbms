@@ -34,11 +34,11 @@ public class BitRDBMSMapping extends BooleanRDBMSMapping
      * @param mapping Java type mapping
      * @param storeMgr Store Manager
      * @param col Column
-     */    
+     */
     public BitRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
-		super(mapping, storeMgr, col);
-	}
+        super(mapping, storeMgr, col);
+    }
 
     /**
      * Accessor for whether the mapping is bit-based.

@@ -61,21 +61,23 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARBINARY);
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#setObject(java.sql.PreparedStatement, int, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#setObject(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     public void setObject(PreparedStatement ps, int param, Object value)
     {
         try
         {
-            if (value == null) 
+            if (value == null)
             {
                 ps.setNull(param, Types.LONGVARBINARY);
-            } 
-            else if (value instanceof File) 
+            }
+            else if (value instanceof File)
             {
-                File file = (File)value;
+                File file = (File) value;
                 ps.setBinaryStream(param, new FileInputStream(file), (int) file.length());
             }
             else
@@ -86,16 +88,18 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "Object", "" + value, column, e.getMessage()), e);
         }
         catch (IOException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001","Object", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "Object", "" + value, column, e.getMessage()), e);
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#getObject(java.sql.ResultSet, int)
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#getObject(java.sql.ResultSet, int)
      */
     @Override
     public Object getObject(ResultSet resultSet, int param)
@@ -105,7 +109,7 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             InputStream is = resultSet.getBinaryStream(param);
-            if (!resultSet.wasNull()) 
+            if (!resultSet.wasNull())
             {
                 if (getJavaTypeMapping() instanceof FileMapping)
                 {
@@ -120,11 +124,11 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (IOException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, e.getMessage()), e);
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "Object", "" + param, column, e.getMessage()), e);
         }
 
         return so;

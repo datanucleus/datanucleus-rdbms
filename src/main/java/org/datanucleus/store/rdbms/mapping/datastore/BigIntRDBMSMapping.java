@@ -45,13 +45,13 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
      * @param mapping Java type mapping
      * @param storeMgr Store Manager
      * @param col Column
-     */    
+     */
     public BigIntRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
-		super(storeMgr, mapping);
-		column = col;
-		initialize();
-	}
+        super(storeMgr, mapping);
+        column = col;
+        initialize();
+    }
 
     private void initialize()
     {
@@ -62,7 +62,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             // Valid Values
             if (getJavaTypeMapping() instanceof SingleFieldMapping)
             {
-                Object[] validValues = ((SingleFieldMapping)getJavaTypeMapping()).getValidValues(0);
+                Object[] validValues = ((SingleFieldMapping) getJavaTypeMapping()).getValidValues(0);
                 if (validValues != null)
                 {
                     String constraints = storeMgr.getDatastoreAdapter().getCheckConstraintForValues(column.getIdentifier(), validValues, column.isNullable());
@@ -70,7 +70,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                 }
             }
         }
-		initTypeInfo();
+        initTypeInfo();
     }
 
     public SQLTypeInfo getTypeInfo()
@@ -100,13 +100,13 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
 
         try
         {
-            value = (int)rs.getLong(param);
+            value = (int) rs.getLong(param);
 
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
             {
                 if (rs.wasNull())
                 {
-                    throw new NullValueException(Localiser.msg("055003",column));
+                    throw new NullValueException(Localiser.msg("055003", column));
                 }
             }
         }
@@ -117,7 +117,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
 
         return value;
     }
-    
+
     public void setLong(PreparedStatement ps, int param, long value)
     {
         try
@@ -138,11 +138,11 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         {
             value = rs.getLong(param);
 
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
             {
                 if (rs.wasNull())
                 {
-                    throw new NullValueException(Localiser.msg("055003",column));
+                    throw new NullValueException(Localiser.msg("055003", column));
                 }
             }
         }
@@ -154,8 +154,10 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         return value;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.AbstractDatastoreMapping#setString(java.lang.Object, int, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.mapping.AbstractDatastoreMapping#setString(java.lang.Object, int,
+     * java.lang.String)
      */
     @Override
     public void setString(PreparedStatement ps, int exprIndex, String value)
@@ -163,7 +165,8 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         setLong(ps, exprIndex, Long.parseLong(value));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.datanucleus.store.rdbms.mapping.AbstractDatastoreMapping#getString(java.lang.Object, int)
      */
     @Override
@@ -184,8 +187,8 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null &&
-                    !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue()
+                        .toString()))
                 {
                     ps.setLong(param, Long.valueOf(column.getDefaultValue().toString().trim()).longValue());
                 }
@@ -199,20 +202,20 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                 if (value instanceof Character)
                 {
                     String s = value.toString();
-                    ps.setInt(param,s.charAt(0));                  
+                    ps.setInt(param, s.charAt(0));
                 }
                 else if (value instanceof String)
                 {
-                    String s = (String)value;
-                    ps.setInt(param,s.charAt(0));                  
+                    String s = (String) value;
+                    ps.setInt(param, s.charAt(0));
                 }
                 else if (value instanceof java.util.Date)
                 {
-                    ps.setLong(param,((java.util.Date)value).getTime());                  
-                }                
+                    ps.setLong(param, ((java.util.Date) value).getTime());
+                }
                 else
                 {
-                    ps.setLong(param, ((Number)value).longValue());
+                    ps.setLong(param, ((Number) value).longValue());
                 }
             }
         }
@@ -243,7 +246,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             else
             {
 
-				// Some RDBMS (e.g PostgreSQL) can return a long as a double
+                // Some RDBMS (e.g PostgreSQL) can return a long as a double
                 // so cater for this, and generate a Long :-)
                 try
                 {
@@ -255,10 +258,10 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                     // Must be a double precision, so cast it
                     value = Long.valueOf((new Double(str)).longValue());
                 }
-	            if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
-	            {
-	                value = new java.util.Date(((Long)value).longValue());
-	            }            
+                if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
+                {
+                    value = new java.util.Date(((Long) value).longValue());
+                }
             }
         }
         catch (SQLException e)
