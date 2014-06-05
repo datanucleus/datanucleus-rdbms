@@ -161,12 +161,16 @@ public final class PersistentClassROF implements ResultObjectFactory
             // Extract the object type using the NucleusType column (if available)
             try
             {
-                className = rs.getString(stmtMapping.getNucleusTypeColumnName()).trim();
+                className = rs.getString(stmtMapping.getNucleusTypeColumnName());
                 if (className == null)
                 {
                     // Discriminator has no value so return null object
                     NucleusLogger.DATASTORE_RETRIEVE.debug("Value of determiner column is null so assuming object is null");
                     return null;
+                }
+                else
+                {
+                    className = className.trim();
                 }
                 requiresInheritanceCheck = false;
             }
@@ -376,16 +380,15 @@ public final class PersistentClassROF implements ResultObjectFactory
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            // Generate the "oid" for this object (of type pcClassForObject), and find the object for that
-            StatementMappingIndex datastoreIdMapping =
-                stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            // Generate the "id" for this object (of type pcClassForObject), and find the object for that
+            StatementMappingIndex datastoreIdMapping = stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
             Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
             if (id != null)
             {
                 if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
-                    // Get an OID for the right inheritance level
+                    // Get a DatastoreId for the right inheritance level
                     id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
 
@@ -414,8 +417,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             }
             else
             {
-                obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, 
-                    id, pcClassForObject, cmd, surrogateVersion);
+                obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, id, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -424,8 +426,8 @@ public final class PersistentClassROF implements ResultObjectFactory
             // Set the version of the object where possible
             if (surrogateVersion != null)
             {
-                ObjectProvider objSM = ec.findObjectProvider(obj);
-                objSM.setVersion(surrogateVersion);
+                ObjectProvider objOP = ec.findObjectProvider(obj);
+                objOP.setVersion(surrogateVersion);
             }
             else
             {
@@ -435,11 +437,11 @@ public final class PersistentClassROF implements ResultObjectFactory
                     int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        ObjectProvider objSM = ec.findObjectProvider(obj);
-                        Object verFieldValue = objSM.provideField(versionFieldNumber);
+                        ObjectProvider objOP = ec.findObjectProvider(obj);
+                        Object verFieldValue = objOP.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
-                            objSM.setVersion(verFieldValue);
+                            objOP.setVersion(verFieldValue);
                         }
                     }
                 }
@@ -473,36 +475,36 @@ public final class PersistentClassROF implements ResultObjectFactory
 
         return ec.findObject(id, new FieldValues()
         {
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(ObjectProvider op)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
-                sm.replaceFields(fieldNumbers, fm, false);
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                op.replaceFields(fieldNumbers, fm, false);
 
                 // Set version
                 if (surrogateVersion != null)
                 {
                     // Surrogate version field
-                    sm.setVersion(surrogateVersion);
+                    op.setVersion(surrogateVersion);
                 }
                 else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
                 {
-                    VersionMetaData vermd = cmd.getVersionMetaData();
                     // Version stored in a normal field
+                    VersionMetaData vermd = cmd.getVersionMetaData();
                     int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        Object verFieldValue = sm.provideField(versionFieldNumber);
+                        Object verFieldValue = op.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
-                            sm.setVersion(verFieldValue);
+                            op.setVersion(verFieldValue);
                         }
                     }
                 }
             }
-            public void fetchNonLoadedFields(ObjectProvider sm)
+            public void fetchNonLoadedFields(ObjectProvider op)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
-                sm.replaceNonLoadedFields(fieldNumbers, fm);
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                op.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()
             {
@@ -549,8 +551,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param mappingDefinition Mapping definition for the candidate class
      * @return The identity (if found) or null (if either not sure of inheritance, or not known).
      */
-    public static Object getDatastoreIdentityForResultSetRow(ExecutionContext ec, 
-            AbstractClassMetaData cmd, Class pcClass, boolean inheritanceCheck, 
+    public static Object getDatastoreIdentityForResultSetRow(ExecutionContext ec, AbstractClassMetaData cmd, Class pcClass, boolean inheritanceCheck, 
             final ResultSet resultSet, final StatementClassMapping mappingDefinition)
     {
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -559,15 +560,14 @@ public final class PersistentClassROF implements ResultObjectFactory
             {
                 pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
             }
-            StatementMappingIndex datastoreIdMapping =
-                mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdMapping = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
             Object id = mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
             if (id != null)
             {
                 if (!pcClass.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
                 {
-                    // Get an OID for the right inheritance level
+                    // Get a DatastoreId for the right inheritance level
                     id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClass.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
                 }
             }
@@ -626,37 +626,35 @@ public final class PersistentClassROF implements ResultObjectFactory
 
         return ec.findObject(oid, new FieldValues()
         {
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(ObjectProvider op)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet,
-                    mappingDefinition);
-                sm.replaceFields(fieldNumbers, fm, false);
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                op.replaceFields(fieldNumbers, fm, false);
 
                 // Set version
                 if (surrogateVersion != null)
                 {
                     // Surrogate version field
-                    sm.setVersion(surrogateVersion);
+                    op.setVersion(surrogateVersion);
                 }
                 else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
                 {
-                    VersionMetaData vermd = cmd.getVersionMetaData();
                     // Version stored in a normal field
+                    VersionMetaData vermd = cmd.getVersionMetaData();
                     int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        Object verFieldValue = sm.provideField(versionFieldNumber);
+                        Object verFieldValue = op.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
-                            sm.setVersion(verFieldValue);
+                            op.setVersion(verFieldValue);
                         }
                     }
                 }
             }
             public void fetchNonLoadedFields(ObjectProvider sm)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet,
-                    mappingDefinition);
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
                 sm.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()

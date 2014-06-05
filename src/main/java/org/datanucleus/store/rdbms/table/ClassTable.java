@@ -1495,8 +1495,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 needsOrderMapping = false;
             }
         }
-        else if (java.util.Collection.class.isAssignableFrom(fmd.getType()) && 
-            omd != null && omd.isIndexedList())
+        else if (java.util.Collection.class.isAssignableFrom(fmd.getType()) && omd != null && omd.isIndexedList())
         {
             // Collection field with <order> and is indexed list so needs order mapping
             needsOrderMapping = true;
@@ -1909,8 +1908,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                                 Index index = new Index(this, false, null);
                                                 for (int j=0;j<numColsInImpl;j++)
                                                 {
-                                                    index.setColumn(j, 
-                                                        fieldMapping.getDatastoreMapping(colNum++).getColumn());
+                                                    index.setColumn(j, fieldMapping.getDatastoreMapping(colNum++).getColumn());
                                                 }
                                                 indices.add(index);
                                             }
@@ -2175,8 +2173,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr) != null &&
-                        memberMapping.getNumberOfDatastoreMappings() > 0 &&
-                        memberMapping instanceof PersistableMapping)
+                        memberMapping.getNumberOfDatastoreMappings() > 0 && memberMapping instanceof PersistableMapping)
                 {
                     // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
                     ForeignKey fk = TableUtils.getForeignKeyForPCField(memberMapping, mmd, autoMode, storeMgr, clr);
@@ -2281,16 +2278,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             else
             {
                 AbstractMemberMetaData embFmd = embFieldMapping.getMemberMetaData();
-                if (ClassUtils.isReferenceType(embFmd.getType()) && 
-                    embFieldMapping instanceof ReferenceMapping)
+                if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                 {
                     // Field is a reference type, so add a FK to the table of the PC for each PC implementation
                     Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                        embFieldMapping.getNumberOfDatastoreMappings() > 0 &&
-                        embFieldMapping instanceof PersistableMapping)
+                        embFieldMapping.getNumberOfDatastoreMappings() > 0 && embFieldMapping instanceof PersistableMapping)
                 {
                     // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
                     ForeignKey fk = TableUtils.getForeignKeyForPCField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
@@ -2339,8 +2334,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (refTable == null)
         {
             // TODO Go to the datastore and query for this table to get the columns of the PK
-            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058106", acmd.getFullClassName(),
-                fkmd.getTable()));
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058106", acmd.getFullClassName(), fkmd.getTable()));
             return null;
         }
         PrimaryKey pk = refTable.getPrimaryKey();
@@ -2360,8 +2354,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 Column sourceCol = columnsByName.get(colId);
                 if (sourceCol == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058107",
-                        acmd.getFullClassName(), fkmd.getTable(), colmds[i].getName(), toString()));
+                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058107", acmd.getFullClassName(), fkmd.getTable(), colmds[i].getName(), toString()));
                     return null;
                 }
                 sourceCols.add(sourceCol);
@@ -2520,8 +2513,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 Column col = columnsByName.get(colName);
                 if (col == null)
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058202", 
-                        toString(), ck.getName(), columnName));
+                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058202", toString(), ck.getName(), columnName));
                     break;
                 }
                 else
@@ -2555,8 +2547,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         else
         {
             // We can't have an index of no columns
-            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058203", 
-                toString(), ck.getName()));
+            NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058203", toString(), ck.getName()));
             return null;
         }
 
@@ -2720,8 +2711,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             if (mfmd == null)
             {
                 // "mapped-by" refers to a field in our class that doesnt exist!
-                throw new NucleusUserException(Localiser.msg("057036",
-                    map_field_name, cmd.getFullClassName(), ownerMmd.getFullFieldName()));                       
+                throw new NucleusUserException(Localiser.msg("057036", map_field_name, cmd.getFullClassName(), ownerMmd.getFullFieldName()));                       
             }
 
             if (ownerMmd.getJoinMetaData() == null)
@@ -2752,15 +2742,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     }
                     if (kmd == null)
                     {
-                        throw new ClassDefinitionException(Localiser.msg("057007", 
-                            mfmd.getFullFieldName(), key_field_name));
+                        throw new ClassDefinitionException(Localiser.msg("057007", mfmd.getFullFieldName(), key_field_name));
                     }
 
                     JavaTypeMapping ownerMapping = getMemberMapping(map_field_name);
                     JavaTypeMapping keyMapping = getMemberMapping(kmd.getName());
 
-                    if (dba.supportsOption(DatastoreAdapter.NULLS_IN_CANDIDATE_KEYS) || 
-                            (!ownerMapping.isNullable() && !keyMapping.isNullable()))
+                    if (dba.supportsOption(DatastoreAdapter.NULLS_IN_CANDIDATE_KEYS) || (!ownerMapping.isNullable() && !keyMapping.isNullable()))
                     {
                         // If the owner and key fields are represented in this table then we can impose
                         // a unique constraint on them. If the key field is in a superclass then we
@@ -2806,8 +2794,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 // so you may get keys/values appearing in the other relation that shouldn't be.
                                 // Logged as a WARNING for now. 
                                 // If there is a situation where this should throw an exception, please update this AND COMMENT WHY.
-                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012", 
-                                    mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
+                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012", mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
                             }
                         }
                     }
@@ -2829,8 +2816,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     JavaTypeMapping ownerMapping = getMemberMapping(map_field_name);
                     JavaTypeMapping valueMapping = getMemberMapping(vmd.getName());
 
-                    if (dba.supportsOption(DatastoreAdapter.NULLS_IN_CANDIDATE_KEYS) || 
-                            (!ownerMapping.isNullable() && !valueMapping.isNullable()))
+                    if (dba.supportsOption(DatastoreAdapter.NULLS_IN_CANDIDATE_KEYS) || (!ownerMapping.isNullable() && !valueMapping.isNullable()))
                     {
                         // If the owner and value fields are represented in this table then we can impose
                         // a unique constraint on them. If the value field is in a superclass then we
@@ -2864,8 +2850,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
                                 else
                                 {
-                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057042", 
-                                        ownerMmd.getName()));
+                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057042", ownerMmd.getName()));
                                 }
                             }
 
@@ -2876,8 +2861,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 // so you may get keys/values appearing in the other relation that shouldn't be.
                                 // Logged as a WARNING for now. 
                                 // If there is a situation where this should throw an exception, please update this AND COMMENT WHY.
-                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012",
-                                    mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
+                                NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057012", mfmd.getFullFieldName(), ownerMmd.getFullFieldName()));
                             }
                         }
                     }
@@ -3234,9 +3218,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 {
                     if (mmd != null && (!mmd.toString().equalsIgnoreCase(foundMmd.toString()) || mmd.getType() != foundMmd.getType()))
                     {
-                        final String errMsg = "Table " + getIdentifier() + 
-                        " manages at least 2 subclasses that both define a field \"" + memberName + "\", " + 
-                        "and the fields' metadata is different or they have different type! That means you can get e.g. wrong fetch results.";
+                        final String errMsg = "Table " + getIdentifier() + " manages at least 2 subclasses that both define a field \"" + memberName + "\", " + 
+                            "and the fields' metadata is different or they have different type! That means you can get e.g. wrong fetch results.";
                         NucleusLogger.DATASTORE_SCHEMA.error(errMsg);
                         throw new NucleusException(errMsg).setFatal();
                     }
@@ -3289,15 +3272,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 // User has defined ordering using the column(s) of an existing field.
                 state = TABLE_STATE_INITIALIZED; // Not adding anything so just set table back to "initialised"
                 JavaTypeMapping orderMapping = getMemberMapping(omd.getMappedBy());
-                if (orderMapping == null)
-                {
-                    throw new NucleusUserException(Localiser.msg("057021", 
-                        mmd.getFullFieldName(), omd.getMappedBy()));
-                }
                 if (!(orderMapping instanceof IntegerMapping) && !(orderMapping instanceof LongMapping))
                 {
-                    throw new NucleusUserException(Localiser.msg("057022", 
-                        mmd.getFullFieldName(), omd.getMappedBy()));
+                    throw new NucleusUserException(Localiser.msg("057022", mmd.getFullFieldName(), omd.getMappedBy()));
                 }
                 return orderMapping;
             }
@@ -3318,8 +3295,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         Column column = addColumn(indexType.getName(), indexColumnName, indexMapping, colmd);
-        if (colmd == null || (colmd.getAllowsNull() == null) ||
-            (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
+        if (colmd == null || (colmd.getAllowsNull() == null) || (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
         {
             // User either wants it nullable, or havent specified anything, so make it nullable
             column.setNullable(true);

@@ -127,11 +127,11 @@ public class FKListStore extends AbstractListStore
         }
 
         elementInfo = getElementInformationForClass();
-        if (elementInfo != null && elementInfo.length > 1)
+        if (elementInfo.length > 1)
         {
             throw new NucleusUserException(Localiser.msg("056031", ownerMemberMetaData.getFullFieldName()));
         }
-        else if (elementInfo == null || elementInfo.length == 0)
+        else if (elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
         }
@@ -149,8 +149,7 @@ public class FKListStore extends AbstractListStore
             AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mappedByFieldName);
             if (eofmd == null)
             {
-                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), 
-                    mappedByFieldName, element_class.getName()));
+                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mappedByFieldName, element_class.getName()));
             }
 
             // Check that the type of the element "mapped-by" field is consistent with the owner type

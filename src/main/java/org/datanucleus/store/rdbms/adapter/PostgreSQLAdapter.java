@@ -435,7 +435,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
                 }
                 finally
                 {
-                    ps.close();
+                    if (ps != null)
+                    {
+                        ps.close();
+                    }
                 }
             }
             catch (SQLException sqle)

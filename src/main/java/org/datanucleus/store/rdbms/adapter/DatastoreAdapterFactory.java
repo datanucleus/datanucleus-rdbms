@@ -76,8 +76,7 @@ public class DatastoreAdapterFactory
      * @return The database adapter for this connection.
      * @throws SQLException Thrown if a DB error occurs.
      */
-    public DatastoreAdapter getDatastoreAdapter(ClassLoaderResolver clr, Connection conn, 
-            String adapterClassName, PluginManager pluginMgr)
+    public DatastoreAdapter getDatastoreAdapter(ClassLoaderResolver clr, Connection conn,  String adapterClassName, PluginManager pluginMgr)
     throws SQLException
     {
         DatastoreAdapter adapter = null;
@@ -103,8 +102,7 @@ public class DatastoreAdapterFactory
      * @param pluginMgr the Plug-in manager
      * @return Instance of the database adapter
      */
-    protected DatastoreAdapter getNewDatastoreAdapter(ClassLoaderResolver clr, DatabaseMetaData metadata, 
-            String adapterClassName, PluginManager pluginMgr)
+    protected DatastoreAdapter getNewDatastoreAdapter(ClassLoaderResolver clr, DatabaseMetaData metadata, String adapterClassName, PluginManager pluginMgr)
     {
         if (metadata == null)
         {
@@ -188,8 +186,7 @@ public class DatastoreAdapterFactory
      */
     protected Class getAdapterClass(PluginManager pluginMgr, String adapterClassName, String productName, ClassLoaderResolver clr)
     {
-        ConfigurationElement[] elems =
-            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastoreadapter", null, null);
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastoreadapter", null, null);
         if (elems != null)
         {
             for (int i=0;i<elems.length;i++)
@@ -199,8 +196,7 @@ public class DatastoreAdapterFactory
                     //if the user selected adapter is defined by one of the plug-ins use the classloader of the plug-in
                     if (elems[i].getAttribute("class-name").equals(adapterClassName))
                     {
-                        return pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(),
-                            elems[i].getAttribute("class-name"));
+                        return pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), elems[i].getAttribute("class-name"));
                     }
                 }
                 else
@@ -208,8 +204,7 @@ public class DatastoreAdapterFactory
                     String vendorId = elems[i].getAttribute("vendor-id");
                     if (productName.toLowerCase().indexOf(vendorId.toLowerCase()) >= 0)
                     {
-                        return pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), 
-                            elems[i].getAttribute("class-name"));
+                        return pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), elems[i].getAttribute("class-name"));
                     }
                 }
             }
