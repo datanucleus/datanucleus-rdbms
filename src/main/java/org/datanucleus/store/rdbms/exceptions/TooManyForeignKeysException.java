@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TooManyForeignKeysException extends NucleusDataStoreException
 {
+    private static final long serialVersionUID = 927612239349408531L;
+
     /**
      * Constructs a too-many-foreign-keys exception.
      * @param dba the database adapter

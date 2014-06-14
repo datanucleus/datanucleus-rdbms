@@ -88,6 +88,8 @@ import org.datanucleus.util.StringUtils;
  */
 public final class SQLQuery extends AbstractSQLQuery
 {
+    private static final long serialVersionUID = 8739306932250146250L;
+
     /** State variable for the compilation state */
     protected transient boolean isCompiled = false;
 

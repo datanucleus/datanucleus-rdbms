@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class MissingTableException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 8360855107029754952L;
+
     /**
      * Constructs a missing table exception.
      * @param catalogName Catalog name which the table was searched.

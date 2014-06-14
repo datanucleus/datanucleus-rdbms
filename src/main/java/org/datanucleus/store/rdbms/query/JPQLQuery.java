@@ -103,6 +103,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JPQLQuery extends AbstractJPQLQuery
 {
+    private static final long serialVersionUID = -3735379324740714088L;
+
     /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 

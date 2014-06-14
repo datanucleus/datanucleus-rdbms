@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class PrimaryKeyColumnNotAllowedException extends NucleusException
 {
+    private static final long serialVersionUID = 4600461704079232724L;
+
     /**
      * Constructs a primary key not allowed exception.
      * @param viewName Name of the view being initialized.

@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class WrongScaleException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 87315294180371240L;
+
     /**
      * Constructs a wrong scale exception.
      * @param columnName Name of the column having the wrong scale.

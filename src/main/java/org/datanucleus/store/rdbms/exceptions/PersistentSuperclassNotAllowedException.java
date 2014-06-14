@@ -30,6 +30,8 @@ import org.datanucleus.util.Localiser;
  */
 public class PersistentSuperclassNotAllowedException extends ClassDefinitionException
 {
+    private static final long serialVersionUID = -2749266341448447043L;
+
     /**
      * Constructs a persistent-superclass-not-allowed exception.
      *

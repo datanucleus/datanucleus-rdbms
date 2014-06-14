@@ -49,6 +49,8 @@ import org.datanucleus.util.StringUtils;
  */
 public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
 {
+    private static final long serialVersionUID = 7264180157109169910L;
+
     /** The ResultSet containing the results. */
     protected ResultSet rs;
 

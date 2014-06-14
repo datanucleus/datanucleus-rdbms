@@ -29,6 +29,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ColumnDefinitionException extends NucleusUserException
 {
+    private static final long serialVersionUID = -6850676317990100517L;
+
     /**
      * Constructs a column definition exception with no specific detail message.
      */

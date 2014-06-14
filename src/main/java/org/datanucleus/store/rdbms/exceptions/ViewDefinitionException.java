@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class ViewDefinitionException extends NucleusUserException
 {
+    private static final long serialVersionUID = -3074298411767413664L;
+
     /**
      * Constructs a class definition exception with the specified detail
      * message.

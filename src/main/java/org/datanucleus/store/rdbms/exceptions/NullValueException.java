@@ -28,6 +28,8 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
  */
 public class NullValueException extends NucleusDataStoreException
 {
+    private static final long serialVersionUID = -4852762927328278822L;
+
     /**
      * Constructs a null value exception with no specific detail message.
      */

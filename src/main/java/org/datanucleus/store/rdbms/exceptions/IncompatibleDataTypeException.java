@@ -30,6 +30,8 @@ import org.datanucleus.util.Localiser;
  */
 public class IncompatibleDataTypeException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 5393213700816758070L;
+
     /**
      * Constructs an incompatible data type exception.
      * @param column        The column having an incompatible data type.

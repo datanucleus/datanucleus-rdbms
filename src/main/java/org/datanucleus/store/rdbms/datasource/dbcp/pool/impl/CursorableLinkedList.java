@@ -956,6 +956,7 @@ class CursorableLinkedList implements List, Serializable {
     //--- inner classes ----------------------------------------------
 
     static class Listable implements Serializable {
+        private static final long serialVersionUID = 7311360633964122272L;
         private Listable _prev = null;
         private Listable _next = null;
         private Object _val = null;
@@ -1199,6 +1200,8 @@ class CursorableLinkedList implements List, Serializable {
 class CursorableSubList extends CursorableLinkedList implements List {
 
     //--- constructors -----------------------------------------------
+
+    private static final long serialVersionUID = 3540983042144093231L;
 
     CursorableSubList(CursorableLinkedList list, int from, int to) {
         if(0 > from || list.size() < to) {

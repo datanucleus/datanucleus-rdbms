@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NoSuchPersistentFieldException extends NucleusUserException
 {
+    private static final long serialVersionUID = 2364470194200034650L;
+
     /**
      * Constructs a no such persistent field exception.
      *

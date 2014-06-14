@@ -51,6 +51,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class StoredProcedureQuery extends AbstractStoredProcedureQuery
 {
+    private static final long serialVersionUID = 4167789892047598591L;
     /** The callable statement used to execute the stored proc. */
     CallableStatement stmt;
 

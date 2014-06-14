@@ -29,6 +29,8 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
  */
 public class UnsupportedDataTypeException extends NucleusDataStoreException
 {
+    private static final long serialVersionUID = -5976850971131790147L;
+
     /**
      * Constructs an unsupported data type exception with no specific detail
      * message.

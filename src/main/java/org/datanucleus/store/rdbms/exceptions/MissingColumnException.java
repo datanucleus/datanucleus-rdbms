@@ -33,6 +33,8 @@ import org.datanucleus.util.Localiser;
  */
 public class MissingColumnException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 4195458244790681864L;
+
     /**
      * Constructs a missing column exception.
      * @param table The table in which column(s) were missing.

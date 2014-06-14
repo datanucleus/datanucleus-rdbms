@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class WrongPrimaryKeyException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 8688198223306432767L;
+
     /**
      * Constructs a wrong primary key exception.
      * @param table_name The table having the wrong primary key.

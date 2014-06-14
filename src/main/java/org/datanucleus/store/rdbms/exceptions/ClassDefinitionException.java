@@ -27,6 +27,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class ClassDefinitionException extends NucleusUserException
 {
+    private static final long serialVersionUID = -611709032031993187L;
+
     /**
      * Constructs a class definition exception with no specific detail
      * message.

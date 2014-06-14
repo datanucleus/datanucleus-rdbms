@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastorePoolException extends NucleusException
 {
+    private static final long serialVersionUID = -7936864514567835075L;
+
     /**
      * Constructor.
      * @param poolName Name of the connection pool

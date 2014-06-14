@@ -25,6 +25,8 @@ import org.datanucleus.util.Localiser;
  */
 public class DatastoreDriverNotFoundException extends NucleusException
 {
+    private static final long serialVersionUID = 2004483035679438362L;
+
     /**
      * Constructor.
      * @param driverClassName Class name for the datastore driver

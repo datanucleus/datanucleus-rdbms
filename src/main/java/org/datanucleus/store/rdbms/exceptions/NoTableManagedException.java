@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NoTableManagedException extends NucleusUserException
 {
+    private static final long serialVersionUID = -1610018637755474684L;
+
     /**
      * Constructs a no table managed exception.
      * @param className Name of the class on which the operation requiring a

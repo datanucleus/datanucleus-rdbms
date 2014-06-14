@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class WrongPrecisionException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = -4580250551015816508L;
+
     /**
      * Constructs a wrong precision exception.
      *

@@ -27,6 +27,7 @@ import org.datanucleus.util.Localiser;
  */
 public class DuplicateColumnException extends NucleusException
 {
+    private static final long serialVersionUID = -8400052870749668700L;
     /** Column that cannot be created because it conflicts with existing column with same identifier. */
     private Column conflictingColumn;
 

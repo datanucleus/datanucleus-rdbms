@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class UnexpectedColumnException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 804974383075712052L;
+
     /**
      * Constructs a unexpected column exception.
      * @param table_name The table in which the column was found.

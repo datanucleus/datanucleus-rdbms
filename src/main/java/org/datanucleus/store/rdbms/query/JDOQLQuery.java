@@ -95,6 +95,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JDOQLQuery extends AbstractJDOQLQuery
 {
+    private static final long serialVersionUID = -937448796638243699L;
+
     /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 

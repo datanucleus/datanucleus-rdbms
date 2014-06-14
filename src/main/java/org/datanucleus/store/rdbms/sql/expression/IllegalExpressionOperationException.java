@@ -25,6 +25,8 @@ import org.datanucleus.exceptions.NucleusUserException;
  */
 public class IllegalExpressionOperationException extends NucleusUserException
 {
+    private static final long serialVersionUID = -4749845297556329228L;
+
     /**
      * Constructor.
      * @param operation the operation. It may include a descriptive localised error message

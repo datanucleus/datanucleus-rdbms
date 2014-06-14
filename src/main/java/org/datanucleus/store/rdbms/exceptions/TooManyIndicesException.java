@@ -28,6 +28,8 @@ import org.datanucleus.util.Localiser;
  */
 public class TooManyIndicesException extends NucleusDataStoreException
 {
+    private static final long serialVersionUID = 3906217271154531757L;
+
     /**
      * Constructs a too-many-indices exception.
      * @param dba the database adapter

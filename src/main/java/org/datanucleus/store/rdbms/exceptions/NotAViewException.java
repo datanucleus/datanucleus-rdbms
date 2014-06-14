@@ -27,6 +27,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NotAViewException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = -3924285872907278607L;
+
     /**
      * Constructs a not-a-view exception.
      * @param viewName Name of the view that is of the wrong type.

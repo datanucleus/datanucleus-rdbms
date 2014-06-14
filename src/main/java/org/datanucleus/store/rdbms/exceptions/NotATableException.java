@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NotATableException extends DatastoreValidationException
 {
+    private static final long serialVersionUID = 8257695149631939361L;
+
     /**
      * Constructs a not-a-table exception.
      * @param tableName Name of the table that is of the wrong type.

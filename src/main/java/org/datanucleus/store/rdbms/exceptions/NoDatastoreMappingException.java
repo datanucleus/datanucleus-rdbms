@@ -29,6 +29,8 @@ import org.datanucleus.util.Localiser;
  */
 public class NoDatastoreMappingException extends NucleusUserException
 {
+    private static final long serialVersionUID = -4514927315711485556L;
+
     /**
      * Constructs a no datastore mapping exception.
      *
