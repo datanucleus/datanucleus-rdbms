@@ -138,75 +138,64 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                         collElementExprs.toArray(new SQLExpression[collElementExprs.size()]) : null);
                 return new InExpression(elemExpr, exprs);
             }
-            else
-            {
-                // Return "elem == val1 || elem == val2 || elem == val3 ..."
-                BooleanExpression bExpr = null;
-                for (int i=0; i<collElementExprs.size(); i++)
-                {
-                    if (bExpr == null)
-                    {
-                        bExpr = (collElementExprs.get(i)).eq(elemExpr); 
-                    }
-                    else
-                    {
-                        bExpr = bExpr.ior((collElementExprs.get(i)).eq(elemExpr)); 
-                    }
-                }
-                bExpr.encloseInParentheses();
-                return bExpr;
-            }
-        }
-        else
-        {
-            if (mmd.isSerialized())
-            {
-                throw new NucleusUserException("Cannot perform Collection.contains when the collection is being serialised");
-            }
-            else
-            {
-                ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
-                Class elementType = clr.classForName(mmd.getCollection().getElementType());
-                if (!api.isPersistable(elementType) && mmd.getJoinMetaData() == null)
-                {
-                    throw new NucleusUserException(
-                        "Cannot perform Collection.contains when the collection<Non-Persistable> is not in a join table");
-                }
-            }
 
-            if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+            // Return "elem == val1 || elem == val2 || elem == val3 ..."
+            BooleanExpression bExpr = null;
+            for (int i=0; i<collElementExprs.size(); i++)
             {
-                boolean useSubquery = getNeedsSubquery(collExpr, elemExpr);
-                if (elemExpr instanceof UnboundExpression)
+                if (bExpr == null)
                 {
-                    // See if the user has defined what should be used
-                    String varName = ((UnboundExpression)elemExpr).getVariableName();
-                    String extensionName = "datanucleus.query.jdoql." + varName + ".join";
-                    String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
-                    if (extensionValue != null && extensionValue.equalsIgnoreCase("SUBQUERY"))
-                    {
-                        useSubquery = true;
-                    }
-                    else if (extensionValue != null && extensionValue.equalsIgnoreCase("INNERJOIN"))
-                    {
-                        useSubquery = false;
-                    }
-                }
-
-                if (useSubquery)
-                {
-                    return containsAsSubquery(collExpr, elemExpr);
+                    bExpr = (collElementExprs.get(i)).eq(elemExpr); 
                 }
                 else
                 {
-                    return containsAsInnerJoin(collExpr, elemExpr);
+                    bExpr = bExpr.ior((collElementExprs.get(i)).eq(elemExpr)); 
                 }
             }
-            else
+            bExpr.encloseInParentheses();
+            return bExpr;
+        }
+
+        if (mmd.isSerialized())
+        {
+            throw new NucleusUserException("Cannot perform Collection.contains when the collection is being serialised");
+        }
+
+        ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
+        Class elementType = clr.classForName(mmd.getCollection().getElementType());
+        if (!api.isPersistable(elementType) && mmd.getJoinMetaData() == null)
+        {
+            throw new NucleusUserException("Cannot perform Collection.contains when the collection<Non-Persistable> is not in a join table");
+        }
+
+        if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+        {
+            boolean useSubquery = getNeedsSubquery(collExpr, elemExpr);
+            if (elemExpr instanceof UnboundExpression)
+            {
+                // See if the user has defined what should be used
+                String varName = ((UnboundExpression)elemExpr).getVariableName();
+                String extensionName = "datanucleus.query.jdoql." + varName + ".join";
+                String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
+                if (extensionValue != null && extensionValue.equalsIgnoreCase("SUBQUERY"))
+                {
+                    useSubquery = true;
+                }
+                else if (extensionValue != null && extensionValue.equalsIgnoreCase("INNERJOIN"))
+                {
+                    useSubquery = false;
+                }
+            }
+
+            if (useSubquery)
             {
                 return containsAsSubquery(collExpr, elemExpr);
             }
+
+            return containsAsInnerJoin(collExpr, elemExpr);
         }
+
+        return containsAsSubquery(collExpr, elemExpr);
     }
 
     /**

@@ -115,10 +115,8 @@ public abstract class AbstractStatementGenerator implements StatementGenerator
                         candidateType.getName() + 
                         " but has no table of its own and not single subclass with table so unsupported");
                 }
-                else
-                {
-                    candidateTable = storeMgr.getDatastoreClass(subcmds[0].getFullClassName(), clr);
-                }
+
+                candidateTable = storeMgr.getDatastoreClass(subcmds[0].getFullClassName(), clr);
             }
         }
         this.candidateTableAlias = candidateTableAlias;

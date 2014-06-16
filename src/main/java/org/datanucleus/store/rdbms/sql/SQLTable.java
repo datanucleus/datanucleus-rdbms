@@ -74,10 +74,8 @@ public class SQLTable
         {
             return alias.hashCode() ^ table.hashCode();
         }
-        else
-        {
-            return table.hashCode();
-        }
+
+        return table.hashCode();
     }
 
     public boolean equals(Object obj)
@@ -95,10 +93,8 @@ public class SQLTable
         {
             return other.table == table && alias == null;
         }
-        else
-        {
-            return other.table == table && other.alias.equals(alias);
-        }
+
+        return other.table == table && other.alias.equals(alias);
     }
 
     /**
@@ -116,9 +112,6 @@ public class SQLTable
         {
             return table.toString() + " " + alias.toString();
         }
-        else
-        {
-            return table.toString();
-        }
+        return table.toString();
     }
 }

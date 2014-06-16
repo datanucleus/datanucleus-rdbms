@@ -103,29 +103,21 @@ public class MapContainsValueMethod extends AbstractSQLMethod
             bExpr.encloseInParentheses();
             return bExpr;
         }
-        else
-        {
-            if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
-            {
-                boolean needsSubquery = getNeedsSubquery();
 
-                // TODO Check if *this* "containsValue" is negated, not any of them (and remove above check)
-                if (needsSubquery)
-                {
-                    NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using SUBQUERY");
-                    return containsAsSubquery(mapExpr, valExpr);
-                }
-                else
-                {
-                    NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using INNERJOIN");
-                    return containsAsInnerJoin(mapExpr, valExpr);
-                }
-            }
-            else
+        if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+        {
+            boolean needsSubquery = getNeedsSubquery();
+
+            // TODO Check if *this* "containsValue" is negated, not any of them (and remove above check)
+            if (needsSubquery)
             {
+                NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using SUBQUERY");
                 return containsAsSubquery(mapExpr, valExpr);
             }
+            NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using INNERJOIN");
+            return containsAsInnerJoin(mapExpr, valExpr);
         }
+        return containsAsSubquery(mapExpr, valExpr);
     }
 
     /**

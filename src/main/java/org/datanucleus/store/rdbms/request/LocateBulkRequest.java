@@ -243,10 +243,7 @@ public class LocateBulkRequest extends BulkRequest
             sqlStatement.addExtension("lock-for-update", Boolean.TRUE);
             return sqlStatement.getSelectStatement().toSQL();
         }
-        else
-        {
-            return sqlStatement.getSelectStatement().toSQL();
-        }
+        return sqlStatement.getSelectStatement().toSQL();
     }
 
     /**

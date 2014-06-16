@@ -104,29 +104,21 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             bExpr.encloseInParentheses();
             return bExpr;
         }
-        else
-        {
-            if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
-            {
-                boolean needsSubquery = getNeedsSubquery();
 
-                // TODO Check if *this* "containsKey" is negated, not any of them (and remove above check)
-                if (needsSubquery)
-                {
-                    NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using SUBQUERY");
-                    return containsAsSubquery(mapExpr, keyExpr);
-                }
-                else
-                {
-                    NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using INNERJOIN");
-                    return containsAsInnerJoin(mapExpr, keyExpr);
-                }
-            }
-            else
+        if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+        {
+            boolean needsSubquery = getNeedsSubquery();
+
+            // TODO Check if *this* "containsKey" is negated, not any of them (and remove above check)
+            if (needsSubquery)
             {
+                NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using SUBQUERY");
                 return containsAsSubquery(mapExpr, keyExpr);
             }
+            NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using INNERJOIN");
+            return containsAsInnerJoin(mapExpr, keyExpr);
         }
+        return containsAsSubquery(mapExpr, keyExpr);
     }
 
     /**

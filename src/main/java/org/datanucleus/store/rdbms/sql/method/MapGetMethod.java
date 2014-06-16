@@ -227,12 +227,10 @@ public class MapGetMethod extends AbstractSQLMethod
 
                     return exprFactory.newExpression(stmt, valueSqlTbl, valTable.getIdMapping());
                 }
-                else
-                {
-                    // Return mapping for the value in the join table
-                    SQLExpression valueExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getValueMapping());
-                    return valueExpr;
-                }
+
+                // Return mapping for the value in the join table
+                SQLExpression valueExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getValueMapping());
+                return valueExpr;
             }
             else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
             {

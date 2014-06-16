@@ -170,9 +170,6 @@ public class SQLJoin
 
             return result.toString();
         }
-        else
-        {
-            return "" + table;
-        }
+        return "" + table;
     }
 }

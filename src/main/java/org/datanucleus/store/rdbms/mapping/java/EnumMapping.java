@@ -101,15 +101,13 @@ public class EnumMapping extends SingleFieldMapping
                         }
                         return valueStrings;
                     }
-                    else
+
+                    Integer[] valueInts = new Integer[values.length];
+                    for (int i=0;i<values.length;i++)
                     {
-                        Integer[] valueInts = new Integer[values.length];
-                        for (int i=0;i<values.length;i++)
-                        {
-                            valueInts[i] = values[i].ordinal();
-                        }
-                        return valueInts;
+                        valueInts[i] = values[i].ordinal();
                     }
+                    return valueInts;
                 }
                 catch (Exception e)
                 {

@@ -67,9 +67,8 @@ public class DelegatingDatabaseMetaData extends AbandonedTrace
             DelegatingDatabaseMetaData s = (DelegatingDatabaseMetaData) obj;
             return delegate.equals(s.getInnermostDelegate());
         }
-        else {
-            return delegate.equals(obj);
-        }
+
+        return delegate.equals(obj);
     }
 
     public int hashCode() {

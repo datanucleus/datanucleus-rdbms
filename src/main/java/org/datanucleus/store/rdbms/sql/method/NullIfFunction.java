@@ -75,9 +75,7 @@ public class NullIfFunction extends AbstractSQLMethod
             }
             return new NumericExpression(stmt, getMappingForClass(cls), "NULLIF", args);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", "NULLIF", expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", "NULLIF", expr));
     }
 }

@@ -1208,11 +1208,9 @@ public class InsertRequest extends Request
             {
                 return "INSERT INTO " + table.toString() + " (" + columnNames + ") VALUES (" + columnValues + ")";
             }
-            else
-            {
-                // No columns in the INSERT statement
-                return table.getStoreManager().getDatastoreAdapter().getInsertStatementForNoColumns(table);
-            }
+
+            // No columns in the INSERT statement
+            return table.getStoreManager().getDatastoreAdapter().getInsertStatementForNoColumns(table);
         }
     }
 }

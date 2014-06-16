@@ -154,11 +154,9 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
                     stmt.getRDBMSManager().getSQLExpressionFactory().getMappingForType(val.getClass(), false);
                 return new ObjectLiteral(stmt, m, val, null);
             }
-            else
-            {
-                // Don't support List.get(SQLExpression)
-                throw new IllegalExpressionOperationException(this, "get", argExpr);
-            }
+
+            // Don't support List.get(SQLExpression)
+            throw new IllegalExpressionOperationException(this, "get", argExpr);
         }
 
         return super.invoke(methodName, args);

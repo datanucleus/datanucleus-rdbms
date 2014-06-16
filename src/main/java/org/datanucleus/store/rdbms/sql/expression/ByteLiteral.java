@@ -215,10 +215,8 @@ public class ByteLiteral extends NumericExpression implements SQLLiteral
         {
             return new ByteLiteral(stmt, mapping, value.add(((ByteLiteral)expr).value), null);
         }
-        else
-        {
-            return super.add(expr);
-        }
+
+        return super.add(expr);
     }
 
     public SQLExpression sub(SQLExpression expr)
@@ -227,10 +225,8 @@ public class ByteLiteral extends NumericExpression implements SQLLiteral
         {
             return new ByteLiteral(stmt, mapping, value.subtract(((ByteLiteral)expr).value), null);
         }
-        else
-        {
-            return super.sub(expr);
-        }
+
+        return super.sub(expr);
     }
 
     public SQLExpression mul(SQLExpression expr)
@@ -239,10 +235,8 @@ public class ByteLiteral extends NumericExpression implements SQLLiteral
         {
             return new ByteLiteral(stmt, mapping, value.multiply(((ByteLiteral)expr).value), null);
         }
-        else
-        {
-            return super.mul(expr);
-        }
+
+        return super.mul(expr);
     }
 
     public SQLExpression div(SQLExpression expr)
@@ -251,10 +245,8 @@ public class ByteLiteral extends NumericExpression implements SQLLiteral
         {
             return new ByteLiteral(stmt, mapping, value.divide(((ByteLiteral)expr).value), null);
         }
-        else
-        {
-            return super.div(expr);
-        }
+
+        return super.div(expr);
     }
 
     public SQLExpression mod(SQLExpression expr)
@@ -263,10 +255,8 @@ public class ByteLiteral extends NumericExpression implements SQLLiteral
         {
             return new ByteLiteral(stmt, mapping, value.mod(((ByteLiteral)expr).value), null);
         }
-        else
-        {
-            return super.mod(expr);
-        }
+
+        return super.mod(expr);
     }
 
     public SQLExpression neg()

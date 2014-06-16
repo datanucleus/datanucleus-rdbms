@@ -396,11 +396,9 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                     // When we are at "query.getRangeToExcl()-1" we have 1 more element
                     return (iterRowNum <= (query.getRangeToExcl()-1));
                 }
-                else
-                {
-                    // When we are at at "size()-1" we have one more element
-                    return (iterRowNum <= (theSize - 1));
-                }
+
+                // When we are at at "size()-1" we have one more element
+                return (iterRowNum <= (theSize - 1));
             }
         }
 
@@ -419,11 +417,9 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                     // row at first of range means no earlier
                     return (iterRowNum > query.getRangeFromIncl());
                 }
-                else
-                {
-                    // row 0 means no earlier
-                    return (iterRowNum > 0);
-                }
+
+                // row 0 means no earlier
+                return (iterRowNum > 0);
             }
         }
 

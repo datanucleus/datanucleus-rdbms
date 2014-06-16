@@ -229,19 +229,17 @@ public class SQLExpressionFactory
             {
                 return (SQLExpression)ClassUtils.newInstance(NullLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
-            else
-            {
-                SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
-                    "literal-class", LIT_CREATION_ARG_TYPES, args);
-                if (sqlExpr == null)
-                {
-                    throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
-                }
 
-                literalClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
-                return sqlExpr;
+            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
+                "literal-class", LIT_CREATION_ARG_TYPES, args);
+            if (sqlExpr == null)
+            {
+                throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
             }
+
+            literalClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
+            return sqlExpr;
         }
         catch (Exception e)
         {
@@ -270,17 +268,15 @@ public class SQLExpressionFactory
             {
                 return (SQLExpression)ClassUtils.newInstance(ParameterLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
-            else
+
+            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
+                "literal-class", LIT_CREATION_ARG_TYPES, args);
+            if (sqlExpr == null)
             {
-                SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
-                    "literal-class", LIT_CREATION_ARG_TYPES, args);
-                if (sqlExpr == null)
-                {
-                    throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
-                }
-                return sqlExpr;
+                throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
             }
+            return sqlExpr;
         }
         catch (Exception e)
         {
@@ -430,10 +426,7 @@ public class SQLExpressionFactory
                     {
                         throw new NucleusUserException(Localiser.msg("060008", methodName, className));
                     }
-                    else
-                    {
-                        throw new NucleusUserException(Localiser.msg("060009", methodName));
-                    }
+                    throw new NucleusUserException(Localiser.msg("060009", methodName));
                 }
             }
         }

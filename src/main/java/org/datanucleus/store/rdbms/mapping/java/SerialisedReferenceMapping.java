@@ -106,10 +106,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
         {
             return getObject(ec, resultSet, exprIndex, null, mmd.getAbsoluteFieldNumber());
         }
-        else
-        {
-            return super.getObject(ec, resultSet, exprIndex);
-        }
+        return super.getObject(ec, resultSet, exprIndex);
     }
 
     /**

@@ -95,29 +95,21 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             // TODO Handle this
             return lit.getValueLiteral().invoke("contains", args);
         }
-        else
-        {
-            if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
-            {
-                boolean needsSubquery = getNeedsSubquery();
 
-                // TODO Check if *this* "containsEntry" is negated, not any of them (and remove above check)
-                if (needsSubquery)
-                {
-                    NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using SUBQUERY");
-                    return containsAsSubquery(mapExpr, keyExpr, valExpr);
-                }
-                else
-                {
-                    NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using INNERJOIN");
-                    return containsAsInnerJoin(mapExpr, keyExpr, valExpr);
-                }
-            }
-            else
+        if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+        {
+            boolean needsSubquery = getNeedsSubquery();
+
+            // TODO Check if *this* "containsEntry" is negated, not any of them (and remove above check)
+            if (needsSubquery)
             {
+                NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using SUBQUERY");
                 return containsAsSubquery(mapExpr, keyExpr, valExpr);
             }
+            NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using INNERJOIN");
+            return containsAsInnerJoin(mapExpr, keyExpr, valExpr);
         }
+        return containsAsSubquery(mapExpr, keyExpr, valExpr);
     }
 
     /**

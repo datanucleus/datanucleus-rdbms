@@ -153,11 +153,9 @@ public class RDBMSQueryUtils extends QueryUtils
     	    // Query value takes top priority
             return query.getSerializeRead();
     	}
-    	else
-        {
-    	    // Fallback to transaction or class itself
-            return query.getExecutionContext().getSerializeReadForClass(query.getCandidateClassName());
-        }
+
+    	// Fallback to transaction or class itself
+    	return query.getExecutionContext().getSerializeReadForClass(query.getCandidateClassName());
     }
 
     /**

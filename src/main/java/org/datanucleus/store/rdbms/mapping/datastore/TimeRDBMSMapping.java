@@ -129,9 +129,6 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
         {
             return null;
         }
-        else
-        {
-            return value;
-        }
+        return value;
     }
 }

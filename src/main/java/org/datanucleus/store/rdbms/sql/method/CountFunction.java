@@ -57,9 +57,7 @@ public class CountFunction extends AbstractSQLMethod
             }
             return new AggregateNumericExpression(stmt, getMappingForClass(long.class), "COUNT", args);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", "COUNT", expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", "COUNT", expr));
     }
 }

@@ -46,35 +46,33 @@ public class StringIndexOfMethod extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
-        else
-        {
-            // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-            SQLExpression substrExpr = args.get(0);
-            if (!(substrExpr instanceof StringExpression) &&
+
+        // {stringExpr}.indexOf(strExpr1 [,numExpr2])
+        SQLExpression substrExpr = args.get(0);
+        if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
-            }
-
-            SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
-
-            ArrayList funcArgs = new ArrayList();
-            funcArgs.add(substrExpr);
-            funcArgs.add(expr);
-            if (args.size() == 2)
-            {
-                SQLExpression fromExpr = args.get(1);
-                if (!(fromExpr instanceof NumericExpression))
-                {
-                    throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
-                        "NumericExpression"));
-                }
-                funcArgs.add(fromExpr.add(one));
-            }
-            NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs);
-            return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();
         }
+
+        SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
+
+        ArrayList funcArgs = new ArrayList();
+        funcArgs.add(substrExpr);
+        funcArgs.add(expr);
+        if (args.size() == 2)
+        {
+            SQLExpression fromExpr = args.get(1);
+            if (!(fromExpr instanceof NumericExpression))
+            {
+                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
+                        "NumericExpression"));
+            }
+            funcArgs.add(fromExpr.add(one));
+        }
+        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs);
+        return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();
     }
 }

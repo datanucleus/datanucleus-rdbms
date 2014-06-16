@@ -324,10 +324,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         {
             return "DROP TABLE " + table.toString();
         }
-        else
-        {
-            return "DROP TABLE " + table.toString() + " CASCADE";
-        }
+        return "DROP TABLE " + table.toString() + " CASCADE";
     }
 
     /**
@@ -529,10 +526,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             // Supported for Postgresql 8
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -562,20 +556,18 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             }
             return str;
         }
-        else
+
+        // Use SQL 2008 standard OFFSET/FETCH keywords
+        StringBuilder str = new StringBuilder();
+        if (offset > 0)
         {
-            // Use SQL 2008 standard OFFSET/FETCH keywords
-            StringBuilder str = new StringBuilder();
-            if (offset > 0)
-            {
-                str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
-            }
-            if (count > 0)
-            {
-                str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
-            }
-            return str.toString();
+            str.append("OFFSET " + offset + (offset > 1 ? " ROWS " : " ROW "));
         }
+        if (count > 0)
+        {
+            str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
+        }
+        return str.toString();
     }
 
     /**

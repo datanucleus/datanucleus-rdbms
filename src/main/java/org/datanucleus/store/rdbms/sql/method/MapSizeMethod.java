@@ -63,76 +63,68 @@ public class MapSizeMethod extends AbstractSQLMethod
         {
             // Just return the map length since we have the value
             Map map = (Map)((MapLiteral)expr).getValue();
-            return exprFactory.newLiteral(stmt, exprFactory.getMappingForType(int.class, false),
-                Integer.valueOf(map.size()));
+            return exprFactory.newLiteral(stmt, exprFactory.getMappingForType(int.class, false), Integer.valueOf(map.size()));
         }
-        else
-        {
-            AbstractMemberMetaData ownerMmd = expr.getJavaTypeMapping().getMemberMetaData();
-            RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
-            // TODO Allow for interface keys/values, etc
-            JavaTypeMapping ownerMapping = null;
-            Table mapTbl = null;
-            if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
+        AbstractMemberMetaData ownerMmd = expr.getJavaTypeMapping().getMemberMetaData();
+        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+
+        // TODO Allow for interface keys/values, etc
+        JavaTypeMapping ownerMapping = null;
+        Table mapTbl = null;
+        if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
+        {
+            // JoinTable
+            mapTbl = storeMgr.getTable(ownerMmd);
+            ownerMapping = ((JoinTable)mapTbl).getOwnerMapping();
+        }
+        else if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
+        {
+            // ForeignKey from value table to key
+            AbstractClassMetaData valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getMap().getValueType(), clr);
+            mapTbl = storeMgr.getDatastoreClass(ownerMmd.getMap().getValueType(), clr);
+            if (ownerMmd.getMappedBy() != null)
             {
-                // JoinTable
-                mapTbl = storeMgr.getTable(ownerMmd);
-                ownerMapping = ((JoinTable)mapTbl).getOwnerMapping();
-            }
-            else if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
-            {
-                // ForeignKey from value table to key
-                AbstractClassMetaData valueCmd =
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getMap().getValueType(), clr);
-                mapTbl = storeMgr.getDatastoreClass(ownerMmd.getMap().getValueType(), clr);
-                if (ownerMmd.getMappedBy() != null)
-                {
-                    ownerMapping = mapTbl.getMemberMapping(valueCmd.getMetaDataForMember(ownerMmd.getMappedBy()));
-                }
-                else
-                {
-                    ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                }
-            }
-            else if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
-            {
-                // ForeignKey from key table to value
-                AbstractClassMetaData keyCmd =
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getMap().getKeyType(), clr);
-                mapTbl = storeMgr.getDatastoreClass(ownerMmd.getMap().getKeyType(), clr);
-                if (ownerMmd.getMappedBy() != null)
-                {
-                    ownerMapping = mapTbl.getMemberMapping(keyCmd.getMetaDataForMember(ownerMmd.getMappedBy()));
-                }
-                else
-                {
-                    ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                }
+                ownerMapping = mapTbl.getMemberMapping(valueCmd.getMetaDataForMember(ownerMmd.getMappedBy()));
             }
             else
             {
-                throw new NucleusException("Invalid map for " + expr + " in size() call");
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-
-            SQLStatement subStmt = new SQLStatement(stmt, storeMgr, mapTbl, null, null);
-            subStmt.setClassLoaderResolver(clr);
-            JavaTypeMapping mapping =
-                storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-            SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
-            ((StringLiteral)countExpr).generateStatementWithoutQuotes();
-            subStmt.select(countExpr, null);
-
-            SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                ownerMapping);
-            SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),
-                expr.getSQLTable().getTable().getIdMapping());
-            subStmt.whereAnd(elementOwnerExpr.eq(ownerIdExpr), true);
-
-            JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
-            SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
-            subqExpr.setJavaTypeMapping(subqMapping);
-            return subqExpr;
         }
+        else if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
+        {
+            // ForeignKey from key table to value
+            AbstractClassMetaData keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(ownerMmd.getMap().getKeyType(), clr);
+            mapTbl = storeMgr.getDatastoreClass(ownerMmd.getMap().getKeyType(), clr);
+            if (ownerMmd.getMappedBy() != null)
+            {
+                ownerMapping = mapTbl.getMemberMapping(keyCmd.getMetaDataForMember(ownerMmd.getMappedBy()));
+            }
+            else
+            {
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+            }
+        }
+        else
+        {
+            throw new NucleusException("Invalid map for " + expr + " in size() call");
+        }
+
+        SQLStatement subStmt = new SQLStatement(stmt, storeMgr, mapTbl, null, null);
+        subStmt.setClassLoaderResolver(clr);
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
+        ((StringLiteral)countExpr).generateStatementWithoutQuotes();
+        subStmt.select(countExpr, null);
+
+        SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
+        SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, expr.getSQLTable(), expr.getSQLTable().getTable().getIdMapping());
+        subStmt.whereAnd(elementOwnerExpr.eq(ownerIdExpr), true);
+
+        JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
+        SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
+        subqExpr.setJavaTypeMapping(subqMapping);
+        return subqExpr;
     }
 }

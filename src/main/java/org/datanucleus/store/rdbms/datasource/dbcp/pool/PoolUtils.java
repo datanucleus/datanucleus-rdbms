@@ -552,9 +552,8 @@ public final class PoolUtils {
         }
         if (perKey) {
             return new ErodingPerKeyKeyedObjectPool(keyedPool, factor);
-        } else {
-            return new ErodingKeyedObjectPool(keyedPool, factor);
         }
+        return new ErodingKeyedObjectPool(keyedPool, factor);
     }
 
     /**
@@ -1062,9 +1061,8 @@ public final class PoolUtils {
             final Object obj = pool.borrowObject();
             if (type.isInstance(obj)) {
                 return obj;
-            } else {
-                throw new ClassCastException("Borrowed object is not of type: " + type.getName() + " was: " + obj);
             }
+            throw new ClassCastException("Borrowed object is not of type: " + type.getName() + " was: " + obj);
         }
 
         /**
@@ -1209,9 +1207,8 @@ public final class PoolUtils {
             Object obj = keyedPool.borrowObject(key);
             if (type.isInstance(obj)) {
                 return obj;
-            } else {
-                throw new ClassCastException("Borrowed object for key: " + key + " is not of type: " + type.getName() + " was: " + obj);
             }
+            throw new ClassCastException("Borrowed object for key: " + key + " is not of type: " + type.getName() + " was: " + obj);
         }
 
         /**

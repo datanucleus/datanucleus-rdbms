@@ -46,37 +46,35 @@ public class StringIndexOf4Method extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
-        else
-        {
-            // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-            SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            ArrayList funcArgs = new ArrayList();
-            SQLExpression substrExpr = args.get(0);
-            if (!(substrExpr instanceof StringExpression) &&
+        // {stringExpr}.indexOf(strExpr1 [,numExpr2])
+        SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
+
+        ArrayList funcArgs = new ArrayList();
+        SQLExpression substrExpr = args.get(0);
+        if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
-            }
-            funcArgs.add(substrExpr);
-            funcArgs.add(expr);
-            if (args.size() == 2)
-            {
-                SQLExpression fromExpr = args.get(1);
-                if (!(fromExpr instanceof NumericExpression))
-                {
-                    throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
-                        "NumericExpression"));
-                }
-                // Add 1 to the passed in value so that it is of origin 1 to be compatible with CHARINDEX
-                funcArgs.add(new NumericExpression(fromExpr, Expression.OP_ADD, one));
-            }
-
-            // Subtract 1 from the result of CHARINDEX to be consistent with Java strings
-            NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs);
-            return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();
         }
+        funcArgs.add(substrExpr);
+        funcArgs.add(expr);
+        if (args.size() == 2)
+        {
+            SQLExpression fromExpr = args.get(1);
+            if (!(fromExpr instanceof NumericExpression))
+            {
+                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
+                        "NumericExpression"));
+            }
+            // Add 1 to the passed in value so that it is of origin 1 to be compatible with CHARINDEX
+            funcArgs.add(new NumericExpression(fromExpr, Expression.OP_ADD, one));
+        }
+
+        // Subtract 1 from the result of CHARINDEX to be consistent with Java strings
+        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs);
+        return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();
     }
 }

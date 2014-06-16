@@ -64,11 +64,9 @@ public class JDOHelperGetObjectIdMethod extends AbstractSQLMethod
             {
                 return new NullLiteral(stmt, null, null, null);
             }
-            else
-            {
-                JavaTypeMapping m = getMappingForClass(id.getClass());
-                return new ObjectLiteral(stmt, m, id, null);
-            }
+
+            JavaTypeMapping m = getMappingForClass(id.getClass());
+            return new ObjectLiteral(stmt, m, id, null);
         }
         else if (ObjectExpression.class.isAssignableFrom(expr.getClass()))
         {

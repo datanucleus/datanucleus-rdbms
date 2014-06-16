@@ -555,12 +555,10 @@ public class FKSetStore extends AbstractSetStore
             }
             return oldOwner != newOwner;
         }
-        else
-        {
-            // 1-N unidir so update the FK if not set to be contained in the set
-            boolean contained = contains(op, element);
-            return (contained ? false : updateElementFk(op, element, newOwner));
-        }
+
+        // 1-N unidir so update the FK if not set to be contained in the set
+        boolean contained = contains(op, element);
+        return (contained ? false : updateElementFk(op, element, newOwner));
     }
  
     /**
@@ -1106,11 +1104,7 @@ public class FKSetStore extends AbstractSetStore
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        else
-                        {
-                            rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null,
-                                clr.classForName(elementType));
-                        }
+                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
 
                         return new CollectionStoreIterator(op, rs, rof, this);
                     }

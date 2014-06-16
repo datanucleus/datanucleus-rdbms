@@ -331,10 +331,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     mmd.getFullFieldName() + " : " + nue.getMessage());
                 return;
             }
-            else
-            {
-                throw nue;
-            }
+            throw nue;
         }
 
         // Set the PK and nullability of column(s) for the implementations (based on the number of impls etc)
@@ -377,20 +374,18 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     toBeAdded = false;
                     break;
                 }
-                else
+
+                if (type.isAssignableFrom(cls))
                 {
-                    if (type.isAssignableFrom(cls))
-                    {
-                        // "type" is superclass of "cls" so swap subclass for this class
-                        clsToSwap = cls;
-                        toBeAdded = false;
-                        break;
-                    }
-                    else if (cls.isAssignableFrom(type))
-                    {
-                        toBeAdded = false;
-                        break;
-                    }
+                    // "type" is superclass of "cls" so swap subclass for this class
+                    clsToSwap = cls;
+                    toBeAdded = false;
+                    break;
+                }
+                else if (cls.isAssignableFrom(type))
+                {
+                    toBeAdded = false;
+                    break;
                 }
             }
             if (toBeAdded)
@@ -600,10 +595,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             {
                 return null;
             }
-            else
-            {
-                return getObjectForReferenceString(ec, refString);
-            }
+            return getObjectForReferenceString(ec, refString);
         }
         else
         {
@@ -673,11 +665,9 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             }
             return refString;
         }
-        else
-        {
-            // Cater for non-persistable objects
-            throw new NucleusException("Identity mapping of non-persistable interface/Object fields not supported");
-        }
+
+        // Cater for non-persistable objects
+        throw new NucleusException("Identity mapping of non-persistable interface/Object fields not supported");
     }
 
     /**
@@ -715,10 +705,8 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
         {
             throw new NucleusException("Reference field contains reference to class of type " + refDefiner + " but no metadata found for this class");
         }
-        else
-        {
-            refClassName = refCmd.getFullClassName();
-        }
+
+        refClassName = refCmd.getFullClassName();
 
         // Obtain the identity
         Object id = null;

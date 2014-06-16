@@ -604,11 +604,9 @@ public abstract class AbstractTable implements Table
             state = TABLE_STATE_VALIDATED;
             return created;
         }
-        else 
-        {
-            // table already existed
-            existsInDatastore = Boolean.TRUE;
-        }
+
+        // table already existed
+        existsInDatastore = Boolean.TRUE;
 
         return false;
     } 

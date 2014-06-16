@@ -79,9 +79,8 @@ public class DelegatingPreparedStatement extends DelegatingStatement
             DelegatingPreparedStatement s = (DelegatingPreparedStatement) obj;
             return delegate.equals(s.getInnermostDelegate());
         }
-        else {
-            return delegate.equals(obj);
-        }
+
+        return delegate.equals(obj);
     }
 
     public void setDelegate(PreparedStatement s) {

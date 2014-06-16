@@ -166,12 +166,12 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
             } else {
                 if(null == _factory) {
                     throw new NoSuchElementException();
-                } else {
-                    obj = _factory.makeObject();
-                    newlyCreated = true;
-                  if (obj == null) {
+                }
+
+                obj = _factory.makeObject();
+                newlyCreated = true;
+                if (obj == null) {
                     throw new NoSuchElementException("PoolableObjectFactory.makeObject() returned null.");
-                  }
                 }
             }
             if (null != _factory && null != obj) {
@@ -386,10 +386,10 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
         assertOpen();
         if(0 < getNumActive()) {
             throw new IllegalStateException("Objects are already active");
-        } else {
-            clear();
-            _factory = factory;
-        }
+        } 
+
+        clear();
+        _factory = factory;
     }
 
     /**

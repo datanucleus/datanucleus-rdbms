@@ -144,9 +144,7 @@ public class ResultSetGetter extends AbstractFieldManager
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
         JavaTypeMapping mapping = mapIdx.getMapping();
         Object value;
-        if (mapping instanceof EmbeddedPCMapping ||
-            mapping instanceof SerialisedPCMapping ||
-            mapping instanceof SerialisedReferenceMapping)
+        if (mapping instanceof EmbeddedPCMapping || mapping instanceof SerialisedPCMapping || mapping instanceof SerialisedReferenceMapping)
         {
             value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions(), op, fieldNumber);
         }
@@ -154,8 +152,7 @@ public class ResultSetGetter extends AbstractFieldManager
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
-            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.ONE_TO_ONE_UNI ||
-                relationType == RelationType.MANY_TO_ONE_BI)
+            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.MANY_TO_ONE_BI)
             {
                 // Process fields of sub-object if available in this result set
                 StatementClassMapping relationMappings =
@@ -164,8 +161,7 @@ public class ResultSetGetter extends AbstractFieldManager
                 {
                     ClassLoaderResolver clr = ec.getClassLoaderResolver();
                     AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                    ResultObjectFactory relationROF = storeMgr.newResultObjectFactory(relatedCmd, relationMappings, 
-                        false, ec.getFetchPlan(), mmd.getType());
+                    ResultObjectFactory relationROF = storeMgr.newResultObjectFactory(relatedCmd, relationMappings, false, ec.getFetchPlan(), mmd.getType());
                     value = relationROF.getObject(ec, resultSet);
                 }
                 else
@@ -184,9 +180,6 @@ public class ResultSetGetter extends AbstractFieldManager
         {
             return op.wrapSCOField(fieldNumber, value, false, false, false);
         }
-        else
-        {
-            return value;
-        }
+        return value;
     }
 }

@@ -68,10 +68,8 @@ public class SumFunction extends SimpleNumericAggregateMethod
             }
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
     }
 
     /* (non-Javadoc)

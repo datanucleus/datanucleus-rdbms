@@ -379,10 +379,8 @@ public class OracleAdapter extends BaseDatastoreAdapter
 	        stmt.setString(4,schema);
 	        return stmt.executeQuery();
         }
-        else
-        {
-            return super.getExistingIndexes(conn,catalog,schema,table);
-        }
+
+        return super.getExistingIndexes(conn,catalog,schema,table);
     }
 
     /**
@@ -397,10 +395,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
             // Add "PURGE" to avoid putting the table into the Oracle "recycle bin"
             return "DROP TABLE " + table.toString() + " CASCADE CONSTRAINTS PURGE";
         }
-        else
-        {
-            return "DROP TABLE " + table.toString() + " CASCADE CONSTRAINTS";
-        }
+        return "DROP TABLE " + table.toString() + " CASCADE CONSTRAINTS";
     }
 
     // ---------------------------- Sequence Support ---------------------------

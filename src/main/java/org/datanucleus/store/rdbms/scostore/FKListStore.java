@@ -995,12 +995,8 @@ public class FKListStore extends AbstractListStore
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        else
-                        {
-                            rof = storeMgr.newResultObjectFactory(emd, resultMapping, false, null,
-                                clr.classForName(elementType));
-                        }
 
+                        rof = storeMgr.newResultObjectFactory(emd, resultMapping, false, null, clr.classForName(elementType));
                         return new ListStoreIterator(op, rs, rof, this);
                     }
                     finally

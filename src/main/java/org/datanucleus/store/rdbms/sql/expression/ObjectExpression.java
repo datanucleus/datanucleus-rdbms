@@ -199,11 +199,9 @@ public class ObjectExpression extends SQLExpression
                 }
                 return bExpr;
             }
-            else
-            {
-                // Comparison with parameter, so just give boolean compare
-                return new BooleanExpression(this, Expression.OP_EQ, expr);
-            }
+
+            // Comparison with parameter, so just give boolean compare
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof NullLiteral)
         {
@@ -221,11 +219,9 @@ public class ObjectExpression extends SQLExpression
                 // More than 1 value to compare with a simple literal!
                 return super.eq(expr);
             }
-            else
-            {
-                // Just do a direct comparison with the basic literals
-                return new BooleanExpression(this, Expression.OP_EQ, expr);
-            }
+
+            // Just do a direct comparison with the basic literals
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof ObjectExpression)
         {
@@ -257,10 +253,8 @@ public class ObjectExpression extends SQLExpression
                 subExprEnd = subExprStart + implMappings[i].getNumberOfDatastoreMappings();
                 break;
             }
-            else
-            {
-                subExprStart += implMappings[i].getNumberOfDatastoreMappings();
-            }
+
+            subExprStart += implMappings[i].getNumberOfDatastoreMappings();
         }
 
         BooleanExpression bExpr = null;
@@ -312,11 +306,9 @@ public class ObjectExpression extends SQLExpression
                 }
                 return new BooleanExpression(Expression.OP_NOT, bExpr.encloseInParentheses());
             }
-            else
-            {
-                // Comparison with parameter, so just give boolean compare
-                return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
-            }
+
+            // Comparison with parameter, so just give boolean compare
+            return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
         else if (expr instanceof NullLiteral)
         {
@@ -334,11 +326,9 @@ public class ObjectExpression extends SQLExpression
                 // More than 1 value to compare with a literal!
                 return super.ne(expr);
             }
-            else
-            {
-                // Just do a direct comparison with the basic literals
-                return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
-            }
+
+            // Just do a direct comparison with the basic literals
+            return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
         else if (expr instanceof ObjectExpression)
         {
@@ -670,11 +660,9 @@ public class ObjectExpression extends SQLExpression
 
                 return typeExpr;
             }
-            else
-            {
-                JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, not));
-            }
+
+            JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
+            return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, not));
         }
         else if (mapping instanceof PersistableMapping || mapping instanceof ReferenceMapping)
         {
@@ -768,111 +756,103 @@ public class ObjectExpression extends SQLExpression
                 }
                 return (not ? discExpr.not() : discExpr);
             }
-            else
+
+            // Join to member table
+            DatastoreClass table = null;
+            if (memberCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
             {
-                // Join to member table
-                DatastoreClass table = null;
-                if (memberCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+                // Field is a PC class that uses "subclass-table" inheritance strategy (and so has multiple possible tables to join to)
+                AbstractClassMetaData[] cmds = storeMgr.getClassesManagingTableForClass(memberCmd, clr);
+                if (cmds != null)
                 {
-                    // Field is a PC class that uses "subclass-table" inheritance strategy (and so has multiple possible tables to join to)
-                    AbstractClassMetaData[] cmds = storeMgr.getClassesManagingTableForClass(memberCmd, clr);
-                    if (cmds != null)
+                    // Join to the first table
+                    // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
+                    if (cmds.length > 1)
                     {
-                        // Join to the first table
-                        // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
-                        if (cmds.length > 1)
-                        {
-                            NucleusLogger.QUERY.warn(Localiser.msg("037006",
-                                mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
-                        }
-                        table = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
+                        NucleusLogger.QUERY.warn(Localiser.msg("037006",
+                            mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
                     }
-                    else
-                    {
-                        // No subclasses with tables to join to, so throw a user error
-                        throw new NucleusUserException(Localiser.msg("037005",
-                            mapping.getMemberMetaData().getFullFieldName()));
-                    }
+                    table = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
                 }
                 else
                 {
-                    // Class of the field will have its own table
-                    table = storeMgr.getDatastoreClass(mapping.getType(), clr);
-                }
-
-                if (table.managesClass(type.getName()))
-                {
-                    // This type is managed in this table so must be an instance TODO Is this correct, what if using discrim?
-                    JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                    return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
-                }
-                else
-                {
-                    if (table == stmt.getPrimaryTable().getTable())
-                    {
-                        // This is member table, so just need to restrict to the instanceof type now
-                        JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                        if (stmt.getNumberOfUnions() > 0)
-                        {
-                            // a). we have unions for the member, so restrict to just the applicable unions
-                            // Note that this is only really valid is wanting "a instanceof SUB1".
-                            // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
-                            // TODO How do we handle those cases?
-                            Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
-                            if (type.isAssignableFrom(mainCandidateCls) == not)
-                            {
-                                SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(
-                                    exprFactory.newLiteral(stmt, m, false));
-                                stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
-                            }
-
-                            List<SQLStatement> unionStmts = stmt.getUnions();
-                            Iterator<SQLStatement> iter = unionStmts.iterator();
-                            while (iter.hasNext())
-                            {
-                                SQLStatement unionStmt = iter.next();
-                                Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
-                                if (type.isAssignableFrom(unionCandidateCls) == not)
-                                {
-                                    SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(
-                                        exprFactory.newLiteral(unionStmt, m, false));
-                                    unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
-                                }
-                            }
-
-                            // Just return true since we applied the condition direct to the unions
-                            SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(
-                                exprFactory.newLiteral(stmt, m, true));
-                            return (BooleanExpression)returnExpr;
-                        }
-                        else
-                        {
-                            // b). The member table doesn't manage the instanceof type, so do inner join to 
-                            // the table of the instanceof to impose the instanceof condition
-                            DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                            stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
-                                instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
-                            return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
-                        }
-                    }
-                    else
-                    {
-                        // Do inner join to this table to impose the instanceOf
-                        DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                        if (stmt.getNumberOfUnions() > 0)
-                        {
-                            // Inner join will likely not give the right result
-                            NucleusLogger.QUERY.debug("InstanceOf for " + table +
-                                " but no discriminator so adding inner join to " + instanceofTable +
-                            " : in some cases with UNIONs this may fail");
-                        }
-                        stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
-                            instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
-                        JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                        return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
-                    }
+                    // No subclasses with tables to join to, so throw a user error
+                    throw new NucleusUserException(Localiser.msg("037005",
+                        mapping.getMemberMetaData().getFullFieldName()));
                 }
             }
+            else
+            {
+                // Class of the field will have its own table
+                table = storeMgr.getDatastoreClass(mapping.getType(), clr);
+            }
+
+            if (table.managesClass(type.getName()))
+            {
+                // This type is managed in this table so must be an instance TODO Is this correct, what if using discrim?
+                JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
+                return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
+            }
+
+            if (table == stmt.getPrimaryTable().getTable())
+            {
+                // This is member table, so just need to restrict to the instanceof type now
+                JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
+                if (stmt.getNumberOfUnions() > 0)
+                {
+                    // a). we have unions for the member, so restrict to just the applicable unions
+                    // Note that this is only really valid is wanting "a instanceof SUB1".
+                    // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
+                    // TODO How do we handle those cases?
+                    Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
+                    if (type.isAssignableFrom(mainCandidateCls) == not)
+                    {
+                        SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(
+                            exprFactory.newLiteral(stmt, m, false));
+                        stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                    }
+
+                    List<SQLStatement> unionStmts = stmt.getUnions();
+                    Iterator<SQLStatement> iter = unionStmts.iterator();
+                    while (iter.hasNext())
+                    {
+                        SQLStatement unionStmt = iter.next();
+                        Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
+                        if (type.isAssignableFrom(unionCandidateCls) == not)
+                        {
+                            SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(
+                                exprFactory.newLiteral(unionStmt, m, false));
+                            unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                        }
+                    }
+
+                    // Just return true since we applied the condition direct to the unions
+                    SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(
+                        exprFactory.newLiteral(stmt, m, true));
+                    return (BooleanExpression)returnExpr;
+                }
+
+                // b). The member table doesn't manage the instanceof type, so do inner join to 
+                // the table of the instanceof to impose the instanceof condition
+                DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
+                stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
+                    instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+                return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
+            }
+
+            // Do inner join to this table to impose the instanceOf
+            DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
+            if (stmt.getNumberOfUnions() > 0)
+            {
+                // Inner join will likely not give the right result
+                NucleusLogger.QUERY.debug("InstanceOf for " + table +
+                    " but no discriminator so adding inner join to " + instanceofTable +
+                        " : in some cases with UNIONs this may fail");
+            }
+            stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
+                instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+            JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
+            return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
         }
         else
         {

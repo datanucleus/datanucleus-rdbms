@@ -163,9 +163,9 @@ public class DelegatingConnection extends AbandonedTrace
         Connection innerCon = getInnermostDelegateInternal();
         if (innerCon == null) {
             return c == null;
-        } else {
-            return innerCon.equals(c);
         }
+
+        return innerCon.equals(c);
     }
 
     /**
@@ -187,9 +187,8 @@ public class DelegatingConnection extends AbandonedTrace
             DelegatingConnection c = (DelegatingConnection) obj;
             return c.innermostDelegateEquals(delegate);
         }
-        else {
-            return delegate.equals(obj);
-        }
+
+        return delegate.equals(obj);
     }
 
     public int hashCode() {
@@ -375,10 +374,10 @@ public class DelegatingConnection extends AbandonedTrace
                 }
                 throw new SQLException
                     ("Connection " + label + " is closed.");
-            } else {
-                throw new SQLException
-                    ("Connection is null.");
-            }      
+            }
+
+            throw new SQLException
+            ("Connection is null.");
         }
     }
 

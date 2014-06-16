@@ -110,33 +110,25 @@ public class ColumnExpression extends SQLExpression
             {
                 return "'" + value + "'";
             }
-            else
-            {
-                return "" + value;
-            }
+
+            return "" + value;
         }
         if (table == null)
         {
             // Column parameter
             return "?";
         }
-        else
+
+        if (omitTableFromString)
         {
-            if (omitTableFromString)
-            {
-                return column.getIdentifier().toString();
-            }
-            else
-            {
-                if (table.getAlias() != null)
-                {
-                    return table.getAlias() + "." + column.getIdentifier().toString();
-                }
-                else
-                {
-                    return table.getTable() + "." + column.getIdentifier().toString();
-                }
-            }
+            return column.getIdentifier().toString();
         }
+
+        if (table.getAlias() != null)
+        {
+            return table.getAlias() + "." + column.getIdentifier().toString();
+        }
+
+        return table.getTable() + "." + column.getIdentifier().toString();
     }
 }

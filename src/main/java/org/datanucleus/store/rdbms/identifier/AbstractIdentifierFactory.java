@@ -344,10 +344,8 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
 
             return identifier.substring(0, tailIndex) + suffix;
         }
-        else
-        {
-            return identifier;
-        }
+
+        return identifier;
     }
 
     /**

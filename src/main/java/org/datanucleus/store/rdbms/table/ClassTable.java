@@ -1239,10 +1239,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     {
                         continue;
                     }
-                    else
-                    {
-                        processedCallbacks.add(callbackMmd);
-                    }
+
+                    processedCallbacks.add(callbackMmd);
 
                     if (callbackMmd.getJoinMetaData() == null)
                     {
@@ -1655,10 +1653,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 return true;
             }
-            else
-            {
-                return supertable.isSuperDatastoreClass(table);
-            }
+
+            return supertable.isSuperDatastoreClass(table);
         }
         return false;
     }
@@ -2100,10 +2096,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058001", toString(), index.getName(), columnName));
                     break;
                 }
-                else
-                {
-                    index.addColumn(col);
-                }
+
+                index.addColumn(col);
             }
         }
         else if (imd.getNumberOfMembers() > 0)
@@ -2516,10 +2510,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058202", toString(), ck.getName(), columnName));
                     break;
                 }
-                else
-                {
-                    ck.addColumn(col);
-                }
+
+                ck.addColumn(col);
             }
         }
         // b). Columns specified using fields

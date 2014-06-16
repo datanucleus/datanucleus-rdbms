@@ -48,25 +48,23 @@ public class StringCharAtMethod extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
                 "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
-        else
-        {
-            // {strExpr}.charAt(numExpr)
-            SQLExpression startExpr = args.get(0);
-            if (!(startExpr instanceof NumericExpression) &&
+
+        // {strExpr}.charAt(numExpr)
+        SQLExpression startExpr = args.get(0);
+        if (!(startExpr instanceof NumericExpression) &&
                 !(startExpr instanceof IntegerLiteral) &&
                 !(startExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
                     "NumericExpression/IntegerLiteral/ParameterLiteral"));
-            }
-
-            SQLExpression endExpr = startExpr.add(ExpressionUtils.getLiteralForOne(stmt));
-
-            // Invoke substring(startExpr, endExpr)
-            List<SQLExpression> newArgs = new ArrayList<SQLExpression>(2);
-            newArgs.add(startExpr);
-            newArgs.add(endExpr);
-            return exprFactory.invokeMethod(stmt, String.class.getName(), "substring", expr, newArgs);
         }
+
+        SQLExpression endExpr = startExpr.add(ExpressionUtils.getLiteralForOne(stmt));
+
+        // Invoke substring(startExpr, endExpr)
+        List<SQLExpression> newArgs = new ArrayList<SQLExpression>(2);
+        newArgs.add(startExpr);
+        newArgs.add(endExpr);
+        return exprFactory.invokeMethod(stmt, String.class.getName(), "substring", expr, newArgs);
     }
 }

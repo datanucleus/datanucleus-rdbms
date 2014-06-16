@@ -252,11 +252,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                     throw new NucleusException(Localiser.msg("047004", poolingType,
                         ite.getTargetException().getMessage()), ite.getTargetException()).setFatal();
                 }
-                else
-                {
-                    throw new NucleusException(Localiser.msg("047004", poolingType,
-                        e.getMessage()),e).setFatal();
-                }
+
+                throw new NucleusException(Localiser.msg("047004", poolingType, e.getMessage()),e).setFatal();
             }
         }
         return dataSources;

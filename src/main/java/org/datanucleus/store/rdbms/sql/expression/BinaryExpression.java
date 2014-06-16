@@ -90,10 +90,8 @@ public class BinaryExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_LT, expr);
         }
-        else
-        {
-            return super.lt(expr);
-        }
+
+        return super.lt(expr);
     }
 
     public BooleanExpression lteq(SQLExpression expr)
@@ -102,10 +100,8 @@ public class BinaryExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_LTEQ, expr);
         }
-        else
-        {
-            return super.le(expr);
-        }
+
+        return super.le(expr);
     }
 
     public BooleanExpression gt(SQLExpression expr)
@@ -114,10 +110,8 @@ public class BinaryExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_GT, expr);
         }
-        else
-        {
-            return super.gt(expr);
-        }
+
+        return super.gt(expr);
     }
 
     public BooleanExpression gteq(SQLExpression expr)
@@ -126,10 +120,8 @@ public class BinaryExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_GTEQ, expr);
         }
-        else
-        {
-            return super.ge(expr);
-        }
+
+        return super.ge(expr);
     }
 
     public BooleanExpression in(SQLExpression expr, boolean not)

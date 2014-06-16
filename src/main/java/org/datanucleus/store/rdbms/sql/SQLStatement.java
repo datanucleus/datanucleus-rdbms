@@ -280,10 +280,7 @@ public class SQLStatement
         {
             return true;
         }
-        else
-        {
-            return isChildStatementOf(parent);
-        }
+        return isChildStatementOf(parent);
     }
 
     /**
@@ -647,17 +644,15 @@ public class SQLStatement
         {
             return false;
         }
-        else
+
+        for (int i=0;i<updates.length;i++)
         {
-            for (int i=0;i<updates.length;i++)
+            if (updates[i] != null)
             {
-                if (updates[i] != null)
-                {
-                    return true;
-                }
+                return true;
             }
-            return false;
         }
+        return false;
     }
 
     // --------------------------------- FROM --------------------------------------

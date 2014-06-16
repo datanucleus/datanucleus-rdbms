@@ -586,9 +586,9 @@ public class BasicDataSource implements DataSource {
     public synchronized int getNumActive() {
         if (connectionPool != null) {
             return connectionPool.getNumActive();
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
 
@@ -601,9 +601,8 @@ public class BasicDataSource implements DataSource {
     public synchronized int getNumIdle() {
         if (connectionPool != null) {
             return connectionPool.getNumIdle();
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     /**

@@ -220,15 +220,13 @@ public class SQLController
                                 }
                                 return state.stmt;
                             }
-                            else
+
+                            // Reached max batch size so process it now and start again for this one
+                            if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                             {
-                                // Reached max batch size so process it now and start again for this one
-                                if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
-                                {
-                                    NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052101", state.stmtText));
-                                }
-                                processConnectionStatement(conn);
+                                NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052101", state.stmtText));
                             }
+                            processConnectionStatement(conn);
                         }
                         else
                         {
@@ -406,18 +404,14 @@ public class SQLController
                     state.closeStatementOnProcess = false; // user method has requested execution so they can close it themselves now
                     return processConnectionStatement(conn);
                 }
-                else
-                {
-                    // Leave processing til later
-                    return null;
-                }
+
+                // Leave processing til later
+                return null;
             }
-            else
-            {
-                // There is a waiting batch yet it is a different statement, so process that one now since we need
-                // our statement executing
-                processConnectionStatement(conn);
-            }
+
+            // There is a waiting batch yet it is a different statement, so process that one now since we need
+            // our statement executing
+            processConnectionStatement(conn);
         }
 
         // Process the normal update statement

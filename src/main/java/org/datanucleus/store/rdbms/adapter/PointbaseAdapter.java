@@ -108,9 +108,6 @@ public class PointbaseAdapter extends BaseDatastoreAdapter
         {
             return 1 << 31;
         }
-        else
-        {
-            return super.getUnlimitedLengthPrecisionValue(typeInfo);
-        }
+        return super.getUnlimitedLengthPrecisionValue(typeInfo);
     }
 }

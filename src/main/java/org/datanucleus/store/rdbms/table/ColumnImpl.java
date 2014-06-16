@@ -362,10 +362,7 @@ public class ColumnImpl implements Column
         {
             return sqlPrecision * 8;
         }
-        else
-        {
-            return sqlPrecision;
-        }
+        return sqlPrecision;
     }
 
     /* (non-Javadoc)
@@ -617,14 +614,11 @@ public class ColumnImpl implements Column
                                 actualPrecision, 
                                 ((AbstractMemberMetaData)this.columnMetaData.getParent()).getFullFieldName());
                         }
-                        else
-                        {
-                            throw new WrongPrecisionException(this.toString(), sqlPrecision, 
-                                actualPrecision);
-                        }
+
+                        throw new WrongPrecisionException(this.toString(), sqlPrecision, actualPrecision);
                     }
                 }
-                
+
                 if (columnMetaData.getScale() != null && actualScale >= 0)
                 {
                     if (columnMetaData.getScale().intValue() != actualScale)
@@ -635,10 +629,7 @@ public class ColumnImpl implements Column
                             throw new WrongScaleException(this.toString(), columnMetaData.getScale().intValue(), actualScale, 
                                 ((AbstractMemberMetaData)this.columnMetaData.getParent()).getFullFieldName());
                         }
-                        else
-                        {
-                            throw new WrongScaleException(this.toString(), columnMetaData.getScale().intValue(), actualScale);
-                        }
+                        throw new WrongScaleException(this.toString(), columnMetaData.getScale().intValue(), actualScale);
                     }
                 }
             }
@@ -675,11 +666,9 @@ public class ColumnImpl implements Column
                         throw new NucleusException("Expected an auto increment column ("+getIdentifier()+
                             ") in the database, but it is not").setFatal();
                     }
-                    else
-                    {
-                        throw new NucleusException("According to the user metadata, the column ("+
+
+                    throw new NucleusException("According to the user metadata, the column ("+
                             getIdentifier()+") is not auto incremented, but the database says it is.").setFatal();
-                    }
                 }
             }
             catch (UnsupportedOperationException ex)

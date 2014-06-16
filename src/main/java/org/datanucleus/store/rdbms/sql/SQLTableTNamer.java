@@ -58,19 +58,10 @@ public class SQLTableTNamer implements SQLTableNamer
                 {
                     return "T" + number + "_SUB_SUB_SUB";
                 }
-                else
-                {
-                    return "T" + number + "_SUB_SUB";
-                }
+                return "T" + number + "_SUB_SUB";
             }
-            else
-            {
-                return "T" + number + "_SUB";
-            }
+            return "T" + number + "_SUB";
         }
-        else
-        {
-            return "T" + number;
-        }
+        return "T" + number;
     }
 }

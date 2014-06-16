@@ -1141,9 +1141,8 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
                                     }
                                 }
                                 throw new NoSuchElementException("Timeout waiting for idle object");
-                            } else {
-                                continue; // keep looping
                             }
+                            continue; // keep looping
                         default:
                             throw new IllegalArgumentException("WhenExhaustedAction property " + whenExhaustedAction +
                                     " not recognized.");
@@ -1201,9 +1200,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
                 if(newlyCreated) {
                     throw new NoSuchElementException("Could not create a validated object, cause: " + e.getMessage());
                 }
-                else {
-                    continue; // keep looping
-                }
+                continue; // keep looping
             }
         }
     }
@@ -1472,11 +1469,11 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
             assertOpen();
             if(0 < getNumActive()) {
                 throw new IllegalStateException("Objects are already active");
-            } else {
-                toDestroy.addAll(_pool);
-                _numInternalProcessing = _numInternalProcessing + _pool._size;
-                _pool.clear();
             }
+
+            toDestroy.addAll(_pool);
+            _numInternalProcessing = _numInternalProcessing + _pool._size;
+            _pool.clear();
             _factory = factory;
         }
         destroy(toDestroy, oldFactory); 
@@ -1696,9 +1693,8 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
     private int getNumTests() {
         if(_numTestsPerEvictionRun >= 0) {
             return Math.min(_numTestsPerEvictionRun, _pool.size());
-        } else {
-            return(int)(Math.ceil(_pool.size()/Math.abs((double)_numTestsPerEvictionRun)));
         }
+        return(int)(Math.ceil(_pool.size()/Math.abs((double)_numTestsPerEvictionRun)));
     }
 
     //--- inner classes ----------------------------------------------

@@ -139,8 +139,7 @@ public class DBCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             {
                 testSQL = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL);
             }
-            new org.apache.commons.dbcp.PoolableConnectionFactory(connectionFactory, connectionPool, kpf, 
-                testSQL, false, false);
+            new org.apache.commons.dbcp.PoolableConnectionFactory(connectionFactory, connectionPool, kpf, testSQL, false, false);
             if (testSQL != null)
             {
                 ((org.apache.commons.pool.impl.GenericObjectPool)connectionPool).setTestOnBorrow(true);

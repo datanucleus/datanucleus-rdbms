@@ -270,10 +270,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 {
                     return ClassUtils.getValueOfFieldByReflection(value, mmd.getName());
                 }
-                else
-                {
-                    return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
-                }
+                return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
             }
 
             if (!mmd.isPrimaryKey())
@@ -845,28 +842,26 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
             return;
         }
-        else
-        {
-            ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
-            if (otherOP == null)
-            {
-                if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || 
-                    relationType == RelationType.MANY_TO_ONE_UNI)
-                {
-                    // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
-                    Object other = op.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
-                    otherOP = op.getExecutionContext().findObjectProvider(other);
-                }
-            }
 
-            if (relationType == RelationType.MANY_TO_ONE_UNI)
+        ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+        if (otherOP == null)
+        {
+            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || 
+                    relationType == RelationType.MANY_TO_ONE_UNI)
             {
-                // Update join table entry
-                PersistableRelationStore store =
+                // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
+                Object other = op.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
+                otherOP = op.getExecutionContext().findObjectProvider(other);
+            }
+        }
+
+        if (relationType == RelationType.MANY_TO_ONE_UNI)
+        {
+            // Update join table entry
+            PersistableRelationStore store =
                     (PersistableRelationStore) storeMgr.getBackingStoreForField(
                         op.getExecutionContext().getClassLoaderResolver(), mmd, mmd.getType());
-                store.update(op, otherOP);
-            }
+            store.update(op, otherOP);
         }
     }
 

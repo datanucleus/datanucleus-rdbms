@@ -203,15 +203,9 @@ public class DiscriminatorMapping extends SingleFieldMapping
                 {
                     return new DiscriminatorLongMapping(table, mapMgr.getMapping(Long.class), dismd);
                 }
-                else
-                {
-                    return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
-                }
-            }
-            else
-            {
                 return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
             }
+            return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
         }
         return null;
     }

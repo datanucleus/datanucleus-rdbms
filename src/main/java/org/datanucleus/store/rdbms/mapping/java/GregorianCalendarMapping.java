@@ -112,17 +112,15 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             // (Timestamp) implementation
             return ClassNameConstants.JAVA_SQL_TIMESTAMP;
         }
-        else
+
+        // (Timestamp millisecs, Timezone) implementation
+        if (index == 0)
         {
-            // (Timestamp millisecs, Timezone) implementation
-            if (index == 0)
-            {
-                return ClassNameConstants.LONG;
-            }
-            else if (index == 1)
-            {
-                return ClassNameConstants.JAVA_LANG_STRING;
-            }
+            return ClassNameConstants.LONG;
+        }
+        else if (index == 1)
+        {
+            return ClassNameConstants.JAVA_LANG_STRING;
         }
         return null;
     }
@@ -219,19 +217,17 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             }
             return cal;
         }
-        else
-        {
-            // (Timestamp millisecs, Timezone) implementation
-            long millisecs = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
 
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTime(new Date(millisecs));
-            String timezoneId = getDatastoreMapping(1).getString(resultSet, exprIndex[1]);
-            if (timezoneId != null)
-            {
-                cal.setTimeZone(TimeZone.getTimeZone(timezoneId));
-            }
-            return cal;
+        // (Timestamp millisecs, Timezone) implementation
+        long millisecs = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(new Date(millisecs));
+        String timezoneId = getDatastoreMapping(1).getString(resultSet, exprIndex[1]);
+        if (timezoneId != null)
+        {
+            cal.setTimeZone(TimeZone.getTimeZone(timezoneId));
         }
+        return cal;
     }
 }

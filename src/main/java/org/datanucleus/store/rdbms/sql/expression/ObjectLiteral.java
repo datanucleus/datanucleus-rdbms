@@ -190,10 +190,7 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
         {
             return super.toString() + " = " + value.toString();
         }
-        else
-        {
-            return super.toString() + " = NULL";
-        }
+        return super.toString() + " = NULL";
     }
 
     /* (non-Javadoc)

@@ -127,20 +127,11 @@ public class SQLTableAlphaNamer implements SQLTableNamer
                 {
                     return groupLetters + numTablesInGroup + "_SUB_SUB_SUB";
                 }
-                else
-                {
-                    return groupLetters + numTablesInGroup + "_SUB_SUB";
-                }
+                return groupLetters + numTablesInGroup + "_SUB_SUB";
             }
-            else
-            {
-                return groupLetters + numTablesInGroup + "_SUB";
-            }
+            return groupLetters + numTablesInGroup + "_SUB";
         }
-        else
-        {
-            return groupLetters + numTablesInGroup;
-        }
+        return groupLetters + numTablesInGroup;
     }
 
     private String getLettersForNumber(int number)

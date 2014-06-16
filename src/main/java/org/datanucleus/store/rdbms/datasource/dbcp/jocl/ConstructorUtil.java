@@ -60,10 +60,10 @@ public class ConstructorUtil {
                     for(int j=0;j<paramtypes.length;j++) {
                         if(paramtypes[j].isAssignableFrom(argTypes[j])) {
                             continue;
-                        } else {
-                            canuse = false;
-                            break;
                         }
+
+                        canuse = false;
+                        break;
                     }
                     if(canuse == true) {
                         ctor = ctors[i];

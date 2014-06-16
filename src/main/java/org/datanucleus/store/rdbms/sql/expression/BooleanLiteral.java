@@ -118,10 +118,8 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         {
             return value ? (BooleanExpression)expr : this;
         }
-        else
-        {
-            return super.and(expr);
-        }
+
+        return super.and(expr);
     }
 
     public BooleanExpression eor(SQLExpression expr)
@@ -130,10 +128,8 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         {
             return value ? expr.not() : (BooleanExpression)expr;
         }
-        else
-        {
-            return super.eor(expr);
-        }
+
+        return super.eor(expr);
     }
 
     public BooleanExpression ior(SQLExpression expr)
@@ -142,10 +138,8 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         {
             return value ? this : (BooleanExpression)expr;
         }
-        else
-        {
-            return super.ior(expr);
-        }
+
+        return super.ior(expr);
     }
 
     public BooleanExpression not()
@@ -154,10 +148,8 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         {
             return new BooleanLiteral(stmt, mapping, !value);
         }
-        else
-        {
-            return new BooleanLiteral(stmt, mapping, !value, null);
-        }
+
+        return new BooleanLiteral(stmt, mapping, !value, null);
     }
 
     public BooleanExpression eq(SQLExpression expr)

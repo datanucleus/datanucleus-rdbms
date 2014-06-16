@@ -89,22 +89,20 @@ public class ListGetMethod extends AbstractSQLMethod
 
             return lit.invoke("get", args);
         }
-        else
-        {
-            if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
-            {
-                return getAsInnerJoin(listExpr, idxExpr);
-            }
-            else if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.ORDERING ||
-                    stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
-                    stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
-            {
-                return getAsSubquery(listExpr, idxExpr);
-            }
 
-            throw new NucleusException("List.get() is not supported for " + listExpr +
-                " with argument " + idxExpr + " for query component " + stmt.getQueryGenerator().getCompilationComponent());
+        if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
+        {
+            return getAsInnerJoin(listExpr, idxExpr);
         }
+        else if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.ORDERING ||
+                stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
+                stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
+        {
+            return getAsSubquery(listExpr, idxExpr);
+        }
+
+        throw new NucleusException("List.get() is not supported for " + listExpr +
+            " with argument " + idxExpr + " for query component " + stmt.getQueryGenerator().getCompilationComponent());
     }
 
     /**
@@ -208,33 +206,31 @@ public class ListGetMethod extends AbstractSQLMethod
             SQLExpression valueExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getElementMapping());
             return valueExpr;
         }
+
+        // FK List
+        DatastoreClass elementTbl = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
+
+        // Add join to element table
+        JavaTypeMapping targetMapping = null;
+        JavaTypeMapping orderMapping = null;
+        if (relatedMmds != null)
+        {
+            targetMapping = elementTbl.getMemberMapping(relatedMmds[0]);
+            orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+        }
         else
         {
-            // FK List
-            DatastoreClass elementTbl = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
-
-            // Add join to element table
-            JavaTypeMapping targetMapping = null;
-            JavaTypeMapping orderMapping = null;
-            if (relatedMmds != null)
-            {
-                targetMapping = elementTbl.getMemberMapping(relatedMmds[0]);
-                orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
-            }
-            else
-            {
-                targetMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
-            }
-            SQLTable elemSqlTbl = stmt.innerJoin(listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(),
-                elementTbl, null, targetMapping, null, null);
-
-            // Add condition on index
-            SQLExpression idxSqlExpr = exprFactory.newExpression(stmt, elemSqlTbl, orderMapping);
-            stmt.whereAnd(idxSqlExpr.eq(idxExpr), true);
-
-            // Return element expression
-            return exprFactory.newExpression(stmt, elemSqlTbl, elementTbl.getIdMapping());
+            targetMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+            orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
         }
+        SQLTable elemSqlTbl = stmt.innerJoin(listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(),
+            elementTbl, null, targetMapping, null, null);
+
+        // Add condition on index
+        SQLExpression idxSqlExpr = exprFactory.newExpression(stmt, elemSqlTbl, orderMapping);
+        stmt.whereAnd(idxSqlExpr.eq(idxExpr), true);
+
+        // Return element expression
+        return exprFactory.newExpression(stmt, elemSqlTbl, elementTbl.getIdMapping());
     }
 }

@@ -52,10 +52,8 @@ public class EnumOrdinalMethod extends AbstractSQLMethod
             {
                 throw new NucleusException("EnumExpression.ordinal is not supported when the enum is stored as a string");
             }
-            else
-            {
-                return enumExpr.getDelegate();
-            }
+
+            return enumExpr.getDelegate();
         }
         else
         {

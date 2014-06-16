@@ -75,9 +75,7 @@ public class CoalesceFunction extends AbstractSQLMethod
             }
             return new NumericExpression(stmt, getMappingForClass(cls), "COALESCE", args);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", "COALESCE", expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", "COALESCE", expr));
     }
 }

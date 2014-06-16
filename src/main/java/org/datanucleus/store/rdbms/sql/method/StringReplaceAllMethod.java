@@ -44,31 +44,29 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 2,
                 "StringExpression/CharacterExpression"));
         }
-        else
-        {
-            // {strExpr}.translate(strExpr1, strExpr2)
-            SQLExpression strExpr1 = args.get(0);
-            SQLExpression strExpr2 = args.get(1);
-            if (!(strExpr1 instanceof StringExpression) &&
-                !(strExpr1 instanceof CharacterExpression))
-            {
-                throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 1,
-                    "StringExpression/CharacterExpression"));
-            }
-            if (!(strExpr2 instanceof StringExpression) &&
-                !(strExpr2 instanceof CharacterExpression))
-            {
-                throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 2,
-                    "StringExpression/CharacterExpression"));
-            }
 
-            // Invoke substring(startExpr, endExpr)
-            List<SQLExpression> newArgs = new ArrayList<SQLExpression>(3);
-            newArgs.add(expr);
-            newArgs.add(strExpr1);
-            newArgs.add(strExpr2);
-            JavaTypeMapping mapping = exprFactory.getMappingForType(String.class, false);
-            return new StringExpression(stmt, mapping, "replace", newArgs);
+        // {strExpr}.translate(strExpr1, strExpr2)
+        SQLExpression strExpr1 = args.get(0);
+        SQLExpression strExpr2 = args.get(1);
+        if (!(strExpr1 instanceof StringExpression) &&
+                !(strExpr1 instanceof CharacterExpression))
+        {
+            throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 1,
+                    "StringExpression/CharacterExpression"));
         }
+        if (!(strExpr2 instanceof StringExpression) &&
+                !(strExpr2 instanceof CharacterExpression))
+        {
+            throw new NucleusException(Localiser.msg("060003", "replaceAll", "StringExpression", 2,
+                    "StringExpression/CharacterExpression"));
+        }
+
+        // Invoke substring(startExpr, endExpr)
+        List<SQLExpression> newArgs = new ArrayList<SQLExpression>(3);
+        newArgs.add(expr);
+        newArgs.add(strExpr1);
+        newArgs.add(strExpr2);
+        JavaTypeMapping mapping = exprFactory.getMappingForType(String.class, false);
+        return new StringExpression(stmt, mapping, "replace", newArgs);
     }
 }

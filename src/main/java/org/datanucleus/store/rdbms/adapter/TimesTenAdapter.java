@@ -229,10 +229,7 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
                 {
                     return cut.substring(0, spacei + 1).trim().equalsIgnoreCase(ref);
                 }
-                else
-                {
-                    return cut.trim().equalsIgnoreCase(ref);
-                }
+                return cut.trim().equalsIgnoreCase(ref);
             }
         }
         return false;

@@ -112,10 +112,8 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
         {
             return super.getString(rs, param);
         }
-        else
-        {
-            return (String) getObject(rs, param);
-        }
+
+        return (String) getObject(rs, param);
     }
     
     public Object getObject(ResultSet rs, int param)
@@ -124,46 +122,44 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
         {
             return super.getObject(rs, param);
         }
-        else
+
+        Object value;
+
+        try
         {
-            Object value;
-            
-            try
+            Clob clob = rs.getClob(param);
+            if (!rs.wasNull())
             {
-                Clob clob = rs.getClob(param);
-                if (!rs.wasNull())
+                BufferedReader br = new BufferedReader(clob.getCharacterStream());
+                try
                 {
-                    BufferedReader br = new BufferedReader(clob.getCharacterStream());
-                    try
+                    int c;
+                    StringBuilder sb = new StringBuilder();
+                    while ((c = br.read()) != -1)
                     {
-                        int c;
-                        StringBuilder sb = new StringBuilder();
-                        while ((c = br.read()) != -1)
-                        {
-                            sb.append((char)c);
-                        }
-                        value = sb.toString(); 
+                        sb.append((char)c);
                     }
-                    finally
-                    {
-                        br.close();
-                    }
+                    value = sb.toString(); 
                 }
-                else
+                finally
                 {
-                    value = null;
+                    br.close();
                 }
             }
-            catch (SQLException e)
+            else
             {
-                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
+                value = null;
             }
-            catch (IOException e)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
-            }
-            
-            return value;
         }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
+        }
+        catch (IOException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("055002","Object", "" + param, column, e.getMessage()), e);
+        }
+
+        return value;
     }    
 }

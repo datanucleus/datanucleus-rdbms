@@ -592,24 +592,22 @@ public class RDBMSMappingManager implements MappingManager
                 // "supported" type yet no FCO mapping !
                 throw new NucleusUserException(Localiser.msg("041001", fieldName, javaType.getName()));
             }
-            else
+
+            Class superClass = javaType; // start in this class
+            while (superClass!=null && !superClass.getName().equals(ClassNameConstants.Object) && (mcd == null || mcd.mappingClass == null))
             {
-                Class superClass = javaType; // start in this class
-                while (superClass!=null && !superClass.getName().equals(ClassNameConstants.Object) && (mcd == null || mcd.mappingClass == null))
+                Class[] interfaces = superClass.getInterfaces();
+                for( int i=0; i<interfaces.length && (mcd == null || mcd.mappingClass == null); i++)
                 {
-                    Class[] interfaces = superClass.getInterfaces();
-                    for( int i=0; i<interfaces.length && (mcd == null || mcd.mappingClass == null); i++)
-                    {
-                        mcd = getDefaultJavaTypeMapping(interfaces[i], colmds);
-                    }
-                    superClass = superClass.getSuperclass();
+                    mcd = getDefaultJavaTypeMapping(interfaces[i], colmds);
                 }
-                if (mcd == null)
-                {
-                    //TODO if serialised == false, should we raise an exception?
-                    // Treat as serialised
-                    return new MappingConverterDetails(SerialisedMapping.class);
-                }
+                superClass = superClass.getSuperclass();
+            }
+            if (mcd == null)
+            {
+                //TODO if serialised == false, should we raise an exception?
+                // Treat as serialised
+                return new MappingConverterDetails(SerialisedMapping.class);
             }
         }
         return mcd;
@@ -640,14 +638,12 @@ public class RDBMSMappingManager implements MappingManager
                 throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() + 
                     " that has no join table defined for the collection/array").setFatal();
             }
-            else
+
+            if (refMmds[0].getJoinMetaData() == null)
             {
-                if (refMmds[0].getJoinMetaData() == null)
-                {
-                    // TODO Localise this
-                    throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() + 
+                // TODO Localise this
+                throw new NucleusException("Attempt to get element mapping for field " + mmd.getFullFieldName() + 
                         " that has no join table defined for the collection/array").setFatal();
-                }
             }
         }
 
@@ -1129,10 +1125,7 @@ public class RDBMSMappingManager implements MappingManager
                 {
                     return new MappingConverterDetails(TypeConverterMultiMapping.class, conv);
                 }
-                else
-                {
-                    return new MappingConverterDetails(TypeConverterMapping.class, conv);
-                }
+                return new MappingConverterDetails(TypeConverterMapping.class, conv);
             }
 
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("041000", javaType.getName()), new Exception());
@@ -1239,12 +1232,9 @@ public class RDBMSMappingManager implements MappingManager
         {
             return null;
         }
-        else
-        {
-            // Make sure we don't have a primitive in here
-            javaType = ClassUtils.getWrapperTypeNameForPrimitiveTypeName(javaType);
-        }
 
+        // Make sure we don't have a primitive in here
+        javaType = ClassUtils.getWrapperTypeNameForPrimitiveTypeName(javaType);
         RDBMSTypeMapping datastoreMapping = null;
         if (sqlType != null)
         {
@@ -1257,10 +1247,7 @@ public class RDBMSMappingManager implements MappingManager
                     {
                         throw new NucleusException(Localiser.msg("054001", javaType, sqlType, fieldName)).setFatal();
                     }
-                    else
-                    {
-                        throw new NucleusException(Localiser.msg("054000", javaType, sqlType)).setFatal();
-                    }
+                    throw new NucleusException(Localiser.msg("054000", javaType, sqlType)).setFatal();
                 }
 
                 if (fieldName != null)
@@ -1297,10 +1284,7 @@ public class RDBMSMappingManager implements MappingManager
                 {
                     throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
                 }
-                else
-                {
-                    throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
-                }
+                throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
             }
 
             // Find if this jdbc-type has been defined for this java-type
@@ -1321,10 +1305,7 @@ public class RDBMSMappingManager implements MappingManager
                 {
                     throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
                 }
-                else
-                {
-                    throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
-                }
+                throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
             }
         }
 
@@ -1381,14 +1362,9 @@ public class RDBMSMappingManager implements MappingManager
         {
             if (fieldName != null)
             {
-                throw new NucleusException(Localiser.msg("054005",
-                    javaType, jdbcType, sqlType, fieldName)).setFatal();
+                throw new NucleusException(Localiser.msg("054005", javaType, jdbcType, sqlType, fieldName)).setFatal();
             }
-            else
-            {
-                throw new NucleusException(Localiser.msg("054004",
-                    javaType, jdbcType, sqlType)).setFatal();
-            }
+            throw new NucleusException(Localiser.msg("054004", javaType, jdbcType, sqlType)).setFatal();
         }
         return datastoreMapping.getMappingType();
     }

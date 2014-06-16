@@ -193,10 +193,8 @@ public class InterfaceMapping extends ReferenceMapping
             }
             return null;
         }
-        else
-        {
-            // Normal persistence goes via MultiMapping.getObject()
-            return super.getObject(ec, rs, pos);
-        }
+
+        // Normal persistence goes via MultiMapping.getObject()
+        return super.getObject(ec, rs, pos);
     }
 }

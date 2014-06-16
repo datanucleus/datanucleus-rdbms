@@ -172,26 +172,26 @@ public class PoolingDriver implements Driver {
             ObjectPool pool = getConnectionPool(url.substring(URL_PREFIX_LEN));
             if(null == pool) {
                 throw new SQLException("No pool found for " + url + ".");
-            } else {
-                try {
-                    Connection conn = (Connection)(pool.borrowObject());
-                    if (conn != null) {
-                        conn = new PoolGuardConnectionWrapper(pool, conn);
-                    } 
-                    return conn;
-                } catch(SQLException e) {
-                    throw e;
-                } catch(NoSuchElementException e) {
-                    throw (SQLException) new SQLException("Cannot get a connection, pool error: " + e.getMessage()).initCause(e);
-                } catch(RuntimeException e) {
-                    throw e;
-                } catch(Exception e) {
-                    throw (SQLException) new SQLException("Cannot get a connection, general error: " + e.getMessage()).initCause(e);
-                }
             }
-        } else {
-            return null;
+
+            try {
+                Connection conn = (Connection)(pool.borrowObject());
+                if (conn != null) {
+                    conn = new PoolGuardConnectionWrapper(pool, conn);
+                } 
+                return conn;
+            } catch(SQLException e) {
+                throw e;
+            } catch(NoSuchElementException e) {
+                throw (SQLException) new SQLException("Cannot get a connection, pool error: " + e.getMessage()).initCause(e);
+            } catch(RuntimeException e) {
+                throw e;
+            } catch(Exception e) {
+                throw (SQLException) new SQLException("Cannot get a connection, general error: " + e.getMessage()).initCause(e);
+            }
         }
+
+        return null;
     }
 
     /**
@@ -477,9 +477,8 @@ public class PoolingDriver implements Driver {
         public Connection getDelegate() {
             if (isAccessToUnderlyingConnectionAllowed()) {
                 return super.getDelegate();
-            } else {
-                return null;
             }
+            return null;
         }
 
         /**
@@ -488,9 +487,8 @@ public class PoolingDriver implements Driver {
         public Connection getInnermostDelegate() {
             if (isAccessToUnderlyingConnectionAllowed()) {
                 return super.getInnermostDelegate();
-            } else {
-                return null;
             }
+            return null;
         }
     }
 

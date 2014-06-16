@@ -46,9 +46,6 @@ public class JPOXIdentifierFactory extends DNIdentifierFactory
 
             return identifier.substring(0, tailIndex) + suffix.substring(suffix.length() - 2);
         }
-        else
-        {
-            return identifier;
-        }
+        return identifier;
     }
 }

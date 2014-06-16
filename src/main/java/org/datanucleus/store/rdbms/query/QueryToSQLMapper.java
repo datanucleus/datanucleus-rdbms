@@ -2067,30 +2067,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
-                else
+
+                // Evaluate the cast
+                expr.getLeft().evaluate(this);
+                sqlExpr = stack.pop();
+
+                // Extract what we are casting it to
+                Literal castLitExpr = (Literal)expr.getLeft().getRight();
+                AbstractClassMetaData castCmd = ec.getMetaDataManager().getMetaDataForClass(resolveClass((String)castLitExpr.getLiteral()), clr);
+
+                SQLTableMapping tblMapping = new SQLTableMapping(sqlExpr.getSQLTable(), castCmd, sqlExpr.getJavaTypeMapping());
+                setSQLTableMappingForAlias(exprCastName, tblMapping);
+
+                SQLTableMapping sqlMapping =getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
+                if (sqlMapping == null)
                 {
-                    // Evaluate the cast
-                    expr.getLeft().evaluate(this);
-                    sqlExpr = stack.pop();
-
-                    // Extract what we are casting it to
-                    Literal castLitExpr = (Literal)expr.getLeft().getRight();
-                    AbstractClassMetaData castCmd =
-                        ec.getMetaDataManager().getMetaDataForClass(resolveClass((String)castLitExpr.getLiteral()), clr);
-
-                    SQLTableMapping tblMapping = new SQLTableMapping(sqlExpr.getSQLTable(), castCmd, sqlExpr.getJavaTypeMapping());
-                    setSQLTableMappingForAlias(exprCastName, tblMapping);
-
-                    SQLTableMapping sqlMapping =
-                        getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
-                    if (sqlMapping == null)
-                    {
-                        throw new NucleusException("PrimaryExpression " + expr + " is not yet supported");
-                    }
-                    sqlExpr = exprFactory.newExpression(stmt, sqlMapping.table, sqlMapping.mapping);
-                    stack.push(sqlExpr);
-                    return sqlExpr;
+                    throw new NucleusException("PrimaryExpression " + expr + " is not yet supported");
                 }
+                sqlExpr = exprFactory.newExpression(stmt, sqlMapping.table, sqlMapping.mapping);
+                stack.push(sqlExpr);
+                return sqlExpr;
             }
             else if (expr.getLeft() instanceof ParameterExpression)
             {
@@ -2108,42 +2104,38 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
-                else
+
+                // Create Literal for the parameter (since we need to perform operations on it)
+                processParameterExpression(paramExpr, true);
+                SQLExpression paramSqlExpr = stack.pop();
+                SQLLiteral lit = (SQLLiteral)paramSqlExpr;
+                Object paramValue = lit.getValue();
+
+                List<String> tuples = expr.getTuples();
+                Iterator<String> tuplesIter = tuples.iterator();
+                Object objValue = paramValue;
+                while (tuplesIter.hasNext())
                 {
-                    // Create Literal for the parameter (since we need to perform operations on it)
-                    processParameterExpression(paramExpr, true);
-                    SQLExpression paramSqlExpr = stack.pop();
-                    SQLLiteral lit = (SQLLiteral)paramSqlExpr;
-                    Object paramValue = lit.getValue();
-
-                    List<String> tuples = expr.getTuples();
-                    Iterator<String> tuplesIter = tuples.iterator();
-                    Object objValue = paramValue;
-                    while (tuplesIter.hasNext())
-                    {
-                        String fieldName = tuplesIter.next();
-                        objValue = getValueForObjectField(objValue, fieldName);
-                        setNotPrecompilable(); // Using literal value of parameter, so cannot precompile it
-                        if (objValue == null)
-                        {
-                            break;
-                        }
-                    }
-
+                    String fieldName = tuplesIter.next();
+                    objValue = getValueForObjectField(objValue, fieldName);
+                    setNotPrecompilable(); // Using literal value of parameter, so cannot precompile it
                     if (objValue == null)
                     {
-                        sqlExpr = exprFactory.newLiteral(stmt, null, null);
-                        stack.push(sqlExpr);
-                        return sqlExpr;
-                    }
-                    else
-                    {
-                        JavaTypeMapping m = exprFactory.getMappingForType(objValue.getClass(), false);
-                        sqlExpr = exprFactory.newLiteral(stmt, m, objValue);
-                        stack.push(sqlExpr);
-                        return sqlExpr;
+                        break;
                     }
                 }
+
+                if (objValue == null)
+                {
+                    sqlExpr = exprFactory.newLiteral(stmt, null, null);
+                    stack.push(sqlExpr);
+                    return sqlExpr;
+                }
+
+                JavaTypeMapping m = exprFactory.getMappingForType(objValue.getClass(), false);
+                sqlExpr = exprFactory.newLiteral(stmt, m, objValue);
+                stack.push(sqlExpr);
+                return sqlExpr;
             }
             else if (expr.getLeft() instanceof VariableExpression)
             {
@@ -2223,13 +2215,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
-                else
-                {
-                    // Join table!
-                    throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
-                        " on " + invokeSqlExpr +
-                        " with invoke having table of " + tbl);
-                }
+
+                // Join table!
+                throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
+                    " on " + invokeSqlExpr + " with invoke having table of " + tbl);
             }
             else
             {
@@ -3008,11 +2997,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             stack.push(subquerySqlExpr);
             return subquerySqlExpr;
         }
-        else
-        {
-            throw new NucleusException("Dont currently support SubqueryExpression " + keyword +
-                " for type " + subqueryExpr);
-        }
+
+        throw new NucleusException("Dont currently support SubqueryExpression " + keyword + " for type " + subqueryExpr);
     }
 
     /* (non-Javadoc)
@@ -3537,10 +3523,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
             return paramFieldValue;
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     protected SQLTableMapping getSQLTableMappingForAlias(String alias)
@@ -3553,10 +3536,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             return sqlTableByPrimary.get(alias.toUpperCase());
         }
-        else
-        {
-            return sqlTableByPrimary.get(alias);
-        }
+        return sqlTableByPrimary.get(alias);
     }
 
     public SQLTable getSQLTableForAlias(String alias)
@@ -3620,10 +3600,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             return sqlTableByPrimary.containsKey(alias.toUpperCase());
         }
-        else
-        {
-            return sqlTableByPrimary.containsKey(alias);
-        }
+        return sqlTableByPrimary.containsKey(alias);
     }
 
     /**
@@ -3641,11 +3618,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             throw new NucleusException("Variable " + varName + " is already bound to " + m.table +
                 " yet attempting to bind to " + sqlTbl);
         }
-        else
-        {
-            NucleusLogger.QUERY.debug("QueryToSQL.bindVariable variable " + varName + 
-                " being bound to table=" + sqlTbl + " mapping=" + mapping);
-        }
+
+        NucleusLogger.QUERY.debug("QueryToSQL.bindVariable variable " + varName + 
+            " being bound to table=" + sqlTbl + " mapping=" + mapping);
         m = new SQLTableMapping(sqlTbl, cmd, mapping);
         setSQLTableMappingForAlias(varName, m);
     }

@@ -52,10 +52,8 @@ public class EnumToStringMethod extends AbstractSQLMethod
             {
                 return enumExpr.getDelegate();
             }
-            else
-            {
-                throw new NucleusException("EnumExpression.toString is not supported when the enum is stored as a numeric");
-            }
+
+            throw new NucleusException("EnumExpression.toString is not supported when the enum is stored as a numeric");
         }
         else
         {

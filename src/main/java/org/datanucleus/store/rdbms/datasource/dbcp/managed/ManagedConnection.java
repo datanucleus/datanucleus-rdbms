@@ -68,12 +68,12 @@ public class ManagedConnection extends DelegatingConnection {
                     throw new SQLException("Connection can not be used while enlisted in another transaction");
                 }
                 return;
-            } else {
-                // transaction should have been cleared up by TransactionContextListener, but in
-                // rare cases another lister could have registered which uses the connection before
-                // our listener is called.  In that rare case, trigger the transaction complete call now
-                transactionComplete();
             }
+
+            // transaction should have been cleared up by TransactionContextListener, but in
+            // rare cases another lister could have registered which uses the connection before
+            // our listener is called.  In that rare case, trigger the transaction complete call now
+            transactionComplete();
         }
 
         // the existing transaction context ended (or we didn't have one), get the active transaction context
@@ -246,16 +246,14 @@ public class ManagedConnection extends DelegatingConnection {
     public Connection getDelegate() {
         if (isAccessToUnderlyingConnectionAllowed()) {
             return getDelegateInternal();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public Connection getInnermostDelegate() {
         if (isAccessToUnderlyingConnectionAllowed()) {
             return super.getInnermostDelegateInternal();
-        } else {
-            return null;
         }
+        return null;
     }
 }

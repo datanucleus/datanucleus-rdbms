@@ -35,10 +35,7 @@ public abstract class TemporalMapping extends SingleFieldMapping
         {
             return getDefaultLengthAsString();
         }
-        else
-        {
-            return super.getDefaultLength(index);
-        }
+        return super.getDefaultLength(index);
     }
 
     protected abstract int getDefaultLengthAsString();
@@ -56,9 +53,6 @@ public abstract class TemporalMapping extends SingleFieldMapping
             // Use String as our java type
             return ClassNameConstants.JAVA_LANG_STRING;
         }
-        else
-        {
-            return super.getJavaTypeForDatastoreMapping(index);
-        }
+        return super.getJavaTypeForDatastoreMapping(index);
     }
 }

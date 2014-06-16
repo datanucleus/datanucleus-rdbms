@@ -144,11 +144,9 @@ public class MapLiteral extends MapExpression implements SQLLiteral
                     JavaTypeMapping m = stmt.getRDBMSManager().getSQLExpressionFactory().getMappingForType(val.getClass(), false);
                     return new ObjectLiteral(stmt, m, val, null);
                 }
-                else
-                {
-                    // Don't support Map.get(SQLExpression)
-                    throw new IllegalExpressionOperationException(this, "get", argExpr);
-                }
+
+                // Don't support Map.get(SQLExpression)
+                throw new IllegalExpressionOperationException(this, "get", argExpr);
             }
 
             return super.invoke(methodName, args);

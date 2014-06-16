@@ -168,34 +168,32 @@ public class SchemaTable extends TableImpl
             // do not query non-existing schema table when DDL is only written to file
             return schema_data;
         }
-        else
+
+        SQLController sqlControl = storeMgr.getSQLController();
+        PreparedStatement ps = sqlControl.getStatementForQuery(conn, fetchAllStmt);
+        try
         {
-            SQLController sqlControl = storeMgr.getSQLController();
-            PreparedStatement ps = sqlControl.getStatementForQuery(conn, fetchAllStmt);
+            ResultSet rs = sqlControl.executeStatementQuery(null, conn, fetchAllStmt, ps);
             try
             {
-                ResultSet rs = sqlControl.executeStatementQuery(null, conn, fetchAllStmt, ps);
-                try
+                while (rs.next())
                 {
-                    while (rs.next())
-                    {
-                        StoreData data = new RDBMSStoreData(rs.getString(1), rs.getString(2), rs.getString(4).equals("1") ? true : false, 
-                                rs.getString(3).equals("FCO") ? StoreData.FCO_TYPE : StoreData.SCO_TYPE, rs.getString(6));
-                        schema_data.add(data);
-                    }
-                }
-                finally
-                {
-                    rs.close();
+                    StoreData data = new RDBMSStoreData(rs.getString(1), rs.getString(2), rs.getString(4).equals("1") ? true : false, 
+                            rs.getString(3).equals("FCO") ? StoreData.FCO_TYPE : StoreData.SCO_TYPE, rs.getString(6));
+                    schema_data.add(data);
                 }
             }
             finally
             {
-                sqlControl.closeStatement(conn, ps);
+                rs.close();
             }
-
-            return schema_data;
         }
+        finally
+        {
+            sqlControl.closeStatement(conn, ps);
+        }
+
+        return schema_data;
     }
 
     /**
@@ -268,34 +266,32 @@ public class SchemaTable extends TableImpl
         {
             return false;
         }
-        else
+
+        SQLController sqlControl = storeMgr.getSQLController();
+        PreparedStatement ps = sqlControl.getStatementForQuery(conn, fetchStmt);
+        try
         {
-            SQLController sqlControl = storeMgr.getSQLController();
-            PreparedStatement ps = sqlControl.getStatementForQuery(conn, fetchStmt);
+            int jdbc_id = 1;
+            tableMapping.setString(null, ps, MappingHelper.getMappingIndices(jdbc_id, tableMapping), data.getName());
+
+            ResultSet rs = sqlControl.executeStatementQuery(null, conn, fetchStmt, ps);
             try
             {
-                int jdbc_id = 1;
-                tableMapping.setString(null, ps, MappingHelper.getMappingIndices(jdbc_id, tableMapping), data.getName());
-
-                ResultSet rs = sqlControl.executeStatementQuery(null, conn, fetchStmt, ps);
-                try
+                if (rs.next())
                 {
-                    if (rs.next())
-                    {
-                        return true;
-                    }
-                }
-                finally
-                {
-                    rs.close();
+                    return true;
                 }
             }
             finally
             {
-                sqlControl.closeStatement(conn, ps);
+                rs.close();
             }
-            return false;
         }
+        finally
+        {
+            sqlControl.closeStatement(conn, ps);
+        }
+        return false;
     }
     
     /**

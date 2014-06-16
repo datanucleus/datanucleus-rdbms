@@ -46,35 +46,31 @@ public class StringStartsWith3Method extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
                 "StringExpression/CharacterExpression/Parameter"));
         }
-        else
-        {
-            // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-            ArrayList funcArgs = new ArrayList();
-            SQLExpression substrExpr = args.get(0);
-            if (!(substrExpr instanceof StringExpression) &&
+
+        // {stringExpr}.indexOf(strExpr1 [,numExpr2])
+        ArrayList funcArgs = new ArrayList();
+        SQLExpression substrExpr = args.get(0);
+        if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
                     "StringExpression/CharacterExpression/Parameter"));
-            }
-
-            SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
-            if (args.size() > 1)
-            {
-                SQLExpression numExpr = args.get(1);
-                funcArgs.add(substrExpr);
-                funcArgs.add(expr);
-                return new BooleanExpression(
-                    new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one.add(numExpr));
-            }
-            else
-            {
-                funcArgs.add(substrExpr);
-                funcArgs.add(expr);
-                return new BooleanExpression(
-                    new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one);
-            }
         }
+
+        SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
+        if (args.size() > 1)
+        {
+            SQLExpression numExpr = args.get(1);
+            funcArgs.add(substrExpr);
+            funcArgs.add(expr);
+            return new BooleanExpression(
+                new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one.add(numExpr));
+        }
+
+        funcArgs.add(substrExpr);
+        funcArgs.add(expr);
+        return new BooleanExpression(
+            new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one);
     }
 }

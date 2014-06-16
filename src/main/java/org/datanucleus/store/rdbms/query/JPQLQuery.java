@@ -186,21 +186,19 @@ public class JPQLQuery extends AbstractJPQLQuery
             // Don't need datastore compilation here since evaluating in-memory
             return compilation != null;
         }
-        else
+
+        // Need both to be present to say "compiled"
+        if (compilation == null || datastoreCompilation == null)
         {
-            // Need both to be present to say "compiled"
-            if (compilation == null || datastoreCompilation == null)
-            {
-                return false;
-            }
-            if (!datastoreCompilation.isPrecompilable())
-            {
-                NucleusLogger.GENERAL.info("Query compiled but not precompilable so ditching datastore compilation");
-                datastoreCompilation = null;
-                return false;
-            }
-            return true;
+            return false;
         }
+        if (!datastoreCompilation.isPrecompilable())
+        {
+            NucleusLogger.GENERAL.info("Query compiled but not precompilable so ditching datastore compilation");
+            datastoreCompilation = null;
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -520,13 +518,10 @@ public class JPQLQuery extends AbstractJPQLQuery
             {
                 return Collections.EMPTY_LIST;
             }
-            else
-            {
-                List candidates = new ArrayList(candidateCollection);
-                JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, 
-                    parameters, clr);
-                return resultMapper.execute(true, true, true, true, true);
-            }
+
+            List candidates = new ArrayList(candidateCollection);
+            JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, parameters, clr);
+            return resultMapper.execute(true, true, true, true, true);
         }
         else if (type == Query.SELECT)
         {

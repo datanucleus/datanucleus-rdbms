@@ -47,37 +47,33 @@ public class StringStartsWith2Method extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
                 "StringExpression/CharacterExpression/Parameter"));
         }
-        else
-        {
-            // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-            SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
-            ArrayList funcArgs = new ArrayList();
-            SQLExpression substrExpr = args.get(0);
-            if (!(substrExpr instanceof StringExpression) && 
+        // {stringExpr}.indexOf(strExpr1 [,numExpr2])
+        SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
+
+        ArrayList funcArgs = new ArrayList();
+        SQLExpression substrExpr = args.get(0);
+        if (!(substrExpr instanceof StringExpression) && 
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
                     "StringExpression/CharacterExpression/Parameter"));
-            }
-
-            if (args.size() == 2)
-            {
-                NumericExpression numExpr = (NumericExpression) args.get(1);
-                funcArgs.add(substrExpr);
-                funcArgs.add(expr);
-                return new BooleanExpression(
-                    new StringExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, 
-                        one.add(numExpr));
-            }
-            else
-            {
-                funcArgs.add(substrExpr);
-                funcArgs.add(expr);
-                return new BooleanExpression(
-                    new StringExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, one);
-            }
         }
+
+        if (args.size() == 2)
+        {
+            NumericExpression numExpr = (NumericExpression) args.get(1);
+            funcArgs.add(substrExpr);
+            funcArgs.add(expr);
+            return new BooleanExpression(
+                new StringExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, 
+                one.add(numExpr));
+        }
+
+        funcArgs.add(substrExpr);
+        funcArgs.add(expr);
+        return new BooleanExpression(
+            new StringExpression(stmt, getMappingForClass(int.class), "CHARINDEX", funcArgs), Expression.OP_EQ, one);
     }
 }

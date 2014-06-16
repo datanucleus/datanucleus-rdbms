@@ -223,9 +223,8 @@ public class PoolingDataSource implements DataSource {
             Connection innerCon = super.getInnermostDelegate();
             if (innerCon == null) {
                 return c == null;
-            } else {
-                return innerCon.equals(c);
             }
+            return innerCon.equals(c);
         }
         
         public boolean getAutoCommit() throws SQLException {
@@ -281,9 +280,8 @@ public class PoolingDataSource implements DataSource {
                 DelegatingConnection c = (DelegatingConnection) obj;
                 return c.innermostDelegateEquals(conn);
             }
-            else {
-                return conn.equals(obj);
-            }
+
+            return conn.equals(obj);
         }
 
         public boolean isReadOnly() throws SQLException {
@@ -419,9 +417,8 @@ public class PoolingDataSource implements DataSource {
         public Connection getDelegate() {
             if (isAccessToUnderlyingConnectionAllowed()) {
                 return super.getDelegate();
-            } else {
-                return null;
             }
+            return null;
         }
 
         /**
@@ -430,9 +427,8 @@ public class PoolingDataSource implements DataSource {
         public Connection getInnermostDelegate() {
             if (isAccessToUnderlyingConnectionAllowed()) {
                 return super.getInnermostDelegate();
-            } else {
-                return null;
             }
+            return null;
         }
     }
 

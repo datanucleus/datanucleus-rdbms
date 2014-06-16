@@ -45,10 +45,8 @@ public abstract class SimpleNumericMethod extends AbstractSQLMethod
             // Assume that we have something like "ABS({expr})"
             return new NumericExpression(stmt, getMappingForClass(getClassForMapping()), getFunctionName(), args);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
     }
 
     protected abstract Class getClassForMapping();

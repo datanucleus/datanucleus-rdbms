@@ -667,16 +667,14 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                     {
                         throw new NoQueryResultsException("No query results were returned");
                     }
-                    else
+
+                    Iterator qrIter = qr.iterator();
+                    Object firstRow = qrIter.next();
+                    if (qrIter.hasNext())
                     {
-                        Iterator qrIter = qr.iterator();
-                        Object firstRow = qrIter.next();
-                        if (qrIter.hasNext())
-                        {
-                            throw new QueryNotUniqueException();
-                        }
-                        return firstRow;
+                        throw new QueryNotUniqueException();
                     }
+                    return firstRow;
                 }
                 finally
                 {
@@ -687,10 +685,8 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                     }
                 }
             }
-            else
-            {
-                // Apply range?
-            }
+
+            // Apply range?
             return qr;
         }
         catch (SQLException sqle)

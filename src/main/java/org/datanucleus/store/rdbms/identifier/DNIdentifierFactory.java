@@ -388,35 +388,33 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             }
             return newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
         }
+
+        String baseName = null;
+        if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
+        {
+            String elementType = ownerFmd.getCollection().getElementType();
+            baseName = elementType.substring(elementType.lastIndexOf('.') + 1);
+        }
+        else if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
+        {
+            String elementType = ownerFmd.getArray().getElementType();
+            baseName = elementType.substring(elementType.lastIndexOf('.') + 1);
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_KEY)
+        {
+            String keyType = ownerFmd.getMap().getKeyType();
+            baseName = keyType.substring(keyType.lastIndexOf('.') + 1);
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
+        {
+            String valueType = ownerFmd.getMap().getValueType();
+            baseName = valueType.substring(valueType.lastIndexOf('.') + 1);
+        }
         else
         {
-            String baseName = null;
-            if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
-            {
-                String elementType = ownerFmd.getCollection().getElementType();
-                baseName = elementType.substring(elementType.lastIndexOf('.') + 1);
-            }
-            else if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
-            {
-                String elementType = ownerFmd.getArray().getElementType();
-                baseName = elementType.substring(elementType.lastIndexOf('.') + 1);
-            }
-            else if (fieldRole == FieldRole.ROLE_MAP_KEY)
-            {
-                String keyType = ownerFmd.getMap().getKeyType();
-                baseName = keyType.substring(keyType.lastIndexOf('.') + 1);
-            }
-            else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
-            {
-                String valueType = ownerFmd.getMap().getValueType();
-                baseName = valueType.substring(valueType.lastIndexOf('.') + 1);
-            }
-            else
-            {
-                baseName = "UNKNOWN";
-            }
-            return newColumnIdentifier(baseName, embedded, fieldRole, false);
+            baseName = "UNKNOWN";
         }
+        return newColumnIdentifier(baseName, embedded, fieldRole, false);
     }
 
     /**
@@ -448,22 +446,20 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                 throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
             }
         }
+
+        if (fieldRole == FieldRole.ROLE_OWNER)
+        {
+            // FK field (FK collection/array/list/map)
+            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
+        }
+        else if (fieldRole == FieldRole.ROLE_INDEX)
+        {
+            // Order field for FK (FK list)
+            return newColumnIdentifier(ownerFmd.getName() + "." + "INTEGER", embedded, fieldRole, false);
+        }
         else
         {
-            if (fieldRole == FieldRole.ROLE_OWNER)
-            {
-                // FK field (FK collection/array/list/map)
-                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
-            }
-            else if (fieldRole == FieldRole.ROLE_INDEX)
-            {
-                // Order field for FK (FK list)
-                return newColumnIdentifier(ownerFmd.getName() + "." + "INTEGER", embedded, fieldRole, false);
-            }
-            else
-            {
-                throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
-            }
+            throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
         }
     }
 

@@ -40,35 +40,33 @@ public class StringTrim3Method extends AbstractSQLMethod
         {
             throw new NucleusException("TRIM has incorrect number of args");
         }
+
+        // {stringExpr}.trim(trimChar)
+        SQLExpression trimCharExpr = null;
+        if (args != null && args.size() > 0)
+        {
+            trimCharExpr = args.get(0);
+        }
+
+        List trimArgs = new ArrayList();
+        if (trimCharExpr == null)
+        {
+            trimArgs.add(expr);
+        }
         else
         {
-            // {stringExpr}.trim(trimChar)
-            SQLExpression trimCharExpr = null;
-            if (args != null && args.size() > 0)
-            {
-                trimCharExpr = args.get(0);
-            }
-
-            List trimArgs = new ArrayList();
-            if (trimCharExpr == null)
-            {
-                trimArgs.add(expr);
-            }
-            else
-            {
-                StringExpression argExpr = new StringExpression(stmt, expr.getJavaTypeMapping(), "NULL", null);
-                SQLText sql = argExpr.toSQLText();
-                sql.clearStatement();
-                sql.append(getTrimSpecKeyword() + " ");
-                sql.append(trimCharExpr);
-                sql.append(" FROM ");
-                sql.append(expr);
-                trimArgs.add(argExpr);
-            }
-
-            StringExpression trimExpr = new StringExpression(stmt, expr.getJavaTypeMapping(), "TRIM", trimArgs);
-            return trimExpr;
+            StringExpression argExpr = new StringExpression(stmt, expr.getJavaTypeMapping(), "NULL", null);
+            SQLText sql = argExpr.toSQLText();
+            sql.clearStatement();
+            sql.append(getTrimSpecKeyword() + " ");
+            sql.append(trimCharExpr);
+            sql.append(" FROM ");
+            sql.append(expr);
+            trimArgs.add(argExpr);
         }
+
+        StringExpression trimExpr = new StringExpression(stmt, expr.getJavaTypeMapping(), "TRIM", trimArgs);
+        return trimExpr;
     }
 
     protected String getTrimSpecKeyword()

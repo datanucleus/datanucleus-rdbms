@@ -112,14 +112,12 @@ public class ExpressionUtils
         {
             return new StringLiteral(expr.getSQLStatement(), m, ((SQLLiteral)expr).getValue().toString(), null);            
         }
-        else
-        {
-            List args = new ArrayList();
-            args.add(expr);
-            List types = new ArrayList();
-            types.add("VARCHAR(4000)");
-            return new StringExpression(expr.getSQLStatement(), m, "CAST", args, types);
-        }
+
+        List args = new ArrayList();
+        args.add(expr);
+        List types = new ArrayList();
+        types.add("VARCHAR(4000)");
+        return new StringExpression(expr.getSQLStatement(), m, "CAST", args, types);
     }
 
     /**
@@ -141,10 +139,8 @@ public class ExpressionUtils
             }
             return exprFactory.newLiteral(patternExpr.getSQLStatement(), m, value);
         }
-        else
-        {
-            return patternExpr;
-        }
+
+        return patternExpr;
     }
 
     /**
@@ -346,10 +342,7 @@ public class ExpressionUtils
                 {
                     return (secondIsLiteral ? expr1.subExprs.getExpression(0).eq(oidLit) : expr2.subExprs.getExpression(0).eq(oidLit));
                 }
-                else
-                {
-                    return (secondIsLiteral ? expr1.subExprs.getExpression(0).ne(oidLit) : expr2.subExprs.getExpression(0).ne(oidLit));
-                }
+                return (secondIsLiteral ? expr1.subExprs.getExpression(0).ne(oidLit) : expr2.subExprs.getExpression(0).ne(oidLit));
             }
             else if (IdentityUtils.isSingleFieldIdentity(value))
             {
@@ -362,10 +355,7 @@ public class ExpressionUtils
                 {
                     return (secondIsLiteral ? expr1.subExprs.getExpression(0).eq(oidLit) : expr2.subExprs.getExpression(0).eq(oidLit));
                 }
-                else
-                {
-                    return (secondIsLiteral ? expr1.subExprs.getExpression(0).ne(oidLit) : expr2.subExprs.getExpression(0).ne(oidLit));
-                }
+                return (secondIsLiteral ? expr1.subExprs.getExpression(0).ne(oidLit) : expr2.subExprs.getExpression(0).ne(oidLit));
             }
             else
             {
@@ -489,20 +479,15 @@ public class ExpressionUtils
                             // It is arguable that we should compare the id with null (as below)
                             /*bExpr = expr.eq(new NullLiteral(qs));*/
                         }
-                        else
+
+                        Object objectIdKey = IdentityUtils.getTargetKeyForDatastoreIdentity(objectId);
+                        JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(objectIdKey.getClass(), false);
+                        SQLExpression oidExpr = exprFactory.newLiteral(stmt, m, objectIdKey);
+                        if (equals)
                         {
-                            Object objectIdKey = IdentityUtils.getTargetKeyForDatastoreIdentity(objectId);
-                            JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(objectIdKey.getClass(), false);
-                            SQLExpression oidExpr = exprFactory.newLiteral(stmt, m, objectIdKey);
-                            if (equals)
-                            {
-                                return source.eq(oidExpr);
-                            }
-                            else
-                            {
-                                return source.ne(oidExpr);
-                            }
+                            return source.eq(oidExpr);
                         }
+                        return source.ne(oidExpr);
                     }
                 }
                 else
@@ -518,12 +503,9 @@ public class ExpressionUtils
                             ExpressionUtils.getAppIdEqualityExpression(value, expr2, storeMgr, clr, cmd, null, null));
                         // TODO Allow for !equals
                     }
-                    else
-                    {
-                        // Value not persistable nor an identity, so return nothing "(1 = 0)"
-                        return exprFactory.newLiteral(stmt, expr1.mapping, false).eq(exprFactory.newLiteral(stmt, expr1.mapping, true));
-                        // TODO Allow for !equals
-                    }
+                    // Value not persistable nor an identity, so return nothing "(1 = 0)"
+                    return exprFactory.newLiteral(stmt, expr1.mapping, false).eq(exprFactory.newLiteral(stmt, expr1.mapping, true));
+                    // TODO Allow for !equals
                 }
             }
         }

@@ -603,10 +603,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 return (Table) sd.getTable();
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
         finally
         {
@@ -1307,7 +1304,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     /**
      * Release of resources
      */
-    public void close()
+    public synchronized void close()
     {
         dba = null;
         super.close();
@@ -1866,62 +1863,54 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     return RDBMSStoreHelper.getClassNameForIdUsingDiscriminator(this, ec, id, rootCmd);
                 }
-                else
-                {
-                    // Query using UNION
-                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                    {
-                        NucleusLogger.PERSISTENCE.debug("Performing query using UNION on " +
-                            rootCmd.getFullClassName() + " and its subclasses to find the class of " + id);
-                    }
-                    return RDBMSStoreHelper.getClassNameForIdUsingUnion(this, ec, id, rootCmds);
-                }
-            }
-            else
-            {
-                // Multiple possible roots so use UNION statement
+
+                // Query using UNION
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    StringBuilder str = new StringBuilder();
-                    Iterator<AbstractClassMetaData> rootCmdIter = rootCmds.iterator();
-                    while (rootCmdIter.hasNext())
-                    {
-                        AbstractClassMetaData cmd = rootCmdIter.next();
-                        str.append(cmd.getFullClassName());
-                        if (rootCmdIter.hasNext())
-                        {
-                            str.append(",");
-                        }
-                    }
                     NucleusLogger.PERSISTENCE.debug("Performing query using UNION on " +
-                        str.toString() + " and their subclasses to find the class of " + id);
+                            rootCmd.getFullClassName() + " and its subclasses to find the class of " + id);
                 }
                 return RDBMSStoreHelper.getClassNameForIdUsingUnion(this, ec, id, rootCmds);
             }
-        }
-        else
-        {
-            // Check not possible so just return the first root
-            if (rootCmds.size() > 1)
+
+            // Multiple possible roots so use UNION statement
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                StringBuilder str = new StringBuilder();
+                Iterator<AbstractClassMetaData> rootCmdIter = rootCmds.iterator();
+                while (rootCmdIter.hasNext())
                 {
-                    NucleusLogger.PERSISTENCE.debug("Id \""+id+"\" has been determined to be the id of class "+
+                    AbstractClassMetaData cmd = rootCmdIter.next();
+                    str.append(cmd.getFullClassName());
+                    if (rootCmdIter.hasNext())
+                    {
+                        str.append(",");
+                    }
+                }
+                NucleusLogger.PERSISTENCE.debug("Performing query using UNION on " +
+                        str.toString() + " and their subclasses to find the class of " + id);
+            }
+            return RDBMSStoreHelper.getClassNameForIdUsingUnion(this, ec, id, rootCmds);
+        }
+
+        // Check not possible so just return the first root
+        if (rootCmds.size() > 1)
+        {
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug("Id \""+id+"\" has been determined to be the id of class "+
                         rootCmd.getFullClassName() + " : this is the first of " + rootCmds.size() + " possible" +
                         ", but unable to determine further");
-                }
-                return rootCmd.getFullClassName();
             }
-            else
-            {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                {
-                    NucleusLogger.PERSISTENCE.debug("Id \""+id+"\" has been determined to be the id of class "+
-                        rootCmd.getFullClassName() + " : unable to determine if actually of a subclass");
-                }
-                return rootCmd.getFullClassName();
-            }
+            return rootCmd.getFullClassName();
         }
+
+        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+        {
+            NucleusLogger.PERSISTENCE.debug("Id \""+id+"\" has been determined to be the id of class "+
+                    rootCmd.getFullClassName() + " : unable to determine if actually of a subclass");
+        }
+        return rootCmd.getFullClassName();
     }
 
     public FieldManager getFieldManagerForResultProcessing(ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
@@ -2297,15 +2286,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 return "sequence";
             }
-            else
-            {
-                return "table-sequence"; // Maybe ought to use "increment"
-            }
+            return "table-sequence"; // Maybe ought to use "increment"
         }
-        else
-        {
-            return super.getStrategyForNative(cmd, absFieldNumber);
-        }
+        return super.getStrategyForNative(cmd, absFieldNumber);
     }
 
     /**
@@ -3246,10 +3229,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         throw (NucleusException)e;
                     }
-                    else
-                    {
-                        NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
-                    }
+                    NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
                     throw new NucleusException(e.toString(), e).setFatal();
                 }
                 finally

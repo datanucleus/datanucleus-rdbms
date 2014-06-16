@@ -294,10 +294,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
             mapStore.remove(op, key);
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     /**
@@ -378,12 +375,9 @@ class MapValueCollectionStore extends AbstractCollectionStore
                             // No ResultObjectFactory needed - handled by SetStoreIterator
                             return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
-                        else
-                        {
-                            rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null,
-                                        clr.classForName(elementType));
-                            return new CollectionStoreIterator(ownerOP, rs, rof, this);
-                        }
+
+                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally
                     {

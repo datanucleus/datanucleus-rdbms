@@ -157,10 +157,10 @@ public class StackKeyedObjectPool extends BaseKeyedObjectPool implements KeyedOb
             } else {
                 if(null == _factory) {
                     throw new NoSuchElementException("pools without a factory cannot create new objects as needed.");
-                } else {
-                    obj = _factory.makeObject(key);
-                    newlyMade = true;
-                }
+                } 
+
+                obj = _factory.makeObject(key);
+                newlyMade = true;
             }
             if (null != _factory && null != obj) {
                 try {
@@ -399,21 +399,21 @@ public class StackKeyedObjectPool extends BaseKeyedObjectPool implements KeyedOb
     private synchronized void destroyStack(Object key, Stack stack) {
         if(null == stack) {
             return;
-        } else {
-            if(null != _factory) {
-                Iterator it = stack.iterator();
-                while(it.hasNext()) {
-                    try {
-                        _factory.destroyObject(key,it.next());
-                    } catch(Exception e) {
-                        // ignore error, keep destroying the rest
-                    }
+        }
+
+        if(null != _factory) {
+            Iterator it = stack.iterator();
+            while(it.hasNext()) {
+                try {
+                    _factory.destroyObject(key,it.next());
+                } catch(Exception e) {
+                    // ignore error, keep destroying the rest
                 }
             }
-            _totIdle -= stack.size();
-            _activeCount.remove(key);
-            stack.clear();
         }
+        _totIdle -= stack.size();
+        _activeCount.remove(key);
+        stack.clear();
     }
 
     /**
@@ -463,10 +463,10 @@ public class StackKeyedObjectPool extends BaseKeyedObjectPool implements KeyedOb
     public synchronized void setFactory(KeyedPoolableObjectFactory factory) throws IllegalStateException {
         if(0 < getNumActive()) {
             throw new IllegalStateException("Objects are already active");
-        } else {
-            clear();
-            _factory = factory;
         }
+
+        clear();
+        _factory = factory;
     }
     
     /**

@@ -1173,9 +1173,8 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                                     }
                                 }
                                 throw new NoSuchElementException("Timeout waiting for idle object");
-                            } else {
-                                continue; // keep looping
                             }
+                            continue; // keep looping
                         default:
                             throw new IllegalArgumentException("whenExhaustedAction " + whenExhaustedAction +
                                     " not recognized.");
@@ -1234,9 +1233,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                        "Could not create a validated object, cause: " +
                             e.getMessage());
                 }
-                else {
-                    continue; // keep looping
-                }
+                continue; // keep looping
             }
         }
     }
@@ -1432,9 +1429,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             pool = (ObjectQueue)(_poolMap.remove(key));
             if (pool == null) {
                 return;
-            } else {
-                _poolList.remove(key);
-            }
+            } 
+
+            _poolList.remove(key);
             // Copy objects to new list so pool.queue can be cleared inside
             // the sync
             List objects = new ArrayList();
@@ -1770,26 +1767,26 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
             assertOpen();
             if (0 < getNumActive()) {
                 throw new IllegalStateException("Objects are already active");
-            } else {
-                for (Iterator it = _poolMap.keySet().iterator(); it.hasNext();) {
-                    Object key = it.next();
-                    ObjectQueue pool = (ObjectQueue)_poolMap.get(key);
-                    if (pool != null) {
-                        // Copy objects to new list so pool.queue can be cleared
-                        // inside the sync
-                        List objects = new ArrayList();
-                        objects.addAll(pool.queue);
-                        toDestroy.put(key, objects);
-                        it.remove();
-                        _poolList.remove(key);
-                        _totalIdle = _totalIdle - pool.queue.size();
-                        _totalInternalProcessing =
-                            _totalInternalProcessing + pool.queue.size();
-                        pool.queue.clear();
-                    }
-                }
-                _factory = factory;
             }
+
+            for (Iterator it = _poolMap.keySet().iterator(); it.hasNext();) {
+                Object key = it.next();
+                ObjectQueue pool = (ObjectQueue)_poolMap.get(key);
+                if (pool != null) {
+                    // Copy objects to new list so pool.queue can be cleared
+                    // inside the sync
+                    List objects = new ArrayList();
+                    objects.addAll(pool.queue);
+                    toDestroy.put(key, objects);
+                    it.remove();
+                    _poolList.remove(key);
+                    _totalIdle = _totalIdle - pool.queue.size();
+                    _totalInternalProcessing =
+                            _totalInternalProcessing + pool.queue.size();
+                    pool.queue.clear();
+                }
+            }
+            _factory = factory;
         }
         destroy(toDestroy, oldFactory);
     }
@@ -2113,9 +2110,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
     private synchronized int getNumTests() {
         if (_numTestsPerEvictionRun >= 0) {
             return Math.min(_numTestsPerEvictionRun, _totalIdle);
-        } else {
-            return(int)(Math.ceil(_totalIdle/Math.abs((double)_numTestsPerEvictionRun)));
         }
+
+        return(int)(Math.ceil(_totalIdle/Math.abs((double)_numTestsPerEvictionRun)));
     }
 
     /**
@@ -2274,10 +2271,9 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                 // make sure the natural ordering is consistent with equals
                 // see java.lang.Comparable Javadocs
                 return System.identityHashCode(this) - System.identityHashCode(other);
-            } else {
-                // handle int overflow
-                return (int)Math.min(Math.max(tstampdiff, Integer.MIN_VALUE), Integer.MAX_VALUE);
             }
+            // handle int overflow
+            return (int)Math.min(Math.max(tstampdiff, Integer.MIN_VALUE), Integer.MAX_VALUE);
         }
 
         /**

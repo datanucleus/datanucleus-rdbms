@@ -909,10 +909,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         {
             return typeInfo.getPrecision();
         }
-        else
-        {
-            return -1;
-        }
+
+        return -1;
     }
 
     /**
@@ -1323,10 +1321,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             String identifier = factory.getIdentifierInAdapterCase(pk.getName());
             return "ALTER TABLE " + pk.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + pk;
         }
-        else
-        {
-            return "ALTER TABLE " + pk.getTable().toString() + " ADD " + pk;
-        }
+
+        return "ALTER TABLE " + pk.getTable().toString() + " ADD " + pk;
     }
 
     /**
@@ -1348,10 +1344,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
             return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + ck;
         }
-        else
-        {
-            return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
-        }
+
+        return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
     }
 
     /**
@@ -1372,10 +1366,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             String identifier = factory.getIdentifierInAdapterCase(fk.getName());
             return "ALTER TABLE " + fk.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + fk;
         }
-        else
-        {
-            return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk;
-        }
+
+        return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk;
     }
 
     /**

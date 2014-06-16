@@ -80,9 +80,8 @@ public class DelegatingCallableStatement extends DelegatingPreparedStatement
             DelegatingCallableStatement s = (DelegatingCallableStatement) obj;
             return delegate.equals(s.getInnermostDelegate());
         }
-        else {
-            return delegate.equals(obj);
-        }
+
+        return delegate.equals(obj);
     }
 
     public void setDelegate(CallableStatement s) {

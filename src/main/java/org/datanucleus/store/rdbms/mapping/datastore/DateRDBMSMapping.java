@@ -132,16 +132,11 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
         {
             return null;
         }
-        else
+
+        if( getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
         {
-            if( getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
-            {
-                return new java.util.Date(value.getTime());
-            }
-            else
-            {
-                return value;
-            }
+            return new java.util.Date(value.getTime());
         }
+        return value;
     }
 }

@@ -91,9 +91,6 @@ public class SQLColumn
         {
             return column.applySelectFunction(str) + " AS " + alias;
         }
-        else
-        {
-            return column.applySelectFunction(str);
-        }
+        return column.applySelectFunction(str);
     }
 }

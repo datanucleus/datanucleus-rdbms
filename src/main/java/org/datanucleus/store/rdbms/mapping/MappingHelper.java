@@ -208,12 +208,10 @@ public class MappingHelper
             {
                 throw new NucleusException(Localiser.msg("041039")).setFatal();
             }
-            else
-            {
-                // Make sure the key type is correct for the type of SingleFieldIdentity
-                Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
-                idObj = ClassUtils.convertValue(idObj, keyType);
-            }
+
+            // Make sure the key type is correct for the type of SingleFieldIdentity
+            Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
+            idObj = ClassUtils.convertValue(idObj, keyType);
             return ec.getNucleusContext().getIdentityManager().getSingleFieldId(objectIdClass, pcClass, idObj);
         }
         catch (Exception e)

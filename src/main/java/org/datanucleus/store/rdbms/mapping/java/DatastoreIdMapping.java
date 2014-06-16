@@ -68,12 +68,10 @@ public class DatastoreIdMapping extends SingleFieldMapping
                         getDatastoreMapping(0).setObject(ps, param[0], null);
                         throw new NotYetFlushedException(value);
                     }
-                    else
-                    {
-                        // Object is not persist, nor in the process of being made persistent
-                        ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
-                        ec.flushInternal(false);
-                    }
+
+                    // Object is not persist, nor in the process of being made persistent
+                    ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
+                    ec.flushInternal(false);
                 }
                 id = api.getIdForObject(value);
             }

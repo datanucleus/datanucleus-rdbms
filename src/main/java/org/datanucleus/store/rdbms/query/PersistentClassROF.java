@@ -168,10 +168,8 @@ public final class PersistentClassROF implements ResultObjectFactory
                     NucleusLogger.DATASTORE_RETRIEVE.debug("Value of determiner column is null so assuming object is null");
                     return null;
                 }
-                else
-                {
-                    className = className.trim();
-                }
+
+                className = className.trim();
                 requiresInheritanceCheck = false;
             }
             catch (SQLException sqle)

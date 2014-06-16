@@ -446,22 +446,20 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
             }
         }
+
+        if (fieldRole == FieldRole.ROLE_OWNER)
+        {
+            // FK field (FK collection/array/list/map)
+            return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
+        }
+        else if (fieldRole == FieldRole.ROLE_INDEX)
+        {
+            // Order field for FK (FK list)
+            return newColumnIdentifier(ownerFmd.getName() + ".IDX", embedded, fieldRole, false);
+        }
         else
         {
-            if (fieldRole == FieldRole.ROLE_OWNER)
-            {
-                // FK field (FK collection/array/list/map)
-                return newColumnIdentifier(ownerFmd.getName() + "." + destinationId.getName(), embedded, fieldRole, false);
-            }
-            else if (fieldRole == FieldRole.ROLE_INDEX)
-            {
-                // Order field for FK (FK list)
-                return newColumnIdentifier(ownerFmd.getName() + ".IDX", embedded, fieldRole, false);
-            }
-            else
-            {
-                throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
-            }
+            throw new NucleusException("Column role " + fieldRole + " not supported by this method").setFatal();
         }
     }
 

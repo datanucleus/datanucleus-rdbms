@@ -98,31 +98,29 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
             }
             return newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
         }
+
+        String baseName = null;
+        if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
+        {
+            baseName = "ELEMENT";
+        }
+        else if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
+        {
+            baseName = "ELEMENT";
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_KEY)
+        {
+            baseName = "KEY";
+        }
+        else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
+        {
+            baseName = "VALUE";
+        }
         else
         {
-            String baseName = null;
-            if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
-            {
-                baseName = "ELEMENT";
-            }
-            else if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT)
-            {
-                baseName = "ELEMENT";
-            }
-            else if (fieldRole == FieldRole.ROLE_MAP_KEY)
-            {
-                baseName = "KEY";
-            }
-            else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
-            {
-                baseName = "VALUE";
-            }
-            else
-            {
-                baseName = "UNKNOWN";
-            }
-            return newColumnIdentifier(baseName);
+            baseName = "UNKNOWN";
         }
+        return newColumnIdentifier(baseName);
     }
 
     /**

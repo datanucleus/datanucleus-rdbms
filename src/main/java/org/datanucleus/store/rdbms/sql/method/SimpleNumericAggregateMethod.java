@@ -64,26 +64,24 @@ public abstract class SimpleNumericAggregateMethod extends AbstractSQLMethod
             JavaTypeMapping m = argExpr.getJavaTypeMapping();
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }
-        else
-        {
-            // Handle as Subquery "SELECT AVG(expr) FROM tbl"
-            SQLExpression argExpr = args.get(0);
-            SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
-                argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
-            subStmt.setClassLoaderResolver(clr);
 
-            JavaTypeMapping mapping =
+        // Handle as Subquery "SELECT AVG(expr) FROM tbl"
+        SQLExpression argExpr = args.get(0);
+        SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
+            argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
+        subStmt.setClassLoaderResolver(clr);
+
+        JavaTypeMapping mapping =
                 stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-            String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
-            SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
-            ((StringLiteral)aggExpr).generateStatementWithoutQuotes();
-            subStmt.select(aggExpr, null);
+        String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
+        SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
+        ((StringLiteral)aggExpr).generateStatementWithoutQuotes();
+        subStmt.select(aggExpr, null);
 
-            JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
-            SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
-            subqExpr.setJavaTypeMapping(subqMapping);
-            return subqExpr;
-        }
+        JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
+        SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
+        subqExpr.setJavaTypeMapping(subqMapping);
+        return subqExpr;
     }
 
     protected abstract Class getClassForMapping();

@@ -514,10 +514,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
             advanceToEndOfResultSet();
             return resultObjs.size();
         }
-        else
-        {
-            return super.getSizeUsingMethod();
-        }
+        return super.getSizeUsingMethod();
     }
 
     /**

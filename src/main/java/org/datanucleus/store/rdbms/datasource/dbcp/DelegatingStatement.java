@@ -85,9 +85,8 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
             DelegatingStatement s = (DelegatingStatement) obj;
             return delegate.equals(s.getInnermostDelegate());
         }
-        else {
-            return delegate.equals(obj);
-        }
+
+        return delegate.equals(obj);
     }
 
     public int hashCode() {

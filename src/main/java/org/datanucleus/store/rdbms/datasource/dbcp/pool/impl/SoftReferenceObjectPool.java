@@ -112,10 +112,10 @@ public class SoftReferenceObjectPool extends BaseObjectPool implements ObjectPoo
             if(_pool.isEmpty()) {
                 if(null == _factory) {
                     throw new NoSuchElementException();
-                } else {
-                    newlyCreated = true;
-                    obj = _factory.makeObject();
                 }
+
+                newlyCreated = true;
+                obj = _factory.makeObject();
             } else {
                 SoftReference ref = (SoftReference)(_pool.remove(_pool.size() - 1));
                 obj = ref.get();
@@ -315,10 +315,10 @@ public class SoftReferenceObjectPool extends BaseObjectPool implements ObjectPoo
         assertOpen();
         if(0 < getNumActive()) {
             throw new IllegalStateException("Objects are already active");
-        } else {
-            clear();
-            _factory = factory;
         }
+
+        clear();
+        _factory = factory;
     }
 
     /**

@@ -68,11 +68,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.add(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.add(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.add(this);
     }
 
     @Override
@@ -82,11 +80,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.eq(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.eq(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.eq(this);
     }
 
     @Override
@@ -96,11 +92,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.ge(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.lt(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.lt(this);
     }
 
     @Override
@@ -110,11 +104,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.gt(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.le(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.le(this);
     }
 
     @Override
@@ -124,11 +116,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.le(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.gt(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.gt(this);
     }
 
     @Override
@@ -138,11 +128,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.lt(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.ge(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.ge(this);
     }
 
     @Override
@@ -152,11 +140,9 @@ public class ParameterLiteral extends SQLExpression implements SQLLiteral
         {
             return super.ne(expr);
         }
-        else
-        {
-            // Swap it around since we don't know the type of this
-            return expr.ne(this);
-        }
+
+        // Swap it around since we don't know the type of this
+        return expr.ne(this);
     }
 
     /* (non-Javadoc)

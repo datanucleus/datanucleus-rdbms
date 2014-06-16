@@ -322,18 +322,15 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             if (name.equalsIgnoreCase("tables"))
             {
                 // Get all tables for the specified catalog/schema (value is catalog name, value2 is schema name)
-                return getRDBMSSchemaInfoForCatalogSchema((Connection)connection, (String)values[0], 
-                    (String)values[1]);
+                return getRDBMSSchemaInfoForCatalogSchema((Connection)connection, (String)values[0], (String)values[1]);
             }
             if (name.equalsIgnoreCase("column") && values[0] instanceof Table && values[1] instanceof String)
             {
                 // Get column info for specified column of a table (value is table, value2 is column name)
                 return getRDBMSColumnInfoForColumn((Connection)connection, (Table)values[0], (String)values[1]);
             }
-            else
-            {
-                return getSchemaData(connection, name, null);
-            }
+
+            return getSchemaData(connection, name, null);
         }
         else if (values.length == 3)
         {

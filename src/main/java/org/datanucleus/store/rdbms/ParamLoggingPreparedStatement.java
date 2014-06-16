@@ -105,25 +105,22 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         {
             return getStatementWithParamsReplacedForSubStatement(currentStatement);
         }
-        else
+
+        // Batched PreparedStatement
+        statementWithParams.append("BATCH [");
+        Iterator iter = subStatements.iterator();
+        while (iter.hasNext())
         {
-            // Batched PreparedStatement
-            statementWithParams.append("BATCH [");
-            Iterator iter = subStatements.iterator();
-            while (iter.hasNext())
+            SubStatement stParams = (SubStatement)iter.next();
+            String stmt = getStatementWithParamsReplacedForSubStatement(stParams);
+            statementWithParams.append(stmt);
+            if (iter.hasNext())
             {
-                SubStatement stParams = (SubStatement)iter.next();
-                String stmt = getStatementWithParamsReplacedForSubStatement(stParams);
-                
-                statementWithParams.append(stmt);
-                if (iter.hasNext())
-                {
-                    statementWithParams.append("; ");
-                }
+                statementWithParams.append("; ");
             }
-            statementWithParams.append("]");
-            return statementWithParams.toString();
         }
+        statementWithParams.append("]");
+        return statementWithParams.toString();
     }
 
     /**
@@ -161,10 +158,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         {
             return statementWithParams.toString();
         }
-        else
-        {
-            return stParams.statementText;
-        }
+        return stParams.statementText;
     }
 
     private void appendParamValue(StringBuilder statementWithParams, final Object paramValue)

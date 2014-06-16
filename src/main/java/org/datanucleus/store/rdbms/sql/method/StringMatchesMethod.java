@@ -114,19 +114,15 @@ public class StringMatchesMethod extends AbstractSQLMethod
                         likeExpr.getJavaTypeMapping(), converter.convert(pattern).toLowerCase());
                     return getBooleanLikeExpression(expr.invoke("toLowerCase", null), patternExpr, escapeExpr);
                 }
-                else
-                {
-                    SQLExpression patternExpr = exprFactory.newLiteral(stmt,
-                        likeExpr.getJavaTypeMapping(), converter.convert(pattern));
-                    return getBooleanLikeExpression(expr, patternExpr, escapeExpr);
-                }
-            }
-            else
-            {
+
                 SQLExpression patternExpr = exprFactory.newLiteral(stmt,
-                    likeExpr.getJavaTypeMapping(), pattern);
+                    likeExpr.getJavaTypeMapping(), converter.convert(pattern));
                 return getBooleanLikeExpression(expr, patternExpr, escapeExpr);
             }
+
+            SQLExpression patternExpr = exprFactory.newLiteral(stmt,
+                likeExpr.getJavaTypeMapping(), pattern);
+            return getBooleanLikeExpression(expr, patternExpr, escapeExpr);
         }
         else if (expr instanceof StringExpression)
         {

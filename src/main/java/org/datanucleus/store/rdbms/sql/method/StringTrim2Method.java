@@ -40,15 +40,12 @@ public class StringTrim2Method extends AbstractSQLMethod
             String val = (String)((StringLiteral)expr).getValue();
             return new StringLiteral(stmt, expr.getJavaTypeMapping(), val.trim(), null);
         }
-        else
-        {
-            ArrayList funcArgs = new ArrayList();
-            funcArgs.add(expr);
-            StringExpression strExpr =
-                new StringExpression(stmt, getMappingForClass(String.class), "RTRIM", funcArgs);
-            args.clear();
-            args.add(strExpr);
-            return new StringExpression(stmt, getMappingForClass(String.class), "LTRIM", args);
-        }
+
+        ArrayList funcArgs = new ArrayList();
+        funcArgs.add(expr);
+        StringExpression strExpr = new StringExpression(stmt, getMappingForClass(String.class), "RTRIM", funcArgs);
+        args.clear();
+        args.add(strExpr);
+        return new StringExpression(stmt, getMappingForClass(String.class), "LTRIM", args);
     }
 }

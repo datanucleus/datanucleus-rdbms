@@ -65,24 +65,21 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
              return getAggregateExpression(args, m);
         }
-        else
-        {
-            // Handle as Subquery "SELECT AVG(expr) FROM tbl"
-            SQLExpression argExpr = (SQLExpression)args.get(0);
-            SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
-                argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
-            subStmt.setClassLoaderResolver(clr);
 
-            JavaTypeMapping mapping =
-                stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-            SQLExpression aggExpr = getAggregateExpression(args, mapping);
-            subStmt.select(aggExpr, null);
+        // Handle as Subquery "SELECT AVG(expr) FROM tbl"
+        SQLExpression argExpr = (SQLExpression)args.get(0);
+        SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(),
+            argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
+        subStmt.setClassLoaderResolver(clr);
 
-            JavaTypeMapping subqMapping = exprFactory.getMappingForType(returnType, false);
-            SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
-            subqExpr.setJavaTypeMapping(subqMapping);
-            return subqExpr;
-        }
+        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        SQLExpression aggExpr = getAggregateExpression(args, mapping);
+        subStmt.select(aggExpr, null);
+
+        JavaTypeMapping subqMapping = exprFactory.getMappingForType(returnType, false);
+        SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
+        subqExpr.setJavaTypeMapping(subqMapping);
+        return subqExpr;
     }
 
     protected SQLExpression getAggregateExpression(List args, JavaTypeMapping m)

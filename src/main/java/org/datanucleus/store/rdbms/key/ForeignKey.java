@@ -246,10 +246,7 @@ public class ForeignKey extends Key
         {
             return foreignKeyDefinition.hashCode();
         }
-        else
-        {
-            return super.hashCode() ^ refColumns.hashCode();
-        }
+        return super.hashCode() ^ refColumns.hashCode();
     }
 
     public boolean equals(Object obj)
@@ -293,53 +290,51 @@ public class ForeignKey extends Key
             // User-provided definition
             return foreignKeyDefinition;
         }
-        else
+
+        StringBuilder s = new StringBuilder("FOREIGN KEY ");
+        s.append(getColumnList(columns));
+
+        // Referenced table
+        if (refTable != null)
         {
-            StringBuilder s = new StringBuilder("FOREIGN KEY ");
-            s.append(getColumnList(columns));
-
-            // Referenced table
-            if (refTable != null)
-            {
-                // Include the referenced column list because some RDBMS require it (e.g MySQL)
-                s.append(" REFERENCES ");
-                s.append(refTable.toString());
-                s.append(" ").append(getColumnList(refColumns));
-            }
-
-            // Delete action
-            if (deleteAction != null)
-            {
-                if ((deleteAction == FKAction.CASCADE && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_CASCADE)) ||
-                        (deleteAction == FKAction.RESTRICT && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_RESTRICT)) ||
-                        (deleteAction == FKAction.NULL && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_NULL)) ||
-                        (deleteAction == FKAction.DEFAULT && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_DEFAULT)))
-                {
-                    s.append(" ON DELETE ").append(deleteAction.toString());
-                }
-            }
-
-            // Update action
-            if (updateAction != null)
-            {
-                if ((updateAction == FKAction.CASCADE && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_CASCADE)) ||
-                        (updateAction == FKAction.RESTRICT && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_RESTRICT)) ||
-                        (updateAction == FKAction.NULL && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_NULL)) ||
-                        (updateAction == FKAction.DEFAULT && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_DEFAULT)))
-                {
-                    s.append(" ON UPDATE ").append(updateAction.toString());
-                }
-            }
-
-            // Deferral of constraints
-            if (initiallyDeferred && dba.supportsOption(DatastoreAdapter.DEFERRED_CONSTRAINTS))
-            {
-                s.append(" INITIALLY DEFERRED");
-            }
-
-            s.append(" ");
-
-            return s.toString();
+            // Include the referenced column list because some RDBMS require it (e.g MySQL)
+            s.append(" REFERENCES ");
+            s.append(refTable.toString());
+            s.append(" ").append(getColumnList(refColumns));
         }
+
+        // Delete action
+        if (deleteAction != null)
+        {
+            if ((deleteAction == FKAction.CASCADE && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_CASCADE)) ||
+                    (deleteAction == FKAction.RESTRICT && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_RESTRICT)) ||
+                    (deleteAction == FKAction.NULL && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_NULL)) ||
+                    (deleteAction == FKAction.DEFAULT && dba.supportsOption(DatastoreAdapter.FK_DELETE_ACTION_DEFAULT)))
+            {
+                s.append(" ON DELETE ").append(deleteAction.toString());
+            }
+        }
+
+        // Update action
+        if (updateAction != null)
+        {
+            if ((updateAction == FKAction.CASCADE && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_CASCADE)) ||
+                    (updateAction == FKAction.RESTRICT && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_RESTRICT)) ||
+                    (updateAction == FKAction.NULL && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_NULL)) ||
+                    (updateAction == FKAction.DEFAULT && dba.supportsOption(DatastoreAdapter.FK_UPDATE_ACTION_DEFAULT)))
+            {
+                s.append(" ON UPDATE ").append(updateAction.toString());
+            }
+        }
+
+        // Deferral of constraints
+        if (initiallyDeferred && dba.supportsOption(DatastoreAdapter.DEFERRED_CONSTRAINTS))
+        {
+            s.append(" INITIALLY DEFERRED");
+        }
+
+        s.append(" ");
+
+        return s.toString();
     }
 }

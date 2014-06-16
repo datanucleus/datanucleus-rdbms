@@ -202,24 +202,23 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
     public Object makeObject(Object obj) throws Exception {
         if(null == obj || !(obj instanceof PStmtKey)) {
             throw new IllegalArgumentException("Prepared statement key is null or invalid.");
-        } else {
-            PStmtKey key = (PStmtKey)obj;
-            if( null == key._resultSetType && null == key._resultSetConcurrency ) {
-                if (key._stmtType == STATEMENT_PREPAREDSTMT ) {
-                    return new PoolablePreparedStatement(getDelegate().prepareStatement( key._sql), key, _pstmtPool, this); 
-                } else {
-                    return new PoolableCallableStatement(getDelegate().prepareCall( key._sql), key, _pstmtPool, this);
-                }
-            } else { // Both _resultSetType and _resultSetConcurrency are non-null here (both or neither are set by constructors)
-                if(key._stmtType == STATEMENT_PREPAREDSTMT) {
-                    return new PoolablePreparedStatement(getDelegate().prepareStatement(
-                        key._sql, key._resultSetType.intValue(),key._resultSetConcurrency.intValue()), key, _pstmtPool, this);
-                } else {
-                    return new PoolableCallableStatement( getDelegate().prepareCall(
-                        key._sql,key._resultSetType.intValue(), key._resultSetConcurrency.intValue()), key, _pstmtPool, this);
-                }
+        } 
+
+        PStmtKey key = (PStmtKey)obj;
+        if( null == key._resultSetType && null == key._resultSetConcurrency ) {
+            if (key._stmtType == STATEMENT_PREPAREDSTMT ) {
+                return new PoolablePreparedStatement(getDelegate().prepareStatement( key._sql), key, _pstmtPool, this); 
             }
+            return new PoolableCallableStatement(getDelegate().prepareCall( key._sql), key, _pstmtPool, this);
         }
+
+        if(key._stmtType == STATEMENT_PREPAREDSTMT) {
+            return new PoolablePreparedStatement(getDelegate().prepareStatement(
+                key._sql, key._resultSetType.intValue(),key._resultSetConcurrency.intValue()), key, _pstmtPool, this);
+        }
+
+        return new PoolableCallableStatement( getDelegate().prepareCall(
+            key._sql,key._resultSetType.intValue(), key._resultSetConcurrency.intValue()), key, _pstmtPool, this);
     }
 
     public void destroyObject(Object key, Object obj) throws Exception {
@@ -246,9 +245,8 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
     public String toString() {
         if (_pstmtPool != null ) {
             return "PoolingConnection: " + _pstmtPool.toString();
-        } else {
-            return "PoolingConnection: null";
         }
+        return "PoolingConnection: null";
     }
 
     /**
@@ -329,8 +327,8 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
         public int hashCode() {
             if (_catalog==null)
                 return(null == _sql ? 0 : _sql.hashCode());
-            else
-                return(null == _sql ? _catalog.hashCode() : (_catalog + _sql).hashCode());
+
+            return(null == _sql ? _catalog.hashCode() : (_catalog + _sql).hashCode());
         }
 
         public String toString() {

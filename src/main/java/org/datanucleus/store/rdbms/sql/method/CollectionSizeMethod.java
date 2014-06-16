@@ -66,83 +66,79 @@ public class CollectionSizeMethod extends AbstractSQLMethod
             return exprFactory.newLiteral(stmt, exprFactory.getMappingForType(int.class, false),
                 Integer.valueOf(coll.size()));
         }
+
+        AbstractMemberMetaData mmd = expr.getJavaTypeMapping().getMemberMetaData();
+        if (mmd.isSerialized())
+        {
+            throw new NucleusUserException("Cannot perform Collection.size when the collection is being serialised");
+        }
+
+        ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
+        Class elementCls = clr.classForName(mmd.getCollection().getElementType());
+        if (!api.isPersistable(elementCls) && mmd.getJoinMetaData() == null)
+        {
+            throw new NucleusUserException(
+                "Cannot perform Collection.size when the collection<Non-Persistable> is not in a join table");
+        }
+
+        String elementType = mmd.getCollection().getElementType();
+        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+
+        // TODO Allow for interface elements, etc
+        JavaTypeMapping ownerMapping = null;
+        Table collectionTbl = null;
+        if (mmd.getMappedBy() != null)
+        {
+            // Bidirectional
+            AbstractMemberMetaData elementMmd = mmd.getRelatedMemberMetaData(clr)[0];
+            if (mmd.getJoinMetaData() != null || elementMmd.getJoinMetaData() != null)
+            {
+                // JoinTable
+                collectionTbl = storeMgr.getTable(mmd);
+                ownerMapping = ((JoinTable)collectionTbl).getOwnerMapping();
+            }
+            else
+            {
+                // ForeignKey
+                collectionTbl = storeMgr.getDatastoreClass(elementType, clr);
+                ownerMapping = collectionTbl.getMemberMapping(elementMmd);
+            }
+        }
         else
         {
-            AbstractMemberMetaData mmd = expr.getJavaTypeMapping().getMemberMetaData();
-            if (mmd.isSerialized())
+            // Unidirectional
+            if (mmd.getJoinMetaData() != null)
             {
-                throw new NucleusUserException("Cannot perform Collection.size when the collection is being serialised");
+                // JoinTable
+                collectionTbl = storeMgr.getTable(mmd);
+                ownerMapping = ((JoinTable)collectionTbl).getOwnerMapping();
             }
             else
             {
-                ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
-                Class elementType = clr.classForName(mmd.getCollection().getElementType());
-                if (!api.isPersistable(elementType) && mmd.getJoinMetaData() == null)
-                {
-                    throw new NucleusUserException(
-                        "Cannot perform Collection.size when the collection<Non-Persistable> is not in a join table");
-                }
+                // ForeignKey
+                collectionTbl = storeMgr.getDatastoreClass(elementType, clr);
+                ownerMapping = ((DatastoreClass)collectionTbl).getExternalMapping(mmd, 
+                    MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-
-            String elementType = mmd.getCollection().getElementType();
-            RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-
-            // TODO Allow for interface elements, etc
-            JavaTypeMapping ownerMapping = null;
-            Table collectionTbl = null;
-            if (mmd.getMappedBy() != null)
-            {
-                // Bidirectional
-                AbstractMemberMetaData elementMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                if (mmd.getJoinMetaData() != null || elementMmd.getJoinMetaData() != null)
-                {
-                    // JoinTable
-                    collectionTbl = storeMgr.getTable(mmd);
-                    ownerMapping = ((JoinTable)collectionTbl).getOwnerMapping();
-                }
-                else
-                {
-                    // ForeignKey
-                    collectionTbl = storeMgr.getDatastoreClass(elementType, clr);
-                    ownerMapping = collectionTbl.getMemberMapping(elementMmd);
-                }
-            }
-            else
-            {
-                // Unidirectional
-                if (mmd.getJoinMetaData() != null)
-                {
-                    // JoinTable
-                    collectionTbl = storeMgr.getTable(mmd);
-                    ownerMapping = ((JoinTable)collectionTbl).getOwnerMapping();
-                }
-                else
-                {
-                    // ForeignKey
-                    collectionTbl = storeMgr.getDatastoreClass(elementType, clr);
-                    ownerMapping = ((DatastoreClass)collectionTbl).getExternalMapping(mmd, 
-                        MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                }
-            }
-
-            SQLStatement subStmt = new SQLStatement(stmt, storeMgr, collectionTbl, null, null);
-            subStmt.setClassLoaderResolver(clr);
-            JavaTypeMapping mapping =
-                storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-            SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
-            ((StringLiteral)countExpr).generateStatementWithoutQuotes();
-            subStmt.select(countExpr, null);
-
-            SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt,
-                subStmt.getPrimaryTable(), ownerMapping);
-            SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),
-                expr.getSQLTable().getTable().getIdMapping());
-            subStmt.whereAnd(elementOwnerExpr.eq(ownerIdExpr), true);
-
-            JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
-            SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
-            subqExpr.setJavaTypeMapping(subqMapping);
-            return subqExpr;
         }
+
+        SQLStatement subStmt = new SQLStatement(stmt, storeMgr, collectionTbl, null, null);
+        subStmt.setClassLoaderResolver(clr);
+        JavaTypeMapping mapping =
+                storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
+        ((StringLiteral)countExpr).generateStatementWithoutQuotes();
+        subStmt.select(countExpr, null);
+
+        SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt,
+            subStmt.getPrimaryTable(), ownerMapping);
+        SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),
+            expr.getSQLTable().getTable().getIdMapping());
+        subStmt.whereAnd(elementOwnerExpr.eq(ownerIdExpr), true);
+
+        JavaTypeMapping subqMapping = exprFactory.getMappingForType(Integer.class, false);
+        SQLExpression subqExpr = new NumericSubqueryExpression(stmt, subStmt);
+        subqExpr.setJavaTypeMapping(subqMapping);
+        return subqExpr;
     }
 }

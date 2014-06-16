@@ -174,10 +174,8 @@ public class BooleanExpression extends SQLExpression
             {
                 return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
             }
-            else
-            {
-                return and(expr.not()).ior(not().and(expr));
-            }
+
+            return and(expr.not()).ior(not().and(expr));
         }
         else
         {
@@ -216,14 +214,10 @@ public class BooleanExpression extends SQLExpression
     {
         if (!hasClosure)
         {
-            return new BooleanExpression(this, Expression.OP_EQ, 
-                new BooleanLiteral(stmt, mapping, Boolean.FALSE, null));
-            
+            return new BooleanExpression(this, Expression.OP_EQ, new BooleanLiteral(stmt, mapping, Boolean.FALSE, null));
         }
-        else
-        {
-            return new BooleanExpression(Expression.OP_NOT, this);
-        }
+
+        return new BooleanExpression(Expression.OP_NOT, this);
     }
 
     public BooleanExpression eq(SQLExpression expr)
@@ -322,10 +316,8 @@ public class BooleanExpression extends SQLExpression
             return new BooleanExpression(new CharacterExpression(stmt, table, mapping), 
                 (not ? Expression.OP_NOTIN : Expression.OP_IN), expr);
         }
-        else
-        {
-            return new BooleanExpression(this, (not ? Expression.OP_NOTIN : Expression.OP_IN), expr);
-        }
+
+        return new BooleanExpression(this, (not ? Expression.OP_NOTIN : Expression.OP_IN), expr);
     }
 
     public SQLExpression invoke(String methodName, List args)

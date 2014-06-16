@@ -158,16 +158,14 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
                 {
                     throw new ValueGenerationException(Localiser.msg("040002"));
                 }
+
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
                 else
                 {
-                    if (number < 0)
-                    {
-                        block = reserveBlock();
-                    }
-                    else
-                    {
-                        block = reserveBlock(number);
-                    }
+                    block = reserveBlock(number);
                 }
             }
             finally

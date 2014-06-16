@@ -85,9 +85,7 @@ public class IndexFunction extends AbstractSQLMethod
 
             return new NumericExpression(stmt, orderTable, orderMapping);
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", "INDEX", ignore));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", "INDEX", ignore));
     }
 }

@@ -57,60 +57,56 @@ public class StringIndexOf5Method extends AbstractSQLMethod
             throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                 "StringExpression/CharacterExpression/ParameterLiteral"));
         }
-        else
-        {
-            // {stringExpr}.indexOf(strExpr1 [,numExpr2])
-            SQLExpression substrExpr = args.get(0);
-            if (!(substrExpr instanceof StringExpression) &&
+
+        // {stringExpr}.indexOf(strExpr1 [,numExpr2])
+        SQLExpression substrExpr = args.get(0);
+        if (!(substrExpr instanceof StringExpression) &&
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
-            {
-                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
+        {
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
-            }
-
-            ArrayList funcArgs = new ArrayList();
-            if (args.size() == 1)
-            {
-                // strExpr.indexOf(str1)
-                funcArgs.add(expr);
-                funcArgs.add(substrExpr);
-                SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
-                NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
-                return new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
-            }
-            else
-            {
-                // strExpr.indexOf(str1, pos)
-                SQLExpression fromExpr = args.get(1);
-                if (!(fromExpr instanceof NumericExpression))
-                {
-                    throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
-                        "NumericExpression"));
-                }
-
-                // Find the substring starting at this position
-                ArrayList substrArgs = new ArrayList(1);
-                substrArgs.add(fromExpr);
-                SQLExpression strExpr = exprFactory.invokeMethod(stmt, "java.lang.String", "substring", expr, substrArgs);
-
-                funcArgs.add(strExpr);
-                funcArgs.add(substrExpr);
-                NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
-
-                SQLExpression[] whenExprs = new SQLExpression[1];
-                NumericExpression zeroExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(0), null);
-                whenExprs[0] = locateExpr.gt(zeroExpr);
-
-                SQLExpression[] actionExprs = new SQLExpression[1];
-                SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
-                NumericExpression posExpr1 = new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
-                actionExprs[0] = new NumericExpression(posExpr1, Expression.OP_ADD, fromExpr);
-
-                SQLExpression elseExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(-1), null);
-
-                return new CaseExpression(whenExprs, actionExprs, elseExpr);
-            }
         }
+
+        ArrayList funcArgs = new ArrayList();
+        if (args.size() == 1)
+        {
+            // strExpr.indexOf(str1)
+            funcArgs.add(expr);
+            funcArgs.add(substrExpr);
+            SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
+            NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
+            return new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
+        }
+
+        // strExpr.indexOf(str1, pos)
+        SQLExpression fromExpr = args.get(1);
+        if (!(fromExpr instanceof NumericExpression))
+        {
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
+                    "NumericExpression"));
+        }
+
+        // Find the substring starting at this position
+        ArrayList substrArgs = new ArrayList(1);
+        substrArgs.add(fromExpr);
+        SQLExpression strExpr = exprFactory.invokeMethod(stmt, "java.lang.String", "substring", expr, substrArgs);
+
+        funcArgs.add(strExpr);
+        funcArgs.add(substrExpr);
+        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
+
+        SQLExpression[] whenExprs = new SQLExpression[1];
+        NumericExpression zeroExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(0), null);
+        whenExprs[0] = locateExpr.gt(zeroExpr);
+
+        SQLExpression[] actionExprs = new SQLExpression[1];
+        SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
+        NumericExpression posExpr1 = new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
+        actionExprs[0] = new NumericExpression(posExpr1, Expression.OP_ADD, fromExpr);
+
+        SQLExpression elseExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(-1), null);
+
+        return new CaseExpression(whenExprs, actionExprs, elseExpr);
     }
 }

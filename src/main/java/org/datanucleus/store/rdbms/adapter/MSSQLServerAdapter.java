@@ -214,28 +214,26 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
                 stmt.close();
             }
         }
-        else
-        {
-            /*
-             * As of version 7 there was no equivalent to the concept of "schema"
-             * in SQL Server.  For DatabaseMetaData functions that include
-             * SCHEMA_NAME drivers usually return the user name that owns the table.
-             *
-             * So the default ProbeTable method for determining the current schema
-             * just ends up returning the current user.  If we then use that name in
-             * performing metadata queries our results may get filtered down to just
-             * objects owned by that user.  So instead we report the schema name as
-             * null which should cause those queries to return everything.
-             * 
-             * DO not use the user name here, as in MSSQL, you are able to use
-             * an user name and access any schema.
-             * 
-             * Use an empty string, otherwise fullyqualified object name is invalid
-             * In MSSQL, fully qualified must include the object owner, or an empty owner
-             * <catalog>.<schema>.<object> e.g. mycatalog..mytable 
-             */
-            return "";
-        }
+
+        /*
+         * As of version 7 there was no equivalent to the concept of "schema"
+         * in SQL Server.  For DatabaseMetaData functions that include
+         * SCHEMA_NAME drivers usually return the user name that owns the table.
+         *
+         * So the default ProbeTable method for determining the current schema
+         * just ends up returning the current user.  If we then use that name in
+         * performing metadata queries our results may get filtered down to just
+         * objects owned by that user.  So instead we report the schema name as
+         * null which should cause those queries to return everything.
+         * 
+         * DO not use the user name here, as in MSSQL, you are able to use
+         * an user name and access any schema.
+         * 
+         * Use an empty string, otherwise fullyqualified object name is invalid
+         * In MSSQL, fully qualified must include the object owner, or an empty owner
+         * <catalog>.<schema>.<object> e.g. mycatalog..mytable 
+         */
+        return "";
     }
 
     /* (non-Javadoc)
@@ -306,10 +304,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
             // MSSQL doesnt support setting to 0
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     /**

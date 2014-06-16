@@ -596,12 +596,8 @@ public class FKArrayStore extends AbstractArrayStore
                         {
                             throw new NucleusException("Cannot have FK array with non-persistent objects");
                         }
-                        else
-                        {
-                            rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null,
-                                clr.classForName(elementType));
-                        }
 
+                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new ArrayStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

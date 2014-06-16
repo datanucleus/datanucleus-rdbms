@@ -65,12 +65,10 @@ public class JDOHelperGetVersionMethod extends AbstractSQLMethod
             {
                 return new NullLiteral(stmt, null, null, null);
             }
-            else
-            {
-                Object ver = stmt.getRDBMSManager().getApiAdapter().getVersionForObject(obj);
-                JavaTypeMapping m = getMappingForClass(ver.getClass());
-                return new ObjectLiteral(stmt, m, ver, null);
-            }
+
+            Object ver = stmt.getRDBMSManager().getApiAdapter().getVersionForObject(obj);
+            JavaTypeMapping m = getMappingForClass(ver.getClass());
+            return new ObjectLiteral(stmt, m, ver, null);
         }
         else if (ObjectExpression.class.isAssignableFrom(expr.getClass()))
         {
@@ -90,10 +88,8 @@ public class JDOHelperGetVersionMethod extends AbstractSQLMethod
                     {
                         return new NumericExpression(stmt, expr.getSQLTable(), mapping);
                     }
-                    else
-                    {
-                        return new TemporalExpression(stmt, expr.getSQLTable(), mapping);
-                    }
+
+                    return new TemporalExpression(stmt, expr.getSQLTable(), mapping);
                 }
 
                 throw new NucleusUserException("Dont currently support JDOHelper.getVersion(ObjectExpression) for expr=" + expr + " on table=" + expr.getSQLTable());

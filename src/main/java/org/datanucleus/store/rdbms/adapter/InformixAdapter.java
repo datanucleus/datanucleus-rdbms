@@ -137,12 +137,10 @@ public class InformixAdapter extends BaseDatastoreAdapter
             // Default in JPOX, but equates to int
             return "SELECT first 1 dbinfo('sqlca.sqlerrd1') from systables";
         }
-        else
-        {
-            // Default in DataNucleus, equating to long
-            // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
-            return "SELECT first 1 dbinfo('serial8') from systables";
-        }
+
+        // Default in DataNucleus, equating to long
+        // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
+        return "SELECT first 1 dbinfo('serial8') from systables";
     }
 
     /**
@@ -157,12 +155,10 @@ public class InformixAdapter extends BaseDatastoreAdapter
             // Default in JPOX, but equates to int
             return "SERIAL";
         }
-        else
-        {
-            // Default in DataNucleus, equating to long
-            // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
-            return "SERIAL8";
-        }
+
+        // Default in DataNucleus, equating to long
+        // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
+        return "SERIAL8";
     }
 
     /**
@@ -195,10 +191,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
             String identifier = factory.getIdentifierInAdapterCase(fk.getName());
             return "ALTER TABLE " + fk.getTable().toString() + " ADD CONSTRAINT" + ' ' + fk + ' ' + "CONSTRAINT" + ' ' + identifier;
         }
-        else
-        {
-            return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk;
-        }
+        return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk;
     }
     
     
@@ -221,10 +214,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
             return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT" + ' ' + ck + ' ' + "CONSTRAINT" + ' ' + identifier;
         }
-        else
-        {
-            return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
-        }
+        return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
     }
 
     /**

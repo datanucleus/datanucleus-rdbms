@@ -637,9 +637,8 @@ public class PoolableConnectionFactory implements PoolableObjectFactory {
             } catch(Exception e) {
                 return false;
             }
-        } else {
-            return false;
         }
+        return false;
     }
 
     public void validateConnection(Connection conn) throws SQLException {

@@ -83,10 +83,8 @@ public class MappedTypeManager
             }
             return false;
         }
-        else
-        {
-            return (type.javaMappingType != null);
-        }
+
+        return (type.javaMappingType != null);
     }
 
     /**
@@ -129,10 +127,8 @@ public class MappedTypeManager
                 return null;
             }
         }
-        else
-        {
-            return type.javaMappingType;
-        }
+
+        return type.javaMappingType;
     }
 
     /**

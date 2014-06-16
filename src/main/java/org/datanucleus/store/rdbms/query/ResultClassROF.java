@@ -660,10 +660,8 @@ public class ResultClassROF implements ResultObjectFactory
             // User has specified a result type for this column so use the specific getter
             return getter.getValue(rs, columnNumber);
         }
-        else
-        {
-            // User has specified Object/Object[] so just retrieve generically
-            return rs.getObject(columnNumber);
-        }
+
+        // User has specified Object/Object[] so just retrieve generically
+        return rs.getObject(columnNumber);
     }
 }

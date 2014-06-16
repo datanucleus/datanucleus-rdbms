@@ -317,10 +317,7 @@ public class SQLStatementHelper
                     {
                         return ClassUtils.getValueOfFieldByReflection(value, mmd.getName());
                     }
-                    else
-                    {
-                        return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
-                    }
+                    return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
                 }
                 position++;
             }

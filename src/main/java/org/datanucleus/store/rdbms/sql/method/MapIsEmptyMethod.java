@@ -53,12 +53,10 @@ public class MapIsEmptyMethod extends AbstractSQLMethod
             JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, false);
             return new BooleanLiteral(stmt, m, isEmpty ? Boolean.TRUE : Boolean.FALSE);
         }
-        else
-        {
-            SQLExpression sizeExpr = exprFactory.invokeMethod(stmt, Map.class.getName(), "size", expr, args);
-            JavaTypeMapping mapping = exprFactory.getMappingForType(Integer.class, true);
-            SQLExpression zeroExpr = exprFactory.newLiteral(stmt, mapping, 0);
-            return sizeExpr.eq(zeroExpr);
-        }
+
+        SQLExpression sizeExpr = exprFactory.invokeMethod(stmt, Map.class.getName(), "size", expr, args);
+        JavaTypeMapping mapping = exprFactory.getMappingForType(Integer.class, true);
+        SQLExpression zeroExpr = exprFactory.newLiteral(stmt, mapping, 0);
+        return sizeExpr.eq(zeroExpr);
     }
 }

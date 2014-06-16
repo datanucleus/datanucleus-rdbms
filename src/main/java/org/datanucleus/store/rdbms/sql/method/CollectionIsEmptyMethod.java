@@ -57,29 +57,23 @@ public class CollectionIsEmptyMethod extends AbstractSQLMethod
             JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, false);
             return new BooleanLiteral(stmt, m, isEmpty ? Boolean.TRUE : Boolean.FALSE);
         }
-        else
-        {
-            AbstractMemberMetaData mmd = ((CollectionExpression)expr).getJavaTypeMapping().getMemberMetaData();
-            if (mmd.isSerialized())
-            {
-                throw new NucleusUserException("Cannot perform Collection.isEmpty when the collection is being serialised");
-            }
-            else
-            {
-                ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
-                Class elementType = clr.classForName(mmd.getCollection().getElementType());
-                if (!api.isPersistable(elementType) && mmd.getJoinMetaData() == null)
-                {
-                    throw new NucleusUserException(
-                        "Cannot perform Collection.isEmpty when the collection<Non-Persistable> is not in a join table");
-                }
-            }
 
-            SQLExpression sizeExpr =
-                exprFactory.invokeMethod(stmt, Collection.class.getName(), "size", expr, args);
-            JavaTypeMapping mapping = exprFactory.getMappingForType(Integer.class, true);
-            SQLExpression zeroExpr = exprFactory.newLiteral(stmt, mapping, 0);
-            return sizeExpr.eq(zeroExpr);
+        AbstractMemberMetaData mmd = ((CollectionExpression)expr).getJavaTypeMapping().getMemberMetaData();
+        if (mmd.isSerialized())
+        {
+            throw new NucleusUserException("Cannot perform Collection.isEmpty when the collection is being serialised");
         }
+
+        ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
+        Class elementType = clr.classForName(mmd.getCollection().getElementType());
+        if (!api.isPersistable(elementType) && mmd.getJoinMetaData() == null)
+        {
+            throw new NucleusUserException("Cannot perform Collection.isEmpty when the collection<Non-Persistable> is not in a join table");
+        }
+
+        SQLExpression sizeExpr = exprFactory.invokeMethod(stmt, Collection.class.getName(), "size", expr, args);
+        JavaTypeMapping mapping = exprFactory.getMappingForType(Integer.class, true);
+        SQLExpression zeroExpr = exprFactory.newLiteral(stmt, mapping, 0);
+        return sizeExpr.eq(zeroExpr);
     }
 }

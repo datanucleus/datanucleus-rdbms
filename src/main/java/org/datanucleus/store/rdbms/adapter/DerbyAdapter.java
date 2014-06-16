@@ -241,10 +241,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
             return "CREATE UNIQUE INDEX " + identifier + " ON " + ck.getTable().toString() +
                 " " + ck.getColumnList();
         }
-        else
-        {
-            return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
-        }
+        return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
     }
 
 	/**

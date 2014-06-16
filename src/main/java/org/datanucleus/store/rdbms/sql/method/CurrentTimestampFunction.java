@@ -52,10 +52,8 @@ public class CurrentTimestampFunction extends AbstractSQLMethod
             dateExpr.toSQLText().append(getFunctionName());
             return dateExpr;
         }
-        else
-        {
-            throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
-        }
+
+        throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));
     }
 
     protected Class getClassForMapping()

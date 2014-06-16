@@ -243,10 +243,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             // Serialised into owner table
             return table;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     /**
@@ -260,11 +258,9 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             // Serialised into owner table
             return super.getNumberOfDatastoreMappings();
         }
-        else
-        {
-            // By default, we have no columns as such for the container
-            return 0;
-        }
+
+        // By default, we have no columns as such for the container
+        return 0;
     }
 
     /**
@@ -279,10 +275,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             // Serialised into owner table
             return super.getDatastoreMapping(index);
         }
-        else
-        {
-            throw new NoDatastoreMappingException(mmd.getName());
-        }
+
+        throw new NoDatastoreMappingException(mmd.getName());
     }
 
     /**
@@ -296,10 +290,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             // Serialised into owner table
             return super.getDatastoreMappings();
         }
-        else
-        {
-            throw new NoDatastoreMappingException(mmd.getName());
-        }
+
+        throw new NoDatastoreMappingException(mmd.getName());
     }
 
     /**
@@ -335,10 +327,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             {
                 return false; // Storable as byte array
             }
-            else
-            {
-                return true; // No join specified but serialised elements so serialise the field
-            }
+
+            return true; // No join specified but serialised elements so serialise the field
         }
         else
         {
