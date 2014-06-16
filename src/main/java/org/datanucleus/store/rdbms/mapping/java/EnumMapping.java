@@ -242,7 +242,7 @@ public class EnumMapping extends SingleFieldMapping
         try
         {
             Method getterMethod = ClassUtils.getMethodForClass(value.getClass(), methodName, null);
-            Number num = (Number)getterMethod.invoke(value, null);
+            Number num = (Number)getterMethod.invoke(value);
             return Long.valueOf(num.longValue());
         }
         catch (Exception e)

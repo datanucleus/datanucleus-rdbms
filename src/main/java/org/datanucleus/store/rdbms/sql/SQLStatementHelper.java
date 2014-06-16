@@ -290,8 +290,7 @@ public class SQLStatementHelper
             }
             else
             {
-                memberValue = ClassUtils.getValueOfMethodByReflection(value,
-                    ClassUtils.getJavaBeanGetterName(mmd.getName(), false), null);
+                memberValue = ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
             }
 
             if (storeMgr.getApiAdapter().isPersistable(mmd.getType()))
@@ -320,8 +319,7 @@ public class SQLStatementHelper
                     }
                     else
                     {
-                        return ClassUtils.getValueOfMethodByReflection(value,
-                            ClassUtils.getJavaBeanGetterName(mmd.getName(), false), null);
+                        return ClassUtils.getValueOfMethodByReflection(value, ClassUtils.getJavaBeanGetterName(mmd.getName(), false));
                     }
                 }
                 position++;

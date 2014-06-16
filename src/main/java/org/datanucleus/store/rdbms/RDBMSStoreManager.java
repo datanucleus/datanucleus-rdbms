@@ -1284,7 +1284,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         jdbcTypeNumber = Short.valueOf(jdbcTypeStr).shortValue();
                     }
-                    catch (NumberFormatException nfe) { };
+                    catch (NumberFormatException nfe) { }
 
                     String typeName = dba.getNameForJDBCType(jdbcTypeNumber);
                     if (typeName == null)

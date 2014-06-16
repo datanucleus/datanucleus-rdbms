@@ -695,7 +695,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     protected Object getObjectForReferenceString(ExecutionContext ec, String refString)
     {
         int sepPos = refString.indexOf(':');
-        String refDefiner = refString.substring(0, sepPos);;
+        String refDefiner = refString.substring(0, sepPos);
         String refClassName = null;
         String refId = refString.substring(sepPos+1);
         AbstractClassMetaData refCmd = null;
