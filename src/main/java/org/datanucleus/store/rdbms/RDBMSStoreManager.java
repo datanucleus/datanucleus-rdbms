@@ -1572,7 +1572,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
         finally
         {
-            mconn.release();
+            if (mconn != null)
+            {
+                mconn.release();
+            }
         }
 
         return serverDate;

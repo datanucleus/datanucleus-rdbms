@@ -298,8 +298,7 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
                 // Single candidate
                 if (!Modifier.isAbstract(candidateType.getModifiers()))
                 {
-                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt,
-                        candidateType.getName(), dismd, discMapping, discrimSqlTbl, clr);
+                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, candidateType.getName(), dismd, discMapping, discrimSqlTbl, clr);
                 }
                 if (includeSubclasses)
                 {
@@ -364,11 +363,8 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
             // Multi-tenancy restriction
             JavaTypeMapping tenantMapping = candidateTable.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), null);
-            SQLExpression tenantExpr = 
-                stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = 
-                stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 

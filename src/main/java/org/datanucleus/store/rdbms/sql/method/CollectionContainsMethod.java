@@ -141,21 +141,31 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
             // Return "elem == val1 || elem == val2 || elem == val3 ..."
             BooleanExpression bExpr = null;
-            for (int i=0; i<collElementExprs.size(); i++)
+            if (collElementExprs != null)
             {
-                if (bExpr == null)
+                for (int i=0; i<collElementExprs.size(); i++)
                 {
-                    bExpr = (collElementExprs.get(i)).eq(elemExpr); 
-                }
-                else
-                {
-                    bExpr = bExpr.ior((collElementExprs.get(i)).eq(elemExpr)); 
+                    if (bExpr == null)
+                    {
+                        bExpr = (collElementExprs.get(i)).eq(elemExpr); 
+                    }
+                    else
+                    {
+                        bExpr = bExpr.ior((collElementExprs.get(i)).eq(elemExpr)); 
+                    }
                 }
             }
-            bExpr.encloseInParentheses();
+            if (bExpr != null)
+            {
+                bExpr.encloseInParentheses();
+            }
             return bExpr;
         }
 
+        if (mmd == null)
+        {
+            throw new NucleusUserException("Cannot perform Collection.contains when the field metadata is not provided");
+        }
         if (mmd.isSerialized())
         {
             throw new NucleusUserException("Cannot perform Collection.contains when the collection is being serialised");

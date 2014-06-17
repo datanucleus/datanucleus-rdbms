@@ -162,7 +162,7 @@ public class BasicManagedDataSource extends BasicDataSource {
         return xaConnectionFactory;
     }
 
-    protected void createDataSourceInstance() throws SQLException {
+    protected void createDataSourceInstance() {
         PoolingDataSource pds = new ManagedDataSource(connectionPool, transactionRegistry);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         pds.setLogWriter(logWriter);

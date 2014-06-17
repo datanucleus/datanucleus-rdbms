@@ -679,10 +679,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                 finally
                 {
                     // can close results right now because we don't return it
-                    if (qr != null)
-                    {
-                        close(qr);
-                    }
+                    close(qr);
                 }
             }
 

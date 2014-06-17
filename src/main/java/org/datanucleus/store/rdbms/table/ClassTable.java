@@ -1337,6 +1337,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     }
                                     ownerClassName = ownerParentCmds[0].getFullClassName();
                                     ownerTbl = storeMgr.getDatastoreClass(ownerClassName, clr);
+                                    if (ownerTbl == null)
+                                    {
+                                        throw new NucleusException("Failed to get owner table at other end of relation for field=" + ownerFmd.getFullFieldName());
+                                    }
                                 }
 
                                 JavaTypeMapping ownerIdMapping = ownerTbl.getIdMapping();
@@ -2385,7 +2389,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             for (int i=0;i<sourceCols.size();i++)
             {
                 Column source = (Column)sourceCols.get(i);
-                String targetColName = colmds[i].getTarget();
+                String targetColName = (colmds != null && colmds[i] != null) ? colmds[i].getTarget() : null;
                 Column target = (Column)targetCols.get(i); // Default to matching via the natural order
                 if (targetColName != null)
                 {

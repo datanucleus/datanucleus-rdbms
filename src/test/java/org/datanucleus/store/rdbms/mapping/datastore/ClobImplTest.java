@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 
 public class ClobImplTest extends TestCase
 {
-    public void testNull() throws SQLException, IOException
+    public void testNull() throws IOException
     {
         try
         {

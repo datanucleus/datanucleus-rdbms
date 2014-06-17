@@ -1032,11 +1032,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     {
                         if (fpMmd.hasCollection())
                         {
-                            if (multifetchType != null && multifetchType.equalsIgnoreCase("none"))
-                            {
-                                NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query");
-                            }
-                            else if (SCOUtils.collectionHasSerialisedElements(fpMmd))
+                            if (SCOUtils.collectionHasSerialisedElements(fpMmd))
                             {
                                 // Ignore collections serialised into the owner (retrieved in main query)
                             }

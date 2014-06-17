@@ -1449,6 +1449,10 @@ public class FKListStore extends AbstractListStore
                     sqlStmt.union(subStmt);
                 }
             }
+            if (sqlStmt == null)
+            {
+                throw new NucleusException("Unable to generate iterator statement for field=" + getOwnerMemberMetaData().getFullFieldName());
+            }
         }
 
         if (addRestrictionOnOwner)

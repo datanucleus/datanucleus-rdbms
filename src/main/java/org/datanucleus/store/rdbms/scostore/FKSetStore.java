@@ -528,7 +528,7 @@ public class FKSetStore extends AbstractSetStore
             }
         }
         int fieldNumInElement = getFieldNumberInElementForBidirectional(elementOP);
-        if (fieldNumInElement >= 0)
+        if (fieldNumInElement >= 0 && elementOP != null)
         {
             // Managed Relations : 1-N bidir, so update the owner of the element
             elementOP.isLoaded(fieldNumInElement); // Ensure is loaded
@@ -1163,8 +1163,7 @@ public class FKSetStore extends AbstractSetStore
             }
             else
             {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
-                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
             }
             iterateUsingDiscriminator = true;
 
@@ -1230,13 +1229,16 @@ public class FKSetStore extends AbstractSetStore
                     sqlStmt.union(subStmt);
                 }
             }
+            if (sqlStmt == null)
+            {
+                throw new NucleusException("Unable to generate iterator statement for field " + getOwnerMemberMetaData().getFullFieldName());
+            }
         }
 
         if (addRestrictionOnOwner)
         {
             // Apply condition to filter by owner
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);

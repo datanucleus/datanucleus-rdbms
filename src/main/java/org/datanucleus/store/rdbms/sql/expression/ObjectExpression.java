@@ -304,7 +304,7 @@ public class ObjectExpression extends SQLExpression
                         subExprs.getExpression(i).eq(((ObjectExpression)expr).subExprs.getExpression(i));
                     bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
                 }
-                return new BooleanExpression(Expression.OP_NOT, bExpr.encloseInParentheses());
+                return new BooleanExpression(Expression.OP_NOT, bExpr != null ? bExpr.encloseInParentheses() : null);
             }
 
             // Comparison with parameter, so just give boolean compare
@@ -317,7 +317,7 @@ public class ObjectExpression extends SQLExpression
                 BooleanExpression subexpr = expr.eq(subExprs.getExpression(i));
                 bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
             }
-            return new BooleanExpression(Expression.OP_NOT, bExpr.encloseInParentheses());
+            return new BooleanExpression(Expression.OP_NOT, bExpr != null ? bExpr.encloseInParentheses() : null);
         }
         else if (literalIsValidForSimpleComparison(expr))
         {
@@ -737,9 +737,7 @@ public class ObjectExpression extends SQLExpression
                     {
                         continue;
                     }
-                    BooleanExpression discExprSub =
-                        SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName,
-                            dismd, discMapping, discSqlTbl, clr);
+                    BooleanExpression discExprSub = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discSqlTbl, clr);
                     if (discExpr != null)
                     {
                         multiplePossibles = true;
@@ -750,11 +748,11 @@ public class ObjectExpression extends SQLExpression
                         discExpr = discExprSub;
                     }
                 }
-                if (multiplePossibles)
+                if (multiplePossibles && discExpr != null)
                 {
                     discExpr.encloseInParentheses();
                 }
-                return (not ? discExpr.not() : discExpr);
+                return ((not && discExpr!=null) ? discExpr.not() : discExpr);
             }
 
             // Join to member table

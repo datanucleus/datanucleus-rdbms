@@ -1290,8 +1290,11 @@ public class SQLStatement
                         discrimCondition = discrimCondition.ior(condition);
                     }
                 }
-                discrimCondition.encloseInParentheses();
-                joinCondition = joinCondition.and(discrimCondition);
+                if (discrimCondition != null)
+                {
+                    discrimCondition.encloseInParentheses();
+                    joinCondition = joinCondition.and(discrimCondition);
+                }
             }
         }
         return joinCondition;

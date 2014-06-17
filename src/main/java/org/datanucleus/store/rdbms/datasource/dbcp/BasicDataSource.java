@@ -1217,7 +1217,7 @@ public class BasicDataSource implements DataSource {
         connectionPool = gop;
     }
 
-    protected void createDataSourceInstance() throws SQLException {
+    protected void createDataSourceInstance() {
         PoolingDataSource pds = new PoolingDataSource(connectionPool);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         pds.setLogWriter(logWriter);

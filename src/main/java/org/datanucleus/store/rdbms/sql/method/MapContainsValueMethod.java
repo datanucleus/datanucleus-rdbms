@@ -100,7 +100,10 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                     bExpr = bExpr.ior((elementExprs.get(i)).eq(valExpr)); 
                 }
             }
-            bExpr.encloseInParentheses();
+            if (bExpr != null)
+            {
+                bExpr.encloseInParentheses();
+            }
             return bExpr;
         }
 

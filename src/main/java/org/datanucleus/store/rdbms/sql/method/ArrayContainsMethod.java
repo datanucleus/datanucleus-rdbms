@@ -98,7 +98,10 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                     bExpr = bExpr.ior(arrElemExpr.eq(elemExpr)); 
                 }
             }
-            bExpr.encloseInParentheses();
+            if (bExpr != null)
+            {
+                bExpr.encloseInParentheses();
+            }
             return bExpr;
         }
         else if (arrExpr.getElementExpressions() != null)
@@ -124,7 +127,10 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                     bExpr = bExpr.ior(arrElemExpr.eq(elemExpr)); 
                 }
             }
-            bExpr.encloseInParentheses();
+            if (bExpr != null)
+            {
+                bExpr.encloseInParentheses();
+            }
             return bExpr;
         }
         else

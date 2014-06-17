@@ -101,7 +101,10 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                     bExpr = bExpr.ior((elementExprs.get(i)).eq(keyExpr)); 
                 }
             }
-            bExpr.encloseInParentheses();
+            if (bExpr != null)
+            {
+                bExpr.encloseInParentheses();
+            }
             return bExpr;
         }
 

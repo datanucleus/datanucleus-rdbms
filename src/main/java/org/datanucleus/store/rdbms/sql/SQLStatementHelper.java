@@ -765,8 +765,7 @@ public class SQLStatementHelper
                         List discValueList = null;
                         for (int i=0;i<clsNames.length;i++)
                         {
-                            List values = getDiscriminatorValuesForMember(clsNames[i],
-                                relatedDiscrimMapping, storeMgr, clr);
+                            List values = getDiscriminatorValuesForMember(clsNames[i], relatedDiscrimMapping, storeMgr, clr);
                             if (discValueList == null)
                             {
                                 discValueList = values;
@@ -776,7 +775,10 @@ public class SQLStatementHelper
                                 discValueList.addAll(values);
                             }
                         }
-                        discrimValues = discValueList.toArray(new Object[discValueList.size()]);
+                        if (discValueList != null)
+                        {
+                            discrimValues = discValueList.toArray(new Object[discValueList.size()]);
+                        }
                     }
                     else if (relatedTbl != relatedMapping.getTable())
                     {
@@ -788,8 +790,7 @@ public class SQLStatementHelper
                     if (relatedTypeMapping == null)
                     {
                         // Join the 1-1 relation
-                        relatedSqlTbl = addJoinForOneToOneRelation(stmt,
-                            sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
+                        relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
                             relatedMapping, relatedTbl, null, discrimValues, tableGroupName, null);
 
                         // Select the id mapping in the related table
