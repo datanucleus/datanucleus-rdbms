@@ -238,8 +238,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
                 if (keyIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), 
-                        keyIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(keyVarName, null, keyIdExpr.getSQLTable(), keyIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -261,15 +260,13 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(),
-                valTbl, null, ownerMapping, null, null);
+            SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
 
             SQLExpression valIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getIdMapping());
             if (valIsUnbound)
             {
                 // Bind the variable in the QueryGenerator
-                stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), 
-                    valIdExpr.getJavaTypeMapping());
+                stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), valIdExpr.getJavaTypeMapping());
             }
             else
             {
@@ -280,18 +277,15 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             if (keyCmd != null)
             {
                 // Add inner join to key table
-                AbstractMemberMetaData valKeyMmd =
-                    valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
+                AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                SQLTable keySqlTbl = stmt.innerJoin(valSqlTbl, valTbl.getMemberMapping(valKeyMmd),
-                    keyTbl, null, keyTbl.getIdMapping(), null, null);
+                SQLTable keySqlTbl = stmt.innerJoin(valSqlTbl, valTbl.getMemberMapping(valKeyMmd), keyTbl, null, keyTbl.getIdMapping(), null, null);
 
                 SQLExpression keyIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
                 if (keyIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), 
-                        keyIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), keyIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -301,15 +295,12 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                AbstractMemberMetaData valKeyMmd =
-                    valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
-                SQLExpression keyIdExpr = exprFactory.newExpression(stmt, valSqlTbl,
-                    valTbl.getMemberMapping(valKeyMmd));
+                AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
+                SQLExpression keyIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getMemberMapping(valKeyMmd));
                 if (keyIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), 
-                        keyIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), keyIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -322,8 +313,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         {
             // Map formed in key table - add join to key table then to value table (if present)
             DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-            AbstractMemberMetaData keyValMmd =
-                keyCmd.getMetaDataForMember(mmd.getValueMetaData().getMappedBy());
+            AbstractMemberMetaData keyValMmd = keyCmd.getMetaDataForMember(mmd.getValueMetaData().getMappedBy());
             JavaTypeMapping ownerMapping = null;
             if (mmd.getMappedBy() != null)
             {
@@ -333,15 +323,13 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(),
-                keyTbl, null, ownerMapping, null, null);
+            SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
 
             SQLExpression keyIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
             if (keyIsUnbound)
             {
                 // Bind the variable in the QueryGenerator
-                stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), 
-                    keyIdExpr.getJavaTypeMapping());
+                stmt.getQueryGenerator().bindVariable(keyVarName, keyCmd, keyIdExpr.getSQLTable(), keyIdExpr.getJavaTypeMapping());
             }
             else
             {
@@ -353,15 +341,13 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 // Add inner join to value table
                 DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                SQLTable valSqlTbl = stmt.innerJoin(keySqlTbl, keyTbl.getMemberMapping(keyValMmd),
-                    valTbl, null, valTbl.getIdMapping(), null, null);
+                SQLTable valSqlTbl = stmt.innerJoin(keySqlTbl, keyTbl.getMemberMapping(keyValMmd), valTbl, null, valTbl.getIdMapping(), null, null);
 
                 SQLExpression valIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getIdMapping());
                 if (valIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), 
-                        valIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), valIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -371,13 +357,11 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                SQLExpression valIdExpr = exprFactory.newExpression(stmt, keySqlTbl,
-                    keyTbl.getMemberMapping(keyValMmd));
+                SQLExpression valIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getMemberMapping(keyValMmd));
                 if (valIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), 
-                        valIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(valVarName, null, valIdExpr.getSQLTable(), valIdExpr.getJavaTypeMapping());
                 }
                 else
                 {

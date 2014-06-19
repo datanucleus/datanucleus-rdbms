@@ -1992,8 +1992,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                         else
                         {
-                            int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(
-                                getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION));
+                            int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION));
                             this.mconn = thisStoreMgr.getConnection(isolationLevel);
                         }
                         return mconn;
@@ -2003,14 +2002,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         try
                         {
-                            if (getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("UsePM"))
-                            {
-                                mconn.release();
-                            }
-                            else
-                            {
-                                mconn.release();
-                            }
+                            mconn.release();
                             mconn = null;
                         }
                         catch (NucleusException e)

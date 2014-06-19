@@ -189,20 +189,17 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         {
             // Map formed in join table - add join to join table, then to key table (if present)
             MapTable mapTbl = (MapTable)storeMgr.getTable(mmd);
-            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(),
-                mapTbl, null, mapTbl.getOwnerMapping(), null, null);
+            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
             if (keyCmd != null)
             {
                 if (keyIsUnbound)
                 {
                     DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                    SQLTable keySqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getKeyMapping(), 
-                        keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
+                    SQLTable keySqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getKeyMapping(), keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
 
                     // Bind the variable in the QueryGenerator
                     keyExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(), 
-                        keyExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(), keyExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -217,8 +214,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 {
                     // Bind the variable in the QueryGenerator
                     keyExpr = exprFactory.newExpression(stmt, joinSqlTbl, mapTbl.getKeyMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(), 
-                        keyExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, keyExpr.getSQLTable(), keyExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -381,22 +377,19 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 // Restrict to map owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(),
-                    mapExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
                 if (keyIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
                     keyExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), joinTbl.getKeyMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(), 
-                        keyExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, keyExpr.getSQLTable(), keyExpr.getJavaTypeMapping());
                 }
                 else
                 {
                     // Add restrict to key
-                    SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                        joinTbl.getKeyMapping());
+                    SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), joinTbl.getKeyMapping());
                     subStmt.whereAnd(elemIdExpr.eq(keyExpr), true);
                 }
             }
@@ -410,28 +403,24 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), keyTbl.getIdMapping(),
-                    joinTbl, null, joinTbl.getKeyMapping(), null, null);
+                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), keyTbl.getIdMapping(), joinTbl, null, joinTbl.getKeyMapping(), null, null);
 
                 // Restrict to map owner
                 JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, joinSqlTbl, ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(),
-                    mapExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
                 if (keyIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
                     keyExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), keyTbl.getIdMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(),
-                        keyExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, keyCmd, keyExpr.getSQLTable(), keyExpr.getJavaTypeMapping());
                 }
                 else
                 {
                     // Add restrict to key
-                    SQLExpression keyIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                        keyTbl.getIdMapping());
+                    SQLExpression keyIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), keyTbl.getIdMapping());
                     subStmt.whereAnd(keyIdExpr.eq(keyExpr), true);
                 }
             }

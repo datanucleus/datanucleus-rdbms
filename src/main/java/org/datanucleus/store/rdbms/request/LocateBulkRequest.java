@@ -96,8 +96,7 @@ public class LocateBulkRequest extends BulkRequest
         if (table.getIdentityType() == IdentityType.DATASTORE)
         {
             JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
-            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                datastoreIdMapping);
+            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             int[] cols = sqlStatement.select(expr, null);
             StatementMappingIndex datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
             datastoreIdx.setColumnPositions(cols);
@@ -114,8 +113,7 @@ public class LocateBulkRequest extends BulkRequest
                 {
                     pkMapping = table.getMemberMapping(mmd);
                 }
-                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(),
-                    pkMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
                 int[] cols = sqlStatement.select(expr, null);
                 StatementMappingIndex pkIdx = new StatementMappingIndex(pkMapping);
                 pkIdx.setColumnPositions(cols);
@@ -171,10 +169,8 @@ public class LocateBulkRequest extends BulkRequest
         {
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping,
-                storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
+            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -188,8 +184,7 @@ public class LocateBulkRequest extends BulkRequest
             {
                 // Datastore identity value for input
                 JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
-                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                    datastoreIdMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
                 sqlStatement.whereOr(expr.eq(val), true);
 
@@ -210,8 +205,7 @@ public class LocateBulkRequest extends BulkRequest
                     {
                         pkMapping = table.getMemberMapping(mmd);
                     }
-                    SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(),
-                        pkMapping);
+                    SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
                     SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + j);
                     BooleanExpression fieldEqExpr = expr.eq(val);
                     if (pkExpr == null)
@@ -280,8 +274,7 @@ public class LocateBulkRequest extends BulkRequest
         short lockType = ec.getLockManager().getLockMode(ops[0].getInternalObjectId());
         if (lockType != LockManager.LOCK_MODE_NONE)
         {
-            if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ ||
-                lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
+            if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ || lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
             {
                 // Override with pessimistic lock
                 locked = true;
@@ -304,18 +297,15 @@ public class LocateBulkRequest extends BulkRequest
                     {
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDefinitions[i].getMappingForMemberPosition(
-                                StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDefinitions[i].getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int j=0;j<datastoreIdx.getNumberOfParameterOccurrences();j++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps,
-                                    datastoreIdx.getParameterPositionsForOccurrence(j), ops[i].getInternalObjectId());
+                                table.getDatastoreIdMapping().setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(j), ops[i].getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            ops[i].provideFields(cmd.getPKMemberPositions(),
-                                storeMgr.getFieldManagerForStatementGeneration(ops[i], ps, mappingDefinitions[i]));
+                            ops[i].provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(ops[i], ps, mappingDefinitions[i]));
                         }
                     }
 
@@ -359,8 +349,7 @@ public class LocateBulkRequest extends BulkRequest
             {
                 exceptions.add(sqle);
             }
-            throw new NucleusDataStoreException(msg, 
-                (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
         }
     }
 
@@ -395,8 +384,7 @@ public class LocateBulkRequest extends BulkRequest
                 if (cmd.usesSingleFieldIdentityClass())
                 {
                     int[] pkFieldNums = cmd.getPKMemberPositions();
-                    AbstractMemberMetaData pkMmd =
-                        cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[0]);
+                    AbstractMemberMetaData pkMmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNums[0]);
                     if (pkMmd.getType() == int.class)
                     {
                         key = resultFM.fetchIntField(pkFieldNums[0]);
@@ -501,19 +489,20 @@ public class LocateBulkRequest extends BulkRequest
                 {
                     VersionMetaData currentVermd = table.getVersionMetaData();
                     Object datastoreVersion = null;
-                    if (currentVermd != null && currentVermd.getFieldName() == null)
+                    if (currentVermd != null)
                     {
-                        // Surrogate version
-                        StatementMappingIndex verIdx =
-                            resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
-                        datastoreVersion = table.getVersionMapping(true).getObject(ec, rs,
-                            verIdx.getColumnPositions());
+                        if (currentVermd.getFieldName() == null)
+                        {
+                            // Surrogate version
+                            StatementMappingIndex verIdx = resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
+                            datastoreVersion = table.getVersionMapping(true).getObject(ec, rs, verIdx.getColumnPositions());
+                        }
+                        else
+                        {
+                            datastoreVersion = op.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getFieldName()));
+                        }
+                        op.setVersion(datastoreVersion);
                     }
-                    else
-                    {
-                        datastoreVersion = op.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getFieldName()));
-                    }
-                    op.setVersion(datastoreVersion);
                 }
             }
         }
