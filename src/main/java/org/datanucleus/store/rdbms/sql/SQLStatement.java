@@ -425,6 +425,7 @@ public class SQLStatement
             aggregated = true;
         }
 
+        // TODO By squashing all selects down to Strings we lose info about parameters in select expressions. Needs fixing if we ever want to put parameters in the SELECT clause
         int[] selected = new int[expr.getNumberOfSubExpressions()];
         if (expr.getNumberOfSubExpressions() > 1)
         {

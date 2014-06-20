@@ -554,11 +554,8 @@ public class JPQLQuery extends AbstractJPQLQuery
                 if (type == Query.SELECT)
                 {
                     // Create PreparedStatement and apply parameters, result settings etc
-                    ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, 
-                        datastoreCompilation.getSQL(), this);
-                    SQLStatementHelper.applyParametersToStatement(ps, ec,
-                        datastoreCompilation.getStatementParameters(),
-                        null, parameters);
+                    ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, datastoreCompilation.getSQL(), this);
+                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
                     RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                     registerTask(ps);
@@ -579,8 +576,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         {
                             // IN-MEMORY EVALUATION
                             ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, 
-                                datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), 
-                                candidateClass);
+                                datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -591,8 +587,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             }
 
                             // Perform in-memory filter/result/order etc
-                            JavaQueryEvaluator resultMapper = 
-                                new JPQLEvaluator(this, candidates, compilation, parameters, clr);
+                            JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, parameters, clr);
                             results = resultMapper.execute(true, true, true, true, true);
                         }
                         else
@@ -611,9 +606,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = storeMgr.newResultObjectFactory(acmd,
-                                    datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), 
-                                    candidateClass);
+                                rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
                             }
 
                             // Create the required type of QueryResult
@@ -621,13 +614,11 @@ public class JPQLQuery extends AbstractJPQLQuery
                             if (resultSetType.equals("scroll-insensitive") ||
                                     resultSetType.equals("scroll-sensitive"))
                             {
-                                qr = new ScrollableQueryResult(this, rof, rs, 
-                                    getResultDistinct() ? null : candidateCollection);
+                                qr = new ScrollableQueryResult(this, rof, rs, getResultDistinct() ? null : candidateCollection);
                             }
                             else
                             {
-                                qr = new ForwardQueryResult(this, rof, rs, 
-                                    getResultDistinct() ? null : candidateCollection);
+                                qr = new ForwardQueryResult(this, rof, rs, getResultDistinct() ? null : candidateCollection);
                             }
 
                             // Register any bulk loaded member resultSets that need loading
@@ -663,8 +654,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
                             final QueryResult qr1 = qr;
                             final ManagedConnection mconn1 = mconn;
-                            ManagedConnectionResourceListener listener =
-                                new ManagedConnectionResourceListener()
+                            ManagedConnectionResourceListener listener = new ManagedConnectionResourceListener()
                             {
                                 public void transactionFlushed(){}
                                 public void transactionPreClose()
@@ -706,9 +696,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                     {
                         // Process single bulk statement
                         ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
-                        SQLStatementHelper.applyParametersToStatement(ps, ec,
-                            datastoreCompilation.getStatementParameters(), 
-                            null, parameters);
+                        SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
                         RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                         int[] execResult = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
@@ -724,9 +712,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         {
                             Boolean useInCount = sqlUseInCountIter.next();
                             ps = sqlControl.getStatementForUpdate(mconn, sql, false);
-                            SQLStatementHelper.applyParametersToStatement(ps, ec,
-                                datastoreCompilation.getStatementParameters(), 
-                                null, parameters);
+                            SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
                             RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                             int[] execResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
@@ -766,8 +752,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021074", getLanguage(), 
-                    "" + (System.currentTimeMillis() - startTime)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021074", getLanguage(), "" + (System.currentTimeMillis() - startTime)));
             }
 
             return results;
@@ -1095,15 +1080,13 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (stmt.allUnionsForSamePrimaryTable())
         {
             // Select fetch-plan fields of candidate class
-            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt,
-                datastoreCompilation.getResultDefinitionForClass(), candidateCmd, getFetchPlan(), 1);
+            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd, getFetchPlan(), 1);
         }
         else
         {
             // Select id only since tables don't have same mappings or column names
             // TODO complete-table will come through here but maybe ought to be treated differently
-            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt,
-                datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
+            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
         }
 
         datastoreCompilation.setSQL(stmt.getSelectStatement().toString());
@@ -1215,10 +1198,8 @@ public class JPQLQuery extends AbstractJPQLQuery
                 // Multi-tenancy restriction
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
-                SQLExpression tenantExpr = 
-                        stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = 
-                        stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
+                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
                             storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
@@ -1326,8 +1307,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1336,8 +1316,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
+            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1367,8 +1346,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (key != null && key.equals(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), 
-                toString());
+            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.addExtension(key, value);
     }
@@ -1383,8 +1361,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (extensions != null && extensions.containsKey(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), 
-                toString());
+            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.setExtensions(extensions);
     }

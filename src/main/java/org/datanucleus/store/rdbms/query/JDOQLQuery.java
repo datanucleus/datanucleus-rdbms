@@ -271,8 +271,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         // so omit the check for that case
                         if (sym != null && sym.getValueType() != null && sym.getValueType().isPrimitive())
                         {
-                            throw new NucleusUserException(Localiser.msg("021117", paramName,
-                                sym.getValueType().getName()));
+                            throw new NucleusUserException(Localiser.msg("021117", paramName, sym.getValueType().getName()));
                         }
                     }
                 }
@@ -355,8 +354,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                 AbstractMemberMetaData mmd = idx.getMapping().getMemberMetaData();
                                 if (mmd != null)
                                 {
-                                    if ((mmd.hasCollection() || mmd.hasMap() || mmd.hasArray()) &&
-                                        idx.getMapping() instanceof AbstractContainerMapping)
+                                    if ((mmd.hasCollection() || mmd.hasMap() || mmd.hasArray()) && idx.getMapping() instanceof AbstractContainerMapping)
                                     {
                                         throw new NucleusUserException(Localiser.msg("021213"));
                                     }
@@ -462,11 +460,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                                             resultFieldType = fld.getType();
 
                                                             // Check the type of the field
-                                                            if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && 
-                                                                    !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
+                                                            if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
                                                             {
-                                                                throw new NucleusUserException(Localiser.msg("021211", 
-                                                                    fieldName, fieldType.getName(), resultFieldType.getName()));
+                                                                throw new NucleusUserException(Localiser.msg("021211", fieldName, fieldType.getName(), resultFieldType.getName()));
                                                             }
                                                             if (!Modifier.isPublic(fld.getModifiers()))
                                                             {
@@ -488,8 +484,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                                                 Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
                                                                 if (putMethod == null)
                                                                 {
-                                                                    throw new NucleusUserException(Localiser.msg("021212", 
-                                                                        resultClass.getName(), fieldName));
+                                                                    throw new NucleusUserException(Localiser.msg("021212", resultClass.getName(), fieldName));
                                                                 }
                                                             }
                                                         }
@@ -574,8 +569,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             else if (inMemory)
             {
                 List candidates = new ArrayList(candidateCollection);
-                JavaQueryEvaluator resultMapper = new JDOQLEvaluator(this, candidates, compilation, 
-                    parameters, clr);
+                JavaQueryEvaluator resultMapper = new JDOQLEvaluator(this, candidates, compilation, parameters, clr);
                 return resultMapper.execute(true, true, true, true, true);
             }
         }
@@ -598,8 +592,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021046", getLanguage(), getSingleStringQuery(),
-                    null));
+                NucleusLogger.QUERY.debug(Localiser.msg("021046", getLanguage(), getSingleStringQuery(), null));
             }
 
             AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
@@ -610,10 +603,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 if (type == Query.SELECT)
                 {
                     // Create PreparedStatement and apply parameters, result settings etc
-                    ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn,
-                        datastoreCompilation.getSQL(), this);
-                    SQLStatementHelper.applyParametersToStatement(ps, ec,
-                        datastoreCompilation.getStatementParameters(), 
+                    ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, datastoreCompilation.getSQL(), this);
+                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), 
                         datastoreCompilation.getParameterNameByPosition(), parameters);
                     RDBMSQueryUtils.prepareStatementForExecution(ps, this, true);
 
@@ -634,8 +625,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, 
-                                datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), 
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), 
                                 candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
@@ -667,8 +657,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), 
-                                    ignoreCache, getFetchPlan(), candidateClass);
+                                rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
                             }
 
                             // Create the required type of QueryResult
@@ -757,8 +746,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     // Create PreparedStatement and apply parameters, result settings etc
                     // TODO Cater for multiple UPDATE statements (datastoreCompilation.getSQLs())
                     ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
-                    SQLStatementHelper.applyParametersToStatement(ps, ec,
-                        datastoreCompilation.getStatementParameters(),
+                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
                         datastoreCompilation.getParameterNameByPosition(), parameters);
                     RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
@@ -781,8 +769,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     if (datastoreCompilation.getSQL() != null)
                     {
                         ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
-                        SQLStatementHelper.applyParametersToStatement(ps, ec,
-                            datastoreCompilation.getStatementParameters(),
+                        SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
                             datastoreCompilation.getParameterNameByPosition(), parameters);
                         RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
@@ -798,8 +785,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         {
                             Boolean useInCount = sqlUseInCountIter.next();
                             ps = sqlControl.getStatementForUpdate(mconn, sql, false);
-                            SQLStatementHelper.applyParametersToStatement(ps, ec,
-                                datastoreCompilation.getStatementParameters(),
+                            SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
                                 datastoreCompilation.getParameterNameByPosition(), parameters);
                             RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
@@ -839,8 +825,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021074", getLanguage(), 
-                    "" + (System.currentTimeMillis() - startTime)));
+                NucleusLogger.QUERY.debug(Localiser.msg("021074", getLanguage(), "" + (System.currentTimeMillis() - startTime)));
             }
             return results;
         }
@@ -916,8 +901,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         try
         {
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, 
-                null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
         }
         catch (NucleusException ne)
         {
@@ -952,8 +936,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             while (iter.hasNext())
             {
                 Object candidate = iter.next();
-                SQLExpression idExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(),
-                    idMapping);
+                SQLExpression idExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(), idMapping);
                 SQLExpression idVal = stmt.getSQLExpressionFactory().newLiteral(stmt, idMapping, candidate);
                 if (candidateExpr == null)
                 {
@@ -1098,8 +1081,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         try
         {
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null,
-                null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
         }
         catch (NucleusException ne)
         {
@@ -1113,15 +1095,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (stmt.allUnionsForSamePrimaryTable())
         {
             // Select fetch-plan fields of candidate class
-            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt,
-                datastoreCompilation.getResultDefinitionForClass(), candidateCmd, getFetchPlan(), 1);
+            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd, getFetchPlan(), 1);
         }
         else
         {
             // Select id only since tables don't have same mappings or column names
             // TODO complete-table will come through here but maybe ought to be treated differently
-            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt,
-                datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
+            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
         }
 
         datastoreCompilation.setSQL(stmt.getSelectStatement().toString());
@@ -1198,11 +1178,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 // Multi-tenancy restriction
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
-                SQLExpression tenantExpr = 
-                        stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = 
-                        stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1309,16 +1286,14 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
 
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
+            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1382,8 +1357,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (key != null && key.equals(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), 
-                toString());
+            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.addExtension(key, value);
     }
@@ -1398,8 +1372,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (extensions != null && extensions.containsKey(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), 
-                toString());
+            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.setExtensions(extensions);
     }
