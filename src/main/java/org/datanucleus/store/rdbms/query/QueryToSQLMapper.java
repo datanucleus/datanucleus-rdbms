@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1960,6 +1961,18 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Convert Class literals (instanceof) into StringLiteral
             litValue = ((Class)litValue).getName();
         }
+        else if (litValue instanceof String)
+        {
+            String litStr = (String)litValue;
+            if (litStr.startsWith("{d ") || litStr.startsWith("{t ") || litStr.startsWith("{ts "))
+            {
+                JavaTypeMapping m = exprFactory.getMappingForType(Date.class, false);
+                SQLExpression sqlExpr = exprFactory.newLiteral(stmt, m, litValue);
+                stack.push(sqlExpr);
+                return sqlExpr;
+            }
+        }
+
         JavaTypeMapping m = null;
         if (litValue != null)
         {
@@ -2607,9 +2620,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected Object processParameterExpression(ParameterExpression expr, boolean asLiteral)
     {
-        if (compileComponent == CompilationComponent.ORDERING)
+        if (compileComponent == CompilationComponent.ORDERING || compileComponent == CompilationComponent.RESULT)
         {
             // All JDBC drivers I know don't allow parameters in the order-by clause
+            // Note that we also don't allow parameters in result clause since SQLStatement squashes all SELECT expression to a String so losing info about params
             asLiteral = true;
         }
 

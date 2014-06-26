@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -33,10 +34,13 @@ import org.datanucleus.store.types.converters.TypeConverter;
 /**
  * Representation of temporal literal in a Query.
  * Can be used for anything based on java.util.Date.
+ * Also supports a temporal literal specified as a String in JDBC escape syntax i.e "{d 'yyyy-mm-dd'}", "{t 'hh:mm:ss'}", "{ts 'yyyy-mm-dd hh:mm:ss.f...'}"
  */
 public class TemporalLiteral extends TemporalExpression implements SQLLiteral
 {
     private final Date value;
+
+    private String jdbcEscapeValue;
 
     /**
      * Constructor for a temporal literal with a value.
@@ -61,6 +65,12 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
         else if (value instanceof Calendar)
         {
             this.value = ((Calendar)value).getTime();
+        }
+        else if (value instanceof String)
+        {
+            // JDBC escape syntax
+            this.value = null;
+            this.jdbcEscapeValue = (String) value;
         }
         else
         {
@@ -124,11 +134,20 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
 
     public String toString()
     {
+        if (jdbcEscapeValue != null)
+        {
+            return super.toString() + " = " + jdbcEscapeValue;
+        }
         return super.toString() + " = " + value.toString();
     }
 
     public SQLExpression invoke(String methodName, List args)
     {
+        if (jdbcEscapeValue != null)
+        {
+            throw new NucleusUserException("Cannot invoke methods on TemporalLiteral using JDBC escape syntax - not supported");
+        }
+
         if (parameterName == null)
         {
             if (methodName.equals("getDay"))
@@ -186,6 +205,10 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
 
     public Object getValue()
     {
+        if (jdbcEscapeValue != null)
+        {
+            return jdbcEscapeValue;
+        }
         return value;
     }
 
@@ -206,23 +229,30 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
     protected void setStatement()
     {
         String formatted;
-        if (value instanceof java.sql.Time || value instanceof java.sql.Date || value instanceof java.sql.Timestamp)
+        if (jdbcEscapeValue != null)
         {
-            // Use native format of the type
-            formatted = value.toString();
-        }
-        else if (mapping.getDatastoreMapping(0) instanceof CharRDBMSMapping)
-        {
-            // Stored as String so use same formatting
-            SimpleDateFormat fmt = ((CharRDBMSMapping)mapping.getDatastoreMapping(0)).getJavaUtilDateFormat();
-            formatted = fmt.format(value);
+            st.append(jdbcEscapeValue);
         }
         else
         {
-            // TODO Include more variations of inputting a Date into JDBC
-            // TODO Cater for timezone storage options see TimestampRDBMSMapping
-            formatted = new Timestamp(value.getTime()).toString();
+            if (value instanceof java.sql.Time || value instanceof java.sql.Date || value instanceof java.sql.Timestamp)
+            {
+                // Use native format of the type
+                formatted = value.toString();
+            }
+            else if (mapping.getDatastoreMapping(0) instanceof CharRDBMSMapping)
+            {
+                // Stored as String so use same formatting
+                SimpleDateFormat fmt = ((CharRDBMSMapping)mapping.getDatastoreMapping(0)).getJavaUtilDateFormat();
+                formatted = fmt.format(value);
+            }
+            else
+            {
+                // TODO Include more variations of inputting a Date into JDBC
+                // TODO Cater for timezone storage options see TimestampRDBMSMapping
+                formatted = new Timestamp(value.getTime()).toString();
+            }
+            st.append('\'').append(formatted).append('\'');
         }
-        st.append('\'').append(formatted).append('\'');
     }
 }
