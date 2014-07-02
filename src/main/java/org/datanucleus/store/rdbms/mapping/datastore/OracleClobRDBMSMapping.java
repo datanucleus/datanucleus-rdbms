@@ -18,7 +18,7 @@ Contributors:
 2006 Andy Jefferson - add convenience method for updating CLOB
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping.datastore;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -38,8 +38,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-import org.datanucleus.store.rdbms.mapping.datastore.ClobRDBMSMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;

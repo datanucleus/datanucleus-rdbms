@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping.java;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
 import org.datanucleus.store.types.SCOUtils;
 
 /**

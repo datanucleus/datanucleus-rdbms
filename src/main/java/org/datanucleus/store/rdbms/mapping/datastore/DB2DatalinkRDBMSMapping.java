@@ -24,9 +24,9 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
- * Mapping of a Datalink RDBMS type (used by DB2).
+ * Mapping of a Datalink RDBMS type for DB2.
  */
-public class DatalinkRDBMSMapping extends CharRDBMSMapping
+public class DB2DatalinkRDBMSMapping extends CharRDBMSMapping
 {
     /**
      * Constructor.
@@ -34,7 +34,7 @@ public class DatalinkRDBMSMapping extends CharRDBMSMapping
      * @param storeMgr Store Manager
      * @param col Column
      */
-    public DatalinkRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
+    public DB2DatalinkRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
 		super(mapping, storeMgr, col);
 	}

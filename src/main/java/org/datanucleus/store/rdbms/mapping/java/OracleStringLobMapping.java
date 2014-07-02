@@ -21,19 +21,20 @@ Contributors:
 2007 Thomas Marti - added BLOB handling
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.java.StringMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleClobRDBMSMapping;
 
 /**
  * Mapping for a String type for Oracle when stored in a BLOB or CLOB column.
  */
-public class OracleStringMapping extends StringMapping implements MappingCallbacks
+public class OracleStringLobMapping extends StringMapping implements MappingCallbacks
 {
     /**
      * Retrieve the empty BLOB/CLOB locator created by the insert statement

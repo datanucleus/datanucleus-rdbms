@@ -17,7 +17,7 @@ Contributors:
 2006 Andy Jefferson - commonised approach to BLOB writing as other Oracle mappings
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping.java;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -27,7 +27,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.java.BitSetMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 

@@ -17,7 +17,7 @@ Contributors:
 2009 Andy Jefferson - rewrite SQL to use SQLStatement API methods
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping.datastore;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -45,9 +45,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;

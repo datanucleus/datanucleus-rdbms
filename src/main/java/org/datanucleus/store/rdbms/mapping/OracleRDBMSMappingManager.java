@@ -20,7 +20,7 @@ Contributors:
 2007 Thomas Marti - added BLOB handling
     ...
 *****************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+package org.datanucleus.store.rdbms.mapping;
 
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ElementMetaData;
@@ -28,11 +28,17 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.KeyMetaData;
 import org.datanucleus.metadata.ValueMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.mapping.RDBMSMappingManager;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.BitSetMapping;
 import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleArrayMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleBitSetMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleCollectionMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleMapMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleSerialisedObjectMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleSerialisedPCMapping;
+import org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
@@ -110,7 +116,7 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
                 if (jdbcTypeLower.indexOf("blob") >= 0 || jdbcTypeLower.indexOf("clob") >= 0)
                 {
                     // BLOB/CLOB, so use OracleString
-                    return OracleStringMapping.class;
+                    return OracleStringLobMapping.class;
                 }
             }
             return mappingClass;

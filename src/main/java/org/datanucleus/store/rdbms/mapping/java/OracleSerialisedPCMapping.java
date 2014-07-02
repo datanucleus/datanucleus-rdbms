@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2005 Brendan De Beer and others. All rights reserved.
+Copyright (c) 2006 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -15,29 +15,23 @@ limitations under the License.
 
 Contributors:
     ...
- **********************************************************************/
-package org.datanucleus.store.rdbms.mapping.oracle;
+**********************************************************************/
+package org.datanucleus.store.rdbms.mapping.java;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
 
 /**
- * Mapping for Object and Serializable types.
+ * Mapping for a serialised persistable object for Oracle.
  */
-public class OracleSerialisedObjectMapping extends SerialisedMapping implements MappingCallbacks
+public class OracleSerialisedPCMapping extends SerialisedPCMapping implements MappingCallbacks
 {
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postFetch(org.datanucleus.state.ObjectProvider)
-     */
-    public void postFetch(ObjectProvider sm)
-    {
-    }
-
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the
      * current BLOB field value to the Oracle BLOB object
@@ -45,9 +39,26 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping implements 
      */
     public void insertPostProcessing(ObjectProvider op)
     {
+        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+        ObjectProvider sm = null;
+        if (value != null)
+        {
+            ExecutionContext ec = op.getExecutionContext();
+            sm = ec.findObjectProvider(value);
+            if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
+            {
+                // Assign a ObjectProvider to the serialised object since none present
+                sm = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, op, mmd.getAbsoluteFieldNumber());
+            }
+        }
+
+        if (sm != null)
+        {
+            sm.setStoringPC();
+        }
+
         // Generate the contents for the BLOB
         byte[] bytes = new byte[0];
-        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
         if (value != null)
         {
             try
@@ -65,6 +76,11 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping implements 
 
         // Update the BLOB
         OracleBlobRDBMSMapping.updateBlobColumn(op, getTable(), getDatastoreMapping(0), bytes);
+
+        if (sm != null)
+        {
+            sm.unsetStoringPC();
+        }
     }
 
     /**
@@ -80,6 +96,13 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping implements 
     public void postUpdate(ObjectProvider op)
     {
         insertPostProcessing(op);
+    }
+
+    /**
+     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postFetch(org.datanucleus.state.ObjectProvider)
+     */
+    public void postFetch(ObjectProvider op)
+    {
     }
 
     /**

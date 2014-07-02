@@ -576,7 +576,7 @@ Contributors:
             <excludes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="CLOB" sql-type="CLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleClobRDBMSMapping">
+             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleClobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false"
@@ -584,11 +584,11 @@ Contributors:
             <excludes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleBlobRDBMSMapping">
+             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="DATALINK" sql-type="DATALINK" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DatalinkRDBMSMapping">
+             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DB2DatalinkRDBMSMapping">
             <includes vendor-id="db2"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="CHAR" sql-type="UNIQUEIDENTIFIER" default="false"
@@ -620,7 +620,7 @@ Contributors:
             <includes vendor-id="mysql"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="XMLTYPE" sql-type="XMLTYPE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.oracle.XMLTypeRDBMSMapping">
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.XMLTypeRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR" default="false"
@@ -727,7 +727,7 @@ Contributors:
             <excludes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleBlobRDBMSMapping">
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="false"
@@ -784,7 +784,7 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.ArrayMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.ArrayLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.ArrayExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleArrayMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleArrayMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.ArrayLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.ArrayExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.BigDecimalMapping" 
@@ -805,7 +805,7 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.CollectionLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.CollectionExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleCollectionMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleCollectionMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.CollectionLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.CollectionExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping" 
@@ -841,7 +841,7 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.MapMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.MapLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.MapExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleMapMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleMapMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.MapLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.MapExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.NumberMapping" 
@@ -895,7 +895,7 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.StringMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.oracle.OracleStringMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionLongMapping" 
