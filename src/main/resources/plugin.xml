@@ -620,7 +620,7 @@ Contributors:
             <includes vendor-id="mysql"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="XMLTYPE" sql-type="XMLTYPE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.XMLTypeRDBMSMapping">
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleXMLTypeRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR" default="false"

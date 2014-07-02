@@ -33,7 +33,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Mapping for an Oracle XMLType type.
  **/
-public class XMLTypeRDBMSMapping extends CharRDBMSMapping
+public class OracleXMLTypeRDBMSMapping extends CharRDBMSMapping
 {
     /**
      * Constructor.
@@ -41,7 +41,7 @@ public class XMLTypeRDBMSMapping extends CharRDBMSMapping
      * @param storeMgr Store Manager
      * @param col Column
      */
-    public XMLTypeRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
+    public OracleXMLTypeRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
         super(mapping, storeMgr, col);
     }
