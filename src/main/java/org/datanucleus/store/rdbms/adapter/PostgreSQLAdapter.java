@@ -407,7 +407,12 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         {
             NucleusLogger.DATASTORE_NATIVE.debug(stmtStr + " : for sequence=" + seqName);
             ps = conn.prepareStatement(stmtStr);
-            ps.setString(1, seqName);
+            String seqNameToSearch = seqName;
+            if (seqName.startsWith("\"") && seqName.endsWith("\""))
+            {
+                seqNameToSearch = seqName.substring(1, seqName.length() - 1);
+            }
+            ps.setString(1, seqNameToSearch);
             rs = ps.executeQuery();
             if (rs.next())
             {
