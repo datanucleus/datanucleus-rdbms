@@ -210,6 +210,7 @@ Contributors:
         <!-- "java.util" types -->
         <mapping java-type="java.util.Calendar" mapping-class="org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping"/>
         <mapping java-type="java.util.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping"/>
+        <mapping java-type="java.util.UUID" mapping-class="org.datanucleus.store.rdbms.mapping.java.UUIDMapping"/>
 
         <!-- "java.sql" types -->
         <mapping java-type="java.sql.Date" mapping-class="org.datanucleus.store.rdbms.mapping.java.SqlDateMapping"/>
@@ -719,6 +720,11 @@ Contributors:
         <mapping java-type="java.util.Date" jdbc-type="TIME" sql-type="TIME" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
 
+        <mapping java-type="java.util.UUID" jdbc-type="OTHER" sql-type="UUID" default="false"
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OtherRDBMSMapping">
+            <includes vendor-id="postgresql"/>
+        </mapping>
+
         <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping">
         </mapping>
@@ -905,6 +911,10 @@ Contributors:
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.ClassMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
+
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.UUIDMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
 
