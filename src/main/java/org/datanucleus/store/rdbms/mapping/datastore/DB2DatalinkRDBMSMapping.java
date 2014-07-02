@@ -24,7 +24,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
- * Mapping of a Datalink RDBMS type for DB2.
+ * Mapping of a DB2 "Datalink" RDBMS type.
  */
 public class DB2DatalinkRDBMSMapping extends CharRDBMSMapping
 {

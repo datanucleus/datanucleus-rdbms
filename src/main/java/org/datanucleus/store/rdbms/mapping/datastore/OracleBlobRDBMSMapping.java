@@ -65,6 +65,7 @@ import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Maps a Field to an Oracle BLOB.
+ * Extends the standard JDBC handler so that we can insert an empty BLOB, and then update it (Oracle non-standard behaviour).
  */
 public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
 {

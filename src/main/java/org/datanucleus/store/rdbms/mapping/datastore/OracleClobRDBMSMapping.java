@@ -56,6 +56,7 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for Oracle CLOB type.
+ * Extends the standard JDBC handler so that we can insert an empty CLOB, and then update it (Oracle non-standard behaviour).
  */
 public class OracleClobRDBMSMapping extends ClobRDBMSMapping
 {
