@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.mapping.java.EnumMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 
@@ -62,8 +63,9 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         }
         else
         {
+            Integer val = getValueAsInt(mapping);
             delegate = new IntegerLiteral(stmt, mapping,
-                (this.value != null ? this.value.ordinal() : null), parameterName);
+                val, parameterName);
         }
     }
 
@@ -80,8 +82,9 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         }
         else
         {
+            Integer val = getValueAsInt(mapping);
             delegate = new IntegerLiteral(stmt, mapping,
-                (this.value != null ? this.value.ordinal() : null), parameterName);
+                val, parameterName);
         }
     }
 
@@ -109,4 +112,19 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
     {
         ((SQLLiteral)delegate).setNotParameter();
     }
+
+    private Integer getValueAsInt(JavaTypeMapping mapping)
+    {
+        Integer val = null;
+        if(this.value != null)
+        {
+            val = this.value.ordinal();
+            if(mapping instanceof EnumMapping)
+            {
+                val = ((EnumMapping)mapping).getValueForEnumUsingMethod(this.value, val);
+            }
+        }
+        return val;
+    }
+
 }
