@@ -680,9 +680,7 @@ Contributors:
         </mapping>
 
         <mapping java-type="java.sql.Time" jdbc-type="TIME" sql-type="TIME" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping">
-            <excludes vendor-id="sqlserver"/>
-        </mapping>
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
         <mapping java-type="java.sql.Time" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
         <mapping java-type="java.sql.Time" jdbc-type="CHAR" sql-type="CHAR" default="false"
@@ -705,9 +703,7 @@ Contributors:
         <mapping java-type="java.util.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
         <mapping java-type="java.util.Date" jdbc-type="DATE" sql-type="DATE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping">
-            <excludes vendor-id="sqlserver"/>
-        </mapping>
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
         <mapping java-type="java.util.Date" jdbc-type="CHAR" sql-type="CHAR" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
         <mapping java-type="java.util.Date" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"

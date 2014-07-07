@@ -192,12 +192,7 @@ public class EnumMapping extends SingleFieldMapping
 
                 if (methodName != null)
                 {
-                    String getterMethodName = mmd.getValueForExtension(ENUM_VALUE_GETTER);
-                    Long longVal = getValueForEnumUsingMethod((Enum)value, getterMethodName);
-                    if (longVal != null)
-                    {
-                        intVal = longVal.intValue();
-                    }
+                    intVal = getValueForEnumUsingMethod((Enum) value, intVal);
                 }
                 getDatastoreMapping(0).setInt(ps, exprIndex[0], intVal);
             }
@@ -225,6 +220,17 @@ public class EnumMapping extends SingleFieldMapping
         {
             super.setObject(ec, ps, exprIndex, value);
         }
+    }
+
+    public int getValueForEnumUsingMethod(Enum value, int intVal)
+    {
+        String getterMethodName = mmd.getValueForExtension(ENUM_VALUE_GETTER);
+        Long longVal = getValueForEnumUsingMethod(value, getterMethodName);
+        if (longVal != null)
+        {
+            intVal = longVal.intValue();
+        }
+        return intVal;
     }
 
     /**
