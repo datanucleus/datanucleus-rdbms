@@ -163,6 +163,19 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
             "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1,
             false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
+
+        if (datastoreMajorVersion > 9)
+        {
+            // Support for build-in TIME and DATE data type for MS SQL Server version >= 2008
+            sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
+                "TIME", (short)Types.TIME, 0, null, null, null, 1, false, (short)1,
+                true, true, false, "TIME", (short)0, (short)0, 0);
+            addSQLTypeForJDBCType(handler, mconn, (short)Types.TIME, sqlType, true);
+            sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
+                "DATE", (short)Types.DATE, 0, null, null, null, 1, false, (short)1,
+                true, true, false, "DATE", (short)0, (short)0, 0);
+            addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
+        }
     }
 
     public String getVendorID()
