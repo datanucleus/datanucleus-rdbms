@@ -403,11 +403,17 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         String stmtStr = "SELECT relname FROM pg_class WHERE relname=?";
         PreparedStatement ps = null;
         ResultSet rs = null;
+        String seqNameToSearch = seqName;
+        if (seqName.startsWith("\"") && seqName.endsWith("\""))
+        {
+            seqNameToSearch = seqName.substring(1, seqName.length() - 1);
+        }
+
         try
         {
-            NucleusLogger.DATASTORE_NATIVE.debug(stmtStr + " : for sequence=" + seqName);
+            NucleusLogger.DATASTORE_NATIVE.debug(stmtStr + " : for sequence=" + seqNameToSearch);
             ps = conn.prepareStatement(stmtStr);
-            ps.setString(1, seqName);
+            ps.setString(1, seqNameToSearch);
             rs = ps.executeQuery();
             if (rs.next())
             {
@@ -417,7 +423,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         }
         catch (SQLException sqle)
         {
-            NucleusLogger.DATASTORE_RETRIEVE.debug("Exception while executing query for sequence " + seqName + " : " + stmtStr + " - " + sqle.getMessage());
+            NucleusLogger.DATASTORE_RETRIEVE.debug("Exception while executing query for sequence " + seqNameToSearch + " : " + stmtStr + " - " + sqle.getMessage());
         }
         finally
         {
