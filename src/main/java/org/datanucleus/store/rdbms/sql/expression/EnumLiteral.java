@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.mapping.java.EnumMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 
@@ -51,19 +52,16 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         }
         else
         {
-            throw new NucleusException("Cannot create " + this.getClass().getName() +
-                " for value of type " + value.getClass().getName());
+            throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + value.getClass().getName());
         }
 
         if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            delegate = new StringLiteral(stmt, mapping,
-                (this.value != null ? this.value.name() : null), parameterName);
+            delegate = new StringLiteral(stmt, mapping, (this.value != null ? this.value.name() : null), parameterName);
         }
         else
         {
-            delegate = new IntegerLiteral(stmt, mapping,
-                (this.value != null ? this.value.ordinal() : null), parameterName);
+            delegate = new IntegerLiteral(stmt, mapping, getValueAsInt(mapping), parameterName);
         }
     }
 
@@ -75,13 +73,11 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         // Reset the delegate in case it has changed
         if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            delegate = new StringLiteral(stmt, mapping,
-                (this.value != null ? this.value.name() : null), parameterName);
+            delegate = new StringLiteral(stmt, mapping, (this.value != null ? this.value.name() : null), parameterName);
         }
         else
         {
-            delegate = new IntegerLiteral(stmt, mapping,
-                (this.value != null ? this.value.ordinal() : null), parameterName);
+            delegate = new IntegerLiteral(stmt, mapping, getValueAsInt(mapping), parameterName);
         }
     }
 
@@ -108,5 +104,21 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
     public void setNotParameter()
     {
         ((SQLLiteral)delegate).setNotParameter();
+    }
+
+    private Integer getValueAsInt(JavaTypeMapping mapping)
+    {
+        Integer val = null;
+        if(this.value != null)
+        {
+            val = this.value.ordinal();
+
+            if(mapping instanceof EnumMapping)
+            {
+                EnumMapping m = (EnumMapping)mapping;
+                val = m.getValueForEnumUsingMethod(this.value, m.getGetValueMethodName(), val);
+            }
+        }
+        return val;
     }
 }

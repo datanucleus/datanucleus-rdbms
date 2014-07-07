@@ -254,6 +254,7 @@ public class MappedTypeManager
             {
                 return type;
             }
+
             if (!type.cls.getName().equals("java.lang.Object") && !type.cls.getName().equals("java.io.Serializable"))
             {
                 if (componentCls != null)
@@ -262,10 +263,6 @@ public class MappedTypeManager
                     if (type.cls.isArray() && type.cls.getComponentType().isAssignableFrom(componentCls))
                     {
                         mappedTypes.put(cls.getName(), type);
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                        {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
-                        }
                         return type;
                     }
                 }
@@ -275,10 +272,6 @@ public class MappedTypeManager
                     if (type.cls.isAssignableFrom(cls))
                     {
                         mappedTypes.put(cls.getName(), type);
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-                        {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("016001", cls.getName(), type.cls.getName()));
-                        }
                         return type;
                     }
                 }
