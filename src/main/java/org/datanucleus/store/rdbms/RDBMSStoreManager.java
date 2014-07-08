@@ -1155,6 +1155,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             schemaCallbacks.put(className, mmd);
         }
+        else
+        {
+            NucleusLogger.DATASTORE_SCHEMA.debug("RDBMSStoreManager.addSchemaCallback called for " + mmd.getFullFieldName() + " on class=" + className + " but already registered");
+        }
     }
 
     /* (non-Javadoc)
