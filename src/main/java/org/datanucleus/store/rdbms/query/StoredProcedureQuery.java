@@ -722,7 +722,9 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         else
         {
             qr = new ForwardQueryResult(this, rof, rs, null);
+            ((ForwardQueryResult)qr).setCloseStatementWithResultSet(false);
         }
+        qr.setCloseStatementWithResultSet(false); // In case there are multiple result sets
         qr.initialise();
 
         final QueryResult qr1 = qr;
@@ -734,6 +736,16 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
             {
                 // Tx : disconnect query from ManagedConnection (read in unread rows etc)
                 qr1.disconnect();
+                try
+                {
+                    if (stmt != null)
+                    {
+                        stmt.close();
+                    }
+                }
+                catch (SQLException e)
+                {
+                }
             }
             public void managedConnectionPreClose()
             {
@@ -741,6 +753,16 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                 {
                     // Non-Tx : disconnect query from ManagedConnection (read in unread rows etc)
                     qr1.disconnect();
+                    try
+                    {
+                        if (stmt != null)
+                        {
+                            stmt.close();
+                        }
+                    }
+                    catch (SQLException e)
+                    {
+                    }
                 }
             }
             public void managedConnectionPostClose(){}

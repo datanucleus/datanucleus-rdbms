@@ -59,6 +59,9 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
 
     protected Map<Object, Map<Integer, Object>> bulkLoadedValueByMemberNumber;
 
+    /** Default to closing the statement when closing the resultSet, but allow override. */
+    protected boolean closeStatementWithResultSet = true;
+
     /**
      * Constructor of the result from a Query.
      * @param query The Query
@@ -70,6 +73,11 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
         super(query);
         this.rof = rof;
         this.rs = rs;
+    }
+
+    public void setCloseStatementWithResultSet(boolean flag)
+    {
+        this.closeStatementWithResultSet = flag;
     }
 
     public void registerMemberBulkResultSet(IteratorStatement iterStmt, ResultSet rs)
@@ -276,7 +284,7 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
                 {
                     try
                     {
-                        if (stmt != null)
+                        if (closeStatementWithResultSet && stmt != null)
                         {
                             // Close the original statement
                             stmt.close();
