@@ -85,7 +85,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value == null)
         {
             // replace null map with an empty SCO wrapper
-            replaceFieldWithWrapper(ownerOP, null, false, false);
+            replaceFieldWithWrapper(ownerOP, null);
             return;
         }
 
@@ -121,7 +121,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                     }
                 }
             }
-            replaceFieldWithWrapper(ownerOP, value, false, false);
+            replaceFieldWithWrapper(ownerOP, value);
         }
         else
         {
@@ -138,7 +138,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 ((MapStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
 
                 // Create a SCO wrapper with the entries loaded
-                replaceFieldWithWrapper(ownerOP, value, false, false);
+                replaceFieldWithWrapper(ownerOP, value);
 
                 // Make sure all are flushed
                 ec.flushInternal(true);
@@ -148,12 +148,12 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
                 {
                     // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                    replaceFieldWithWrapper(ownerOP, null, false, false);
+                    replaceFieldWithWrapper(ownerOP, null);
                 }
                 else
                 {
                     // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
-                    replaceFieldWithWrapper(ownerOP, value, false, false);
+                    replaceFieldWithWrapper(ownerOP, value);
                 }
             }
         }
@@ -183,7 +183,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value == null)
         {
             // replace null map with empty SCO wrapper
-            replaceFieldWithWrapper(ownerOP, null, false, false);
+            replaceFieldWithWrapper(ownerOP, null);
             return;
         }
 
@@ -233,7 +233,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         store.putAll(ownerOP, value);
 
         // Replace the field with a wrapper containing these entries
-        replaceFieldWithWrapper(ownerOP, value, false, false);
+        replaceFieldWithWrapper(ownerOP, value);
     }
 
     /**

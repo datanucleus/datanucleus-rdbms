@@ -78,7 +78,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         if (value == null)
         {
             // replace null collections with an empty SCO wrapper
-            replaceFieldWithWrapper(ownerOP, null, false, false);
+            replaceFieldWithWrapper(ownerOP, null);
             return;
         }
 
@@ -101,7 +101,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElements[i]);
                 }
             }
-            replaceFieldWithWrapper(ownerOP, value, false, false);
+            replaceFieldWithWrapper(ownerOP, value);
         }
         else
         {
@@ -126,7 +126,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             if (needsAttaching)
             {
                 // Create a wrapper and attach the elements (and add the others)
-                SCO collWrapper = replaceFieldWithWrapper(ownerOP, null, false, false);
+                SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
                 collWrapper.attachCopy(value);
             }
             else
@@ -137,19 +137,19 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     ((CollectionStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerOP, value, 0);
 
                     // Create a SCO wrapper with the elements loaded
-                    replaceFieldWithWrapper(ownerOP, value, false, false);
+                    replaceFieldWithWrapper(ownerOP, value);
                 }
                 else
                 {
                     if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
                     {
                         // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                        replaceFieldWithWrapper(ownerOP, null, false, false);
+                        replaceFieldWithWrapper(ownerOP, null);
                     }
                     else
                     {
                         // Create a SCO wrapper, pass in empty collection to avoid loading from DB (extra SQL)
-                        replaceFieldWithWrapper(ownerOP, value, false, false);
+                        replaceFieldWithWrapper(ownerOP, value);
                     }
                 }
             }
@@ -182,7 +182,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         {
             // remove any elements in the collection and replace it with an empty SCO wrapper
             ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerOP);
-            replaceFieldWithWrapper(ownerOP, null, false, false);
+            replaceFieldWithWrapper(ownerOP, null);
             return;
         }
 
@@ -224,7 +224,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         backingStore.update(ownerOP, value);
 
         // Replace the field with a wrapper containing these elements
-        replaceFieldWithWrapper(ownerOP, value, false, false);
+        replaceFieldWithWrapper(ownerOP, value);
     }
 
     /**

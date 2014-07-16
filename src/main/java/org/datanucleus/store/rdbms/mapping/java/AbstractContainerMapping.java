@@ -368,27 +368,24 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
 
     /**
      * Method to replace the field that this mapping represents with a SCO wrapper.
-     * The wrapper will be suitable for the passed instantiated type and if it is null will be for
-     * the declared type of the field.
+     * The wrapper will be suitable for the passed instantiated type and if it is null will be for the declared type of the field.
      * @param op ObjectProvider for the owning object
      * @param value The value to create the wrapper with
-     * @param forInsert Whether to insert the SCO with this value
-     * @param forUpdate Whether to update the SCO with this value
      * @return The SCO wrapper object that the field was replaced with
      */
-    protected SCO replaceFieldWithWrapper(ObjectProvider op, Object value, boolean forInsert, boolean forUpdate)
+    protected SCO replaceFieldWithWrapper(ObjectProvider op, Object value)
     {
         Class type = mmd.getType();
-        if( value!= null)
+        if (value!= null)
         {
             type = value.getClass();
         }
-        else if (mmd.getOrderMetaData()!=null && type.isAssignableFrom(java.util.List.class))
+        else if (mmd.getOrderMetaData() != null && type.isAssignableFrom(java.util.List.class))
         {
             type = java.util.List.class;
         }
-        SCO sco = SCOUtils.newSCOInstance(op, mmd, mmd.getType(), type, value, forInsert, forUpdate, true);
-        return sco;
+
+        return SCOUtils.newSCOInstance(op, mmd, mmd.getType(), type, value, false, false, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------
@@ -405,6 +402,6 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             return;
         }
 
-        replaceFieldWithWrapper(sm, null, false, false);
+        replaceFieldWithWrapper(sm, null);
     }
 }
