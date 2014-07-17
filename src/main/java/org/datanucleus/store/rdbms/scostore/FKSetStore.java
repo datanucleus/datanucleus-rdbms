@@ -36,6 +36,7 @@ import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -545,7 +546,14 @@ public class FKSetStore extends AbstractSetStore
                 if (ec.getManageRelations())
                 {
                     // Managed Relationships - add the change we've made here to be analysed at flush
-                    ec.getRelationshipManager(elementOP).relationChange(fieldNumInElement, oldOwner, newOwner);
+                    RelationshipManager relationshipManager = ec.getRelationshipManager(elementOP);
+                    relationshipManager.relationChange(fieldNumInElement, oldOwner, newOwner);
+                    
+                    if (ec.isFlushing())
+                    {
+                        // When already flushing process the changes right away to make them effective during the current flush
+                        relationshipManager.process();
+                    }
                 }
 
                 if (ec.isFlushing())
