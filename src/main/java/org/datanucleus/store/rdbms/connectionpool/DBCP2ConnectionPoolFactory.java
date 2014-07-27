@@ -92,15 +92,14 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
                     connectionPool.setMinIdle(value);
                 }
             }
-            // TODO What is the equivalent of this in DBCP2?
-            /*if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE))
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE))
             {
                 int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_ACTIVE);
                 if (value > 0)
                 {
-                    connectionPool.setMaxActive(value);
+                    connectionPool.setMaxTotal(value);
                 }
-            }*/
+            }
             if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT))
             {
                 int value = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_WAIT);
