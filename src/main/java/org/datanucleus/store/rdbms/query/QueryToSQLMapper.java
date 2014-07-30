@@ -1218,7 +1218,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Iterator<String> iter = joinPrimExpr.getTuples().iterator();
                 String rootId = iter.next();
                 String joinTableGroupName = null;
-                if (rootId.equalsIgnoreCase(candidateAlias))
+                if (rootId.equalsIgnoreCase(candidateAlias) && candidateCmd.getName().equals(cmd.getName()))
                 {
                     // Join relative to the candidate
                     // Name table group of joined-to as per the relation
@@ -1237,8 +1237,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     else
                     {
-                        throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet the first component "+
-                            rootId + " is unknown!");
+                        throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet the first component " + rootId + " is unknown!");
                     }
                 }
 
