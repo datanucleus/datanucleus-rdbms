@@ -119,7 +119,6 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
                     }
                 }
             }
-
         }
 
         if (parameterName != null)
@@ -136,9 +135,13 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
     {
         if (jdbcEscapeValue != null)
         {
-            return super.toString() + " = " + jdbcEscapeValue;
+            return jdbcEscapeValue;
         }
-        return super.toString() + " = " + value.toString();
+        else if (value == null)
+        {
+            return "null";
+        }
+        return value.toString();
     }
 
     public SQLExpression invoke(String methodName, List args)
