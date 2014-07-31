@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of the backing store for a Map.
@@ -238,7 +239,8 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056019",containsValueStmt),e);
+            NucleusLogger.DATASTORE_RETRIEVE.warn("Exception during backing store select", e);
+            throw new NucleusDataStoreException(Localiser.msg("056019",containsValueStmt), e);
         }
 
         return exists;
@@ -511,8 +513,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @param mapTable the map table
      * @return Statement to check if a value is contained in the Map.
      */
-    private String getContainsValueStmt(JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, 
-            Table mapTable)
+    private String getContainsValueStmt(JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, Table mapTable)
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
@@ -532,8 +533,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         return stmt.toString();
     }
 
-    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue,
-            JavaTypeMapping fieldMapping)
+    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue, JavaTypeMapping fieldMapping)
     {
         boolean modified;
         String stmt = getUpdateEmbeddedValueStmt(fieldMapping, getOwnerMapping(), getValueMapping(), getMapTable());
@@ -552,8 +552,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
                     fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), newValue);
                     jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(
-                        op, value, ps, jdbcPosition, (JoinTable)getMapTable(), this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(op, value, ps, jdbcPosition, (JoinTable)getMapTable(), this);
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     modified = true;
                 }
@@ -569,7 +568,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE_PERSIST.warn("Exception in backing store update", e);
             throw new NucleusDataStoreException(Localiser.msg("056011", stmt), e);
         }
         return modified;
@@ -590,8 +589,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @param mapTable The map table
      * @return Statement for updating an embedded key in the Set
      */
-    protected String getUpdateEmbeddedKeyStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping,
-            JavaTypeMapping keyMapping, Table mapTable)
+    protected String getUpdateEmbeddedKeyStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, Table mapTable)
     {
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
@@ -643,8 +641,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @param mapTable The map table
      * @return Statement for updating an embedded value in the Set
      */
-    protected String getUpdateEmbeddedValueStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping,
-           JavaTypeMapping valueMapping, Table mapTable)
+    protected String getUpdateEmbeddedValueStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, Table mapTable)
     {
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
@@ -681,8 +678,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         return stmt.toString();
     }
 
-    public boolean updatedEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue, 
-            JavaTypeMapping fieldMapping)
+    public boolean updatedEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue, JavaTypeMapping fieldMapping)
     {
         boolean modified;
         String stmt = getUpdateEmbeddedKeyStmt(fieldMapping, getOwnerMapping(), getKeyMapping(), getMapTable());
@@ -701,8 +697,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
                     fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), key);
                     jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(op, key, ps, jdbcPosition,
-                        (JoinTable)getMapTable(), this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(op, key, ps, jdbcPosition, (JoinTable)getMapTable(), this);
 
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     modified = true;
@@ -719,7 +714,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE_PERSIST.warn("Exception during backing store update", e);
             throw new NucleusDataStoreException(Localiser.msg("056010", stmt), e);
         }
         return modified;

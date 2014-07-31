@@ -194,8 +194,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                     jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
-                        ps, jdbcPosition, ((JoinTable) getContainerTable()).getOwnerMemberMetaData(),
-                        getElementMapping(), getEmd(), this);
+                        ps, jdbcPosition, ((JoinTable) getContainerTable()).getOwnerMemberMetaData(), getElementMapping(), getEmd(), this);
 
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     modified = true;
@@ -297,13 +296,11 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised,
-            containerAlias, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, containerAlias, false);
 
         // TODO Remove the "containerTable == " clause and make discriminator restriction part of the JoinTable statement too
         // Needs to pass TCK M-M relationship test. see contains(ObjectProvider, Object) method also
         JavaTypeMapping discrimMapping = (elementInfo != null ? elementInfo[0].getDiscriminatorMapping() : null);
-
         if (elementInfo != null && containerTable == elementInfo[0].getDatastoreClass() && discrimMapping != null)
         {
             // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
@@ -311,34 +308,48 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
             // Element table has discriminator so restrict to the element-type and subclasses
             // Add WHERE for the element and each subclass type so we restrict to valid element types TODO Is the element itself included?
+            Class cls = clr.classForName(elementInfo[0].getClassName());
+            if (!Modifier.isAbstract(cls.getModifiers()))
+            {
+                if (joinedDiscrim)
+                {
+                    discrimStr.append(joinedElementAlias);
+                }
+                else
+                {
+                    discrimStr.append(containerAlias);
+                }
+                discrimStr.append(".").append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                discrimStr.append(" = ");
+                discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter());
+            }
+
             Collection<String> subclasses = storeMgr.getSubClassesForClass(elementInfo[0].getClassName(), true, clr);
             for (String subclass : subclasses)
             {
-                Class cls = clr.classForName(subclass);
+                cls = clr.classForName(subclass);
                 if (!Modifier.isAbstract(cls.getModifiers()))
                 {
-                    for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
+                    if (discrimStr.length() > 0)
                     {
-                        if (discrimStr.length() > 0)
-                        {
-                            discrimStr.append(" OR ");
-                        }
-
-                        if (joinedDiscrim)
-                        {
-                            discrimStr.append(joinedElementAlias);
-                        }
-                        else
-                        {
-                            discrimStr.append(containerAlias);
-                        }
-                        discrimStr.append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
-                        discrimStr.append(" = ");
-                        discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                        discrimStr.append(" OR ");
                     }
+
+                    if (joinedDiscrim)
+                    {
+                        discrimStr.append(joinedElementAlias);
+                    }
+                    else
+                    {
+                        discrimStr.append(containerAlias);
+                    }
+                    discrimStr.append(".").append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    discrimStr.append(" = ");
+                    discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter());
                 }
             }
 
+            // Add discriminator clause if anything present
             if (discrimStr.length() > 0)
             {
                 stmt.append(" AND (").append(discrimStr.toString()).append(")");
@@ -348,8 +359,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         if (relationDiscriminatorMapping != null)
         {
             // Relation uses shared resource (FK, JoinTable) so restrict to this particular relation
-            BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping,
-                containerAlias, false);
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
         }
 
         return stmt.toString();
@@ -377,16 +387,13 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
 
                     // Populate element
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element,
-                        jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
 
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
                     // Needs to pass TCK M-M relation test
-                    if (elementInfo != null && elementInfo[0].getDiscriminatorMapping() != null && 
-                        elementInfo[0].getDatastoreClass() == containerTable)
+                    if (elementInfo != null && elementInfo[0].getDiscriminatorMapping() != null && elementInfo[0].getDatastoreClass() == containerTable)
                     {
-                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition,
-                                true, elementInfo[0], clr);
+                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[0], clr);
                     }
                     if (relationDiscriminatorMapping != null)
                     {
@@ -421,8 +428,8 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         return retval;
     }
 
-    public int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, 
-            boolean executeNow) throws MappedDatastoreException
+    public int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
+    throws MappedDatastoreException
     {
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -435,8 +442,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                 int jdbcPosition = 1;
 
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, 
-                    jdbcPosition, elementMapping);
+                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                 if (relationDiscriminatorMapping != null)
                 {
                     jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -501,13 +507,11 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerTable.toString(), true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, 
-            containerTable.toString(), false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, containerTable.toString(), false);
         if (relationDiscriminatorMapping != null)
         {
             // Relation uses shared resource (FK, JoinTable) so restrict to this particular relation
-            BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, 
-                containerTable.toString(), false);
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerTable.toString(), false);
         }
 
         return stmt.toString();

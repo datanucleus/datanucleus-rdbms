@@ -211,8 +211,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         if (ec.getApiAdapter().isDetached(element))
         {
             // Element passed in is detached so find attached version (DON'T attach this object)
-            elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false,
-                element.getClass().getName());
+            elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false, element.getClass().getName());
         }
 
         boolean modified = remove(op, elementToRemove, size);
@@ -232,10 +231,9 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
     }
 
     /**
-     * Remove all elements from a collection from the association owner vs
-     * elements. This implementation iterates around the remove() method doing
-     * each element 1 at a time. Please refer to the JoinSetStore and
-     * FKSetStore for the variations used there. 
+     * Remove all elements from a collection from the association owner vs elements.
+     * This implementation iterates around the remove() method doing each element 1 at a time. 
+     * Please refer to the JoinSetStore and FKSetStore for the variations used there. 
      * This is used for Map key and value stores.
      * @param op ObjectProvider for the container
      * @param elements Collection of elements to remove 
@@ -332,6 +330,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
 
         return modified;
     }
+
     /**
      * Method to process an "add" statement.
      * @param op ObjectProvider for the owner
@@ -391,12 +390,10 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, 
-                        jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
-                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition,
-                            this);
+                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
 
                     int[] rowsDeleted = sqlControl.executeStatementUpdate(ec, mconn, removeStmt, ps, true);
@@ -422,8 +419,8 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         return modified;
     }
 
-    public int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element,
-            boolean executeNow) throws MappedDatastoreException
+    public int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
+    throws MappedDatastoreException
     {
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();

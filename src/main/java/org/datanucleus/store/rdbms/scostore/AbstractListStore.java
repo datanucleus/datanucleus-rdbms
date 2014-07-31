@@ -53,7 +53,7 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class AbstractListStore extends AbstractCollectionStore implements ListStore
 {
-    /** Whether the list is indexed (like with JDO). If false then it will have no orderMapping (like with JPA). */
+    /** Whether the list is indexed. If false then it will have no orderMapping. */
     protected boolean indexedList = true;
 
     protected String indexOfStmt;
@@ -295,8 +295,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         if (ec.getApiAdapter().isDetached(element))
         {
             // Element passed in is detached so find attached version (DON'T attach this object)
-            elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false,
-                element.getClass().getName());
+            elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false, element.getClass().getName());
         }
 
         boolean modified = internalRemove(op, elementToRemove, size);
@@ -717,8 +716,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), 
-            null, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
         if (relationDiscriminatorMapping != null)
         {
             BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
@@ -783,8 +781,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         stmt.append(containerTable.toString());
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(),
-            null, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
         if (relationDiscriminatorMapping != null)
         {
             BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
@@ -848,8 +845,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
             }
 
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(),
-                null, false);
+            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
             if (relationDiscriminatorMapping != null)
             {
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
