@@ -2111,8 +2111,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             for (int i=0;i<memberNames.length;i++)
             {
                 // Find the metadata for the actual field with the same name as this "index" field
-                AbstractMemberMetaData realFmd = getMetaDataForMember(memberNames[i]);
-                JavaTypeMapping fieldMapping = memberMappingsMap.get(realFmd);
+                AbstractMemberMetaData realMmd = getMetaDataForMember(memberNames[i]);
+                if (realMmd == null)
+                {
+                    throw new NucleusUserException("Table " + this + " has index specified on member " + memberNames[i] + 
+                        " but that member does not exist in the class that this table represents");
+                }
+
+                JavaTypeMapping fieldMapping = memberMappingsMap.get(realMmd);
                 int countFields = fieldMapping.getNumberOfDatastoreMappings();
                 for (int j=0; j<countFields; j++)
                 {
@@ -2365,8 +2371,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 // Find the metadata for the actual field with the same name as this "foreign-key" field
                 // and add all columns to the source columns for the FK
-                AbstractMemberMetaData realFmd = getMetaDataForMember(memberNames[i]);
-                JavaTypeMapping fieldMapping = memberMappingsMap.get(realFmd);
+                AbstractMemberMetaData realMmd = getMetaDataForMember(memberNames[i]);
+                if (realMmd == null)
+                {
+                    throw new NucleusUserException("Table " + this + " has foreign-key specified on member " + memberNames[i] + 
+                        " but that member does not exist in the class that this table represents");
+                }
+
+                JavaTypeMapping fieldMapping = memberMappingsMap.get(realMmd);
                 int countCols = fieldMapping.getNumberOfDatastoreMappings();
                 for (int j=0; j<countCols; j++)
                 {
@@ -2528,10 +2540,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 AbstractMemberMetaData realMmd = getMetaDataForMember(memberName);
                 if (realMmd == null)
                 {
-                    // User is an idiot and has specified some field that doesnt exist
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Unique metadata defined to use field " + memberName + " which doesn't exist in this class");
-                    return null;
+                    throw new NucleusUserException("Table " + this + " has unique key specified on member " + memberName + 
+                        " but that member does not exist in the class that this table represents");
                 }
+
                 JavaTypeMapping memberMapping = memberMappingsMap.get(realMmd);
                 int countFields = memberMapping.getNumberOfDatastoreMappings();
                 for (int j=0; j<countFields; j++)
