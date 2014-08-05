@@ -1174,6 +1174,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond3Method"/>
         <sql-method class="java.util.Date" method="getSecond" datastore="sqlserver"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond4Method"/>
+        <sql-method class="java.util.Date" method="getSecond" datastore="hsql"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond5Method"/>
 
         <sql-method class="java.util.Map" method="containsEntry"
             evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsEntryMethod"/>

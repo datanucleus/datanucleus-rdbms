@@ -30,7 +30,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 /**
  * Some databases will use the same type for the return value as the argument, which can be an issue
  * when averaging on integral types since it will drop the decimals.
- * This class will convert the arg to a "CAST( {arg} AS double)"
+ * This class will convert the arg to a "CAST({arg} AS double)"
  */
 public class AvgWithCastFunction extends AvgFunction
 {
@@ -41,8 +41,7 @@ public class AvgWithCastFunction extends AvgFunction
         List<SQLExpression> checkedArgs = null;
 
         // Only add the CAST if the argument is a non-floating point
-        if (!argType.equals(Double.class)
-                && !argType.equals(Float.class))
+        if (!argType.equals(Double.class) && !argType.equals(Float.class))
         {
             checkedArgs = new ArrayList<>();
             checkedArgs.add(new StringExpression(stmt, m, "CAST", args, asList("double")));
