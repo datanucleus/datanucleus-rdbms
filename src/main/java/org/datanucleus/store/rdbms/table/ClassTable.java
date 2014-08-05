@@ -1888,6 +1888,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         // Indexing not set, so add where we think it is appropriate
                         if (!fmd.isPrimaryKey()) // Ignore PKs since they will be indexed anyway
                         {
+                            // TODO Some RDBMS create index automatically for all FK cols so we don't need to really
                             RelationType relationType = fmd.getRelationType(clr);
                             if (relationType == RelationType.ONE_TO_ONE_UNI)
                             {
