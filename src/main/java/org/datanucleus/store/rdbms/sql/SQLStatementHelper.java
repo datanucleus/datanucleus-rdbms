@@ -873,7 +873,7 @@ public class SQLStatementHelper
                             JavaTypeMapping referenceMapping = collTable.getElementMapping();
                             joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
                                 sourceSqlTbl.getTable().getIdMapping(),
-                                collTable, null, referenceMapping, null, tableGroupName);
+                                collTable, null, referenceMapping, null, tableGroupName + "_JOIN");
                         }
                         else
                         {
@@ -893,7 +893,7 @@ public class SQLStatementHelper
                     PersistableJoinTable joinTable = (PersistableJoinTable) storeMgr.getTable(mmd);
                     SQLTable joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
                         sourceSqlTbl.getTable().getIdMapping(),
-                        joinTable, null, joinTable.getOwnerMapping(), null, tableGroupName);
+                        joinTable, null, joinTable.getOwnerMapping(), null, tableGroupName + "_JOIN");
 
                     int[] colNumbers = stmt.select(joinSqlTbl, joinTable.getRelatedMapping(), null);
                     stmtMapping.setColumnPositions(colNumbers);
