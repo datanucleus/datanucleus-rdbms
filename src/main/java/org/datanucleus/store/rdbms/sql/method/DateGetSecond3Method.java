@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {dateExpr}.getSecond() using PostgreSQL.
- * Returns a NumericExpression that equates to <pre>date_part("second", expr)</pre>
+ * Returns a NumericExpression that equates to <pre>CAST(date_part("second", expr) AS 'INTEGER')</pre>
  */
 public class DateGetSecond3Method extends AbstractSQLMethod
 {
@@ -51,6 +53,9 @@ public class DateGetSecond3Method extends AbstractSQLMethod
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(day);
         funcArgs.add(expr);
-        return new NumericExpression(stmt, getMappingForClass(int.class), "date_part", funcArgs);
+        NumericExpression secondExpr = new NumericExpression(stmt, getMappingForClass(int.class), "date_part", funcArgs);
+        List castArgs = new ArrayList();
+        castArgs.add(secondExpr);
+        return new NumericExpression(stmt, getMappingForClass(Integer.class), "CAST", castArgs, asList("INTEGER"));
     }
 }
