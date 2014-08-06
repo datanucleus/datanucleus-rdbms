@@ -46,7 +46,7 @@ public class SQLTableAlphaNamer implements SQLTableNamer
             int number = stmt.tableGroups.size();
             groupLetters = getLettersForNumber(number);
 
-            // Check that this doesn't clash with predefined table aliases
+            // Check that this doesn't clash with predefined table aliases. Note, we allow for lowercase here too since some datastores (e.g Postgresql) convert to lower.
             boolean nameClashes = true;
             while (nameClashes)
             {
@@ -61,13 +61,13 @@ public class SQLTableAlphaNamer implements SQLTableNamer
                     // No other tables defined so ok
                     nameClashes = false;
                 }
-                else if (stmt.tables.containsKey(groupLetters)) // Try a predefined table of that letter
+                else if (stmt.tables.containsKey(groupLetters) || stmt.tables.containsKey(groupLetters.toLowerCase())) // Try a predefined table of that letter
                 {
                     // Clashes with other table
                     number++;
                     groupLetters = getLettersForNumber(number);
                 }
-                else if (stmt.tables.containsKey(groupLetters + "0")) // Try the first of that group
+                else if (stmt.tables.containsKey(groupLetters + "0") || stmt.tables.containsKey(groupLetters.toLowerCase() + "0")) // Try the first of that group
                 {
                     // Clashes with other table
                     number++;
