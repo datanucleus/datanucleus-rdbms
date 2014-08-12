@@ -187,8 +187,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue()
-                        .toString()))
+                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue().toString()))
                 {
                     ps.setLong(param, Long.valueOf(column.getDefaultValue().toString().trim()).longValue());
                 }
@@ -201,17 +200,16 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (value instanceof Character)
                 {
-                    String s = value.toString();
-                    ps.setInt(param, s.charAt(0));
+                    ps.setInt(param, value.toString().charAt(0));
                 }
                 else if (value instanceof String)
                 {
-                    String s = (String) value;
-                    ps.setInt(param, s.charAt(0));
+                    // User requested to store a String as an INTEGER! Why would anyone do that?
+                    ps.setLong(param, Long.valueOf((String)value).longValue());
                 }
                 else if (value instanceof java.util.Date)
                 {
-                    ps.setLong(param, ((java.util.Date) value).getTime());
+                    ps.setLong(param, ((java.util.Date)value).getTime());
                 }
                 else
                 {
@@ -236,8 +234,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         Object value;
         try
         {
-            // Read the object as a String since that is the most DB independent
-            // type we can use and should always get us something.
+            // Read the object as a String since that is the most DB independent type we can use and should always get us something.
             String str = rs.getString(param);
             if (rs.wasNull())
             {
@@ -245,9 +242,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-
-                // Some RDBMS (e.g PostgreSQL) can return a long as a double
-                // so cater for this, and generate a Long :-)
+                // Some RDBMS (e.g PostgreSQL) can return a long as a double so cater for this, and generate a Long :-)
                 try
                 {
                     // Try it as a long
@@ -258,6 +253,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                     // Must be a double precision, so cast it
                     value = Long.valueOf((new Double(str)).longValue());
                 }
+
                 if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
                 {
                     value = new java.util.Date(((Long) value).longValue());
