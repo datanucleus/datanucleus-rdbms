@@ -102,9 +102,8 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
         {           
             try
             {
-                //when value is real in database, cause cause a parse error when calling getFloat
-                //JDBC error:Value can not be converted to requested type.
-
+                // when value is real in database, cause cause a parse error when calling getFloat
+                // JDBC error:Value can not be converted to requested type.
                 value = Float.parseFloat(rs.getString(param));
                 if( column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
                 {
@@ -162,8 +161,7 @@ public class RealRDBMSMapping extends AbstractDatastoreMapping
 		{
             try
             {
-                // when value is real in database, cause cause a parse error
-                // when calling getFloat
+                // when value is real in database, cause cause a parse error when calling getFloat
                 // JDBC error:Value can not be converted to requested type.
                 value = new Float(Float.parseFloat(rs.getString(param)));
                 if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )

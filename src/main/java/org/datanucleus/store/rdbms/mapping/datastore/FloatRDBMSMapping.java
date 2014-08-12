@@ -65,12 +65,9 @@ public class FloatRDBMSMapping extends DoubleRDBMSMapping
         try
         {
             value = rs.getFloat(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)

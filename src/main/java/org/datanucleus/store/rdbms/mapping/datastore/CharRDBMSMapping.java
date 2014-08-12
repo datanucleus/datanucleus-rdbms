@@ -130,9 +130,8 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (typeInfo.isAllowsPrecisionSpec())
                 {
-                    throw new NucleusUserException(
-                            "String max length of " + column.getColumnMetaData().getLength() + " is outside the acceptable range [0, " + maxlength + "] for column \"" + column
-                                    .getIdentifier() + "\"");
+                    throw new NucleusUserException("String max length of " + column.getColumnMetaData().getLength() + " is outside the acceptable range [0, " + 
+                        maxlength + "] for column \"" + column.getIdentifier() + "\"");
                 }
             }
         }
@@ -249,8 +248,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-                if (column != null) // Column could be null if we have a query of something like an
-                                    // "enumClass.value"
+                if (column != null) // Column could be null if we have a query of something like an "enumClass.value"
                 {
                     Integer colLength = column.getColumnMetaData().getLength();
                     if (colLength != null && colLength.intValue() < value.length())
@@ -259,8 +257,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                         String action = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STRING_LENGTH_EXCEEDED_ACTION);
                         if (action.equals("EXCEPTION"))
                         {
-                            throw new NucleusUserException(Localiser.msg("055007", value, column.getIdentifier().toString(), "" + colLength.intValue()))
-                                    .setFatal();
+                            throw new NucleusUserException(Localiser.msg("055007", value, column.getIdentifier().toString(), "" + colLength.intValue())).setFatal();
                         }
                         else if (action.equals("TRUNCATE"))
                         {
@@ -292,8 +289,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             {
                 return value;
             }
-            else if (getDatastoreAdapter().supportsOption(DatastoreAdapter.NULL_EQUALS_EMPTY_STRING) && value.equals(getDatastoreAdapter()
-                    .getSurrogateForEmptyStrings()))
+            else if (getDatastoreAdapter().supportsOption(DatastoreAdapter.NULL_EQUALS_EMPTY_STRING) && value.equals(getDatastoreAdapter().getSurrogateForEmptyStrings()))
             {
                 // Special character simbolizing empty string
                 return "";
@@ -302,8 +298,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (column.getJdbcType() == JdbcType.CHAR && getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
                 {
-                    // String has likely been padded with spaces at the end by the datastore so trim trailing
-                    // whitespace
+                    // String has likely been padded with spaces at the end by the datastore so trim trailing whitespace
                     int numPaddingChars = 0;
                     for (int i = value.length() - 1; i >= 0; i--)
                     {
@@ -445,8 +440,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    // This caters for all non-string types. If any more need specific treatment, split them
-                    // out above.
+                    // This caters for all non-string types. If any more need specific treatment, split them out above.
                     ps.setString(param, value.toString());
                 }
             }

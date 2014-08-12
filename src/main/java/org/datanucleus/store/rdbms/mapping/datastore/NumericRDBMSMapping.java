@@ -162,12 +162,9 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getInt(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -200,18 +197,14 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getByte(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002",
-                "byte", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "byte", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -225,8 +218,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001",
-                "boolean", "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "boolean", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -240,8 +232,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002",
-                "boolean", "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "boolean", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -255,8 +246,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001",
-                "double","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "double","" + value, column, e.getMessage()), e);
         }
     }
 
@@ -267,12 +257,9 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getDouble(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003", column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -291,8 +278,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002",
-                "float","" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "float","" + value, column, e.getMessage()), e);
         }
     }    
 
@@ -303,12 +289,9 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = (float) rs.getDouble(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -327,8 +310,7 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001",
-                "short", "" + value,column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "short", "" + value,column, e.getMessage()), e);
         }
     }
 
@@ -339,12 +321,9 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getShort(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -374,12 +353,9 @@ public class NumericRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getLong(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)

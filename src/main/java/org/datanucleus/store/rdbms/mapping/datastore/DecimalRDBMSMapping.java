@@ -60,8 +60,7 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         // want to control it.
         if (column != null && column.getColumnMetaData().getLength() == null)
         {
-            // In case the default DECIMAL precision is less than the number of
-            // digits we need, set it manually
+            // In case the default DECIMAL precision is less than the number of digits we need, set it manually
             if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_INTEGER))
             {
                 column.getColumnMetaData().setLength(INT_MAX_DECIMAL_DIGITS);
@@ -138,12 +137,9 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         {
             value = rs.getDouble(param);
 
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -162,12 +158,9 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         {
             value = (float) rs.getDouble(param);
 
-            if( column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -186,12 +179,9 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         {
             value = rs.getInt(param);
 
-            if( column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -222,12 +212,9 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         {
             value = rs.getLong(param);
 
-            if( column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)

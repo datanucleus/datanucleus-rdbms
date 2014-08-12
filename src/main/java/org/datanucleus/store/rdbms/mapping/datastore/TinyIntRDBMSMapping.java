@@ -171,13 +171,9 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getInt(param);
-
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -208,12 +204,9 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getInt(param);
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull())
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
@@ -247,13 +240,9 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             value = rs.getByte(param);
-
-            if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
+            if ((column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull()) && rs.wasNull())
             {
-                if (rs.wasNull())
-                {
-                    throw new NullValueException(Localiser.msg("055003",column));
-                }
+                throw new NullValueException(Localiser.msg("055003",column));
             }
         }
         catch (SQLException e)
