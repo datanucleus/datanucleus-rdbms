@@ -376,6 +376,8 @@ public interface DatastoreAdapter
     public static final String RESULTSET_TYPE_SCROLL_SENSITIVE = "ResultSetTypeScrollSens";
     public static final String RESULTSET_TYPE_SCROLL_INSENSITIVE = "ResultSetTypeScrollInsens";
 
+    public static final String HOLD_CURSORS_OVER_COMMIT = "HoldCursorsOverCommit";
+
     /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.
      * @return The options (Collection&lt;String&gt;)

@@ -51,6 +51,9 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
 
+        // Firebird doesn't hold cursors over commit so have to load all results before committing connection
+        supportedOptions.remove(HOLD_CURSORS_OVER_COMMIT);
+
         if (datastoreMajorVersion < 2)
         {
             // CROSS JOIN syntax is not supported before Firebird 2

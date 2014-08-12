@@ -402,6 +402,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             {
                 supportedOptions.add(IDENTIFIERS_MIXEDCASE_QUOTED_SENSITIVE);
             }
+            supportedOptions.add(HOLD_CURSORS_OVER_COMMIT); // TODO Could use metadata.supportResultSetHoldability but some JDBC drivers give unexpected results
 
             // Retrieve the catalog separator string (default = ".")
             catalogSeparator = metadata.getCatalogSeparator();

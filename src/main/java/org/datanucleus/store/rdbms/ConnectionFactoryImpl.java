@@ -342,6 +342,16 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 // Nontransactional context, and need to commit the connection
                 try
                 {
+                    DatastoreAdapter dba = ((RDBMSStoreManager)storeMgr).getDatastoreAdapter();
+                    if (!dba.supportsOption(DatastoreAdapter.HOLD_CURSORS_OVER_COMMIT))
+                    {
+                        // Call mcPreClose since this datastore doesn't hold open results when calling conn.commit (Firebird)
+                        for (int i=0; i<listeners.size(); i++)
+                        {
+                            listeners.get(i).managedConnectionPreClose();
+                        }
+                    }
+
                     Connection conn = getSqlConnection();
                     if (conn != null && !conn.isClosed() && !conn.getAutoCommit())
                     {
