@@ -357,9 +357,17 @@ public abstract class AbstractClassTable extends TableImpl
         {
             strategyName = cmd.getIdentityMetaData().getValueStrategy().getCustomName();
         }
+        if (strategyName != null && IdentityStrategy.NATIVE.toString().equals(strategyName))
+        {
+            strategyName = storeMgr.getStrategyForNative(cmd, -1);
+        }
 
         // Check the value generator type being stored
         Class valueGeneratedType = Long.class;
+        if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
+        {
+            valueGeneratedType = dba.getAutoIncrementJavaType();
+        }
         try
         {
             // Create generator so we can find the generated type

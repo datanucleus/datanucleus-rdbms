@@ -522,6 +522,12 @@ public interface DatastoreAdapter
     int getDatastoreIdentifierMaxLength(IdentifierType identifierType);
 
     /**
+     * Return the java type that represents any autoincrement/identity column value.
+     * @return The java type for any IDENTITY column
+     */
+    Class getAutoIncrementJavaType();
+
+    /**
      * Accessor for the maximum foreign keys by table permitted in this datastore.
      * @return Max number of foreign keys
      */

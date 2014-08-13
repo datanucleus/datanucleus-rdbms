@@ -1082,6 +1082,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
 
+    @Override
+    public Class getAutoIncrementJavaType()
+    {
+        // Most datastores just use Long (BIGINT column)
+        return Long.class;
+    }
+
     /**
      * Verifies if the given <code>typeName</code> is auto incremented by the datastore.
      * @param typeName the datastore type name
