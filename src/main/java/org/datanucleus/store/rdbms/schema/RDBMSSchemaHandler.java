@@ -610,8 +610,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param tableName Name of the table
      * @return The primary key info
      */
-    protected RDBMSTablePKInfo getRDBMSTablePKInfoForTable(Connection conn,
-            String catalogName, String schemaName, String tableName)
+    protected RDBMSTablePKInfo getRDBMSTablePKInfoForTable(Connection conn, String catalogName, String schemaName, String tableName)
     {
         // We don't cache PK info, so retrieve it directly
         RDBMSTablePKInfo info = new RDBMSTablePKInfo(catalogName, schemaName, tableName);
@@ -688,8 +687,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param tableName Name of the table
      * @return The index info
      */
-    protected RDBMSTableIndexInfo getRDBMSTableIndexInfoForTable(Connection conn, 
-            String catalogName, String schemaName, String tableName)
+    protected RDBMSTableIndexInfo getRDBMSTableIndexInfoForTable(Connection conn, String catalogName, String schemaName, String tableName)
     {
         // We don't cache Index info, so retrieve it directly
         RDBMSTableIndexInfo info = new RDBMSTableIndexInfo(catalogName, schemaName, tableName);
@@ -736,8 +734,8 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown while querying indices for table=" + tableName, sqle);
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception thrown while querying indices for table=" + tableName, sqle);
+            throw new NucleusDataStoreException("Exception thrown while querying indices for table=" + tableName, sqle);
         }
 
         return info;
@@ -750,8 +748,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param schema Schema
      * @return Schema information
      */
-    protected RDBMSSchemaInfo getRDBMSSchemaInfoForCatalogSchema(Connection conn, String catalog, 
-            String schema)
+    protected RDBMSSchemaInfo getRDBMSSchemaInfoForCatalogSchema(Connection conn, String catalog, String schema)
     {
         if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS))
         {
@@ -806,8 +803,8 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         catch (SQLException sqle)
         {
             // TODO Localise
-            throw new NucleusDataStoreException(
-                "Exception thrown obtaining schema column information from datastore", sqle);
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception thrown obtaining schema column information from datastore", sqle);
+            throw new NucleusDataStoreException("Exception thrown obtaining schema column information from datastore", sqle);
         }
         finally
         {
@@ -826,8 +823,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             catch (SQLException sqle)
             {
                 // TODO Localise
-                throw new NucleusDataStoreException(
-                    "Exception thrown closing results of DatabaseMetaData.getColumns()", sqle);
+                throw new NucleusDataStoreException("Exception thrown closing results of DatabaseMetaData.getColumns()", sqle);
             }
         }
 
@@ -873,8 +869,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param tableName Name of the table
      * @return The table info containing the columns
      */
-    protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, String catalogName,
-            String schemaName, String tableName)
+    protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, String catalogName, String schemaName, String tableName)
     {
         RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(conn, "tables", null);
         if (info == null)
@@ -924,8 +919,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             }
             else
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050032", 
-                    tableName, "" + tableInfo.getNumberOfChildren()));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050032", tableName, "" + tableInfo.getNumberOfChildren()));
             }
         }
         return tableInfo;
@@ -988,7 +982,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 
         // Retrieve all column info for the required catalog/schema
         ResultSet rs = null;
-        HashSet tablesProcessed = new HashSet();
+        Set<String> tablesProcessed = new HashSet();
         try
         {
             Connection conn = (Connection)connection;
@@ -1075,11 +1069,17 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 }
             }
         }
+        catch (NullPointerException npe)
+        {
+            // SQLite throws NPEs, nice.
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception thrown obtaining schema column information from datastore", npe);
+            throw new NucleusDataStoreException("Exception thrown obtaining schema column information from datastore", npe);
+        }
         catch (SQLException sqle)
         {
             // TODO Localise
-            throw new NucleusDataStoreException(
-                "Exception thrown obtaining schema column information from datastore", sqle);
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception thrown obtaining schema column information from datastore", sqle);
+            throw new NucleusDataStoreException("Exception thrown obtaining schema column information from datastore", sqle);
         }
         finally
         {
