@@ -1083,10 +1083,10 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     @Override
-    public Class getAutoIncrementJavaType()
+    public Class getAutoIncrementJavaTypeForType(Class type)
     {
-        // Most datastores just use Long (BIGINT column)
-        return Long.class;
+        // Most datastores have no restrictions (maybe we should limit to Long, Integer, Short?)
+        return type;
     }
 
     /**

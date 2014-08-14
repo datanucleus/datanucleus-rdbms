@@ -41,6 +41,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.NullValue;
@@ -397,7 +398,27 @@ public class RDBMSMappingManager implements MappingManager
             else
             {
                 // Non-embedded/non-serialised - Just get the basic mapping for the type
-                mcd = getMappingClass(mmd.getType(), false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
+                Class memberType = mmd.getType();
+                IdentityStrategy strategy = mmd.getValueStrategy();
+                if (strategy != null)
+                {
+                    String strategyName = strategy.toString();
+                    if (strategy == IdentityStrategy.NATIVE)
+                    {
+                        strategyName = storeMgr.getStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
+                    }
+                    if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
+                    {
+                        memberType = storeMgr.getDatastoreAdapter().getAutoIncrementJavaTypeForType(memberType);
+                        if (memberType != mmd.getType())
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.debug("Member " + mmd.getFullFieldName() + " uses IDENTITY strategy and rather than using memberType of " + mmd.getTypeName() +
+                                " for the column type, using " + memberType + " since the datastore requires that");
+                        }
+                    }
+                }
+
+                mcd = getMappingClass(memberType, false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
 
                 if (mmd.getParent() instanceof EmbeddedMetaData && mmd.getRelationType(clr) != RelationType.NONE)
                 {

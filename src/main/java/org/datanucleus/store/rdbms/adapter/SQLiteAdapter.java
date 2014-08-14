@@ -266,9 +266,13 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     }
 
     @Override
-    public Class getAutoIncrementJavaType()
+    public Class getAutoIncrementJavaTypeForType(Class type)
     {
         // SQLite only seems to allow INTEGER columns for AUTOINCREMENT
+        if (type.isPrimitive())
+        {
+            return int.class;
+        }
         return Integer.class;
     }
 }

@@ -523,9 +523,10 @@ public interface DatastoreAdapter
 
     /**
      * Return the java type that represents any autoincrement/identity column value.
-     * @return The java type for any IDENTITY column
+     * @param type The type of the member mapping to an IDENTITY column
+     * @return The type that should be used in generating the column
      */
-    Class getAutoIncrementJavaType();
+    Class getAutoIncrementJavaTypeForType(Class type);
 
     /**
      * Accessor for the maximum foreign keys by table permitted in this datastore.
