@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.table;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -81,7 +80,7 @@ import org.datanucleus.util.StringUtils;
 public abstract class AbstractClassTable extends TableImpl
 {
     /** Mappings for members mapped to this table, keyed by the metadata for the member. */
-    protected Map<AbstractMemberMetaData, JavaTypeMapping> memberMappingsMap = new LinkedHashMap<>();
+    protected Map<AbstractMemberMetaData, JavaTypeMapping> memberMappingsMap = new LinkedHashMap<AbstractMemberMetaData, JavaTypeMapping>();
 
     /** Mapping for datastore identity (optional). */
     protected JavaTypeMapping datastoreIDMapping;
