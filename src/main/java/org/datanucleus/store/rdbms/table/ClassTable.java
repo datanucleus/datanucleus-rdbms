@@ -53,6 +53,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.DiscriminatorMetaData;
+import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
@@ -725,6 +726,43 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 {
                                     elementCmds = new ClassMetaData[1];
                                     elementCmds[0] = elementCmd;
+                                }
+
+                                ElementMetaData elemmd = mmd.getElementMetaData();
+                                if (elemmd != null && elemmd.getTable() != null)
+                                {
+                                    DatastoreIdentifier requiredTableId = storeMgr.getIdentifierFactory().newTableIdentifier(elemmd.getTable());
+                                    DatastoreClass requiredTable = storeMgr.getDatastoreClass(requiredTableId);
+                                    if (requiredTable != null)
+                                    {
+                                        // TODO Respect specification of table in ElementMetaData rather than just defaulting to table of element type
+                                        // Note that this will need updates to FKListStore, FKSetStore etc to look for the table
+                                        NucleusLogger.GENERAL.warn("Member=" + mmd.getFullFieldName() + " has 1-N FK with required table=" + requiredTable +
+                                                " : we don't currently support specification of the element table, and always take the default table for the element type");
+                                        /*for (int i=0;i<elementCmds.length;i++)
+                                        {
+                                            AbstractClassMetaData theElementCmd = elementCmds[i];
+                                            while (theElementCmd != null)
+                                            {
+                                                if (requiredTable.managesClass(theElementCmd.getFullClassName()))
+                                                {
+                                                    NucleusLogger.GENERAL.info(">> CT reqdTable=" + requiredTable + " manages element=" + theElementCmd.getFullClassName());
+                                                    if (theElementCmd != elementCmds[i])
+                                                    {
+                                                        elementCmds = new ClassMetaData[1];
+                                                        elementCmds[0] = theElementCmd;
+                                                        break;
+                                                    }
+                                                }
+                                                theElementCmd = theElementCmd.getSuperAbstractClassMetaData();
+                                            }
+                                        }*/
+                                    }
+                                    else
+                                    {
+                                        NucleusLogger.DATASTORE_SCHEMA.warn("Member " + mmd.getFullFieldName() + " specified element FK in table=" + elemmd.getTable() + 
+                                            " but table not known. Ignoring.");
+                                    }
                                 }
 
                                 // Run callbacks for each of the element classes.
