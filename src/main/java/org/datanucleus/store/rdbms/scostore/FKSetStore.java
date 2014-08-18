@@ -176,8 +176,7 @@ public class FKSetStore extends AbstractSetStore
             }
             if (isEmbeddedMapping(ownerMapping))
             {
-                throw new NucleusUserException(Localiser.msg("056026",
-                    ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
             }
         }
         else
@@ -186,10 +185,10 @@ public class FKSetStore extends AbstractSetStore
             // The element class knows nothing about the owner (but its table has external mappings)
             ownerFieldNumber = -1;
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+            // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056030", 
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+                throw new NucleusUserException(Localiser.msg("056030", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
             }
         }
 

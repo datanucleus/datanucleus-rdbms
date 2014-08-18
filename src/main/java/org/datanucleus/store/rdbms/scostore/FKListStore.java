@@ -169,8 +169,7 @@ public class FKListStore extends AbstractListStore
             }
             if (isEmbeddedMapping(ownerMapping))
             {
-                throw new NucleusUserException(Localiser.msg("056026",
-                    ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
             }
         }
         else
@@ -179,6 +178,7 @@ public class FKListStore extends AbstractListStore
             // The element class knows nothing about the owner (but its table has external mappings)
             ownerFieldNumber = -1;
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+            // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
             if (ownerMapping == null)
             {
                 throw new NucleusUserException(Localiser.msg("056030", 
@@ -195,12 +195,10 @@ public class FKListStore extends AbstractListStore
         if (orderMapping == null && indexedList)
         {
             // "Indexed List" but no order mapping present!
-            throw new NucleusUserException(Localiser.msg("056041", 
-                mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+            throw new NucleusUserException(Localiser.msg("056041", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
         }
 
-        relationDiscriminatorMapping =
-            elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
         if (relationDiscriminatorMapping != null)
         {
             relationDiscriminatorValue = mmd.getValueForExtension("relation-discriminator-value");
