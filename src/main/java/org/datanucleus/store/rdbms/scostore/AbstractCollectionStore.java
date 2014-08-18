@@ -29,7 +29,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
@@ -42,6 +41,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of a store of a Collection.
@@ -173,8 +173,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         return stmt.toString();
     }
 
-    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value, 
-            JavaTypeMapping fieldMapping)
+    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
     {
         boolean modified = false;
         String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
@@ -211,7 +210,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE_PERSIST.error("Exception updating embedded element in collection", e);
             // TODO Update this localised message to reflect that it is the update of an embedded element
             throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
         }
@@ -365,6 +364,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         return stmt.toString();
     }
+
     protected boolean containsInternal(ObjectProvider op, Object element)
     {
         boolean retval;
@@ -427,40 +427,6 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
             throw new NucleusDataStoreException(Localiser.msg("056008", stmt), e);
         }
         return retval;
-    }
-
-    public int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
-    throws MappedDatastoreException
-    {
-        ExecutionContext ec = op.getExecutionContext();
-        SQLController sqlControl = storeMgr.getSQLController();
-        String removeStmt = getRemoveStmt(element);
-        try
-        {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, removeStmt, batched);
-            try
-            {
-                int jdbcPosition = 1;
-
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
-                if (relationDiscriminatorMapping != null)
-                {
-                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                }
-
-                // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, removeStmt, ps, executeNow);
-            }
-            finally
-            {
-                sqlControl.closeStatement(conn, ps);
-            }
-        }
-        catch (SQLException sqle)
-        {
-            throw new MappedDatastoreException("SQLException", sqle);
-        }
     }
 
     /**

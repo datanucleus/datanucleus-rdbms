@@ -452,7 +452,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      *
      * @return The Statement for adding an item
      */
-    protected String getAddStmt()
+    protected String getAddStmtForJoinTable()
     {
         if (addStmt == null)
         {

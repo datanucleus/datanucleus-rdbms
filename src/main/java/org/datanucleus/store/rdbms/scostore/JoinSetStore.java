@@ -194,35 +194,6 @@ public class JoinSetStore extends AbstractSetStore
     }
 
     /**
-     * Remove all elements from a collection from the association owner vs elements.
-     * @param op ObjectProvider for the container
-     * @param elements Collection of elements to remove
-     * @return Whether the database was updated
-     */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
-    {
-        if (elements == null || elements.size() == 0)
-        {
-            return false;
-        }
-
-        boolean modified = removeAllInternal(op, elements, size);
-        boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
-        if (ownerMemberMetaData.isCascadeRemoveOrphans())
-        {
-            dependent = true;
-        }
-        if (dependent)
-        {
-            // "delete-dependent" : delete elements if the collection is marked as dependent
-            // TODO What if the collection contains elements that are not in the Set ? should not delete them
-            op.getExecutionContext().deleteObjects(elements.toArray());
-        }
-
-        return modified;
-    }
-
-    /**
      * Convenience method to check if an element already refers to the owner in an M-N relation.
      * @param ownerOP ObjectProvider of the owner
      * @param element The element
@@ -505,6 +476,35 @@ public class JoinSetStore extends AbstractSetStore
         return null;
     }
 
+    /**
+     * Remove all elements from a collection from the association owner vs elements.
+     * @param op ObjectProvider for the container
+     * @param elements Collection of elements to remove
+     * @return Whether the database was updated
+     */
+    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    {
+        if (elements == null || elements.size() == 0)
+        {
+            return false;
+        }
+
+        boolean modified = removeAllInternal(op, elements, size);
+        boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
+        if (ownerMemberMetaData.isCascadeRemoveOrphans())
+        {
+            dependent = true;
+        }
+        if (dependent)
+        {
+            // "delete-dependent" : delete elements if the collection is marked as dependent
+            // TODO What if the collection contains elements that are not in the Set ? should not delete them
+            op.getExecutionContext().deleteObjects(elements.toArray());
+        }
+
+        return modified;
+    }
+
     protected boolean removeAllInternal(ObjectProvider op, Collection elements, int size)
     {
         boolean modified = false;
@@ -709,7 +709,7 @@ public class JoinSetStore extends AbstractSetStore
             }
         }
 
-        String addStmt = getAddStmt();
+        String addStmt = getAddStmtForJoinTable();
         boolean notYetFlushedError = false;
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();

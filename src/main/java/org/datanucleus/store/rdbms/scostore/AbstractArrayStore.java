@@ -289,7 +289,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
     {
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
-        String addStmt = getAddStmt();
+        String addStmt = getAddStmtForJoinTable();
         try
         {
             PreparedStatement ps = sqlControl.getStatementForUpdate(conn, addStmt, false);

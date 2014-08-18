@@ -255,7 +255,7 @@ public class JoinListStore extends AbstractListStore
             }
         }
 
-        String addStmt = getAddStmt();
+        String addStmt = getAddStmtForJoinTable();
         try
         {
             ManagedConnection mconn = storeMgr.getConnection(ec);
@@ -529,6 +529,40 @@ public class JoinListStore extends AbstractListStore
         }
 
         return modified;
+    }
+
+    private int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
+    throws MappedDatastoreException
+    {
+        ExecutionContext ec = op.getExecutionContext();
+        SQLController sqlControl = storeMgr.getSQLController();
+        String removeStmt = getRemoveStmt(element);
+        try
+        {
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, removeStmt, batched);
+            try
+            {
+                int jdbcPosition = 1;
+
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                if (relationDiscriminatorMapping != null)
+                {
+                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                }
+
+                // Execute the statement
+                return sqlControl.executeStatementUpdate(ec, conn, removeStmt, ps, executeNow);
+            }
+            finally
+            {
+                sqlControl.closeStatement(conn, ps);
+            }
+        }
+        catch (SQLException sqle)
+        {
+            throw new MappedDatastoreException("SQLException", sqle);
+        }
     }
 
     /**

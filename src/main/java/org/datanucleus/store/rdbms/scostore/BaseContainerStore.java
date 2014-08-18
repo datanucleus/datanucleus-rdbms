@@ -131,8 +131,7 @@ public abstract class BaseContainerStore implements Store
      * @param pcType Object type for the embedded object (see ObjectProvider EMBEDDED_PC etc)
      * @return The ObjectProvider
      */
-    public ObjectProvider getObjectProviderForEmbeddedPCObject(ObjectProvider op, Object obj, 
-            AbstractMemberMetaData ownerMmd, short pcType)
+    public ObjectProvider getObjectProviderForEmbeddedPCObject(ObjectProvider op, Object obj, AbstractMemberMetaData ownerMmd, short pcType)
     {
         ExecutionContext ec = op.getExecutionContext();
         ObjectProvider objOP = ec.findObjectProvider(obj);

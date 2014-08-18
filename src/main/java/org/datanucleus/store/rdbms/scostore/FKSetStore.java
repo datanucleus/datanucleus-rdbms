@@ -214,6 +214,26 @@ public class FKSetStore extends AbstractSetStore
     }
 
     /**
+     * This seems to return the field number in the element of the relation when it is a bidirectional relation.
+     * @param op ObjectProvider for the owner.
+     * @return The field number in the element for this relation
+     */
+    protected int getFieldNumberInElementForBidirectional(ObjectProvider op)
+    {
+        if (ownerFieldNumber < 0)
+        {
+            // Unidirectional
+            return -1;
+        }
+        // This gives a different result when using persistent interfaces.
+        // For example with the JDO2 TCK, org.apache.jdo.tck.pc.company.PIDepartmentImpl.employees will
+        // return 3, yet the ownerMemberMetaData.getRelatedMetaData returns 8 since the generated implementation
+        // will have all fields in a single MetaData (numbering from 0), whereas in a normal inheritance
+        // tree there will be multiple MetaData (the root starting from 0)
+        return op.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
+    }
+
+    /**
      * Utility to update a foreign-key (and distinguisher) in the element in the case of
      * a unidirectional 1-N relationship.
      * @param op ObjectProvider for the owner
@@ -309,26 +329,6 @@ public class FKSetStore extends AbstractSetStore
         }
 
         return retval;
-    }
-
-    /**
-     * This seems to return the field number in the element of the relation when it is a bidirectional relation.
-     * @param op ObjectProvider for the owner.
-     * @return The field number in the element for this relation
-     */
-    protected int getFieldNumberInElementForBidirectional(ObjectProvider op)
-    {
-        if (ownerFieldNumber < 0)
-        {
-            // Unidirectional
-            return -1;
-        }
-        // This gives a different result when using persistent interfaces.
-        // For example with the JDO2 TCK, org.apache.jdo.tck.pc.company.PIDepartmentImpl.employees will
-        // return 3, yet the ownerMemberMetaData.getRelatedMetaData returns 8 since the generated implementation
-        // will have all fields in a single MetaData (numbering from 0), whereas in a normal inheritance
-        // tree there will be multiple MetaData (the root starting from 0)
-        return op.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
     }
 
     /**
@@ -442,8 +442,7 @@ public class FKSetStore extends AbstractSetStore
             {
                 if (elementTbl != null)
                 {
-                    JavaTypeMapping externalFKMapping = elementTbl.getExternalMapping(ownerMemberMetaData, 
-                        MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    JavaTypeMapping externalFKMapping = elementTbl.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
@@ -465,8 +464,7 @@ public class FKSetStore extends AbstractSetStore
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037",
-                            op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject())));
                         elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
                     }
@@ -487,10 +485,8 @@ public class FKSetStore extends AbstractSetStore
                         else if (op.getReferencedPC() == null)
                         {
                             // Not being attached so must be inconsistent owner, so throw exception
-                            throw new NucleusUserException(Localiser.msg("056038",
-                                op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                                StringUtils.toJVMIDString(elementOP.getObject()),
-                                StringUtils.toJVMIDString(currentOwner)));
+                            throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                                StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(currentOwner)));
                         }
                     }
                 }
@@ -582,7 +578,6 @@ public class FKSetStore extends AbstractSetStore
         }
 
         boolean success = false;
-
         Iterator iter = elements.iterator();
         while (iter.hasNext())
         {
