@@ -271,6 +271,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         }
         stmt.append(" FROM ");
         stmt.append(getContainerTable().toString()).append(" ").append(containerAlias);
+        // TODO Add join to owner if ownerMapping is for supertable
 
         // Add join to element table if required (only allows for 1 element table currently)
         boolean joinedDiscrim = false;

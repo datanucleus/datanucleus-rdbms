@@ -1057,6 +1057,7 @@ public class FKListStore extends AbstractListStore
 
     private String getUpdateFkStatementString(Object element)
     {
+        // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
         StringBuilder stmt = new StringBuilder("UPDATE ");
         if (elementInfo.length > 1)
         {
@@ -1125,6 +1126,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
+                // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
@@ -1204,6 +1206,7 @@ public class FKListStore extends AbstractListStore
 
     private String getSetStatementString(Object element)
     {
+        // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(containerTable.toString()); // TODO Allow for multiple element tables
         stmt.append(" SET ");
@@ -1259,6 +1262,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
+                // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
                 // TODO Allow for multiple element tables
                 stmt.append(containerTable.toString());
@@ -1330,6 +1334,7 @@ public class FKListStore extends AbstractListStore
         {
             synchronized (this)
             {
+                // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
@@ -1456,6 +1461,7 @@ public class FKListStore extends AbstractListStore
         if (addRestrictionOnOwner)
         {
             // Apply condition to filter by owner
+            // TODO If ownerMapping is not for containerTable then do JOIN to ownerTable in the FROM clause (or find if already done)
             SQLTable ownerSqlTbl =
                     SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);

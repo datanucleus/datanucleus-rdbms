@@ -919,6 +919,7 @@ public class FKSetStore extends AbstractSetStore
         {
             synchronized (this)
             {
+                // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
                 StringBuilder stmt = new StringBuilder("UPDATE ");
                 if (elementInfo.length > 1)
                 {
@@ -995,6 +996,7 @@ public class FKSetStore extends AbstractSetStore
     private String getUpdateFkStatementString(Object element)
     {
         StringBuilder stmt = new StringBuilder("UPDATE ");
+        // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
         if (elementInfo.length > 1)
         {
             //CANNOT USE ? to replace. JDBC drivers does not accept, so we replace
@@ -1245,6 +1247,7 @@ public class FKSetStore extends AbstractSetStore
         if (addRestrictionOnOwner)
         {
             // Apply condition to filter by owner
+            // TODO If ownerMapping is not for containerTable then do JOIN to ownerTable in the FROM clause (or find if already done)
             SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");

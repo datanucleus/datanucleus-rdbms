@@ -744,6 +744,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         .append(elemIdMapping.getDatastoreMapping(i).getColumn().getIdentifier());
                 }
             }
+            // TODO Add join to owner if ownerMapping is for supertable
 
             stmt.append(" WHERE ");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
