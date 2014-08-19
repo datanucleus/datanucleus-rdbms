@@ -127,8 +127,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             {
                 throw new NucleusUserException(Localiser.msg("032013", className));
             }
-            throw new NucleusException(Localiser.msg("032014", className, 
-                op.getClassMetaData().getInheritanceMetaData().getStrategy())).setFatal();
+            throw new NucleusException(Localiser.msg("032014", className, op.getClassMetaData().getInheritanceMetaData().getStrategy())).setFatal();
         }
 
         if (ec.getStatistics() != null)
@@ -136,7 +135,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             ec.getStatistics().incrementInsertCount();
         }
 
-        insertTable(dc, op, clr);
+        insertObjectInTable(dc, op, clr);
     }
 
     /**
@@ -145,7 +144,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param op ObjectProvider for the object being inserted
      * @param clr ClassLoader resolver
      */
-    private void insertTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr)
+    private void insertObjectInTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr)
     {
         if (table instanceof ClassView)
         {
@@ -156,7 +155,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table first
-            insertTable(supertable, op, clr);
+            insertObjectInTable(supertable, op, clr);
         }
 
         // Do the actual insert of this table
@@ -170,7 +169,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             while (tablesIter.hasNext())
             {
                 // Process the secondary table
-                insertTable(tablesIter.next(), op, clr);
+                insertObjectInTable(tablesIter.next(), op, clr);
             }
         }
     }
@@ -330,11 +329,9 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param clr ClassLoader resolver
      * @return A fetch request object.
      */
-    private Request getFetchRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, 
-            ClassLoaderResolver clr)
+    private Request getFetchRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
-        RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.FETCH, 
-            cmd.getFullClassName());
+        RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.FETCH, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
         if (req == null)
         {
@@ -383,7 +380,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
             DatastoreClass dc = getDatastoreClass(op.getObject().getClass().getName(), clr);
-            updateTable(dc, op, clr, mmds);
+            updateObjectInTable(dc, op, clr, mmds);
         }
     }
 
@@ -394,8 +391,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param clr ClassLoader resolver
      * @param mmds MetaData for the fields being updated
      */
-    private void updateTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr,
-            AbstractMemberMetaData[] mmds)
+    private void updateObjectInTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
     {
         if (table instanceof ClassView)
         {
@@ -406,7 +402,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table first
-            updateTable(supertable, op, clr, mmds);
+            updateObjectInTable(supertable, op, clr, mmds);
         }
 
         // Do the actual update of this table
@@ -420,7 +416,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             while (tablesIter.hasNext())
             {
                 // Process the secondary table
-                updateTable(tablesIter.next(), op, clr, mmds);
+                updateObjectInTable(tablesIter.next(), op, clr, mmds);
             }
         }
     }
@@ -435,8 +431,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param clr ClassLoader resolver
      * @return An update request object.
      */
-    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, 
-            ClassLoaderResolver clr)
+    private Request getUpdateRequest(DatastoreClass table, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         RequestIdentifier reqID = new RequestIdentifier(table, mmds, RequestType.UPDATE, cmd.getFullClassName());
         Request req = requestsByID.get(reqID);
@@ -472,7 +467,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
         ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
         DatastoreClass dc = getDatastoreClass(op.getClassMetaData().getFullClassName(), clr);
-        deleteTable(dc, op, clr);
+        deleteObjectFromTable(dc, op, clr);
     }
 
     /**
@@ -481,7 +476,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm ObjectProvider for the object being deleted
      * @param clr ClassLoader resolver
      */
-    private void deleteTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
+    private void deleteObjectFromTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
     {
         if (table instanceof ClassView)
         {
@@ -496,7 +491,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             while (tablesIter.hasNext())
             {
                 // Process the secondary table
-                deleteTable(tablesIter.next(), sm, clr);
+                deleteObjectFromTable(tablesIter.next(), sm, clr);
             }
         }
 
@@ -507,7 +502,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table last
-            deleteTable(supertable, sm, clr);
+            deleteObjectFromTable(supertable, sm, clr);
         }
     }
 
