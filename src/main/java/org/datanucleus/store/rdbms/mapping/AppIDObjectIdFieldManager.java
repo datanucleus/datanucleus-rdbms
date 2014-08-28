@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.state.AppIdObjectIdFieldConsumer;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -230,7 +229,7 @@ public class AppIDObjectIdFieldManager extends AbstractFieldManager
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(value))
         {
-            ((Persistable)value).dnCopyKeyFieldsFromObjectId(new AppIdObjectIdFieldConsumer(api, this), api.getIdForObject(value));
+            api.copyKeyFieldsFromIdToObject(value, new AppIdObjectIdFieldConsumer(api, this), api.getIdForObject(value));
         }
         else
         {

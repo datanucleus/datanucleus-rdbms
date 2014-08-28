@@ -34,7 +34,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.enhancer.Persistable;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -646,7 +645,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         {
                             // Copy PK fields from identity to the object
                             FieldManager fm = new AppIDObjectIdFieldManager(param, ec, ps, javaTypeMappings);
-                            ((Persistable)value).dnCopyKeyFieldsFromObjectId(new AppIdObjectIdFieldConsumer(api, fm), id);
+                            api.copyKeyFieldsFromIdToObject(value, new AppIdObjectIdFieldConsumer(api, fm), id);
                         }
                     }
                 }
