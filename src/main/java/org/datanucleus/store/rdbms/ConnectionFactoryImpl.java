@@ -47,7 +47,6 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.AbstractConnectionFactory;
 import org.datanucleus.store.connection.AbstractEmulatedXAResource;
 import org.datanucleus.store.connection.AbstractManagedConnection;
-import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.connectionpool.ConnectionPool;
@@ -111,17 +110,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         if (resourceType.equals("tx"))
         {
             // Transactional
-            // TODO Remove this, now part of AbstractConnectionFactory
-            String configuredResourceTypeProperty = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION_RESOURCE_TYPE);
-            if (configuredResourceTypeProperty != null)
-            {
-                if (options == null)
-                {
-                    options = new HashMap();
-                }
-                options.put(ConnectionFactory.RESOURCE_TYPE_OPTION, configuredResourceTypeProperty);
-            }
-
             String requiredPoolingType = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE);
             Object connDS = storeMgr.getConnectionFactory();
             String connJNDI = storeMgr.getConnectionFactoryName();
@@ -135,17 +123,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         else
         {
             // Non-transactional
-            // TODO Remove this, now part of AbstractConnectionFactory
-            String configuredResourceTypeProperty = storeMgr.getStringProperty(DATANUCLEUS_CONNECTION2_RESOURCE_TYPE);
-            if (configuredResourceTypeProperty!=null)
-            {
-                if (options == null)
-                {
-                    options = new HashMap();
-                }
-                options.put(ConnectionFactory.RESOURCE_TYPE_OPTION, configuredResourceTypeProperty);
-            }
-
             String requiredPoolingType = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE2);
             if (requiredPoolingType == null)
             {
@@ -171,16 +148,16 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     /**
      * Method to generate the datasource(s) used by this connection factory.
-     * Searches initially for a provided DataSource, then if not found, for JNDI DataSource(s), and finally
-     * for the DataSource at a connection URL.
+     * Searches initially for a provided DataSource, then if not found, for JNDI DataSource(s), and finally for the DataSource at a connection URL.
      * @param storeMgr Store Manager
      * @param connDS Factory data source object
      * @param connJNDI DataSource JNDI name(s)
+     * @param resourceType Type of resource
+     * @param requiredPoolingType Type of connection pool
      * @param connURL URL for connections
      * @return The DataSource(s)
      */
-    private DataSource[] generateDataSources(StoreManager storeMgr, Object connDS, String connJNDI, 
-            String resourceType, String requiredPoolingType, String connURL)
+    private DataSource[] generateDataSources(StoreManager storeMgr, Object connDS, String connJNDI, String resourceType, String requiredPoolingType, String connURL)
     {
         DataSource[] dataSources = null;
         if (connDS != null)
@@ -249,8 +226,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 if (e instanceof InvocationTargetException)
                 {
                     InvocationTargetException ite = (InvocationTargetException)e;
-                    throw new NucleusException(Localiser.msg("047004", poolingType,
-                        ite.getTargetException().getMessage()), ite.getTargetException()).setFatal();
+                    throw new NucleusException(Localiser.msg("047004", poolingType, ite.getTargetException().getMessage()), ite.getTargetException()).setFatal();
                 }
 
                 throw new NucleusException(Localiser.msg("047004", poolingType, e.getMessage()),e).setFatal();
@@ -301,8 +277,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             }
             else
             {
-                isolation = TransactionUtils.getTransactionIsolationLevelForName(
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
+                isolation = TransactionUtils.getTransactionIsolationLevelForName(storeMgr.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
             }
 
             // Use the required ConnectionProvider
@@ -310,8 +285,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             {
                 connProvider = (ConnectionProvider) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
                         "org.datanucleus.store.rdbms.connectionprovider", "name",
-                        storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME),
-                        "class-name", null, null);
+                        storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME), "class-name", null, null);
                 if (connProvider == null)
                 {
                     // No provider with this name (missing plugin ?)
@@ -465,8 +439,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
                                 NucleusLogger.CONNECTION.debug(Localiser.msg("009012", this.toString(),
-                                    TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel),
-                                    cnx.getAutoCommit()));
+                                    TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel), cnx.getAutoCommit()));
                             }
 
                             if (reqdIsolationLevel != isolation && isolation == TransactionIsolation.NONE)
@@ -643,6 +616,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         }
 
         private Map<String, Savepoint> savepoints = null;
+
         /* (non-Javadoc)
          * @see org.datanucleus.store.connection.AbstractManagedConnection#setSavepoint(java.lang.String)
          */
@@ -840,7 +814,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         if (poolingType == null)
         {
-            // Fallback to built-in DBCP (JDK1.6+)
+            // Fallback to built-in DBCP
             poolingType = "dbcp-builtin";
         }
         return poolingType;
