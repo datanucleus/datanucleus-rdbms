@@ -44,8 +44,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(),
-        		ObjectProvider.EMBEDDED_PC);
+        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), ObjectProvider.EMBEDDED_PC);
     }
 
     public void insertPostProcessing(ObjectProvider op)
@@ -54,18 +53,18 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object is being fetched.
-     * @param sm StateManager of the owning object
+     * @param op ObjectProvider of the owning object
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(ObjectProvider op)
     {
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             return;
         }
 
-        // Find the SM for the embedded PC object
-        ObjectProvider thisSM = getObjectProviderForEmbeddedObject(sm);
-        if (thisSM == null)
+        // Find the OP for the embedded PC object
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        if (thisOP == null)
         {
             return;
         }
@@ -75,25 +74,25 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postFetch(thisSM);
+                ((MappingCallbacks)m).postFetch(thisOP);
             }
         }
     }
 
     /**
      * MappingCallback called when the owning object has just being inserted.
-     * @param sm StateManager of the owning object
+     * @param op ObjectProvider of the owning object
      */
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(ObjectProvider op)
     {
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             return;
         }
 
-        // Find the SM for the embedded PC object
-        ObjectProvider thisSM = getObjectProviderForEmbeddedObject(sm);
-        if (thisSM == null)
+        // Find the OP for the embedded PC object
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        if (thisOP == null)
         {
             return;
         }
@@ -104,25 +103,25 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postInsert(thisSM);
+                ((MappingCallbacks)m).postInsert(thisOP);
             }
         }
     }
 
     /**
      * MappingCallback called when the owning object has just being udpated.
-     * @param sm StateManager of the owning object
+     * @param op ObjectProvider of the owning object
      */
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(ObjectProvider op)
     {
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             return;
         }
 
-        // Find the SM for the embedded PC object
-        ObjectProvider thisSM = getObjectProviderForEmbeddedObject(sm);
-        if (thisSM == null)
+        // Find the OP for the embedded PC object
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        if (thisOP == null)
         {
             return;
         }
@@ -133,25 +132,25 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).postUpdate(thisSM);
+                ((MappingCallbacks)m).postUpdate(thisOP);
             }
         }
     }
 
     /**
      * MappingCallback called when the owning object is about to be deleted.
-     * @param sm StateManager of the owning object
+     * @param op ObjectProvider of the owning object
      */
-    public void preDelete(ObjectProvider sm)
+    public void preDelete(ObjectProvider op)
     {
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             return;
         }
 
-        // Find the SM for the embedded PC object
-        ObjectProvider thisSM = getObjectProviderForEmbeddedObject(sm);
-        if (thisSM == null)
+        // Find the OP for the embedded PC object
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        if (thisOP == null)
         {
             return;
         }
@@ -162,7 +161,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             JavaTypeMapping m = getJavaTypeMapping(i);
             if (m instanceof MappingCallbacks)
             {
-                ((MappingCallbacks)m).preDelete(thisSM);
+                ((MappingCallbacks)m).preDelete(thisOP);
             }
         }
     }
@@ -189,14 +188,14 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             return null;
         }
 
-        ObjectProvider thisSM = ec.findObjectProvider(value);
-        if (thisSM == null)
+        ObjectProvider thisOP = ec.findObjectProvider(value);
+        if (thisOP == null)
         {
-            // Assign a StateManager to manage our embedded object
-            thisSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, theMmd.getAbsoluteFieldNumber());
-            thisSM.setPcObjectType(objectType);
+            // Assign a ObjectProvider to manage our embedded object
+            thisOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, theMmd.getAbsoluteFieldNumber());
+            thisOP.setPcObjectType(objectType);
         }
 
-        return thisSM;
+        return thisOP;
     }
 }
