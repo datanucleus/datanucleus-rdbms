@@ -37,6 +37,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.QueryResultMetaData;
+import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeMapping;
 import org.datanucleus.metadata.QueryResultMetaData.PersistentTypeMapping;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
@@ -279,6 +280,17 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     NucleusLogger.QUERY.error(msg);
                     throw new NucleusUserException(msg, sqe);
                 }
+            }
+        }
+
+        // C). Process constructor type mappings
+        ConstructorTypeMapping[] ctrTypeMappings = queryResultMetaData.getConstructorTypeMappings();
+        if (ctrTypeMappings != null)
+        {
+            for (int i=0;i<ctrTypeMappings.length;i++)
+            {
+                // TODO Support this
+                NucleusLogger.QUERY.warn("Dont currently support Constructor mappings in result");
             }
         }
 
