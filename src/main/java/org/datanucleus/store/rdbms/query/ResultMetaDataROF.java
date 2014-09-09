@@ -296,13 +296,16 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 List<ConstructorTypeColumn> ctrColumns = ctrTypeMappings[i].getColumnsForConstructor();
                 Class[] ctrArgTypes = null;
                 Object[] ctrArgVals = null;
-                if (ctrColumns != null)
+
+                if (ctrColumns != null && ctrColumns.size() > 0)
                 {
                     int j=0;
                     ctrArgTypes = new Class[ctrColumns.size()];
                     ctrArgVals = new Object[ctrColumns.size()];
-                    for (ConstructorTypeColumn ctrCol : ctrColumns)
+                    Iterator<ConstructorTypeColumn> colIter = ctrColumns.iterator();
+                    while (colIter.hasNext())
                     {
+                        ConstructorTypeColumn ctrCol = colIter.next();
                         try
                         {
                             Object colVal = getResultObject(rs, ctrCol.getColumnName());
