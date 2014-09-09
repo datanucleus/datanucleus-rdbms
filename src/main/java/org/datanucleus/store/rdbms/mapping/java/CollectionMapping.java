@@ -94,8 +94,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Check for any persistable elements that arent persistent
             for (int i=0;i<collElements.length;i++)
             {
-                if (!ec.getApiAdapter().isDetached(collElements[i]) &&
-                    !ec.getApiAdapter().isPersistent(collElements[i]))
+                if (!ec.getApiAdapter().isDetached(collElements[i]) && !ec.getApiAdapter().isPersistent(collElements[i]))
                 {
                     // Element is not persistent so throw exception
                     throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElements[i]);
@@ -275,7 +274,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
         if (ownerOP.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
         {
-            // JDO2 doesn't currently (2.0 spec) take note of foreign-key
+            // JDO doesn't currently take note of foreign-key
             hasFK = false;
         }
 

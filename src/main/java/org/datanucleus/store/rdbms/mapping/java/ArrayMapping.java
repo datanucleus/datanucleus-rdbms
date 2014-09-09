@@ -76,7 +76,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param ownerOP StateManager of the owner
+     * @param ownerOP ObjectProvider of the owner
      **/
     public void postInsert(ObjectProvider ownerOP)
     {
@@ -108,8 +108,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 Object[] array = (Object[])value;
                 for (int i=0;i<array.length;i++)
                 {
-                    if (!ec.getApiAdapter().isDetached(array[i]) &&
-                        !ec.getApiAdapter().isPersistent(array[i]))
+                    if (!ec.getApiAdapter().isDetached(array[i]) && !ec.getApiAdapter().isPersistent(array[i]))
                     {
                         // Element is not persistent so throw exception
                         throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), array[i]);
@@ -132,9 +131,9 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called after any fetch of the owner class element.
-     * @param sm StateManager of the owner
+     * @param op ObjectProvider of the owner
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(ObjectProvider op)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -142,7 +141,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             return;
         }
 
-        List elements = ((ArrayStore) storeMgr.getBackingStoreForField(sm.getExecutionContext().getClassLoaderResolver(),mmd,null)).getArray(sm);
+        List elements = ((ArrayStore) storeMgr.getBackingStoreForField(op.getExecutionContext().getClassLoaderResolver(),mmd,null)).getArray(op);
         if (elements != null)
         {
             boolean primitiveArray = mmd.getType().getComponentType().isPrimitive();
@@ -193,16 +192,16 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             }
             if (elements.size() == 0)
             {
-                sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
+                op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
             }
             else
             {
-                sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), array);
+                op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), array);
             }
         }
         else
         {
-            sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
+            op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
         }
     }
 
@@ -258,9 +257,9 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called before any delete of the owner class element, if the field in the owner is dependent
-     * @param sm StateManager of the owner
+     * @param op ObjectProvider of the owner
      */
-    public void preDelete(ObjectProvider sm)
+    public void preDelete(ObjectProvider op)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -269,15 +268,15 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         }
 
         // makes sure field is loaded
-        sm.isLoaded(getAbsoluteFieldNumber());
-        Object value = sm.provideField(getAbsoluteFieldNumber());
+        op.isLoaded(getAbsoluteFieldNumber());
+        Object value = op.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
         }
 
         // Clear the array via its backing store
-        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(sm.getExecutionContext().getClassLoaderResolver(), mmd, null);
-        backingStore.clear(sm);
+        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(op.getExecutionContext().getClassLoaderResolver(), mmd, null);
+        backingStore.clear(op);
     }
 }
