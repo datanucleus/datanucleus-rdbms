@@ -37,6 +37,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.QueryResultMetaData;
+import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeColumn;
 import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeMapping;
 import org.datanucleus.metadata.QueryResultMetaData.PersistentTypeMapping;
 import org.datanucleus.state.ObjectProvider;
@@ -48,9 +49,11 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * ResultObjectFactory that operates using a QueryResultMetaData and returns objects based on the definition.
@@ -144,8 +147,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 Set columnsInThisType = new HashSet();
                 AbstractMemberMetaData[] fmds = new AbstractMemberMetaData[columnNames.length];
                 Map fieldColumns = new HashMap();
-                DatastoreClass dc = storeMgr.getDatastoreClass(persistentTypes[i].getClassName(),
-                    ec.getClassLoaderResolver());
+                DatastoreClass dc = storeMgr.getDatastoreClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 Object id = null;
 
@@ -289,8 +291,43 @@ public class ResultMetaDataROF implements ResultObjectFactory
         {
             for (int i=0;i<ctrTypeMappings.length;i++)
             {
-                // TODO Support this
-                NucleusLogger.QUERY.warn("Dont currently support Constructor mappings in result");
+                String ctrClassName = ctrTypeMappings[i].getClassName();
+                Class ctrCls = ec.getClassLoaderResolver().classForName(ctrClassName);
+                List<ConstructorTypeColumn> ctrColumns = ctrTypeMappings[i].getColumnsForConstructor();
+                Class[] ctrArgTypes = null;
+                Object[] ctrArgVals = null;
+                if (ctrColumns != null)
+                {
+                    int j=0;
+                    ctrArgTypes = new Class[ctrColumns.size()];
+                    ctrArgVals = new Object[ctrColumns.size()];
+                    for (ConstructorTypeColumn ctrCol : ctrColumns)
+                    {
+                        try
+                        {
+                            Object colVal = getResultObject(rs, ctrCol.getColumnName());
+                            ctrArgTypes[j] = colVal.getClass();
+                            if (ctrCol.getJavaType() != null)
+                            {
+                                // Attempt to convert to the type requested
+                                ctrArgTypes[j] = ctrCol.getJavaType();
+                                ctrArgVals[j] = TypeConversionHelper.convertTo(colVal, ctrArgTypes[j]);
+                            }
+                            else
+                            {
+                                ctrArgTypes[j] = colVal.getClass();
+                                ctrArgVals[j] = colVal;
+                            }
+                        }
+                        catch (SQLException sqle)
+                        {
+                            // TODO Handle this
+                        }
+                        j++;
+                    }
+                }
+
+                returnObjects.add(ClassUtils.newInstance(ctrCls, ctrArgTypes, ctrArgVals));
             }
         }
 
