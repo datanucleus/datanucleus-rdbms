@@ -49,8 +49,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Mapping for an embedded PC object. 
- * The PC object can be embedded directly (1-1 relation) or be the element of 
- * a collection, or be the key or value of a map.
+ * The PC object can be embedded directly (1-1 relation) or be the element of a collection, or be the key or value of a map.
  */
 public abstract class EmbeddedMapping extends SingleFieldMapping
 {
@@ -98,8 +97,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param typeName type of the embedded PC object
      * @param objectType Type of the PC object being embedded (see StateManagerImpl object types)
      */
-    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr,
-        EmbeddedMetaData emd, String typeName, int objectType)
+    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, int objectType)
     {
     	super.initialize(fmd, table, clr);
         this.clr = clr;
@@ -212,8 +210,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         int[] pcFieldNumbers = rootEmbCmd.getAllMemberPositions();
         for (int i=0;i<pcFieldNumbers.length;i++)
         {
-            AbstractMemberMetaData rootEmbMmd =
-                rootEmbCmd.getMetaDataForManagedMemberAtAbsolutePosition(pcFieldNumbers[i]);
+            AbstractMemberMetaData rootEmbMmd = rootEmbCmd.getMetaDataForManagedMemberAtAbsolutePosition(pcFieldNumbers[i]);
             if (rootEmbMmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
             {
                 addMappingForMember(rootEmbCmd, rootEmbMmd, embFmds);
@@ -247,8 +244,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * @param embMmd Member to be added
      * @param embMmds The metadata defining mapping information for the members (if any)
      */
-    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd,
-            AbstractMemberMetaData[] embMmds)
+    private void addMappingForMember(AbstractClassMetaData embCmd, AbstractMemberMetaData embMmd, AbstractMemberMetaData[] embMmds)
     {
         if (emd != null && emd.getOwnerMember() != null && emd.getOwnerMember().equals(embMmd.getName()))
         {
@@ -282,17 +278,14 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             {
                 // User has provided a field definition so map with that
                 embMmdMapping = mapMgr.getMapping(table, embeddedMmd, clr, FieldRole.ROLE_FIELD);
-                if (embeddedMmd.getAbsoluteFieldNumber() < 0)
-                {
-                    // Embedded AbstractMemberMetaData don't have the field number etc, so we set the field number directly
-                    embMmdMapping.setAbsFieldNumber(embMmd.getAbsoluteFieldNumber());
-                }
             }
             else
             {
                 // User hasn't provided a field definition so map with the classes own definition
                 embMmdMapping = mapMgr.getMapping(table, embMmd, clr, FieldRole.ROLE_FIELD);
             }
+            // Use field number from embMmd, since the embedded mapping info doesn't have reliable field number infos
+            embMmdMapping.setAbsFieldNumber(embMmd.getAbsoluteFieldNumber());
             this.addJavaTypeMapping(embMmdMapping);
 
             for (int j=0; j<embMmdMapping.getNumberOfDatastoreMappings(); j++)
@@ -453,13 +446,11 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                         Object convertedValue = null;
                         try
                         {
-                            if (mapping instanceof IntegerMapping ||
-                                mapping instanceof ShortMapping)
+                            if (mapping instanceof IntegerMapping || mapping instanceof ShortMapping)
                             {
                                 convertedValue = Integer.valueOf(nullValue);
                             }
-                            else if (mapping instanceof LongMapping ||
-                                mapping instanceof BigIntegerMapping)
+                            else if (mapping instanceof LongMapping || mapping instanceof BigIntegerMapping)
                             {
                                 convertedValue = Long.valueOf(nullValue);
                             }
@@ -647,11 +638,9 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     Object fieldValue = mapping.getObject(ec, rs, posMapping);
 
                     // Check for the null column and its value and break if this matches the null check
-                    if (nullColumn != null && 
-                        mapping.getMemberMetaData().getColumnMetaData()[0].getName().equals(nullColumn))
+                    if (nullColumn != null && mapping.getMemberMetaData().getColumnMetaData()[0].getName().equals(nullColumn))
                     {
-                        if ((nullValue == null && fieldValue == null) ||
-                            (nullValue != null && fieldValue.toString().equals(nullValue)))
+                        if ((nullValue == null && fieldValue == null) || (nullValue != null && fieldValue.toString().equals(nullValue)))
                         {
                             value = null;
                             break;
