@@ -222,7 +222,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
                     {
                         mde.printStackTrace();
                         exceptions.add(mde);
-                        NucleusLogger.DATASTORE.error(mde);
+                        NucleusLogger.DATASTORE.error("Exception in remove", mde);
                     }
                 }
             }

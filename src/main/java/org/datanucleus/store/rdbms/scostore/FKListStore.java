@@ -164,8 +164,7 @@ public class FKListStore extends AbstractListStore
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056029",
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                throw new NucleusUserException(Localiser.msg("056029", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
             }
             if (isEmbeddedMapping(ownerMapping))
             {
@@ -181,8 +180,7 @@ public class FKListStore extends AbstractListStore
             // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056030", 
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+                throw new NucleusUserException(Localiser.msg("056030", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
             }
         }
 
@@ -358,8 +356,7 @@ public class FKListStore extends AbstractListStore
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, op,
-                                ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -460,16 +457,7 @@ public class FKListStore extends AbstractListStore
         }
 
         // Check what we have persistent already
-        int currentListSize = 0;
-        if (size < 0)
-        {
-            // Get the current size from the datastore
-            currentListSize = size(op);
-        }
-        else
-        {
-            currentListSize = size;
-        }
+        int currentListSize = (size < 0 ? size(op) : size);
 
         boolean shiftingElements = true;
         if (atEnd || startAt == currentListSize)
@@ -585,8 +573,7 @@ public class FKListStore extends AbstractListStore
                 {
                     // Set field in element to null (so it nulls the FK)
                     // TODO This is ManagedRelations - move into RelationshipManager
-                    elementSM.replaceFieldMakeDirty(ownerMemberMetaData.getRelatedMemberMetaData(clr)[0].getAbsoluteFieldNumber(), 
-                        null);
+                    elementSM.replaceFieldMakeDirty(ownerMemberMetaData.getRelatedMemberMetaData(clr)[0].getAbsoluteFieldNumber(), null);
                     if (op.getExecutionContext().isFlushing())
                     {
                         elementSM.flush();
@@ -630,10 +617,7 @@ public class FKListStore extends AbstractListStore
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
                         NucleusLogger.PERSISTENCE.debug(
-                            Localiser.msg("055010",
-                                ownerSM.toPrintableID(),
-                                ownerMemberMetaData.getFullFieldName(),
-                                StringUtils.toJVMIDString(element)));
+                            Localiser.msg("055010", ownerSM.toPrintableID(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                     }
 
                     elementSM.replaceField(getFieldNumberInElementForBidirectional(elementSM), null, true);
@@ -861,7 +845,7 @@ public class FKListStore extends AbstractListStore
                             // We support mapped-by fields of types int/long/Integer/Long currently
                             Object indexValue = null;
                             if (orderMapping.getMemberMetaData().getTypeName().equals(ClassNameConstants.JAVA_LANG_LONG) ||
-                                    orderMapping.getMemberMetaData().getTypeName().equals(ClassNameConstants.LONG))
+                                orderMapping.getMemberMetaData().getTypeName().equals(ClassNameConstants.LONG))
                             {
                                 indexValue = Long.valueOf(index);
                             }
@@ -886,8 +870,7 @@ public class FKListStore extends AbstractListStore
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037",
-                            op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(esm.getObject())));
                         esm.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
                     }
@@ -895,10 +878,8 @@ public class FKListStore extends AbstractListStore
                     {
                         // Owner of the element is neither this container nor is it being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038",
-                            op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(esm.getObject()),
-                            StringUtils.toJVMIDString(currentOwner)));
+                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                            StringUtils.toJVMIDString(esm.getObject()), StringUtils.toJVMIDString(currentOwner)));
                     }
                 }
             }
@@ -979,8 +960,7 @@ public class FKListStore extends AbstractListStore
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
                 }
 
                 try
@@ -1401,8 +1381,7 @@ public class FKListStore extends AbstractListStore
             String elementType = ownerMemberMetaData.getCollection().getElementType();
             if (ClassUtils.isReferenceType(clr.classForName(elementType)))
             {
-                String[] clsNames =
-                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+                String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                 Class[] cls = new Class[clsNames.length];
                 for (int i=0; i<clsNames.length; i++)
                 {
@@ -1412,8 +1391,7 @@ public class FKListStore extends AbstractListStore
             }
             else
             {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
-                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
             }
             iterateUsingDiscriminator = true;
 
@@ -1434,13 +1412,11 @@ public class FKListStore extends AbstractListStore
                 // Select the required fields (of the element class)
                 if (sqlStmt == null)
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping,
-                        fp, subStmt.getPrimaryTable(), emd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), emd, 0);
                 }
                 else
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
-                        fp, subStmt.getPrimaryTable(), emd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), emd, 0);
                 }
 
                 if (sqlStmt == null)
@@ -1462,8 +1438,7 @@ public class FKListStore extends AbstractListStore
         {
             // Apply condition to filter by owner
             // TODO If ownerMapping is not for containerTable then do JOIN to ownerTable in the FROM clause (or find if already done)
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -1472,8 +1447,7 @@ public class FKListStore extends AbstractListStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -1526,8 +1500,7 @@ public class FKListStore extends AbstractListStore
             if (needsOrdering)
             {
                 // Order by the ordering column
-                SQLTable orderSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+                SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
                 SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
                 boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
                 orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

@@ -79,17 +79,13 @@ public class JoinSetStore extends AbstractSetStore
 
     /**
      * Constructor for a join set store for RDBMS.
-     * @param mmd owner member metadata
+     * @param mmd Metadata for the member that has the set with join table
      * @param joinTable The join table
      * @param clr The ClassLoaderResolver
      */
     public JoinSetStore(AbstractMemberMetaData mmd, CollectionTable joinTable, ClassLoaderResolver clr)
     {
         super(joinTable.getStoreManager(), clr);
-
-        // A Set really needs a SetTable, but we need to cope with the situation
-        // where a user declares a field as Collection but is instantiated as a List or a Set
-        // so we just accept CollectionTable and rely on it being adequate
         this.containerTable = joinTable;
         setOwner(mmd);
 
@@ -98,7 +94,6 @@ public class JoinSetStore extends AbstractSetStore
         this.orderMapping = joinTable.getOrderMapping();
         this.relationDiscriminatorMapping = joinTable.getRelationDiscriminatorMapping();
         this.relationDiscriminatorValue = joinTable.getRelationDiscriminatorValue();
-
         this.elementType = mmd.getCollection().getElementType();
         this.elementsAreEmbedded = joinTable.isEmbeddedElement();
         this.elementsAreSerialised = joinTable.isSerialisedElement();
@@ -119,8 +114,7 @@ public class JoinSetStore extends AbstractSetStore
                 for (int i = 0; i < implNames.length; i++)
                 {
                     DatastoreClass table = storeMgr.getDatastoreClass(implNames[i], clr);
-                    AbstractClassMetaData cmd =
-                        storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implNames[i], clr);
+                    AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implNames[i], clr);
                     elementInfo[i] = new ElementInfo(cmd, table);
                 }
             }
@@ -195,6 +189,8 @@ public class JoinSetStore extends AbstractSetStore
 
     /**
      * Convenience method to check if an element already refers to the owner in an M-N relation.
+     * Note that we are using this since JDO TCK "managed relationships" test relationshipAllRelationships.conf requires it for adding to mappedBy side.
+     * TODO Only do this if at owner side? and fix elsewhere so that JDO TCK test still passes
      * @param ownerOP ObjectProvider of the owner
      * @param element The element
      * @return Whether the element contains the owner
@@ -202,41 +198,38 @@ public class JoinSetStore extends AbstractSetStore
     private boolean elementAlreadyContainsOwnerInMtoN(ObjectProvider ownerOP, Object element)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
+        ObjectProvider elementOP = ec.findObjectProvider(element);
         Object elementColl = null;
-        ObjectProvider elementSM = ec.findObjectProvider(element);
-        if (elementSM != null)
+        if (elementOP != null)
         {
             AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(ec.getClassLoaderResolver());
-            elementColl = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+            elementColl = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
         }
         else
         {
             // TODO What if detached?
         }
 
-        if (elementColl != null && elementColl instanceof SCOMtoN)
+        if (elementColl != null && elementColl instanceof SCOMtoN) // TODO Just check whether SCO since we know it is M-N before coming in here
         {
             // The field is already a SCO wrapper so just query it
-            // TODO Maybe this check should only apply when not the OWNER of the relation
-            if (((SCOMtoN)elementColl).contains(ownerOP.getObject())/* && ownerMemberMetaData.getMappedBy() != null*/)
+            if (((SCOMtoN)elementColl).contains(ownerOP.getObject()) && ownerMemberMetaData.getMappedBy() != null)
             {
                 NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
-        else
+
+        // Query the join-table directly.
+        // TODO Fix this. It is inefficient to go off to the datastore to check whether a record exists.
+        // This should be changed in line with TCK test AllRelationships since that tries to load up
+        // many relationships, and CollectionMapping.postInsert calls addAll with these hence we don't have SCO's to use contains() on
+        if (locate(ownerOP, element))
         {
-            // The element is not a SCO wrapper so query the datastore directly
-            // TODO Fix this. It is inefficient to go off to the datastore to check whether a record exists.
-            // This should be changed in line with TCK test AllRelationships since that tries to load up
-            // many relationships, and CollectionMapping.postInsert calls addAll with these hence we don't
-            // have SCO's to use contains() on
-            if (locate(ownerOP, element))
-            {
-                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
-                return true;
-            }
+            NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+            return true;
         }
+
         return false;
     }
 
@@ -256,24 +249,24 @@ public class JoinSetStore extends AbstractSetStore
         {
             // TODO This is ManagedRelations - move into RelationshipManager
             // Managed Relations : make sure we have consistency of relation
-            ObjectProvider elementSM = ec.findObjectProvider(element);
-            if (elementSM != null)
+            ObjectProvider elementOP = ec.findObjectProvider(element);
+            if (elementOP != null)
             {
                 AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
-                Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                 if (elementOwner == null)
                 {
                     // No owner, so correct it
-                    NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
-                            .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject())));
-                    elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                    NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        StringUtils.toJVMIDString(elementOP.getObject())));
+                    elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
                 }
                 else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
                 {
                     // Owner of the element is neither this container nor being attached
                     // Inconsistent owner, so throw exception
-                    throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData
-                            .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject()), StringUtils.toJVMIDString(elementOwner)));
+                    throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                 }
             }
         }
@@ -283,10 +276,15 @@ public class JoinSetStore extends AbstractSetStore
         boolean toBeInserted = true;
         if (relationType == RelationType.MANY_TO_MANY_BI)
         {
-            // TODO Why not just return if this is the non-owner side?
-            // This is an M-N relation so we need to check if the element already has us in its collection
-            // to avoid duplicate join table entries
-            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
+            if (!ec.getManageRelations() && ownerMemberMetaData.getMappedBy() != null)
+            {
+                toBeInserted = false;
+            }
+            else
+            {
+                // This is an M-N relation so we need to check if the element already has us in its collection to avoid duplicate join table entries
+                toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
+            }
         }
 
         if (toBeInserted)
@@ -302,7 +300,7 @@ public class JoinSetStore extends AbstractSetStore
                     {
                         orderID = getNextIDForOrderColumn(op);
                     }
-                    int[] returnCode = internalAdd(op, element, mconn, false, orderID, true);
+                    int[] returnCode = doInternalAdd(op, element, mconn, false, orderID, true);
                     if (returnCode[0] > 0)
                     {
                         modified = true;
@@ -315,9 +313,8 @@ public class JoinSetStore extends AbstractSetStore
             }
             catch (MappedDatastoreException e)
             {
-                NucleusLogger.DATASTORE.error(e);
                 String msg = Localiser.msg("056009", e.getMessage());
-                NucleusLogger.DATASTORE.error(msg);
+                NucleusLogger.DATASTORE.error(msg, e);
                 throw new NucleusDataStoreException(msg, e);
             }
         }
@@ -354,25 +351,24 @@ public class JoinSetStore extends AbstractSetStore
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
                 // Managed Relations : make sure we have consistency of relation
-                ObjectProvider elementSM = op.getExecutionContext().findObjectProvider(element);
-                if (elementSM != null)
+                ObjectProvider elementOP = op.getExecutionContext().findObjectProvider(element);
+                if (elementOP != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
-                    Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                    Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData
-                                .getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject())));
-                        elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                            StringUtils.toJVMIDString(elementOP.getObject())));
+                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
                     }
                     else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor its referenced object
                         // Inconsistent owner, so throw exception
                         throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(),
-                            ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementSM.getObject()), StringUtils
-                                    .toJVMIDString(elementOwner)));
+                            ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
             }
@@ -384,7 +380,6 @@ public class JoinSetStore extends AbstractSetStore
             try
             {
                 preGetNextIDForOrderColumn(mconn);
-
                 int nextOrderID = 0;
                 if (orderMapping != null)
                 {
@@ -402,19 +397,36 @@ public class JoinSetStore extends AbstractSetStore
                     try
                     {
                         // Add the row to the join table
-                        int[] rc = internalAdd(op, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
-                        if (rc != null)
+                        boolean toBeInserted = true;
+                        if (relationType == RelationType.MANY_TO_MANY_BI)
                         {
-                            for (int i = 0; i < rc.length; i++)
+                            if (!ec.getManageRelations() && ownerMemberMetaData.getMappedBy() != null)
                             {
-                                if (rc[i] > 0)
-                                {
-                                    // At least one record was inserted
-                                    modified = true;
-                                }
+                                toBeInserted = false;
+                            }
+                            else
+                            {
+                                // This is an M-N relation so we need to check if the element already has us in its collection to avoid duplicate join table entries
+                                toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
                             }
                         }
-                        nextOrderID++;
+
+                        if (toBeInserted)
+                        {
+                            int[] rc = doInternalAdd(op, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
+                            if (rc != null)
+                            {
+                                for (int i = 0; i < rc.length; i++)
+                                {
+                                    if (rc[i] > 0)
+                                    {
+                                        // At least one record was inserted
+                                        modified = true;
+                                    }
+                                }
+                            }
+                            nextOrderID++;
+                        }
                     }
                     catch (MappedDatastoreException mde)
                     {
@@ -436,44 +448,13 @@ public class JoinSetStore extends AbstractSetStore
 
         if (!exceptions.isEmpty())
         {
-            // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which
-            // record(s) didn't persist
+            // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't persist
             String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
             throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
         }
 
         return modified;
-    }
-
-    /**
-     * Method to add a row to the join table. Used by add() and addAll() to add a row to the join table.
-     * @param op ObjectProvider for the owner of the collection
-     * @param element The element to add the relation to
-     * @param conn Connection to use
-     * @param batched Whether we are batching
-     * @param orderId The order id to use for this element relation (if ordering is used)
-     * @param executeNow Whether to execute the statement now (or leave til later)
-     * @return The return code(s) for any records added. There may be multiple if using batched
-     * @throws MappedDatastoreException Thrown if an error occurs
-     */
-    private int[] internalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
-        throws MappedDatastoreException
-    {
-        boolean toBeInserted = true;
-        if (relationType == RelationType.MANY_TO_MANY_BI)
-        {
-            // This is an M-N relation so we need to check if the element already has us
-            // in its collection to avoid duplicate join table entries
-            // TODO Find a better way of doing this
-            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
-        }
-
-        if (toBeInserted)
-        {
-            return doInternalAdd(op, element, conn, batched, orderId, executeNow);
-        }
-        return null;
     }
 
     /**
@@ -526,8 +507,7 @@ public class JoinSetStore extends AbstractSetStore
                     {
                         Object element = iter.next();
                         jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element,
-                            jdbcPosition, elementMapping);
+                        jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (relationDiscriminatorMapping != null)
                         {
                             jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -552,7 +532,7 @@ public class JoinSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            NucleusLogger.DATASTORE.error(e);
+            NucleusLogger.DATASTORE.error("Exception on removeAll", e);
             throw new NucleusDataStoreException(Localiser.msg("056012", removeAllStmt), e);
         }
         return modified;
@@ -572,12 +552,9 @@ public class JoinSetStore extends AbstractSetStore
      */
     protected String getRemoveStmt(Object element)
     {
-        StringBuilder stmt = new StringBuilder("DELETE FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised,
-            null, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, null, false);
         if (relationDiscriminatorMapping != null)
         {
             BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
@@ -605,27 +582,16 @@ public class JoinSetStore extends AbstractSetStore
             return null;
         }
 
-        StringBuilder stmt = new StringBuilder("DELETE FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
 
         Iterator elementsIter = elements.iterator();
         boolean first = true;
         while (elementsIter.hasNext())
         {
             Object element = elementsIter.next();
-            if (first)
-            {
-                stmt.append("(");
-            }
-            else
-            {
-                stmt.append(" OR (");
-            }
-
+            stmt.append(first ? "(" : " OR (");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised,
-                null, false);
+            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, null, false);
             if (relationDiscriminatorMapping != null)
             {
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
@@ -638,7 +604,7 @@ public class JoinSetStore extends AbstractSetStore
         return stmt.toString();
     }
 
-    public boolean locate(ObjectProvider op, Object element)
+    private boolean locate(ObjectProvider op, Object element)
     {
         boolean exists = true;
         String stmt = getLocateStmt(element);
@@ -654,8 +620,7 @@ public class JoinSetStore extends AbstractSetStore
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, 
-                        jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -686,14 +651,13 @@ public class JoinSetStore extends AbstractSetStore
         }
         catch (SQLException e)
         {
-            NucleusLogger.DATASTORE.error(e);
+            NucleusLogger.DATASTORE.error(Localiser.msg("RDBMS.SCO.LocateRequestFailed", stmt), e);
             throw new NucleusDataStoreException(Localiser.msg("RDBMS.SCO.LocateRequestFailed", stmt), e);
         }
         return exists;
     }
 
-    protected int[] doInternalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched,
-            int orderId, boolean executeNow)
+    protected int[] doInternalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
     throws MappedDatastoreException
     {
         // Check for dynamic schema updates prior to addition
@@ -755,12 +719,13 @@ public class JoinSetStore extends AbstractSetStore
             throw new MappedDatastoreException(addStmt, e);
         }
     }
+
     /**
      * Generate statement for checking the existence of an owner-element relation (used for M-N).
      * <PRE>
-     * SELECT 1 FROM SETTABLE WHERE OWNERCOL = ? AND ELEMENTCOL = ?
+     * SELECT 1 FROM JOINTABLE WHERE OWNERCOL = ? AND ELEMENTCOL = ?
      * </PRE>
-     * @return Statement for locating an owner-element relation
+     * @return Statement for locating an owner-element relation in the join table
      */
     private synchronized String getLocateStmt(Object element)
     {
@@ -782,12 +747,9 @@ public class JoinSetStore extends AbstractSetStore
 
     private String getLocateStatementString(Object element)
     {
-        StringBuilder stmt = new StringBuilder("SELECT 1 FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        StringBuilder stmt = new StringBuilder("SELECT 1 FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised,
-            null, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, null, false);
         if (relationDiscriminatorMapping != null)
         {
             BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
@@ -825,11 +787,8 @@ public class JoinSetStore extends AbstractSetStore
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("SELECT MAX(" + 
-                        orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
-                stmt.append(" FROM ");
-                stmt.append(containerTable.toString());
-                stmt.append(" WHERE ");
+                StringBuilder stmt = new StringBuilder("SELECT MAX(" + orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
+                stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
                 if (relationDiscriminatorMapping != null)
                 {
@@ -959,8 +918,7 @@ public class JoinSetStore extends AbstractSetStore
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerStmtMapIdx.getMapping().setObject(ec, ps,
-                        ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
 
                 try
@@ -980,8 +938,7 @@ public class JoinSetStore extends AbstractSetStore
                         }
                         else
                         {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
-                                iteratorMappingClass, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
                             return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
@@ -1053,23 +1010,20 @@ public class JoinSetStore extends AbstractSetStore
                 final int elementNo = i;
                 final Class elementCls = clr.classForName(elementInfo[elementNo].getClassName());
                 SQLStatement elementStmt = null;
-                if (elementInfo[elementNo].getDiscriminatorStrategy() != null &&
-                        elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
+                if (elementInfo[elementNo].getDiscriminatorStrategy() != null && elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
                 {
                     // The element uses a discriminator so just use that in the SELECT
                     String elementType = ownerMemberMetaData.getCollection().getElementType();
                     if (ClassUtils.isReferenceType(clr.classForName(elementType)))
                     {
-                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(
-                            elementType, clr);
+                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                         Class[] cls = new Class[clsNames.length];
                         for (int j = 0; j < clsNames.length; j++)
                         {
                             cls[j] = clr.classForName(clsNames[j]);
                         }
 
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, 
-                            true, null, null, containerTable, null, elementMapping);
+                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
@@ -1078,8 +1032,7 @@ public class JoinSetStore extends AbstractSetStore
                     }
                     else
                     {
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls,
-                            true, null, null, containerTable, null, elementMapping);
+                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
@@ -1091,8 +1044,7 @@ public class JoinSetStore extends AbstractSetStore
                 else
                 {
                     // No discriminator, but subclasses so use UNIONs
-                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null,
-                        null, containerTable, null, elementMapping);
+                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                     stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement();
@@ -1109,16 +1061,14 @@ public class JoinSetStore extends AbstractSetStore
             }
 
             // Select the required fields
-            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(),
-                sqlStmt.getPrimaryTable().getGroupName());
+            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
         }
 
         if (addRestrictionOnOwner)
         {
             // Apply condition on join-table owner field to filter by owner
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -1127,8 +1077,7 @@ public class JoinSetStore extends AbstractSetStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -1137,8 +1086,7 @@ public class JoinSetStore extends AbstractSetStore
         if (orderMapping != null)
         {
             // Order by the ordering column, when present
-            SQLTable orderSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+            SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
             SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
             boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

@@ -636,8 +636,8 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @return Return code(s) from any executed statements
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalShift(ObjectProvider op, ManagedConnection conn, boolean batched, int oldIndex,
-            int amount, boolean executeNow) throws MappedDatastoreException
+    protected int[] internalShift(ObjectProvider op, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
+    throws MappedDatastoreException
     {
         ExecutionContext ec = op.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -712,9 +712,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
             }
             stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
         BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
         if (relationDiscriminatorMapping != null)
@@ -777,9 +775,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
             }
             stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
         BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
         if (relationDiscriminatorMapping != null)
@@ -826,24 +822,14 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
             }
             stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         Iterator iter = elements.iterator();
         boolean first_element = true;
         while (iter.hasNext())
         {
             Object element = iter.next(); // Move to next element
 
-            if (!first_element)
-            {
-                stmt.append(" OR (");
-            }
-            else
-            {
-                stmt.append("(");
-            }
-
+            stmt.append(first_element ? "(" : " OR (");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
             BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
             if (relationDiscriminatorMapping != null)
@@ -862,8 +848,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
-            stmt.append(" DESC");
+            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString()).append(" DESC");
         }
 
         return stmt.toString();
@@ -886,10 +871,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("DELETE FROM ");
-                stmt.append(containerTable.toString());
-                stmt.append(" WHERE ");
-
+                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
                 if (orderMapping != null)
                 {
@@ -922,9 +904,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("UPDATE ");
-                stmt.append(containerTable.toString());
-                stmt.append(" SET ");
+                StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
 
                 for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                 {

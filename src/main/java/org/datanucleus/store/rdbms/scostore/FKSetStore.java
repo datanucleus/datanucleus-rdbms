@@ -145,8 +145,7 @@ public class FKSetStore extends AbstractSetStore
             AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mmd.getMappedBy());
             if (eofmd == null)
             {
-                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(),
-                    mmd.getMappedBy(), element_class.getName()));
+                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
             }
 
             // Check that the type of the element "mapped-by" field is consistent with the owner type
@@ -171,8 +170,7 @@ public class FKSetStore extends AbstractSetStore
             }
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056029",
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                throw new NucleusUserException(Localiser.msg("056029", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
             }
             if (isEmbeddedMapping(ownerMapping))
             {
@@ -284,8 +282,7 @@ public class FKSetStore extends AbstractSetStore
                         }
                         else
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                                null);
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null);
                         }
                     }
                     else
@@ -297,8 +294,7 @@ public class FKSetStore extends AbstractSetStore
                         }
                         else
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                                op.getObject());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), op.getObject());
                         }
                     }
                     jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
@@ -399,8 +395,7 @@ public class FKSetStore extends AbstractSetStore
         DatastoreClass elementTable = null;
         if (isPersistentInterface)
         {
-            elementTable = storeMgr.getDatastoreClass(
-                storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr);
+            elementTable = storeMgr.getDatastoreClass(storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr);
         }
         else
         {
@@ -533,8 +528,7 @@ public class FKSetStore extends AbstractSetStore
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", op.getObjectAsPrintable(),
-                        ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                 }
 
                 elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
@@ -766,9 +760,7 @@ public class FKSetStore extends AbstractSetStore
                     // Null the owner of the element
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010",
-                            op.getObjectAsPrintable(),
-                            ownerMemberMetaData.getFullFieldName(),
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(),
                             StringUtils.toJVMIDString(element)));
                     }
 
@@ -861,8 +853,7 @@ public class FKSetStore extends AbstractSetStore
                     else
                     {
                         NucleusLogger.PERSISTENCE.warn("FKSetStore.updateElementFK : " +
-                            "need to set table in statement but dont know table where to store " +
-                            elementInfo[0].getClassName());
+                            "need to set table in statement but dont know table where to store " + elementInfo[0].getClassName());
                     }
                 }
                 ManagedConnection mconn = storeMgr.getConnection(ec);
@@ -1094,8 +1085,7 @@ public class FKSetStore extends AbstractSetStore
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerStmtMapIdx.getMapping().setObject(ec, ps,
-                        ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
+                    ownerStmtMapIdx.getMapping().setObject(ec, ps, ownerStmtMapIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
                 }
 
                 try
@@ -1156,8 +1146,7 @@ public class FKSetStore extends AbstractSetStore
             String elementType = ownerMemberMetaData.getCollection().getElementType();
             if (ClassUtils.isReferenceType(clr.classForName(elementType)))
             {
-                String[] clsNames =
-                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+                String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                 Class[] cls = new Class[clsNames.length];
                 for (int i=0; i<clsNames.length; i++)
                 {
@@ -1252,8 +1241,7 @@ public class FKSetStore extends AbstractSetStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -1262,8 +1250,7 @@ public class FKSetStore extends AbstractSetStore
         if (orderMapping != null)
         {
             // Order by the ordering column, when present
-            SQLTable orderSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+            SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
             SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
             boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

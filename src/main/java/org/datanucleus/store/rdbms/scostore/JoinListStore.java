@@ -75,42 +75,36 @@ public class JoinListStore extends AbstractListStore
     private String setStmt;
 
     /**
-     * Constructor for an RDBMS implementation of a join list store.
-     * @param mmd Metadata for the owning field/property
-     * @param collTable The Join table
+     * Constructor for a join list store for RDBMS.
+     * @param mmd Metadata for the member that has the list with join table
+     * @param joinTable The Join table
      * @param clr ClassLoader resolver
      */
-    public JoinListStore(AbstractMemberMetaData mmd, CollectionTable collTable, ClassLoaderResolver clr)
+    public JoinListStore(AbstractMemberMetaData mmd, CollectionTable joinTable, ClassLoaderResolver clr)
     {
-        super(collTable.getStoreManager(), clr);
-
-        // A List really needs a ListTable, but we need to cope with the situation
-        // where a user declares a field as Collection but is instantiated as a List or a Set
-        // so we just accept CollectionTable and rely on it being adequate
-        this.containerTable = collTable;
+        super(joinTable.getStoreManager(), clr);
+        this.containerTable = joinTable;
         setOwner(mmd);
-
-        this.ownerMapping = collTable.getOwnerMapping();
-        this.elementMapping = collTable.getElementMapping();
-
-        this.orderMapping = collTable.getOrderMapping();
         if (ownerMemberMetaData.getOrderMetaData() != null && !ownerMemberMetaData.getOrderMetaData().isIndexedList())
         {
             indexedList = false;
         }
+
+        this.ownerMapping = joinTable.getOwnerMapping();
+        this.elementMapping = joinTable.getElementMapping();
+        this.orderMapping = joinTable.getOrderMapping();
+        this.relationDiscriminatorMapping = joinTable.getRelationDiscriminatorMapping();
+        this.relationDiscriminatorValue = joinTable.getRelationDiscriminatorValue();
+        this.elementType = mmd.getCollection().getElementType();
+        this.elementsAreEmbedded = joinTable.isEmbeddedElement();
+        this.elementsAreSerialised = joinTable.isSerialisedElement();
+
         if (orderMapping == null && indexedList)
         {
             // If the user declares a field as java.util.Collection we use SetTable to generate the join table
             // If they then instantiate it as a List type it will come through here, so we need to ensure the order column exists
-            throw new NucleusUserException(Localiser.msg("056044", 
-                ownerMemberMetaData.getFullFieldName(), collTable.toString()));
+            throw new NucleusUserException(Localiser.msg("056044", ownerMemberMetaData.getFullFieldName(), joinTable.toString()));
         }
-        this.relationDiscriminatorMapping = collTable.getRelationDiscriminatorMapping();
-        this.relationDiscriminatorValue = collTable.getRelationDiscriminatorValue();
-
-        elementType = mmd.getCollection().getElementType();
-        this.elementsAreEmbedded = collTable.isEmbeddedElement();
-        this.elementsAreSerialised = collTable.isSerialisedElement();
 
         if (elementsAreSerialised)
         {
@@ -204,28 +198,25 @@ public class JoinListStore extends AbstractListStore
             if (relationType == RelationType.ONE_TO_MANY_BI)
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
-                ObjectProvider elementSM = ec.findObjectProvider(element);
-                if (elementSM != null)
+                ObjectProvider elementOP = ec.findObjectProvider(element);
+                if (elementOP != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
                     // TODO Cater for more than 1 related field
-                    Object elementOwner = elementSM.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+                    Object elementOwner = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037",
-                            op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(elementSM.getObject())));
-                        elementSM.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                            StringUtils.toJVMIDString(elementOP.getObject())));
+                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
                     }
                     else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038",
-                            op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(elementSM.getObject()),
-                            StringUtils.toJVMIDString(elementOwner)));
+                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                            StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
             }
@@ -302,8 +293,7 @@ public class JoinListStore extends AbstractListStore
                         }
                         if (relationDiscriminatorMapping != null)
                         {
-                            jdbcPosition =
-                                BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                            jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                         }
                         start++;
 
@@ -372,8 +362,7 @@ public class JoinListStore extends AbstractListStore
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    if (getOwnerMemberMetaData().getOrderMetaData() != null && 
-                        !getOwnerMemberMetaData().getOrderMetaData().isIndexedList())
+                    if (getOwnerMemberMetaData().getOrderMetaData() != null && !getOwnerMemberMetaData().getOrderMetaData().isIndexedList())
                     {
                         // Ordered list, so can't easily do a set!!!
                         NucleusLogger.PERSISTENCE.warn("Calling List.addElement at a position for an ordered list is a stupid thing to do; the ordering is set my the ordering specification. Use an indexed list to do this correctly");
@@ -384,8 +373,7 @@ public class JoinListStore extends AbstractListStore
                     }
                     if (relationDiscriminatorMapping != null)
                     {
-                        jdbcPosition = 
-                            BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
 
                     sqlControl.executeStatementUpdate(ec, mconn, setStmt, ps, true);
@@ -437,8 +425,7 @@ public class JoinListStore extends AbstractListStore
             return;
         }
 
-        if (ownerMemberMetaData.getCollection().isSerializedElement() || 
-            ownerMemberMetaData.getCollection().isEmbeddedElement())
+        if (ownerMemberMetaData.getCollection().isSerializedElement() || ownerMemberMetaData.getCollection().isEmbeddedElement())
         {
             // Serialized/Embedded elements so just clear and add again
             clear(op);
@@ -770,8 +757,7 @@ public class JoinListStore extends AbstractListStore
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
                 }
 
                 try
@@ -791,8 +777,7 @@ public class JoinListStore extends AbstractListStore
                         }
                         else
                         {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
-                                resultMapping, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, resultMapping, false, null, clr.classForName(elementType));
                             return new ListStoreIterator(op, rs, rof, this);
                         }
                     }
@@ -838,9 +823,7 @@ public class JoinListStore extends AbstractListStore
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("UPDATE ");
-                stmt.append(containerTable.toString());
-                stmt.append(" SET ");
+                StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
                 for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
                 {
                     if (i > 0)
@@ -888,32 +871,20 @@ public class JoinListStore extends AbstractListStore
             return null;
         }
 
-        StringBuilder stmt = new StringBuilder("DELETE FROM ");
-        stmt.append(containerTable.toString());
-        stmt.append(" WHERE ");
+        StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
 
         boolean first = true;
         Iterator elementsIter = elements.iterator();
         while (elementsIter.hasNext())
         {
             Object element = elementsIter.next();
-            if (first)
-            {
-                stmt.append("(");
-            }
-            else
-            {
-                stmt.append(" OR (");
-            }
-
+            stmt.append(first ? "(" : " OR (");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(),
-                null, false);
+            BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, false);
             if (relationDiscriminatorMapping != null)
             {
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
             }
-
             stmt.append(")");
             first = false;
         }
@@ -965,23 +936,20 @@ public class JoinListStore extends AbstractListStore
                 final int elementNo = i;
                 final Class elementCls = clr.classForName(elementInfo[elementNo].getClassName());
                 SQLStatement elementStmt = null;
-                if (elementInfo[elementNo].getDiscriminatorStrategy() != null &&
-                    elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
+                if (elementInfo[elementNo].getDiscriminatorStrategy() != null && elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
                 {
                     // The element uses a discriminator so just use that in the SELECT
                     String elementType = ownerMemberMetaData.getCollection().getElementType();
                     if (ClassUtils.isReferenceType(clr.classForName(elementType)))
                     {
-                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(
-                            elementType, clr);
+                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                         Class[] cls = new Class[clsNames.length];
                         for (int j = 0; j < clsNames.length; j++)
                         {
                             cls[j] = clr.classForName(clsNames[j]);
                         }
 
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, 
-                            true, null, null, containerTable, null, elementMapping);
+                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
@@ -990,8 +958,7 @@ public class JoinListStore extends AbstractListStore
                     }
                     else
                     {
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls,
-                            true, null, null, containerTable, null, elementMapping);
+                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
@@ -1003,8 +970,7 @@ public class JoinListStore extends AbstractListStore
                 else
                 {
                     // No discriminator, but subclasses so use UNIONs
-                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null,
-                        null, containerTable, null, elementMapping);
+                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                     stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement();
@@ -1021,17 +987,14 @@ public class JoinListStore extends AbstractListStore
             }
 
             // Select the required fields
-            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(),
-                sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping,
-                fp, elementSqlTbl, emd, 0);
+            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, emd, 0);
         }
 
         if (addRestrictionOnOwner)
         {
             // Apply condition on join-table owner field to filter by owner
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -1040,8 +1003,7 @@ public class JoinListStore extends AbstractListStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -1094,8 +1056,7 @@ public class JoinListStore extends AbstractListStore
             if (needsOrdering)
             {
                 // Order by the ordering column, when present
-                SQLTable orderSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+                SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
                 SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
                 boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
                 orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

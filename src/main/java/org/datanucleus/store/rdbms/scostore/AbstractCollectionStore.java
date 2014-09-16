@@ -138,9 +138,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         Table containerTable = getContainerTable();
         JavaTypeMapping elementMapping = getElementMapping();
 
-        StringBuilder stmt = new StringBuilder("UPDATE ");
-        stmt.append(containerTable.toString());
-        stmt.append(" SET ");
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
         for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -268,8 +266,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ");
-        stmt.append(getContainerTable().toString()).append(" ").append(containerAlias);
+        stmt.append(" FROM ").append(getContainerTable().toString()).append(" ").append(containerAlias);
         // TODO Add join to owner if ownerMapping is for supertable
 
         // Add join to element table if required (only allows for 1 element table currently)
@@ -384,14 +381,12 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                 try
                 {
                     int jdbcPosition = 1;
-                    // Populate the owner
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
 
-                    // Populate element
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
 
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
-                    // Needs to pass TCK M-M relation test
+                    // Needs to pass TCK M-N relation test
                     if (elementInfo != null && elementInfo[0].getDiscriminatorMapping() != null && elementInfo[0].getDatastoreClass() == containerTable)
                     {
                         jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[0], clr);
@@ -457,9 +452,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
     private String getRemoveStatementString(Object element)
     {
-        StringBuilder stmt = new StringBuilder();
-        stmt.append("DELETE FROM ");
-        stmt.append(containerTable.toString());
+        StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString());
 
         // Add join to element table if required (only allows for 1 element table currently)
         /*            ElementContainerStore.ElementInfo[] elementInfo = ecs.getElementInfo();

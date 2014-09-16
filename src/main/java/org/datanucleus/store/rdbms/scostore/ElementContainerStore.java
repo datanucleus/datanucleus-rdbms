@@ -346,11 +346,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
     protected boolean validateElementForWriting(ExecutionContext ec, Object element, FieldValues fieldValues)
     {
         // Check the element type for this collection
-        if (!elementIsPersistentInterface &&
-            !validateElementType(ec.getClassLoaderResolver(), element))
+        if (!elementIsPersistentInterface && !validateElementType(ec.getClassLoaderResolver(), element))
         {
-            throw new ClassCastException(Localiser.msg("056033", element.getClass().getName(), 
-                ownerMemberMetaData.getFullFieldName(), elementType));
+            throw new ClassCastException(Localiser.msg("056033", element.getClass().getName(), ownerMemberMetaData.getFullFieldName(), elementType));
         }
 
         boolean persisted = false;
@@ -364,8 +362,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             if (elementSM != null && elementSM.isEmbedded())
             {
                 // Element is already with ObjectProvider and is embedded in another field!
-                throw new NucleusUserException(Localiser.msg("056028", 
-                    ownerMemberMetaData.getFullFieldName(), element));
+                throw new NucleusUserException(Localiser.msg("056028", ownerMemberMetaData.getFullFieldName(), element));
             }
 
             persisted = SCOUtils.validateObjectForWriting(ec, element, fieldValues);
@@ -472,24 +469,21 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
                 for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
                 {
-                    stmt.append(",");
-                    stmt.append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(",").append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 }
 
                 if (getOrderMapping() != null)
                 {
                     for (int i = 0; i < getOrderMapping().getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",");
-                        stmt.append(getOrderMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(getOrderMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
                 if (getRelationDiscriminatorMapping() != null)
                 {
                     for (int i = 0; i < getRelationDiscriminatorMapping().getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",");
-                        stmt.append(getRelationDiscriminatorMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(getRelationDiscriminatorMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
 
@@ -505,24 +499,21 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
                 for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
                 {
-                    stmt.append(",");
-                    stmt.append(((AbstractDatastoreMapping) getElementMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                    stmt.append(",").append(((AbstractDatastoreMapping) getElementMapping().getDatastoreMapping(0)).getInsertionInputParameter());
                 }
 
                 if (getOrderMapping() != null)
                 {
                     for (int i = 0; i < getOrderMapping().getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",");
-                        stmt.append(((AbstractDatastoreMapping) getOrderMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(((AbstractDatastoreMapping) getOrderMapping().getDatastoreMapping(0)).getInsertionInputParameter());
                     }
                 }
                 if (getRelationDiscriminatorMapping() != null)
                 {
                     for (int i = 0; i < getRelationDiscriminatorMapping().getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",");
-                        stmt.append(((AbstractDatastoreMapping) getRelationDiscriminatorMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(((AbstractDatastoreMapping) getRelationDiscriminatorMapping().getDatastoreMapping(0)).getInsertionInputParameter());
                     }
                 }
 
@@ -589,9 +580,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("DELETE FROM ");
-                stmt.append(getContainerTable().toString());
-                stmt.append(" WHERE ");
+                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(getContainerTable().toString()).append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
                 if (getRelationDiscriminatorMapping() != null)
                 {
@@ -629,16 +618,13 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         {
                             if (getElementInfo()[i].getDiscriminatorMapping() != null)
                             {
-                                jdbcPosition =
-                                    BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, 
-                                        jdbcPosition, true, getElementInfo()[i], clr);
+                                jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, getElementInfo()[i], clr);
                             }
                         }
                     }
                     if (getRelationDiscriminatorMapping() != null)
                     {
-                        jdbcPosition =
-                            BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, sizeStmt, ps);
@@ -707,8 +693,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             String containerAlias = "THIS";
             String joinedElementAlias = "ELEM";
-            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ");
-            stmt.append(getContainerTable().toString()).append(" ").append(containerAlias);
+            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ").append(getContainerTable().toString()).append(" ").append(containerAlias);
 
             // Add join to element table if required (only allows for 1 element table currently)
             boolean joinedDiscrim = false;
@@ -720,16 +705,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 // Need join to the element table to restrict the discriminator
                 joinedDiscrim = true;
                 JavaTypeMapping elemIdMapping = getElementInfo()[0].getDatastoreClass().getIdMapping();
-                if (allowNulls)
-                {
-                    // User wants to allow for nulls so have to use left outer join
-                    stmt.append(" LEFT OUTER JOIN ");
-                }
-                else
-                {
-                    // No nulls so use inner join
-                    stmt.append(" INNER JOIN ");
-                }
+                stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
                 stmt.append(getElementInfo()[0].getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
                 for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
                 {
@@ -737,11 +713,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     {
                         stmt.append(" AND ");
                     }
-                    stmt.append(containerAlias).append(".")
-                        .append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier());
+                    stmt.append(containerAlias).append(".").append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier());
                     stmt.append("=");
-                    stmt.append(joinedElementAlias).append(".")
-                        .append(elemIdMapping.getDatastoreMapping(i).getColumn().getIdentifier());
+                    stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(i).getColumn().getIdentifier());
                 }
             }
             // TODO Add join to owner if ownerMapping is for supertable
@@ -755,8 +729,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                 {
                     stmt.append(" AND ");
-                    stmt.append(containerAlias).append(".")
-                        .append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(">=0");
                 }
             }
@@ -786,14 +759,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                                     discrStmt.append(" OR ");
                                 }
 
-                                if (joinedDiscrim)
-                                {
-                                    discrStmt.append(joinedElementAlias);
-                                }
-                                else
-                                {
-                                    discrStmt.append(containerAlias);
-                                }
+                                discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
                                 discrStmt.append(".");
                                 discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                                 discrStmt.append("=");
@@ -816,14 +782,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                                             discrStmt.append(" OR ");
                                         }
 
-                                        if (joinedDiscrim)
-                                        {
-                                            discrStmt.append(joinedElementAlias);
-                                        }
-                                        else
-                                        {
-                                            discrStmt.append(containerAlias);
-                                        }
+                                        discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
                                         discrStmt.append(".");
                                         discrStmt.append(discrimMapping.getDatastoreMapping(k).getColumn().getIdentifier().toString());
                                         discrStmt.append("=");
