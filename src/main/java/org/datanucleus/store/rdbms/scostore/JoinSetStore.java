@@ -60,6 +60,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.scostore.SetStore;
+import org.datanucleus.store.types.SCO;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -187,9 +188,7 @@ public class JoinSetStore extends AbstractSetStore
     }
 
     /**
-     * Convenience method to check if an element already refers to the owner in an M-N relation.
-     * Note that we are using this since JDO TCK "managed relationships" test relationshipAllRelationships.conf requires it for adding to mappedBy side.
-     * TODO Only do this if at owner side? and fix elsewhere so that JDO TCK test still passes
+     * Convenience method to check if an element already refers to the owner in an M-N relation (i.e added from other side).
      * @param ownerOP ObjectProvider of the owner
      * @param element The element
      * @return Whether the element contains the owner
@@ -197,36 +196,39 @@ public class JoinSetStore extends AbstractSetStore
     private boolean elementAlreadyContainsOwnerInMtoN(ObjectProvider ownerOP, Object element)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
-        ObjectProvider elementOP = ec.findObjectProvider(element);
-        Object elementColl = null;
-        if (elementOP != null)
+
+        if (ec.getOperationQueue() != null)
         {
-            AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(ec.getClassLoaderResolver());
-            elementColl = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
-        }
-        else
-        {
-            // TODO What if detached?
+            // Optimistic add, so additions are queued. No point checking the SCO on the other side, so just query the datastore whether already added (from other side)
+            // TODO This means we always do a "SELECT 1 FROM JOINTABLE" for every addition when optimistic. Should seek to avoid this by updates to operationQueue maybe
+            if (locate(ownerOP, element))
+            {
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                return true;
+            }
+            return false;
         }
 
-        if (elementColl != null && elementColl instanceof Collection)
+        ObjectProvider elementOP = ec.findObjectProvider(element);
+        if (elementOP != null)
         {
-            // The field is already a SCO wrapper so just query it
-            if (((Collection)elementColl).contains(ownerOP.getObject()) && ownerMemberMetaData.getMappedBy() != null)
+            // Check the collection at the other side whether already added (to avoid the locate call)
+            AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(ec.getClassLoaderResolver());
+            Object elementColl = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
+            if (elementColl != null && elementColl instanceof Collection && elementColl instanceof SCO && ((Collection)elementColl).contains(ownerOP.getObject()))
             {
                 NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
             }
         }
-
-        // Query the join-table directly.
-        // TODO Fix this. It is inefficient to go off to the datastore to check whether a record exists.
-        // This should be changed in line with TCK test AllRelationships since that tries to load up
-        // many relationships, and CollectionMapping.postInsert calls addAll with these hence we don't have SCO's to use contains() on
-        if (locate(ownerOP, element))
+        else
         {
-            NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
-            return true;
+            // Element is still detached
+            if (locate(ownerOP, element))
+            {
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                return true;
+            }
         }
 
         return false;
@@ -275,15 +277,7 @@ public class JoinSetStore extends AbstractSetStore
         boolean toBeInserted = true;
         if (relationType == RelationType.MANY_TO_MANY_BI)
         {
-            if (!ec.getManageRelations() && ownerMemberMetaData.getMappedBy() != null)
-            {
-                toBeInserted = false;
-            }
-            else
-            {
-                // This is an M-N relation so we need to check if the element already has us in its collection to avoid duplicate join table entries
-                toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
-            }
+            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
         }
 
         if (toBeInserted)
@@ -334,7 +328,6 @@ public class JoinSetStore extends AbstractSetStore
             return false;
         }
 
-        boolean modified = false;
         List exceptions = new ArrayList();
         boolean batched = (elements.size() > 1);
 
@@ -373,6 +366,7 @@ public class JoinSetStore extends AbstractSetStore
             }
         }
 
+        boolean modified = false;
         try
         {
             ManagedConnection mconn = storeMgr.getConnection(ec);
@@ -399,15 +393,7 @@ public class JoinSetStore extends AbstractSetStore
                         boolean toBeInserted = true;
                         if (relationType == RelationType.MANY_TO_MANY_BI)
                         {
-                            if (!ec.getManageRelations() && ownerMemberMetaData.getMappedBy() != null)
-                            {
-                                toBeInserted = false;
-                            }
-                            else
-                            {
-                                // This is an M-N relation so we need to check if the element already has us in its collection to avoid duplicate join table entries
-                                toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
-                            }
+                            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
                         }
 
                         if (toBeInserted)
