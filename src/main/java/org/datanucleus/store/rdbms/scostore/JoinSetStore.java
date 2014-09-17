@@ -60,7 +60,6 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.scostore.SetStore;
-import org.datanucleus.store.types.SCOMtoN;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -210,10 +209,10 @@ public class JoinSetStore extends AbstractSetStore
             // TODO What if detached?
         }
 
-        if (elementColl != null && elementColl instanceof SCOMtoN) // TODO Just check whether SCO since we know it is M-N before coming in here
+        if (elementColl != null && elementColl instanceof Collection)
         {
             // The field is already a SCO wrapper so just query it
-            if (((SCOMtoN)elementColl).contains(ownerOP.getObject()) && ownerMemberMetaData.getMappedBy() != null)
+            if (((Collection)elementColl).contains(ownerOP.getObject()) && ownerMemberMetaData.getMappedBy() != null)
             {
                 NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
                 return true;
