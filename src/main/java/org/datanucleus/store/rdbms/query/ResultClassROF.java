@@ -273,8 +273,7 @@ public class ResultClassROF implements ResultObjectFactory
                 {
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
-                    AbstractClassMetaData acmd =
-                        ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
+                    AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
                     PersistentClassROF rof = new PersistentClassROF(storeMgr, acmd, classMap, false, ec.getFetchPlan(), cls);
                     fieldValues[i] = rof.getObject(ec, rs);
                 }
@@ -332,8 +331,7 @@ public class ResultClassROF implements ResultObjectFactory
             else if (fieldValues.length == 1 && !resultClass.isAssignableFrom(fieldValues[0].getClass()))
             {
                 // Simple object is not assignable to the ResultClass so throw an error
-                String msg = Localiser.msg("021202",
-                    resultClass.getName(), fieldValues[0].getClass().getName());
+                String msg = Localiser.msg("021202", resultClass.getName(), fieldValues[0].getClass().getName());
                 NucleusLogger.QUERY.error(msg);
                 throw new NucleusUserException(msg);
             }
@@ -349,8 +347,7 @@ public class ResultClassROF implements ResultObjectFactory
             }
 
             // A. Find a constructor with the correct constructor arguments
-            Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, fieldValues,
-                resultFieldTypes);
+            Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, fieldValues, resultFieldTypes);
             if (obj != null)
             {
                 return obj;
@@ -387,14 +384,12 @@ public class ResultClassROF implements ResultObjectFactory
                         Class javaType = stmtMappings[i].getMapping().getJavaType();
                         str.append(javaType.getName());
                     }
-                    NucleusLogger.QUERY.debug(Localiser.msg("021206",
-                        resultClass.getName(), str.toString()));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), str.toString()));
                 }
             }
 
             // B. No argumented constructor exists so create an object and update fields using fields/put method/set method
-            obj = QueryUtils.createResultObjectUsingDefaultConstructorAndSetters(resultClass, resultFieldNames, 
-                resultClassFieldsByName, fieldValues);
+            obj = QueryUtils.createResultObjectUsingDefaultConstructorAndSetters(resultClass, resultFieldNames, resultClassFieldsByName, fieldValues);
 
             return obj;
         }
@@ -501,8 +496,8 @@ public class ResultClassROF implements ResultObjectFactory
         for (int i=0;i<declaredFields.length;i++)
         {
             Field field = declaredFields[i];
-            if (!field.isSynthetic() 
-                    && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null)
+            if (!field.isSynthetic() && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null && 
+                !field.getName().startsWith(storeMgr.getMetaDataManager().getEnhancedMethodNamePrefix()))
             {
                 throw new NucleusUserException(Localiser.msg("021210", field.getName()));
             }
@@ -607,8 +602,7 @@ public class ResultClassROF implements ResultObjectFactory
             }
         };
         resultSetGetters.put(java.sql.Timestamp.class, timestampGetter);
-        // also use Timestamp getter for Date, so it also has time of the day
-        // e.g. with Oracle
+        // also use Timestamp getter for Date, so it also has time of the day e.g. with Oracle
         resultSetGetters.put(java.util.Date.class, timestampGetter);
 
         resultSetGetters.put(java.sql.Date.class, new ResultSetGetter()
