@@ -202,8 +202,7 @@ import org.datanucleus.util.StringUtils;
  * </ul>
  * TODO Change RDBMSManager to share schema information (DatabaseMetaData) with other RDBMSManager.
  */
-public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCOStoreManager, SchemaAwareStoreManager,
-    SchemaScriptAwareStoreManager
+public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCOStoreManager, SchemaAwareStoreManager, SchemaScriptAwareStoreManager
 {
     static
     {
@@ -311,8 +310,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             try
             {
                 dba = DatastoreAdapterFactory.getInstance().getDatastoreAdapter(clr, conn, 
-                    getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME), 
-                    ctx.getPluginManager());
+                    getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME), ctx.getPluginManager());
                 dba.initialiseTypes(schemaHandler, mc);
                 dba.removeUnsupportedMappings(schemaHandler, mc);
 
@@ -321,8 +319,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     if (!dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS))
                     {
-                        NucleusLogger.DATASTORE.warn(Localiser.msg("050002",
-                            getStringProperty(PropertyNames.PROPERTY_MAPPING_CATALOG)));
+                        NucleusLogger.DATASTORE.warn(Localiser.msg("050002", getStringProperty(PropertyNames.PROPERTY_MAPPING_CATALOG)));
                     }
                     else
                     {
@@ -333,8 +330,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     if (!dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS))
                     {
-                        NucleusLogger.DATASTORE.warn(Localiser.msg("050003",
-                            getStringProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA)));
+                        NucleusLogger.DATASTORE.warn(Localiser.msg("050003", getStringProperty(PropertyNames.PROPERTY_MAPPING_SCHEMA)));
                     }
                     else
                     {
@@ -399,7 +395,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             catch (Exception e)
             {
-                NucleusLogger.GENERAL.info(">> RDBMSStoreManager.init", e);
+                NucleusLogger.GENERAL.info("Error in initialisation of RDBMSStoreManager", e);
                 throw e;
             }
             finally
@@ -415,8 +411,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         catch (Exception e1)
         {
             // Unknown type of exception so wrap it in a NucleusUserException for later handling
-            String msg = Localiser.msg("050004") + ' ' + 
-                Localiser.msg("050006") + ' ' + Localiser.msg("048000",e1);
+            String msg = Localiser.msg("050004") + ' ' + Localiser.msg("050006") + ' ' + Localiser.msg("048000",e1);
             NucleusLogger.DATASTORE_SCHEMA.error(msg, e1);
             throw new NucleusUserException(msg, e1).setFatal();
         }
@@ -488,8 +483,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             Class[] argTypes = new Class[] {DatastoreAdapter.class, ClassConstants.CLASS_LOADER_RESOLVER, Map.class};
             Object[] args = new Object[] {dba, nucleusContext.getClassLoaderResolver(null), props};
             identifierFactory = (IdentifierFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                "org.datanucleus.store.rdbms.identifierfactory", "name", idFactoryName, "class-name", 
-                argTypes, args);
+                "org.datanucleus.store.rdbms.identifierfactory", "name", idFactoryName, "class-name", argTypes, args);
         }
         catch (ClassNotFoundException cnfe)
         {
@@ -867,22 +861,22 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Returns whether this object is inserted in the datastore far enough to be considered to be the
      * supplied type. For example if we have base class A, B extends A and this object is a B, and we 
      * pass in A here then this returns whether the A part of the object is now inserted.
-     * @param sm StateManager for the object
+     * @param op ObjectProvider for the object
      * @param className Name of class that we want to check the insertion level for.
      * @return Whether the object is inserted in the datastore to this level
      */
-    public boolean isObjectInserted(ObjectProvider sm, String className)
+    public boolean isObjectInserted(ObjectProvider op, String className)
     {
-        if (sm == null)
+        if (op == null)
         {
             return false;
         }
-        if (!sm.isInserting())
+        if (!op.isInserting())
         {
             return false;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(sm);
+        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(op);
         if (latestTable != null)
         {
             DatastoreClass datastoreCls = latestTable;
@@ -903,18 +897,18 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to set that the specified object is inserted down to the defined datastore class.
      * When the object is fully inserted (the table is the primary table for this object type)
      * it is removed from the map of objects being inserted.
-     * @param sm StateManager for the object
+     * @param op ObjectProvider for the object
      * @param table Table to which it is now inserted
      */
-    public void setObjectIsInsertedToLevel(ObjectProvider sm, DatastoreClass table)
+    public void setObjectIsInsertedToLevel(ObjectProvider op, DatastoreClass table)
     {
-        insertedDatastoreClassByStateManager.put(sm, table);
+        insertedDatastoreClassByStateManager.put(op, table);
 
-        if (table.managesClass(sm.getClassMetaData().getFullClassName()))
+        if (table.managesClass(op.getClassMetaData().getFullClassName()))
         {
             // Full insertion has just completed so update activity state in StateManager
-            sm.changeActivityState(ActivityState.INSERTING_CALLBACKS);
-            insertedDatastoreClassByStateManager.remove(sm);
+            op.changeActivityState(ActivityState.INSERTING_CALLBACKS);
+            insertedDatastoreClassByStateManager.remove(op);
         }
     }
 
@@ -979,8 +973,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param type Type of object
      * @param expectedMappingType Mapping type expected
      */
-    private void assertCompatibleFieldType(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type,
-            Class expectedMappingType)
+    private void assertCompatibleFieldType(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type, Class expectedMappingType)
     {
         DatastoreClass ownerTable = getDatastoreClass(mmd.getClassName(), clr);
         if (ownerTable == null)
@@ -999,8 +992,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
             if (!expectedMappingType.isAssignableFrom(m.getClass()))
             {
-                throw new IncompatibleFieldTypeException(mmd.getFullFieldName(),
-                    type.getName(), mmd.getTypeName());
+                throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), type.getName(), mmd.getTypeName());
             }
         }
     }
@@ -1011,8 +1003,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param clr ClassLoader resolver
      * @return The backing store of this collection in this store
      */
-    private CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, Class type)
+    private CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type)
     {
         CollectionStore store = null;
         Table datastoreTable = getTable(mmd);
@@ -1448,8 +1439,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 catch (SQLException e)
                 {
-                    String msg = Localiser.msg("050005", e.getMessage()) + ' ' + 
-                            Localiser.msg("050006");
+                    String msg = Localiser.msg("050005", e.getMessage()) + ' ' + Localiser.msg("050006");
                     NucleusLogger.DATASTORE_SCHEMA.warn(msg);
                     // This is only logged as a warning since if the JDBC driver has some issue creating the ProbeTable we would be stuck
                     // We need to allow SchemaTool "dbinfo" mode to work in all circumstances.
@@ -1500,7 +1490,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for the (default) RDBMS catalog name.
-     * 
      * @return The catalog name.
      */
     public String getCatalogName()
@@ -1510,7 +1499,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for the (default) RDBMS schema name.
-     * 
      * @return The schema name.
      */
     public String getSchemaName()
@@ -1624,8 +1612,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void unmanageAllClasses(ClassLoaderResolver clr)
     {
-        DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this,
-            Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
+        DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
         boolean success = true;
         try
         {
@@ -1754,8 +1741,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         else
         {
             // Find all of the class with a PK class of this type
-            Collection<AbstractClassMetaData> pkCmds =
-                getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
+            Collection<AbstractClassMetaData> pkCmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
             if (pkCmds != null && pkCmds.size() > 0)
             {
                 Iterator<AbstractClassMetaData> iter = pkCmds.iterator();
@@ -1894,8 +1880,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         str.append(",");
                     }
                 }
-                NucleusLogger.PERSISTENCE.debug("Performing query using UNION on " +
-                        str.toString() + " and their subclasses to find the class of " + id);
+                NucleusLogger.PERSISTENCE.debug("Performing query using UNION on " + str.toString() + " and their subclasses to find the class of " + id);
             }
             return RDBMSStoreHelper.getClassNameForIdUsingUnion(this, ec, id, rootCmds);
         }
@@ -1906,8 +1891,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug("Id \""+id+"\" has been determined to be the id of class "+
-                        rootCmd.getFullClassName() + " : this is the first of " + rootCmds.size() + " possible" +
-                        ", but unable to determine further");
+                        rootCmd.getFullClassName() + " : this is the first of " + rootCmds.size() + " possible, but unable to determine further");
             }
             return rootCmd.getFullClassName();
         }
@@ -2059,8 +2043,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         // Get base table with the required field
-        DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(),
-            ec.getClassLoaderResolver());
+        DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(), ec.getClassLoaderResolver());
         if (tbl == null)
         {
             tbl = getTableForStrategy(cmd,absoluteFieldNumber,ec.getClassLoaderResolver());
@@ -2362,9 +2345,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public RDBMSColumnInfo getColumnInfoForColumnName(Table table, Connection conn, DatastoreIdentifier column)
     throws SQLException
     {
-        RDBMSColumnInfo colInfo = (RDBMSColumnInfo)schemaHandler.getSchemaData(
-            conn, "column", new Object[] {table, column.getName()});
-        return colInfo;
+        return (RDBMSColumnInfo)schemaHandler.getSchemaData(conn, "column", new Object[] {table, column.getName()});
     }
 
     /**
@@ -2386,8 +2367,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public List getColumnInfoForTable(Table table, Connection conn)
     throws SQLException
     {
-        RDBMSTableInfo tableInfo = (RDBMSTableInfo)schemaHandler.getSchemaData(conn, "columns",
-            new Object[] {table});
+        RDBMSTableInfo tableInfo = (RDBMSTableInfo)schemaHandler.getSchemaData(conn, "columns", new Object[] {table});
         if (tableInfo == null)
         {
             return Collections.EMPTY_LIST;
@@ -2436,13 +2416,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 DatastoreIdentifier identifier = ((Table)sd.getTable()).getIdentifier();
                 boolean catalogMatches = true;
                 boolean schemaMatches = true;
-                if (catalog != null && identifier.getCatalogName() != null &&
-                    !catalog.equals(identifier.getCatalogName()))
+                if (catalog != null && identifier.getCatalogName() != null &&!catalog.equals(identifier.getCatalogName()))
                 {
                     catalogMatches = false;
                 }
-                if (schema != null && identifier.getSchemaName() != null &&
-                    !schema.equals(identifier.getSchemaName()))
+                if (schema != null && identifier.getSchemaName() != null && !schema.equals(identifier.getSchemaName()))
                 {
                     schemaMatches = false;
                 }
@@ -2619,8 +2597,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             try
             {
                 Connection conn = (Connection)mc.getConnection();
-                RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(
-                    conn, "tables", new Object[] {this.catalogName, this.schemaName});
+                RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(conn, "tables", new Object[] {this.catalogName, this.schemaName});
                 if (schemaInfo != null)
                 {
                     Iterator tableIter = schemaInfo.getChildren().values().iterator();
@@ -2718,8 +2695,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
 
                 // Trap all non-PC elements that haven't had a join table specified but need one
-                throw new NucleusUserException(Localiser.msg("050049",
-                    mmd.getFullFieldName(), mmd.toString()));
+                throw new NucleusUserException(Localiser.msg("050049", mmd.getFullFieldName(), mmd.toString()));
             }
         }
 
@@ -2801,7 +2777,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         protected final boolean checkExistTablesOrViews;
 
         /** tracks the SchemaData currrently being added - used to rollback the AutoStart added classes **/
-        private HashSet<RDBMSStoreData> schemaDataAdded = new HashSet();
+        private Set<RDBMSStoreData> schemaDataAdded = new HashSet();
 
         private final String[] classNames;
 
@@ -3007,8 +2983,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         // Check whether this class has the same base persistable class as the others using the PK. 
                         // If not, then throw an error
                         String baseClassWithMetaData = cmd.getBaseAbstractClassMetaData().getFullClassName();
-                        Collection<AbstractClassMetaData> pkCmds =
-                            getMetaDataManager().getClassMetaDataWithApplicationId(cmd.getObjectidClass());
+                        Collection<AbstractClassMetaData> pkCmds = getMetaDataManager().getClassMetaDataWithApplicationId(cmd.getObjectidClass());
                         if (pkCmds != null && pkCmds.size() > 0)
                         {
                             // We already have at least 1 class using the same app id PK class
@@ -3020,8 +2995,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             while (iter.hasNext())
                             {
                                 AbstractClassMetaData pkCmd = iter.next();
-                                String otherClassBaseClass = 
-                                    pkCmd.getBaseAbstractClassMetaData().getFullClassName();
+                                String otherClassBaseClass = pkCmd.getBaseAbstractClassMetaData().getFullClassName();
                                 if (otherClassBaseClass.equals(baseClassWithMetaData))
                                 {
                                     in_same_tree = true;
@@ -3032,8 +3006,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                             if (!in_same_tree)
                             {
-                                String error_msg = Localiser.msg("050021", cmd.getFullClassName(), 
-                                    cmd.getObjectidClass(), sample_class_in_other_tree);
+                                String error_msg = Localiser.msg("050021", cmd.getFullClassName(), cmd.getObjectidClass(), sample_class_in_other_tree);
                                 NucleusLogger.DATASTORE.error(error_msg);
                                 throw new NucleusUserException(error_msg);
                             }
@@ -3063,8 +3036,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         sdNew = new RDBMSStoreData(cmd, null, false);
                         registerStoreData(sdNew);
                     }
-                    else if (imd.getStrategy() == InheritanceStrategy.NEW_TABLE ||
-                             imd.getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                    else if (imd.getStrategy() == InheritanceStrategy.NEW_TABLE || imd.getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
                     {
                         // Table managed by this class
                         // Generate an identifier for the table required
@@ -3095,8 +3067,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             // Give a warning and then create a new instance of the table (mapped to the same datastore object)
                             if (existingClass != null)
                             {
-                                String msg = Localiser.msg("050015", cmd.getFullClassName(), 
-                                    tableName.getName(), existingClass);
+                                String msg = Localiser.msg("050015", cmd.getFullClassName(), tableName.getName(), existingClass);
                                 NucleusLogger.DATASTORE.warn(msg);
                             }
                         }
@@ -3619,8 +3590,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          * @param tableConstraintsCreated the constraints created that must be dropped
          * @param tablesCreated the tables created that must be dropped
          */
-        private void rollbackSchemaCreation(List<Table> viewsCreated,
-                List<Table> tableConstraintsCreated, List<Table> tablesCreated)
+        private void rollbackSchemaCreation(List<Table> viewsCreated, List<Table> tableConstraintsCreated, List<Table> tablesCreated)
         {
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {
@@ -3816,8 +3786,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return false;
     }
 
-    public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, 
-        StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, 
+    public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, 
         Class persistentClass)
     {
         return new PersistentClassROF(this, acmd, mappingDefinition, ignoreCache, fetchPlan, persistentClass);
@@ -3863,8 +3832,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return new JoinSetStore(mmd, (CollectionTable)table, clr);
     }
 
-    protected PersistableRelationStore newPersistableRelationStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr,
-            Table table)
+    protected PersistableRelationStore newPersistableRelationStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
     {
         return new JoinPersistableRelationStore(mmd, (PersistableJoinTable) table, clr);
     }
@@ -3957,10 +3925,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     ddlFileWriter = new FileWriter(ddlFile);
 
                     SimpleDateFormat fmt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    ddlFileWriter.write("------------------------------------------------------------------\n");
+                    ddlFileWriter.write("-- ----------------------------------------------------------------\n");
                     ddlFileWriter.write("-- DataNucleus SchemaTool " + 
                         "(ran at " + fmt.format(new java.util.Date()) + ")\n");
-                    ddlFileWriter.write("------------------------------------------------------------------\n");
+                    ddlFileWriter.write("-- ----------------------------------------------------------------\n");
                     if (completeDdl)
                     {
                         ddlFileWriter.write("-- Complete schema required for the following classes:-\n");
@@ -3997,7 +3965,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             try
                             {
                                 ddlFileWriter.write("\n");
-                                ddlFileWriter.write("------------------------------------------------------------------\n");
+                                ddlFileWriter.write("-- ----------------------------------------------------------------\n");
                                 ddlFileWriter.write("-- Table for SchemaTable auto-starter\n");
                             }
                             catch (IOException ioe)
@@ -4018,7 +3986,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     if (ddlFileWriter != null)
                     {
                         ddlFileWriter.write("\n");
-                        ddlFileWriter.write("------------------------------------------------------------------\n");
+                        ddlFileWriter.write("-- ----------------------------------------------------------------\n");
                         ddlFileWriter.write("-- Sequences and SequenceTables\n");
                     }
                     createSchemaSequences(classNames, clr, ddlFileWriter);
