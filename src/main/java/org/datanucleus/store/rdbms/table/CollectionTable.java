@@ -91,7 +91,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             elementMapping = storeMgr.getMappingManager().getMapping(this, mmd, clr, FieldRole.ROLE_COLLECTION_ELEMENT);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(elementMapping);
+                logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);
             }
         }
         else
@@ -129,7 +129,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(elementMapping);
+                logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);
             }
         }
 
@@ -241,7 +241,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, orderColmd, pkRequired && !pkColsSpecified);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(orderMapping);
+                logMapping(mmd.getFullFieldName()+".[ORDER]", orderMapping);
             }
         }
 

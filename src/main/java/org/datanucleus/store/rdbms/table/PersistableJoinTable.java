@@ -86,7 +86,7 @@ public class PersistableJoinTable extends JoinTable
             ownerColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            debugMapping(ownerMapping);
+            logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
         }
 
         // Add related mapping
@@ -101,7 +101,7 @@ public class PersistableJoinTable extends JoinTable
             relatedColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_PERSISTABLE_RELATION, clr);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            debugMapping(relatedMapping);
+            logMapping(mmd.getFullFieldName()+".[RELATED]", relatedMapping);
         }
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())

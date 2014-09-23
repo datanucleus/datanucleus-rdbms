@@ -347,8 +347,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
 
         // Add the datastore identity column as the PK
-        Column idColumn = addColumn(DatastoreId.class.getName(), 
-            storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIDMapping, colmd);
+        Column idColumn = addColumn(DatastoreId.class.getName(), storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIDMapping, colmd);
         idColumn.setPrimaryKey();
 
         // Set the identity column type based on the IdentityStrategy
@@ -399,6 +398,7 @@ public abstract class AbstractClassTable extends TableImpl
             NucleusLogger.VALUEGENERATION.warn("Error retrieving storage class for value-generator " + strategyName + " " + e.getMessage());
         }
         storeMgr.getMappingManager().createDatastoreMapping(datastoreIDMapping, idColumn, valueGeneratedType.getName());
+        logMapping("DATASTORE_ID", datastoreIDMapping);
 
         // Handle any auto-increment requirement
         if (isObjectIdDatastoreAttributed())
@@ -447,9 +447,9 @@ public abstract class AbstractClassTable extends TableImpl
         }
         tenantMapping.setTable(this);
         tenantMapping.initialize(storeMgr, typeName);
-        Column tenantColumn = addColumn(typeName,
-            storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), tenantMapping, colmd);
+        Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), tenantMapping, colmd);
         storeMgr.getMappingManager().createDatastoreMapping(tenantMapping, tenantColumn, typeName);
+        logMapping("MULTITENANCY", tenantMapping);
     }
 
     /**
@@ -459,35 +459,7 @@ public abstract class AbstractClassTable extends TableImpl
     protected void addMemberMapping(JavaTypeMapping fieldMapping)
     {
         AbstractMemberMetaData mmd = fieldMapping.getMemberMetaData();
-        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-        {
-            // Provide field->column mapping debug message
-            StringBuilder columnsStr = new StringBuilder();
-            for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
-            {
-                if (i > 0)
-                {
-                    columnsStr.append(",");
-                }
-                columnsStr.append(fieldMapping.getDatastoreMapping(i).getColumn());
-            }
-            if (fieldMapping.getNumberOfDatastoreMappings() == 0)
-            {
-                columnsStr.append("[none]");
-            }
-            StringBuilder datastoreMappingTypes = new StringBuilder();
-            for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
-            {
-                if (i > 0)
-                {
-                    datastoreMappingTypes.append(',');
-                }
-                datastoreMappingTypes.append(fieldMapping.getDatastoreMapping(i).getClass().getName());
-            }
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
-                mmd.getFullFieldName(), columnsStr.toString(), fieldMapping.getClass().getName(), datastoreMappingTypes.toString()));
-        }
-
+        logMapping(mmd.getFullFieldName(), fieldMapping);
         memberMappingsMap.put(mmd, fieldMapping);
 
         // Update highest field number if this is higher

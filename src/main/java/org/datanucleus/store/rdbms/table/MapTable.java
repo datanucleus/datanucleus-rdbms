@@ -139,7 +139,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            debugMapping(ownerMapping);
+            logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
         }
 
         String keyValueFieldName = (mmd.getKeyMetaData() != null ? mmd.getKeyMetaData().getMappedBy() : null);
@@ -168,7 +168,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(keyMapping);
+                logMapping(mmd.getFullFieldName()+".[KEY]", keyMapping);
             }
             if (valueKeyFieldName != null && isEmbeddedKeyPC())
             {
@@ -200,7 +200,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(keyMapping);
+                logMapping(mmd.getFullFieldName()+".[KEY]", keyMapping);
             }
         }
 
@@ -227,7 +227,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(valueMapping);
+                logMapping(mmd.getFullFieldName()+".[VALUE]", valueMapping);
             }
             if (keyValueFieldName != null && isEmbeddedValuePC())
             {
@@ -259,7 +259,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(valueMapping);
+                logMapping(mmd.getFullFieldName()+".[VALUE]", valueMapping);
             }
         }
 
@@ -355,7 +355,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, orderColmd, pkRequired && !pkColsSpecified);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(orderMapping);
+                logMapping(mmd.getFullFieldName()+".[ORDER]", orderMapping);
             }
         }
 

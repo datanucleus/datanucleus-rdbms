@@ -301,6 +301,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
                 versionMapping = new VersionTimestampMapping(this, mapMgr.getMapping(Timestamp.class));
             }
+            if (versionMapping != null)
+            {
+                logMapping("VERSION", versionMapping);
+            }
         }
 
         // Add Discriminator where specified in MetaData
@@ -323,6 +327,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     // No superclass with a discriminator so add it in this table
                     discriminatorMapping = DiscriminatorMapping.createDiscriminatorMapping(this, dismd);
                 }
+            }
+            if (discriminatorMapping != null)
+            {
+                logMapping("DISCRIMINATOR", discriminatorMapping);
             }
         }
 
@@ -502,35 +510,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     break;
                                 }
                             }
-                            if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-                            {
-                                // TODO Change this to reflect that we have updated the previous mapping
-                                // Provide field->column mapping debug message
-                                StringBuilder columnsStr = new StringBuilder();
-                                for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
-                                {
-                                    if (i > 0)
-                                    {
-                                        columnsStr.append(",");
-                                    }
-                                    columnsStr.append(fieldMapping.getDatastoreMapping(i).getColumn());
-                                }
-                                if (fieldMapping.getNumberOfDatastoreMappings() == 0)
-                                {
-                                    columnsStr.append("[none]");
-                                }
-                                StringBuilder datastoreMappingTypes = new StringBuilder();
-                                for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
-                                {
-                                    if (i > 0)
-                                    {
-                                        datastoreMappingTypes.append(',');
-                                    }
-                                    datastoreMappingTypes.append(fieldMapping.getDatastoreMapping(i).getClass().getName());
-                                }
-                                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
-                                    mmd.getFullFieldName(), columnsStr.toString(), fieldMapping.getClass().getName(), datastoreMappingTypes.toString()));
-                            }
+
+                            // TODO Change this to reflect that we have updated the previous mapping
+                            logMapping(mmd.getFullFieldName(), fieldMapping);
                         }
                     }
                 }

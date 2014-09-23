@@ -134,7 +134,7 @@ public abstract class ElementContainerTable extends JoinTable
             storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            debugMapping(ownerMapping);
+            logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
         }
 
         // Add any distinguisher column

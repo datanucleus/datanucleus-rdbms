@@ -57,6 +57,7 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.ForeignKeyInfo;
 import org.datanucleus.store.rdbms.schema.IndexInfo;
 import org.datanucleus.store.rdbms.schema.PrimaryKeyInfo;
@@ -1420,5 +1421,41 @@ public abstract class TableImpl extends AbstractTable
         ArrayList stmts = new ArrayList();
         stmts.add(dba.getDropTableStatement(this));
         return stmts;
+    }
+
+    /**
+     * Convenience logging method to output the mapping information for an element, key, value field
+     * @param mapping The mapping
+     */
+    protected void logMapping(String memberName, JavaTypeMapping mapping)
+    {
+        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
+        {
+            // Provide field->column mapping debug message
+            StringBuilder columnsStr = new StringBuilder();
+            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
+            {
+                if (i > 0)
+                {
+                    columnsStr.append(",");
+                }
+                columnsStr.append(mapping.getDatastoreMapping(i).getColumn());
+            }
+            if (mapping.getNumberOfDatastoreMappings() == 0)
+            {
+                columnsStr.append("[none]");
+            }
+            StringBuilder datastoreMappingTypes = new StringBuilder();
+            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
+            {
+                if (i > 0)
+                {
+                    datastoreMappingTypes.append(',');
+                }
+                datastoreMappingTypes.append(mapping.getDatastoreMapping(i).getClass().getName());
+            }
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
+                memberName, columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
+        }
     }
 }

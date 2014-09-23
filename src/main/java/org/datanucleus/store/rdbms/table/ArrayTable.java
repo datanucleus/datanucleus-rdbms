@@ -87,7 +87,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             }
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(elementMapping);
+                logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);
             }
         }
         else
@@ -104,7 +104,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
                 elemColmd, storeMgr, this, false, true, FieldRole.ROLE_ARRAY_ELEMENT, clr);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
-                debugMapping(elementMapping);
+                logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);
             }
         }
 
@@ -127,7 +127,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
         ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, colmd, pkRequired && !pkColsSpecified);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            debugMapping(orderMapping);
+            logMapping(mmd.getFullFieldName()+".[ORDER]", orderMapping);
         }
 
         // Define primary key of the join table (if any)

@@ -32,7 +32,6 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract class representing a field that maps to a table in the datastore.
@@ -133,41 +132,5 @@ public abstract class JoinTable extends TableImpl
     public JavaTypeMapping getIdMapping()
     {
         throw new NucleusException("Unsupported ID mapping in join table").setFatal();
-    }
-
-    /**
-     * Convenience logging method to output the mapping information for an element, key, value field
-     * @param mapping The mapping
-     */
-    protected void debugMapping(JavaTypeMapping mapping)
-    {
-        if (NucleusLogger.DATASTORE.isDebugEnabled())
-        {
-            // Provide field->column mapping debug message
-            StringBuilder columnsStr = new StringBuilder();
-            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
-            {
-                if (i > 0)
-                {
-                    columnsStr.append(",");
-                }
-                columnsStr.append(mapping.getDatastoreMapping(i).getColumn());
-            }
-            if (mapping.getNumberOfDatastoreMappings() == 0)
-            {
-                columnsStr.append("[none]");
-            }
-            StringBuilder datastoreMappingTypes = new StringBuilder();
-            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
-            {
-                if (i > 0)
-                {
-                    datastoreMappingTypes.append(',');
-                }
-                datastoreMappingTypes.append(mapping.getDatastoreMapping(i).getClass().getName());
-            }
-            NucleusLogger.DATASTORE.debug(Localiser.msg("057010",
-                mmd.getFullFieldName(), columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
-        }
     }
 }
