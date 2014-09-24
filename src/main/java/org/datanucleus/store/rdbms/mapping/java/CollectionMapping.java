@@ -126,7 +126,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             {
                 // Create a wrapper and attach the elements (and add the others)
                 SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
-                collWrapper.attachCopy(value);
+                if (value.size() > 0)
+                {
+                    collWrapper.attachCopy(value);
+
+                    // The attach will have put entries in the operationQueue if using optimistic, so flush them
+                    ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
+                }
             }
             else
             {
