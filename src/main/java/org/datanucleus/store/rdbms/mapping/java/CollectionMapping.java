@@ -26,7 +26,6 @@ import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
@@ -34,7 +33,6 @@ import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.store.types.SCO;
-import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.Localiser;
@@ -165,10 +163,8 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
      * Method to be called after any update of the owner class element.
      * This method could be called in two situations
      * <ul>
-     * <li>Update a collection field of an object by replacing the collection with a new collection, 
-     * so UpdateRequest is called, which calls here</li>
-     * <li>Persist a new object, and it needed to wait til the element was inserted so
-     * goes into dirty state and then flush() triggers UpdateRequest, which comes here</li>
+     * <li>Update a collection field of an object by replacing the collection with a new collection, so UpdateRequest is called, which calls here</li>
+     * <li>Persist a new object, and it needed to wait til the element was inserted so goes into dirty state and then flush() triggers UpdateRequest, which comes here</li>
      * </ul>
      * @param ownerOP ObjectProvider of the owner
      */
@@ -191,25 +187,27 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
-        if (value instanceof SCOContainer)
+        if (value instanceof BackedSCO)
         {
-            // Already have a SCO value
-            SCOContainer sco = (SCOContainer) value;
-            if (ownerOP.getObject() == sco.getOwner() && mmd.getName().equals(sco.getFieldName()))
-            {
-                // Flush any outstanding updates
-                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)sco).getBackingStore(), ownerOP);
-
-                return;
-            }
-
-            if (sco.getOwner() != null)
-            {
-                throw new NucleusException(Localiser.msg("CollectionMapping.WrongOwnerError")).setFatal();
-            }
+            // Already have a SCO value, so flush outstanding updates
+            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+            return;
         }
 
-        if (!mmd.isCascadeUpdate())
+        if (mmd.isCascadeUpdate())
+        {
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
+            }
+
+            CollectionStore backingStore = ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
+            backingStore.update(ownerOP, value);
+
+            // Replace the field with a wrapper containing these elements
+            replaceFieldWithWrapper(ownerOP, value);
+        }
+        else
         {
             // TODO Should this throw exception if the element doesn't exist?
             // User doesn't want to update by reachability
@@ -219,17 +217,6 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             }
             return;
         }
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
-        }
-
-        CollectionStore backingStore = ((CollectionStore) storeMgr.getBackingStoreForField(
-            ec.getClassLoaderResolver(), mmd, value.getClass()));
-        backingStore.update(ownerOP, value);
-
-        // Replace the field with a wrapper containing these elements
-        replaceFieldWithWrapper(ownerOP, value);
     }
 
     /**

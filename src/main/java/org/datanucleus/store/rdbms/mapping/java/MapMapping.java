@@ -28,7 +28,6 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
@@ -36,7 +35,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.types.SCO;
-import org.datanucleus.store.types.SCOContainer;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.Localiser;
@@ -89,41 +87,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (!mmd.isCascadePersist())
-        {
-            // Field doesnt support cascade-persist so no reachability
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
-            }
-
-            // Check for any persistable keys/values that arent persistent
-            ApiAdapter api = ec.getApiAdapter();
-            Set entries = value.entrySet();
-            Iterator iter = entries.iterator();
-            while (iter.hasNext())
-            {
-                Map.Entry entry = (Map.Entry)iter.next();
-                if (api.isPersistable(entry.getKey()))
-                {
-                    if (!api.isPersistent(entry.getKey()) && !api.isDetached(entry.getKey()))
-                    {
-                        // Key is not persistent so throw exception
-                        throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), entry.getKey());
-                    }
-                }
-                if (api.isPersistable(entry.getValue()))
-                {
-                    if (!api.isPersistent(entry.getValue()) && !api.isDetached(entry.getValue()))
-                    {
-                        // Value is not persistent so throw exception
-                        throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), entry.getValue());
-                    }
-                }
-            }
-            replaceFieldWithWrapper(ownerOP, value);
-        }
-        else
+        if (mmd.isCascadePersist())
         {
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -157,6 +121,40 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                 }
             }
         }
+        else
+        {
+            // Field doesnt support cascade-persist so no reachability
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
+            }
+
+            // Check for any persistable keys/values that arent persistent
+            ApiAdapter api = ec.getApiAdapter();
+            Set entries = value.entrySet();
+            Iterator iter = entries.iterator();
+            while (iter.hasNext())
+            {
+                Map.Entry entry = (Map.Entry)iter.next();
+                if (api.isPersistable(entry.getKey()))
+                {
+                    if (!api.isPersistent(entry.getKey()) && !api.isDetached(entry.getKey()))
+                    {
+                        // Key is not persistent so throw exception
+                        throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), entry.getKey());
+                    }
+                }
+                if (api.isPersistable(entry.getValue()))
+                {
+                    if (!api.isPersistent(entry.getValue()) && !api.isDetached(entry.getValue()))
+                    {
+                        // Value is not persistent so throw exception
+                        throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), entry.getValue());
+                    }
+                }
+            }
+            replaceFieldWithWrapper(ownerOP, value);
+        }
     }
 
     /**
@@ -187,26 +185,38 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (value instanceof SCOContainer)
+        if (value instanceof BackedSCO)
         {
-            SCOContainer sco = (SCOContainer) value;
-
-            if (ownerOP.getObject() == sco.getOwner() && mmd.getName().equals(sco.getFieldName()))
-            {
-                // Flush any outstanding updates
-                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)sco).getBackingStore(), ownerOP);
-
-                return;
-            }
-
-            if (sco.getOwner() != null)
-            {
-                throw new NucleusException("Owned second-class object was somehow assigned to a field other than its owner's").setFatal();
-            }
+            // Already have a SCO value, so flush outstanding updates
+            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+            return;
         }
 
-        if (!mmd.isCascadeUpdate())
+        if (mmd.isCascadeUpdate())
         {
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
+            }
+
+            // Update the datastore with this value of map (clear old entries and add new ones)
+            // This method could be called in two situations
+            // 1). Update a map field of an object, so UpdateRequest is called, which calls here
+            // 2). Persist a new object, and it needed to wait til the element was inserted so
+            //     goes into dirty state and then flush() triggers UpdateRequest, which comes here
+            MapStore store = ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
+
+            // TODO Consider making this more efficient picking the ones to remove/add
+            // e.g use an update() method on the backing store like for CollectionStore
+            store.clear(ownerOP);
+            store.putAll(ownerOP, value);
+
+            // Replace the field with a wrapper containing these entries
+            replaceFieldWithWrapper(ownerOP, value);
+        }
+        else
+        {
+            // TODO Should this throw exception if the element doesn't exist?
             // User doesnt want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
@@ -214,26 +224,6 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             }
             return;
         }
-        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-        {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
-        }
-
-        // Update the datastore with this value of map (clear old entries and add new ones)
-        // This method could be called in two situations
-        // 1). Update a map field of an object, so UpdateRequest is called, which calls here
-        // 2). Persist a new object, and it needed to wait til the element was inserted so
-        //     goes into dirty state and then flush() triggers UpdateRequest, which comes here
-        MapStore store = ((MapStore) storeMgr.getBackingStoreForField(
-            ec.getClassLoaderResolver(), mmd, value.getClass()));
-
-        // TODO Consider making this more efficient picking the ones to remove/add
-        // e.g use an update() method on the backing store like for CollectionStore
-        store.clear(ownerOP);
-        store.putAll(ownerOP, value);
-
-        // Replace the field with a wrapper containing these entries
-        replaceFieldWithWrapper(ownerOP, value);
     }
 
     /**
