@@ -385,7 +385,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             type = java.util.List.class;
         }
 
-        return SCOUtils.newSCOInstance(op, mmd, mmd.getType(), type, value, false, false, true);
+        return SCOUtils.newSCOInstance(op, mmd, type, value, false, false, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------
