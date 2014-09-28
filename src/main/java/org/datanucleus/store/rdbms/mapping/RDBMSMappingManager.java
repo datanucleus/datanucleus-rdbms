@@ -1149,7 +1149,7 @@ public class RDBMSMappingManager implements MappingManager
                 return new MappingConverterDetails(TypeConverterMapping.class, conv);
             }
 
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("041000", javaType.getName()), new Exception());
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("041000", javaType.getName()));
             return null;
         }
         return new MappingConverterDetails(cls);
