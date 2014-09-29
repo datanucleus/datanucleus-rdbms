@@ -97,6 +97,7 @@ import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MetaData;
+import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
 import org.datanucleus.state.ActivityState;
@@ -1159,6 +1160,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public boolean isJdbcStore()
     {
         return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.AbstractStoreManager#getNativeQueryLanguage()
+     */
+    @Override
+    public String getNativeQueryLanguage()
+    {
+        return QueryLanguage.SQL.toString();
     }
 
     /**
