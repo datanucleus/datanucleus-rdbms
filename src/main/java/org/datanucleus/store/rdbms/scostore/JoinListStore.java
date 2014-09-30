@@ -478,6 +478,10 @@ public class JoinListStore extends AbstractListStore
             Collection elements = new ArrayList();
             elements.add(element);
             int[] indices = getIndicesOf(ownerOP, elements);
+            if (indices == null)
+            {
+                return false;
+            }
 
             // Remove each element in turn, doing the shifting of indexes each time
             // TODO : Change this to remove all in one go and then shift once
@@ -574,6 +578,10 @@ public class JoinListStore extends AbstractListStore
 
         // Get the indices of the elements we are going to remove (highest first)
         int[] indices = getIndicesOf(op, elements);
+        if (indices == null)
+        {
+            return false;
+        }
 
         boolean modified = false;
         SQLController sqlControl = storeMgr.getSQLController();

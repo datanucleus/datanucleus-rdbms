@@ -541,6 +541,67 @@ public class FKListStore extends AbstractListStore
         return true;
     }
 
+    /**
+     * Remove all elements from a collection from the association owner vs elements.
+     * TODO : Change the query to do all in one go for efficiency. Currently
+     * removes an element and shuffles the indexes, then removes an element
+     * and shuffles the indexes, then removes an element and shuffles the
+     * indexes etc ... a bit inefficient !!!
+     * @param op ObjectProvider for the owner
+     * @param elements Collection of elements to remove 
+     * @return Whether the database was updated 
+     */
+    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    {
+        if (elements == null || elements.size() == 0)
+        {
+            return false;
+        }
+
+        boolean modified = false;
+        if (indexedList)
+        {
+            // Get the indices of the elements to remove in reverse order (highest first)
+            int[] indices = getIndicesOf(op,elements);
+            if (indices == null)
+            {
+                return false;
+            }
+
+            // Remove each element in turn, doing the shifting of indexes each time
+            // TODO : Change this to remove all in one go and then shift once
+            for (int i=0;i<indices.length;i++)
+            {
+                internalRemoveAt(op, indices[i], -1);
+                modified = true;
+            }
+
+            // Dependent-element
+            boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
+            if (ownerMemberMetaData.isCascadeRemoveOrphans())
+            {
+                dependent = true;
+            }
+            if (dependent)
+            {
+                // "delete-dependent" : delete elements if the collection is marked as dependent
+                // TODO What if the collection contains elements that are not in the List ? should not delete them
+                op.getExecutionContext().deleteObjects(elements.toArray());
+            }
+        }
+        else
+        {
+            // Ordered List
+            Iterator iter = elements.iterator();
+            while (iter.hasNext())
+            {
+                Object element = iter.next();
+                remove(op, element, size, true);
+            }
+        }
+
+        return modified;
+    }
 
     /**
      * Convenience method to remove the specified element from the List.
@@ -1396,8 +1457,7 @@ public class FKListStore extends AbstractListStore
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping,
-                fp, sqlStmt.getPrimaryTable(), emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), emd, 0);
         }
         else
         {

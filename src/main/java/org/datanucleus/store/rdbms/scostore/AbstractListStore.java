@@ -10,8 +10,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License. 
- 
+limitations under the License.
 
 Contributors:
 2003 Andy Jefferson - coding standards
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -218,64 +218,6 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
     }
 
     /**
-     * Remove all elements from a collection from the association owner vs elements.
-     * TODO : Change the query to do all in one go for efficiency. Currently
-     * removes an element and shuffles the indexes, then removes an element
-     * and shuffles the indexes, then removes an element and shuffles the
-     * indexes etc ... a bit inefficient !!!
-     * @param op ObjectProvider for the owner
-     * @param elements Collection of elements to remove 
-     * @return Whether the database was updated 
-     */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
-    {
-        if (elements == null || elements.size() == 0)
-        {
-            return false;
-        }
-
-        boolean modified = false;
-        if (indexedList)
-        {
-            // Get the indices of the elements to remove in reverse order (highest first)
-            int[] indices = getIndicesOf(op,elements);
-
-            // Remove each element in turn, doing the shifting of indexes each time
-            // TODO : Change this to remove all in one go and then shift once
-            for (int i=0;i<indices.length;i++)
-            {
-                internalRemoveAt(op, indices[i], -1);
-                modified = true;
-            }
-
-            // Dependent-element
-            boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
-            if (ownerMemberMetaData.isCascadeRemoveOrphans())
-            {
-                dependent = true;
-            }
-            if (dependent)
-            {
-                // "delete-dependent" : delete elements if the collection is marked as dependent
-                // TODO What if the collection contains elements that are not in the List ? should not delete them
-                op.getExecutionContext().deleteObjects(elements.toArray());
-            }
-        }
-        else
-        {
-            // Ordered List
-            Iterator iter = elements.iterator();
-            while (iter.hasNext())
-            {
-                Object element = iter.next();
-                remove(op, element, size, true);
-            }
-        }
-
-        return modified;
-    }
-
-    /**
      * Method to remove the specified element from the List.
      * @param op ObjectProvider for the owner
      * @param element The element to remove.
@@ -319,15 +261,6 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
     }
 
     /**
-     * Convenience method to remove the specified element from the List.
-     * @param op ObjectProvider of the owner
-     * @param element The element
-     * @param size Current size of list if known. -1 if not known
-     * @return Whether the List was modified
-     */
-    protected abstract boolean internalRemove(ObjectProvider op, Object element, int size);
-
-    /**
      * Method to remove an object at an index in the List.
      * If the list is ordered, will remove the element completely since no index positions exist.
      * @param op ObjectProvider
@@ -367,6 +300,15 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
 
         return element;
     }
+
+    /**
+     * Internal method to remove the specified element from the List.
+     * @param op ObjectProvider of the owner
+     * @param element The element
+     * @param size Current size of list if known. -1 if not known
+     * @return Whether the List was modified
+     */
+    protected abstract boolean internalRemove(ObjectProvider op, Object element, int size);
 
     /**
      * Internal method to remove an object at a location from the List.
@@ -411,7 +353,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      */
     protected int[] getIndicesOf(ObjectProvider op, Collection elements)
     {
-        if (elements == null || elements.size() == 0)
+        if (elements == null || elements.isEmpty())
         {
             return null;
         }
@@ -423,7 +365,6 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         }
 
         String stmt = getIndicesOfStmt(elements);
-        int[] indices = new int[elements.size()];
         try
         {
             ExecutionContext ec = op.getExecutionContext();
@@ -434,35 +375,27 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
                 try
                 {
-                    if (!elements.isEmpty())
+                    Iterator elemIter = elements.iterator();
+                    int jdbcPosition = 1;
+                    while (elemIter.hasNext())
                     {
-                        Iterator elemIter = elements.iterator();
-                        int jdbcPosition = 1;
-                        while (elemIter.hasNext())
-                        {
-                            Object element = elemIter.next();
+                        Object element = elemIter.next();
 
-                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                            jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
-                            if (relationDiscriminatorMapping != null)
-                            {
-                                jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                            }
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                        if (relationDiscriminatorMapping != null)
+                        {
+                            jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                         }
                     }
 
+                    List<Integer> indexes = new ArrayList();
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        int i = 0;
                         while (rs.next())
                         {
-                            indices[i++] = rs.getInt(1);
-                        }
-
-                        if (i < elements.size())
-                        {
-                            throw new NucleusDataStoreException(Localiser.msg("056023", stmt));
+                            indexes.add(rs.getInt(1));
                         }
                         JDBCUtils.logWarnings(rs);
                     }
@@ -470,6 +403,19 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
                     {
                         rs.close();
                     }
+
+                    if (indexes.isEmpty())
+                    {
+                        return null;
+                    }
+
+                    int i=0;
+                    int[] indicesReturn = new int[indexes.size()];
+                    for (Integer idx : indexes)
+                    {
+                        indicesReturn[i++] = idx;
+                    }
+                    return indicesReturn;
                 }
                 finally
                 {
@@ -485,8 +431,6 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         {
             throw new NucleusDataStoreException(Localiser.msg("056017", stmt), e);
         }
-
-        return indices;
     }
 
     /**
