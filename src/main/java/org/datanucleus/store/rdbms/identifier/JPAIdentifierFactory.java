@@ -24,6 +24,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.schema.naming.NamingCase;
 
@@ -33,12 +34,11 @@ import org.datanucleus.store.schema.naming.NamingCase;
  * <ul>
  * <li>Class called "MyClass" will generate table name of "MYCLASS"</li>
  * <li>Field called "myField" will generate column name of "MYFIELD"</li>
- * <li>Join table will be named after the ownerClass and the otherClass so "MyClass" joining to "MyOtherClass"
- * will have a join table called "MYCLASS_MYOTHERCLASS"</li>
+ * <li>Join table will be named after the ownerClass and the otherClass so "MyClass" joining to "MyOtherClass" will have a join table called "MYCLASS_MYOTHERCLASS"</li>
+ * <li>Join table for Collection/Map of nonPC will be based on "ownerEntity_memberName"</li>
  * <li>Datastore-identity column for class "MyClass" will be "MYCLASS_ID" (not part of JPA)</li>
  * <li>1-N uni between "MyClass" (field="myField") and "MyElement" will have FK in "MYELEMENT" of MYFIELD_MYCLASS_ID</li>
- * <li>1-N bi between "MyClass" (field="myField") and "MyElement" (field="myClassRef") will have FK in "MYELEMENT"
- * of name "MYCLASSREF_MYCLASS_ID".</li>
+ * <li>1-N bi between "MyClass" (field="myField") and "MyElement" (field="myClassRef") will have FK in "MYELEMENT" of name "MYCLASSREF_MYCLASS_ID".</li>
  * <li>1-1 uni between "MyClass" (field="myField") and "MyElement" will have FK in "MYCLASS" of name "MYFIELD_MYELEMENT_ID"</li>
  * <li>Discriminator field columns will, by default, be called "DTYPE"</li>
  * <li>Version field columns will, by default, be called "VERSION"</li>
@@ -168,33 +168,41 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
         // No user-specified name, so generate a default using the previously created fallback
         if (identifierName == null)
         {
-            // Generate a fallback name, based on the ownerClass/otherClass names
-            String ownerClass = mmd.getClassName(false);
-            String otherClass = mmd.getTypeName();
-            if (mmd.hasCollection())
+            // Generate a fallback name
+            if (mmd.getRelationType(clr) == RelationType.NONE)
             {
-                otherClass = mmd.getCollection().getElementType();
+                // CollectionTable, so default based on owner entity name + separator + member name
+                identifierName = mmd.getAbstractClassMetaData().getEntityName() + getWordSeparator() + mmd.getName();
             }
-            else if (mmd.hasArray())
+            else
             {
-                otherClass = mmd.getArray().getElementType();
-            }
-            else if (mmd.hasMap())
-            {
-                otherClass = mmd.getMap().getValueType();
-            }
+                // JoinTable, so default based on the ownerClass/otherClass names
+                // TODO This should be based on "ownerTableName_otherTableName" not the class names.
+                String ownerClass = mmd.getClassName(false);
+                String otherClass = mmd.getTypeName();
+                if (mmd.hasCollection())
+                {
+                    otherClass = mmd.getCollection().getElementType();
+                }
+                else if (mmd.hasArray())
+                {
+                    otherClass = mmd.getArray().getElementType();
+                }
+                else if (mmd.hasMap())
+                {
+                    otherClass = mmd.getMap().getValueType();
+                }
 
-            if (mmd.hasCollection() && relatedMmds != null && relatedMmds[0].hasCollection() && mmd.getMappedBy() != null)
-            {
-                // M-N collection and the owner is the other side
-                ownerClass = relatedMmds[0].getClassName(false);
-                otherClass = relatedMmds[0].getCollection().getElementType();
+                if (mmd.hasCollection() && relatedMmds != null && relatedMmds[0].hasCollection() && mmd.getMappedBy() != null)
+                {
+                    // M-N collection and the owner is the other side
+                    ownerClass = relatedMmds[0].getClassName(false);
+                    otherClass = relatedMmds[0].getCollection().getElementType();
+                }
+                otherClass = otherClass.substring(otherClass.lastIndexOf('.')+1);
+
+                identifierName = ownerClass + getWordSeparator() + otherClass;
             }
-
-            otherClass = otherClass.substring(otherClass.lastIndexOf('.')+1);
-            String unique_name = ownerClass + getWordSeparator() + otherClass;
-
-            identifierName = unique_name;
         }
 
         // Generate the table identifier now that we have the identifier name
