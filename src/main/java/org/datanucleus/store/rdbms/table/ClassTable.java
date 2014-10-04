@@ -110,6 +110,7 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Table representing a Java class (or classes) as a first class object (FCO).
@@ -711,7 +712,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
 
                                 ElementMetaData elemmd = mmd.getElementMetaData();
-                                if (elemmd != null && elemmd.getTable() != null)
+                                if (elemmd != null && !StringUtils.isWhitespace(elemmd.getTable()))
                                 {
                                     DatastoreIdentifier requiredTableId = storeMgr.getIdentifierFactory().newTableIdentifier(elemmd.getTable());
                                     DatastoreClass requiredTable = storeMgr.getDatastoreClass(requiredTableId);
@@ -728,7 +729,6 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                             {
                                                 if (requiredTable.managesClass(theElementCmd.getFullClassName()))
                                                 {
-                                                    NucleusLogger.GENERAL.info(">> CT reqdTable=" + requiredTable + " manages element=" + theElementCmd.getFullClassName());
                                                     if (theElementCmd != elementCmds[i])
                                                     {
                                                         elementCmds = new ClassMetaData[1];
