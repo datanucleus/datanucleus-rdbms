@@ -171,10 +171,8 @@ import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
 import org.datanucleus.store.scostore.ArrayStore;
 import org.datanucleus.store.scostore.CollectionStore;
-import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.store.scostore.PersistableRelationStore;
-import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
 import org.datanucleus.store.types.SCOUtils;
@@ -809,30 +807,30 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for whether the specified field of the object is inserted in the datastore yet.
-     * @param sm StateManager for the object
+     * @param op ObjectProvider for the object
      * @param fieldNumber (Absolute) field number for the object
      * @return Whether it is persistent
      */
-    public boolean isObjectInserted(ObjectProvider sm, int fieldNumber)
+    public boolean isObjectInserted(ObjectProvider op, int fieldNumber)
     {
-        if (sm == null)
+        if (op == null)
         {
             return false;
         }
-        if (!sm.isInserting())
+        if (!op.isInserting())
         {
             // StateManager isn't inserting so must be persistent
             return true;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(sm);
+        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(op);
         if (latestTable == null)
         {
             // Not yet inserted anything
             return false;
         }
 
-        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd == null)
         {
             // Specified field doesn't exist for this object type!
@@ -843,7 +841,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (mmd.isPrimaryKey())
         {
             // PK field so need to check if the latestTable manages the actual class here
-            className = sm.getObject().getClass().getName();
+            className = op.getObject().getClass().getName();
         }
 
         DatastoreClass datastoreCls = latestTable;
@@ -960,7 +958,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             else
             {
                 assertCompatibleFieldType(mmd, clr, type, PersistableMapping.class);
-                store = getBackingStoreForPersistableRelation(mmd, clr, type);
+                store = getBackingStoreForPersistableRelation(mmd, clr);
             }
             backingStoreByMemberName.put(mmd.getFullFieldName(), store);
             return store;
@@ -1004,9 +1002,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param clr ClassLoader resolver
      * @return The backing store of this collection in this store
      */
-    private CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type)
+    protected CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type)
     {
-        CollectionStore store = null;
         Table datastoreTable = getTable(mmd);
         if (type == null)
         {
@@ -1016,57 +1013,42 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // We need a "FK" relation.
                 if (mmd.getOrderMetaData() != null || List.class.isAssignableFrom(mmd.getType()))
                 {
-                    store = newFKListStore(mmd, clr);
+                    return new FKListStore(mmd, this, clr);
                 }
-                else
-                {
-                    store = newFKSetStore(mmd, clr);
-                }
+
+                return new FKSetStore(mmd, this, clr);
             }
-            else
+
+            // We need a "JoinTable" relation.
+            if (mmd.getOrderMetaData() != null || List.class.isAssignableFrom(mmd.getType()))
             {
-                // We need a "JoinTable" relation.
-                if (mmd.getOrderMetaData() != null || List.class.isAssignableFrom(mmd.getType()))
-                {
-                    store = newJoinListStore(mmd, clr, datastoreTable);
-                }
-                else
-                {
-                    store = newJoinSetStore(mmd, clr, datastoreTable);
-                }
+                return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
             }
+
+            return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
         }
-        else
+
+        // Instantiated type specified, so use it to pick the associated backing store
+        if (datastoreTable == null)
         {
-            // Instantiated type specified so use it to pick the associated backing store
-            if (datastoreTable == null)
+            if (SCOUtils.isListBased(type))
             {
-                if (SCOUtils.isListBased(type))
-                {
-                    // List required
-                    store = newFKListStore(mmd, clr);
-                }
-                else
-                {
-                    // Set required
-                    store = newFKSetStore(mmd, clr);
-                }
+                // List required
+                return new FKListStore(mmd, this, clr);
             }
-            else
-            {
-                if (SCOUtils.isListBased(type))
-                {
-                    // List required
-                    store = newJoinListStore(mmd, clr, datastoreTable);
-                }
-                else
-                {
-                    // Set required
-                    store = newJoinSetStore(mmd, clr, datastoreTable);
-                }
-            }
+
+            // Set required
+            return new FKSetStore(mmd, this, clr);
         }
-        return store;
+
+        if (SCOUtils.isListBased(type))
+        {
+            // List required
+            return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
+        }
+
+        // Set required
+        return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
     }
 
     /**
@@ -1075,19 +1057,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param clr ClassLoader resolver
      * @return The backing store of this map in this store
      */
-    private MapStore getBackingStoreForMap(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    protected MapStore getBackingStoreForMap(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
-        MapStore store = null;
         Table datastoreTable = getTable(mmd);
         if (datastoreTable == null)
         {
-            store = newFKMapStore(mmd, clr);
+            return new FKMapStore(mmd, this, clr);
         }
-        else
-        {
-            store = newJoinMapStore(mmd, clr, datastoreTable);
-        }
-        return store;
+
+        return new JoinMapStore((MapTable)datastoreTable, clr);
     }
 
     /**
@@ -1096,19 +1074,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param clr ClassLoader resolver
      * @return The backing store of this array in this store
      */
-    private ArrayStore getBackingStoreForArray(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    protected ArrayStore getBackingStoreForArray(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
-        ArrayStore store;
         Table datastoreTable = getTable(mmd);
         if (datastoreTable != null)
         {
-            store = newJoinArrayStore(mmd, clr, datastoreTable);
+            return new JoinArrayStore(mmd, (ArrayTable)datastoreTable, clr);
         }
-        else
-        {
-            store = newFKArrayStore(mmd, clr);
-        }
-        return store;
+
+        return new FKArrayStore(mmd, this, clr);
     }
 
     /**
@@ -1117,13 +1091,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param clr ClassLoader resolver
      * @return The backing store of this persistable relation in this store
      */
-    private PersistableRelationStore getBackingStoreForPersistableRelation(AbstractMemberMetaData mmd,
-            ClassLoaderResolver clr, Class type)
+    protected PersistableRelationStore getBackingStoreForPersistableRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
-        PersistableRelationStore store = null;
-        Table datastoreTable = getTable(mmd);
-        store = newPersistableRelationStore(mmd, clr, datastoreTable);
-        return store;
+        return new JoinPersistableRelationStore(mmd, (PersistableJoinTable)getTable(mmd), clr);
     }
 
     /**
@@ -1181,10 +1151,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             NucleusLogger.DATASTORE.debug("Datastore Adapter : " + dba.getClass().getName());
-            NucleusLogger.DATASTORE.debug("Datastore : name=\"" + dba.getDatastoreProductName() + "\"" +
-                " version=\"" + dba.getDatastoreProductVersion() + "\"");
-            NucleusLogger.DATASTORE.debug("Datastore Driver : name=\"" + dba.getDatastoreDriverName() + "\"" +
-                " version=\"" + dba.getDatastoreDriverVersion() + "\"");
+            NucleusLogger.DATASTORE.debug("Datastore : name=\"" + dba.getDatastoreProductName() + "\" version=\"" + dba.getDatastoreProductVersion() + "\"");
+            NucleusLogger.DATASTORE.debug("Datastore Driver : name=\"" + dba.getDatastoreDriverName() + "\" version=\"" + dba.getDatastoreDriverVersion() + "\"");
 
             // Connection Information
             String primaryDS = null;
@@ -1919,8 +1887,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return new ResultSetGetter(this, op, rs, resultMappings);
     }
 
-    public FieldManager getFieldManagerForResultProcessing(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings,
-            AbstractClassMetaData cmd)
+    public FieldManager getFieldManagerForResultProcessing(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
     {
         return new ResultSetGetter(this, ec, rs, resultMappings, cmd);
     }
@@ -1932,8 +1899,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param stmtMappings the index of parameters/mappings
      * @return The FieldManager to use
      */
-    public FieldManager getFieldManagerForStatementGeneration(ObjectProvider sm, PreparedStatement ps, 
-            StatementClassMapping stmtMappings)
+    public FieldManager getFieldManagerForStatementGeneration(ObjectProvider sm, PreparedStatement ps, StatementClassMapping stmtMappings)
     {
         return new ParameterSetter(sm, ps, stmtMappings);
     }
@@ -2305,7 +2271,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public SQLTypeInfo getSQLTypeInfoForJDBCType(int jdbcType, String sqlType)
     throws UnsupportedDataTypeException
     {
-        // NB The connection first arg is not required since will be cached from initialisation stage
         RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, "types", null);
         JDBCTypeInfo jdbcTypeInfo = (JDBCTypeInfo)typesInfo.getChild("" + jdbcType);
 
@@ -2639,14 +2604,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Called by (container) Mapping objects to request the creation of a DatastoreObject (table).
+     * Called by (container) Mapping objects to request the creation of a join table.
      * If the specified field doesn't require a join table then this returns null.
      * If the join table already exists, then this returns it.
      * @param mmd The metadata describing the field/property.
      * @param clr The ClassLoaderResolver
      * @return The table (SetTable/ListTable/MapTable/ArrayTable)
      */
-    public Table newJoinDatastoreContainerObject(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    public Table newJoinTable(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         if (mmd.getJoinMetaData() == null)
         {
@@ -3249,8 +3214,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             int numTablesInitializedInit = 0;
             do
             {
-                RDBMSStoreData[] rdbmsStoreData =
-                        storeDataMgr.getManagedStoreData().toArray(new RDBMSStoreData[storeDataMgr.size()]);
+                RDBMSStoreData[] rdbmsStoreData = storeDataMgr.getManagedStoreData().toArray(new RDBMSStoreData[storeDataMgr.size()]);
 
                 numTablesInitializedInit = tablesRecentlyInitialized.size();
                 for (int i=0; i<rdbmsStoreData.length; i++)
@@ -3312,10 +3276,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          * Validate tables.
          * @param tablesToValidate list of TableImpl to validate
          * @param clr the ClassLoaderResolver
-         * @return an array of List where index == 0 has a list of the tables created
-         *                                index == 1 has a list of the contraints created
-         *                                index == 2 has a list of the auto creation errors 
-         * @throws SQLException
+         * @return an array of List where index == 0 has a list of the tables created, index == 1 has a list of the contraints created, index == 2 has a list of the auto creation errors 
+         * @throws SQLException When an error occurs in validation
          */
         private List[] performTablesValidation(List<Table> tablesToValidate, ClassLoaderResolver clr) 
         throws SQLException
@@ -3788,63 +3750,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public boolean allowsBatching()
     {
-        if (dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) &&
-            getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0)
-        {
-            return true;
-        }
-        return false;
+        return (dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0);
     }
 
     public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, 
         Class persistentClass)
     {
         return new PersistentClassROF(this, acmd, mappingDefinition, ignoreCache, fetchPlan, persistentClass);
-    }
-
-    protected ArrayStore newFKArrayStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        return new FKArrayStore(mmd, this, clr);
-    }
-
-    protected ListStore newFKListStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        return new FKListStore(mmd, this, clr);
-    }
-
-    protected SetStore newFKSetStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        return new FKSetStore(mmd, this, clr);
-    }
-
-    protected MapStore newFKMapStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        return new FKMapStore(mmd, this, clr);
-    }
-
-    protected ArrayStore newJoinArrayStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
-    {
-        return new JoinArrayStore(mmd, (ArrayTable)table, clr);
-    }
-
-    protected MapStore newJoinMapStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
-    {
-        return new JoinMapStore((MapTable)table, clr);
-    }
-
-    protected ListStore newJoinListStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
-    {
-        return new JoinListStore(mmd, (CollectionTable)table, clr);
-    }
-
-    protected SetStore newJoinSetStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
-    {
-        return new JoinSetStore(mmd, (CollectionTable)table, clr);
-    }
-
-    protected PersistableRelationStore newPersistableRelationStore(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Table table)
-    {
-        return new JoinPersistableRelationStore(mmd, (PersistableJoinTable) table, clr);
     }
 
     public boolean usesBackedSCOWrappers()
@@ -4052,8 +3964,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                         if (!StringUtils.isWhitespace(seqName))
                         {
-                            addSequenceForMetaData(cmd.getIdentityMetaData(), seqName, clr, sequencesGenerated, 
-                                ddlWriter);
+                            addSequenceForMetaData(cmd.getIdentityMetaData(), seqName, clr, sequencesGenerated, ddlWriter);
                         }
                     }
                 }
@@ -4141,8 +4052,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    protected void addSequenceForMetaData(MetaData md, String seq,  ClassLoaderResolver clr,
-            Set<String> sequencesGenerated, FileWriter ddlWriter)
+    protected void addSequenceForMetaData(MetaData md, String seq,  ClassLoaderResolver clr, Set<String> sequencesGenerated, FileWriter ddlWriter)
     {
         String seqName = seq;
         Integer min = null;

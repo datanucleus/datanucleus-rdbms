@@ -195,7 +195,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (relationType == RelationType.MANY_TO_ONE_UNI)
             {
                 // create join table
-                storeMgr.newJoinDatastoreContainerObject(mmd, clr);
+                storeMgr.newJoinTable(mmd, clr);
             }
             else
             {
