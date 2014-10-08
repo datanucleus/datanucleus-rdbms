@@ -220,7 +220,6 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
                     }
                     catch (MappedDatastoreException mde)
                     {
-                        mde.printStackTrace();
                         exceptions.add(mde);
                         NucleusLogger.DATASTORE.error("Exception in remove", mde);
                     }

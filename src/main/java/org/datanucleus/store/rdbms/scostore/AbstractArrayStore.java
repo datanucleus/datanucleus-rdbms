@@ -156,9 +156,8 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
                     }
                     catch (MappedDatastoreException mde)
                     {
-                        mde.printStackTrace();
                         exceptions.add(mde);
-                        NucleusLogger.DATASTORE.error(mde);
+                        NucleusLogger.DATASTORE.error("Exception thrown in set of element", mde);
                     }
                 }
             }
@@ -169,9 +168,8 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
         }
         catch (MappedDatastoreException e)
         {
-            e.printStackTrace();
             exceptions.add(e);
-            NucleusLogger.DATASTORE.error(e);
+            NucleusLogger.DATASTORE.error("Exception thrown in set of element", e);
         }
 
         if (!exceptions.isEmpty())
@@ -180,8 +178,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
             // record(s) didn't persist
             String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, 
-                (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
+            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
         }
 
         return modified;
