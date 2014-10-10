@@ -89,17 +89,17 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     }
     
     /**
-     * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given MetaData.
-     * @param fmd metadata for the field
+     * Initialize for the specified member.
+     * @param mmd metadata for the embedded member
      * @param table Table for persisting this field
      * @param clr The ClassLoaderResolver
      * @param emd Embedded MetaData for the object being embedded
-     * @param typeName type of the embedded PC object
-     * @param objectType Type of the PC object being embedded (see StateManagerImpl object types)
+     * @param typeName type of the embedded PC object being stored
+     * @param objectType Object type of the PC object being embedded (see StateManagerImpl object types)
      */
-    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, int objectType)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr, EmbeddedMetaData emd, String typeName, int objectType)
     {
-    	super.initialize(fmd, table, clr);
+    	super.initialize(mmd, table, clr);
         this.clr = clr;
         this.emd = emd;
         this.typeName = typeName;
@@ -111,44 +111,42 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
         if (rootEmbCmd == null)
         {
             // Not found so must be an interface
-            if (fmd != null)
+
+            // Try using the fieldTypes on the field/property - we support it if only 1 implementation
+            String[] fieldTypes = mmd.getFieldTypes();
+            if (fieldTypes != null && fieldTypes.length == 1)
             {
-                // Try using the fieldTypes on the field/property - we support it if only 1 implementation
-                String[] fieldTypes = fmd.getFieldTypes();
-                if (fieldTypes != null && fieldTypes.length == 1)
-                {
-                    rootEmbCmd = mmgr.getMetaDataForClass(fieldTypes[0], clr);
-                }
-                else if (fieldTypes != null && fieldTypes.length > 1)
-                {
-                    // TODO Cater for multiple implementations
-                    throw new NucleusUserException("Field " + fmd.getFullFieldName() + 
-                        " is a reference field that is embedded with multiple possible implementations. " +
+                rootEmbCmd = mmgr.getMetaDataForClass(fieldTypes[0], clr);
+            }
+            else if (fieldTypes != null && fieldTypes.length > 1)
+            {
+                // TODO Cater for multiple implementations
+                throw new NucleusUserException("Field " + mmd.getFullFieldName() + 
+                    " is a reference field that is embedded with multiple possible implementations. " +
                         "DataNucleus doesnt support embedded reference fields that have more than 1 implementation");
-                }
             }
 
             if (rootEmbCmd == null)
             {
                 // Try a persistent interface
                 rootEmbCmd = mmgr.getMetaDataForInterface(clr.classForName(typeName), clr);
-                if (rootEmbCmd == null && fmd.getFieldTypes() != null && fmd.getFieldTypes().length == 1)
+                if (rootEmbCmd == null && mmd.getFieldTypes() != null && mmd.getFieldTypes().length == 1)
                 {
                     // No MetaData for the type so try "fieldType" specified on the field
-                    rootEmbCmd = mmgr.getMetaDataForInterface(clr.classForName(fmd.getFieldTypes()[0]), clr);
+                    rootEmbCmd = mmgr.getMetaDataForInterface(clr.classForName(mmd.getFieldTypes()[0]), clr);
                 }
             }
         }
 
         embCmd = rootEmbCmd;
 
-        AbstractMemberMetaData[] embFmds;
+        AbstractMemberMetaData[] embFmds = null;
         if (emd == null && rootEmbCmd.isEmbeddedOnly())
         {
             // No <embedded> block yet the class is defined as embedded-only so just use its own definition of fields
             embFmds = rootEmbCmd.getManagedMembers();
         }
-        else
+        else if (emd != null)
         {
             // <embedded> block so use those field definitions
             embFmds = emd.getMemberMetaData();
