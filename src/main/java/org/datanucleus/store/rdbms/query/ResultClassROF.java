@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.query.QueryUtils;
@@ -420,7 +421,7 @@ public class ResultClassROF implements ResultObjectFactory
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new NucleusException("Attempt to create object for query result row of type " + newMap.getObjectClass().getName() + " threw an exception", e);
             }
         }
         else

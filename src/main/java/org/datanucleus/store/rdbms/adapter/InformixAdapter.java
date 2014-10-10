@@ -96,7 +96,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception when trying to initialise datastore", e);
             throw new NucleusDataStoreException(e.getMessage(), e);
         }
     }

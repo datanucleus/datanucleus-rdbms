@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Provides methods for adapting SQL language elements to the H2 Database Engine.
@@ -61,7 +62,7 @@ public class H2Adapter extends BaseDatastoreAdapter
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            NucleusLogger.DATASTORE_SCHEMA.warn("Exception when trying to get default schema name for datastore", e);
         }
 
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);

@@ -480,7 +480,6 @@ public class DeleteRequest extends Request
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
                     throw new NucleusDataStoreException("Update request failed", e);
                 }
             }
