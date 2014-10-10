@@ -60,12 +60,13 @@ public class OracleRDBMSMappingManager extends RDBMSMappingManager
     }
 
     /**
-     * Method to allow overriding of mapping classes
+     * Method to allow overriding of mapping classes. Allows us to configure Oracle-specific non-standard BLOB handling.
      * @param mappingClass The mapping class
      * @param mmd Field meta data for the field (if appropriate)
      * @param fieldRole Role of this column for the field (e.g collection element)
      * @return The mapping class to use
      */
+    @Override
     protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
     {
         // Override some mappings with Oracle-specific mappings

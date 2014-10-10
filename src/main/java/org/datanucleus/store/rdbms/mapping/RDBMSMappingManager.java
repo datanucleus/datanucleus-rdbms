@@ -213,6 +213,8 @@ public class RDBMSMappingManager implements MappingManager
             MappingConverterDetails mcd = getMappingClass(javaType, serialised, embedded, null, null); // TODO Pass in 4th arg?
 
             Class mc = mcd.mappingClass;
+            // Allow override by Oracle
+            mc = getOverrideMappingClass(mc, null, null);
             try
             {
                 JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
@@ -262,6 +264,8 @@ public class RDBMSMappingManager implements MappingManager
     {
         MappingConverterDetails mcd = getMappingClass(javaType, serialised, embedded, null, fieldName); // TODO Pass in 4th arg?
         Class mc = mcd.mappingClass;
+        // Allow override by Oracle
+        mc = getOverrideMappingClass(mc, null, null);
         try
         {
             JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
@@ -434,7 +438,10 @@ public class RDBMSMappingManager implements MappingManager
         if (mcd != null)
         {
             mc = mcd.mappingClass;
+            // Allow override by Oracle
+            mc = getOverrideMappingClass(mc, mmd, fieldRole);
         }
+
         if (mc != null && (mcd == null || mcd.typeConverter == null))
         {
             try
@@ -1236,6 +1243,18 @@ public class RDBMSMappingManager implements MappingManager
                 NucleusLogger.DATASTORE.debug(Localiser.msg("054010", mapping.javaType, mapping.jdbcType, mapping.sqlType));
             }
         }
+    }
+
+    /**
+     * Convenience method to allow overriding of particular mapping classes. This is currently only required for Oracle due to non-standard BLOB handlers.
+     * @param mappingClass The mapping class selected
+     * @param mmd Meta data for the member (if appropriate)
+     * @param fieldRole Role for the field (e.g collection element)
+     * @return The mapping class to use
+     */
+    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
+    {
+        return mappingClass;
     }
 
     /**
