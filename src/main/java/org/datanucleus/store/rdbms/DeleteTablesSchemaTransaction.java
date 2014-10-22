@@ -74,8 +74,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             boolean success = true;
             try
             {
-                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", 
-                    rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
+                NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
 
                 Map baseTablesByName = new HashMap();
                 Map viewsByName = new HashMap();
@@ -113,8 +112,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             if (view instanceof ClassView)
                             {
-                                writer.write("-- ClassView " + view.toString() + 
-                                    " for classes " + StringUtils.objectArrayToString(((ClassView)view).getManagedClasses()) + "\n");
+                                writer.write("-- ClassView " + view.toString() + " for classes " + StringUtils.objectArrayToString(((ClassView)view).getManagedClasses()) + "\n");
                             }
                         }
                         catch (IOException ioe)
@@ -136,8 +134,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             if (tbl instanceof ClassTable)
                             {
-                                writer.write("-- Constraints for ClassTable " + tbl.toString() + 
-                                    " for classes " + StringUtils.objectArrayToString(((ClassTable)tbl).getManagedClasses()) + "\n");
+                                writer.write("-- Constraints for ClassTable " + tbl.toString() + " for classes " + StringUtils.objectArrayToString(((ClassTable)tbl).getManagedClasses()) + "\n");
                             }
                             else if (tbl instanceof JoinTable)
                             {
@@ -163,8 +160,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             if (tbl instanceof ClassTable)
                             {
-                                writer.write("-- ClassTable " + tbl.toString() + 
-                                    " for classes " + StringUtils.objectArrayToString(((ClassTable)tbl).getManagedClasses()) + "\n");
+                                writer.write("-- ClassTable " + tbl.toString() + " for classes " + StringUtils.objectArrayToString(((ClassTable)tbl).getManagedClasses()) + "\n");
                             }
                             else if (tbl instanceof JoinTable)
                             {

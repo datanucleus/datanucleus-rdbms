@@ -208,6 +208,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         Localiser.registerBundle("org.datanucleus.store.rdbms.Localisation", RDBMSStoreManager.class.getClassLoader());
     }
 
+    public static final String METADATA_NONDURABLE_REQUIRES_TABLE = "requires-table";
+
     /** Adapter for the datastore being used. */
     protected DatastoreAdapter dba;
 
@@ -497,8 +499,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for whether this value strategy is supported.
-     * Overrides the setting in the superclass for identity/sequence if the adapter doesn't 
-     * support them.
+     * Overrides the setting in the superclass for identity/sequence if the adapter doesn't support them.
      * @param strategy The strategy
      * @return Whether it is supported.
      */
@@ -1562,21 +1563,44 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void manageClasses(ClassLoaderResolver clr, String... classNames)
     {
+        if (classNames == null || classNames.length == 0)
+        {
+            return;
+        }
+
+        boolean allManaged = true;
+        for (int i=0;i<classNames.length;i++)
+        {
+            if (!managesClass(classNames[i]))
+            {
+                 allManaged = false;
+                 break;
+            }
+        }
+        if (allManaged)
+        {
+            return;
+        }
+
+        // Filter out any supported classes
+        classNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
+        if (classNames.length == 0)
+        {
+            return;
+        }
+
         try
         {
             schemaLock.writeLock().lock();
 
             if (classAdder != null)
             {
-                // addClasses() has been recursively re-entered: just add table
-                // objects for the requested classes and return.
-                classAdder.addClasses(classNames, clr);
+                // manageClasses() has been recursively re-entered: just add table objects for the requested classes and return.
+                classAdder.addClassTables(classNames, clr);
                 return;
             }
-            if (classNames != null && classNames.length > 0)
-            {
-                new ClassAdder(classNames, null).execute(clr);
-            }
+
+            new ClassAdder(classNames, null).execute(clr);
         }
         finally
         {
@@ -2718,20 +2742,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * A schema transaction that adds a set of classes to the RDBMSManager,
-     * making them usable for persistence.
+     * A schema transaction that adds a set of classes to the RDBMSManager, making them usable for persistence.
      * <p>
-     * This class embodies the work necessary to activate a persistent class and
-     * ready it for storage management. It is the primary mutator of a RDBMSManager.
+     * This class embodies the work necessary to activate a persistent class and ready it for storage management. 
+     * It is the primary mutator of a RDBMSManager.
      * </p>
      * <p>
-     * Adding classes is an involved process that includes the creation and/or
-     * validation in the database of tables, views, and table constraints, and
-     * their corresponding Java objects maintained by the RDBMSManager. Since
-     * it's a management transaction, the entire process is subject to retry on
-     * SQLExceptions. It is responsible for ensuring that the procedure either
-     * adds <i>all </i> of the requested classes successfully, or adds none of
-     * them and preserves the previous state of the RDBMSManager exactly as it was.
+     * Adding classes is an involved process that includes the creation and/or validation in the database of tables, views, and table constraints, 
+     * and their corresponding Java objects maintained by the RDBMSManager. Since it's a management transaction, the entire process is subject to 
+     * retry on SQLExceptions. It is responsible for ensuring that the procedure either adds <i>all </i> of the requested classes successfully, 
+     * or adds none of them and preserves the previous state of the RDBMSManager exactly as it was.
      * </p>
      */
     private class ClassAdder extends AbstractSchemaTransaction
@@ -2749,14 +2769,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         private Writer ddlWriter = null;
 
         /** Whether to check if table/view exists */
-        protected final boolean checkExistTablesOrViews;
+        private final boolean checkExistTablesOrViews;
 
         /** tracks the SchemaData currrently being added - used to rollback the AutoStart added classes **/
         private Set<RDBMSStoreData> schemaDataAdded = new HashSet();
 
         private final String[] classNames;
 
-        public List<Table> tablesRecentlyInitialized = new ArrayList();
+        private List<Table> tablesRecentlyInitialized = new ArrayList();
 
         /**
          * Constructs a new class adder transaction that will add the given classes to the RDBMSManager.
@@ -2767,7 +2787,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             super(RDBMSStoreManager.this, dba.getTransactionIsolationForSchemaCreation());
             this.ddlWriter = writer;
-            this.classNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
+            this.classNames = classNames;
 
             checkExistTablesOrViews = RDBMSStoreManager.this.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CHECK_EXISTS_TABLES_VIEWS);
         }
@@ -2782,14 +2802,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         /**
-         * Method to perform the action using the specified connection to the datastore.
+         * Method to perform the class addition.
          * @param clr the ClassLoaderResolver
          * @throws SQLException Thrown if an error occurs in execution.
          */
         protected void run(ClassLoaderResolver clr)
         throws SQLException
         {
-            if (classNames.length == 0)
+            if (classNames == null || classNames.length == 0)
             {
                 return;
             }
@@ -2801,7 +2821,104 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 classAdder = this;
                 try
                 {
-                    addClassTablesAndValidate(classNames, clr);
+                    /*
+                     * Adds a new table object (ie ClassTable or ClassView) for every class in the given list that 
+                     * 1) requires an extent and 2) does not yet have an extent (ie table) initialized in the store manager.
+                     * After all of the table objects, including any other tables they might reference, have been added, 
+                     * each table is initialized and validated in the database.
+                     * If any error occurs along the way, any table(s) that were created are dropped and the state of the 
+                     * RDBMSManager is rolled back to the point at which this method was called.
+                     */
+                    storeDataMgr.begin();
+                    boolean completed = false;
+
+                    List tablesCreated = null;
+                    List tableConstraintsCreated = null;
+                    List viewsCreated = null;
+
+                    try
+                    {
+                        List autoCreateErrors = new ArrayList();
+
+                        // Add SchemaData entries and tables/views for the requested classes - not yet initialized
+                        addClassTables(classNames, clr);
+
+                        // Initialise all tables/views for the classes
+                        List<Table>[] toValidate = initializeClassTables(classNames, clr);
+
+                        if (toValidate[0] != null && toValidate[0].size() > 0)
+                        {
+                            // Validate the tables
+                            List[] result = performTablesValidation(toValidate[0], clr);
+                            tablesCreated = result[0];
+                            tableConstraintsCreated = result[1];
+                            autoCreateErrors = result[2];
+                        }
+
+                        if (toValidate[1] != null && toValidate[1].size() > 0)
+                        {
+                            // Validate the views
+                            List[] result = performViewsValidation(toValidate[1]);
+                            viewsCreated = result[0];
+                            autoCreateErrors.addAll(result[1]);
+                        }
+
+                        // Process all errors from the above
+                        if (autoCreateErrors.size() > 0)
+                        {
+                            // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
+                            Iterator errorsIter = autoCreateErrors.iterator();
+                            while (errorsIter.hasNext())
+                            {
+                                Throwable exc = (Throwable)errorsIter.next();
+                                if (rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
+                                {
+                                    NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
+                                }
+                                else
+                                {
+                                    NucleusLogger.DATASTORE.error(Localiser.msg("050044", exc));
+                                }
+                            }
+                            if (!rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
+                            {
+                                throw new NucleusDataStoreException(Localiser.msg("050043"), (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
+                            }
+                        }
+
+                        completed = true;
+                    }
+                    catch (SQLException sqle)
+                    {
+                        String msg = Localiser.msg("050044", sqle);
+                        NucleusLogger.DATASTORE_SCHEMA.error(msg);
+                        throw new NucleusDataStoreException(msg, sqle);
+                    }
+                    catch (Exception e)
+                    {
+                        if (NucleusException.class.isAssignableFrom(e.getClass()))
+                        {
+                            throw (NucleusException)e;
+                        }
+                        NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
+                        throw new NucleusException(e.toString(), e).setFatal();
+                    }
+                    finally
+                    {
+                        // If something went wrong, roll things back to the way they were before we started.
+                        // This may not restore the database 100% of the time (if DDL statements are not transactional) 
+                        // but it will always put the RDBMSManager's internal structures back the way they were.
+                        if (!completed)
+                        {
+                            storeDataMgr.rollback();
+                            rollbackSchemaCreation(viewsCreated,tableConstraintsCreated,tablesCreated);
+                        }
+                        else
+                        {
+                            storeDataMgr.commit();
+                        }
+                        schemaDataAdded.clear();
+                    }
                 }
                 finally
                 {
@@ -2814,50 +2931,27 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
         }
 
-        /**
-         * Called by RDBMSManager.addClasses() when it has been recursively
-         * re-entered. This just adds table objects for the requested additional 
-         * classes and returns.
-         * @param classNames Names of the (additional) class(es) to be added.
-         * @param clr the ClassLoaderResolver
-         */
-        private void addClasses(String[] classNames, ClassLoaderResolver clr)
-        {
-            // Filter out any supported classes
-            classNames = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames);
-            if (classNames.length == 0)
-            {
-                return;
-            }
-
-            // Add the tables for these additional classes
-            addClassTables(classNames, clr);
-        }
-        
         private int addClassTablesRecursionCounter = 0;
 
         /**
-         * Adds a new table object (ie ClassTable or ClassView) for every
-         * class in the given list. These classes
+         * Adds a new table object (ie ClassTable or ClassView) for every class in the given list. These classes
          * <ol>
          * <li>require a table</li>
          * <li>do not yet have a table initialized in the store manager.</li>
          * </ol>
          * <p>
-         * This doesn't initialize or validate the tables, it just adds the
-         * table objects to the RDBMSManager's internal data structures.
+         * This doesn't initialize or validate the tables, it just adds the table objects to the RDBMSManager's internal data structures.
          * </p>
-         *
          * @param classNames Names of class(es) whose tables are to be added.
          * @param clr the ClassLoaderResolver
          */
-        private void addClassTables(String[] classNames, ClassLoaderResolver clr)
+        public void addClassTables(String[] classNames, ClassLoaderResolver clr)
         {
             addClassTablesRecursionCounter += 1;
             try
             {
                 Iterator iter = getMetaDataManager().getReferencedClasses(classNames, clr).iterator();
-                AutoStartMechanism starter = nucleusContext.getAutoStartMechanism();
+                AutoStartMechanism starter = rdbmsMgr.getNucleusContext().getAutoStartMechanism();
                 try
                 {
                     if (starter != null && !starter.isOpen())
@@ -2868,8 +2962,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     // Pass through the classes and create necessary tables
                     while (iter.hasNext())
                     {
-                        ClassMetaData cmd = (ClassMetaData) iter.next();
-                        addClassTable(cmd, clr);
+                        addClassTable((ClassMetaData) iter.next(), clr);
                     }
 
                     // For data where the table wasn't defined, make a second pass.
@@ -2937,16 +3030,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 return;
             }
-            if (cmd.getIdentityType() == IdentityType.NONDURABLE)
+            else if (cmd.getIdentityType() == IdentityType.NONDURABLE)
             {
-                if (cmd.hasExtension("requires-table") && cmd.getValueForExtension("requires-table") != null && 
-                    cmd.getValueForExtension("requires-table").equalsIgnoreCase("false"))
+                if (cmd.hasExtension(METADATA_NONDURABLE_REQUIRES_TABLE) && cmd.getValueForExtension(METADATA_NONDURABLE_REQUIRES_TABLE) != null && 
+                    cmd.getValueForExtension(METADATA_NONDURABLE_REQUIRES_TABLE).equalsIgnoreCase("false"))
                 {
                     return;
                 }
             }
-            RDBMSStoreData sd = (RDBMSStoreData) storeDataMgr.get(cmd.getFullClassName());
-            if (sd == null)
+
+            if (!storeDataMgr.managesClass(cmd.getFullClassName()))
             {
                 // For application-identity classes with user-defined identities we check for use of the 
                 // objectid-class in different inheritance trees. We prevent this to avoid problems later on.
@@ -3017,13 +3110,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         // Generate an identifier for the table required
                         DatastoreIdentifier tableName = null;
                         RDBMSStoreData tmpData = (RDBMSStoreData) storeDataMgr.get(cmd.getFullClassName());
-                        if (tmpData !=null && tmpData.getDatastoreIdentifier() != null)
+                        if (tmpData != null && tmpData.getDatastoreIdentifier() != null)
                         {
                             tableName = tmpData.getDatastoreIdentifier();
                         }
                         else
                         {
-                            tableName = identifierFactory.newTableIdentifier(cmd);
+                            tableName = rdbmsMgr.getIdentifierFactory().newTableIdentifier(cmd);
                         }
 
                         // Check that the required table isn't already in use
@@ -3039,11 +3132,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                     break;
                                 }
                             }
-                            // Give a warning and then create a new instance of the table (mapped to the same datastore object)
                             if (existingClass != null)
                             {
-                                String msg = Localiser.msg("050015", cmd.getFullClassName(), tableName.getName(), existingClass);
-                                NucleusLogger.DATASTORE.warn(msg);
+                                // Give a warning that will create a new instance of the table (mapped to the same datastore object)
+                                NucleusLogger.DATASTORE.warn(Localiser.msg("050015", cmd.getFullClassName(), tableName.getName(), existingClass));
                             }
                         }
 
@@ -3068,10 +3160,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
 
                         sdNew = new RDBMSStoreData(cmd, t, true);
-                        registerStoreData(sdNew);
+                        rdbmsMgr.registerStoreData(sdNew);
 
                         // must be initialized after registering, to avoid StackOverflowError
-                        ((Table) t).preInitialize(clr);
+                        ((Table)t).preInitialize(clr);
                     }
                     else if (imd.getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE)
                     {
@@ -3088,7 +3180,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                                 superTable = (Table) superData.getTable();
                             }
                             sdNew = new RDBMSStoreData(cmd, superTable, false);
-                            registerStoreData(sdNew);
+                            rdbmsMgr.registerStoreData(sdNew);
                         }
                         else
                         {
@@ -3098,100 +3190,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
                     schemaDataAdded.add(sdNew);
-                }
-            }
-        }
-
-        /**
-         * Adds a new table object (ie ClassTable or ClassView) for every class
-         * in the given list that 1) requires an extent and 2) does not yet have
-         * an extent (ie table) initialized in the store manager.
-         * <p>
-         * After all of the table objects, including any other tables they might
-         * reference, have been added, each table is initialized and validated
-         * in the database.
-         * </p>
-         * <p>
-         * If any error occurs along the way, any table(s) that were created are
-         * dropped and the state of the RDBMSManager is rolled back to the point
-         * at which this method was called.
-         * </p>
-         * @param classNames The class(es) whose tables are to be added.
-         * @param clr the ClassLoaderResolver
-         */
-        private void addClassTablesAndValidate(String[] classNames, ClassLoaderResolver clr)
-        {
-            synchronized (storeDataMgr)
-            {
-                storeDataMgr.begin();
-                boolean completed = false;
-
-                List tablesCreated = null;
-                List tableConstraintsCreated = null;
-                List viewsCreated = null;
-
-                try
-                {
-                    List autoCreateErrors = new ArrayList();
-
-                    // Add SchemaData entries and Table's for the requested classes
-                    addClassTables(classNames, clr);
-
-                    // Initialise all tables/views for the classes
-                    List<Table>[] toValidate = initializeClassTables(classNames, clr);
-
-                    if (toValidate[0] != null && toValidate[0].size() > 0)
-                    {
-                        // Validate the tables
-                        List[] result = performTablesValidation(toValidate[0], clr);
-                        tablesCreated = result[0];
-                        tableConstraintsCreated = result[1];
-                        autoCreateErrors = result[2];
-                    }
-
-                    if (toValidate[1] != null && toValidate[1].size() > 0)
-                    {
-                        // Validate the views
-                        List[] result = performViewsValidation(toValidate[1]);
-                        viewsCreated = result[0];
-                        autoCreateErrors.addAll(result[1]);
-                    }
-
-                    // Process all errors from the above
-                    verifyErrors(autoCreateErrors);
-
-                    completed = true;
-                }
-                catch (SQLException sqle)
-                {
-                    String msg = Localiser.msg("050044", sqle);
-                    NucleusLogger.DATASTORE_SCHEMA.error(msg);
-                    throw new NucleusDataStoreException(msg, sqle);
-                }
-                catch (Exception e)
-                {
-                    if (NucleusException.class.isAssignableFrom(e.getClass()))
-                    {
-                        throw (NucleusException)e;
-                    }
-                    NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
-                    throw new NucleusException(e.toString(), e).setFatal();
-                }
-                finally
-                {
-                    // If something went wrong, roll things back to the way they were before we started.
-                    // This may not restore the database 100% of the time (if DDL statements are not transactional) 
-                    // but it will always put the RDBMSManager's internal structures back the way they were.
-                    if (!completed)
-                    {
-                        storeDataMgr.rollback();
-                        rollbackSchemaCreation(viewsCreated,tableConstraintsCreated,tablesCreated);
-                    }
-                    else
-                    {
-                        storeDataMgr.commit();
-                    }
-                    schemaDataAdded.clear();
                 }
             }
         }
@@ -3226,7 +3224,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         Table t = (Table) currentStoreData.getTable();
                         if (t instanceof DatastoreClass)
                         {
-                            ((RDBMSPersistenceHandler)persistenceHandler).removeRequestsForTable((DatastoreClass)t);
+                            ((RDBMSPersistenceHandler)rdbmsMgr.getPersistenceHandler()).removeRequestsForTable((DatastoreClass)t);
                         }
 
                         if (!t.isInitialized())
@@ -3286,13 +3284,38 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             List<Table> tableConstraintsCreated = new ArrayList();
             List<Table> tablesCreated = new ArrayList();
 
-            if (ddlWriter != null)
+            if (ddlWriter != null) // TODO Why is this only done with the DDL option enabled?
             {
                 // Remove any existence of the same actual table more than once so we dont duplicate its
                 // DDL for creation. Note that this will allow more than once instance of tables with the same
                 // name (identifier) since when you have multiple inheritance trees each inheritance tree
                 // will have its own ClassTable, and you want both of these to pass through to schema generation.
-                tablesToValidate = removeDuplicateTablesFromList(tablesToValidate);
+                tablesToValidate = new ArrayList();
+                for (Table tbl : tablesToValidate)
+                {
+                    // This just checks the identifier name - see hashCode of Table. The commented out code below was the original, maybe useful if we find an example that needs it
+                    if (!tablesToValidate.contains(tbl))
+                    {
+                        tablesToValidate.add(tbl);
+                    }
+
+                  /*String tblRef1 = StringUtils.toJVMIDString(tbl.getIdentifier());
+                    boolean exists = false;
+                    for (DatastoreContainerObject resultTbl : result)
+                    {
+                        // Compare identifier reference since the same identifier name does not imply the same
+                        // table identifier
+                        String tblRef2 = StringUtils.toJVMIDString(resultTbl.getIdentifier());
+                        if (tblRef1.equals(tblRef2))
+                        {
+                            exists = true;
+                        }
+                    }
+                    if (!exists)
+                    {
+                        result.add(tbl);
+                    }*/
+                }
             }
 
             // Table existence and validation.
@@ -3313,8 +3336,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         {
                             if (t instanceof ClassTable)
                             {
-                                ddlWriter.write("-- Table " + t.toString() + 
-                                    " for classes " + StringUtils.objectArrayToString(((ClassTable)t).getManagedClasses()) + "\n");
+                                ddlWriter.write("-- Table " + t.toString() + " for classes " + StringUtils.objectArrayToString(((ClassTable)t).getManagedClasses()) + "\n");
                             }
                             else if (t instanceof JoinTable)
                             {
@@ -3327,7 +3349,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
 
-                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), getSchemaHandler().isAutoCreateTables()))
+                    if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isAutoCreateTables()))
                     {
                         // Table has been created so add to our list so we dont process it multiple times
                         // Any subsequent instance of this table in the list will have the columns checked only
@@ -3337,19 +3359,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     else
                     {
                         // Table wasn't just created, so do any autocreate of columns necessary
-                        if (t.isInitializedModified() || getSchemaHandler().isAutoCreateColumns())
+                        if (t.isInitializedModified() || rdbmsMgr.getSchemaHandler().isAutoCreateColumns())
                         {
                             // Check for existence of the required columns and add where required
-                            t.validateColumns(getCurrentConnection(), false, getSchemaHandler().isAutoCreateColumns(), autoCreateErrors);
+                            t.validateColumns(getCurrentConnection(), false, rdbmsMgr.getSchemaHandler().isAutoCreateColumns(), autoCreateErrors);
                             columnsValidated = true;
                         }
                     }
                 }
 
-                if (getSchemaHandler().isValidateTables() && !columnsValidated) // Table not just created and validation requested
+                if (rdbmsMgr.getSchemaHandler().isValidateTables() && !columnsValidated) // Table not just created and validation requested
                 {
                     // Check down to the column structure where required
-                    t.validate(getCurrentConnection(), getSchemaHandler().isValidateColumns(), false, autoCreateErrors);
+                    t.validate(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isValidateColumns(), false, autoCreateErrors);
                 }
                 else if (!columnsValidated)
                 {
@@ -3381,7 +3403,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             while (i.hasNext())
             {
                 TableImpl t = (TableImpl) i.next();
-                if (getSchemaHandler().isValidateConstraints() || getSchemaHandler().isAutoCreateConstraints())
+                if (rdbmsMgr.getSchemaHandler().isValidateConstraints() || rdbmsMgr.getSchemaHandler().isAutoCreateConstraints())
                 {
                     if (ddlWriter != null)
                     {
@@ -3389,8 +3411,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         {
                             if (t instanceof ClassTable)
                             {
-                                ddlWriter.write("-- Constraints for table " + t.toString() + 
-                                    " for class(es) " + StringUtils.objectArrayToString(((ClassTable)t).getManagedClasses()) + "\n");
+                                ddlWriter.write("-- Constraints for table " + t.toString() + " for class(es) " + StringUtils.objectArrayToString(((ClassTable)t).getManagedClasses()) + "\n");
                             }
                             else
                             {
@@ -3402,6 +3423,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file for table " + t, ioe);
                         }
                     }
+
                     // TODO : split this method into checkExistsConstraints and validateConstraints
                     // TODO : if duplicated entries on the list, we need to validate before.
                     if (tablesCreated.contains(t) && !hasDuplicateTablesFromList(tablesToValidate))
@@ -3411,7 +3433,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             tableConstraintsCreated.add(t);
                         }
                     }
-                    else if (t.validateConstraints(getCurrentConnection(), getSchemaHandler().isAutoCreateConstraints(), autoCreateErrors, clr))
+                    else if (t.validateConstraints(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isAutoCreateConstraints(), autoCreateErrors, clr))
                     {
                         tableConstraintsCreated.add(t);
                     }
@@ -3429,43 +3451,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
             }
             return new List[] { tablesCreated, tableConstraintsCreated, autoCreateErrors };
-        }
-
-        /**
-         * Remove duplicated tables from the list.
-         * Tables are only removed if they are the same table object. That is we don't remove if they have
-         * the same table identifier.
-         * @param newTables the list of DatastoreContainerObject
-         * @return a distinct list with DatastoreContainerObject  
-         */
-        private List<Table> removeDuplicateTablesFromList(List<Table> newTables)
-        {
-            List<Table> result = new ArrayList();
-            for (Table tbl : newTables)
-            {
-                if (!result.contains(tbl)) // TODO This just checks identifier name. The check commented out below
-                    // was the original check so may need re-instating depending on some example that requires it
-                {
-                    result.add(tbl);
-                }
-/*              String tblRef1 = StringUtils.toJVMIDString(tbl.getIdentifier());
-                boolean exists = false;
-                for (DatastoreContainerObject resultTbl : result)
-                {
-                    // Compare identifier reference since the same identifier name does not imply the same
-                    // table identifier
-                    String tblRef2 = StringUtils.toJVMIDString(resultTbl.getIdentifier());
-                    if (tblRef1.equals(tblRef2))
-                    {
-                        exists = true;
-                    }
-                }
-                if (!exists)
-                {
-                    result.add(tbl);
-                }*/
-            }
-            return result;
         }
 
         /**
@@ -3491,30 +3476,29 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         /**
          * Validate the supplied views.
          * @param viewsToValidate list of ViewImpl to validate
-         * @return an array of List where index == 0 has a list of the views created
-         *                                index == 1 has a list of the auto creation errors 
+         * @return an array of List where index == 0 has a list of the views created, index == 1 has a list of the auto creation errors 
          * @throws SQLException
          */
         private List[] performViewsValidation(List<Table> viewsToValidate) throws SQLException
         {
-            List<Table> viewsCreated = new ArrayList();
-            List autoCreateErrors = new ArrayList();
             // View existence and validation.
             // a). Check for existence of the view
             // b). If autocreate, create the view if necessary
             // c). If validate, validate the view
+            List<Table> viewsCreated = new ArrayList();
+            List autoCreateErrors = new ArrayList();
             Iterator i = viewsToValidate.iterator();
             while (i.hasNext())
             {
                 ViewImpl v = (ViewImpl) i.next();
                 if (checkExistTablesOrViews)
                 {
-                    if (v.exists(getCurrentConnection(), getSchemaHandler().isAutoCreateTables()))
+                    if (v.exists(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isAutoCreateTables()))
                     {
                         viewsCreated.add(v);
                     }
                 }
-                if (getSchemaHandler().isValidateTables())
+                if (rdbmsMgr.getSchemaHandler().isValidateTables())
                 {
                     v.validate(getCurrentConnection(), true, false, autoCreateErrors);
                 }
@@ -3523,36 +3507,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 invalidateColumnInfoForTable(v);
             }
             return new List[] { viewsCreated, autoCreateErrors };
-        }
-
-        /**
-         * Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
-         * @param autoCreateErrors the list of Throwables
-         */
-        private void verifyErrors(List autoCreateErrors)
-        {
-            if (autoCreateErrors.size() > 0)
-            {
-                // Print out all errors found during auto-creation/validation
-                Iterator errorsIter = autoCreateErrors.iterator();
-                while (errorsIter.hasNext())
-                {
-                    Throwable exc = (Throwable)errorsIter.next();
-                    if (getSchemaHandler().isAutoCreateWarnOnError())
-                    {
-                        NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
-                    }
-                    else
-                    {
-                        NucleusLogger.DATASTORE.error(Localiser.msg("050044", exc));
-                    }
-                }
-                if (!getSchemaHandler().isAutoCreateWarnOnError())
-                {
-                    throw new NucleusDataStoreException(Localiser.msg("050043"), 
-                        (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
-                }
-            }
         }
 
         /**
@@ -3603,7 +3557,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             // AutoStarter - Remove all classes from the supported list that were added in this pass.
-            AutoStartMechanism starter = nucleusContext.getAutoStartMechanism();
+            AutoStartMechanism starter = rdbmsMgr.getNucleusContext().getAutoStartMechanism();
             if (starter != null)
             {
                 try
@@ -3666,8 +3620,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 join = new PersistableJoinTable(tableName, mmd, RDBMSStoreManager.this);
             }
 
-            RDBMSStoreData data;
-            AutoStartMechanism starter = nucleusContext.getAutoStartMechanism();
+            AutoStartMechanism starter = rdbmsMgr.getNucleusContext().getAutoStartMechanism();
             try
             {
                 if (starter != null && !starter.isOpen())
@@ -3675,8 +3628,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     starter.open();
                 }
 
-                data = new RDBMSStoreData(mmd, join);
-                registerStoreData(data);
+                RDBMSStoreData data = new RDBMSStoreData(mmd, join);
+                schemaDataAdded.add(data);
+                rdbmsMgr.registerStoreData(data);
             }
             finally
             {
@@ -3686,7 +3640,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
             }
 
-            schemaDataAdded.add(data);
             return join;
         }
     }
@@ -3753,8 +3706,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         return (dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0);
     }
 
-    public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, 
-        Class persistentClass)
+    public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, Class persistentClass)
     {
         return new PersistentClassROF(this, acmd, mappingDefinition, ignoreCache, fetchPlan, persistentClass);
     }
@@ -3876,8 +3828,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         this.writtenDdlStatements = new HashSet();
                     }
 
-                    // Generate the tables/constraints
-                    new ClassAdder(classNames.toArray(new String[classNames.size()]), ddlFileWriter).execute(clr);
+                    // Tables/constraints DDL
+                    String[] classNamesArr = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames.toArray(new String[classNames.size()]));
+                    if (classNamesArr.length > 0)
+                    {
+                        new ClassAdder(classNamesArr, ddlFileWriter).execute(clr);
+                    }
 
                     if (autoStart)
                     {
@@ -3905,6 +3861,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         this.writtenDdlStatements = null;
                     }
 
+                    // Sequences, ValueGenerator table
                     if (ddlFileWriter != null)
                     {
                         ddlFileWriter.write("\n");
@@ -4202,8 +4159,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     manageClasses(clr, classNameArray); // Add them to mgr first
 
                     // Delete the tables of the required classes
-                    DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this,
-                        Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
+                    DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
                     deleteTablesTxn.setWriter(ddlWriter);
                     boolean success = true;
                     try
