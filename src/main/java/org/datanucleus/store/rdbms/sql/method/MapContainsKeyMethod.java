@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +34,17 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
-import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
+import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
+import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
+import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
+import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral.MapKeyLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -78,12 +85,53 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
 
         if (expr instanceof MapLiteral)
         {
+            // Literal Map
             MapLiteral lit = (MapLiteral)expr;
             Map map = (Map)lit.getValue();
+            JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
             if (map == null || map.size() == 0)
             {
-                JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                return new BooleanLiteral(stmt, m, Boolean.FALSE);
+                return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+            }
+
+            boolean useInExpression = false;
+            List<SQLExpression> mapKeyExprs = lit.getKeyLiteral().getKeyExpressions();
+            if (mapKeyExprs != null && !mapKeyExprs.isEmpty())
+            {
+                // Make sure the the map key(s) are compatible with the keyExpr
+                boolean incompatible = true;
+                Class elemtype = clr.classForName(keyExpr.getJavaTypeMapping().getType());
+                Iterator<SQLExpression> mapKeyExprIter = mapKeyExprs.iterator();
+                while (mapKeyExprIter.hasNext())
+                {
+                    SQLExpression mapKeyExpr = mapKeyExprIter.next();
+                    Class mapKeyType = clr.classForName(mapKeyExpr.getJavaTypeMapping().getType());
+                    if (keyTypeCompatible(elemtype, mapKeyType))
+                    {
+                        incompatible = false;
+                        break;
+                    }
+                }
+                if (incompatible)
+                {
+                    // The provided element type isn't assignable to any of the input collection elements!
+                    return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                }
+
+                // Check if we should compare using an "IN (...)" expression
+                SQLExpression mapKeyExpr = mapKeyExprs.get(0);
+                if (mapKeyExpr instanceof StringExpression || mapKeyExpr instanceof NumericExpression ||
+                    mapKeyExpr instanceof TemporalExpression || mapKeyExpr instanceof CharacterExpression ||
+                    mapKeyExpr instanceof ByteExpression || mapKeyExpr instanceof EnumExpression)
+                {
+                    useInExpression = true;
+                }
+            }
+            if (useInExpression)
+            {
+                // Return "key IN (val1, val2, ...)"
+                SQLExpression[] exprs = (mapKeyExprs != null ? mapKeyExprs.toArray(new SQLExpression[mapKeyExprs.size()]) : null);
+                return new InExpression(keyExpr, exprs);
             }
 
             // TODO If keyExpr is a parameter and mapExpr is derived from a parameter ?
@@ -544,5 +592,51 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         }
 
         return new BooleanSubqueryExpression(stmt, "EXISTS", subStmt);
+    }
+
+    protected boolean keyTypeCompatible(Class keyType, Class mapKeyType)
+    {
+        if (!keyType.isPrimitive() && mapKeyType.isPrimitive() && !mapKeyType.isAssignableFrom(keyType) && !keyType.isAssignableFrom(mapKeyType))
+        {
+            return false;
+        }
+        else if (keyType.isPrimitive())
+        {
+            if (keyType == boolean.class && mapKeyType == Boolean.class)
+            {
+                return true;
+            }
+            else if (keyType == byte.class && mapKeyType == Byte.class)
+            {
+                return true;
+            }
+            else if (keyType == char.class && mapKeyType == Character.class)
+            {
+                return true;
+            }
+            else if (keyType == double.class && mapKeyType == Double.class)
+            {
+                return true;
+            }
+            else if (keyType == float.class && mapKeyType == Float.class)
+            {
+                return true;
+            }
+            else if (keyType == int.class && mapKeyType == Integer.class)
+            {
+                return true;
+            }
+            else if (keyType == long.class && mapKeyType == Long.class)
+            {
+                return true;
+            }
+            else if (keyType == short.class && mapKeyType == Short.class)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        return true;
     }
 }

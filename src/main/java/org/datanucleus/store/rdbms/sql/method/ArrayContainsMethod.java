@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.method;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -31,7 +32,14 @@ import org.datanucleus.store.rdbms.sql.expression.ArrayExpression;
 import org.datanucleus.store.rdbms.sql.expression.ArrayLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
+import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
+import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
+import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
+import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -81,6 +89,46 @@ public class ArrayContainsMethod extends AbstractSQLMethod
             if (array == null || Array.getLength(array) == 0)
             {
                 return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+            }
+
+            boolean useInExpression = false;
+            List<SQLExpression> collElementExprs = lit.getElementExpressions();
+            if (collElementExprs != null && !collElementExprs.isEmpty())
+            {
+                // Make sure the the collection element(s) are compatible with the elemExpr
+                boolean incompatible = true;
+                Class elemtype = clr.classForName(elemExpr.getJavaTypeMapping().getType());
+                Iterator<SQLExpression> collElementExprIter = collElementExprs.iterator();
+                while (collElementExprIter.hasNext())
+                {
+                    SQLExpression collElementExpr = collElementExprIter.next();
+                    Class collElemType = clr.classForName(collElementExpr.getJavaTypeMapping().getType());
+                    if (elementTypeCompatible(elemtype, collElemType))
+                    {
+                        incompatible = false;
+                        break;
+                    }
+                }
+                if (incompatible)
+                {
+                    // The provided element type isn't assignable to any of the input collection elements!
+                    return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                }
+
+                // Check if we should compare using an "IN (...)" expression
+                SQLExpression collElementExpr = collElementExprs.get(0);
+                if (collElementExpr instanceof StringExpression || collElementExpr instanceof NumericExpression ||
+                    collElementExpr instanceof TemporalExpression || collElementExpr instanceof CharacterExpression ||
+                    collElementExpr instanceof ByteExpression || collElementExpr instanceof EnumExpression)
+                {
+                    useInExpression = true;
+                }
+            }
+            if (useInExpression)
+            {
+                // Return "elem IN (val1, val2, ...)"
+                SQLExpression[] exprs = (collElementExprs != null ? collElementExprs.toArray(new SQLExpression[collElementExprs.size()]) : null);
+                return new InExpression(elemExpr, exprs);
             }
 
             // TODO If elemExpr is a parameter and collExpr is derived from a parameter ?
@@ -254,5 +302,51 @@ public class ArrayContainsMethod extends AbstractSQLMethod
         }
 
         return new BooleanSubqueryExpression(stmt, "EXISTS", subStmt);
+    }
+
+    protected boolean elementTypeCompatible(Class elementType, Class collectionElementType)
+    {
+        if (!elementType.isPrimitive() && collectionElementType.isPrimitive() && !collectionElementType.isAssignableFrom(elementType) && !elementType.isAssignableFrom(collectionElementType))
+        {
+            return false;
+        }
+        else if (elementType.isPrimitive())
+        {
+            if (elementType == boolean.class && collectionElementType == Boolean.class)
+            {
+                return true;
+            }
+            else if (elementType == byte.class && collectionElementType == Byte.class)
+            {
+                return true;
+            }
+            else if (elementType == char.class && collectionElementType == Character.class)
+            {
+                return true;
+            }
+            else if (elementType == double.class && collectionElementType == Double.class)
+            {
+                return true;
+            }
+            else if (elementType == float.class && collectionElementType == Float.class)
+            {
+                return true;
+            }
+            else if (elementType == int.class && collectionElementType == Integer.class)
+            {
+                return true;
+            }
+            else if (elementType == long.class && collectionElementType == Long.class)
+            {
+                return true;
+            }
+            else if (elementType == short.class && collectionElementType == Short.class)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        return true;
     }
 }

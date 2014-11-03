@@ -134,8 +134,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             if (useInExpression)
             {
                 // Return "elem IN (val1, val2, ...)"
-                SQLExpression[] exprs = (collElementExprs != null ? 
-                        collElementExprs.toArray(new SQLExpression[collElementExprs.size()]) : null);
+                SQLExpression[] exprs = (collElementExprs != null ? collElementExprs.toArray(new SQLExpression[collElementExprs.size()]) : null);
                 return new InExpression(elemExpr, exprs);
             }
 
@@ -607,9 +606,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
     protected boolean elementTypeCompatible(Class elementType, Class collectionElementType)
     {
-        if (!elementType.isPrimitive() && collectionElementType.isPrimitive() && 
-            !collectionElementType.isAssignableFrom(elementType) &&
-            !elementType.isAssignableFrom(collectionElementType))
+        if (!elementType.isPrimitive() && collectionElementType.isPrimitive() && !collectionElementType.isAssignableFrom(elementType) && !elementType.isAssignableFrom(collectionElementType))
         {
             return false;
         }
