@@ -71,12 +71,12 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
     /**
      * Constructor.
      * @param storeMgr Store Manager
-     * @param resourceType either tx or nontx
+     * @param resourceName either tx or nontx
      */
-    public ConnectionFactoryImpl(StoreManager storeMgr, String resourceType)
+    public ConnectionFactoryImpl(StoreManager storeMgr, String resourceName)
     {
-        super(storeMgr, resourceType);
-        if (resourceType.equals("tx"))
+        super(storeMgr, resourceName);
+        if (resourceType.equals(RESOURCE_NAME_TX))
         {
             // JTA needs the primary DataSource to be present always
             initialiseDataSources();
@@ -94,7 +94,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             // Close any DataNucleus-created connection pool
             if (NucleusLogger.CONNECTION.isDebugEnabled())
             {
-                NucleusLogger.CONNECTION.debug(Localiser.msg("047010", resourceType));
+                NucleusLogger.CONNECTION.debug(Localiser.msg("047010", getResourceName()));
             }
             pool.close();
         }
@@ -107,14 +107,14 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
      */
     protected synchronized void initialiseDataSources()
     {
-        if (resourceType.equals("tx"))
+        if (getResourceName().equals(RESOURCE_NAME_TX))
         {
             // Transactional
             String requiredPoolingType = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE);
             Object connDS = storeMgr.getConnectionFactory();
             String connJNDI = storeMgr.getConnectionFactoryName();
             String connURL = storeMgr.getConnectionURL();
-            dataSources = generateDataSources(storeMgr, connDS, connJNDI, resourceType, requiredPoolingType, connURL);
+            dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
             if (dataSources == null)
             {
                 throw new NucleusUserException(Localiser.msg("047009", "transactional")).setFatal();
@@ -131,13 +131,13 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             Object connDS = storeMgr.getConnectionFactory2();
             String connJNDI = storeMgr.getConnectionFactory2Name();
             String connURL = storeMgr.getConnectionURL();
-            dataSources = generateDataSources(storeMgr, connDS, connJNDI, resourceType, requiredPoolingType, connURL);
+            dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
             if (dataSources == null)
             {
                 // Fallback to transactional settings
                 connDS = storeMgr.getConnectionFactory();
                 connJNDI = storeMgr.getConnectionFactoryName();
-                dataSources = generateDataSources(storeMgr, connDS, connJNDI, resourceType, requiredPoolingType, connURL);
+                dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
             }
             if (dataSources == null)
             {
