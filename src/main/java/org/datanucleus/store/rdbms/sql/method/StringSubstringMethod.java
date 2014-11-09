@@ -46,8 +46,7 @@ public class StringSubstringMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                "NumericExpression/IntegerLiteral/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
         else if (args.size() == 1)
         {
@@ -55,12 +54,9 @@ public class StringSubstringMethod extends AbstractSQLMethod
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
 
             SQLExpression startExpr = args.get(0);
-            if (!(startExpr instanceof NumericExpression) &&
-                !(startExpr instanceof IntegerLiteral) &&
-                !(startExpr instanceof ParameterLiteral))
+            if (!(startExpr instanceof NumericExpression) && !(startExpr instanceof IntegerLiteral) && !(startExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                    "NumericExpression/IntegerLiteral/ParameterLiteral"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
             }
 
             // Create a new StringExpression and manually update its SQL
@@ -77,21 +73,18 @@ public class StringSubstringMethod extends AbstractSQLMethod
             SQLExpression startExpr = args.get(0);
             if (!(startExpr instanceof NumericExpression))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                    "NumericExpression"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression"));
             }
             SQLExpression endExpr = args.get(1);
             if (!(endExpr instanceof NumericExpression))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 1,
-                    "NumericExpression"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 1, "NumericExpression"));
             }
 
             // Create a new StringExpression and manually update its SQL
             StringExpression strExpr = new StringExpression(stmt, null, null);
             SQLText sql = strExpr.toSQLText();
-            sql.append("SUBSTRING(").append(expr).append(" FROM ").append(startExpr.add(one))
-                .append(" FOR ").append(endExpr.sub(startExpr)).append(')');
+            sql.append("SUBSTRING(").append(expr).append(" FROM ").append(startExpr.add(one)).append(" FOR ").append(endExpr.sub(startExpr)).append(')');
             return strExpr;
         }
     }

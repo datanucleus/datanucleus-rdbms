@@ -44,17 +44,13 @@ public class StringEndsWithMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
-                "StringExpression/CharacterExpression/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0, "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 
         SQLExpression substrExpr = args.get(0);
-        if (!(substrExpr instanceof StringExpression) &&
-                !(substrExpr instanceof CharacterExpression) &&
-                !(substrExpr instanceof ParameterLiteral))
+        if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
-                    "StringExpression/CharacterExpression/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0, "StringExpression/CharacterExpression/ParameterLiteral"));
         }
         if (args.size() > 1)
         {
@@ -67,14 +63,11 @@ public class StringEndsWithMethod extends AbstractSQLMethod
                 stmt.getQueryGenerator().useParameterExpressionAsLiteral(substrLit);
                 if (substrLit.getValue() == null)
                 {
-                    return new BooleanExpression(expr, Expression.OP_LIKE, 
-                        ExpressionUtils.getEscapedPatternExpression(substrExpr));
+                    return new BooleanExpression(expr, Expression.OP_LIKE, ExpressionUtils.getEscapedPatternExpression(substrExpr));
                 }
             }
-            SQLExpression likeSubstrExpr = new StringLiteral(stmt,
-                expr.getJavaTypeMapping(), '%', null);
-            return new BooleanExpression(expr, Expression.OP_LIKE, 
-                likeSubstrExpr.add(ExpressionUtils.getEscapedPatternExpression(substrExpr)));
+            SQLExpression likeSubstrExpr = new StringLiteral(stmt, expr.getJavaTypeMapping(), '%', null);
+            return new BooleanExpression(expr, Expression.OP_LIKE, likeSubstrExpr.add(ExpressionUtils.getEscapedPatternExpression(substrExpr)));
         }
 
         // Create a new StringExpression and manually update its SQL
@@ -85,13 +78,10 @@ public class StringEndsWithMethod extends AbstractSQLMethod
             stmt.getQueryGenerator().useParameterExpressionAsLiteral(substrLit);
             if (substrLit.getValue() == null)
             {
-                return new BooleanExpression(expr, Expression.OP_LIKE, 
-                    ExpressionUtils.getEscapedPatternExpression(substrExpr));
+                return new BooleanExpression(expr, Expression.OP_LIKE, ExpressionUtils.getEscapedPatternExpression(substrExpr));
             }
         }
-        SQLExpression likeSubstrExpr = new StringLiteral(stmt,
-            expr.getJavaTypeMapping(), '%', null);
-        return new BooleanExpression(expr, Expression.OP_LIKE, 
-            likeSubstrExpr.add(ExpressionUtils.getEscapedPatternExpression(substrExpr)));
+        SQLExpression likeSubstrExpr = new StringLiteral(stmt, expr.getJavaTypeMapping(), '%', null);
+        return new BooleanExpression(expr, Expression.OP_LIKE, likeSubstrExpr.add(ExpressionUtils.getEscapedPatternExpression(substrExpr)));
     }
 }

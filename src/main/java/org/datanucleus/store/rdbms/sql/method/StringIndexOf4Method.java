@@ -43,8 +43,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
-                "StringExpression/CharacterExpression/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0, "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
@@ -52,12 +51,9 @@ public class StringIndexOf4Method extends AbstractSQLMethod
 
         ArrayList funcArgs = new ArrayList();
         SQLExpression substrExpr = args.get(0);
-        if (!(substrExpr instanceof StringExpression) &&
-                !(substrExpr instanceof CharacterExpression) &&
-                !(substrExpr instanceof ParameterLiteral))
+        if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
-                    "StringExpression/CharacterExpression/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0, "StringExpression/CharacterExpression/ParameterLiteral"));
         }
         funcArgs.add(substrExpr);
         funcArgs.add(expr);
@@ -66,8 +62,7 @@ public class StringIndexOf4Method extends AbstractSQLMethod
             SQLExpression fromExpr = args.get(1);
             if (!(fromExpr instanceof NumericExpression))
             {
-                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
-                        "NumericExpression"));
+                throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1, "NumericExpression"));
             }
             // Add 1 to the passed in value so that it is of origin 1 to be compatible with CHARINDEX
             funcArgs.add(new NumericExpression(fromExpr, Expression.OP_ADD, one));

@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
-import org.datanucleus.store.rdbms.sql.expression.CaseExpression;
+import org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
@@ -60,9 +60,7 @@ public class StringIndexOf5Method extends AbstractSQLMethod
 
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
         SQLExpression substrExpr = args.get(0);
-        if (!(substrExpr instanceof StringExpression) &&
-                !(substrExpr instanceof CharacterExpression) &&
-                !(substrExpr instanceof ParameterLiteral))
+        if (!(substrExpr instanceof StringExpression) && !(substrExpr instanceof CharacterExpression) && !(substrExpr instanceof ParameterLiteral))
         {
             throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 0,
                     "StringExpression/CharacterExpression/ParameterLiteral"));
@@ -83,8 +81,7 @@ public class StringIndexOf5Method extends AbstractSQLMethod
         SQLExpression fromExpr = args.get(1);
         if (!(fromExpr instanceof NumericExpression))
         {
-            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1,
-                    "NumericExpression"));
+            throw new NucleusException(Localiser.msg("060003", "indexOf", "StringExpression", 1, "NumericExpression"));
         }
 
         // Find the substring starting at this position
@@ -107,6 +104,6 @@ public class StringIndexOf5Method extends AbstractSQLMethod
 
         SQLExpression elseExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(-1), null);
 
-        return new CaseExpression(whenExprs, actionExprs, elseExpr);
+        return new CaseNumericExpression(whenExprs, actionExprs, elseExpr);
     }
 }

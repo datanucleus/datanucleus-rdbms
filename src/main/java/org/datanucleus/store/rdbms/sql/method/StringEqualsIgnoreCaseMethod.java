@@ -37,8 +37,7 @@ public class StringEqualsIgnoreCaseMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() != 1)
         {
-            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0,
-                "StringExpression/CharacterExpression/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "endsWith", "StringExpression", 0, "StringExpression/CharacterExpression/ParameterLiteral"));
         }
 
         StringExpression strExpr1 = (StringExpression)expr;

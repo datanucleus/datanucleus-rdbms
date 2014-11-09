@@ -43,8 +43,7 @@ public class StringSimilarPostgresqlMethod extends StringMatchesMethod
     protected BooleanExpression getBooleanLikeExpression(SQLExpression expr, SQLExpression regExpr,
             SQLExpression escapeExpr)
     {
-        BooleanExpression similarToExpr = new BooleanExpression(stmt, 
-            exprFactory.getMappingForType(boolean.class, false));
+        BooleanExpression similarToExpr = new BooleanExpression(stmt, exprFactory.getMappingForType(boolean.class, false));
         SQLText sql = similarToExpr.toSQLText();
         sql.clearStatement();
         if (OP_SIMILAR_TO.isHigherThanLeftSide(expr.getLowestOperator()))

@@ -259,8 +259,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         if (elemIsUnbound)
         {
             varName = ((UnboundExpression)elemExpr).getVariableName();
-            NucleusLogger.QUERY.debug("collection.contains(" + elemExpr + ") binding unbound variable " + varName +
-                " using INNER JOIN");
+            NucleusLogger.QUERY.debug("collection.contains(" + elemExpr + ") binding unbound variable " + varName + " using INNER JOIN");
         }
         else if (!stmt.getQueryGenerator().hasExplicitJoins())
         {
@@ -270,8 +269,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 elemAlias = stmt.removeCrossJoin(elemExpr.getSQLTable());
                 elemIsUnbound = true;
                 elemType = elemExpr.getJavaTypeMapping().getType();
-                NucleusLogger.QUERY.debug("collection.contains(" + elemExpr +
-                    ") was previously bound as CROSS JOIN but changing to INNER JOIN");
+                NucleusLogger.QUERY.debug("collection.contains(" + elemExpr + ") was previously bound as CROSS JOIN but changing to INNER JOIN");
             }
         }
 
@@ -306,8 +304,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 if (elemIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), 
-                        elemIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -338,20 +335,17 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                                 break;
                             }
                         }
-                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, elemMapping, joinTbl.getElementMapping(),
-                            elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null);
+                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, elemMapping, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null);
                     }
                     else
                     {
-                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(),
-                            elemTbl, elemAlias, elemTbl.getIdMapping(), null, null);
+                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null);
                     }
                     SQLExpression elemIdExpr = exprFactory.newExpression(stmt, elemSqlTbl, elemTbl.getIdMapping());
                     if (elemIsUnbound)
                     {
                         // Bind the variable in the QueryGenerator
-                        stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                            elemIdExpr.getJavaTypeMapping());
+                        stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                     }
                     else
                     {
@@ -365,8 +359,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                     if (elemIsUnbound)
                     {
                         // Bind the variable in the QueryGenerator
-                        stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                            elemIdExpr.getJavaTypeMapping());
+                        stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                     }
                     else
                     {
@@ -389,8 +382,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             {
                 ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable elemSqlTbl = stmt.innerJoin(collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(),
-                elemTbl, elemAlias, ownerMapping, null, null);
+            SQLTable elemSqlTbl = stmt.innerJoin(collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), elemTbl, elemAlias, ownerMapping, null, null);
 
             if (elemIsUnbound)
             {
@@ -399,8 +391,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 {
                     // Variable is defined as a subclass of the declared type so add extra join to variable type
                     DatastoreClass varTbl = storeMgr.getDatastoreClass(elemType, clr);
-                    SQLTable varSqlTbl = stmt.innerJoin(elemSqlTbl, elemTbl.getIdMapping(),
-                        varTbl, null, varTbl.getIdMapping(), null, null);
+                    SQLTable varSqlTbl = stmt.innerJoin(elemSqlTbl, elemTbl.getIdMapping(), varTbl, null, varTbl.getIdMapping(), null, null);
                     elemIdExpr = exprFactory.newExpression(stmt, varSqlTbl, varTbl.getIdMapping());
                 }
                 else
@@ -409,8 +400,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 }
 
                 // Bind the variable in the QueryGenerator
-                stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                    elemIdExpr.getJavaTypeMapping());
+                stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
             }
             else
             {
@@ -460,14 +450,12 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         if (elemIsUnbound)
         {
             varName = ((UnboundExpression)elemExpr).getVariableName();
-            NucleusLogger.QUERY.debug("collection.contains(" + elemExpr + ") binding unbound variable " + varName +
-                " using SUBQUERY");
+            NucleusLogger.QUERY.debug("collection.contains(" + elemExpr + ") binding unbound variable " + varName + " using SUBQUERY");
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData elemCmd =
-            mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
+        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
         String elemType = mmd.getCollection().getElementType();
         if (elemIsUnbound)
@@ -494,17 +482,14 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 // Restrict to collection owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(),
-                    collExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
-                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                    joinTbl.getElementMapping());
+                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), joinTbl.getElementMapping());
                 if (elemIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), 
-                        elemIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -522,23 +507,19 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(),
-                    joinTbl, null, joinTbl.getElementMapping(), null, null);
+                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
 
                 // Restrict to collection owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, joinSqlTbl, ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(),
-                    collExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
-                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                    elemTbl.getIdMapping());
+                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),elemTbl.getIdMapping());
                 if (elemIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                        elemIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -567,8 +548,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
             SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
-            SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(),
-                collExpr.getSQLTable().getTable().getIdMapping());
+            SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());
             subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
             if (elemIsUnbound)
@@ -578,25 +558,21 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 {
                     // Variable is defined as a subclass of the declared type so add extra join to variable type
                     DatastoreClass varTbl = storeMgr.getDatastoreClass(elemType, clr);
-                    SQLTable varSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(),
-                        varTbl, null, varTbl.getIdMapping(), null, null);
+                    SQLTable varSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(), varTbl, null, varTbl.getIdMapping(), null, null);
                     elemIdExpr = exprFactory.newExpression(subStmt, varSqlTbl, varTbl.getIdMapping());
                 }
                 else
                 {
-                    elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                        elemTbl.getIdMapping());
+                    elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), elemTbl.getIdMapping());
                 }
 
                 // Bind the variable in the QueryGenerator
-                stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                    elemIdExpr.getJavaTypeMapping());
+                stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
             }
             else
             {
                 // Add restrict to element
-                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                    elemTbl.getIdMapping());
+                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), elemTbl.getIdMapping());
                 subStmt.whereAnd(elemIdExpr.eq(elemExpr), true);
             }
         }

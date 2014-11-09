@@ -44,17 +44,13 @@ public class StringConcat2Method extends AbstractSQLMethod
     {
         if (args == null || args.size() != 1)
         {
-            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0,
-                "StringExpression/CharacterExpression/Parameter"));
+            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
             
         SQLExpression otherExpr = args.get(0);
-        if (!(otherExpr instanceof StringExpression) &&
-                !(otherExpr instanceof CharacterExpression) &&
-                !(otherExpr instanceof ParameterLiteral))
+        if (!(otherExpr instanceof StringExpression) && !(otherExpr instanceof CharacterExpression) && !(otherExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0,
-                "StringExpression/CharacterExpression/Parameter"));
+            throw new NucleusException(Localiser.msg("060003", "concat", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
         
         ArrayList funcArgs = new ArrayList();

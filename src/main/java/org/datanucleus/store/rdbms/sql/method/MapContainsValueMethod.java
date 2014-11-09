@@ -212,8 +212,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         if (valIsUnbound)
         {
             varName = ((UnboundExpression)valExpr).getVariableName();
-            NucleusLogger.QUERY.debug("map.containsValue(" + valExpr + ") binding unbound variable " + varName +
-                " using INNER JOIN");
+            NucleusLogger.QUERY.debug("map.containsValue(" + valExpr + ") binding unbound variable " + varName + " using INNER JOIN");
             // TODO What if the variable is declared as a subtype, handle this see CollectionContainsMethod
         }
         else if (!stmt.getQueryGenerator().hasExplicitJoins())
@@ -224,8 +223,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                 // Value is currently joined via CROSS JOIN, so remove it (and use INNER JOIN below)
                 valAlias = stmt.removeCrossJoin(valExpr.getSQLTable());
                 valIsUnbound = true;
-                NucleusLogger.QUERY.debug("map.containsValue(" + valExpr +
-                    ") was previously bound as CROSS JOIN but changing to INNER JOIN");
+                NucleusLogger.QUERY.debug("map.containsValue(" + valExpr + ") was previously bound as CROSS JOIN but changing to INNER JOIN");
             }
 
             // TODO If owner is joined via CROSS JOIN and value is already present then remove CROSS JOIN 
@@ -240,20 +238,17 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         {
             // Map formed in join table - add join to join table, then to value table (if present)
             MapTable mapTbl = (MapTable)storeMgr.getTable(mmd);
-            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(),
-                mapTbl, null, mapTbl.getOwnerMapping(), null, null);
+            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
             if (valCmd != null)
             {
                 if (valIsUnbound)
                 {
                     DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                    SQLTable valSqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getValueMapping(), 
-                        valTbl, valAlias, valTbl.getIdMapping(), null, null);
+                    SQLTable valSqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getValueMapping(), valTbl, valAlias, valTbl.getIdMapping(), null, null);
 
                     // Bind the variable in the QueryGenerator
                     valExpr = exprFactory.newExpression(stmt, valSqlTbl, valSqlTbl.getTable().getIdMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, valCmd, valExpr.getSQLTable(), 
-                        valExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, valCmd, valExpr.getSQLTable(), valExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -268,8 +263,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                 {
                     // Bind the variable in the QueryGenerator
                     valExpr = exprFactory.newExpression(stmt, joinSqlTbl, mapTbl.getValueMapping());
-                    stmt.getQueryGenerator().bindVariable(varName, null, valExpr.getSQLTable(), 
-                        valExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, valExpr.getSQLTable(), valExpr.getJavaTypeMapping());
                 }
                 else
                 {

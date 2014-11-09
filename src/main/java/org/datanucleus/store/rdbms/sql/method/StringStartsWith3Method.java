@@ -43,8 +43,7 @@ public class StringStartsWith3Method extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
-                "StringExpression/CharacterExpression/Parameter"));
+            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
 
         // {stringExpr}.indexOf(strExpr1 [,numExpr2])
@@ -54,8 +53,7 @@ public class StringStartsWith3Method extends AbstractSQLMethod
                 !(substrExpr instanceof CharacterExpression) &&
                 !(substrExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0,
-                    "StringExpression/CharacterExpression/Parameter"));
+            throw new NucleusException(Localiser.msg("060003", "startsWith", "StringExpression", 0, "StringExpression/CharacterExpression/Parameter"));
         }
 
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
@@ -64,13 +62,11 @@ public class StringStartsWith3Method extends AbstractSQLMethod
             SQLExpression numExpr = args.get(1);
             funcArgs.add(substrExpr);
             funcArgs.add(expr);
-            return new BooleanExpression(
-                new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one.add(numExpr));
+            return new BooleanExpression(new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one.add(numExpr));
         }
 
         funcArgs.add(substrExpr);
         funcArgs.add(expr);
-        return new BooleanExpression(
-            new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one);
+        return new BooleanExpression(new StringExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs), Expression.OP_EQ, one);
     }
 }

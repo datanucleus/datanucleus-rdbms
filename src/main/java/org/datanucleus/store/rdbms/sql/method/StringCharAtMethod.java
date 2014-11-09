@@ -45,18 +45,14 @@ public class StringCharAtMethod extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
-            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
-                "NumericExpression/IntegerLiteral/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
 
         // {strExpr}.charAt(numExpr)
         SQLExpression startExpr = args.get(0);
-        if (!(startExpr instanceof NumericExpression) &&
-                !(startExpr instanceof IntegerLiteral) &&
-                !(startExpr instanceof ParameterLiteral))
+        if (!(startExpr instanceof NumericExpression) && !(startExpr instanceof IntegerLiteral) && !(startExpr instanceof ParameterLiteral))
         {
-            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0,
-                    "NumericExpression/IntegerLiteral/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "charAt", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
 
         SQLExpression endExpr = startExpr.add(ExpressionUtils.getLiteralForOne(stmt));

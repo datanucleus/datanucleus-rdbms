@@ -48,19 +48,15 @@ public class StringSubstring4Method extends AbstractSQLMethod
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
-            throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                "NumericExpression/IntegerLiteral/ParameterLiteral"));
+            throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
         }
         else if (args.size() == 1)
         {
             // {stringExpr}.substring(numExpr1)
             SQLExpression startExpr = args.get(0);
-            if (!(startExpr instanceof NumericExpression) &&
-                !(startExpr instanceof IntegerLiteral) &&
-                !(startExpr instanceof ParameterLiteral))
+            if (!(startExpr instanceof NumericExpression) && !(startExpr instanceof IntegerLiteral) && !(startExpr instanceof ParameterLiteral))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                    "NumericExpression/IntegerLiteral/ParameterLiteral"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
             }
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
@@ -83,14 +79,12 @@ public class StringSubstring4Method extends AbstractSQLMethod
             SQLExpression startExpr = args.get(0);
             if (!(startExpr instanceof NumericExpression))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0,
-                    "NumericExpression"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression"));
             }
             SQLExpression endExpr = args.get(1);
             if (!(endExpr instanceof NumericExpression))
             {
-                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 1,
-                    "NumericExpression"));
+                throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 1, "NumericExpression"));
             }
 
             SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);

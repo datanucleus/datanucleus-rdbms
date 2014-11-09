@@ -242,17 +242,14 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                 // Restrict to array owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(),
-                    arrExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(), arrExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
-                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-                    joinTbl.getElementMapping());
+                SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), joinTbl.getElementMapping());
                 if (elemIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), 
-                        elemIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, null, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -270,14 +267,12 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(),
-                    joinTbl, null, joinTbl.getElementMapping(), null, null);
+                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
 
                 // Restrict to array owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, joinSqlTbl, ownerMapping);
-                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(),
-                    arrExpr.getSQLTable().getTable().getIdMapping());
+                SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, arrExpr.getSQLTable(), arrExpr.getSQLTable().getTable().getIdMapping());
                 subStmt.whereAnd(ownerExpr.eq(ownerIdExpr), true);
 
                 SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
@@ -285,8 +280,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                 if (elemIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), 
-                        elemIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(varName, elemCmd, elemIdExpr.getSQLTable(), elemIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
