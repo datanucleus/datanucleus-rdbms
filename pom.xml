@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <dn.core.version>4.0.3</dn.core.version>
+        <dn.core.version>4.0.4</dn.core.version>
     </properties>
 
     <repositories>
