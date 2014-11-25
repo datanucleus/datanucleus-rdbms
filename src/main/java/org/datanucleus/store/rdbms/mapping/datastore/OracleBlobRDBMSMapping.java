@@ -375,7 +375,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         if (sm.isEmbedded())
         {
             // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-            ObjectProvider[] embeddedOwners = sm.getEmbeddedOwners();
+            ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(sm);
             if (embeddedOwners != null)
             {
                 // Just use the first owner

@@ -258,7 +258,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         if (op.isEmbedded())
         {
             // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-            ObjectProvider[] embeddedOwners = op.getEmbeddedOwners();
+            ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(op);
             if (embeddedOwners != null)
             {
                 // Just use the first owner
