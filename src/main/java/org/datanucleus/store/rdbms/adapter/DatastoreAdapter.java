@@ -150,10 +150,11 @@ public interface DatastoreAdapter
      */
     public static final String DEFERRED_CONSTRAINTS = "DeferredConstraints";
 
-    /**
-     * Whether this datastore supports using DISTINCT when using SELECT ... FOR UPDATE.
-     */
     public static final String DISTINCT_WITH_SELECT_FOR_UPDATE = "DistinctWithSelectForUpdate";
+    public static final String GROUPING_WITH_SELECT_FOR_UPDATE = "GroupingWithSelectForUpdate";
+    public static final String HAVING_WITH_SELECT_FOR_UPDATE = "HavingWithSelectForUpdate";
+    public static final String ORDERING_WITH_SELECT_FOR_UPDATE = "OrderingWithSelectForUpdate";
+    public static final String MULTITABLES_WITH_SELECT_FOR_UPDATE = "MultipleTablesWithSelectForUpdate";
 
     public static final String ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE = "TableAliasInUpdateSet";
 

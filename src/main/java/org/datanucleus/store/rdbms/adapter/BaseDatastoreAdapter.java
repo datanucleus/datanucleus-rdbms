@@ -432,7 +432,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(EXISTS_SYNTAX);
         supportedOptions.add(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         supportedOptions.add(DEFERRED_CONSTRAINTS);
+
         supportedOptions.add(DISTINCT_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(GROUPING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(HAVING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(ORDERING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(MULTITABLES_WITH_SELECT_FOR_UPDATE);
+
         supportedOptions.add(PERSIST_OF_UNASSIGNED_CHAR);
         supportedOptions.add(CHECK_IN_CREATE_STATEMENTS);
         supportedOptions.add(GET_GENERATED_KEYS_STATEMENT);

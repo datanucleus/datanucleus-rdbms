@@ -1693,6 +1693,22 @@ public class SQLStatement
             {
                 NucleusLogger.QUERY.warn(Localiser.msg("052502"));
             }
+            else if (groupingExpressions != null && !dba.supportsOption(DatastoreAdapter.GROUPING_WITH_SELECT_FOR_UPDATE))
+            {
+                NucleusLogger.QUERY.warn(Localiser.msg("052506"));
+            }
+            else if (having != null && !dba.supportsOption(DatastoreAdapter.HAVING_WITH_SELECT_FOR_UPDATE))
+            {
+                NucleusLogger.QUERY.warn(Localiser.msg("052507"));
+            }
+            else if (orderingExpressions != null && !dba.supportsOption(DatastoreAdapter.ORDERING_WITH_SELECT_FOR_UPDATE))
+            {
+                NucleusLogger.QUERY.warn(Localiser.msg("052508"));
+            }
+            else if (joins != null && !joins.isEmpty() && !dba.supportsOption(DatastoreAdapter.MULTITABLES_WITH_SELECT_FOR_UPDATE))
+            {
+                NucleusLogger.QUERY.warn(Localiser.msg("052509"));
+            }
             else
             {
                 sql.append(" " + dba.getSelectForUpdateText());

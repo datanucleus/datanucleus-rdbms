@@ -88,6 +88,11 @@ public class DB2Adapter extends BaseDatastoreAdapter
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.remove(NULLS_IN_CANDIDATE_KEYS);
         supportedOptions.remove(NULLS_KEYWORD_IN_COLUMN_OPTIONS);
+        supportedOptions.remove(DISTINCT_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.remove(GROUPING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.remove(HAVING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.remove(ORDERING_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.remove(MULTITABLES_WITH_SELECT_FOR_UPDATE);
 
         supportedOptions.remove(FK_DELETE_ACTION_DEFAULT);
         supportedOptions.remove(FK_UPDATE_ACTION_DEFAULT);
