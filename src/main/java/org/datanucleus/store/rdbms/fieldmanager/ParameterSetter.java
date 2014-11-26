@@ -23,7 +23,9 @@ import java.sql.PreparedStatement;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.NullValue;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
@@ -35,6 +37,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
+import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -206,8 +209,17 @@ public class ParameterSetter extends AbstractFieldManager
                 }
             }
 
-            // Make sure the field is wrapped where appropriate
-	        op.wrapSCOField(fieldNumber, value, false, true, true);
+            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
+            if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+            {
+                SCOUtils.wrapSCOField(op, fieldNumber, value, false, true, true);
+            }
+            else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
+            {
+                // Embedded PC, so make sure the field is wrapped where appropriate TODO This should be part of ManagedRelationships
+                op.updateOwnerFieldInEmbeddedField(fieldNumber, value);
+            }
         }
         catch (NotYetFlushedException e)
         {

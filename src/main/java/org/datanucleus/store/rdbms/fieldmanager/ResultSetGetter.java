@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.types.SCOUtils;
 
 /**
  * ResultSet getter implementation of a field manager.
@@ -143,6 +144,9 @@ public class ResultSetGetter extends AbstractFieldManager
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
         JavaTypeMapping mapping = mapIdx.getMapping();
+        AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
+
         Object value;
         if (mapping instanceof EmbeddedPCMapping || mapping instanceof SerialisedPCMapping || mapping instanceof SerialisedReferenceMapping)
         {
@@ -150,13 +154,10 @@ public class ResultSetGetter extends AbstractFieldManager
         }
         else
         {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-            RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
-            if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.MANY_TO_ONE_BI)
+            if (RelationType.isRelationSingleValued(relationType))
             {
                 // Process fields of sub-object if available in this result set
-                StatementClassMapping relationMappings =
-                    resultMappings.getMappingDefinitionForMemberPosition(fieldNumber);
+                StatementClassMapping relationMappings = resultMappings.getMappingDefinitionForMemberPosition(fieldNumber);
                 if (relationMappings != null)
                 {
                     ClassLoaderResolver clr = ec.getClassLoaderResolver();
@@ -178,7 +179,16 @@ public class ResultSetGetter extends AbstractFieldManager
         // Return the field value (as a wrapper if wrappable)
         if (op != null)
         {
-            return op.wrapSCOField(fieldNumber, value, false, false, false);
+            if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+            {
+                return SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, false);
+            }
+            else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
+            {
+                // Embedded PC, so make sure the field is wrapped where appropriate TODO This should be part of ManagedRelationships
+                op.updateOwnerFieldInEmbeddedField(fieldNumber, value);
+                return value;
+            }
         }
         return value;
     }
