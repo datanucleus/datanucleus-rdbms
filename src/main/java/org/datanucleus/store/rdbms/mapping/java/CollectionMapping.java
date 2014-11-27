@@ -283,7 +283,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // we need to remove the join entries), or there are no FKs specified (in which case we need to clean up)
             if (!(value instanceof SCO))
             {
-                value = (Collection)SCOUtils.wrapSCOField(ownerOP, getAbsoluteFieldNumber(), value, false, false, true);
+                value = (Collection)SCOUtils.wrapSCOField(ownerOP, getAbsoluteFieldNumber(), value, true);
             }
             value.clear();
 

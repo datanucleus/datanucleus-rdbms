@@ -251,7 +251,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             if (!(value instanceof SCO))
             {
                 // Make sure we have a SCO wrapper so we can clear from the datastore
-                value = (java.util.Map)SCOUtils.wrapSCOField(ownerOP, mmd.getAbsoluteFieldNumber(), value, false, false, true);
+                value = (java.util.Map)SCOUtils.wrapSCOField(ownerOP, mmd.getAbsoluteFieldNumber(), value, true);
             }
             value.clear();
 

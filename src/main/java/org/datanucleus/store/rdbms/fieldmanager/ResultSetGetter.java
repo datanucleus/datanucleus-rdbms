@@ -181,7 +181,7 @@ public class ResultSetGetter extends AbstractFieldManager
         {
             if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
             {
-                return SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, false);
+                return SCOUtils.wrapSCOField(op, fieldNumber, value, false);
             }
             else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
             {
