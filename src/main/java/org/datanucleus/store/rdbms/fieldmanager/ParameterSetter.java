@@ -213,7 +213,7 @@ public class ParameterSetter extends AbstractFieldManager
             RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
             if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
             {
-                SCOUtils.wrapSCOField(op, fieldNumber, value, false, true, true);
+                SCOUtils.wrapSCOField(op, fieldNumber, value, false, false, true);
             }
             else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
             {
