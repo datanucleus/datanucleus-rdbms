@@ -376,7 +376,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     protected SCO replaceFieldWithWrapper(ObjectProvider op, Object value)
     {
         Class type = mmd.getType();
-        if (value!= null)
+        if (value != null)
         {
             type = value.getClass();
         }
@@ -385,7 +385,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             type = java.util.List.class;
         }
 
-        return SCOUtils.newSCOInstance(op, mmd, type, value, false, true);
+        return SCOUtils.newSCOInstance(op, mmd, type, value, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------
