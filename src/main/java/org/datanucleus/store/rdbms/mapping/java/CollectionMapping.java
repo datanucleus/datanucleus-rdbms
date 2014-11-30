@@ -174,8 +174,11 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         Collection value = (Collection) ownerOP.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
-            // Make sure the elements are ok for proceeding
-            SCOUtils.validateObjectsForWriting(ec, value);
+            if (value != null)
+            {
+                // Make sure the elements are ok for proceeding
+                SCOUtils.validateObjectsForWriting(ec, value);
+            }
             return;
         }
 

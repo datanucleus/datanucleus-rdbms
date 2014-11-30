@@ -180,7 +180,8 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
         if (value == null)
         {
-            // replace null map with empty SCO wrapper
+            // remove any entries in the map and replace it with an empty SCO wrapper
+            ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerOP);
             replaceFieldWithWrapper(ownerOP, null);
             return;
         }
