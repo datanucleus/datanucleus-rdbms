@@ -2740,8 +2740,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Parameter being represented as a literal (for whatever reason), so no longer precompilable
             if (isPrecompilable())
             {
-                NucleusLogger.QUERY.debug("Parameter " + expr + 
-                    " is being resolved as a literal, so the query is no longer precompilable");
+                NucleusLogger.QUERY.debug("Parameter " + expr + " is being resolved as a literal, so the query is no longer precompilable");
             }
             setNotPrecompilable();
         } 
@@ -2750,17 +2749,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (isPrecompilable())
             {
                 NucleusLogger.QUERY.debug("Parameter " + expr + " is set to null so this has to " +
-                " be resolved as a NullLiteral, and the query is no longer precompilable");
+                    " be resolved as a NullLiteral, and the query is no longer precompilable");
             }
             setNotPrecompilable();
         }
 
         // Create the SQLExpression for this parameter, either as value-literal or as parameter-literal
         SQLExpression sqlExpr = null;
-        if (paramValueSet && paramValue == null)
+        boolean nullParamValueUsesIsNull = true;
+        if (hasExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM) && 
+            ((String)getValueForExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM)).equalsIgnoreCase("false"))
         {
-            // Value is set to null, so enforce a NullLiteral for the case of null comparisons
-            // e.g we don't want "field == ?", but instead "field IS NULL"
+            // Don't use autoconvert to "field IS NULL" instead of "field = ?" when parameter is null
+            nullParamValueUsesIsNull = false;
+        }
+
+        if (paramValueSet && paramValue == null && nullParamValueUsesIsNull)
+        {
+            // Value is set to null, but we enforce a NullLiteral for the case of null comparisons e.g we don't want "field = ?", but instead "field IS NULL" 
             sqlExpr = exprFactory.newLiteral(stmt, null, null);
         }
         else if (asLiteral)

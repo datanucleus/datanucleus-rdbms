@@ -100,6 +100,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 
+    /** Extension for whether to convert "== ?" with null parameter to "IS NULL". */
+    public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
+
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation = null;
 
