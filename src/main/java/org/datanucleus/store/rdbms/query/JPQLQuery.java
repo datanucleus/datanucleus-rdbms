@@ -48,7 +48,6 @@ import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.evaluator.JPQLEvaluator;
-import org.datanucleus.query.evaluator.JavaQueryEvaluator;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -264,8 +263,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             if (!nullParameter)
             {
                 // Allowing caching so try to find compiled (datastore) query
-                datastoreCompilation = (RDBMSQueryCompilation)qm.getDatastoreQueryCompilation(datastoreKey,
-                    getLanguage(), queryCacheKey);
+                datastoreCompilation = (RDBMSQueryCompilation)qm.getDatastoreQueryCompilation(datastoreKey, getLanguage(), queryCacheKey);
                 if (datastoreCompilation != null)
                 {
                     // Cached compilation exists for this datastore so reuse it
@@ -411,11 +409,9 @@ public class JPQLQuery extends AbstractJPQLQuery
                                                 resultFieldType = fld.getType();
 
                                                 // Check the type of the field
-                                                if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && 
-                                                        !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
+                                                if (!ClassUtils.typesAreCompatible(fieldType, resultFieldType) && !ClassUtils.typesAreCompatible(resultFieldType, fieldType))
                                                 {
-                                                    throw new NucleusUserException(Localiser.msg("021211", 
-                                                        fieldName, fieldType.getName(), resultFieldType.getName()));
+                                                    throw new NucleusUserException(Localiser.msg("021211", fieldName, fieldType.getName(), resultFieldType.getName()));
                                                 }
                                                 if (!Modifier.isPublic(fld.getModifiers()))
                                                 {
@@ -437,8 +433,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                                     Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
                                                     if (putMethod == null)
                                                     {
-                                                        throw new NucleusUserException(Localiser.msg("021212", 
-                                                            resultClass.getName(), fieldName));
+                                                        throw new NucleusUserException(Localiser.msg("021212", resultClass.getName(), fieldName));
                                                     }
                                                 }
                                             }
@@ -471,8 +466,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             {
                 hasParams = true;
             }
-            if (!datastoreCompilation.isPrecompilable() ||
-                (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
+            if (!datastoreCompilation.isPrecompilable() || (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
             {
                 // Some parameters had their clauses evaluated during compilation so the query
                 // didn't gain any parameters, so don't cache it
@@ -512,8 +506,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
 
             List candidates = new ArrayList(candidateCollection);
-            JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, parameters, clr);
-            return resultMapper.execute(true, true, true, true, true);
+            return new JPQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
         }
         else if (type == Query.SELECT)
         {
@@ -533,8 +526,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             long startTime = System.currentTimeMillis();
             if (NucleusLogger.QUERY.isDebugEnabled())
             {
-                NucleusLogger.QUERY.debug(Localiser.msg("021046", getLanguage(), getSingleStringQuery(),
-                    null));
+                NucleusLogger.QUERY.debug(Localiser.msg("021046", getLanguage(), getSingleStringQuery(), null));
             }
 
             RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
@@ -567,8 +559,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         if (evaluateInMemory())
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, 
-                                datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -579,8 +570,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             }
 
                             // Perform in-memory filter/result/order etc
-                            JavaQueryEvaluator resultMapper = new JPQLEvaluator(this, candidates, compilation, parameters, clr);
-                            results = resultMapper.execute(true, true, true, true, true);
+                            results = new JPQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
                         }
                         else
                         {

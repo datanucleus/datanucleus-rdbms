@@ -48,7 +48,6 @@ import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.evaluator.JDOQLEvaluator;
-import org.datanucleus.query.evaluator.JavaQueryEvaluator;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.symbol.Symbol;
 import org.datanucleus.store.StoreManager;
@@ -571,9 +570,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
             else if (inMemory)
             {
-                List candidates = new ArrayList(candidateCollection);
-                JavaQueryEvaluator resultMapper = new JDOQLEvaluator(this, candidates, compilation, parameters, clr);
-                return resultMapper.execute(true, true, true, true, true);
+                return new JDOQLEvaluator(this, new ArrayList(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
             }
         }
         else if (type == Query.SELECT)
@@ -607,8 +604,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 {
                     // Create PreparedStatement and apply parameters, result settings etc
                     ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, datastoreCompilation.getSQL(), this);
-                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), 
-                        datastoreCompilation.getParameterNameByPosition(), parameters);
+                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), datastoreCompilation.getParameterNameByPosition(), parameters);
                     RDBMSQueryUtils.prepareStatementForExecution(ps, this, true);
 
                     registerTask(ps);
@@ -628,8 +624,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), 
-                                candidateClass);
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -640,9 +635,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             }
 
                             // Perform in-memory filter/result/order etc
-                            JavaQueryEvaluator resultMapper = 
-                                new JDOQLEvaluator(this, candidates, compilation, parameters, clr);
-                            results = resultMapper.execute(true, true, true, true, true);
+                            results = new JDOQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
                         }
                         else
                         {
@@ -749,8 +742,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     // Create PreparedStatement and apply parameters, result settings etc
                     // TODO Cater for multiple UPDATE statements (datastoreCompilation.getSQLs())
                     ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
-                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
-                        datastoreCompilation.getParameterNameByPosition(), parameters);
+                    SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), datastoreCompilation.getParameterNameByPosition(), parameters);
                     RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                     int[] updateResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
@@ -772,8 +764,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     if (datastoreCompilation.getSQL() != null)
                     {
                         ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
-                        SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
-                            datastoreCompilation.getParameterNameByPosition(), parameters);
+                        SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), datastoreCompilation.getParameterNameByPosition(), parameters);
                         RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                         int[] execResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
@@ -788,8 +779,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         {
                             Boolean useInCount = sqlUseInCountIter.next();
                             ps = sqlControl.getStatementForUpdate(mconn, sql, false);
-                            SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(),
-                                datastoreCompilation.getParameterNameByPosition(), parameters);
+                            SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), datastoreCompilation.getParameterNameByPosition(), parameters);
                             RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
                             int[] execResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
@@ -971,8 +961,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 else
                 {
                     // Must be numbered input so take penultimate
-                    int pos = parameters.size()-2;
-                    lower = ((Number)parameters.get(Integer.valueOf(pos))).longValue();
+                    lower = ((Number)parameters.get(Integer.valueOf(parameters.size()-2))).longValue();
                 }
             }
             if (toExclParam != null)
@@ -984,8 +973,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 else
                 {
                     // Must be numbered input so take ultimate
-                    int pos = parameters.size()-1;
-                    upper = ((Number)parameters.get(Integer.valueOf(pos))).longValue();
+                    upper = ((Number)parameters.get(Integer.valueOf(parameters.size()-1))).longValue();
                 }
             }
             stmt.setRange(lower, upper-lower);
@@ -1093,8 +1081,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         catch (NucleusException ne)
         {
             // Statement would result in no results, so just catch it and avoid generating the statement
-            NucleusLogger.QUERY.warn("Query for candidates of " + candidateClass.getName() +
-                (subclasses ? " and subclasses" : "") + " resulted in no possible candidates", ne);
+            NucleusLogger.QUERY.warn("Query for candidates of " + candidateClass.getName() + (subclasses ? " and subclasses" : "") + " resulted in no possible candidates", ne);
             statementReturnsEmpty = true;
             return;
         }
