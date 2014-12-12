@@ -80,10 +80,11 @@ public class BulkFetchHelper
      * @param parameters Parameters for the query
      * @param mmd Metadata for the multi-valued field
      * @param datastoreCompilation The datastore compilation of the query
+     * @param mapperOptions Any options for the query to SQL mapper
      * @return The bulk-fetch statement for retrieving this multi-valued field.
      */
     public IteratorStatement getSQLStatementForContainerField(AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd,
-            RDBMSQueryCompilation datastoreCompilation)
+            RDBMSQueryCompilation datastoreCompilation, Set<String> mapperOptions)
     {
         IteratorStatement iterStmt = null;
         ExecutionContext ec = query.getExecutionContext();
@@ -139,6 +140,10 @@ public class BulkFetchHelper
             SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
             Set<String> options = new HashSet<String>();
+            if (mapperOptions != null)
+            {
+                options.addAll(mapperOptions);
+            }
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, query.getCompilation(), parameters,
                 null, null, candidateCmd, query.isSubclasses(), query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());
@@ -173,6 +178,10 @@ public class BulkFetchHelper
             SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
             Set<String> options = new HashSet<String>();
+            if (mapperOptions != null)
+            {
+                options.addAll(mapperOptions);
+            }
             options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, query.getCompilation(), parameters,
                 null, null, candidateCmd, query.isSubclasses(), query.getFetchPlan(), ec, query.getParsedImports(), options, query.getExtensions());

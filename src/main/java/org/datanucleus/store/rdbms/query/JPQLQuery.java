@@ -67,24 +67,13 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.scostore.BaseContainerStore;
-import org.datanucleus.store.rdbms.scostore.FKListStore;
-import org.datanucleus.store.rdbms.scostore.FKMapStore;
-import org.datanucleus.store.rdbms.scostore.FKSetStore;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
-import org.datanucleus.store.rdbms.scostore.JoinListStore;
-import org.datanucleus.store.rdbms.scostore.JoinMapStore;
-import org.datanucleus.store.rdbms.scostore.JoinSetStore;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
-import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
-import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -108,7 +97,7 @@ public class JPQLQuery extends AbstractJPQLQuery
     /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 
-    /** Extension for whether to convert "== ?" with null parameter to "IS NULL". */
+    /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to false to comply with JPA spec 4.11. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
@@ -842,6 +831,10 @@ public class JPQLQuery extends AbstractJPQLQuery
         Set<String> options = new HashSet<String>();
         options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
         options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
+        if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, false)) // Default to false for "IS NULL" with null param
+        {
+            options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+        }
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters,
             datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
             candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
@@ -910,7 +903,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             {
                                 // Fetch collection elements for all candidate owners
                                 BulkFetchHelper helper = new BulkFetchHelper(this);
-                                IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation);
+                                IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation, options);
                                 if (iterStmt != null)
                                 {
                                     datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);
@@ -944,115 +937,6 @@ public class JPQLQuery extends AbstractJPQLQuery
         {
             NucleusLogger.QUERY.debug(Localiser.msg("021084", getLanguage(), System.currentTimeMillis()-startTime));
         }
-    }
-
-    protected IteratorStatement getSQLStatementForContainerFieldBatch(ExecutionContext ec, AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd)
-    {
-        IteratorStatement iterStmt = null;
-        Store backingStore = ((RDBMSStoreManager)storeMgr).getBackingStoreForField(clr, mmd, null);
-        if (backingStore instanceof JoinSetStore)
-        {
-            iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof FKSetStore)
-        {
-            iterStmt = ((FKSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof JoinListStore)
-        {
-            iterStmt = ((JoinListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof FKListStore)
-        {
-            iterStmt = ((FKListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
-
-        if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore)
-        {
-            // Generate an iterator query of the form
-            // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
-            // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
-            SQLStatement sqlStmt = iterStmt.getSQLStatement();
-            JoinTable joinTbl = (JoinTable)sqlStmt.getPrimaryTable().getTable();
-            JavaTypeMapping joinOwnerMapping = joinTbl.getOwnerMapping();
-
-            // Generate the EXISTS subquery (based on the JDOQL query)
-            SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
-            Set<String> options = new HashSet<String>();
-            options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
-            sqlMapper.compile();
-
-            // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
-            BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
-            sqlStmt.whereAnd(existsExpr, true);
-
-            // Join to outer statement so we restrict to collection elements for the query candidates
-            SQLExpression joinTblOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(sqlStmt, sqlStmt.getPrimaryTable(), joinOwnerMapping);
-            SQLExpression existsOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(existsStmt, existsStmt.getPrimaryTable(), 
-                existsStmt.getPrimaryTable().getTable().getIdMapping());
-            existsStmt.whereAnd(joinTblOwnerExpr.eq(existsOwnerExpr), true);
-
-            // Select the owner candidate so we can separate the collection elements out to their owner
-            int[] ownerColIndexes = sqlStmt.select(joinTblOwnerExpr, null);
-            StatementMappingIndex ownerMapIdx = new StatementMappingIndex(existsStmt.getPrimaryTable().getTable().getIdMapping());
-            ownerMapIdx.setColumnPositions(ownerColIndexes);
-            iterStmt.setOwnerMapIndex(ownerMapIdx);
-        }
-        else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore)
-        {
-            // Generate an iterator query of the form
-            // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
-            // WHERE EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND ELEM_TBL.OWNER_ID = OWNER_TBL.ID)
-            SQLStatement sqlStmt = iterStmt.getSQLStatement();
-
-            // Generate the EXISTS subquery (based on the JDOQL query)
-            SQLStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
-            Set<String> options = new HashSet<String>();
-            options.add(QueryToSQLMapper.OPTION_SELECT_CANDIDATE_ID_ONLY);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(existsStmt, compilation, parameters,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
-            sqlMapper.compile();
-
-            // Add EXISTS clause on iterator statement so we can restrict to just the owners in this query
-            BooleanExpression existsExpr = new BooleanSubqueryExpression(sqlStmt, "EXISTS", existsStmt);
-            sqlStmt.whereAnd(existsExpr, true);
-
-            // Join to outer statement so we restrict to collection elements for the query candidates
-            SQLExpression elemTblOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
-                ((BaseContainerStore) backingStore).getOwnerMapping());
-            SQLExpression existsOwnerExpr = sqlStmt.getRDBMSManager().getSQLExpressionFactory().newExpression(existsStmt, existsStmt.getPrimaryTable(), 
-                existsStmt.getPrimaryTable().getTable().getIdMapping());
-            existsStmt.whereAnd(elemTblOwnerExpr.eq(existsOwnerExpr), true);
-
-            // Select the owner candidate so we can separate the collection elements out to their owner
-            int[] ownerColIndexes = sqlStmt.select(elemTblOwnerExpr, null);
-            StatementMappingIndex ownerMapIdx = new StatementMappingIndex(existsStmt.getPrimaryTable().getTable().getIdMapping());
-            ownerMapIdx.setColumnPositions(ownerColIndexes);
-            iterStmt.setOwnerMapIndex(ownerMapIdx);
-        }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-        }
-        return iterStmt;
     }
 
     /**
@@ -1150,8 +1034,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (candidateTbl == null)
         {
             // TODO Using subclass-table, so find the table(s) it can be persisted into
-            throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + 
-                " not supported since candidate has no table of its own");
+            throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
         InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
@@ -1202,8 +1085,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1211,8 +1093,11 @@ public class JPQLQuery extends AbstractJPQLQuery
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
+            if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, false)) // Default to false for "IS NULL" with null param
+            {
+                options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+            }
+            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1259,8 +1144,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (candidateTbl == null)
         {
             // TODO Using subclass-table, so find the table(s) it can be persisted into
-            throw new NucleusDataStoreException("Bulk delete of " + candidateCmd.getFullClassName() + 
-                " not supported since candidate has no table of its own");
+            throw new NucleusDataStoreException("Bulk delete of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
         InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
@@ -1318,6 +1202,10 @@ public class JPQLQuery extends AbstractJPQLQuery
             Set<String> options = new HashSet<String>();
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
             options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
+            if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, false)) // Default to false for "IS NULL" with null param
+            {
+                options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+            }
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);

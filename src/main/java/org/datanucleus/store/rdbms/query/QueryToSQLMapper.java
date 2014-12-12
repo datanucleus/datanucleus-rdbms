@@ -141,6 +141,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     public static final String OPTION_BULK_UPDATE_VERSION = "BULK_UPDATE_VERSION";
     public static final String OPTION_BULK_DELETE_NO_RESULT = "BULK_DELETE_NO_RESULT";
     public static final String OPTION_SELECT_CANDIDATE_ID_ONLY = "RESULT_CANDIDATE_ID";
+    public static final String OPTION_NULL_PARAM_USE_IS_NULL = "USE_IS_NULL_FOR_NULL_PARAM";
 
     final String candidateAlias;
 
@@ -2667,13 +2668,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         // Create the SQLExpression for this parameter, either as value-literal or as parameter-literal
         SQLExpression sqlExpr = null;
-        boolean nullParamValueUsesIsNull = true;
-        if (hasExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM) && 
-            ((String)getValueForExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM)).equalsIgnoreCase("false"))
-        {
-            // Null parameter : Don't use autoconvert to "field IS NULL"; just put "field = ?" (SQL92 null equality rules etc)
-            nullParamValueUsesIsNull = false;
-        }
+        boolean nullParamValueUsesIsNull = options.contains(OPTION_NULL_PARAM_USE_IS_NULL);
 
         if (paramValueSet && paramValue == null && nullParamValueUsesIsNull)
         {

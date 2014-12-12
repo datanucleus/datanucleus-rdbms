@@ -100,7 +100,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
     public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
 
-    /** Extension for whether to convert "== ?" with null parameter to "IS NULL". */
+    /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to true to match Java semantics. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
@@ -918,6 +918,10 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         // Update the SQLStatement with filter, ordering, result etc
         Set<String> options = new HashSet<String>();
         options.add(QueryToSQLMapper.OPTION_BULK_UPDATE_VERSION);
+        if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
+        {
+            options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+        }
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters,
             datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
             candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
@@ -1026,7 +1030,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             {
                                 // Fetch collection elements for all candidate owners
                                 BulkFetchHelper helper = new BulkFetchHelper(this);
-                                IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation);
+                                IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation, options);
                                 if (iterStmt != null)
                                 {
                                     datastoreCompilation.setSCOIteratorStatement(fpMmd.getFullFieldName(), iterStmt);
@@ -1130,8 +1134,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         DatastoreClass candidateTbl = storeMgr.getDatastoreClass(candidateCmd.getFullClassName(), clr);
         if (candidateTbl == null)
         {
-            throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + 
-                " not supported since candidate has no table of its own");
+            throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
         InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
@@ -1188,10 +1191,11 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             // TODO Discriminator restriction?
 
             Set<String> options = new HashSet<String>();
-            options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
-            options.add(QueryToSQLMapper.OPTION_EXPLICIT_JOINS);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues,
-                null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
+            if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
+            {
+                options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+            }
+            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
@@ -1238,8 +1242,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (candidateTbl == null)
         {
             // TODO Using subclass-table, so find the table(s) it can be persisted into
-            throw new NucleusDataStoreException("Bulk delete of " + candidateCmd.getFullClassName() + 
-                " not supported since candidate has no table of its own");
+            throw new NucleusDataStoreException("Bulk delete of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
         InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
@@ -1295,6 +1298,10 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             // TODO Discriminator restriction?
 
             Set<String> options = new HashSet<String>();
+            if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
+            {
+                options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+            }
             options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
