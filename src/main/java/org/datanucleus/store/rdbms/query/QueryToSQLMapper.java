@@ -232,9 +232,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         public String toString()
         {
-            return "SQLTableMapping: tbl=" + table + 
-                " class=" + (cmd != null ? cmd.getFullClassName() : "null") + 
-                " mapping=" + mapping;
+            return "SQLTableMapping: tbl=" + table + " class=" + (cmd != null ? cmd.getFullClassName() : "null") + " mapping=" + mapping;
         }
     }
 
@@ -281,8 +279,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         this.stmt.setQueryGenerator(this);
 
         // Register the candidate
-        SQLTableMapping tblMapping =
-            new SQLTableMapping(stmt.getPrimaryTable(), candidateCmd, stmt.getPrimaryTable().getTable().getIdMapping());
+        SQLTableMapping tblMapping = new SQLTableMapping(stmt.getPrimaryTable(), candidateCmd, stmt.getPrimaryTable().getTable().getIdMapping());
         setSQLTableMappingForAlias(candidateAlias, tblMapping);
     }
 
@@ -414,8 +411,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Symbol sym = compilation.getSymbolTable().getSymbol(symIter.next());
             if (sym.getType() == Symbol.VARIABLE)
             {
-                if (compilation.getCompilationForSubquery(sym.getQualifiedName()) == null &&
-                    !hasSQLTableMappingForAlias(sym.getQualifiedName()))
+                if (compilation.getCompilationForSubquery(sym.getQualifiedName()) == null && !hasSQLTableMappingForAlias(sym.getQualifiedName()))
                 {
                     // Variable not a subquery, nor had its table allocated
                     throw new QueryCompilerSyntaxException("Query has variable \"" + sym.getQualifiedName() + "\" which is not bound to the query");
@@ -645,8 +641,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     {
                         // "this", so select fetch plan fields
                         StatementClassMapping map = new StatementClassMapping(candidateCmd.getFullClassName(), null);
-                        SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, map, 
-                            candidateCmd, fetchPlan, 1);
+                        SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, map, candidateCmd, fetchPlan, 1);
                         resultDefinition.addMappingForResultExpression(i, map);
                     }
                     else
@@ -770,8 +765,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (stmt.getNumberOfSelects() == 0)
             {
                 // Nothing selected so likely the user had some "new MyClass()" expression, so select "1"
-                stmt.select(exprFactory.newLiteral(stmt,
-                    storeMgr.getMappingManager().getMapping(Integer.class), 1), null);
+                stmt.select(exprFactory.newLiteral(stmt, storeMgr.getMappingManager().getMapping(Integer.class), 1), null);
             }
         }
         else if (options.contains(OPTION_BULK_DELETE_NO_RESULT))
@@ -805,14 +799,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 // Select fetch-plan members of the candidate (and optionally the next level of sub-objects)
                 // Don't select next level when we are processing a subquery
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, 
-                    candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
+                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
             }
             else if (candidateCmd.getInheritanceMetaData() != null && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
             {
                 // complete-table should have all fields of superclass present in all unions, so try to select fetch plan
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, 
-                    candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
+                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
             }
             else
             {
@@ -979,9 +971,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else
                 {
-                    throw new NucleusUserException(
-                        "Subquery has been specified with a candidate-expression that" +
-                                " includes \"" + tokens[i] + "\" that isnt a relation field!!");
+                    throw new NucleusUserException("Subquery has been specified with a candidate-expression that includes \"" + tokens[i] + "\" that isnt a relation field!!");
                 }
 
                 leftMmds[i] = leftMmd;
@@ -1006,18 +996,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (i == 0)
                     {
                         // Add where clause right table to outer table
-                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                            outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                        SQLExpression rightExpr = exprFactory.newExpression(stmt, 
-                            rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
                         stmt.whereAnd(outerExpr.eq(rightExpr), false);
                     }
                     else
                     {
                         // Join to left table
                         JavaTypeMapping leftMapping = leftTbl.getMemberMapping(leftMmd);
-                        lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                            leftTbl, null, leftMapping, null, null);
+                        lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftMapping, null, null);
                     }
                 }
                 else if (relationType == RelationType.ONE_TO_ONE_BI)
@@ -1029,17 +1016,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, 
-                                rSqlTbl, rightMapping);
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rightMapping);
                             stmt.whereAnd(outerExpr.eq(rightExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(rSqlTbl, rightMapping,
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(rSqlTbl, rightMapping, leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                     else
@@ -1048,17 +1032,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt,
-                                rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
                             stmt.whereAnd(outerExpr.eq(rightExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                                leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null);
+                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null);
                         }
                     }
                 }
@@ -1067,25 +1048,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl =
-                                (ElementContainerTable)storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                            joinTbl, null, joinTbl.getElementMapping(), null, null);
+                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
+                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
 
                         if (i == 0)
                         {
                             // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, 
-                                joinSqlTbl, joinTbl.getOwnerMapping());
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(),
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                     else
@@ -1094,17 +1070,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt,
-                                rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
                             stmt.whereAnd(outerExpr.eq(rightExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd),
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                 }
@@ -1113,25 +1086,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl = 
-                                (ElementContainerTable)storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                            joinTbl, null, joinTbl.getElementMapping(), null, null);
+                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
+                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
 
                         if (i == 0)
                         {
                             // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, 
-                                joinSqlTbl, joinTbl.getOwnerMapping());
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(),
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                     else
@@ -1140,17 +1108,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt,
-                                rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
                             stmt.whereAnd(outerExpr.eq(rightExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd),
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                 }
@@ -1159,25 +1124,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl = 
-                                (ElementContainerTable)storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                            joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
+                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
                         if (i == 0)
                         {
                             // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, 
-                                joinSqlTbl, joinTbl.getElementMapping());
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getElementMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(),
-                                leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
                         }
                     }
                     else
@@ -1185,17 +1145,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(),
-                                outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt,
-                                rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
                             stmt.whereAnd(outerExpr.eq(rightExpr), false);
                         }
                         else
                         {
                             // Join to left table
-                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(),
-                                leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null);
+                            lSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null);
                         }
                     }
                 }
@@ -1611,8 +1568,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         BooleanExpression right = (BooleanExpression)rightExpr;
         BooleanExpression left = (BooleanExpression)leftExpr;
-        if (left.getSQLStatement() != null && right.getSQLStatement() != null &&
-            left.getSQLStatement() != right.getSQLStatement())
+        if (left.getSQLStatement() != null && right.getSQLStatement() != null && left.getSQLStatement() != right.getSQLStatement())
         {
             if (left.getSQLStatement() == stmt && right.getSQLStatement().isChildStatementOf(stmt))
             {
@@ -1706,14 +1662,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (joinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN)
                     {
                         stmt.leftOuterJoin(right.getSQLTable(), right.getJavaTypeMapping(), 
-                            left.getSQLTable().getTable(), leftTblAlias, left.getJavaTypeMapping(), null, 
-                            left.getSQLTable().getGroupName());
+                            left.getSQLTable().getTable(), leftTblAlias, left.getJavaTypeMapping(), null, left.getSQLTable().getGroupName());
                     }
                     else
                     {
                         stmt.innerJoin(right.getSQLTable(), right.getJavaTypeMapping(), 
-                            left.getSQLTable().getTable(), leftTblAlias, left.getJavaTypeMapping(), null, 
-                            left.getSQLTable().getGroupName());
+                            left.getSQLTable().getTable(), leftTblAlias, left.getJavaTypeMapping(), null, left.getSQLTable().getGroupName());
                     }
 
                     JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
@@ -1735,14 +1689,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (joinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN)
                     {
                         stmt.leftOuterJoin(left.getSQLTable(), left.getJavaTypeMapping(), 
-                            right.getSQLTable().getTable(), rightTblAlias, right.getJavaTypeMapping(), null, 
-                            right.getSQLTable().getGroupName());
+                            right.getSQLTable().getTable(), rightTblAlias, right.getJavaTypeMapping(), null, right.getSQLTable().getGroupName());
                     }
                     else
                     {
                         stmt.innerJoin(left.getSQLTable(), left.getJavaTypeMapping(), 
-                            right.getSQLTable().getTable(), rightTblAlias, right.getJavaTypeMapping(), null, 
-                            right.getSQLTable().getGroupName());
+                            right.getSQLTable().getTable(), rightTblAlias, right.getJavaTypeMapping(), null, right.getSQLTable().getGroupName());
                     }
 
                     JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
@@ -1972,11 +1924,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
         }
 
-        JavaTypeMapping m = null;
-        if (litValue != null)
-        {
-            m = exprFactory.getMappingForType(litValue.getClass(), false);
-        }
+        JavaTypeMapping m = (litValue != null) ? exprFactory.getMappingForType(litValue.getClass(), false) : null;
         SQLExpression sqlExpr = exprFactory.newLiteral(stmt, m, litValue);
         stack.push(sqlExpr);
         return sqlExpr;
@@ -2028,8 +1976,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // Should have a discriminator always when casting this
                         AbstractClassMetaData fieldCmd = ec.getMetaDataManager().getMetaDataForClass(castType, clr);
                         DiscriminatorMetaData dismd = fieldCmd.getDiscriminatorMetaDataRoot();
-                        SQLExpression discExpr =
-                            stmt.getSQLExpressionFactory().newExpression(stmt, sqlExpr.getSQLTable(), discMapping);
+                        SQLExpression discExpr = stmt.getSQLExpressionFactory().newExpression(stmt, sqlExpr.getSQLTable(), discMapping);
                         SQLExpression discVal = null;
                         if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                         {
@@ -2037,8 +1984,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else
                         {
-                            discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                                castCmd.getDiscriminatorMetaData().getValue());
+                            discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, castCmd.getDiscriminatorMetaData().getValue());
                         }
                         BooleanExpression discRestrictExpr = discExpr.eq(discVal);
 
@@ -2050,13 +1996,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
                             if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                             {
-                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                                    subtypeCmd.getFullClassName());
+                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
                             }
                             else
                             {
-                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                                    subtypeCmd.getDiscriminatorMetaData().getValue());
+                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getDiscriminatorMetaData().getValue());
                             }
                             BooleanExpression subtypeExpr = discExpr.eq(discVal);
 
@@ -2069,8 +2013,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     SQLTableMapping tblMapping = new SQLTableMapping(sqlExpr.getSQLTable(), castCmd, sqlExpr.getJavaTypeMapping());
                     setSQLTableMappingForAlias(exprCastName, tblMapping);
 
-                    SQLTableMapping sqlMapping =
-                        getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
+                    SQLTableMapping sqlMapping = getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
                     if (sqlMapping == null)
                     {
                         throw new NucleusException("PrimaryExpression " + expr + " is not yet supported");
@@ -2166,8 +2109,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 if (varSqlExpr.getSQLStatement() == stmt.getParentStatement())
                 {
                     // Use parent mapper to get the mapping for this field since it has the table
-                    SQLTableMapping sqlMapping =
-                        parentMapper.getSQLTableMappingForPrimaryExpression(stmt, null, expr, Boolean.FALSE);
+                    SQLTableMapping sqlMapping = parentMapper.getSQLTableMappingForPrimaryExpression(stmt, null, expr, Boolean.FALSE);
                     if (sqlMapping == null)
                     {
                         throw new NucleusException("PrimaryExpression " + expr.getId() + " is not yet supported");
@@ -2176,8 +2118,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     // This should check on
                     // getDatastoreAdapter().supportsOption(RDBMSAdapter.ACCESS_PARENTQUERY_IN_SUBQUERY))
 
-                    sqlExpr = exprFactory.newExpression(varSqlExpr.getSQLStatement(), 
-                        sqlMapping.table, sqlMapping.mapping);
+                    sqlExpr = exprFactory.newExpression(varSqlExpr.getSQLStatement(), sqlMapping.table, sqlMapping.mapping);
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
@@ -2192,12 +2133,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     throw new NucleusUserException("Variable " + varExpr.getId() + " of type " + varType.getName() + " cannot evaluate " + expr.getId());
                 }
 
-                SQLTableMapping sqlMapping =
-                    getSQLTableMappingForPrimaryExpression(varSqlExpr.getSQLStatement(), varExpr.getId(), 
-                        expr, Boolean.FALSE);
+                SQLTableMapping sqlMapping = getSQLTableMappingForPrimaryExpression(varSqlExpr.getSQLStatement(), varExpr.getId(), expr, Boolean.FALSE);
 
-                sqlExpr = exprFactory.newExpression(sqlMapping.table.getSQLStatement(), sqlMapping.table,
-                    sqlMapping.mapping);
+                sqlExpr = exprFactory.newExpression(sqlMapping.table.getSQLStatement(), sqlMapping.table, sqlMapping.mapping);
                 stack.push(sqlExpr);
                 return sqlExpr;
             }
@@ -2219,8 +2157,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (mapping == null)
                     {
                         throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
-                            " on " + invokeSqlExpr +
-                            ". The field " + expr.getId() + " doesnt exist in table " + tbl);
+                            " on " + invokeSqlExpr + ". The field " + expr.getId() + " doesnt exist in table " + tbl);
                     }
 
                     sqlExpr = exprFactory.newExpression(stmt, invokeSqlExpr.getSQLTable(), mapping);
@@ -2410,8 +2347,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                             if (iter.hasNext())
                             {
-                                sqlMappingNew = new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(),
-                                    relTable.getIdMapping());
+                                sqlMappingNew = new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
                                 cmd = sqlMappingNew.cmd;
                             }
                             else
@@ -2471,8 +2407,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (sqlTbl == null)
                                 {
                                     sqlTbl = SQLStatementHelper.addJoinForOneToOneRelation(theStmt, mapping, 
-                                        sqlMapping.table, relMapping, relTable, null, null, primaryName, 
-                                        defaultJoinType);
+                                        sqlMapping.table, relMapping, relTable, null, null, primaryName, defaultJoinType);
                                 }
 
                                 sqlMappingNew = new SQLTableMapping(sqlTbl, relCmd, relMapping);
@@ -2502,31 +2437,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
                             if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.INNER_JOIN)
                             {
-                                SQLTable joinSqlTbl = theStmt.innerJoin(
-                                    sqlMapping.table, sqlMapping.table.getTable().getIdMapping(),
-                                    joinTbl, null, joinTbl.getElementMapping(),
-                                    null, null);
-                                sqlTbl = theStmt.innerJoin(
-                                    joinSqlTbl, joinTbl.getOwnerMapping(),
-                                    relTable, null, relTable.getIdMapping(),
-                                    null, primaryName);
+                                SQLTable joinSqlTbl = theStmt.innerJoin(sqlMapping.table, sqlMapping.table.getTable().getIdMapping(),
+                                    joinTbl, null, joinTbl.getElementMapping(), null, null);
+                                sqlTbl = theStmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, null, relTable.getIdMapping(), null, primaryName);
                             }
                             else if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN ||
                                     defaultJoinType == null)
                             {
-                                SQLTable joinSqlTbl = theStmt.leftOuterJoin(
-                                    sqlMapping.table, sqlMapping.table.getTable().getIdMapping(),
-                                    joinTbl, null, joinTbl.getElementMapping(),
-                                    null, null);
-                                sqlTbl = theStmt.leftOuterJoin(
-                                    joinSqlTbl, joinTbl.getOwnerMapping(),
-                                    relTable, null, relTable.getIdMapping(),
-                                    null, primaryName);
+                                SQLTable joinSqlTbl = theStmt.leftOuterJoin(sqlMapping.table, sqlMapping.table.getTable().getIdMapping(),
+                                    joinTbl, null, joinTbl.getElementMapping(), null, null);
+                                sqlTbl = theStmt.leftOuterJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, null, relTable.getIdMapping(), null, primaryName);
                             }
                         }
 
-                        sqlMappingNew =
-                                new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
+                        sqlMappingNew = new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
                         cmd = sqlMappingNew.cmd;
                         setSQLTableMappingForAlias(primaryName, sqlMappingNew);
                     }
@@ -2543,44 +2467,33 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             {
                                 // Just return the FK mapping since in a "a.b == c.d" type expression and not needing
                                 // to go further than the FK
-                                sqlMappingNew =
-                                        new SQLTableMapping(sqlMapping.table, relMmd.getAbstractClassMetaData(), mapping);
+                                sqlMappingNew = new SQLTableMapping(sqlMapping.table, relMmd.getAbstractClassMetaData(), mapping);
                             }
                             else
                             {
                                 // Join to the related table
                                 if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.INNER_JOIN)
                                 {
-                                    sqlTbl = theStmt.innerJoin(
-                                        sqlMapping.table, mapping,
-                                        relTable, null, relTable.getIdMapping(),
-                                        null, primaryName);
+                                    sqlTbl = theStmt.innerJoin(sqlMapping.table, mapping, relTable, null, relTable.getIdMapping(), null, primaryName);
                                 }
-                                else if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN ||
-                                        defaultJoinType == null)
+                                else if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN || defaultJoinType == null)
                                 {
-                                    sqlTbl = theStmt.leftOuterJoin(
-                                        sqlMapping.table, mapping,
-                                        relTable, null, relTable.getIdMapping(),
-                                        null, primaryName);
+                                    sqlTbl = theStmt.leftOuterJoin(sqlMapping.table, mapping, relTable, null, relTable.getIdMapping(), null, primaryName);
                                 }
-                                sqlMappingNew =
-                                        new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
+                                sqlMappingNew = new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
                                 cmd = sqlMappingNew.cmd;
                                 setSQLTableMappingForAlias(primaryName, sqlMappingNew);
                             }
                         }
                         else
                         {
-                            sqlMappingNew =
-                                    new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
+                            sqlMappingNew = new SQLTableMapping(sqlTbl, relMmd.getAbstractClassMetaData(), relTable.getIdMapping());
                             cmd = sqlMappingNew.cmd;
                             setSQLTableMappingForAlias(primaryName, sqlMappingNew);
                         }
                     }
                 }
-                else if (relationType == RelationType.ONE_TO_MANY_UNI || relationType == RelationType.ONE_TO_MANY_BI ||
-                        relationType == RelationType.MANY_TO_MANY_BI)
+                else if (RelationType.isRelationMultiValued(relationType))
                 {
                     // Can't reference further than a collection/map so just return its mapping here
                     sqlMappingNew = new SQLTableMapping(sqlTbl, cmd, mapping);
@@ -2712,8 +2625,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     if (!QueryUtils.queryParameterTypesAreCompatible(expr.getSymbol().getValueType(), paramValue.getClass()))
                     {
-                        throw new QueryCompilerSyntaxException(Localiser.msg("021118", expr.getId(),
-                            expr.getSymbol().getValueType().getName(), paramValue.getClass().getName()));
+                        throw new QueryCompilerSyntaxException(Localiser.msg("021118", expr.getId(), expr.getSymbol().getValueType().getName(), paramValue.getClass().getName()));
                     }
                     if (expr.getSymbol().getValueType() != paramValue.getClass())
                     {
@@ -2748,8 +2660,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             if (isPrecompilable())
             {
-                NucleusLogger.QUERY.debug("Parameter " + expr + " is set to null so this has to " +
-                    " be resolved as a NullLiteral, and the query is no longer precompilable");
+                NucleusLogger.QUERY.debug("Parameter " + expr + " is set to null so this has to be resolved as a NullLiteral, and the query is no longer precompilable");
             }
             setNotPrecompilable();
         }
@@ -2760,7 +2671,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (hasExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM) && 
             ((String)getValueForExtension(JDOQLQuery.EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM)).equalsIgnoreCase("false"))
         {
-            // Don't use autoconvert to "field IS NULL" instead of "field = ?" when parameter is null
+            // Null parameter : Don't use autoconvert to "field IS NULL"; just put "field = ?" (SQL92 null equality rules etc)
             nullParamValueUsesIsNull = false;
         }
 
@@ -2846,8 +2757,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 arrSqlExprs[i] = stack.pop();
             }
             JavaTypeMapping m = exprFactory.getMappingForType(Object[].class, false);
-            invokedSqlExpr =
-                new org.datanucleus.store.rdbms.sql.expression.ArrayExpression(stmt, m, arrSqlExprs);
+            invokedSqlExpr = new org.datanucleus.store.rdbms.sql.expression.ArrayExpression(stmt, m, arrSqlExprs);
         }
         else if (invokedExpr instanceof DyadicExpression)
         {
@@ -2875,11 +2785,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     processPrimaryExpression((PrimaryExpression)argExpr);
                     SQLExpression argSqlExpr = stack.pop();
 
-                    if (compileComponent == CompilationComponent.RESULT && operation.equalsIgnoreCase("count") &&
-                        stmt.getNumberOfTableGroups() > 1)
+                    if (compileComponent == CompilationComponent.RESULT && operation.equalsIgnoreCase("count") && stmt.getNumberOfTableGroups() > 1)
                     {
-                        if (argSqlExpr.getSQLTable() == stmt.getPrimaryTable() &&
-                            argSqlExpr.getJavaTypeMapping() == stmt.getPrimaryTable().getTable().getIdMapping())
+                        if (argSqlExpr.getSQLTable() == stmt.getPrimaryTable() && argSqlExpr.getJavaTypeMapping() == stmt.getPrimaryTable().getTable().getIdMapping())
                         {
                             // Result with "count(this)" and joins to other groups, so enforce distinct
                             argSqlExpr.distinct();
@@ -2992,8 +2900,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 // EXISTS expressions need to be Boolean
                 if (subquerySqlExpr instanceof org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)
                 {
-                    SQLStatement subStmt = 
-                        ((org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)subquerySqlExpr).getSubqueryStatement();
+                    SQLStatement subStmt = ((org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)subquerySqlExpr).getSubqueryStatement();
                     subquerySqlExpr = new BooleanSubqueryExpression(stmt, keyword, subStmt);
                 }
                 else
@@ -3004,8 +2911,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             else if (subquerySqlExpr instanceof org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)
             {
-                SQLStatement subStmt = 
-                    ((org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)subquerySqlExpr).getSubqueryStatement();
+                SQLStatement subStmt = ((org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)subquerySqlExpr).getSubqueryStatement();
                 subquerySqlExpr = new BooleanSubqueryExpression(stmt, keyword, subStmt);
             }
             else if (subquerySqlExpr instanceof NumericSubqueryExpression)
@@ -3191,8 +3097,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         elseExpr.evaluate(this);
         SQLExpression elseSqlExpr = stack.pop();
 
-        SQLExpression caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(
-            whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        SQLExpression caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
         stack.push(caseSqlExpr);
         return caseSqlExpr;
     }
@@ -3286,8 +3191,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     ctrArgTypes[i] = ((NewObjectExpression)sqlExpr).getNewClass();
                 }
-                else if (sqlExpr.getJavaTypeMapping() instanceof DatastoreIdMapping ||
-                        sqlExpr.getJavaTypeMapping() instanceof PersistableMapping)
+                else if (sqlExpr.getJavaTypeMapping() instanceof DatastoreIdMapping || sqlExpr.getJavaTypeMapping() instanceof PersistableMapping)
                 {
                     ctrArgTypes[i] = clr.classForName(sqlExpr.getJavaTypeMapping().getType());
                 }
@@ -3302,8 +3206,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Constructor ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes);
             if (ctr == null)
             {
-                throw new NucleusUserException(Localiser.msg("021033", className,
-                    StringUtils.objectArrayToString(ctrArgTypes)));
+                throw new NucleusUserException(Localiser.msg("021033", className, StringUtils.objectArrayToString(ctrArgTypes)));
             }
         }
 
@@ -3346,8 +3249,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             // Variable already found
             SQLTableMapping tblMapping = getSQLTableMappingForAlias(varName);
-            SQLExpression sqlExpr = exprFactory.newExpression(tblMapping.table.getSQLStatement(), 
-                tblMapping.table, tblMapping.mapping);
+            SQLExpression sqlExpr = exprFactory.newExpression(tblMapping.table.getSQLStatement(), tblMapping.table, tblMapping.mapping);
             stack.push(sqlExpr);
             return sqlExpr;
         }
@@ -3365,13 +3267,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             StatementResultMapping subqueryResultMapping = new StatementResultMapping();
             // TODO Fix "avg(something)" arg - not essential but is a hack right now
-            SQLStatement subStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, stmt, subCmd,
-                null, ec, subCompilation.getCandidateClass(), true, "avg(something)", subAlias, null);
-            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(subStmt, subCompilation, parameters,
-                null, subqueryResultMapping, subCmd, true, fetchPlan, ec, importsDefinition, options,
+            SQLStatement subStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, stmt, subCmd, null, ec, subCompilation.getCandidateClass(), true, "avg(something)", subAlias, null);
+
+            QueryToSQLMapper sqlMapper = new QueryToSQLMapper(subStmt, subCompilation, parameters, null, subqueryResultMapping, subCmd, true, fetchPlan, ec, importsDefinition, options,
                 extensionsByName);
             sqlMapper.setParentMapper(this);
             sqlMapper.compile();
+
             if (subqueryResultMapping.getNumberOfResultExpressions() > 1)
             {
                 throw new NucleusUserException("Number of result expressions in subquery should be 1");
@@ -3385,8 +3287,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             else
             {
-                JavaTypeMapping subMapping = 
-                    ((StatementMappingIndex)subqueryResultMapping.getMappingForResultExpression(0)).getMapping();
+                JavaTypeMapping subMapping = ((StatementMappingIndex)subqueryResultMapping.getMappingForResultExpression(0)).getMapping();
                 if (subMapping instanceof TemporalMapping)
                 {
                     subExpr = new TemporalSubqueryExpression(stmt, subStmt);
@@ -3411,8 +3312,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 parentMapper.candidateAlias != null && parentMapper.candidateAlias.equals(varName))
         {
             // Variable in subquery linking back to parent query
-            SQLExpression varExpr = exprFactory.newExpression(stmt.getParentStatement(),
-                stmt.getParentStatement().getPrimaryTable(),
+            SQLExpression varExpr = exprFactory.newExpression(stmt.getParentStatement(), stmt.getParentStatement().getPrimaryTable(),
                 stmt.getParentStatement().getPrimaryTable().getTable().getIdMapping());
             stack.push(varExpr);
             return varExpr;
@@ -3420,8 +3320,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         else
         {
             // Variable never met before, so return as UnboundExpression - process later if needing binding
-            NucleusLogger.QUERY.debug("QueryToSQL.processVariable (unbound) variable=" + varName +
-                " is not yet bound so returning UnboundExpression");
+            NucleusLogger.QUERY.debug("QueryToSQL.processVariable (unbound) variable=" + varName + " is not yet bound so returning UnboundExpression");
             UnboundExpression unbExpr = new UnboundExpression(stmt, varName);
             stack.push(unbExpr);
             return unbExpr;
@@ -3450,8 +3349,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected SQLExpression replaceParameterLiteral(ParameterLiteral paramLit, JavaTypeMapping mapping)
     {
-        return exprFactory.newLiteralParameter(stmt, mapping, paramLit.getValue(),
-            paramLit.getParameterName());
+        return exprFactory.newLiteralParameter(stmt, mapping, paramLit.getValue(), paramLit.getParameterName());
     }
 
     /* (non-Javadoc)
@@ -3634,12 +3532,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLTableMapping m = getSQLTableMappingForAlias(varName);
         if (m != null)
         {
-            throw new NucleusException("Variable " + varName + " is already bound to " + m.table +
-                " yet attempting to bind to " + sqlTbl);
+            throw new NucleusException("Variable " + varName + " is already bound to " + m.table + " yet attempting to bind to " + sqlTbl);
         }
 
-        NucleusLogger.QUERY.debug("QueryToSQL.bindVariable variable " + varName + 
-            " being bound to table=" + sqlTbl + " mapping=" + mapping);
+        NucleusLogger.QUERY.debug("QueryToSQL.bindVariable variable " + varName + " being bound to table=" + sqlTbl + " mapping=" + mapping);
         m = new SQLTableMapping(sqlTbl, cmd, mapping);
         setSQLTableMappingForAlias(varName, m);
     }
@@ -3730,8 +3626,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (!expr.hasClosure())
         {
             // Add closure to the boolean expression
-            return new BooleanExpression(expr, Expression.OP_EQ,
-                new BooleanLiteral(stmt, expr.getJavaTypeMapping(), Boolean.TRUE, null));
+            return new BooleanExpression(expr, Expression.OP_EQ, new BooleanLiteral(stmt, expr.getJavaTypeMapping(), Boolean.TRUE, null));
         }
         return expr;
     }
