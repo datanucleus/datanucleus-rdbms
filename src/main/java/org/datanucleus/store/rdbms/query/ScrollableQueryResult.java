@@ -224,8 +224,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
 
         if (rs == null)
         {
-            throw new NucleusUserException(
-                "Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
+            throw new NucleusUserException("Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
         }
         try
         {
@@ -247,8 +246,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                     while (memberValIter.hasNext())
                     {
                         Map.Entry<Integer, Object> memberValueEntry = memberValIter.next();
-                        int fieldNumber = memberValueEntry.getKey();
-                        op.replaceField(fieldNumber, memberValueEntry.getValue());
+                        op.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
                     }
                     op.replaceAllLoadedSCOFieldsWithWrappers();
                 }
@@ -530,8 +528,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         {
             if (rs == null)
             {
-                throw new NucleusUserException(
-                    "Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
+                throw new NucleusUserException("Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
             }
             try
             {
@@ -549,8 +546,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             }
             catch (SQLException sqle)
             {
-                throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(
-                    Localiser.msg("052601", sqle.getMessage()), sqle);
+                throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(Localiser.msg("052601", sqle.getMessage()), sqle);
             }
 
             if (applyRangeChecks)
@@ -583,8 +579,11 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
 
     public Object[] toArray(Object[] a)
     {
-        if (a == null) // ArrayList.toArray(Object[]) does not allow null arguments, so we don't do this either (according to javadoc, a NPE is thrown).
+        if (a == null)
+        {
+            // ArrayList.toArray(Object[]) does not allow null arguments, so we don't do this either (according to javadoc, a NPE is thrown).
             throw new NullPointerException("null argument is illegal!");
+        }
 
         return toArrayInternal(a);
     }
@@ -613,8 +612,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         {
             if (result == null || result.length < size)
             {
-                // if the size is known and exceeds the array length, we use a list
-                // instead of populating the array directly
+                // if the size is known and exceeds the array length, we use a list instead of populating the array directly
                 result = null;
                 resultList = new ArrayList(size);
             }
@@ -635,11 +633,14 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                     result[idx] = iterator.next();
                 }
                 else
-                { // exceeding array size => switch to resultList
+                {
+                    // exceeding array size => switch to resultList
                     int capacity = (result.length * 3) / 2 + 1;
-
-                    if (capacity < result.length) // this could only happen, if the above calculation exceeds the integer range - but safer is better
+                    if (capacity < result.length)
+                    {
+                        // this could only happen, if the above calculation exceeds the integer range - but safer is better
                         capacity = result.length;
+                    }
 
                     resultList = new ArrayList(capacity);
                     for (int i = 0; i < result.length; i++)
@@ -652,7 +653,8 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             }
             ++idx;
             if (result != null && idx < result.length)
-            { // it's a convention that the first element in the array after the real data is null (ArrayList.toArray(Object[]) does the same)
+            {
+                // it's a convention that the first element in the array after the real data is null (ArrayList.toArray(Object[]) does the same)
                 result[idx] = null;
             }
         }
@@ -661,20 +663,22 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         if (result == null)
         {
             if (resultList == null)
+            {
                 resultList = new ArrayList();
+            }
 
-            if (iterator == null) // the iterator might already exist (if we tried to use the result array and saw that it is not long enough)
+            if (iterator == null)
+            {
+                // the iterator might already exist (if we tried to use the result array and saw that it is not long enough)
                 iterator = this.iterator();
+            }
 
             while (iterator.hasNext())
             {
                 resultList.add(iterator.next());
             }
 
-            if (a == null)
-                result = resultList.toArray();
-            else
-                result = resultList.toArray(a);
+            result = (a == null) ? resultList.toArray() : resultList.toArray(a);
         }
 
         return result;
@@ -692,8 +696,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         List results = new java.util.ArrayList();
         for (int i=0;i<resultsObjsByIndex.size();i++)
         {
-            Object obj = resultsObjsByIndex.get(i);
-            results.add(obj);
+            results.add(resultsObjsByIndex.get(i));
         }
         return results;
     }

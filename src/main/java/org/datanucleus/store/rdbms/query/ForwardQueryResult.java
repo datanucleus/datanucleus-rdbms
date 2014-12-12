@@ -197,8 +197,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
                 while (memberValIter.hasNext())
                 {
                     Map.Entry<Integer, Object> memberValueEntry = memberValIter.next();
-                    int fieldNumber = memberValueEntry.getKey();
-                    op.replaceField(fieldNumber, memberValueEntry.getValue());
+                    op.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
                 }
                 op.replaceAllLoadedSCOFieldsWithWrappers();
             }
@@ -207,8 +206,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         // Update the status of whether there are more results outstanding
         if (rs == null)
         {
-            throw new NucleusUserException(
-                "Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
+            throw new NucleusUserException("Results for query have already been closed. Perhaps you called flush(), closed the query, or ended a transaction");
         }
         try
         {
@@ -293,8 +291,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
                 }
                 else
                 {
-                    throw query.getExecutionContext().getApiAdapter().getUserExceptionForException(
-                        "Exception thrown while loading remaining rows of query", re);
+                    throw query.getExecutionContext().getApiAdapter().getUserExceptionForException("Exception thrown while loading remaining rows of query", re);
                 }
             }
         }
