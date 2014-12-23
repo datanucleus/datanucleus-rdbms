@@ -3069,7 +3069,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     @Override
     protected Object processCaseExpression(CaseExpression expr)
     {
-        boolean numeric = false;
+        boolean numericCase = false;
+        boolean booleanCase = false;
         Map<Expression, Expression> conditions = expr.getConditions();
         Iterator<Map.Entry<Expression, Expression>> whenExprIter = conditions.entrySet().iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
@@ -3092,7 +3093,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (actionSqlExprs[i] instanceof NumericExpression)
             {
                 // TODO Check that all else expressions are numeric
-                numeric = true;
+                numericCase = true;
+            }
+            else if (actionSqlExprs[i] instanceof BooleanExpression)
+            {
+                // TODO Check that all else expressions are boolean
+                booleanCase = true;
             }
 
             i++;
@@ -3102,8 +3108,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         elseExpr.evaluate(this);
         SQLExpression elseSqlExpr = stack.pop();
 
-        SQLExpression caseSqlExpr = numeric ? new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr) :
-            new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        SQLExpression caseSqlExpr = null;
+        if (numericCase)
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        }
+        else if (booleanCase)
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        }
+        else
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        }
         stack.push(caseSqlExpr);
         return caseSqlExpr;
     }
