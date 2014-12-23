@@ -3081,6 +3081,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression whenExpr = entry.getKey();
             whenExpr.evaluate(this);
             whenSqlExprs[i] = stack.pop();
+            if (!(whenSqlExprs[i] instanceof BooleanExpression))
+            {
+                throw new QueryCompilerSyntaxException("IF/ELSE conditional expression should return boolean but doesn't : " + expr);
+            }
 
             Expression actionExpr = entry.getValue();
             actionExpr.evaluate(this);
