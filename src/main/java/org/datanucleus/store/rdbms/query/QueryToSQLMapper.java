@@ -3162,6 +3162,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     @Override
     protected Object processCaseExpression(CaseExpression expr)
     {
+        boolean numeric = false;
         Map<Expression, Expression> conditions = expr.getConditions();
         Iterator<Map.Entry<Expression, Expression>> whenExprIter = conditions.entrySet().iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
@@ -3173,10 +3174,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression whenExpr = entry.getKey();
             whenExpr.evaluate(this);
             whenSqlExprs[i] = stack.pop();
+            if (!(whenSqlExprs[i] instanceof BooleanExpression))
+            {
+                throw new QueryCompilerSyntaxException("IF/ELSE conditional expression should return boolean but doesn't : " + expr);
+            }
 
             Expression actionExpr = entry.getValue();
             actionExpr.evaluate(this);
             actionSqlExprs[i] = stack.pop();
+            if (actionSqlExprs[i] instanceof NumericExpression)
+            {
+                // TODO Check that all else expressions are numeric
+                numeric = true;
+            }
 
             i++;
         }
@@ -3185,8 +3195,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         elseExpr.evaluate(this);
         SQLExpression elseSqlExpr = stack.pop();
 
-        SQLExpression caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(
-            whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        SQLExpression caseSqlExpr = numeric ? new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr) :
+            new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+
         stack.push(caseSqlExpr);
         return caseSqlExpr;
     }
