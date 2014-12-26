@@ -317,10 +317,8 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
             // Multi-tenancy restriction
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), tblGroupName);
-            SQLExpression tenantExpr = 
-                stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = 
-                stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
+            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
                     storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
@@ -359,9 +357,8 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping tableIdMapping = table.getIdMapping();
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = 
-                        stmt.leftOuterJoin(null, tableIdMapping, subclassTables[i], null, subclassIdMapping,
-                            null, stmt.getPrimaryTable().getGroupName());
+                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, tableIdMapping, subclassTables[i], null, 
+                    		subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
 
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
                     SQLExpression nullExpr = new NullLiteral(stmt, null, null, null);
@@ -471,8 +468,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                     // Adds FROM clause of "LEFT OUTER JOIN {subTable} ON ..."
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = 
-                        stmt.leftOuterJoin(null, joinElementMapping, subclassTables[i], null,
+                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, joinElementMapping, subclassTables[i], null,
                             subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
 
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
