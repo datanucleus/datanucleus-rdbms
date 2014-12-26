@@ -362,7 +362,7 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
         {
             // Multi-tenancy restriction
             JavaTypeMapping tenantMapping = candidateTable.getMultitenancyMapping();
-            SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), null);
+            SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), discrimSqlTbl.getGroupName());
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
             SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
