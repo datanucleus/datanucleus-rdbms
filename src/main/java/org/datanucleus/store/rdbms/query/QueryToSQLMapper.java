@@ -462,7 +462,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 compileProperties.put("Filter.NOT", true);
             }
 
-            BooleanExpression filterExpr = (BooleanExpression)compilation.getExprFilter().evaluate(this);
+            SQLExpression filterSqlExpr = (SQLExpression) compilation.getExprFilter().evaluate(this);
+            if (!(filterSqlExpr instanceof BooleanExpression))
+            {
+                throw new QueryCompilerSyntaxException("Filter compiles to something that is not a boolean expression. Kindly fix your query : " + filterSqlExpr);
+            }
+            BooleanExpression filterExpr = (BooleanExpression)filterSqlExpr;
             filterExpr = getBooleanExpressionForUseInFilter(filterExpr);
             stmt.whereAnd(filterExpr, true);
             compileComponent = null;
