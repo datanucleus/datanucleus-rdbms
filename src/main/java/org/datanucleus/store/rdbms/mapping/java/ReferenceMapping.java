@@ -83,8 +83,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      */
-    public void initialize(AbstractMemberMetaData mmd, Table table, 
-            ClassLoaderResolver clr)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         if (mmd.hasExtension("mapping-strategy"))
         {
@@ -152,8 +151,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     // Column mappings defined at this side (1-N, M-N)
                     colmds = elemmd.getColumnMetaData();
                 }
-                createPerImplementationColumnsForReferenceField(false, false, false, false, 
-                    roleForMember, colmds, clr);
+                createPerImplementationColumnsForReferenceField(false, false, false, false, roleForMember, colmds, clr);
             }
             else if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
             {
@@ -173,8 +171,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     // Column mappings defined at other side (M-N) on <join>
                     colmds = relatedMmds[0].getJoinMetaData().getColumnMetaData();
                 }
-                createPerImplementationColumnsForReferenceField(false, false, false, false, 
-                    roleForMember, colmds, clr);
+                createPerImplementationColumnsForReferenceField(false, false, false, false, roleForMember, colmds, clr);
             }
             else if (roleForMember == FieldRole.ROLE_MAP_KEY)
             {
@@ -186,8 +183,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     // Column mappings defined at this side (1-N, M-N)
                     colmds = keymd.getColumnMetaData();
                 }
-                createPerImplementationColumnsForReferenceField(false, false, false, false, 
-                    roleForMember, colmds, clr);
+                createPerImplementationColumnsForReferenceField(false, false, false, false, roleForMember, colmds, clr);
             }
             else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
             {
@@ -199,17 +195,14 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     // Column mappings defined at this side (1-N, M-N)
                     colmds = valuemd.getColumnMetaData();
                 }
-                createPerImplementationColumnsForReferenceField(false, false, false, false, 
-                    roleForMember, colmds, clr);
+                createPerImplementationColumnsForReferenceField(false, false, false, false, roleForMember, colmds, clr);
             }
             else
             {
                 if (mmd.getMappedBy() == null)
                 {
                     // Unidirectional 1-1
-                    createPerImplementationColumnsForReferenceField(false, true, false, 
-                        mmd.isEmbedded() || mmd.getElementMetaData() != null,
-                        roleForMember, mmd.getColumnMetaData(), clr);
+                    createPerImplementationColumnsForReferenceField(false, true, false, mmd.isEmbedded() || mmd.getElementMetaData() != null, roleForMember, mmd.getColumnMetaData(), clr);
                 }
                 else
                 {
@@ -241,8 +234,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     }
                     else
                     {
-                        String[] implTypes = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, 
-                            FieldRole.ROLE_FIELD, clr, storeMgr.getMetaDataManager());
+                        String[] implTypes = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(mmd, FieldRole.ROLE_FIELD, clr, storeMgr.getMetaDataManager());
                         for (int j=0; j<implTypes.length; j++)
                         {
                             JavaTypeMapping refMapping = storeMgr.getDatastoreClass(implTypes[j], clr).getIdMapping();
@@ -307,8 +299,8 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * Create columns for reference (Interface/Object) fields on a per-implementation basis.
      * This call ColumnCreator.createColumnsForField for each implementation class of the reference.
      */
-    void createPerImplementationColumnsForReferenceField(boolean pk, boolean nullable, boolean serialised, 
-            boolean embedded, FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr)
+    void createPerImplementationColumnsForReferenceField(boolean pk, boolean nullable, boolean serialised, boolean embedded, FieldRole fieldRole, 
+            ColumnMetaData[] columnMetaData, ClassLoaderResolver clr)
     {
         if (this instanceof InterfaceMapping && mmd != null && mmd.hasExtension("implementation-classes"))
         {
@@ -327,8 +319,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             // No implementation classes found, so log warning and return
             if (storeMgr.getBooleanProperty(PropertyNames.PROPERTY_STORE_ALLOW_REFS_WITHOUT_IMPLS, false))
             {
-                NucleusLogger.DATASTORE_SCHEMA.warn("Possible problem encountered while adding columns for field " +
-                    mmd.getFullFieldName() + " : " + nue.getMessage());
+                NucleusLogger.DATASTORE_SCHEMA.warn("Possible problem encountered while adding columns for field " + mmd.getFullFieldName() + " : " + nue.getMessage());
                 return;
             }
             throw nue;
@@ -358,8 +349,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             }
             else if (type.isInterface())
             {
-                throw new NucleusUserException(Localiser.msg("020190", mmd.getFullFieldName(), 
-                    mmd.getTypeName(), implTypes[i]));
+                throw new NucleusUserException(Localiser.msg("020190", mmd.getFullFieldName(), mmd.getTypeName(), implTypes[i]));
             }
 
             Iterator iter = implClasses.iterator();
@@ -441,8 +431,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 JavaTypeMapping m;
                 if (storeMgr.getMappedTypeManager().isSupportedMappedType(implClass.getName()))
                 {
-                    m = storeMgr.getMappingManager().getMapping(implClass, serialised, embedded, 
-                        mmd.getFullFieldName());
+                    m = storeMgr.getMappingManager().getMapping(implClass, serialised, embedded, mmd.getFullFieldName());
                 }
                 else
                 {
@@ -454,8 +443,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                     catch (NoTableManagedException ex)
                     {
                         // TODO Localise this message
-                        throw new NucleusUserException("Cannot define columns for " + mmd.getFullFieldName() + 
-                            " due to " + ex.getMessage(), ex);
+                        throw new NucleusUserException("Cannot define columns for " + mmd.getFullFieldName() + " due to " + ex.getMessage(), ex);
                     }
                 }
 
@@ -464,9 +452,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 {
                     if (columnMetaData.length < colPos+m.getNumberOfDatastoreMappings())
                     {
-                        throw new NucleusUserException(Localiser.msg("020186", 
-                            mmd.getFullFieldName(), "" + columnMetaData.length, 
-                            "" + (colPos + m.getNumberOfDatastoreMappings())));
+                        throw new NucleusUserException(Localiser.msg("020186", mmd.getFullFieldName(), "" + columnMetaData.length, "" + (colPos + m.getNumberOfDatastoreMappings())));
                     }
                     columnMetaDataForType = new ColumnMetaData[m.getNumberOfDatastoreMappings()];
                     System.arraycopy(columnMetaData, colPos, columnMetaDataForType, 0, columnMetaDataForType.length);
@@ -474,8 +460,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 }
 
                 // Create the FK column(s) for this implementation
-                ColumnCreator.createColumnsForField(implClass, this, table, storeMgr, mmd, pk, 
-                    nullable, serialised, embedded, fieldRole, columnMetaDataForType, clr, true);
+                ColumnCreator.createColumnsForField(implClass, this, table, storeMgr, mmd, pk, nullable, serialised, embedded, fieldRole, columnMetaDataForType, clr, true);
 
                 if (NucleusLogger.DATASTORE.isInfoEnabled())
                 {
@@ -563,8 +548,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             }
             else
             {
-                String refString = getReferenceStringForObject(ec, value);
-                getJavaTypeMapping()[0].setString(ec, ps, pos, refString);
+                getJavaTypeMapping()[0].setString(ec, ps, pos, getReferenceStringForObject(ec, value));
             }
         }
     }

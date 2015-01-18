@@ -47,8 +47,7 @@ public class InterfaceMapping extends ReferenceMapping
      * @param table datastore container (table)
      * @param clr ClassLoader resolver
      */
-    public void initialize(AbstractMemberMetaData mmd, Table table, 
-            ClassLoaderResolver clr)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         super.initialize(mmd, table, clr);
 
@@ -89,8 +88,7 @@ public class InterfaceMapping extends ReferenceMapping
             if (mappingStrategy == ID_MAPPING || mappingStrategy == XCALIA_MAPPING)
             {
                 // TODO Cater for other mapping-strategy than FK per implementation.
-                throw new NucleusUserException("DataNucleus does not support use of mapping-strategy=" + mappingStrategy +
-                    " with a \"persistable interface\"");
+                throw new NucleusUserException("DataNucleus does not support use of mapping-strategy=" + mappingStrategy + " with a \"persistable interface\"");
             }
 
             // ********* This code is for the "persistent-interfaces" JDO feature **********

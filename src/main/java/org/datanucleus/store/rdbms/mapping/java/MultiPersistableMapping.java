@@ -140,8 +140,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
         {
             // as required by the JDO spec, a ClassCastException is thrown since not valid implementation
             // TODO Change this to a multiple field mapping localised message
-            throw new ClassCastException(Localiser.msg("041044",
-                mmd != null ? mmd.getFullFieldName() : "", getType(), value.getClass().getName()));
+            throw new ClassCastException(Localiser.msg("041044", mmd != null ? mmd.getFullFieldName() : "", getType(), value.getClass().getName()));
         }
 
         if (value != null)
@@ -199,8 +198,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                             // TODO Update the container element with the attached variant
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + 
-                                    " has field " + ownerFieldNumber +
+                                NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + " has field " + ownerFieldNumber +
                                     " that is 1-N bidirectional - should really update the reference in the relation. Not yet supported");
                             }
                         }
