@@ -93,9 +93,6 @@ public class JPQLQuery extends AbstractJPQLQuery
 {
     private static final long serialVersionUID = -3735379324740714088L;
 
-    /** Extension for how to handle multivalued fields. Support values of "none", "bulk-fetch". */
-    public static final String EXTENSION_MULTIVALUED_FETCH = "datanucleus.multivaluedFetch";
-
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to false to comply with JPA spec 4.11. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
@@ -619,7 +616,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
                                         if (datastoreCompilation.getStatementParameters() != null)
                                         {
-                                            BulkFetchHelper helper = new BulkFetchHelper(this);
+                                            BulkFetchExistsHelper helper = new BulkFetchExistsHelper(this);
                                             helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
                                         }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
@@ -872,16 +869,16 @@ public class JPQLQuery extends AbstractJPQLQuery
                 RelationType fpRelType = fpMmd.getRelationType(clr);
                 if (RelationType.isRelationMultiValued(fpRelType))
                 {
-                    String multifetchType = getStringExtensionProperty(EXTENSION_MULTIVALUED_FETCH, null);
+                    String multifetchType = getStringExtensionProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH, null);
                     if (multifetchType == null)
                     {
                         // Default to bulk-fetch, so advise the user of why this is happening and how to turn it off
-                        NucleusLogger.QUERY.debug("You have selected field " + fpMmd.getFullFieldName() + " for fetching by this query. We will fetch it using bulk-fetch." +
-                            " To disable this set the query extension/hint '" + EXTENSION_MULTIVALUED_FETCH + "' as 'none' or remove the field from the query FetchPlan" +
-                            " If this bulk-fetch generates an invalid or unoptimised query, please report it with a way of reproducing it");
-                        multifetchType = "bulk-fetch";
+                        NucleusLogger.QUERY.debug("You have selected field " + fpMmd.getFullFieldName() + " for fetching by this query. We will fetch it using 'EXISTS'." +
+                            " To disable this set the query extension/hint '" + RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH + "' as 'none' or remove the field" +
+                            " from the query FetchPlan. If this bulk-fetch generates an invalid or unoptimised query, please report it with a way of reproducing it");
+                        multifetchType = "exists";
                     }
-                    if (multifetchType.equalsIgnoreCase("bulk-fetch"))
+                    if (multifetchType.equalsIgnoreCase("exists"))
                     {
                         if (fpMmd.hasCollection())
                         {
@@ -892,7 +889,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             else
                             {
                                 // Fetch collection elements for all candidate owners
-                                BulkFetchHelper helper = new BulkFetchHelper(this);
+                                BulkFetchExistsHelper helper = new BulkFetchExistsHelper(this);
                                 IteratorStatement iterStmt = helper.getSQLStatementForContainerField(candidateCmd, parameters, fpMmd, datastoreCompilation, options);
                                 if (iterStmt != null)
                                 {

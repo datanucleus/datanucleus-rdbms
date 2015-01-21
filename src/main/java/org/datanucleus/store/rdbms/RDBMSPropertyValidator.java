@@ -74,6 +74,18 @@ public class RDBMSPropertyValidator implements PropertyValidator
                 }
             }
         }
+        else if (name.equalsIgnoreCase(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH))
+        {
+            if (value instanceof String)
+            {
+                String strVal = (String)value;
+                if (strVal.equalsIgnoreCase("exists") ||
+                    strVal.equalsIgnoreCase("none"))
+                {
+                    return true;
+                }
+            }
+        }
         else if (name.equalsIgnoreCase(RDBMSPropertyNames.PROPERTY_RDBMS_CONSTRAINT_CREATE_MODE))
         {
             if (value instanceof String)

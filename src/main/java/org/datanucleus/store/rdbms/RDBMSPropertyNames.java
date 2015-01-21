@@ -45,6 +45,7 @@ public class RDBMSPropertyNames
 
     public static final String PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY = "datanucleus.rdbms.adapter.informixUseSerialForIdentity";
 
+    public static final String PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH = "datanucleus.rdbms.query.multivaluedFetch";
     public static final String PROPERTY_RDBMS_QUERY_FETCH_DIRECTION = "datanucleus.rdbms.query.fetchDirection";
     public static final String PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE = "datanucleus.rdbms.query.resultSetType";
     public static final String PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY = "datanucleus.rdbms.query.resultSetConcurrency";

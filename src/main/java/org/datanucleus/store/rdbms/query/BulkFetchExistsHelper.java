@@ -65,11 +65,11 @@ import org.datanucleus.store.scostore.Store;
  * instead of restricting the statement to just a particular owner, it adds an EXISTS clause with the query as the exists
  * subquery).
  */
-public class BulkFetchHelper
+public class BulkFetchExistsHelper
 {
     Query query;
 
-    public BulkFetchHelper(Query q)
+    public BulkFetchExistsHelper(Query q)
     {
         this.query = q;
     }

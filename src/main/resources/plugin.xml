@@ -92,6 +92,8 @@ Contributors:
             validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.query.resultSetConcurrency" datastore="true" value="read-only"
             validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.query.multivaluedFetch" datastore="true" value="exists"
+            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
 
         <persistence-property name="datanucleus.rdbms.classAdditionMaxRetries" datastore="true" value="3"
             validator="org.datanucleus.properties.IntegerPropertyValidator"/>
