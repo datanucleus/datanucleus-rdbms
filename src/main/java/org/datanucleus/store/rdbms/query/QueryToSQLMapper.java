@@ -3167,7 +3167,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     @Override
     protected Object processCaseExpression(CaseExpression expr)
     {
-        boolean numeric = false;
+        boolean numericCase = false;
+        boolean booleanCase = false;
         Map<Expression, Expression> conditions = expr.getConditions();
         Iterator<Map.Entry<Expression, Expression>> whenExprIter = conditions.entrySet().iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
@@ -3189,8 +3190,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             actionSqlExprs[i] = stack.pop();
             if (actionSqlExprs[i] instanceof NumericExpression)
             {
-                // TODO Check that all else expressions are numeric
-                numeric = true;
+                numericCase = true;
+            }
+            else if (actionSqlExprs[i] instanceof BooleanExpression)
+            {
+                booleanCase = true;
             }
 
             i++;
@@ -3198,10 +3202,39 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         Expression elseExpr = expr.getElseExpression();
         elseExpr.evaluate(this);
-        SQLExpression elseSqlExpr = stack.pop();
+        SQLExpression elseActionSqlExpr = stack.pop();
 
-        SQLExpression caseSqlExpr = numeric ? new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr) :
-            new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
+        // Check that all action sql expressions are consistent
+        Class firstActionMappingType = actionSqlExprs[0].getJavaTypeMapping().getClass();
+        for (int j=1;j<actionSqlExprs.length;j++)
+        {
+            JavaTypeMapping m = actionSqlExprs[j].getJavaTypeMapping();
+            if (!m.getClass().equals(firstActionMappingType))
+            {
+                throw new QueryCompilerSyntaxException("IF/ELSE action expression " + actionSqlExprs[j] + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
+            }
+        }
+        JavaTypeMapping m = elseActionSqlExpr.getJavaTypeMapping();
+        if (!m.getClass().equals(firstActionMappingType))
+        {
+            throw new QueryCompilerSyntaxException("IF/ELSE action expression " + elseActionSqlExpr + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
+        }
+
+        SQLExpression caseSqlExpr = null;
+        if (numericCase)
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+        }
+        else if (booleanCase)
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+        }
+        else
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+        }
+//      SQLExpression caseSqlExpr = numeric ? new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr) :
+//          new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseSqlExpr);
 
         stack.push(caseSqlExpr);
         return caseSqlExpr;
