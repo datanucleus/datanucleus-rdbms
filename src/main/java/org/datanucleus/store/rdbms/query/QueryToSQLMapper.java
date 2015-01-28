@@ -3095,7 +3095,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression actionExpr = entry.getValue();
             actionExpr.evaluate(this);
             actionSqlExprs[i] = stack.pop();
-            NucleusLogger.GENERAL.info(">> processCaseExpr actionSqlExpr.mapping=" + actionSqlExprs[i].getJavaTypeMapping());
             if (actionSqlExprs[i] instanceof NumericExpression)
             {
                 numericCase = true;
