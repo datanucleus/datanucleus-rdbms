@@ -54,6 +54,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
+import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.query.AbstractJPQLQuery;
 import org.datanucleus.store.query.CandidateIdsQueryResult;
@@ -306,7 +307,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             AbstractMemberMetaData mmd = idx.getMapping().getMemberMetaData();
                             if (mmd != null)
                             {
-                                if (mmd.hasCollection() || mmd.hasMap() || mmd.hasArray())
+                                if (idx.getMapping() instanceof AbstractContainerMapping && idx.getMapping().getNumberOfDatastoreMappings() != 1)
                                 {
                                     throw new NucleusUserException(Localiser.msg("021213"));
                                 }
