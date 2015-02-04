@@ -32,7 +32,7 @@ import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 
 /**
- * This generator for Relational Databases uses the "select max(column) from table" strategy. The block size is limited to 1. 
+ * This generator for RDBMS uses the "select max(column) from table" strategy. The block size is limited to 1.
  * MaxGenerator works with numbers, so clients using this generator must cast the ID to Long.
  */
 public class MaxGenerator extends AbstractRDBMSGenerator
@@ -114,5 +114,15 @@ public class MaxGenerator extends AbstractRDBMSGenerator
         stmt.append(") FROM ");
         stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get("table-name")));  
         return stmt.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator#getConnectionPreference()
+     */
+    @Override
+    public ConnectionPreference getConnectionPreference()
+    {
+        // Since the method employed here depends on all previous records being available to this connection, then we must use the existing ExecutionContext connection always.
+        return ConnectionPreference.EXISTING;
     }
 }
