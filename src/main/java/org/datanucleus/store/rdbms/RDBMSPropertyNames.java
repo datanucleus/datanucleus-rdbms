@@ -69,4 +69,6 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_CONNECTION_POOL_TIME_BETWEEN_EVICTOR_RUNS_MILLIS = "datanucleus.connectionPool.timeBetweenEvictionRunsMillis";
     public static final String PROPERTY_CONNECTION_POOL_MIN_EVICTABLE_IDLE_TIME_MILLIS = "datanucleus.connectionPool.minEvictableIdleTimeMillis";
     public static final String PROPERTY_CONNECTION_POOL_DRIVER_PROPS = "datanucleus.connectionPool.driverProps";
+    public static final String PROPERTY_CONNECTION_POOL_LEAK_DETECTION_THRESHOLD = "datanucleus.connectionPool.leakThreshold";
+    public static final String PROPERTY_CONNECTION_POOL_MAX_LIFETIME = "datanucleus.connectionPool.maxLifetime";
 }
