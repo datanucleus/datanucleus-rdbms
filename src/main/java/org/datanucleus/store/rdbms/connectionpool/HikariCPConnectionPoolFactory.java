@@ -71,6 +71,35 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
                 config.setMaximumPoolSize(size);
             }
         }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE))
+        {
+            long idle = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE);
+            if (idle >= 0 )
+            {
+                config.setIdleTimeout(idle);
+            }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_LEAK_DETECTION_THRESHOLD))
+        {
+            long threshold = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_LEAK_DETECTION_THRESHOLD);
+            if (threshold >= 0)
+            {
+                config.setLeakDetectionThreshold(threshold);
+            }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_LIFETIME))
+        {
+            long maxLifeTime = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_LIFETIME);
+            if (maxLifeTime >= 0)
+            {
+                config.setMaxLifetime(maxLifeTime);
+            }
+        }
+
+
         // TODO Support other properties
 
         // Create the actual pool of connections
