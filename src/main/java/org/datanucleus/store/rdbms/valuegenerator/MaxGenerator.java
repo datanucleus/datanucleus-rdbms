@@ -115,4 +115,14 @@ public class MaxGenerator extends AbstractRDBMSGenerator
         stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get("table-name")));  
         return stmt.toString();
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator#getConnectionPreference()
+     */
+    @Override
+    public ConnectionPreference getConnectionPreference()
+    {
+        // Since the method employed here depends on all previous records being available to this connection, then we must use the existing ExecutionContext connection always.
+        return ConnectionPreference.EXISTING;
+    }
 }

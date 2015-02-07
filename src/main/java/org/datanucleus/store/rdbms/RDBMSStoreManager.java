@@ -177,6 +177,7 @@ import org.datanucleus.store.scostore.Store;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
+import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator.ConnectionPreference;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.transaction.TransactionIsolation;
@@ -1967,6 +1968,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // It maybe would be good to change ValueGenerator to have a next taking the connectionProvider
             if (generator instanceof AbstractDatastoreGenerator)
             {
+                ConnectionPreference connPref = ((AbstractDatastoreGenerator)generator).getConnectionPreference();
+                final boolean newConnection;
+                if (connPref == ConnectionPreference.NONE)
+                {
+                    // No preference from the generator so use NEW unless overridden by the persistence property
+                    if (getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("UsePM"))
+                    {
+                        newConnection = false;
+                    }
+                    else
+                    {
+                        newConnection = true;
+                    }
+                }
+                else
+                {
+                    newConnection = (connPref == ConnectionPreference.NEW);
+                }
+
                 // RDBMS-based generator so set the connection provider
                 final RDBMSStoreManager thisStoreMgr = this;
                 ValueGenerationConnectionProvider connProvider = new ValueGenerationConnectionProvider()
@@ -1974,14 +1994,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     ManagedConnection mconn;
                     public ManagedConnection retrieveConnection()
                     {
-                        if (getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("UsePM"))
+                        if (newConnection)
                         {
-                            this.mconn = thisStoreMgr.getConnection(ec);
+                            mconn = thisStoreMgr.getConnection(TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION)));
                         }
                         else
                         {
-                            int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION));
-                            this.mconn = thisStoreMgr.getConnection(isolationLevel);
+                            mconn = thisStoreMgr.getConnection(ec);
                         }
                         return mconn;
                     }
