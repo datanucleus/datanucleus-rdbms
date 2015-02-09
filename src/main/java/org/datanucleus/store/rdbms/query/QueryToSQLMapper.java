@@ -57,6 +57,7 @@ import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.evaluator.AbstractExpressionEvaluator;
 import org.datanucleus.query.expression.ArrayExpression;
 import org.datanucleus.query.expression.CaseExpression;
+import org.datanucleus.query.expression.CaseExpression.ExpressionPair;
 import org.datanucleus.query.expression.ClassExpression;
 import org.datanucleus.query.expression.CreatorExpression;
 import org.datanucleus.query.expression.DyadicExpression;
@@ -3073,15 +3074,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         boolean numericCase = false;
         boolean booleanCase = false;
-        Map<Expression, Expression> conditions = expr.getConditions();
-        Iterator<Map.Entry<Expression, Expression>> whenExprIter = conditions.entrySet().iterator();
+        List<ExpressionPair> conditions = expr.getConditions();
+        Iterator<ExpressionPair> whenExprIter = conditions.iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
         SQLExpression[] actionSqlExprs = new SQLExpression[conditions.size()];
         int i = 0;
         while (whenExprIter.hasNext())
         {
-            Map.Entry<Expression, Expression> entry = whenExprIter.next();
-            Expression whenExpr = entry.getKey();
+            ExpressionPair pair = whenExprIter.next();
+            Expression whenExpr = pair.getWhenExpression();
             whenExpr.evaluate(this);
             whenSqlExprs[i] = stack.pop();
             if (!(whenSqlExprs[i] instanceof BooleanExpression))
@@ -3089,7 +3090,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 throw new QueryCompilerSyntaxException("IF/ELSE conditional expression should return boolean but doesn't : " + expr);
             }
 
-            Expression actionExpr = entry.getValue();
+            Expression actionExpr = pair.getActionExpression();
             actionExpr.evaluate(this);
             actionSqlExprs[i] = stack.pop();
             if (actionSqlExprs[i] instanceof NumericExpression)
