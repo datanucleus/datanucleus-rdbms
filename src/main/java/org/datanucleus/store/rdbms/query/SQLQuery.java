@@ -78,12 +78,9 @@ import org.datanucleus.util.StringUtils;
  * <h3>Parameters</h3>
  * Parameters to this type of query can be :-
 * <ul>
- * <li><b>Positional</b> : The SQL statement includes "?" and the parameters are positional starting at 1
- * (just like in JDBC).</li>
- * <li><b>Numbered</b> : The SQL statement includes "?1", "?2" etc (with numbers starting at 1) and the users input
- * of parameters at execute is of the numbered parameters.</li>
- * <li><b>Named</b> : The SQL statement includes ":myParam1", ":myOtherParam" etc and the users input of parameters
- * via "executeWithMap" includes values for all specified names.</li>
+ * <li><b>Positional</b> : The SQL statement includes "?" and the parameters are positional starting at 1 (just like in JDBC).</li>
+ * <li><b>Numbered</b> : The SQL statement includes "?1", "?2" etc (with numbers starting at 1) and the users input of parameters at execute is of the numbered parameters.</li>
+ * <li><b>Named</b> : The SQL statement includes ":myParam1", ":myOtherParam" etc and the users input of parameters via "executeWithMap" includes values for all specified names.</li>
  * </ul>
  */
 public final class SQLQuery extends AbstractSQLQuery
@@ -296,8 +293,7 @@ public final class SQLQuery extends AbstractSQLQuery
 
                             // Return the associated type of results depending on whether scrollable or not
                             String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(this);
-                            if (resultSetType.equals("scroll-insensitive") ||
-                                resultSetType.equals("scroll-sensitive"))
+                            if (resultSetType.equals("scroll-insensitive") || resultSetType.equals("scroll-sensitive"))
                             {
                                 qr = new ScrollableQueryResult(this, rof, rs, null);
                             }
@@ -461,8 +457,7 @@ public final class SQLQuery extends AbstractSQLQuery
                 else
                 {
                     // Fall back to generating a mapping for this type - does this ever happen?
-                    m = storeMgr.getMappingManager().getMappingWithDatastoreMapping(
-                        fieldType, false, false, clr);
+                    m = storeMgr.getMappingManager().getMappingWithDatastoreMapping(fieldType, false, false, clr);
                 }
                 if (m.includeInFetchStatement())
                 {
@@ -525,12 +520,10 @@ public final class SQLQuery extends AbstractSQLQuery
         }
 
         // Generate discriminator information for later checking it is present
-        String discrimColName = table.getDiscriminatorMapping(false) != null ?
-                table.getDiscriminatorMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        String discrimColName = table.getDiscriminatorMapping(false) != null ? table.getDiscriminatorMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Generate version information for later checking it is present
-        String versionColName = table.getVersionMapping(false) != null ?
-                table.getVersionMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        String versionColName = table.getVersionMapping(false) != null ? table.getVersionMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Go through the fields of the ResultSet and map to the required fields in the candidate
         // Note that we check the existence of the columns again here even though they were checked at compilation
@@ -643,8 +636,7 @@ public final class SQLQuery extends AbstractSQLQuery
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionMappingIdx);
         }
 
-        return storeMgr.newResultObjectFactory(candidateCmd, mappingDefinition,
-            ignoreCache, getFetchPlan(), getCandidateClass());
+        return storeMgr.newResultObjectFactory(candidateCmd, mappingDefinition, ignoreCache, getFetchPlan(), getCandidateClass());
     }
 
     /**
@@ -786,20 +778,17 @@ public final class SQLQuery extends AbstractSQLQuery
 
                 if (discrimMissing)
                 {
-                    throw new NucleusUserException(Localiser.msg("059014", 
-                        compiledSQL, candidateClass.getName(), discriminatorColName));
+                    throw new NucleusUserException(Localiser.msg("059014", compiledSQL, candidateClass.getName(), discriminatorColName));
                 }
                 if (versionMissing)
                 {
-                    throw new NucleusUserException(Localiser.msg("059015", 
-                        compiledSQL, candidateClass.getName(), versionColName));
+                    throw new NucleusUserException(Localiser.msg("059015", compiledSQL, candidateClass.getName(), versionColName));
                 }
                 for (int i = 0; i < idColMissing.length; i++)
                 {
                     if (idColMissing[i])
                     {
-                        throw new NucleusUserException(Localiser.msg("059013", 
-                            compiledSQL, candidateClass.getName(), idColNames[i]));
+                        throw new NucleusUserException(Localiser.msg("059013", compiledSQL, candidateClass.getName(), idColNames[i]));
                     }
                 }
             }
