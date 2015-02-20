@@ -369,7 +369,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             }
             else
             {
-                // Define PK using JPOX rules
+                // Define PK using internal rules
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK

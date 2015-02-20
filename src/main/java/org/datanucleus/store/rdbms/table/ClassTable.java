@@ -2624,7 +2624,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
         else
         {
-            // JPOX creates the DDL
+            // Create the DDL
             if (cmd.getExtensions() != null)
             {
                 tableProps = new Properties();
