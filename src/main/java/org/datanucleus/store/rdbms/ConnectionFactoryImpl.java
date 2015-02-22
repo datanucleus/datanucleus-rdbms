@@ -78,7 +78,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         super(storeMgr, resourceName);
         if (resourceName.equals(RESOURCE_NAME_TX))
         {
-            // JTA needs the primary DataSource to be present always
+            // Primary DataSource to be present always
             initialiseDataSources();
         }
     }

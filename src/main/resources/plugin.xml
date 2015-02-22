@@ -54,10 +54,8 @@ Contributors:
 
     <!-- CONNECTION FACTORY -->
     <extension point="org.datanucleus.store_connectionfactory">
-        <connectionfactory name="rdbms/tx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="true" 
-            datastore="rdbms"/>
-        <connectionfactory name="rdbms/nontx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="false"
-            datastore="rdbms"/>
+        <connectionfactory name="rdbms/tx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="true" datastore="rdbms"/>
+        <connectionfactory name="rdbms/nontx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="false" datastore="rdbms"/>
     </extension>
 
     <!-- CONNECTION PROVIDER -->
