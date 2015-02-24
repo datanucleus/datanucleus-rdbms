@@ -3899,8 +3899,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             catch (IOException ioe)
             {
+                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown writing DDL file", ioe);
                 // Error in writing DDL file
-                // TODO Handle this
             }
         }
         else

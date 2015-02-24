@@ -99,9 +99,6 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             }
         }
 
-
-        // TODO Support other properties
-
         // Create the actual pool of connections
         HikariDataSource ds = new HikariDataSource(config);
 

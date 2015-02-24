@@ -951,109 +951,107 @@ class ParamLoggingPreparedStatement implements PreparedStatement
 
     public void setAsciiStream(int parameterIndex, InputStream x, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setAsciiStream(parameterIndex, x, length);
     }
 
     public void setAsciiStream(int parameterIndex, InputStream x) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setAsciiStream(parameterIndex, x);
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setBinaryStream(parameterIndex, x, length);
     }
 
     public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setBinaryStream(parameterIndex, x);
     }
 
     public void setBlob(int parameterIndex, InputStream inputStream, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setBlob(parameterIndex, inputStream, length);
     }
 
     public void setBlob(int parameterIndex, InputStream inputStream) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setBlob(parameterIndex, inputStream);
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setCharacterStream(parameterIndex, reader, length);
     }
 
     public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setCharacterStream(parameterIndex, reader);
     }
 
     public void setClob(int parameterIndex, Reader reader, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setClob(parameterIndex, reader, length);
     }
 
     public void setClob(int parameterIndex, Reader reader) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setClob(parameterIndex, reader);
     }
 
     public void setNCharacterStream(int parameterIndex, Reader value, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNCharacterStream(parameterIndex, value, length);
     }
 
     public void setNCharacterStream(int parameterIndex, Reader value) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNCharacterStream(parameterIndex, value);
     }
 
     public void setNString(int parameterIndex, String value) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNString(parameterIndex, value);
     }
 
     public boolean isClosed() throws SQLException
     {
-        // TODO Auto-generated method stub
-        return false;
+        return ps.isClosed();
     }
 
     public boolean isPoolable() throws SQLException
     {
-        // TODO Auto-generated method stub
-        return false;
+        return ps.isPoolable();
     }
 
     public void setPoolable(boolean poolable) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setPoolable(poolable);
     }
 
     public void setNClob(int parameterIndex, java.sql.NClob value) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNClob(parameterIndex, value);
     }
 
     public void setNClob(int parameterIndex, Reader reader, long length) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNClob(parameterIndex, reader, length);
     }
 
     public void setNClob(int parameterIndex, Reader reader) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setNClob(parameterIndex, reader);
     }
 
     public void setRowId(int parameterIndex, java.sql.RowId x) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setRowId(parameterIndex, x);
     }
 
     public void setSQLXML(int parameterIndex, java.sql.SQLXML xmlObject) throws SQLException
     {
-        // TODO Auto-generated method stub
+        ps.setSQLXML(parameterIndex, xmlObject);
     }
 
     public boolean isWrapperFor(Class iface) throws SQLException
@@ -1071,17 +1069,14 @@ class ParamLoggingPreparedStatement implements PreparedStatement
         return this;
     }
 
-    // Implementation of JDBC 4.1 methods
-
     public void closeOnCompletion() throws SQLException
     {
-//        ps.closeOnCompletion();
+        ps.closeOnCompletion();
     }
 
     public boolean isCloseOnCompletion() throws SQLException
     {
-//        return ps.isCloseOnCompletion();
-        return false;
+        return ps.isCloseOnCompletion();
     }
 
     // Implementation of JDBC 4.2 methods

@@ -174,10 +174,9 @@ public abstract class SQLExpression
         }
 
         // some databases use a ESCAPE expression with LIKE when using an escaped pattern
-        if (op == Expression.OP_LIKE && 
-            stmt.getRDBMSManager().getDatastoreAdapter().supportsOption(DatastoreAdapter.ESCAPE_EXPRESSION_IN_LIKE_PREDICATE))
+        if (op == Expression.OP_LIKE && stmt.getRDBMSManager().getDatastoreAdapter().supportsOption(DatastoreAdapter.ESCAPE_EXPRESSION_IN_LIKE_PREDICATE))
         {
-            // TODO Remove the need for thise code
+            // TODO Remove the need for this code
             if (expr2 instanceof SQLLiteral)
             {
                 DatastoreAdapter dba = stmt.getRDBMSManager().getDatastoreAdapter();

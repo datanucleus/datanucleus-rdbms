@@ -83,7 +83,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         if (candidates != null)
         {
             //TODO support this feature
-            throw new NucleusException("Unsupported Feature: Candidate Collection is only allowed using ForwardQueryResults").setFatal();
+            throw new NucleusException("Unsupported Feature: Candidate Collection is only allowed using ForwardQueryResult").setFatal();
         }
 
         if (query.useResultsCaching())

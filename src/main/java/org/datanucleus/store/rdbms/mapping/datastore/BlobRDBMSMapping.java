@@ -113,18 +113,6 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
         return getObjectForBytes(bytes, param);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.AbstractLargeBinaryRDBMSMapping#setObject(java.lang.Object,
-     * int, java.lang.Object)
-     */
-    @Override
-    public void setObject(PreparedStatement ps, int param, Object value)
-    {
-        // TODO Auto-generated method stub
-        super.setObject(ps, param, value);
-    }
-
     public void setString(PreparedStatement ps, int param, String value)
     {
         try

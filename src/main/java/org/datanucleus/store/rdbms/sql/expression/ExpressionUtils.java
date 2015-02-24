@@ -20,7 +20,6 @@ package org.datanucleus.store.rdbms.sql.expression;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -66,20 +65,17 @@ public class ExpressionUtils
         {
             char c = ((Character)((CharacterLiteral)expr).getValue()).charValue();
             BigInteger value = new BigInteger("" + (int)c);
-            return (NumericExpression)factory.newLiteral(expr.getSQLStatement(), 
-                storeMgr.getMappingManager().getMapping(value.getClass()), value);
+            return (NumericExpression)factory.newLiteral(expr.getSQLStatement(), storeMgr.getMappingManager().getMapping(value.getClass()), value);
         }
         else if (expr instanceof SQLLiteral)
         {
             BigInteger value = new BigInteger((String)((SQLLiteral)expr).getValue());
-            return (NumericExpression)factory.newLiteral(expr.getSQLStatement(), 
-                storeMgr.getMappingManager().getMapping(value.getClass()), value);
+            return (NumericExpression)factory.newLiteral(expr.getSQLStatement(), storeMgr.getMappingManager().getMapping(value.getClass()), value);
         }
 
         ArrayList args = new ArrayList();
         args.add(expr);
-        return new NumericExpression(expr.getSQLStatement(), expr.getJavaTypeMapping(), 
-            dba.getNumericConversionFunction(), args);
+        return new NumericExpression(expr.getSQLStatement(), expr.getJavaTypeMapping(), dba.getNumericConversionFunction(), args);
     }
 
     /**
@@ -92,32 +88,6 @@ public class ExpressionUtils
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(BigInteger.class);
         return storeMgr.getSQLExpressionFactory().newLiteral(stmt, mapping, BigInteger.ONE);
-    }
-
-    /**
-     * Method to convert the provided expression into a String-based expression using the datastore.
-     * Generates SQL like :-
-     * <pre>
-     * CAST({expr} AS VARCHAR(4000))
-     * </pre>
-     * TODO Move this to a method so we can have datastore differences. e.g MySQL wants to cast as CHAR
-     * @param expr The expression
-     * @return The StringExpression
-     */
-    public static StringExpression getStringExpression(SQLExpression expr)
-    {
-        RDBMSStoreManager storeMgr = expr.getSQLStatement().getRDBMSManager();
-        JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(String.class, false);
-        if (expr instanceof SQLLiteral)
-        {
-            return new StringLiteral(expr.getSQLStatement(), m, ((SQLLiteral)expr).getValue().toString(), null);            
-        }
-
-        List args = new ArrayList();
-        args.add(expr);
-        List types = new ArrayList();
-        types.add("VARCHAR(4000)");
-        return new StringExpression(expr.getSQLStatement(), m, "CAST", args, types);
     }
 
     /**
@@ -158,11 +128,8 @@ public class ExpressionUtils
      * @param clr ClassLoader resolver
      * @return The current position (after our processing)
      */
-    public static int populatePrimaryKeyMappingsValuesForPCMapping(JavaTypeMapping[] pkMappings, 
-            Object[] pkFieldValues, 
-            int position, PersistableMapping pcMapping,
-            AbstractClassMetaData cmd, AbstractMemberMetaData mmd, Object fieldValue,
-            RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
+    public static int populatePrimaryKeyMappingsValuesForPCMapping(JavaTypeMapping[] pkMappings, Object[] pkFieldValues, int position, 
+            PersistableMapping pcMapping, AbstractClassMetaData cmd, AbstractMemberMetaData mmd, Object fieldValue, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
     {
         ExecutionContext ec = storeMgr.getApiAdapter().getExecutionContext(fieldValue);
         JavaTypeMapping[] subMappings = pcMapping.getJavaTypeMapping();
@@ -246,8 +213,7 @@ public class ExpressionUtils
      * @return the equality expression
      */
     public static BooleanExpression getAppIdEqualityExpression(Object id, SQLExpression expr,
-            RDBMSStoreManager storeMgr, ClassLoaderResolver clr, AbstractClassMetaData acmd, Integer index, 
-            BooleanExpression bExpr)
+            RDBMSStoreManager storeMgr, ClassLoaderResolver clr, AbstractClassMetaData acmd, Integer index, BooleanExpression bExpr)
     {
         if (index == null)
         {
@@ -276,11 +242,8 @@ public class ExpressionUtils
             {
                 //if a simple value, we simply apply the equals
                 SQLExpression source = expr.subExprs.getExpression(index);
-                JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(
-                    value.getClass(), false, false, clr);
-                SQLExpression target =
-                    expr.getSQLStatement().getSQLExpressionFactory().newLiteral(expr.getSQLStatement(),
-                        mapping, value);
+                JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(value.getClass(), false, false, clr);
+                SQLExpression target = expr.getSQLStatement().getSQLExpressionFactory().newLiteral(expr.getSQLStatement(), mapping, value);
                 if (bExpr == null)
                 {
                     bExpr = source.eq(target);
@@ -359,8 +322,7 @@ public class ExpressionUtils
             }
             else
             {
-                AbstractClassMetaData cmd =
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(value.getClass(), clr);
+                AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(value.getClass(), clr);
                 if (cmd != null)
                 {
                     // Value is a persistable object
@@ -407,8 +369,7 @@ public class ExpressionUtils
                                 if (mapping instanceof PersistableMapping)
                                 {
                                     position = ExpressionUtils.populatePrimaryKeyMappingsValuesForPCMapping(pkMappingsApp, 
-                                        pkFieldValues, position, (PersistableMapping)mapping, 
-                                        cmd, mmd, fieldValue, storeMgr, clr);
+                                        pkFieldValues, position, (PersistableMapping)mapping, cmd, mmd, fieldValue, storeMgr, clr);
                                 }
                                 else
                                 {
@@ -421,8 +382,7 @@ public class ExpressionUtils
                             for (int i=0; i<expr.subExprs.size(); i++)
                             {
                                 SQLExpression source = expr.subExprs.getExpression(i);
-                                SQLExpression target =
-                                    exprFactory.newLiteral(stmt, pkMappingsApp[i], pkFieldValues[i]);
+                                SQLExpression target = exprFactory.newLiteral(stmt, pkMappingsApp[i], pkFieldValues[i]);
                                 BooleanExpression subExpr = (secondIsLiteral ? source.eq(target) : target.eq(source));
                                 if (bExpr == null)
                                 {
@@ -568,8 +528,7 @@ public class ExpressionUtils
         }
     }
 
-    protected static void checkAndCorrectLiteralForConsistentMappingsForBooleanComparison(SQLLiteral lit, 
-            SQLExpression expr)
+    protected static void checkAndCorrectLiteralForConsistentMappingsForBooleanComparison(SQLLiteral lit, SQLExpression expr)
     {
         JavaTypeMapping litMapping = ((SQLExpression)lit).getJavaTypeMapping();
         JavaTypeMapping exprMapping = expr.getJavaTypeMapping();
@@ -607,12 +566,10 @@ public class ExpressionUtils
             // This embeds some type conversion rules and would be nice to avoid it
             Class litMappingCls = litMapping.getJavaType();
             Class mappingCls = exprMapping.getJavaType();
-            if (litMappingCls == Double.class || litMappingCls == Float.class ||
-                litMappingCls == BigDecimal.class)
+            if (litMappingCls == Double.class || litMappingCls == Float.class || litMappingCls == BigDecimal.class)
             {
                 // Comparison between integral, and floating point parameter, so don't convert the param mapping
-                if (mappingCls == Integer.class || mappingCls == Long.class ||
-                    mappingCls == Short.class || mappingCls == BigInteger.class || mappingCls == Byte.class)
+                if (mappingCls == Integer.class || mappingCls == Long.class || mappingCls == Short.class || mappingCls == BigInteger.class || mappingCls == Byte.class)
                 {
                     if (litMappingCls == BigDecimal.class)
                     {

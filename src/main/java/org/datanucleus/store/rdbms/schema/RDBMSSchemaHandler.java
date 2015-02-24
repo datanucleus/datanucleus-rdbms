@@ -114,7 +114,8 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             }
             catch (SQLException sqle)
             {
-                // TODO Log this and return error
+                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown creating schema " + schemaName, sqle);
+                throw new NucleusException("Exception thrown in createSchema. See the log for full details : " + sqle.getMessage());
             }
             finally
             {
@@ -160,7 +161,8 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             }
             catch (SQLException sqle)
             {
-                // TODO Log this and return error
+                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown in deleteSchema " + schemaName, sqle);
+                throw new NucleusException("Exception thrown in deleteSchema. See the log for full details : " + sqle.getMessage());
             }
             finally
             {

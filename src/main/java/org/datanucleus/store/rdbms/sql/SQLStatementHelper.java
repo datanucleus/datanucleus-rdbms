@@ -846,7 +846,7 @@ public class SQLStatementHelper
                     if (selectSubobjects && !mmd.isSerialized() && !mmd.isEmbedded())
                     {
                         // Select the fetch-plan fields of the related object
-                        StatementClassMapping subMappingDefinition = new StatementClassMapping(mmd.getName());
+                        StatementClassMapping subMappingDefinition = new StatementClassMapping(null, mmd.getName());
                         selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan,
                             relatedSqlTbl, relatedMmd.getAbstractClassMetaData(), maxFetchPlanLimit-1);
                         if (mappingDefinition != null)

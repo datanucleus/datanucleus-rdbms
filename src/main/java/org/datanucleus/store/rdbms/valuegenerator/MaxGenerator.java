@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * This generator for RDBMS uses the "select max(column) from table" strategy. The block size is limited to 1.
@@ -76,9 +77,8 @@ public class MaxGenerator extends AbstractRDBMSGenerator
         }
         catch (SQLException e)
         {
-            //TODO adds a message correspondent to the exception. 
-            //we need to work to create user friendly messages
-            throw new ValueGenerationException(e.getMessage());
+            NucleusLogger.VALUEGENERATION.warn("Exception thrown getting next value for MaxGenerator", e);
+            throw new ValueGenerationException("Exception thrown getting next value for MaxGenerator", e);
         }
         finally
         {

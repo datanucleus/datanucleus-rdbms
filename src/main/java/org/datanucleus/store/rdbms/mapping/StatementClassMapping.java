@@ -95,12 +95,6 @@ public class StatementClassMapping
         this.memberName = memberName;
     }
 
-    // TODO Drop this
-    public StatementClassMapping(String memberName)
-    {
-        this(null, memberName);
-    }
-
     public String getClassName()
     {
         return className;
