@@ -96,23 +96,21 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Pre-initilize. For things that must be initialized right after constructor 
+     * Pre-initialise. For things that must be initialised right after constructor 
      * @param clr the ClassLoaderResolver
      */
     public void preInitialize(final ClassLoaderResolver clr)
     {
         assertIsUninitialized();
-        //nothing to do here
     }    
 
     /**
-     * Post initilize. For things that must be set after all classes have been initialized before 
+     * Post initialise. For things that must be set after all classes have been initialised before 
      * @param clr the ClassLoaderResolver
      */
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
-        //nothing to do here
     }    
 
     /**
@@ -219,20 +217,20 @@ public abstract class TableImpl extends AbstractTable
             RDBMSColumnInfo ci = (RDBMSColumnInfo) i.next();
 
             // Create an identifier to use for the real column - use "CUSTOM" because we don't want truncation
-            DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(ci.getColumnName(), 
+            DatastoreIdentifier colIdentifier = storeMgr.getIdentifierFactory().newColumnIdentifier(ci.getColumnName(), 
                 this.storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(String.class), null, true);
-            Column col = unvalidated.get(colName);
+            Column col = unvalidated.get(colIdentifier);
             if (col != null)
             {
                 if (validateColumnStructure)
                 {
                     col.initializeColumnInfoFromDatastore(ci);
                     col.validate(ci);
-                    unvalidated.remove(colName);
+                    unvalidated.remove(colIdentifier);
                 }
                 else
                 {
-                    unvalidated.remove(colName);
+                    unvalidated.remove(colIdentifier);
                 }
             }
         }
@@ -544,8 +542,7 @@ public abstract class TableImpl extends AbstractTable
     }
     
     /**
-     * Method to validate any indices for this table, and auto create any
-     * missing ones where required.
+     * Method to validate any indices for this table, and auto create any missing ones where required.
      * @param conn The JDBC Connection
      * @param autoCreate Whether to auto create any missing indices
      * @param autoCreateErrors Errors found during the auto-create process
@@ -791,18 +788,15 @@ public abstract class TableImpl extends AbstractTable
             return;
         }
 
-        /*
-         * There's no need to drop indices; we assume they'll go away quietly
-         * when the table is dropped.
-         */
+        // There's no need to drop indices; we assume they'll go away quietly when the table is dropped.
         HashSet fkNames = new HashSet();
         StoreSchemaHandler handler = storeMgr.getSchemaHandler();
         RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
         Iterator iter = fkInfo.getChildren().iterator();
         while (iter.hasNext())
         {
-            ForeignKeyInfo fki = (ForeignKeyInfo)iter.next();
             // JDBC drivers can return null names for foreign keys, so we then skip the DROP CONSTRAINT.
+            ForeignKeyInfo fki = (ForeignKeyInfo)iter.next();
             String fkName = (String)fki.getProperty("fk_name");
             if (fkName != null)
             {
@@ -856,10 +850,7 @@ public abstract class TableImpl extends AbstractTable
     {
         assertIsInitialized();
 
-        /*
-         * The following HashSet is to avoid the duplicate usage of columns that
-         * have already been used in conjunction with another column
-         */
+        // The following Set is to avoid the duplicate usage of columns that have already been used in conjunction with another column
         Set colsInFKs = new HashSet();
         ArrayList foreignKeys = new ArrayList();
         Iterator i = columns.iterator();
@@ -898,8 +889,7 @@ public abstract class TableImpl extends AbstractTable
     protected List getExpectedCandidateKeys()
     {
         assertIsInitialized();
-        ArrayList candidateKeys = new ArrayList();
-        return candidateKeys;
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -948,8 +938,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTablePKInfo tablePkInfo = (RDBMSTablePKInfo)handler.getSchemaData(conn, "primary-keys", 
-                new Object[] {this});
+            RDBMSTablePKInfo tablePkInfo = (RDBMSTablePKInfo)handler.getSchemaData(conn, "primary-keys", new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator pkColsIter = tablePkInfo.getChildren().iterator();
             while (pkColsIter.hasNext())
@@ -957,7 +946,7 @@ public abstract class TableImpl extends AbstractTable
                 PrimaryKeyInfo pkInfo = (PrimaryKeyInfo)pkColsIter.next();
                 String pkName = (String)pkInfo.getProperty("pk_name");
                 DatastoreIdentifier pkIdentifier;
-    
+
                 if (pkName == null)
                 {
                     pkIdentifier = idFactory.newPrimaryKeyIdentifier(this);
@@ -1454,8 +1443,7 @@ public abstract class TableImpl extends AbstractTable
                 }
                 datastoreMappingTypes.append(mapping.getDatastoreMapping(i).getClass().getName());
             }
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010",
-                memberName, columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010", memberName, columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
         }
     }
 }
