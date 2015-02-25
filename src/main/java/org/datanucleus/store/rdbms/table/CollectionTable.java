@@ -205,37 +205,18 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 orderColmd = mmd.getOrderMetaData().getColumnMetaData()[0];
                 if (orderColmd.getName() == null)
                 {
+                    // No column name so use default
                     orderColmd = new ColumnMetaData(orderColmd);
-                    if (mmd.hasExtension("adapter-column-name"))
-                    {
-                        // Specified "extension" column name
-                        // TODO Is this needed? The user can just specify <order column="...">
-                        orderColmd.setName(mmd.getValueForExtension("adapter-column-name"));
-                    }
-                    else
-                    {
-                        // No column name so use default
-                        DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
-                        orderColmd.setName(id.getName());
-                    }
+                    DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
+                    orderColmd.setName(id.getName());
                 }
             }
             else
             {
-                if (mmd.hasExtension("adapter-column-name"))
-                {
-                    // Specified "extension" column name
-                    // TODO Is this needed? The user can just specify <order column="...">
-                    orderColmd = new ColumnMetaData();
-                    orderColmd.setName(mmd.getValueForExtension("adapter-column-name"));
-                }
-                else
-                {
-                    // No column name so use default
-                    DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
-                    orderColmd = new ColumnMetaData();
-                    orderColmd.setName(id.getName());
-                }
+                // No column name so use default
+                DatastoreIdentifier id = storeMgr.getIdentifierFactory().newIndexFieldIdentifier(mmd);
+                orderColmd = new ColumnMetaData();
+                orderColmd.setName(id.getName());
             }
             orderMapping = storeMgr.getMappingManager().getMapping(int.class); // JDO2 spec [18.5] order column is assumed to be "int"
             ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, orderColmd, pkRequired && !pkColsSpecified);
