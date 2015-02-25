@@ -50,36 +50,32 @@ public abstract class ViewImpl extends AbstractTable
      * Constructor, taking the table identifier.
      * @param name The identifier for the table.
      * @param storeMgr The Store Manager
-     **/
+     */
     public ViewImpl(DatastoreIdentifier name, RDBMSStoreManager storeMgr)
     {
         super(name, storeMgr);
     }
 
     /**
-     * Pre initilize. For things that must be initialized right after constructor 
+     * Pre-initialise. For things that must be initialised right after constructor.
      * @param clr the ClassLoaderResolver
      */
     public void preInitialize(final ClassLoaderResolver clr)
     {
         assertIsUninitialized();
-        //nothing to do here
-    }    
-    
-    
+    }
+
     /**
-     * Post initilize. For things that must be set after all classes have been initialized before 
+     * Post initialise. For things that must be set after all classes have been initialised before.
      * @param clr the ClassLoaderResolver
      */
     public void postInitialize(final ClassLoaderResolver clr)
     {
         assertIsInitialized();
-        //nothing to do here
     }
-    
+
     /**
-     * Method to validate the view in the datastore. Validates the existence of
-     * the table, and then the specifications of the Columns.
+     * Method to validate the view in the datastore. Validates the existence of the table, and then the specifications of the Columns.
      * @param conn The JDBC Connection
      * @param validateColumnStructure Whether to validate down to column structure, or just their existence
      * @param autoCreate Whether to update the view to fix errors (not used).
@@ -111,34 +107,31 @@ public abstract class ViewImpl extends AbstractTable
         }
 
         // Validate the column(s)
-        Map<String, Column> unvalidated = new HashMap(columnsByName);
+        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByIdentifier);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {
             RDBMSColumnInfo ci = (RDBMSColumnInfo)i.next();
-            Column col = unvalidated.get(ci.getColumnName());
+            DatastoreIdentifier colIdentifier = storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, ci.getColumnName());
+            Column col = unvalidated.get(colIdentifier);
             if (col == null)
             {
-                DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, ci.getColumnName());
-                if (!hasColumnName(colName))
+                if (!hasColumnName(colIdentifier))
                 {
                     throw new UnexpectedColumnException(this.toString(), ci.getColumnName(), this.getSchemaName(), this.getCatalogName());
                 }
- 
-                /*
-                 * Otherwise it's a duplicate column name in the metadata and we ignore it.  Cloudscape is known to do this, although I think that's probably a bug.
-                 */
+                // Otherwise it's a duplicate column name in the metadata and we ignore it.  Cloudscape is known to do this, although I think that's probably a bug.
             }
             else
             {
                 if (validateColumnStructure)
                 {
                     col.validate(ci);
-                    unvalidated.remove(ci.getColumnName());
+                    unvalidated.remove(colIdentifier);
                 }
                 else
                 {
-                    unvalidated.remove(ci.getColumnName());
+                    unvalidated.remove(colIdentifier);
                 }
             }
         }
@@ -159,7 +152,7 @@ public abstract class ViewImpl extends AbstractTable
     /**
      * Internal method to generate the SQL statements for dropping the view.
      * @return The List of SQL statements.
-     **/
+     */
     protected List getSQLDropStatements()
     {
         assertIsInitialized();
@@ -173,7 +166,7 @@ public abstract class ViewImpl extends AbstractTable
     /**
      * Method to add a Column to the View.
      * @param col The column
-     **/
+     */
     protected synchronized void addColumnInternal(Column col)
     {
         if (col.isPrimaryKey())

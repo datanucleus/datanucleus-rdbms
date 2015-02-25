@@ -96,8 +96,8 @@ public abstract class AbstractTable implements Table
     /** Columns for this table. */
     protected List<org.datanucleus.store.schema.table.Column> columns = new ArrayList();
 
-    /** Index to the columns, keyed by name. TODO Key this by the column name, not its identifier. */
-    protected Map<DatastoreIdentifier, Column> columnsByName = new HashMap();
+    /** Index to the columns, keyed by name identifier. TODO Key this by the column name, not its identifier. */
+    protected Map<DatastoreIdentifier, Column> columnsByIdentifier = new HashMap();
 
     /** Fully qualified name of this table. */
     private String fullyQualifiedName;
@@ -391,7 +391,7 @@ public abstract class AbstractTable implements Table
             // 1. subclasses defining the duplicated column are using "super class table" strategy
             //
             // Find the MetaData for the existing column
-            Column existingCol = columnsByName.get(name);
+            Column existingCol = columnsByIdentifier.get(name);
             MetaData md = existingCol.getColumnMetaData().getParent();
             while (!(md instanceof AbstractClassMetaData))
             {
@@ -507,7 +507,7 @@ public abstract class AbstractTable implements Table
 	 */
 	public Column getColumn(DatastoreIdentifier identifier)
 	{
-	    return columnsByName.get(identifier);
+	    return columnsByIdentifier.get(identifier);
 	}
 
     /**
@@ -705,7 +705,7 @@ public abstract class AbstractTable implements Table
         DatastoreIdentifier colName = col.getIdentifier();
 
         columns.add(col);
-        columnsByName.put(colName, col);
+        columnsByIdentifier.put(colName, col);
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
@@ -720,7 +720,7 @@ public abstract class AbstractTable implements Table
      */
     protected boolean hasColumnName(DatastoreIdentifier colName)
     {
-        return columnsByName.get(colName) != null;
+        return columnsByIdentifier.get(colName) != null;
     }
 
     /**

@@ -2115,7 +2115,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             for (String columnName : columnNames)
             {
                 DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(columnName);
-                Column col = columnsByName.get(colName);
+                Column col = columnsByIdentifier.get(colName);
                 if (col == null)
                 {
                     NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058001", toString(), index.getName(), columnName));
@@ -2376,7 +2376,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 // Find the column and add to the source columns for the FK
                 DatastoreIdentifier colId = storeMgr.getIdentifierFactory().newColumnIdentifier(colmds[i].getName());
-                Column sourceCol = columnsByName.get(colId);
+                Column sourceCol = columnsByIdentifier.get(colId);
                 if (sourceCol == null)
                 {
                     NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058107", acmd.getFullClassName(), fkmd.getTable(), colmds[i].getName(), toString()));
@@ -2541,7 +2541,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             for (String columnName : columnNames)
             {
                 DatastoreIdentifier colName = storeMgr.getIdentifierFactory().newColumnIdentifier(columnName);
-                Column col = columnsByName.get(colName);
+                Column col = columnsByIdentifier.get(colName);
                 if (col == null)
                 {
                     NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("058202", toString(), ck.getName(), columnName));

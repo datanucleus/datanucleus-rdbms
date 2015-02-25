@@ -209,7 +209,7 @@ public abstract class TableImpl extends AbstractTable
     public boolean validateColumns(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors)
     throws SQLException
     {
-        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByName);
+        Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByIdentifier);
         List tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
         Iterator i = tableColInfo.iterator();
         while (i.hasNext())
@@ -297,7 +297,7 @@ public abstract class TableImpl extends AbstractTable
     public void initializeColumnInfoForPrimaryKeyColumns(Connection conn)
     throws SQLException
     {
-        Iterator<Column> i = columnsByName.values().iterator();
+        Iterator<Column> i = columnsByIdentifier.values().iterator();
         while (i.hasNext())
         {
             Column col = i.next();
@@ -320,7 +320,7 @@ public abstract class TableImpl extends AbstractTable
     public void initializeColumnInfoFromDatastore(Connection conn)
     throws SQLException
     {
-        Map<DatastoreIdentifier, Column> columns = new HashMap(columnsByName);
+        Map<DatastoreIdentifier, Column> columns = new HashMap(columnsByIdentifier);
         Iterator i = storeMgr.getColumnInfoForTable(this, conn).iterator();
         while (i.hasNext())
         {
@@ -889,7 +889,7 @@ public abstract class TableImpl extends AbstractTable
     protected List getExpectedCandidateKeys()
     {
         assertIsInitialized();
-        return Collections.EMPTY_LIST;
+        return new ArrayList();
     }
 
     /**
@@ -967,7 +967,7 @@ public abstract class TableImpl extends AbstractTable
                 int keySeq = (((Short)pkInfo.getProperty("key_seq")).shortValue()) - 1;
                 String colName = (String)pkInfo.getProperty("column_name");
                 DatastoreIdentifier colIdentifier = idFactory.newIdentifier(IdentifierType.COLUMN, colName);
-                Column col = columnsByName.get(colIdentifier);
+                Column col = columnsByIdentifier.get(colIdentifier);
     
                 if (col == null)
                 {
@@ -1027,7 +1027,7 @@ public abstract class TableImpl extends AbstractTable
                     String pkColumnName = (String)fkInfo.getProperty("pk_column_name");
                     DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, fkColumnName);
                     DatastoreIdentifier refColName = idFactory.newIdentifier(IdentifierType.COLUMN, pkColumnName);
-                    Column col = columnsByName.get(colName);
+                    Column col = columnsByIdentifier.get(colName);
                     Column refCol = refTable.getColumn(refColName);
                     if (col != null && refCol != null)
                     {
@@ -1087,7 +1087,7 @@ public abstract class TableImpl extends AbstractTable
                     // Set the column
                     int colSeq = ((Short)indexInfo.getProperty("ordinal_position")).shortValue() - 1;
                     DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, (String)indexInfo.getProperty("column_name"));
-                    Column col = columnsByName.get(colName);
+                    Column col = columnsByIdentifier.get(colName);
                     if (col != null)
                     {
                         key.setColumn(colSeq, col);
@@ -1140,7 +1140,7 @@ public abstract class TableImpl extends AbstractTable
                 // Set the column
                 int colSeq = ((Short)indexInfo.getProperty("ordinal_position")).shortValue() - 1;
                 DatastoreIdentifier colName = idFactory.newIdentifier(IdentifierType.COLUMN, (String)indexInfo.getProperty("column_name"));
-                Column col = columnsByName.get(colName);
+                Column col = columnsByIdentifier.get(colName);
                 if (col != null)
                 {
                     idx.setColumn(colSeq, col);
