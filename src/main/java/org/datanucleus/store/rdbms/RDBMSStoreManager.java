@@ -3309,32 +3309,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // DDL for creation. Note that this will allow more than once instance of tables with the same
                 // name (identifier) since when you have multiple inheritance trees each inheritance tree
                 // will have its own ClassTable, and you want both of these to pass through to schema generation.
-                tablesToValidate = new ArrayList();
+                List<Table> tmpTablesToValidate = new ArrayList();
                 for (Table tbl : tablesToValidate)
                 {
                     // This just checks the identifier name - see hashCode of Table. The commented out code below was the original, maybe useful if we find an example that needs it
-                    if (!tablesToValidate.contains(tbl))
+                    if (!tmpTablesToValidate.contains(tbl))
                     {
-                        tablesToValidate.add(tbl);
+                        tmpTablesToValidate.add(tbl);
                     }
-
-                  /*String tblRef1 = StringUtils.toJVMIDString(tbl.getIdentifier());
-                    boolean exists = false;
-                    for (DatastoreContainerObject resultTbl : result)
-                    {
-                        // Compare identifier reference since the same identifier name does not imply the same
-                        // table identifier
-                        String tblRef2 = StringUtils.toJVMIDString(resultTbl.getIdentifier());
-                        if (tblRef1.equals(tblRef2))
-                        {
-                            exists = true;
-                        }
-                    }
-                    if (!exists)
-                    {
-                        result.add(tbl);
-                    }*/
                 }
+                tablesToValidate = tmpTablesToValidate;
             }
 
             // Table existence and validation.
