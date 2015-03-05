@@ -113,16 +113,13 @@ public abstract class ElementContainerTable extends JoinTable
         // Add owner mapping
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
         ColumnMetaData[] columnMetaData = null;
-        if (mmd.getJoinMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData().length > 0)
+        if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getColumnMetaData() != null && mmd.getJoinMetaData().getColumnMetaData().length > 0)
         {
             // Column mappings defined at this side (1-N, M-N)
             // When specified at this side they use the <join> tag
             columnMetaData = mmd.getJoinMetaData().getColumnMetaData();
         }
-        else if (relatedMmds != null && relatedMmds[0].getElementMetaData() != null &&
-            relatedMmds[0].getElementMetaData().getColumnMetaData() != null &&
+        else if (relatedMmds != null && relatedMmds[0].getElementMetaData() != null && relatedMmds[0].getElementMetaData().getColumnMetaData() != null &&
             relatedMmds[0].getElementMetaData().getColumnMetaData().length > 0)
         {
             // Column mappings defined at other side (M-N)
@@ -130,8 +127,8 @@ public abstract class ElementContainerTable extends JoinTable
             // ** This is really only for Collections/Sets since M-N doesnt make sense for Lists/arrays **
             columnMetaData = relatedMmds[0].getElementMetaData().getColumnMetaData();
         }
-        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, 
-            storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+
+        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
@@ -151,8 +148,7 @@ public abstract class ElementContainerTable extends JoinTable
             colmd.setName(colName);
 
             boolean relationDiscriminatorPk = false;
-            if (mmd.hasExtension("relation-discriminator-pk") &&
-                mmd.getValueForExtension("relation-discriminator-pk").equalsIgnoreCase("true"))
+            if (mmd.hasExtension("relation-discriminator-pk") && mmd.getValueForExtension("relation-discriminator-pk").equalsIgnoreCase("true"))
             {
                 // Default this to not be part of the PK of the join table, but allow the user to override it
                 relationDiscriminatorPk = true;
@@ -379,8 +375,7 @@ public abstract class ElementContainerTable extends JoinTable
                 {
                     JavaTypeMapping embFieldMapping = embMapping.getJavaTypeMapping(i);
                     AbstractMemberMetaData embFmd = embFieldMapping.getMemberMetaData();
-                    if (ClassUtils.isReferenceType(embFmd.getType()) && 
-                        embFieldMapping instanceof ReferenceMapping)
+                    if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                     {
                         // Field is a reference type, so add a FK to the table of the PC for each PC implementation
                         Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
@@ -405,8 +400,7 @@ public abstract class ElementContainerTable extends JoinTable
                 for (int i=0;i<implJavaTypeMappings.length;i++)
                 {
                     JavaTypeMapping implMapping = implJavaTypeMappings[i];
-                    if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implMapping.getType(), clr) != null &&
-                        implMapping.getNumberOfDatastoreMappings() > 0)
+                    if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implMapping.getType(), clr) != null && implMapping.getNumberOfDatastoreMappings() > 0)
                     {
                         referencedTable = storeMgr.getDatastoreClass(implMapping.getType(), clr);
                         if (referencedTable != null)
@@ -570,8 +564,7 @@ public abstract class ElementContainerTable extends JoinTable
                     }
                     else
                     {
-                        throw new NucleusUserException("Unique key on join-table " + this + " has column " +
-                            columnName + " that is not found");
+                        throw new NucleusUserException("Unique key on join-table " + this + " has column " + columnName + " that is not found");
                     }
                 }
                 candidateKeys.add(uniKey);

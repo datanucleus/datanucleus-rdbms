@@ -101,17 +101,14 @@ public final class ColumnCreator
      * @param clr ClassLoader resolver
      * @return The java type mapping for this field
      */
-    public static JavaTypeMapping createColumnsForJoinTables(Class javaType, AbstractMemberMetaData mmd,
-            ColumnMetaData[] columnMetaData, RDBMSStoreManager storeMgr, Table table,
+    public static JavaTypeMapping createColumnsForJoinTables(Class javaType, AbstractMemberMetaData mmd, ColumnMetaData[] columnMetaData, RDBMSStoreManager storeMgr, Table table,
             boolean primaryKey, boolean nullable, FieldRole fieldRole, ClassLoaderResolver clr)
     {
         // Collection<PC>, Map<PC>, PC[]
-        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(javaType, false, false, 
-            mmd.getFullFieldName());
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(javaType, false, false, mmd.getFullFieldName());
         mapping.setTable(table);
         // TODO Remove this when PCMapping creates its own columns
-        createColumnsForField(javaType, mapping, table, storeMgr, mmd, primaryKey, nullable, 
-            false, false, fieldRole, columnMetaData, clr, false);
+        createColumnsForField(javaType, mapping, table, storeMgr, mmd, primaryKey, nullable, false, false, fieldRole, columnMetaData, clr, false);
         return mapping;
     }
 
@@ -132,31 +129,28 @@ public final class ColumnCreator
      * @param isReferenceField Whether this field is part of a reference field
      * @return The JavaTypeMapping for the table
      */
-    public static JavaTypeMapping createColumnsForField(Class javaType, JavaTypeMapping mapping,
-            Table table, RDBMSStoreManager storeMgr, AbstractMemberMetaData mmd,
+    public static JavaTypeMapping createColumnsForField(Class javaType, JavaTypeMapping mapping, Table table, RDBMSStoreManager storeMgr, AbstractMemberMetaData mmd,
             boolean isPrimaryKey, boolean isNullable, boolean serialised, boolean embedded,
             FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr, boolean isReferenceField)
     {
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-        if (mapping instanceof ReferenceMapping ||
-            mapping instanceof PersistableMapping)
+        if (mapping instanceof ReferenceMapping || mapping instanceof PersistableMapping)
         {
             // PC/interface/Object mapping
             JavaTypeMapping container = mapping;
             if (mapping instanceof ReferenceMapping)
             {
                 // Interface/Object has child mappings for each implementation
-                container = storeMgr.getMappingManager().getMapping(javaType, serialised, embedded,
-                    mmd != null ? mmd.getFullFieldName() : null);
+                container = storeMgr.getMappingManager().getMapping(javaType, serialised, embedded, mmd != null ? mmd.getFullFieldName() : null);
                 ((ReferenceMapping) mapping).addJavaTypeMapping(container);
             }
 
-            // Get the table that we want our column to be a FK to
-            // This could be the owner table, element table, key table, value table etc
+            // Get the table that we want our column to be a FK to. This could be the owner table, element table, key table, value table etc
             DatastoreClass destinationTable = storeMgr.getDatastoreClass(javaType.getName(), clr);
             if (destinationTable == null)
             {
                 // Maybe the owner hasn't got its own table (e.g "subclass-table" inheritance strategy)
+                // Alternate is when we have an embedded type which itself has an embedded collection - not catered for at all currently
                 AbstractClassMetaData ownerCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr);
                 AbstractClassMetaData[] ownerCmds = storeMgr.getClassesManagingTableForClass(ownerCmd, clr);
                 if (ownerCmds == null || ownerCmds.length == 0)
@@ -177,14 +171,11 @@ public final class ColumnCreator
                 {
                     columnContainer = (ColumnMetaDataContainer)columnMetaData[0].getParent();
                 }
-                CorrespondentColumnsMapper correspondentColumnsMapping =
-                    new CorrespondentColumnsMapper(columnContainer, columnMetaData, m, true);
+                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(columnContainer, columnMetaData, m, true);
                 for (int i=0; i<m.getNumberOfDatastoreMappings(); i++)
                 {
-                    JavaTypeMapping refDatastoreMapping =
-                        storeMgr.getMappingManager().getMapping(m.getDatastoreMapping(i).getJavaTypeMapping().getJavaType());
-                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(
-                        m.getDatastoreMapping(i).getColumn().getIdentifier());
+                    JavaTypeMapping refDatastoreMapping = storeMgr.getMappingManager().getMapping(m.getDatastoreMapping(i).getJavaTypeMapping().getJavaType());
+                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(m.getDatastoreMapping(i).getColumn().getIdentifier());
                     try
                     {
                         DatastoreIdentifier identifier = null;
@@ -194,8 +185,7 @@ public final class ColumnCreator
                             if (isReferenceField)
                             {
                                 // Create reference identifier
-                                identifier = idFactory.newReferenceFieldIdentifier(mmd, 
-                                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr),
+                                identifier = idFactory.newReferenceFieldIdentifier(mmd, storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr),
                                     m.getDatastoreMapping(i).getColumn().getIdentifier(),
                                     storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                             }
@@ -204,8 +194,7 @@ public final class ColumnCreator
                                 // Create join table identifier (FK using destination table identifier)
                                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                                 // TODO Cater for more than 1 related field
-                                identifier = idFactory.newJoinTableFieldIdentifier(mmd, 
-                                    relatedMmds != null ? relatedMmds[0] : null,
+                                identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
                                     m.getDatastoreMapping(i).getColumn().getIdentifier(), 
                                     storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                             }
@@ -259,8 +248,7 @@ public final class ColumnCreator
             else
             {
                 // No user-supplied name so generate one
-                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, 
-                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
+                identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
             }
             column = table.addColumn(javaType.getName(), identifier, mapping, colmd);
             storeMgr.getMappingManager().createDatastoreMapping(mapping, column, mapping.getJavaTypeForDatastoreMapping(0));
