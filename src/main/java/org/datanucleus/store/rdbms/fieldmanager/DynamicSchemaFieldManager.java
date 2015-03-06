@@ -23,6 +23,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
@@ -88,8 +89,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
         ExecutionContext ec = op.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
-        AbstractMemberMetaData mmd = 
-            op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         DatastoreClass table = rdbmsMgr.getDatastoreClass(op.getObject().getClass().getName(), clr);
         JavaTypeMapping fieldMapping = table.getMemberMapping(mmd);
         if (fieldMapping != null)
@@ -100,7 +100,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
                 InterfaceMapping intfMapping = (InterfaceMapping)fieldMapping;
                 if (mmd != null)
                 {
-                    if (mmd.getFieldTypes() != null || mmd.hasExtension("implementation-classes"))
+                    if (mmd.getFieldTypes() != null || mmd.hasExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES))
                     {
                         // Field is defined to not accept this type so just return
                         return;
@@ -236,8 +236,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
                     NucleusLogger.DATASTORE_SCHEMA.debug("Dynamic schema updates : field=" + mmd.getFullFieldName() + 
-                        " has an interface mapping yet " + StringUtils.toJVMIDString(value) + 
-                    " is not a known implementation - trying to update the schema ...");
+                        " has an interface mapping yet " + StringUtils.toJVMIDString(value) + " is not a known implementation - trying to update the schema ...");
                 }
 
                 // Make sure the metadata for this value class is loaded (may be first encounter)
@@ -253,8 +252,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
                     {
                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.debug("Dynamic schema updates : field=" + 
-                                mmd.getFullFieldName() + " has a new implementation available so reinitialising its mapping");
+                            NucleusLogger.DATASTORE_SCHEMA.debug("Dynamic schema updates : field=" + mmd.getFullFieldName() + " has a new implementation available so reinitialising its mapping");
                         }
                         intfMapping.initialize(mmd, intfMapping.getTable(), clr);
                         intfMapping.getStoreManager().validateTable((TableImpl)intfMapping.getTable(), clr);
