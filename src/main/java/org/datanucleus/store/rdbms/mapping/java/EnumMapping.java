@@ -19,7 +19,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
-import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,12 +29,11 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping for Enum type.
@@ -99,22 +97,10 @@ public class EnumMapping extends SingleFieldMapping
                         return valueStrings;
                     }
 
-                    String getValueMethodName = getGetValueMethodName();
-                    if (getValueMethodName != null)
-                    {
-                        // Using getValue method for persisted value so set values to possible values
-                        Integer[] valueInts = new Integer[values.length];
-                        for (int i=0;i<values.length;i++)
-                        {
-                            valueInts[i] = getValueForEnumUsingMethod(values[i], getValueMethodName, values[i].ordinal());
-                        }
-                        return valueInts;
-                    }
-
                     Integer[] valueInts = new Integer[values.length];
                     for (int i=0;i<values.length;i++)
                     {
-                        valueInts[i] = values[i].ordinal();
+                        valueInts[i] = (int)TypeConversionHelper.getValueFromEnum(mmd, roleForMember, values[i]);
                     }
                     return valueInts;
                 }
@@ -163,13 +149,7 @@ public class EnumMapping extends SingleFieldMapping
         {
             if (value instanceof Enum)
             {
-                int intVal = ((Enum)value).ordinal();
-                String methodName = getGetValueMethodName();
-                if (methodName != null)
-                {
-                    intVal = getValueForEnumUsingMethod((Enum) value, methodName, intVal);
-                }
-
+                int intVal = (int)TypeConversionHelper.getValueFromEnum(mmd, roleForMember, (Enum)value);
                 getDatastoreMapping(0).setInt(ps, exprIndex[0], intVal);
             }
             else if (value instanceof BigInteger)
@@ -199,39 +179,6 @@ public class EnumMapping extends SingleFieldMapping
     }
 
     /**
-     * Convenience method to get the value to be persisted for an Enum via a method call.
-     * @param value The Enum value
-     * @param methodName The name of the method
-     * @return The value to use (or null if not valid)
-     */
-    protected Long getValueForEnumUsingMethod(Enum value, String methodName)
-    {
-        // Case where the user has defined their own "value" for each enum. Assumes the method returns a Number (something that we can get an int from)
-        try
-        {
-            Method getterMethod = ClassUtils.getMethodForClass(value.getClass(), methodName, null);
-            Number num = (Number)getterMethod.invoke(value);
-            return Long.valueOf(num.longValue());
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.PERSISTENCE.warn("Specified enum value-getter for method " + methodName + " on field " + mmd.getFullFieldName() +
-                " gave an error on extracting the value", e);
-        }
-        return null;
-    }
-
-    public int getValueForEnumUsingMethod(Enum value, String methodName, int defaultVal)
-    {
-        Long longVal = getValueForEnumUsingMethod(value, methodName);
-        if (longVal != null)
-        {
-            return longVal.intValue();
-        }
-        return defaultVal;
-    }
-
-    /**
      * Method to extract the Enum object from the passed result set.
      * @param ec ExecutionContext
      * @param resultSet The result set
@@ -256,62 +203,10 @@ public class EnumMapping extends SingleFieldMapping
             if (mmd == null)
             {
                 enumType = ec.getClassLoaderResolver().classForName(type);
+                return enumType.getEnumConstants()[(int)longVal];
             }
-            else
-            {
-                enumType = mmd.getType();
-                if (roleForMember == FieldRole.ROLE_FIELD)
-                {
-                    if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
-                    {
-                        // Case where the user has defined their own "value" for each enum
-                        String getterMethodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
-                        return getEnumValueForMethod(enumType, longVal, getterMethodName);
-                    }
-                }
 
-                if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
-                    if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
-                    {
-                        // Case where the user has defined their own "value" for each enum
-                        String getterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
-                        return getEnumValueForMethod(enumType, longVal, getterMethodName);
-                    }
-                }
-                else if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getArray().getElementType());
-                    if (mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
-                    {
-                        // Case where the user has defined their own "value" for each enum
-                        String getterMethodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
-                        return getEnumValueForMethod(enumType, longVal, getterMethodName);
-                    }
-                }
-                else if (roleForMember == FieldRole.ROLE_MAP_KEY)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getKeyType());
-                    if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
-                    {
-                        // Case where the user has defined their own "value" for each enum
-                        String getterMethodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
-                        return getEnumValueForMethod(enumType, longVal, getterMethodName);
-                    }
-                }
-                else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getValueType());
-                    if (mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE))
-                    {
-                        // Case where the user has defined their own "value" for each enum
-                        String getterMethodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_GETTER_BY_VALUE);
-                        return getEnumValueForMethod(enumType, longVal, getterMethodName);
-                    }
-                }
-            }
-            return enumType.getEnumConstants()[(int)longVal];
+            return TypeConversionHelper.getEnumFromValue(mmd, roleForMember, ec, longVal);
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
@@ -347,81 +242,5 @@ public class EnumMapping extends SingleFieldMapping
         {
             return super.getObject(ec, resultSet, exprIndex);
         }
-    }
-
-    /**
-     * Convenience method to return the value of an Enum using a static getter method, passing in a value.
-     * @param enumType The type of the enum
-     * @param val The value to pass in
-     * @param methodName Name of the static method
-     * @return The Enum value
-     */
-    protected Object getEnumValueForMethod(Class enumType, long val, String methodName)
-    {
-        // Case where the user has defined their own "value" for each enum
-        // Assumes the method takes in a short/int, and returns the Enum);
-        try
-        {
-            Method getterMethod = ClassUtils.getMethodForClass(enumType, methodName, new Class[] {short.class});
-            return getterMethod.invoke(null, new Object[] {(short)val});
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.PERSISTENCE.warn("Specified enum getter-by-value for field " + mmd.getFullFieldName() +
-                " gave an error on extracting the enum so just using the ordinal : " + e.getMessage());
-        }
-        try
-        {
-            Method getterMethod = ClassUtils.getMethodForClass(enumType, methodName, new Class[] {int.class});
-            return getterMethod.invoke(null, new Object[] {(int)val});
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.PERSISTENCE.warn("Specified enum getter-by-value for field " + mmd.getFullFieldName() +
-                " gave an error on extracting the enum so just using the ordinal : " + e.getMessage());
-        }
-        return null;
-    }
-
-    /**
-     * Accessor for the "getValue" getter name if that extension is enabled for this mapping.
-     * @return Method name for "getValue" (or null if not used)
-     */
-    public String getGetValueMethodName()
-    {
-        String methodName = null;
-        if (roleForMember == FieldRole.ROLE_FIELD)
-        {
-            if (mmd != null && mmd.hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
-            {
-                // Case where the user has defined their own "value" for each enum
-                methodName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-            }
-        }
-        else if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT || roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
-        {
-            if (mmd != null && mmd.getElementMetaData() != null && mmd.getElementMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
-            {
-                // Case where the user has defined their own "value" for each enum
-                methodName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-            }
-        }
-        else if (roleForMember == FieldRole.ROLE_MAP_KEY)
-        {
-            if (mmd != null && mmd.getKeyMetaData() != null && mmd.getKeyMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
-            {
-                // Case where the user has defined their own "value" for each enum
-                methodName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-            }
-        }
-        else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
-        {
-            if (mmd != null && mmd.getValueMetaData() != null && mmd.getValueMetaData().hasExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER))
-            {
-                // Case where the user has defined their own "value" for each enum
-                methodName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_ENUM_VALUE_GETTER);
-            }
-        }
-        return methodName;
     }
 }
