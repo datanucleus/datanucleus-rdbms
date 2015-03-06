@@ -46,6 +46,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
@@ -738,7 +739,7 @@ public class InsertRequest extends Request
                     // Fields to be "inserted" (that have a datastore column)
 
                     // Check if the field is "insertable" (either using JPA column, or JDO extension)
-                    if (mmd.hasExtension("insertable") && mmd.getValueForExtension("insertable").equalsIgnoreCase("false"))
+                    if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_INSERTABLE) && mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_INSERTABLE).equalsIgnoreCase("false"))
                     {
                         return;
                     }

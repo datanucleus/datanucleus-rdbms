@@ -339,24 +339,24 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
         if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
         {
-            if ("true".equalsIgnoreCase(cmd.getValueForExtension("multitenancy-disable")))
+            if ("true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE)))
             {
                 // Don't bother with multitenancy for this class
             }
             else
             {
                 ColumnMetaData colmd = new ColumnMetaData();
-                if (cmd.hasExtension("multitenancy-column-name"))
+                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
                 {
-                    colmd.setName(cmd.getValueForExtension("multitenancy-column-name"));
+                    colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME));
                 }
-                if (cmd.hasExtension("multitenancy-jdbc-type"))
+                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
                 {
-                    colmd.setJdbcType(cmd.getValueForExtension("multitenancy-jdbc-type"));
+                    colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
                 }
-                if (cmd.hasExtension("multitenancy-column-length"))
+                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH))
                 {
-                    colmd.setLength(cmd.getValueForExtension("multitenancy-column-length"));
+                    colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
                 }
                 addMultitenancyMapping(colmd);
             }

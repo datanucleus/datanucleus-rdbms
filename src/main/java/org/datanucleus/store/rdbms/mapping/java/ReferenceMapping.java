@@ -39,6 +39,7 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.KeyMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.ValueMetaData;
 import org.datanucleus.state.ObjectProvider;
@@ -302,10 +303,10 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     void createPerImplementationColumnsForReferenceField(boolean pk, boolean nullable, boolean serialised, boolean embedded, FieldRole fieldRole, 
             ColumnMetaData[] columnMetaData, ClassLoaderResolver clr)
     {
-        if (this instanceof InterfaceMapping && mmd != null && mmd.hasExtension("implementation-classes"))
+        if (this instanceof InterfaceMapping && mmd != null && mmd.hasExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES))
         {
             // Store the implementation-classes with the mapping (persistent interfaces?)
-            ((InterfaceMapping) this).setImplementationClasses(mmd.getValueForExtension("implementation-classes"));
+            ((InterfaceMapping) this).setImplementationClasses(mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES));
         }
 
         // Find the available implementations that we are creating columns for

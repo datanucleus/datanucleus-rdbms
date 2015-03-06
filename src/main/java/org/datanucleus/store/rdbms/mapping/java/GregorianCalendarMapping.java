@@ -30,8 +30,10 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.NucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 
@@ -71,7 +73,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
                 // 2 columns specified so use that handling
                 singleColumn = false;
             }
-            else if (mmd.hasExtension("calendar-one-column") && mmd.getValueForExtension("calendar-one-column").equals("false"))
+            else if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_CALENDAR_ONE_COLUMN) && mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_CALENDAR_ONE_COLUMN).equals("false"))
             {
                 singleColumn = false;
             }
@@ -209,7 +211,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTimeInMillis(ts.getTime());
 
-            String timezoneID = ec.getNucleusContext().getConfiguration().getStringProperty("datanucleus.ServerTimeZoneID");
+            String timezoneID = ec.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
             if (timezoneID != null)
             {
                 // Apply server timezone ID since we dont know what it was upon persistence

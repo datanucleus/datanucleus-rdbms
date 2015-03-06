@@ -38,6 +38,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.ObjectProvider;
@@ -506,7 +507,7 @@ public class UpdateRequest extends Request
             if (m.includeInUpdateStatement())
             {
                 // Check if the field is "updatable" (either using JPA column, or JDO extension)
-                if (fmd.hasExtension("updateable") && fmd.getValueForExtension("updateable").equalsIgnoreCase("false"))
+                if (fmd.hasExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE) && fmd.getValueForExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE).equalsIgnoreCase("false"))
                 {
                     return;
                 }
