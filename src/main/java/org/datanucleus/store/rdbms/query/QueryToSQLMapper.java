@@ -798,6 +798,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 // TODO Check for special case of candidate+subclasses stores in same table with discriminator, so select FetchGroup of subclasses also
             }
 
+            int maxFetchDepth = fetchPlan.getMaxFetchDepth();
+            if (maxFetchDepth < 0)
+            {
+                maxFetchDepth = 3; // TODO Arbitrary
+            }
             if (options.contains(OPTION_SELECT_CANDIDATE_ID_ONLY))
             {
                 SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
@@ -806,12 +811,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 // Select fetch-plan members of the candidate (and optionally the next level of sub-objects)
                 // Don't select next level when we are processing a subquery
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
+                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
             }
             else if (candidateCmd.getInheritanceMetaData() != null && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
             {
                 // complete-table should have all fields of superclass present in all unions, so try to select fetch plan
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? 1 : 0);
+                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
             }
             else
             {
