@@ -31,7 +31,6 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
-import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -89,8 +88,7 @@ public class SQLStatementHelper
         SQLController sqlControl = sqlStmt.getRDBMSManager().getSQLController();
 
         // Generate the statement using the statement text
-        PreparedStatement ps = sqlControl.getStatementForQuery(mconn, sqlText.toString(), 
-            resultSetType, resultSetConcurrency);
+        PreparedStatement ps = sqlControl.getStatementForQuery(mconn, sqlText.toString(), resultSetType, resultSetConcurrency);
 
         boolean done = false;
         try
@@ -208,13 +206,11 @@ public class SQLStatementHelper
                     {
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            colValue = mapping.getValueForDatastoreMapping(ec.getNucleusContext(), 
-                                param.getColumnNumber(), value);
+                            colValue = mapping.getValueForDatastoreMapping(ec.getNucleusContext(), param.getColumnNumber(), value);
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            colValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(value,
-                                param.getColumnNumber(), cmd, storeMgr, ec.getClassLoaderResolver());
+                            colValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(value, param.getColumnNumber(), cmd, storeMgr, ec.getClassLoaderResolver());
                         }
                     }
                     mapping.getDatastoreMapping(param.getColumnNumber()).setObject(ps, num, colValue);
@@ -248,8 +244,7 @@ public class SQLStatementHelper
                             // Set whole object and only 1 column
                             mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), value);
                         }
-                        else if (mapping.getNumberOfDatastoreMappings() > 1 && 
-                            param.getColumnNumber() == (mapping.getNumberOfDatastoreMappings()-1))
+                        else if (mapping.getNumberOfDatastoreMappings() > 1 && param.getColumnNumber() == (mapping.getNumberOfDatastoreMappings()-1))
                         {
                             // Set whole object and this is the last parameter entry for it, so set now
                             mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num - mapping.getNumberOfDatastoreMappings()+1, mapping), value);
@@ -270,8 +265,7 @@ public class SQLStatementHelper
      * @param clr ClassLoader resolver
      * @return Value of this index of the PK field
      */
-    public static Object getValueForPrimaryKeyIndexOfObjectUsingReflection(Object value, int index, 
-            AbstractClassMetaData cmd, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
+    public static Object getValueForPrimaryKeyIndexOfObjectUsingReflection(Object value, int index, AbstractClassMetaData cmd, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
     {
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
@@ -300,8 +294,7 @@ public class SQLStatementHelper
                 AbstractClassMetaData subCmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
                 DatastoreClass subTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                 JavaTypeMapping subMapping = subTable.getIdMapping();
-                Object subValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(memberValue, index-position, 
-                    subCmd, storeMgr, clr);
+                Object subValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(memberValue, index-position, subCmd, storeMgr, clr);
                 if (index < position + subMapping.getNumberOfDatastoreMappings())
                 {
                     return subValue;
@@ -333,13 +326,11 @@ public class SQLStatementHelper
      * table is a secondary table then the join will be defined by the meta-data for the secondary table.
      * If this table group is NOT the candidate table group then LEFT OUTER JOIN will be used.
      * @param stmt The statement
-     * @param sqlTbl SQLTable to start from for the supplied mapping (may be in super-table,
-     *     or secondary-table of this)
+     * @param sqlTbl SQLTable to start from for the supplied mapping (may be in super-table, or secondary-table of this)
      * @param mapping The mapping
      * @return The SQLTable for this mapping (may have been added to the statement during this method)
      */
-    public static SQLTable getSQLTableForMappingOfTable(SQLStatement stmt, SQLTable sqlTbl, 
-            JavaTypeMapping mapping)
+    public static SQLTable getSQLTableForMappingOfTable(SQLStatement stmt, SQLTable sqlTbl, JavaTypeMapping mapping)
     {
         Table table = sqlTbl.getTable();
         if (table instanceof SecondaryDatastoreClass || table instanceof JoinTable)
@@ -399,14 +390,12 @@ public class SQLStatementHelper
                 if (innerJoin && !forceLeftOuter)
                 {
                     // Add join from {sourceTbl}.ID to {secondaryTbl}.ID
-                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                        mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
                 else
                 {
                     // Add join from {sourceTbl}.ID to {secondaryTbl}.ID
-                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                        mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
             }
             else
@@ -414,14 +403,12 @@ public class SQLStatementHelper
                 if (forceLeftOuter)
                 {
                     // Add join from {sourceTbl}.ID to {superclassTbl}.ID
-                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                        mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
                 else
                 {
                     // Add join from {sourceTbl}.ID to {superclassTbl}.ID
-                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                        mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
             }
         }
@@ -438,8 +425,7 @@ public class SQLStatementHelper
      * @param mappingDefinition Mapping definition for result columns
      * @param candidateCmd The candidate class meta-data
      */
-    public static void selectIdentityOfCandidateInStatement(SQLStatement stmt,
-            StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd)
+    public static void selectIdentityOfCandidateInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd)
     {
         DatastoreClass candidateTbl = (DatastoreClass)stmt.getPrimaryTable().getTable();
 
@@ -478,8 +464,7 @@ public class SQLStatementHelper
         if (verMapping != null)
         {
             // Version surrogate column (adds inner join to any required superclass table)
-            SQLTable versionSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt,
-                stmt.getPrimaryTable(), verMapping);
+            SQLTable versionSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, stmt.getPrimaryTable(), verMapping);
             int[] colNumbers = stmt.select(versionSqlTbl, verMapping, "DN_VERSION", false);
             if (mappingDefinition != null)
             {
@@ -493,8 +478,7 @@ public class SQLStatementHelper
         if (discrimMapping != null)
         {
             // Discriminator surrogate column (adds inner join to any required superclass table)
-            SQLTable discrimSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt,
-                stmt.getPrimaryTable(), discrimMapping);
+            SQLTable discrimSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, stmt.getPrimaryTable(), discrimMapping);
             int[] colNumbers = stmt.select(discrimSqlTbl, discrimMapping, "DN_DISCRIM", false);
             if (mappingDefinition != null)
             {
@@ -526,12 +510,10 @@ public class SQLStatementHelper
      * @param fetchPlan FetchPlan in use
      * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
      */
-    public static void selectFetchPlanOfCandidateInStatement(SQLStatement stmt,
-            StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd,
+    public static void selectFetchPlanOfCandidateInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd,
             FetchPlan fetchPlan, int maxFetchDepth)
     {
-        selectFetchPlanOfSourceClassInStatement(stmt, mappingDefinition, fetchPlan,
-            stmt.getPrimaryTable(), candidateCmd, maxFetchDepth);
+        selectFetchPlanOfSourceClassInStatement(stmt, mappingDefinition, fetchPlan, stmt.getPrimaryTable(), candidateCmd, maxFetchDepth);
     }
 
     /**
@@ -547,18 +529,15 @@ public class SQLStatementHelper
      * @param sourceCmd Meta-data for the source class
      * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
      */
-    public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt,
-            StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
-            SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd,
-            int maxFetchDepth)
+    public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+            SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd, int maxFetchDepth)
     {
         DatastoreClass sourceTbl = (DatastoreClass)sourceSqlTbl.getTable();
         int[] fieldNumbers;
         if (fetchPlan != null)
         {
             // Use FetchPlan fields
-            FetchPlanForClass fpc = fetchPlan.getFetchPlanForClass(sourceCmd);
-            fieldNumbers = fpc.getMemberNumbers();
+            fieldNumbers = fetchPlan.getFetchPlanForClass(sourceCmd).getMemberNumbers();
         }
         else
         {
@@ -569,10 +548,8 @@ public class SQLStatementHelper
         ClassLoaderResolver clr = stmt.getRDBMSManager().getNucleusContext().getClassLoaderResolver(null);
         for (int i=0;i<fieldNumbers.length;i++)
         {
-            AbstractMemberMetaData mmd =
-                sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-            selectMemberOfSourceInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr,
-                maxFetchDepth);
+            AbstractMemberMetaData mmd = sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+            selectMemberOfSourceInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchDepth);
         }
 
         if (sourceCmd.getIdentityType() == IdentityType.DATASTORE)
@@ -629,10 +606,8 @@ public class SQLStatementHelper
      * @param clr ClassLoader resolver
      * @param maxFetchPlanLimit Max fetch depth from this point to select (0 implies no other objects)
      */
-    public static void selectMemberOfSourceInStatement(SQLStatement stmt,
-            StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
-            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr,
-            int maxFetchPlanLimit)
+    public static void selectMemberOfSourceInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit)
     {
         boolean selectSubobjects = false;
         if (maxFetchPlanLimit > 0)
@@ -664,15 +639,13 @@ public class SQLStatementHelper
 
                 boolean selectFK = true;
                 if (selectSubobjects && (relationType == RelationType.ONE_TO_ONE_UNI ||
-                    (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)) &&
-                    !mmd.isSerialized() && !mmd.isEmbedded())
+                    (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)) && !mmd.isSerialized() && !mmd.isEmbedded())
                 {
                     // Related object with FK at this side
                     selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, 
                         maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl);
                 }
-                else if (selectSubobjects && (!mmd.isEmbedded() && !mmd.isSerialized()) &&
-                        relationType == RelationType.MANY_TO_ONE_BI)
+                else if (selectSubobjects && (!mmd.isEmbedded() && !mmd.isSerialized()) && relationType == RelationType.MANY_TO_ONE_BI)
                 {
                     AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                     if (mmd.getJoinMetaData() != null || relatedMmds[0].getJoinMetaData() != null)
@@ -687,9 +660,7 @@ public class SQLStatementHelper
                         {
                             // Join to the join table
                             JavaTypeMapping referenceMapping = collTable.getElementMapping();
-                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
-                                sourceSqlTbl.getTable().getIdMapping(),
-                                collTable, null, referenceMapping, null, tableGroupName);
+                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), collTable, null, referenceMapping, null, tableGroupName);
                         }
                         else
                         {
@@ -706,8 +677,7 @@ public class SQLStatementHelper
                     {
                         // N-1 bidirectional FK relation
                         // Related object with FK at this side, so join/select related object as required
-                        selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, 
-                            sourceSqlTbl, mmd, clr, maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl);
+                        selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl);
                     }
                 }
                 if (selectFK)
@@ -758,8 +728,7 @@ public class SQLStatementHelper
                     Object[] discrimValues = null;
                     JavaTypeMapping relatedTypeMapping = null;
                     AbstractClassMetaData relatedCmd = relatedMmd.getAbstractClassMetaData();
-                    if (relatedDiscrimMapping != null &&
-                        (relatedCmd.getSuperAbstractClassMetaData() != null || !relatedCmd.getFullClassName().equals(mmd.getTypeName())))
+                    if (relatedDiscrimMapping != null && (relatedCmd.getSuperAbstractClassMetaData() != null || !relatedCmd.getFullClassName().equals(mmd.getTypeName())))
                     {
                         // Related table has a discriminator and the field can store other types
                         List discValueList = null;
@@ -807,11 +776,9 @@ public class SQLStatementHelper
                                 // Nullable - left outer join from {sourceTable}.ID to {relatedBaseTable}.FK
                                 // and inner join from {relatedBaseTable}.ID to {relatedTable}.ID
                                 // (joins the relation and restricts to the right type)
-                                relatedSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
-                                    sourceSqlTbl.getTable().getIdMapping(),
+                                relatedSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
                                     relatedMapping.getTable(), null, relatedMapping, null, tableGroupName);
-                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl,
-                                    relatedMapping.getTable().getIdMapping(),
+                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl, relatedMapping.getTable().getIdMapping(),
                                     relatedTbl, null, relatedTbl.getIdMapping(), null, tableGroupName);
                             }
                             else
@@ -819,26 +786,22 @@ public class SQLStatementHelper
                                 // Not nullable - inner join from {sourceTable}.ID to {relatedBaseTable}.FK
                                 // and inner join from {relatedBaseTable}.ID to {relatedTable}.ID
                                 // (joins the relation and restricts to the right type)
-                                relatedSqlTbl = stmt.innerJoin(sourceSqlTbl,
-                                    sourceSqlTbl.getTable().getIdMapping(),
+                                relatedSqlTbl = stmt.innerJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
                                     relatedMapping.getTable(), null, relatedMapping, null, tableGroupName);
-                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl,
-                                    relatedMapping.getTable().getIdMapping(),
+                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl, relatedMapping.getTable().getIdMapping(),
                                     relatedTbl, null, relatedTbl.getIdMapping(), null, tableGroupName);
                             }
                         }
                         else
                         {
                             // Join the 1-1 relation
-                            relatedSqlTbl = addJoinForOneToOneRelation(stmt,
-                                sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
+                            relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
                                 relatedMapping, relationTbl, null, null, tableGroupName, null);
                         }
 
                         // Select the id mapping in the subclass of the related table
                         // Note this adds an inner join from relatedTable to its subclass
-                        relatedSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, relatedSqlTbl,
-                            relatedTbl.getIdMapping());
+                        relatedSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, relatedSqlTbl, relatedTbl.getIdMapping());
                         int[] colNumbers = stmt.select(relatedSqlTbl, relatedTbl.getIdMapping(), null);
                         stmtMapping.setColumnPositions(colNumbers);
                     }
@@ -847,12 +810,10 @@ public class SQLStatementHelper
                     {
                         // Select the fetch-plan fields of the related object
                         StatementClassMapping subMappingDefinition = new StatementClassMapping(null, mmd.getName());
-                        selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan,
-                            relatedSqlTbl, relatedMmd.getAbstractClassMetaData(), maxFetchPlanLimit-1);
+                        selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedMmd.getAbstractClassMetaData(), maxFetchPlanLimit-1);
                         if (mappingDefinition != null)
                         {
-                            mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(),
-                                subMappingDefinition);
+                            mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(), subMappingDefinition);
                         }
                     }
                 }
@@ -871,8 +832,7 @@ public class SQLStatementHelper
                         {
                             // Join to the join table
                             JavaTypeMapping referenceMapping = collTable.getElementMapping();
-                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
-                                sourceSqlTbl.getTable().getIdMapping(),
+                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
                                 collTable, null, referenceMapping, null, tableGroupName + "_JOIN");
                         }
                         else
@@ -891,8 +851,7 @@ public class SQLStatementHelper
                 {
                     // Add left outer join from {sourceTable}.ID to {joinTable}.OWNER_FK
                     PersistableJoinTable joinTable = (PersistableJoinTable) storeMgr.getTable(mmd);
-                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl,
-                        sourceSqlTbl.getTable().getIdMapping(),
+                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
                         joinTable, null, joinTable.getOwnerMapping(), null, tableGroupName + "_JOIN");
 
                     int[] colNumbers = stmt.select(joinSqlTbl, joinTable.getRelatedMapping(), null);
@@ -912,10 +871,8 @@ public class SQLStatementHelper
      * via an FK at this side.
      * @return Whether the caller should select the FK themselves (i.e we haven't selected anything)
      */
-    private static boolean selectFetchPlanFieldsOfFKRelatedObject(SQLStatement stmt,
-            StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
-            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr,
-            int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
+    private static boolean selectFetchPlanFieldsOfFKRelatedObject(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
             StatementMappingIndex stmtMapping, SQLTable sqlTbl)
     {
         boolean selectFK = true;
@@ -937,8 +894,7 @@ public class SQLStatementHelper
                 if (relatedTbl == null)
                 {
                     // Class doesn't have its own table (subclass-table) so find where it persists
-                    AbstractClassMetaData[] ownerParentCmds = 
-                        storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
+                    AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
                     if (ownerParentCmds.length > 1)
                     {
                         throw new NucleusUserException("Relation (" + mmd.getFullFieldName() + 
@@ -958,14 +914,12 @@ public class SQLStatementHelper
                 if (relatedSqlTbl == null)
                 {
                     // Join the 1-1 relation
-                    relatedSqlTbl = addJoinForOneToOneRelation(stmt,
-                        m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, null);
+                    relatedSqlTbl = addJoinForOneToOneRelation(stmt, m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, null);
                 }
 
                 StatementClassMapping subMappingDefinition =
                     new StatementClassMapping(mmd.getClassName(), mmd.getName());
-                selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan,
-                    relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1);
+                selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1);
                 if (mappingDefinition != null)
                 {
                     if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
@@ -992,8 +946,7 @@ public class SQLStatementHelper
                         selectFK = false;
                         stmtMapping.setColumnPositions(pkIdx.getColumnPositions());
                     }
-                    mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(),
-                        subMappingDefinition);
+                    mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(), subMappingDefinition);
                 }
             }
             else
@@ -1041,20 +994,17 @@ public class SQLStatementHelper
         if (joinType == JoinType.LEFT_OUTER_JOIN)
         {
             // left outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceMapping,
-                targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.INNER_JOIN)
         {
             // inner join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.innerJoin(sourceSqlTbl, sourceMapping,
-                targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.innerJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.RIGHT_OUTER_JOIN)
         {
             // right outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.rightOuterJoin(sourceSqlTbl, sourceMapping,
-                targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.rightOuterJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.CROSS_JOIN)
         {
@@ -1076,8 +1026,7 @@ public class SQLStatementHelper
      * @param clr ClassLoader resolver
      * @return Boolean expression for this discriminator value
      */
-    public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt,
-            String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
+    public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
             SQLTable discrimSqlTbl, ClassLoaderResolver clr)
     {
         Object discriminatorValue = className; // Default to the "class-name" discriminator strategy
@@ -1113,10 +1062,8 @@ public class SQLStatementHelper
             }
         }
 
-        SQLExpression discrExpr = 
-            stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
-        SQLExpression discrVal = 
-            stmt.getSQLExpressionFactory().newLiteral(stmt, discriminatorMapping, discriminatorValue);
+        SQLExpression discrExpr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
+        SQLExpression discrVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discriminatorMapping, discriminatorValue);
         return discrExpr.eq(discrVal);
     }
 
@@ -1128,12 +1075,10 @@ public class SQLStatementHelper
      * @param clr ClassLoader resolver
      * @return The possible discriminator values
      */
-    public static List getDiscriminatorValuesForMember(String className,
-            JavaTypeMapping discMapping, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
+    public static List getDiscriminatorValuesForMember(String className, JavaTypeMapping discMapping, RDBMSStoreManager storeMgr, ClassLoaderResolver clr)
     {
         List discrimValues = new ArrayList();
-        DiscriminatorStrategy strategy =
-            discMapping.getTable().getDiscriminatorMetaData().getStrategy();
+        DiscriminatorStrategy strategy = discMapping.getTable().getDiscriminatorMetaData().getStrategy();
         if (strategy == DiscriminatorStrategy.CLASS_NAME)
         {
             discrimValues.add(className);
@@ -1156,8 +1101,7 @@ public class SQLStatementHelper
                 {
                     String subclassName = subclassesIter.next();
                     AbstractClassMetaData subclassCmd = mmgr.getMetaDataForClass(subclassName, clr);
-                    discrimValues.add(
-                        subclassCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                    discrimValues.add(subclassCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
                 }
             }
         }
