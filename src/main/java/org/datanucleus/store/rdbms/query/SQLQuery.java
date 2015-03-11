@@ -222,8 +222,7 @@ public final class SQLQuery extends AbstractSQLQuery
                         // Set the values of any parameters
                         for (int i=0;i<parameters.size();i++)
                         {
-                            Object obj = parameters.get(Integer.valueOf(i+1));
-                            ps.setObject((i+1), obj);
+                            ps.setObject((i+1), parameters.get(Integer.valueOf(i+1)));
                         }
 
                         // Execute the update statement
@@ -263,8 +262,7 @@ public final class SQLQuery extends AbstractSQLQuery
                         // Set the values of any parameters
                         for (int i=0;i<parameters.size();i++)
                         {
-                            Object obj = parameters.get(Integer.valueOf(i+1));
-                            ps.setObject((i+1), obj);
+                            ps.setObject((i+1), parameters.get(Integer.valueOf(i+1)));
                         }
 
                         // Apply any user-specified constraints over timeouts and ResultSet
@@ -378,8 +376,7 @@ public final class SQLQuery extends AbstractSQLQuery
                         // Set the values of any parameters
                         for (int i=0;i<parameters.size();i++)
                         {
-                            Object obj = parameters.get(Integer.valueOf(i+1));
-                            ps.setObject((i+1), obj);
+                            ps.setObject((i+1), parameters.get(Integer.valueOf(i+1)));
                         }
 
                         // Apply any user-specified constraints over timeouts etc
@@ -803,6 +800,6 @@ public final class SQLQuery extends AbstractSQLQuery
      */
     private String stripComments(String sql)
     {
-      return sql.replaceAll("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)", "");
+        return sql.replaceAll("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)", "");
     }
 }
