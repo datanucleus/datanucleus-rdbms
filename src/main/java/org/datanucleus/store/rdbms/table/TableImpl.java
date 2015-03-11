@@ -1413,7 +1413,8 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Convenience logging method to output the mapping information for an element, key, value field
+     * Convenience logging method to output the mapping information for an element, key, value field.
+     * @param memberName Name of the member
      * @param mapping The mapping
      */
     protected void logMapping(String memberName, JavaTypeMapping mapping)

@@ -1002,6 +1002,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to return a backing store for a Collection, consistent with this store and the instantiated type.
      * @param mmd MetaData for the field that has this collection
      * @param clr ClassLoader resolver
+     * @param type Type of the field (optional)
      * @return The backing store of this collection in this store
      */
     protected CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type)
