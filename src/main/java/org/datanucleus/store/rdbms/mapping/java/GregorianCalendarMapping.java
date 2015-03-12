@@ -207,9 +207,9 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
 
         if (getNumberOfDatastoreMappings() == 1)
         {
-            Timestamp ts = (Timestamp)getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+            Date date = (Date)getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
             GregorianCalendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(ts.getTime());
+            cal.setTimeInMillis(date.getTime());
 
             String timezoneID = ec.getNucleusContext().getConfiguration().getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
             if (timezoneID != null)
