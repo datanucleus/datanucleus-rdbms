@@ -684,6 +684,8 @@ Contributors:
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
         <mapping java-type="java.sql.Timestamp" jdbc-type="DATE" sql-type="DATE" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="TIME" sql-type="TIME" default="false"
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
 
         <mapping java-type="java.util.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
