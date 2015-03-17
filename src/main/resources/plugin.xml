@@ -1181,26 +1181,19 @@ Contributors:
         <sql-method class="java.util.Date" method="getSecond" datastore="hsql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond5Method"/>
 
-        <sql-method class="java.util.Map" method="containsEntry"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsEntryMethod"/>
-        <sql-method class="java.util.Map" method="containsKey"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsKeyMethod"/>
-        <sql-method class="java.util.Map" method="containsValue"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsValueMethod"/>
-        <sql-method class="java.util.Map" method="get"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapGetMethod"/>
-        <sql-method class="java.util.Map" method="isEmpty"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapIsEmptyMethod"/>
-        <sql-method class="java.util.Map" method="size"
-            evaluator="org.datanucleus.store.rdbms.sql.method.MapSizeMethod"/>
-        <sql-method class="ARRAY" method="contains"
-            evaluator="org.datanucleus.store.rdbms.sql.method.ArrayContainsMethod"/>
-        <sql-method class="ARRAY" method="isEmpty"
-            evaluator="org.datanucleus.store.rdbms.sql.method.ArrayIsEmptyMethod"/>
-        <sql-method class="ARRAY" method="size"
-            evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
-        <sql-method class="ARRAY" method="length"
-            evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
+        <sql-method class="java.util.Map" method="mapKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapKeyMethod"/>
+        <sql-method class="java.util.Map" method="mapValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapValueMethod"/>
+        <sql-method class="java.util.Map" method="containsEntry" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsEntryMethod"/>
+        <sql-method class="java.util.Map" method="containsKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsKeyMethod"/>
+        <sql-method class="java.util.Map" method="containsValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsValueMethod"/>
+        <sql-method class="java.util.Map" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.MapGetMethod"/>
+        <sql-method class="java.util.Map" method="isEmpty" evaluator="org.datanucleus.store.rdbms.sql.method.MapIsEmptyMethod"/>
+        <sql-method class="java.util.Map" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.MapSizeMethod"/>
+
+        <sql-method class="ARRAY" method="contains" evaluator="org.datanucleus.store.rdbms.sql.method.ArrayContainsMethod"/>
+        <sql-method class="ARRAY" method="isEmpty" evaluator="org.datanucleus.store.rdbms.sql.method.ArrayIsEmptyMethod"/>
+        <sql-method class="ARRAY" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
+        <sql-method class="ARRAY" method="length" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
     </extension>
 
     <!-- SQL OPERATIONS -->
