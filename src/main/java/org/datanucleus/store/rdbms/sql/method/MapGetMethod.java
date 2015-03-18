@@ -230,17 +230,22 @@ public class MapGetMethod extends AbstractSQLMethod
             }
             else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
             {
-                // Key stored in value table, so join to value table, add condition on key, and return value
+                // Key stored in value table, so join to value table
                 DatastoreClass valTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getValueType(), clr);
                 AbstractClassMetaData valCmd = mapmd.getValueClassMetaData(clr, mmgr);
-
-                // Add join to value table
-                SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTable, null, valTable.getIdMapping(), null, null);
+                JavaTypeMapping mapTblOwnerMapping;
+                if (mmd.getMappedBy() != null)
+                {
+                    mapTblOwnerMapping = valTable.getMemberMapping(valCmd.getMetaDataForMember(mmd.getMappedBy()));
+                }
+                else
+                {
+                    mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                }
+                SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTable, null, mapTblOwnerMapping, null, null);
 
                 // Add condition on key
-                String keyFieldName = mmd.getKeyMetaData().getMappedBy();
-                AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(keyFieldName);
-                JavaTypeMapping keyMapping = valTable.getMemberMapping(valKeyMmd);
+                JavaTypeMapping keyMapping = valTable.getMemberMapping(valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy()));
                 SQLExpression keyExpr = exprFactory.newExpression(stmt, valSqlTbl, keyMapping);
                 stmt.whereAnd(keyExpr.eq(keyValExpr), true);
 
@@ -250,21 +255,26 @@ public class MapGetMethod extends AbstractSQLMethod
             }
             else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
             {
-                // Value stored in key table, so join to key table, add condition on key, and return value
+                // Value stored in key table, so join to key table
                 DatastoreClass keyTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getKeyType(), clr);
                 AbstractClassMetaData keyCmd = mapmd.getKeyClassMetaData(clr, mmgr);
-
-                // Add join to key table
-                SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTable, null, keyTable.getIdMapping(), null, null);
+                JavaTypeMapping mapTblOwnerMapping;
+                if (mmd.getMappedBy() != null)
+                {
+                    mapTblOwnerMapping = keyTable.getMemberMapping(keyCmd.getMetaDataForMember(mmd.getMappedBy()));
+                }
+                else
+                {
+                    mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                }
+                SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTable, null, mapTblOwnerMapping, null, null);
 
                 // Add condition on key
                 SQLExpression keyExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTable.getIdMapping());
                 stmt.whereAnd(keyExpr.eq(keyValExpr), true);
 
                 // Return value expression
-                String valueFieldName = mmd.getValueMetaData().getMappedBy();
-                AbstractMemberMetaData valKeyMmd = keyCmd.getMetaDataForMember(valueFieldName);
-                JavaTypeMapping valueMapping = keyTable.getMemberMapping(valKeyMmd);
+                JavaTypeMapping valueMapping = keyTable.getMemberMapping(keyCmd.getMetaDataForMember(mmd.getValueMetaData().getMappedBy()));
                 SQLExpression valueExpr = exprFactory.newExpression(stmt, keySqlTbl, valueMapping);
                 return valueExpr;
             }
