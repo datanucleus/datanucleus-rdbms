@@ -46,10 +46,12 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
+import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.NullOrderingType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.compiler.CompilationComponent;
@@ -100,6 +102,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
+import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.NewObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
@@ -116,6 +119,7 @@ import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.ElementContainerTable;
+import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
@@ -223,17 +227,31 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLTable table;
         AbstractClassMetaData cmd;
+        AbstractMemberMetaData mmd;
         JavaTypeMapping mapping;
 
         public SQLTableMapping(SQLTable tbl, AbstractClassMetaData cmd, JavaTypeMapping m)
         {
             this.table = tbl;
             this.cmd = cmd;
+            this.mmd = null;
+            this.mapping = m;
+        }
+
+        public SQLTableMapping(SQLTable tbl, AbstractMemberMetaData mmd, JavaTypeMapping m)
+        {
+            this.table = tbl;
+            this.cmd = mmd.getAbstractClassMetaData();
+            this.mmd = mmd;
             this.mapping = m;
         }
 
         public String toString()
         {
+            if (mmd != null)
+            {
+                return "SQLTableMapping: tbl=" + table + " member=" + mmd.getFullFieldName() + " mapping=" + mapping;
+            }
             return "SQLTableMapping: tbl=" + table + " class=" + (cmd != null ? cmd.getFullClassName() : "null") + " mapping=" + mapping;
         }
     }
@@ -1207,6 +1225,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                 }
 
+                JavaTypeMapping tblIdMapping = null;
+                SQLTable tblMappingSqlTbl = null;
+                AbstractMemberMetaData tblMmd = null;
                 while (iter.hasNext())
                 {
                     String id = iter.next();
@@ -1254,14 +1275,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
                             if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                             {
-                                sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd),
-                                    relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                             }
                             else
                             {
-                                sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd),
-                                    relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                             }
+                            tblIdMapping = sqlTbl.getTable().getIdMapping();
+                            tblMappingSqlTbl = sqlTbl;
                         }
                         else if (relationType == RelationType.ONE_TO_ONE_BI)
                         {
@@ -1272,65 +1293,112 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                                 if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                 {
-                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                        relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
                                 }
                                 else
                                 {
-                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                                        relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
                                 }
                             }
                             else
                             {
                                 if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                 {
-                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, 
-                                        relTable.getIdMapping(), null, joinTableGroupName);
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                                 else
                                 {
-                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, 
-                                        relTable.getIdMapping(), null, joinTableGroupName);
+                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                             }
+                            tblIdMapping = sqlTbl.getTable().getIdMapping();
+                            tblMappingSqlTbl = sqlTbl;
                         }
                         else if (relationType == RelationType.ONE_TO_MANY_BI)
                         {
-                            relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
-                            cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
-                            relMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                            if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
+                            if (mmd.hasCollection())
                             {
-                                // Join to join table, then to related table
-                                ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
-                                if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
+                                cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
+                                relMmd = mmd.getRelatedMemberMetaData(clr)[0];
+                                if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                                 {
-                                    SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                        joinTbl, null, joinTbl.getOwnerMapping(), null, null);
-                                    sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), 
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    // Join to join table, then to related table
+                                    ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
+                                    if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                    {
+                                        SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                        sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    }
+                                    else
+                                    {
+                                        SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                        sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    }
                                 }
                                 else
                                 {
-                                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                        joinTbl, null, joinTbl.getOwnerMapping(), null, null);
-                                    sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), 
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    // Join to related table
+                                    if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                    {
+                                        sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    }
+                                    else
+                                    {
+                                        sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    }
                                 }
+                                tblIdMapping = sqlTbl.getTable().getIdMapping();
+                                tblMappingSqlTbl = sqlTbl;
                             }
-                            else
+                            else if (mmd.hasMap())
                             {
-                                // Join to related table
-                                if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                MapMetaData mapmd = mmd.getMap();
+                                tblMappingSqlTbl = sqlTbl;
+                                tblIdMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                tblMmd = mmd;
+                                if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
-                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                                        relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    // Add join to join table
+                                    MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
+                                    if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                    {
+                                        sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, joinExpr.getAlias(), joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                    else
+                                    {
+                                        sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, joinExpr.getAlias(), joinTbl.getOwnerMapping(), null, null);
+                                    }
                                 }
-                                else
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
                                 {
-                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(),
-                                        relTable, null, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    DatastoreClass valTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
+                                    AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+                                    JavaTypeMapping mapTblOwnerMapping;
+                                    if (mmd.getMappedBy() != null)
+                                    {
+                                        mapTblOwnerMapping = valTable.getMemberMapping(valCmd.getMetaDataForMember(mmd.getMappedBy()));
+                                    }
+                                    else
+                                    {
+                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                    }
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, joinExpr.getAlias(), mapTblOwnerMapping, null, null);
+                                }
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
+                                {
+                                    DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
+                                    AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
+                                    JavaTypeMapping mapTblOwnerMapping;
+                                    if (mmd.getMappedBy() != null)
+                                    {
+                                        mapTblOwnerMapping = keyTable.getMemberMapping(keyCmd.getMetaDataForMember(mmd.getMappedBy()));
+                                    }
+                                    else
+                                    {
+                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                    }
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, joinExpr.getAlias(), mapTblOwnerMapping, null, null);
                                 }
                             }
                         }
@@ -1368,11 +1436,58 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, null, relMapping, null, joinTableGroupName);
                                     }
                                 }
+                                tblIdMapping = sqlTbl.getTable().getIdMapping();
+                                tblMappingSqlTbl = sqlTbl;
                             }
                             else if (mmd.hasMap())
                             {
-                                // TODO Support KEY, VALUE joins
-                                throw new NucleusException("We do not currently support JOINs with Map fields");
+                                MapMetaData mapmd = mmd.getMap();
+                                tblMappingSqlTbl = sqlTbl;
+                                tblIdMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                tblMmd = mmd;
+                                if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
+                                {
+                                    // Add join to join table
+                                    MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
+                                    if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                    {
+                                        sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, joinExpr.getAlias(), joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                    else
+                                    {
+                                        sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, joinExpr.getAlias(), joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                }
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
+                                {
+                                    DatastoreClass valTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
+                                    AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+                                    JavaTypeMapping mapTblOwnerMapping;
+                                    if (mmd.getMappedBy() != null)
+                                    {
+                                        mapTblOwnerMapping = valTable.getMemberMapping(valCmd.getMetaDataForMember(mmd.getMappedBy()));
+                                    }
+                                    else
+                                    {
+                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                    }
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, joinExpr.getAlias(), mapTblOwnerMapping, null, null);
+                                }
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
+                                {
+                                    DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
+                                    AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
+                                    JavaTypeMapping mapTblOwnerMapping;
+                                    if (mmd.getMappedBy() != null)
+                                    {
+                                        mapTblOwnerMapping = keyTable.getMemberMapping(keyCmd.getMetaDataForMember(mmd.getMappedBy()));
+                                    }
+                                    else
+                                    {
+                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                    }
+                                    sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, joinExpr.getAlias(), mapTblOwnerMapping, null, null);
+                                }
                             }
                         }
                         else if (relationType == RelationType.MANY_TO_MANY_BI)
@@ -1384,18 +1499,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
                             if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                             {
-                                SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                    joinTbl, null, joinTbl.getOwnerMapping(), null, null);
-                                sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), 
-                                    relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                             }
                             else
                             {
-                                SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                    joinTbl, null, joinTbl.getOwnerMapping(), null, null);
-                                sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), 
-                                    relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                             }
+                            tblIdMapping = sqlTbl.getTable().getIdMapping();
+                            tblMappingSqlTbl = sqlTbl;
                         }
                         else if (relationType == RelationType.MANY_TO_ONE_BI)
                         {
@@ -1408,17 +1521,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
                                 if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                 {
-                                    SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                        joinTbl, null, joinTbl.getElementMapping(), null, null);
-                                    sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), 
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                                    sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                                 else
                                 {
-                                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), 
-                                        joinTbl, null, joinTbl.getElementMapping(), null, null);
-                                    sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getOwnerMapping(), 
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                                    sqlTbl = stmt.leftOuterJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                             }
                             else
@@ -1427,15 +1536,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 JavaTypeMapping fkMapping = sqlTbl.getTable().getMemberMapping(mmd);
                                 if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                 {
-                                    sqlTbl = stmt.innerJoin(sqlTbl, fkMapping,
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    sqlTbl = stmt.innerJoin(sqlTbl, fkMapping, relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                                 else
                                 {
-                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, fkMapping,
-                                        relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
+                                    sqlTbl = stmt.leftOuterJoin(sqlTbl, fkMapping, relTable, null, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                             }
+                            tblIdMapping = sqlTbl.getTable().getIdMapping();
+                            tblMappingSqlTbl = sqlTbl;
                         }
                     }
                 }
@@ -1449,7 +1558,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     explicitJoinPrimaryByAlias.put(joinAlias, joinPrimExpr.getId());
                 }
 
-                SQLTableMapping tblMapping = new SQLTableMapping(sqlTbl, cmd, sqlTbl.getTable().getIdMapping());
+                // TODO When we join to a "map" we have no cmd here, and no "idMapping" for the join table necesarily
+                SQLTableMapping tblMapping = null;
+                if (tblMmd != null)
+                {
+                    tblMapping = new SQLTableMapping(tblMappingSqlTbl, tblMmd, tblIdMapping);
+                }
+                else
+                {
+                    tblMapping = new SQLTableMapping(tblMappingSqlTbl, cmd, tblIdMapping);
+                }
                 setSQLTableMappingForAlias(joinAlias, tblMapping);
 
                 DyadicExpression joinOnExpr = joinExpr.getOnExpression();
@@ -2044,7 +2162,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 SQLTableMapping tblMapping = new SQLTableMapping(sqlExpr.getSQLTable(), castCmd, sqlExpr.getJavaTypeMapping());
                 setSQLTableMappingForAlias(exprCastName, tblMapping);
 
-                SQLTableMapping sqlMapping =getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
+                SQLTableMapping sqlMapping = getSQLTableMappingForPrimaryExpression(stmt, exprCastName, expr, Boolean.FALSE);
                 if (sqlMapping == null)
                 {
                     throw new NucleusException("PrimaryExpression " + expr + " is not yet supported");
@@ -2192,6 +2310,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             throw new NucleusException("PrimaryExpression " + expr.getId() + " is not yet supported");
         }
         sqlExpr = exprFactory.newExpression(stmt, sqlMapping.table, sqlMapping.mapping);
+        if (sqlMapping.mmd != null && sqlExpr instanceof MapExpression)
+        {
+            // This sqlMapping is for something joined in a FROM clause, so set the alias on the returned MapExpression to avoid doing the same joins
+            String alias = getAliasForSQLTableMapping(sqlMapping);
+            ((MapExpression)sqlExpr).setAliasForMapTable(alias);
+        }
         stack.push(sqlExpr);
         return sqlExpr;
     }
@@ -2209,8 +2333,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      * @param forceJoin Whether to force a join if a relation member (or null if leaving to this method to decide)
      * @return The SQL table mapping information for the specified primary
      */
-    private SQLTableMapping getSQLTableMappingForPrimaryExpression(SQLStatement theStmt, String exprName,
-            PrimaryExpression primExpr, Boolean forceJoin)
+    private SQLTableMapping getSQLTableMappingForPrimaryExpression(SQLStatement theStmt, String exprName, PrimaryExpression primExpr, Boolean forceJoin)
     {
         if (forceJoin == null && primExpr.getParent() != null)
         {
@@ -2372,8 +2495,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // FK is at this side, so only join if further component provided, or if forcing
                         if (forceJoin == null && !iter.hasNext())
                         {
-                            if (primExpr.getParent() != null && 
-                                    primExpr.getParent().getOperator() == Expression.OP_CAST)
+                            if (primExpr.getParent() != null && primExpr.getParent().getOperator() == Expression.OP_CAST)
                             {
                                 // Cast and not an interface field, so do a join to the table of the persistable object
                                 if (!(mapping instanceof ReferenceMapping))
@@ -2471,9 +2593,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (sqlTbl == null)
                         {
                             Operator op = (primExpr.getParent() != null ? primExpr.getParent().getOperator() : null);
-                            if (!iter.hasNext() && (op == Expression.OP_EQ || op == Expression.OP_GT ||
-                                    op == Expression.OP_LT || op == Expression.OP_GTEQ || op == Expression.OP_LTEQ ||
-                                    op == Expression.OP_NOTEQ))
+                            if (!iter.hasNext() && (op == Expression.OP_EQ || op == Expression.OP_GT || op == Expression.OP_LT || op == Expression.OP_GTEQ || 
+                                    op == Expression.OP_LTEQ || op == Expression.OP_NOTEQ))
                             {
                                 // Just return the FK mapping since in a "a.b == c.d" type expression and not needing
                                 // to go further than the FK
@@ -3506,6 +3627,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLTableMapping tblMapping = getSQLTableMappingForAlias(alias);
         return (tblMapping != null ? tblMapping.table : null);
+    }
+
+    public String getAliasForSQLTableMapping(SQLTableMapping tblMapping)
+    {
+        Iterator<Map.Entry<String, SQLTableMapping>> iter = sqlTableByPrimary.entrySet().iterator();
+        while (iter.hasNext())
+        {
+            Map.Entry<String, SQLTableMapping> entry = iter.next();
+            if (entry.getValue() == tblMapping)
+            {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     /**

@@ -77,12 +77,18 @@ public class MapValueMethod extends AbstractSQLMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
-        // TODO Detect if already joined in this query, for other KEY/VALUE expression
         if (mmd != null)
         {
             MapMetaData mapmd = mmd.getMap();
             SQLTable mapSqlTbl = mapExpr.getSQLTable();
-            String mapJoinAlias = (mapExpr.getSQLTable().getAlias().toString() + "_" + mmd.getName()).toUpperCase();
+
+            // Set alias of "map" table from MapExpression in case it was defined in FROM clause
+            String mapJoinAlias = mapExpr.getAliasForMapTable();
+            if (mapJoinAlias == null)
+            {
+                mapJoinAlias = (mapExpr.getSQLTable().getAlias().toString() + "_" + mmd.getName()).toUpperCase();
+            }
+
             if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
             {
                 // Add join to join table

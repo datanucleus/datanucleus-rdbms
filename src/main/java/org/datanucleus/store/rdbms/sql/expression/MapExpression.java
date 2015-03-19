@@ -29,6 +29,8 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
  */
 public class MapExpression extends SQLExpression
 {
+    String alias;
+
     /**
      * Constructor.
      * @param stmt The SQL Statement
@@ -38,6 +40,24 @@ public class MapExpression extends SQLExpression
     public MapExpression(SQLStatement stmt, SQLTable table, JavaTypeMapping mapping)
     {
         super(stmt, table, mapping);
+    }
+
+    /**
+     * Method to set the alias for the "map" table (join table, or key table when value in key, or value table when key in value) when specified in FROM.
+     * @param alias The alias for the map table
+     */
+    public void setAliasForMapTable(String alias)
+    {
+        this.alias = alias;
+    }
+
+    /**
+     * Accessor for the "map" table where this expression represents an alias set in the FROM clause, so already joined.
+     * @return Alias for the "map" table (if defined in FROM)
+     */
+    public String getAliasForMapTable()
+    {
+        return this.alias;
     }
 
     public SQLExpression invoke(String methodName, List args)
