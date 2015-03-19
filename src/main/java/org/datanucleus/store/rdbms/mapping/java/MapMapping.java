@@ -87,48 +87,14 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (mmd.isCascadePersist()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
+        if (!mmd.isCascadePersist())
         {
-            // Reachability
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
-            }
-
-            if (value.size() > 0)
-            {
-                // Add the entries direct to the datastore
-                ((MapStore) table.getStoreManager().getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
-
-                // Create a SCO wrapper with the entries loaded
-                replaceFieldWithWrapper(ownerOP, value);
-
-                // Make sure all are flushed
-                ec.flushInternal(true);
-            }
-            else
-            {
-                if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
-                {
-                    // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                    replaceFieldWithWrapper(ownerOP, null);
-                }
-                else
-                {
-                    // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
-                    replaceFieldWithWrapper(ownerOP, value);
-                }
-            }
-        }
-        else
-        {
-            // Field doesnt support cascade-persist so no reachability
+            // Check that all keys/values are persistent before continuing and throw exception if necessary
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
-            // Check for any persistable keys/values that arent persistent
             ApiAdapter api = ec.getApiAdapter();
             Set entries = value.entrySet();
             Iterator iter = entries.iterator();
@@ -143,6 +109,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                         throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), entry.getKey());
                     }
                 }
+
                 if (api.isPersistable(entry.getValue()))
                 {
                     if (!api.isPersistent(entry.getValue()) && !api.isDetached(entry.getValue()))
@@ -152,7 +119,39 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                     }
                 }
             }
+        }
+        else
+        {
+            // Reachability
+            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            {
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
+            }
+        }
+
+        if (value.size() > 0)
+        {
+            // Add the entries direct to the datastore
+            ((MapStore) table.getStoreManager().getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
+
+            // Create a SCO wrapper with the entries loaded
             replaceFieldWithWrapper(ownerOP, value);
+
+            // Make sure all are flushed
+            ec.flushInternal(true);
+        }
+        else
+        {
+            if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
+            {
+                // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
+                replaceFieldWithWrapper(ownerOP, null);
+            }
+            else
+            {
+                // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
+                replaceFieldWithWrapper(ownerOP, value);
+            }
         }
     }
 
@@ -192,7 +191,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (mmd.isCascadeUpdate()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
+        if (mmd.isCascadeUpdate())
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {

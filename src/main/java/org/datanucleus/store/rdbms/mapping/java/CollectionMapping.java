@@ -81,15 +81,15 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
 
         Object[] collElements = value.toArray();
-        if (!mmd.isCascadePersist()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
+
+        if (!mmd.isCascadePersist())
         {
-            // Field doesnt support cascade-persist so no reachability
+            // Check that all elements are persistent before continuing and throw exception if necessary
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
-            // Check for any persistable elements that arent persistent
             for (int i=0;i<collElements.length;i++)
             {
                 if (!ec.getApiAdapter().isDetached(collElements[i]) && !ec.getApiAdapter().isPersistent(collElements[i]))
@@ -98,7 +98,6 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElements[i]);
                 }
             }
-            replaceFieldWithWrapper(ownerOP, value);
         }
         else
         {
@@ -107,53 +106,53 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             {
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
             }
+        }
 
-            // Check if some elements need attaching
-            // TODO Investigate if we can just use the attachCopy route below and skip off this check
-            boolean needsAttaching = false;
-            for (int i=0;i<collElements.length;i++)
+        // Check if some elements need attaching
+        // TODO Investigate if we can just use the attachCopy route below and skip off this check
+        boolean needsAttaching = false;
+        for (int i=0;i<collElements.length;i++)
+        {
+            if (ownerOP.getExecutionContext().getApiAdapter().isDetached(collElements[i]))
             {
-                if (ownerOP.getExecutionContext().getApiAdapter().isDetached(collElements[i]))
-                {
-                    needsAttaching = true;
-                    break;
-                }
+                needsAttaching = true;
+                break;
             }
+        }
 
-            if (needsAttaching)
+        if (needsAttaching)
+        {
+            // Create a wrapper and attach the elements (and add the others)
+            SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
+            if (value.size() > 0)
             {
-                // Create a wrapper and attach the elements (and add the others)
-                SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
-                if (value.size() > 0)
-                {
-                    collWrapper.attachCopy(value);
+                collWrapper.attachCopy(value);
 
-                    // The attach will have put entries in the operationQueue if using optimistic, so flush them
-                    ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
-                }
+                // The attach will have put entries in the operationQueue if using optimistic, so flush them
+                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
+            }
+        }
+        else
+        {
+            if (value.size() > 0)
+            {
+                // Add the elements direct to the datastore
+                ((CollectionStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerOP, value, 0);
+
+                // Create a SCO wrapper with the elements loaded
+                replaceFieldWithWrapper(ownerOP, value);
             }
             else
             {
-                if (value.size() > 0)
+                if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
                 {
-                    // Add the elements direct to the datastore
-                    ((CollectionStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerOP, value, 0);
-
-                    // Create a SCO wrapper with the elements loaded
-                    replaceFieldWithWrapper(ownerOP, value);
+                    // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
+                    replaceFieldWithWrapper(ownerOP, null);
                 }
                 else
                 {
-                    if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
-                    {
-                        // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                        replaceFieldWithWrapper(ownerOP, null);
-                    }
-                    else
-                    {
-                        // Create a SCO wrapper, pass in empty collection to avoid loading from DB (extra SQL)
-                        replaceFieldWithWrapper(ownerOP, value);
-                    }
+                    // Create a SCO wrapper, pass in empty collection to avoid loading from DB (extra SQL)
+                    replaceFieldWithWrapper(ownerOP, value);
                 }
             }
         }
@@ -197,7 +196,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
-        if (mmd.isCascadeUpdate()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
+        if (mmd.isCascadeUpdate())
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
