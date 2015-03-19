@@ -25,16 +25,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 
 /**
- * An expression that represents some Map field in a query candidate
- * class, or a Map field in an object linked from the candidate class
- * by navigation.
- * <p>
- * When navigated through using containsKey(expr) the keys of the Map are
- * relationally joined onto the query statement. When navigated through using
- * containsValue(expr) the values of the Map are relationally joined onto the
- * query statement. These 2 methods are required for JDO 2.0, whilst the
- * isEmpty() and contains() are JDO 1.0.1. containsEntry() is an extension.
- * </p>
+ * An expression that represents some Map field in a query candidate class, or a Map field in an object linked from the candidate class by navigation.
  */
 public class MapExpression extends SQLExpression
 {
@@ -43,7 +34,7 @@ public class MapExpression extends SQLExpression
      * @param stmt The SQL Statement
      * @param table Table containing the map field
      * @param mapping The java field mapping
-     **/
+     */
     public MapExpression(SQLStatement stmt, SQLTable table, JavaTypeMapping mapping)
     {
         super(stmt, table, mapping);
@@ -51,8 +42,7 @@ public class MapExpression extends SQLExpression
 
     public SQLExpression invoke(String methodName, List args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Map.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Map.class.getName(), methodName, this, args);
     }
 
     /**
