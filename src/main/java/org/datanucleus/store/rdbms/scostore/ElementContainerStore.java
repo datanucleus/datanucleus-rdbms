@@ -345,6 +345,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      */
     protected boolean validateElementForWriting(ExecutionContext ec, Object element, FieldValues fieldValues)
     {
+        // TODO Pass in cascade flag and if element not present then throw exception
         // Check the element type for this collection
         if (!elementIsPersistentInterface && !validateElementType(ec.getClassLoaderResolver(), element))
         {

@@ -87,7 +87,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (mmd.isCascadePersist())
+        if (mmd.isCascadePersist()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
         {
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -98,8 +98,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             if (value.size() > 0)
             {
                 // Add the entries direct to the datastore
-                RDBMSStoreManager storeMgr = table.getStoreManager();
-                ((MapStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
+                ((MapStore) table.getStoreManager().getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
 
                 // Create a SCO wrapper with the entries loaded
                 replaceFieldWithWrapper(ownerOP, value);
@@ -193,7 +192,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (mmd.isCascadeUpdate())
+        if (mmd.isCascadeUpdate()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {

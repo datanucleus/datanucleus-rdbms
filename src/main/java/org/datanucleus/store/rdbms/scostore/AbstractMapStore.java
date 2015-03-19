@@ -373,6 +373,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      */
     protected void validateKeyForWriting(ObjectProvider ownerOP, Object key)
     {
+        // TODO Pass in cascade flag and if key not present then throw exception
         ExecutionContext ec = ownerOP.getExecutionContext();
         validateKeyType(ec.getClassLoaderResolver(), key);
         if (!keysAreEmbedded && !keysAreSerialised)
@@ -388,6 +389,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      */
     protected void validateValueForWriting(ObjectProvider ownerOP, Object value)
     {
+        // TODO Pass in cascade flag and if value not present then throw exception
         ExecutionContext ec = ownerOP.getExecutionContext();
         validateValueType(ec.getClassLoaderResolver(), value);
         if (!valuesAreEmbedded && !valuesAreSerialised)

@@ -81,7 +81,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
 
         Object[] collElements = value.toArray();
-        if (!mmd.isCascadePersist())
+        if (!mmd.isCascadePersist()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
         {
             // Field doesnt support cascade-persist so no reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -197,7 +197,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
-        if (mmd.isCascadeUpdate())
+        if (mmd.isCascadeUpdate()) // TODO Consider moving this check into BackingStore when it validates elements, would need to pass in as flag
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
