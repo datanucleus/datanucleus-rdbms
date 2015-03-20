@@ -125,8 +125,7 @@ public class SQLJoin
         }
         else if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN)
         {
-            return "JoinType: " + (type == JoinType.INNER_JOIN ? "INNERJOIN" : "OUTERJOIN") + 
-                " tbl=" + table + " joinedTbl=" + joinedTable;
+            return "JoinType: " + (type == JoinType.INNER_JOIN ? "INNERJOIN" : "OUTERJOIN") + " tbl=" + table + " joinedTbl=" + joinedTable;
         }
         return super.toString();
     }
@@ -174,47 +173,5 @@ public class SQLJoin
             st.append("" + table);
         }
         return st;
-    }
-
-    public String toFromClause(DatastoreAdapter dba, boolean lock)
-    {
-        if (type != JoinType.NON_ANSI_JOIN)
-        {
-            StringBuilder result = new StringBuilder();
-            if (type == JoinType.INNER_JOIN)
-            {
-                result.append("INNER JOIN ");
-            }
-            else if (type == JoinType.LEFT_OUTER_JOIN)
-            {
-                result.append("LEFT OUTER JOIN ");
-            }
-            else if (type == JoinType.RIGHT_OUTER_JOIN)
-            {
-                result.append("RIGHT OUTER JOIN ");
-            }
-            else if (type == JoinType.CROSS_JOIN)
-            {
-                result.append("CROSS JOIN ");
-            }
-            result.append(table);
-
-            if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
-            {
-                result.append(" ON ");
-                if (condition != null)
-                {
-                    result.append(condition.toSQLText().toSQL());
-                }
-            }
-
-            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
-            {
-                result.append(" WITH ").append(dba.getSelectWithLockOption());
-            }
-
-            return result.toString();
-        }
-        return "" + table;
     }
 }
