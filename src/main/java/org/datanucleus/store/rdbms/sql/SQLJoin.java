@@ -131,6 +131,51 @@ public class SQLJoin
         return super.toString();
     }
 
+    public SQLText toSQLText(DatastoreAdapter dba, boolean lock)
+    {
+        SQLText st = new SQLText();
+
+        if (type != JoinType.NON_ANSI_JOIN)
+        {
+            if (type == JoinType.INNER_JOIN)
+            {
+                st.append("INNER JOIN ");
+            }
+            else if (type == JoinType.LEFT_OUTER_JOIN)
+            {
+                st.append("LEFT OUTER JOIN ");
+            }
+            else if (type == JoinType.RIGHT_OUTER_JOIN)
+            {
+                st.append("RIGHT OUTER JOIN ");
+            }
+            else if (type == JoinType.CROSS_JOIN)
+            {
+                st.append("CROSS JOIN ");
+            }
+            st.append(table.toString());
+
+            if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
+            {
+                st.append(" ON ");
+                if (condition != null)
+                {
+                    st.append(condition.toSQLText());
+                }
+            }
+
+            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
+            {
+                st.append(" WITH ").append(dba.getSelectWithLockOption());
+            }
+        }
+        else
+        {
+            st.append("" + table);
+        }
+        return st;
+    }
+
     public String toFromClause(DatastoreAdapter dba, boolean lock)
     {
         if (type != JoinType.NON_ANSI_JOIN)

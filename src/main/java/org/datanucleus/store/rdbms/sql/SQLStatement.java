@@ -1891,9 +1891,9 @@ public class SQLStatement
      * @param lock Whether to add locking on the join clause (only for some RDBMS)
      * @return The SQL for the join clause
      */
-    private String getSqlForJoins(boolean lock)
+    private SQLText getSqlForJoins(boolean lock)
     {
-        StringBuilder sql = new StringBuilder();
+        SQLText sql = new SQLText();
         DatastoreAdapter dba = getDatastoreAdapter();
         if (requiresJoinReorder)
         {
@@ -1911,7 +1911,7 @@ public class SQLStatement
                 {
                     // ANSI-92 style joins, separate joins by space
                     sql.append(" ");
-                    sql.append(join.toFromClause(dba, lock));
+                    sql.append(join.toSQLText(dba, lock));
                 }
                 else if (dba.supportsOption(DatastoreAdapter.CROSSJOIN_ASINNER11_SYNTAX))
                 {
@@ -1930,17 +1930,17 @@ public class SQLStatement
                 {
                     // ANSI-92 style joins, separate joins by space
                     sql.append(" ");
-                    sql.append(join.toFromClause(dba, lock));
+                    sql.append(join.toSQLText(dba, lock));
                 }
                 else
                 {
                     // "ANSI-86" style joins, separate joins by comma
                     sql.append(",");
-                    sql.append(join.toFromClause(dba, lock));
+                    sql.append(join.toSQLText(dba, lock));
                 }
             }
         }
-        return sql.toString();
+        return sql;
     }
 
     /**
@@ -1982,8 +1982,7 @@ public class SQLStatement
 
             // Create sub-statement selecting the first joined table, joining back to the outer statement
             SQLJoin subJoin = joinIter.next();
-            SQLStatement subStmt = new SQLStatement(this, rdbmsMgr, subJoin.getTable().getTable(), 
-                subJoin.getTable().getAlias(), subJoin.getTable().getGroupName());
+            SQLStatement subStmt = new SQLStatement(this, rdbmsMgr, subJoin.getTable().getTable(), subJoin.getTable().getAlias(), subJoin.getTable().getGroupName());
             subStmt.whereAnd(subJoin.getCondition(), false);
             if (where != null)
             {
@@ -2033,8 +2032,7 @@ public class SQLStatement
 
             // Create sub-statement selecting the first joined table, joining back to the outer statement
             SQLJoin subJoin = joinIter.next();
-            SQLStatement subStmt = new SQLStatement(this, rdbmsMgr, subJoin.getTable().getTable(), 
-                subJoin.getTable().getAlias(), subJoin.getTable().getGroupName());
+            SQLStatement subStmt = new SQLStatement(this, rdbmsMgr, subJoin.getTable().getTable(), subJoin.getTable().getAlias(), subJoin.getTable().getGroupName());
             subStmt.whereAnd(subJoin.getCondition(), false);
             if (where != null)
             {
@@ -2117,9 +2115,7 @@ public class SQLStatement
                         }
                         else
                         {
-                            JavaTypeMapping m = orderingExpressions[i].getJavaTypeMapping();
-
-                            DatastoreMapping[] mappings = m.getDatastoreMappings();
+                            DatastoreMapping[] mappings = orderingExpressions[i].getJavaTypeMapping().getDatastoreMappings();
                             for (int j=0;j<mappings.length;j++)
                             {
                                 String alias = orderString + "_" + j;
@@ -2228,10 +2224,8 @@ public class SQLStatement
                         for (int j=0;j<mappings.length;j++)
                         {
                             String alias = orderExpr + "_" + j;
-                            DatastoreIdentifier aliasId =
-                                rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
-                            SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), 
-                                mappings[j].getColumn(), aliasId);
+                            DatastoreIdentifier aliasId = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
+                            SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
                             String selectedName = col.toString();
                             selectItem(selectedName);
 
