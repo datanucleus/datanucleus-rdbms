@@ -36,6 +36,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchGroup;
 import org.datanucleus.FetchGroupManager;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -647,17 +648,55 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 String alias = resultExprs[i].getAlias();
                 if (resultExprs[i] instanceof InvokeExpression)
                 {
+                    InvokeExpression invokeExpr = (InvokeExpression)resultExprs[i];
                     processInvokeExpression((InvokeExpression)resultExprs[i]);
                     SQLExpression sqlExpr = stack.pop();
                     validateExpressionForResult(sqlExpr);
-                    int[] cols = stmt.select(sqlExpr, alias);
-                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(cols);
-                    if (alias != null)
+
+                    String invokeMethod = invokeExpr.getOperation();
+                    if (sqlExpr.getJavaTypeMapping() instanceof PersistableMapping && alias == null && 
+                        (invokeMethod.equalsIgnoreCase("mapKey") || invokeMethod.equalsIgnoreCase("mapValue")))
                     {
-                        idx.setColumnAlias(alias);
+                        // Some methods can return persistable object, so select the FetchPlan
+                        String selectedType = ((PersistableMapping)sqlExpr.getJavaTypeMapping()).getType();
+                        AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
+                        FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
+                        int[] membersToSelect = fpForCmd.getMemberNumbers();
+                        ClassTable selectedTable = (ClassTable) sqlExpr.getSQLTable().getTable();
+                        StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
+
+                        if (selectedCmd.getIdentityType() == IdentityType.DATASTORE)
+                        {
+                            int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getDatastoreIdMapping(), alias);
+                            StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getDatastoreIdMapping());
+                            idx.setColumnPositions(cols);
+                            map.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, idx);
+                        }
+
+                        // Select the FetchPlan members
+                        for (int j=0;j<membersToSelect.length;j++)
+                        {
+                            AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
+                            JavaTypeMapping selMapping = selectedTable.getMemberMapping(selMmd);
+                            int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
+                            StatementMappingIndex idx = new StatementMappingIndex(selMapping);
+                            idx.setColumnPositions(cols);
+                            map.addMappingForMember(membersToSelect[j], idx);
+                        }
+
+                        resultDefinition.addMappingForResultExpression(i, map);
                     }
-                    resultDefinition.addMappingForResultExpression(i, idx);
+                    else
+                    {
+                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                        int[] cols = stmt.select(sqlExpr, alias);
+                        idx.setColumnPositions(cols);
+                        if (alias != null)
+                        {
+                            idx.setColumnAlias(alias);
+                        }
+                        resultDefinition.addMappingForResultExpression(i, idx);
+                    }
                 }
                 else if (resultExprs[i] instanceof PrimaryExpression)
                 {
