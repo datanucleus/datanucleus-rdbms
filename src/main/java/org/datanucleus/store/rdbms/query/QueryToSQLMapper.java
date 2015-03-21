@@ -1255,7 +1255,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (sqlTblMapping != null)
                     {
                         cmd = sqlTblMapping.cmd;
-                        joinTableGroupName = sqlTblMapping.table.getGroupName();
+                        joinTableGroupName = sqlTblMapping.table.getGroupName() + joinPrimExpr.getId().substring(rootId.length());
                         sqlTbl = sqlTblMapping.table;
                     }
                     else
