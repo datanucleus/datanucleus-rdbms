@@ -3105,7 +3105,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (cmd.isEmbeddedOnly())
                 {
                     // Nothing to do. Only persisted as SCO.
-                    NucleusLogger.DATASTORE.info(Localiser.msg("032012", cmd.getFullClassName()));
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("032012", cmd.getFullClassName()));
                 }
                 else
                 {
