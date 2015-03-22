@@ -67,7 +67,7 @@ public final class PersistentClassROF implements ResultObjectFactory
     protected final RDBMSStoreManager storeMgr;
 
     /** Metadata for the persistent class. */
-    protected final AbstractClassMetaData acmd;
+    protected final AbstractClassMetaData cmd;
 
     /** Persistent class that this factory will generate (may be the base class). */
     private Class persistentClass;
@@ -87,13 +87,13 @@ public final class PersistentClassROF implements ResultObjectFactory
     /**
      * Constructor.
      * @param storeMgr RDBMS StoreManager
-     * @param acmd MetaData for the class (base class)
+     * @param cmd MetaData for the class (base class)
      * @param mappingDefinition Mapping information for the result set and how it maps to the class
      * @param ignoreCache Whether to ignore the cache
      * @param fetchPlan the Fetch Plan
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData acmd, StatementClassMapping mappingDefinition,
+    public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData cmd, StatementClassMapping mappingDefinition,
                            boolean ignoreCache, FetchPlan fetchPlan, Class persistentClass)
     {
         if (mappingDefinition == null)
@@ -103,7 +103,7 @@ public final class PersistentClassROF implements ResultObjectFactory
 
         this.storeMgr = storeMgr;
         this.stmtMapping = mappingDefinition;
-        this.acmd = acmd;
+        this.cmd = cmd;
         this.ignoreCache = ignoreCache;
         this.fetchPlan = fetchPlan;
         this.persistentClass = persistentClass;
@@ -146,8 +146,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                     return null;
                 }
                 JavaTypeMapping discrimMapping = discrimMapIdx.getMapping();
-                DiscriminatorMetaData dismd =
-                    (discrimMapping != null ? discrimMapping.getTable().getDiscriminatorMetaData() : null);
+                DiscriminatorMetaData dismd = (discrimMapping != null ? discrimMapping.getTable().getDiscriminatorMetaData() : null);
                 className = ec.getMetaDataManager().getClassNameFromDiscriminatorValue(discrimValue, dismd);
                 requiresInheritanceCheck = false;
             }
@@ -235,8 +234,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Only one possible subclass, so use that
                     pcClassForObject = concreteSubclass;
-                    NucleusLogger.DATASTORE_RETRIEVE.warn(Localiser.msg("052300", 
-                        pcClassForObject.getName(), concreteSubclass.getName()));
+                    NucleusLogger.DATASTORE_RETRIEVE.warn(Localiser.msg("052300", pcClassForObject.getName(), concreteSubclass.getName()));
                 }
                 else if (numConcreteSubclasses == 0)
                 {
@@ -245,10 +243,8 @@ public final class PersistentClassROF implements ResultObjectFactory
                 else
                 {
                     // More than 1 possible so notify the user. Really should return the abstract
-                    warnMsg = "Found type=" + pcClassForObject +
-                        " but abstract and more than 1 concrete subclass (" +
-                        StringUtils.objectArrayToString(subclasses) + "). Really you need a discriminator " +
-                        " to help identifying the type. Choosing " + concreteSubclass;
+                    warnMsg = "Found type=" + pcClassForObject + " but abstract and more than 1 concrete subclass (" +
+                        StringUtils.objectArrayToString(subclasses) + "). Really you need a discriminator to help identifying the type. Choosing " + concreteSubclass;
                     pcClassForObject = concreteSubclass;
                     requiresInheritanceCheck = true;
                 }
@@ -270,7 +266,7 @@ public final class PersistentClassROF implements ResultObjectFactory
         int[] fieldNumbers = stmtMapping.getMemberNumbers();
         StatementClassMapping mappingDefinition;
         int[] mappedFieldNumbers;
-        if (acmd instanceof InterfaceMetaData)
+        if (cmd instanceof InterfaceMetaData)
         {
             // Persistent-interface : create new mapping definition for a result type of the implementation
             mappingDefinition = new StatementClassMapping();
@@ -278,10 +274,9 @@ public final class PersistentClassROF implements ResultObjectFactory
             mappedFieldNumbers = new int[fieldNumbers.length];
             for (int i = 0; i < fieldNumbers.length; i++)
             {
-                AbstractMemberMetaData mmd = acmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
                 mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
-                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], 
-                    stmtMapping.getMappingForMemberPosition(fieldNumbers[i]));
+                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], stmtMapping.getMappingForMemberPosition(fieldNumbers[i]));
             }
         }
         else
@@ -339,8 +334,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (pkIdx == null)
                 {
                     throw new NucleusException("You have just executed an SQL statement yet the information " +
-                        "for the primary key column(s) is not available! " + 
-                        "Please generate a testcase and report this issue");
+                        "for the primary key column(s) is not available! Please generate a testcase and report this issue");
                 }
                 int[] colPositions = pkIdx.getColumnPositions();
                 for (int j=0;j<colPositions.length;j++)
@@ -372,8 +366,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     NucleusLogger.DATASTORE_RETRIEVE.warn(warnMsg);
                 }
-                obj = getObjectForApplicationId(ec, rs, mappingDefinition, mappedFieldNumbers,
-                    pcClassForObject, cmd, requiresInheritanceCheck, surrogateVersion);
+                obj = getObjectForApplicationId(ec, rs, mappingDefinition, mappedFieldNumbers, pcClassForObject, cmd, requiresInheritanceCheck, surrogateVersion);
             }
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -407,6 +400,11 @@ public final class PersistentClassROF implements ResultObjectFactory
         }
         else if (cmd.getIdentityType() == IdentityType.NONDURABLE)
         {
+            if (className == null)
+            {
+                // Fallback to the default class name
+                className = cmd.getFullClassName();
+            }
             Object id = ec.newObjectId(className, null);
             if (mappedFieldNumbers == null)
             {
@@ -432,7 +430,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (vermd != null && vermd.getFieldName() != null)
                 {
                     // Version stored in a normal field
-                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         ObjectProvider objOP = ec.findObjectProvider(obj);
@@ -488,7 +486,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = op.provideField(versionFieldNumber);
@@ -613,8 +611,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param surrogateVersion Surrogate version (if applicable)
      * @return The Object
      */
-    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, 
-            final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
+    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
             Object oid, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
     {
         if (oid == null)
@@ -639,7 +636,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = op.provideField(versionFieldNumber);
