@@ -63,15 +63,15 @@ public class MapKeyMethod extends AbstractSQLMethod
             return getAsSubquery(mapExpr);
         }*/
 
-        return getAsInnerJoin(mapExpr);
+        return getAsJoin(mapExpr);
     }
 
     /**
-     * Implementation of KEY(mapExpr) using an inner join to the table representing the map, and returning an expression for the key.
+     * Implementation of KEY(mapExpr) using a join to the table representing the map, and returning an expression for the key.
      * @param mapExpr The map expression
      * @return The value expression
      */
-    protected SQLExpression getAsInnerJoin(MapExpression mapExpr)
+    protected SQLExpression getAsJoin(MapExpression mapExpr)
     {
         JavaTypeMapping m = mapExpr.getJavaTypeMapping();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
@@ -96,7 +96,7 @@ public class MapKeyMethod extends AbstractSQLMethod
                 SQLTable joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
 
                 // Return key expression
-                if (mapmd.getKeyClassMetaData(clr, mmgr) != null)
+                if (mapmd.getKeyClassMetaData(clr, mmgr) != null && !mapmd.isEmbeddedKey())
                 {
                     // Persistable key so join to its table
                     DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);

@@ -654,49 +654,74 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     validateExpressionForResult(sqlExpr);
 
                     String invokeMethod = invokeExpr.getOperation();
-                    if (sqlExpr.getJavaTypeMapping() instanceof PersistableMapping && alias == null && 
-                        (invokeMethod.equalsIgnoreCase("mapKey") || invokeMethod.equalsIgnoreCase("mapValue")))
+                    if ((invokeMethod.equalsIgnoreCase("mapKey") || invokeMethod.equalsIgnoreCase("mapValue")) && alias == null)
                     {
-                        // Some methods can return persistable object, so select the FetchPlan
-                        String selectedType = ((PersistableMapping)sqlExpr.getJavaTypeMapping()).getType();
-                        AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
-                        FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
-                        int[] membersToSelect = fpForCmd.getMemberNumbers();
-                        ClassTable selectedTable = (ClassTable) sqlExpr.getSQLTable().getTable();
-                        StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
-
-                        if (selectedCmd.getIdentityType() == IdentityType.DATASTORE)
+                        if (sqlExpr.getJavaTypeMapping() instanceof PersistableMapping)
                         {
-                            int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getDatastoreIdMapping(), alias);
-                            StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getDatastoreIdMapping());
-                            idx.setColumnPositions(cols);
-                            map.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, idx);
-                        }
+                            // Method returns persistable object, so select the FetchPlan
+                            String selectedType = ((PersistableMapping)sqlExpr.getJavaTypeMapping()).getType();
+                            AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
+                            FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
+                            int[] membersToSelect = fpForCmd.getMemberNumbers();
+                            ClassTable selectedTable = (ClassTable) sqlExpr.getSQLTable().getTable();
+                            StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
 
-                        // Select the FetchPlan members
-                        for (int j=0;j<membersToSelect.length;j++)
+                            if (selectedCmd.getIdentityType() == IdentityType.DATASTORE)
+                            {
+                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getDatastoreIdMapping(), alias);
+                                StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getDatastoreIdMapping());
+                                idx.setColumnPositions(cols);
+                                map.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, idx);
+                            }
+
+                            // Select the FetchPlan members
+                            for (int j=0;j<membersToSelect.length;j++)
+                            {
+                                AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
+                                JavaTypeMapping selMapping = selectedTable.getMemberMapping(selMmd);
+                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
+                                StatementMappingIndex idx = new StatementMappingIndex(selMapping);
+                                idx.setColumnPositions(cols);
+                                map.addMappingForMember(membersToSelect[j], idx);
+                            }
+
+                            resultDefinition.addMappingForResultExpression(i, map);
+                            continue;
+                        }
+                        else if (sqlExpr.getJavaTypeMapping() instanceof EmbeddedMapping)
                         {
-                            AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
-                            JavaTypeMapping selMapping = selectedTable.getMemberMapping(selMmd);
-                            int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
-                            StatementMappingIndex idx = new StatementMappingIndex(selMapping);
-                            idx.setColumnPositions(cols);
-                            map.addMappingForMember(membersToSelect[j], idx);
-                        }
+                            // Method returns embedded object, so select the FetchPlan
+                            EmbeddedMapping embMapping = (EmbeddedMapping)sqlExpr.getJavaTypeMapping();
+                            String selectedType = embMapping.getType();
+                            AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
+                            FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
+                            int[] membersToSelect = fpForCmd.getMemberNumbers();
+                            StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
 
-                        resultDefinition.addMappingForResultExpression(i, map);
+                            // Select the FetchPlan members
+                            for (int j=0;j<membersToSelect.length;j++)
+                            {
+                                AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
+                                JavaTypeMapping selMapping = embMapping.getJavaTypeMapping(selMmd.getName());
+                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
+                                StatementMappingIndex idx = new StatementMappingIndex(selMapping);
+                                idx.setColumnPositions(cols);
+                                map.addMappingForMember(membersToSelect[j], idx);
+                            }
+
+                            resultDefinition.addMappingForResultExpression(i, map);
+                            continue;
+                        }
                     }
-                    else
+
+                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                    int[] cols = stmt.select(sqlExpr, alias);
+                    idx.setColumnPositions(cols);
+                    if (alias != null)
                     {
-                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                        int[] cols = stmt.select(sqlExpr, alias);
-                        idx.setColumnPositions(cols);
-                        if (alias != null)
-                        {
-                            idx.setColumnAlias(alias);
-                        }
-                        resultDefinition.addMappingForResultExpression(i, idx);
+                        idx.setColumnAlias(alias);
                     }
+                    resultDefinition.addMappingForResultExpression(i, idx);
                 }
                 else if (resultExprs[i] instanceof PrimaryExpression)
                 {

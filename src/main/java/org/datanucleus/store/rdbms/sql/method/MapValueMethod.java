@@ -63,15 +63,15 @@ public class MapValueMethod extends AbstractSQLMethod
             return getAsSubquery(mapExpr);
         }*/
 
-        return getAsInnerJoin(mapExpr);
+        return getAsJoin(mapExpr);
     }
 
     /**
-     * Implementation of VALUE(map) using an inner join to the table representing the map, and returning the value.
+     * Implementation of VALUE(map) using a join to the table representing the map, and returning the value.
      * @param mapExpr The map expression
      * @return The value expression
      */
-    protected SQLExpression getAsInnerJoin(MapExpression mapExpr)
+    protected SQLExpression getAsJoin(MapExpression mapExpr)
     {
         JavaTypeMapping m = mapExpr.getJavaTypeMapping();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
@@ -96,7 +96,7 @@ public class MapValueMethod extends AbstractSQLMethod
                 SQLTable joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
 
                 // Return value expression
-                if (mapmd.getValueClassMetaData(clr, mmgr) != null)
+                if (mapmd.getValueClassMetaData(clr, mmgr) != null && !mapmd.isEmbeddedValue())
                 {
                     // Persistable value so join to its table
                     DatastoreClass valTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
