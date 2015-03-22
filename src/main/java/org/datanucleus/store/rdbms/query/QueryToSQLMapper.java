@@ -120,6 +120,7 @@ import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.ElementContainerTable;
+import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.ClassUtils;
@@ -2442,15 +2443,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 processInvokeExpression((InvokeExpression)expr.getLeft());
                 SQLExpression invokeSqlExpr = stack.pop();
                 Table tbl = invokeSqlExpr.getSQLTable().getTable();
+                if (expr.getTuples().size() > 1)
+                {
+                    throw new NucleusUserException("Dont currently support evaluating " + expr.getId() + " on " + invokeSqlExpr);
+                }
                 if (tbl instanceof DatastoreClass)
                 {
                     // Table of a class, so assume to have field in the table of the class
                     // TODO Allow joins to superclasses if required
-                    if (expr.getTuples().size() > 1)
-                    {
-                        throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
-                            " on " + invokeSqlExpr);
-                    }
                     JavaTypeMapping mapping = ((DatastoreClass)tbl).getMemberMapping(expr.getId());
                     if (mapping == null)
                     {
@@ -2462,10 +2462,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
+                else if (tbl instanceof JoinTable)
+                {
+                    if (invokeSqlExpr.getJavaTypeMapping() instanceof EmbeddedMapping)
+                    {
+                        // Table containing an embedded element/key/value so assume we have a column in the join table
+                        EmbeddedMapping embMapping = (EmbeddedMapping)invokeSqlExpr.getJavaTypeMapping();
+                        JavaTypeMapping mapping = embMapping.getJavaTypeMapping(expr.getId());
+                        if (mapping == null)
+                        {
+                            throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
+                                " on " + invokeSqlExpr + ". The field " + expr.getId() + " doesnt exist in table " + tbl);
+                        }
+                        sqlExpr = exprFactory.newExpression(stmt, invokeSqlExpr.getSQLTable(), mapping);
+                        stack.push(sqlExpr);
+                        return sqlExpr;
+                    }
+                }
 
-                // Join table!
-                throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
-                    " on " + invokeSqlExpr + " with invoke having table of " + tbl);
+                throw new NucleusUserException("Dont currently support evaluating " + expr.getId() + " on " + invokeSqlExpr + " with invoke having table of " + tbl);
             }
             else
             {
