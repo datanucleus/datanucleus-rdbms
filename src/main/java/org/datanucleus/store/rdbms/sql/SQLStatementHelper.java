@@ -867,8 +867,7 @@ public class SQLStatementHelper
     }
 
     /**
-     * Convenience method to join to and select all required FP fields of a related object where linked
-     * via an FK at this side.
+     * Convenience method to join to and select all required FP fields of a related object where linked via an FK at this side.
      * @return Whether the caller should select the FK themselves (i.e we haven't selected anything)
      */
     private static boolean selectFetchPlanFieldsOfFKRelatedObject(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
@@ -885,10 +884,14 @@ public class SQLStatementHelper
             RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
             // select fetch plan fields of this object
-            AbstractClassMetaData relatedCmd =
-                storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+            AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
             if (relatedCmd != null)
             {
+                if (relatedCmd.isEmbeddedOnly())
+                {
+                    return true;
+                }
+
                 // Find the table of the related class
                 DatastoreClass relatedTbl = storeMgr.getDatastoreClass(relatedCmd.getFullClassName(), clr);
                 if (relatedTbl == null)
