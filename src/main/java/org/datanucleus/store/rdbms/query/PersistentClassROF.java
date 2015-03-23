@@ -67,7 +67,7 @@ public final class PersistentClassROF implements ResultObjectFactory
     protected final RDBMSStoreManager storeMgr;
 
     /** Metadata for the persistent class. */
-    protected final AbstractClassMetaData cmd;
+    protected final AbstractClassMetaData acmd;
 
     /** Persistent class that this factory will generate (may be the base class). */
     private Class persistentClass;
@@ -87,13 +87,13 @@ public final class PersistentClassROF implements ResultObjectFactory
     /**
      * Constructor.
      * @param storeMgr RDBMS StoreManager
-     * @param cmd MetaData for the class (base class)
+     * @param acmd MetaData for the class (base class)
      * @param mappingDefinition Mapping information for the result set and how it maps to the class
      * @param ignoreCache Whether to ignore the cache
      * @param fetchPlan the Fetch Plan
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData cmd, StatementClassMapping mappingDefinition,
+    public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData acmd, StatementClassMapping mappingDefinition,
                            boolean ignoreCache, FetchPlan fetchPlan, Class persistentClass)
     {
         if (mappingDefinition == null)
@@ -103,7 +103,7 @@ public final class PersistentClassROF implements ResultObjectFactory
 
         this.storeMgr = storeMgr;
         this.stmtMapping = mappingDefinition;
-        this.cmd = cmd;
+        this.acmd = acmd;
         this.ignoreCache = ignoreCache;
         this.fetchPlan = fetchPlan;
         this.persistentClass = persistentClass;
@@ -266,7 +266,7 @@ public final class PersistentClassROF implements ResultObjectFactory
         int[] fieldNumbers = stmtMapping.getMemberNumbers();
         StatementClassMapping mappingDefinition;
         int[] mappedFieldNumbers;
-        if (cmd instanceof InterfaceMetaData)
+        if (acmd instanceof InterfaceMetaData)
         {
             // Persistent-interface : create new mapping definition for a result type of the implementation
             mappingDefinition = new StatementClassMapping();
@@ -274,7 +274,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             mappedFieldNumbers = new int[fieldNumbers.length];
             for (int i = 0; i < fieldNumbers.length; i++)
             {
-                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+                AbstractMemberMetaData mmd = acmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
                 mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
                 mappingDefinition.addMappingForMember(mappedFieldNumbers[i], stmtMapping.getMappingForMemberPosition(fieldNumbers[i]));
             }
@@ -400,12 +400,13 @@ public final class PersistentClassROF implements ResultObjectFactory
         }
         else if (cmd.getIdentityType() == IdentityType.NONDURABLE)
         {
+            String classNameForId = className;
             if (className == null)
             {
-                // Fallback to the default class name
-                className = cmd.getFullClassName();
+                // No discriminator info from the query, so just fallback to default type
+                classNameForId = cmd.getFullClassName();
             }
-            Object id = ec.newObjectId(className, null);
+            Object id = ec.newObjectId(classNameForId, null);
             if (mappedFieldNumbers == null)
             {
                 obj = ec.findObject(id, false, requiresInheritanceCheck, null);
@@ -430,7 +431,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (vermd != null && vermd.getFieldName() != null)
                 {
                     // Version stored in a normal field
-                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         ObjectProvider objOP = ec.findObjectProvider(obj);
@@ -486,7 +487,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = op.provideField(versionFieldNumber);
@@ -611,7 +612,8 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param surrogateVersion Surrogate version (if applicable)
      * @return The Object
      */
-    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
+    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, 
+            final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
             Object oid, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
     {
         if (oid == null)
@@ -636,7 +638,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 {
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = op.provideField(versionFieldNumber);
