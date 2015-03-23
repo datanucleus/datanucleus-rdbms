@@ -1650,7 +1650,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             if (mmd.hasCollection())
                             {
-                                // TODO Support join to Collection<NonPC>
+                                if (mmd.getJoinMetaData() != null)
+                                {
+                                    // Join to join table
+                                    MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
+                                    if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
+                                    {
+                                        sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                    else
+                                    {
+                                        sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                    tblIdMapping = sqlTbl.getTable().getIdMapping();
+                                    tblMappingSqlTbl = sqlTbl;
+                                }
+                                else
+                                {
+                                    throw new NucleusUserException("FROM clause contains join to Collection field at " + mmd.getFullFieldName() + " yet this has no join table");
+                                }
                             }
                             else if (mmd.hasMap())
                             {
