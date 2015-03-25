@@ -18,10 +18,10 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.NucleusContext;
@@ -44,7 +44,7 @@ public class MappedTypeManager
     protected final ClassLoaderResolver clr;
 
     /** The mapped types, keyed by the class name. */
-    Map<String, MappedType> mappedTypes = new HashMap();
+    Map<String, MappedType> mappedTypes = new ConcurrentHashMap();
 
     /**
      * Constructor, loading support for type mappings using the plugin mechanism.
@@ -148,8 +148,7 @@ public class MappedTypeManager
 
                 if (!mappedTypes.containsKey(javaName)) // Use "priority" attribute to be placed higher in the list
                 {
-                    addMappedType(mgr, elems[i].getExtension().getPlugin().getSymbolicName(), javaName, 
-                        mappingClassName, clr);
+                    addMappedType(mgr, elems[i].getExtension().getPlugin().getSymbolicName(), javaName, mappingClassName, clr);
                 }
             }
         }
@@ -197,8 +196,7 @@ public class MappedTypeManager
      * @param mappingClassName The Java mapping type
      * @param clr the ClassLoaderResolver
      */
-    private void addMappedType(PluginManager mgr, String pluginId, String className, String mappingClassName,
-            ClassLoaderResolver clr)
+    private void addMappedType(PluginManager mgr, String pluginId, String className, String mappingClassName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -219,19 +217,17 @@ public class MappedTypeManager
             }
         }
 
-        Class cls = null;
         try
         {
-            cls = clr.classForName(className);
+            Class cls = clr.classForName(className);
+            if (cls != null)
+            {
+                mappedTypes.put(className, new MappedType(cls, mappingType));
+            }
         }
         catch (Exception e)
         {
             // Class not found so ignore. Should log this
-        }
-        if (cls != null)
-        {
-            MappedType type = new MappedType(cls, mappingType);
-            mappedTypes.put(className, type);
         }
     }
 
@@ -293,7 +289,6 @@ public class MappedTypeManager
         {
             return null;
         }
-
         return mappedTypes.get(className);
     }
 }
