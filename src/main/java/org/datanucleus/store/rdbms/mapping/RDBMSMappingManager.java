@@ -43,6 +43,7 @@ import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.JdbcType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
@@ -643,7 +644,6 @@ public class RDBMSMappingManager implements MappingManager
 
     /**
      * Convenience accessor for the element mapping for the element of a collection/array of elements.
-     * Currently only used where the collection/array elements are serialised/embedded into a join table.
      * @param table The table
      * @param mmd MetaData for the collection member containing the collection/array of PCs
      * @param fieldRole role of this mapping for this member
@@ -678,11 +678,22 @@ public class RDBMSMappingManager implements MappingManager
         MappingConverterDetails mcd = null;
         Class mc = null;
         String userMappingClassName = null;
+        String userTypeConverterName = null;
         if (mmd.getElementMetaData() != null)
         {
+            userTypeConverterName = mmd.getElementMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME);
             userMappingClassName = mmd.getElementMetaData().getValueForExtension("mapping-class");
         }
-        if (userMappingClassName != null)
+        if (userTypeConverterName != null)
+        {
+            TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForName(userTypeConverterName);
+            if (conv == null)
+            {
+                throw new NucleusUserException("Field " + mmd.getFullFieldName() + " ELEMENT has been specified to use type converter " + userTypeConverterName + " but not found!");
+            }
+            mcd = new MappingConverterDetails(TypeConverterMapping.class, conv); // TODO Could be TypeConverterMultiMapping?
+        }
+        else if (userMappingClassName != null)
         {
             // User has defined their own mapping class for this element so use that
             try
@@ -813,7 +824,6 @@ public class RDBMSMappingManager implements MappingManager
 
     /**
      * Convenience accessor for the mapping of the key of a map.
-     * Currently only used where the keys are serialised/embedded into a join table.
      * @param table The container
      * @param mmd MetaData for the field containing the map that this key is for
      * @param clr ClassLoader resolver
@@ -829,12 +839,23 @@ public class RDBMSMappingManager implements MappingManager
 
         MappingConverterDetails mcd = null;
         Class mc = null;
+        String userTypeConverterName = null;
         String userMappingClassName = null;
         if (mmd.getKeyMetaData() != null)
         {
+            userTypeConverterName = mmd.getKeyMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME);
             userMappingClassName = mmd.getKeyMetaData().getValueForExtension("mapping-class");
         }
-        if (userMappingClassName != null)
+        if (userTypeConverterName != null)
+        {
+            TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForName(userTypeConverterName);
+            if (conv == null)
+            {
+                throw new NucleusUserException("Field " + mmd.getFullFieldName() + " KEY has been specified to use type converter " + userTypeConverterName + " but not found!");
+            }
+            mcd = new MappingConverterDetails(TypeConverterMapping.class, conv); // TODO Could be TypeConverterMultiMapping?
+        }
+        else if (userMappingClassName != null)
         {
             // User has defined their own mapping class for this key so use that
             try
@@ -945,7 +966,6 @@ public class RDBMSMappingManager implements MappingManager
 
     /**
      * Convenience accessor for the mapping of the value for a map.
-     * Currently only used where the value are serialised/embedded into a join table.
      * @param table The container
      * @param mmd MetaData for the field/property containing the map that this value is for
      * @param clr ClassLoader resolver
@@ -961,12 +981,23 @@ public class RDBMSMappingManager implements MappingManager
 
         MappingConverterDetails mcd = null;
         Class mc = null;
+        String userTypeConverterName = null;
         String userMappingClassName = null;
         if (mmd.getValueMetaData() != null)
         {
+            userTypeConverterName = mmd.getValueMetaData().getValueForExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME);
             userMappingClassName = mmd.getValueMetaData().getValueForExtension("mapping-class");
         }
-        if (userMappingClassName != null)
+        if (userTypeConverterName != null)
+        {
+            TypeConverter conv = storeMgr.getNucleusContext().getTypeManager().getTypeConverterForName(userTypeConverterName);
+            if (conv == null)
+            {
+                throw new NucleusUserException("Field " + mmd.getFullFieldName() + " VALUE has been specified to use type converter " + userTypeConverterName + " but not found!");
+            }
+            mcd = new MappingConverterDetails(TypeConverterMapping.class, conv); // TODO Could be TypeConverterMultiMapping?
+        }
+        else if (userMappingClassName != null)
         {
             // User has defined their own mapping class for this value so use that
             try
