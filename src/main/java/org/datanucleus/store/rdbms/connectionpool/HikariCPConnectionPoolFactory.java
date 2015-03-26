@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.connectionpool;
 import javax.sql.DataSource;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
@@ -37,8 +38,7 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
      * @see org.datanucleus.store.rdbms.datasource.ConnectionPoolFactory#createConnectionPool(org.datanucleus.store.StoreManager)
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
-    {
-        String dbDriver = storeMgr.getConnectionDriverName();
+    {   
         String dbURL = storeMgr.getConnectionURL();
         String dbUser = storeMgr.getConnectionUserName();
         if (dbUser == null)
@@ -53,16 +53,23 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
 
         // Load the database driver
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
 
         // Check the existence of the necessary pooling classes
         ClassUtils.assertClassForJarExistsInClasspath(clr, "com.zaxxer.hikari.HikariConfig", "hikaricp.jar");
 
         HikariConfig config = new HikariConfig();
-        config.setDriverClassName(dbDriver);
         config.setJdbcUrl(dbURL);
         config.setUsername(dbUser);
         config.setPassword(dbPassword);
+
+        if (storeMgr.hasProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME))
+        {
+            String dbDriver = storeMgr.getStringProperty(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME);
+            loadDriver(dbDriver, clr);
+            config.setDriverClassName(dbDriver);
+        }
+
+
         if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_POOL_SIZE))
         {
             int size = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_POOL_SIZE);
@@ -97,6 +104,83 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             {
                 config.setMaxLifetime(maxLifeTime);
             }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME))
+        {
+            String dataSourceClassName = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME);
+            if (dataSourceClassName != null)
+            {
+                config.setDataSourceClassName(dataSourceClassName);
+            }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_AUTO_COMMIT))
+        {
+            boolean autoCommit = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_AUTO_COMMIT);
+            config.setAutoCommit(autoCommit);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_CONNECTION_WAIT_TIMEOUT))
+        {
+            long connectionTimeout = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_CONNECTION_WAIT_TIMEOUT);
+            if (connectionTimeout >= 0)
+            {
+                config.setConnectionTimeout(connectionTimeout);
+            }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL))
+        {
+            String connectionTestQuery = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL);
+            config.setConnectionTestQuery(connectionTestQuery);
+        }
+
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE))
+        {
+            int minimumIdle = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MIN_IDLE);
+            if (minimumIdle >= 0)
+            {
+                config.setMinimumIdle(minimumIdle);
+            }
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_NAME))
+        {
+            String poolName = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_NAME);
+            config.setPoolName(poolName);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_ALLOW_POOL_SUPSENSION))
+        {
+            boolean allowPoolSuspension = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_ALLOW_POOL_SUPSENSION);
+            config.setAllowPoolSuspension(allowPoolSuspension);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_READ_ONLY))
+        {
+            boolean readOnly = storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_READ_ONLY);
+            config.setReadOnly(readOnly);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION__POOL_VALIDATION_TIMEOUT))
+        {
+            long validationTimeout = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION__POOL_VALIDATION_TIMEOUT);
+            if (validationTimeout >= 0)
+            config.setValidationTimeout(validationTimeout);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TRANSACTION_ISOLATION))
+        {
+            String transactionIsolation = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TRANSACTION_ISOLATION);
+            config.setTransactionIsolation(transactionIsolation);
+        }
+
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_CATALOG))
+        {
+            String catalog = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_CATALOG);
+            config.setCatalog(catalog);
         }
 
         // Create the actual pool of connections
