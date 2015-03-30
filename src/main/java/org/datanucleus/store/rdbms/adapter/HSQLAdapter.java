@@ -92,6 +92,8 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         // Cannot access parent query columns in a subquery (at least in HSQLDB 1.8)
         supportedOptions.remove(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
 
+        supportedOptions.remove(SUBQUERY_IN_HAVING);
+
         if (datastoreMajorVersion < 1 || (datastoreMajorVersion == 1 && datastoreMinorVersion < 7))
         {
             // HSQL before 1.7.* doesn't support foreign keys

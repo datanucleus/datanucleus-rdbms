@@ -454,6 +454,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.add(INCLUDE_ORDERBY_COLS_IN_SELECT);
         supportedOptions.add(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
+        supportedOptions.add(SUBQUERY_IN_HAVING);
 
         supportedOptions.add(FK_DELETE_ACTION_CASCADE);
         supportedOptions.add(FK_DELETE_ACTION_RESTRICT);

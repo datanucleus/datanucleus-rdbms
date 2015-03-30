@@ -343,10 +343,10 @@ public interface DatastoreAdapter
      */
     public static final String ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED = "AccessParentQueryInSubquery";
 
-    /**
-     * In SAPDB any orderby has to be using the index(es) of any SELECT column(s) rather than
-     * their name(s).
-     */
+    /** Whether the adapter supports subqueries in the HAVING clause. */
+    public static final String SUBQUERY_IN_HAVING = "SubqueryInHaving";
+
+    /** In SAPDB any orderby has to be using the index(es) of any SELECT column(s) rather than their name(s). */
     public static final String ORDERBY_USING_SELECT_COLUMN_INDEX = "OrderByUsingSelectColumnIndex";
 
     /** Whether we support NULLS directives in ORDER expressions. */
