@@ -76,9 +76,6 @@ public class H2Adapter extends BaseDatastoreAdapter
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(TX_ISOLATION_NONE);
 
-        // TODO Does H2 support this?
-        supportedOptions.remove(SUBQUERY_IN_HAVING);
-
         // Create index before FK to avoid duplication since H2 automatically creates index for FK
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
     }
