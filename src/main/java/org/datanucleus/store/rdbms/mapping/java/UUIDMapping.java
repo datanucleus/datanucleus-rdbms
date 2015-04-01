@@ -46,13 +46,16 @@ public class UUIDMapping extends SingleFieldMapping
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
         boolean useConverter = true;
-        ColumnMetaData[] colmds = mmd.getColumnMetaData();
-        if (colmds != null && colmds.length == 1)
+        if (mmd != null)
         {
-            ColumnMetaData colmd = colmds[0];
-            if (colmd.getSqlType() != null)
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+            if (colmds != null && colmds.length == 1)
             {
-                useConverter = false;
+                ColumnMetaData colmd = colmds[0];
+                if (colmd.getSqlType() != null)
+                {
+                    useConverter = false;
+                }
             }
         }
 
@@ -77,13 +80,16 @@ public class UUIDMapping extends SingleFieldMapping
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         boolean useConverter = true;
-        ColumnMetaData[] colmds = mmd.getColumnMetaData();
-        if (colmds != null && colmds.length == 1)
+        if (mmd != null)
         {
-            ColumnMetaData colmd = colmds[0];
-            if (colmd.getSqlType() != null)
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+            if (colmds != null && colmds.length == 1)
             {
-                useConverter = false;
+                ColumnMetaData colmd = colmds[0];
+                if (colmd.getSqlType() != null)
+                {
+                    useConverter = false;
+                }
             }
         }
 
