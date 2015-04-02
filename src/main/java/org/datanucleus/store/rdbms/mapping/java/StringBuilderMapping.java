@@ -28,9 +28,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Mapping for a StringBuilder type.
- * 
- * Note: A java.lang.StringBuilder is a final class and does not allow a
- * SCO implementation in order to implement dirty detection.
+ * Note: A java.lang.StringBuilder is a final class and does not allow a SCO implementation in order to implement dirty detection.
+ * TODO Drop this and just use the TypeConverter
  */
 public class StringBuilderMapping extends StringMapping
 {

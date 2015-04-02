@@ -28,9 +28,8 @@ import org.datanucleus.store.types.converters.TypeConverter;
 
 /**
  * Mapping for a StringBuffer type.
- * 
- * Note: A java.lang.StringBuffer is a final class and does not allow a
- * SCO implementation in order of implementing dirty detecting 
+ * Note: A java.lang.StringBuffer is a final class and does not allow a SCO implementation in order of implementing dirty detection.
+ * TODO Drop this and just use the TypeConverter
  */
 public class StringBufferMapping extends StringMapping
 {
