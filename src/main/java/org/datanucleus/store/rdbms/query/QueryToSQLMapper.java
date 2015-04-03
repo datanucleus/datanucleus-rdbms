@@ -3440,17 +3440,17 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression elseActionSqlExpr = stack.pop();
 
         // Check that all action sql expressions are consistent
-        Class firstActionMappingType = actionSqlExprs[0].getJavaTypeMapping().getClass();
+        String firstActionMappingTypeName = actionSqlExprs[0].getJavaTypeMapping().getClass().getName();
         for (int j=1;j<actionSqlExprs.length;j++)
         {
             JavaTypeMapping m = actionSqlExprs[j].getJavaTypeMapping();
-            if (!m.getClass().equals(firstActionMappingType))
+            if (!m.getClass().getName().equals(firstActionMappingTypeName))
             {
                 throw new QueryCompilerSyntaxException("IF/ELSE action expression " + actionSqlExprs[j] + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
             }
         }
         JavaTypeMapping m = elseActionSqlExpr.getJavaTypeMapping();
-        if (!m.getClass().equals(firstActionMappingType))
+        if (!m.getClass().getName().equals(firstActionMappingTypeName))
         {
             throw new QueryCompilerSyntaxException("IF/ELSE action expression " + elseActionSqlExpr + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
         }
