@@ -390,13 +390,20 @@ public abstract class AbstractClassTable extends TableImpl
             }
             if (generator != null)
             {
-                valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                try
+                {
+                    valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                }
+                catch (Exception e)
+                {
+                }
             }
         }
         catch (Exception e)
         {
-            NucleusLogger.VALUEGENERATION.warn("Error retrieving storage class for value-generator " + strategyName + " " + e.getMessage());
+            NucleusLogger.VALUEGENERATION.warn("Error retrieving generator for strategy=" + strategyName, e);
         }
+
         storeMgr.getMappingManager().createDatastoreMapping(datastoreIDMapping, idColumn, valueGeneratedType.getName());
         logMapping("DATASTORE_ID", datastoreIDMapping);
 
