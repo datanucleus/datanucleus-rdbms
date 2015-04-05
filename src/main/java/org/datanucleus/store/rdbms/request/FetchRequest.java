@@ -167,8 +167,7 @@ public class FetchRequest extends Request
         SQLStatement sqlStatement = new SQLStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         Collection<MappingCallbacks> fetchCallbacks = new HashSet<MappingCallbacks>();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, 
-            sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
         callbacks = fetchCallbacks.toArray(new MappingCallbacks[fetchCallbacks.size()]);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
 
@@ -179,8 +178,7 @@ public class FetchRequest extends Request
         {
             // Datastore identity value for input
             JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
-            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                datastoreIdMapping);
+            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
             sqlStatement.whereAnd(expr.eq(val), true);
 
@@ -200,8 +198,7 @@ public class FetchRequest extends Request
             {
                 AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
                 JavaTypeMapping pkMapping = table.getMemberMapping(mmd);
-                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(),
-                    pkMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
                 sqlStatement.whereAnd(expr.eq(val), true);
 
@@ -224,10 +221,8 @@ public class FetchRequest extends Request
         {
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping,
-                storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
+            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -281,8 +276,7 @@ public class FetchRequest extends Request
         if (fieldsToFetch != null && NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", op.getObjectAsPrintable(),
-                fieldsToFetch, table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", op.getObjectAsPrintable(), fieldsToFetch, table));
         }
 
         if (isFetchingVersionOnly() && isVersionLoaded(op))
@@ -298,8 +292,7 @@ public class FetchRequest extends Request
             short lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
             if (lockType != LockManager.LOCK_MODE_NONE)
             {
-                if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ ||
-                    lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
+                if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ || lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
                 {
                     // Override with pessimistic lock
                     locked = true;
@@ -329,18 +322,15 @@ public class FetchRequest extends Request
                         // Provide the primary key field(s) to the JDBC statement
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(
-                                StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps,
-                                    datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getDatastoreIdMapping().setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(),
-                                storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDef));
+                            op.provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDef));
                         }
 
                         // Execute the statement
@@ -352,16 +342,13 @@ public class FetchRequest extends Request
                             {
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018",
-                                        op.getInternalObjectId()));
+                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", op.getInternalObjectId()));
                                 }
-                                throw new NucleusObjectNotFoundException("No such database row",
-                                    op.getInternalObjectId());
+                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
                             }
 
                             // Copy the results into the object
-                            op.replaceFields(memberNumbersToFetch,
-                                storeMgr.getFieldManagerForResultProcessing(op, rs, mappingDef));
+                            op.replaceFields(memberNumbersToFetch, storeMgr.getFieldManagerForResultProcessing(op, rs, mappingDef));
 
                             if (op.getTransactionalVersion() == null)
                             {
@@ -370,11 +357,8 @@ public class FetchRequest extends Request
                                 if (fetchingSurrogateVersion)
                                 {
                                     // Surrogate version column - get from the result set using the version mapping
-                                    StatementMappingIndex verIdx =
-                                        mappingDef.getMappingForMemberPosition(
-                                            StatementClassMapping.MEMBER_VERSION);
-                                    datastoreVersion = table.getVersionMapping(true).getObject(ec, rs,
-                                        verIdx.getColumnPositions());
+                                    StatementMappingIndex verIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
+                                    datastoreVersion = table.getVersionMapping(true).getObject(ec, rs, verIdx.getColumnPositions());
                                 }
                                 else if (versionFieldName != null)
                                 {
@@ -409,8 +393,7 @@ public class FetchRequest extends Request
                 {
                     exceptions.add(sqle);
                 }
-                throw new NucleusDataStoreException(msg, 
-                    (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
             }
         }
 
@@ -454,8 +437,7 @@ public class FetchRequest extends Request
      * @return Number of fields being fetched
      */
     protected int processMembersOfClass(SQLStatement sqlStatement, AbstractMemberMetaData[] mmds, 
-            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, 
-            Collection fetchCallbacks, ClassLoaderResolver clr)
+            DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr)
     {
         int number = 0;
         if (mmds != null)
@@ -490,8 +472,7 @@ public class FetchRequest extends Request
                                 }
                             }
                         }
-                        SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null,
-                            sqlTbl, mmd, clr, depth);
+                        SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth);
                         number++;
                     }
 
@@ -509,8 +490,7 @@ public class FetchRequest extends Request
         {
             // Select version
             StatementMappingIndex verMapIdx = new StatementMappingIndex(verMapping);
-            SQLTable verSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStatement, sqlTbl,
-                verMapping);
+            SQLTable verSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStatement, sqlTbl, verMapping);
             int[] cols = sqlStatement.select(verSqlTbl, verMapping, null);
             verMapIdx.setColumnPositions(cols);
             mappingDef.addMappingForMember(StatementClassMapping.MEMBER_VERSION, verMapIdx);
