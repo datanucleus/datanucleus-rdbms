@@ -46,7 +46,6 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
@@ -59,6 +58,7 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -73,10 +73,10 @@ public class FKSetStore extends AbstractSetStore
     /** Field number of owner link in element class. */
     private final int ownerFieldNumber;
 
-    /** Statement for updating a foreign key in a 1-N unidirectional */
+    /** Statement for updating a FK in the element. */
     private String updateFkStmt;
 
-    /** Statement for nullifying a FK in the element. */
+    /** Statement for clearing a FK in the element. */
     private String clearNullifyStmt;
 
     /**
@@ -258,44 +258,19 @@ public class FKSetStore extends AbstractSetStore
             try
             {
                 int jdbcPosition = 1;
-                if (elementInfo.length > 1)
-                {
-                    DatastoreClass table = storeMgr.getDatastoreClass(element.getClass().getName(), clr);
-                    if (table != null)
-                    {
-                        stmt = stmt.replace("<TABLE NAME>", table.toString());
-                    }
-                    else
-                    {
-                        NucleusLogger.PERSISTENCE.warn("FKSetStore.updateElementFK : need to set table in statement but dont know table where to store " + element);
-                    }
-                }
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
                 try
                 {
+                    // TODO ownerMapping is for a particular elementInfo so need to use the right one when we have multiple
                     if (owner == null)
                     {
-                        if (ownerMemberMetaData != null)
-                        {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                                null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
-                        }
-                        else
-                        {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null);
-                        }
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
+                            null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     else
                     {
-                        if (ownerMemberMetaData != null)
-                        {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                                op.getObject(), op, ownerMemberMetaData.getAbsoluteFieldNumber());
-                        }
-                        else
-                        {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), op.getObject());
-                        }
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
+                            op.getObject(), op, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
 
@@ -839,133 +814,123 @@ public class FKSetStore extends AbstractSetStore
 
             // Clear the FKs in the datastore
             // TODO This is likely not necessary in the 1-N bidir case since we've just set the owner FK to null above
-            String stmt = getClearNullifyStmt();
-            try
+            for (int i=0;i<elementInfo.length;i++)
             {
-                if (elementInfo.length > 1)
-                {
-                    // TODO we should loop over all tables that has elements stored into and clear all them
-                    DatastoreClass table = storeMgr.getDatastoreClass(elementInfo[0].getClassName(), clr);
-                    if (table != null)
-                    {
-                        stmt = stmt.replace("<TABLE NAME>", table.toString());
-                    }
-                    else
-                    {
-                        NucleusLogger.PERSISTENCE.warn("FKSetStore.updateElementFK : " +
-                            "need to set table in statement but dont know table where to store " + elementInfo[0].getClassName());
-                    }
-                }
-                ManagedConnection mconn = storeMgr.getConnection(ec);
-                SQLController sqlControl = storeMgr.getSQLController();
+                String stmt = getClearNullifyStmt(elementInfo[i]);
                 try
                 {
-                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {
-                        int jdbcPosition = 1;
-                        BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                        PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                        try
+                        {
+                            int jdbcPosition = 1;
+                            BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                            sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                        }
+                        finally
+                        {
+                            sqlControl.closeStatement(mconn, ps);
+                        }
                     }
                     finally
                     {
-                        sqlControl.closeStatement(mconn, ps);
+                        mconn.release();
                     }
                 }
-                finally
+                catch (SQLException e)
                 {
-                    mconn.release();
+                    throw new NucleusDataStoreException(Localiser.msg("056013",stmt), e);
                 }
-            }
-            catch (SQLException e)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("056013",stmt),e);
             }
         }
     }
 
     /**
      * Generates the statement for clearing items by nulling the owner link out.
-     * The statement will be
+     * The statement will be of the form
      * <PRE>
      * UPDATE LISTTABLE SET OWNERCOL=NULL [,DISTINGUISHER=NULL]
      * WHERE OWNERCOL=?
      * </PRE>
-     * when there is only one element table, and will be
-     * <PRE>
-     * UPDATE &lt;TABLE NAME&gt; SET OWNERCOL=NULL [,DISTINGUISHER=NULL]
-     * WHERE OWNERCOL=?
-     * </PRE>
-     * when there is more than 1 element table.
      * @return The Statement for clearing items for the owner.
      */
-    protected String getClearNullifyStmt()
+    protected String getClearNullifyStmt(ElementInfo info)
     {
-        if (clearNullifyStmt == null)
+        if (elementInfo.length == 1 && clearNullifyStmt != null)
         {
-            synchronized (this)
-            {
-                // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
-                StringBuilder stmt = new StringBuilder("UPDATE ");
-                if (elementInfo.length > 1)
-                {
-                    //CANNOT USE ? to replace. JDBC drivers does not accept, so we replace
-                    //the <TABLE NAME> right before firing the statement to the database
-                    stmt.append("<TABLE NAME>");
-                }
-                else
-                {
-                    // Could use elementInfo[0].getDatastoreClass but need to allow for relation being in superclass table
-                    stmt.append(containerTable.toString());
-                }
-                stmt.append(" SET ");
-                for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
-                {
-                    if (i > 0)
-                    {
-                        stmt.append(", ");
-                    }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
-                    stmt.append("=NULL");
-                }
-                if (relationDiscriminatorMapping != null)
-                {
-                    for (int i=0; i<relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
-                    {
-                        stmt.append(", ");
-                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
-                        stmt.append("=NULL");
-                    }
-                }
-                stmt.append(" WHERE ");
-                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+            return clearNullifyStmt;
+        }
 
-                clearNullifyStmt = stmt.toString();
+        StringBuilder stmt = new StringBuilder("UPDATE ");
+        if (elementInfo.length > 1)
+        {
+            stmt.append(info.getDatastoreClass().toString());
+        }
+        else
+        {
+            // Could use elementInfo[0].getDatastoreClass but need to allow for relation being in superclass table
+            stmt.append(containerTable.toString());
+        }
+
+        stmt.append(" SET ");
+        JavaTypeMapping ownerMapping = this.ownerMapping;
+        if (ownerMemberMetaData.getMappedBy() != null)
+        {
+            ownerMapping = info.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
+        }
+        else
+        {
+            ownerMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+        }
+        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(", ");
+            }
+            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append("=NULL");
+        }
+
+        JavaTypeMapping relDiscrimMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        if (relDiscrimMapping != null)
+        {
+            for (int i=0; i<relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
+            {
+                stmt.append(", ");
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append("=NULL");
             }
         }
-        return clearNullifyStmt;
+
+        stmt.append(" WHERE ");
+        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+        if (elementInfo.length == 1)
+        {
+            clearNullifyStmt = stmt.toString();
+        }
+
+        return stmt.toString();
     }
 
     /**
-     * Generate statement for updating a Foreign Key in an inverse 1-N.
-     * The statement generated will be
+     * Generate statement for updating a Foreign Key in a FK 1-N.
+     * The statement generated will be of the form
      * <PRE>
      * UPDATE ELEMENTTABLE SET FK_COL_1=?, FK_COL_2=?, [DISTINGUISHER=?]
      * WHERE ELEMENT_ID = ?
      * </PRE>
-     * where there is a single element table, and
-     * <PRE>
-     * UPDATE <TABLE NAME> SET FK_COL_1=?, FK_COL_2=?, [DISTINGUISHER=?]
-     * WHERE ELEMENT_ID=?
-     * </PRE>
-     * where there are more than 1 element tables
-     * @return Statement for updating the FK in an inverse 1-N
+     * @return Statement for updating the FK in a FK 1-N
      */
     private String getUpdateFkStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementInfo.length > 1)
         {
-            // The statement is based on the element passed in so don't cache
+            // Can't cache in this situation since next time may be a different implementation
             return getUpdateFkStatementString(element);
         }
 
@@ -981,19 +946,34 @@ public class FKSetStore extends AbstractSetStore
 
     private String getUpdateFkStatementString(Object element)
     {
-        StringBuilder stmt = new StringBuilder("UPDATE ");
-        // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
+        JavaTypeMapping elemMapping = elementMapping;
+        Table table = containerTable;
         if (elementInfo.length > 1)
         {
-            //CANNOT USE ? to replace. JDBC drivers does not accept, so we replace
-            //the <TABLE NAME> right before firing the statement to the database
-            stmt.append("<TABLE NAME>");
+            for (int i=0;i<elementInfo.length;i++)
+            {
+                ElementInfo info = elementInfo[i];
+                Class implCls = clr.classForName(info.getClassName());
+                if (element.getClass().isAssignableFrom(implCls))
+                {
+                    table = info.getDatastoreClass();
+                    if (ownerMemberMetaData.getMappedBy() != null)
+                    {
+                        elemMapping = info.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
+                    }
+                    else
+                    {
+                        elemMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    }
+                    break;
+                }
+            }
         }
-        else
-        {
-            // Could use elementInfo[0].getDatastoreClass but need to allow for relation being in superclass table
-            stmt.append(containerTable.toString());
-        }
+
+        StringBuilder stmt = new StringBuilder("UPDATE ");
+        // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
+        stmt.append(table.toString());
+
         stmt.append(" SET ");
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
@@ -1017,8 +997,7 @@ public class FKSetStore extends AbstractSetStore
         }
 
         stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, 
-            null, true);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elemMapping, element, elementsAreSerialised, null, true);
 
         return stmt.toString();
     }

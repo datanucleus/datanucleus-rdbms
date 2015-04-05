@@ -236,9 +236,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
         String[] clsNames;
         if (clr.classForName(elementType).isInterface())
         {
-            // Collection<interface>, so find implementations of the interface and choose the first
+            // Collection<interface>, so find implementations of the interface
             clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
-            rootTbl = storeMgr.getDatastoreClass(clsNames[0], clr);
+            rootTbl = null;
         }
         else
         {
@@ -248,12 +248,25 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
         if (rootTbl == null)
         {
-            AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
-            info = new ElementInfo[subclassCmds.length];
-            for (int i=0;i<subclassCmds.length;i++)
+            if (clr.classForName(elementType).isInterface())
             {
-                DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
-                info[i] = new ElementInfo(subclassCmds[i], table);
+                info = new ElementInfo[clsNames.length];
+                for (int i=0;i<clsNames.length;i++)
+                {
+                    AbstractClassMetaData implCmd = storeMgr.getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
+                    DatastoreClass table = storeMgr.getDatastoreClass(clsNames[i], clr);
+                    info[i] = new ElementInfo(implCmd, table);
+                }
+            }
+            else
+            {
+                AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
+                info = new ElementInfo[subclassCmds.length];
+                for (int i=0;i<subclassCmds.length;i++)
+                {
+                    DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
+                    info[i] = new ElementInfo(subclassCmds[i], table);
+                }
             }
         }
         else
