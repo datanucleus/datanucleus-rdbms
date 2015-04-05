@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.mapping.java.DiscriminatorLongMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -832,6 +833,13 @@ public class SQLStatementHelper
                         {
                             // Join to the join table
                             JavaTypeMapping referenceMapping = collTable.getElementMapping();
+                            if (referenceMapping instanceof ReferenceMapping)
+                            {
+                                // Join table has a reference mapping pointing to our table, so get the submapping for the implementation
+                                ReferenceMapping refMap = (ReferenceMapping)referenceMapping;
+                                Class implType = clr.classForName(mmd.getClassName(true));
+                                referenceMapping = refMap.getJavaTypeMappingForType(implType);
+                            }
                             joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
                                 collTable, null, referenceMapping, null, tableGroupName + "_JOIN");
                         }

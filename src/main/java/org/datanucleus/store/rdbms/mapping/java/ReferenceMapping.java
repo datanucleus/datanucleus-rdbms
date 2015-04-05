@@ -105,14 +105,37 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     }
 
     /**
-     * Accessor for the mapping strategy. There are various supported strategies for reference
-     * fields with the default being one mapping per implementation, but also allowing a single
-     * (String) mapping for all implementations.
+     * Accessor for the mapping strategy. There are various supported strategies for reference fields with the default 
+     * being one mapping per implementation, but also allowing a single (String) mapping for all implementations.
      * @return The mapping strategy
      */
     public int getMappingStrategy()
     {
         return mappingStrategy;
+    }
+
+    /**
+     * Method to return the submapping for the specified (implementation) type.
+     * If PER_IMPLEMENTATION_MAPPING is specified then tries to find the appropriate submapping for this implementation type.
+     * Otherwise just returns this mapping.
+     * @param type The implementation type we want the submapping for
+     * @return The javaTypeMapping for this implementation
+     */
+    public JavaTypeMapping getJavaTypeMappingForType(Class type)
+    {
+        if (mappingStrategy == PER_IMPLEMENTATION_MAPPING)
+        {
+            for (int i=0;i<javaTypeMappings.length;i++)
+            {
+                JavaTypeMapping m = javaTypeMappings[i];
+                Class implType = storeMgr.getNucleusContext().getClassLoaderResolver(type.getClassLoader()).classForName(m.getType());
+                if (type.isAssignableFrom(implType))
+                {
+                    return m;
+                }
+            }
+        }
+        return this;
     }
 
     /**
