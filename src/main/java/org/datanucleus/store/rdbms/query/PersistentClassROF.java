@@ -233,8 +233,8 @@ public final class PersistentClassROF implements ResultObjectFactory
                 if (numConcreteSubclasses == 1)
                 {
                     // Only one possible subclass, so use that
-                    pcClassForObject = concreteSubclass;
                     NucleusLogger.DATASTORE_RETRIEVE.warn(Localiser.msg("052300", pcClassForObject.getName(), concreteSubclass.getName()));
+                    pcClassForObject = concreteSubclass;
                 }
                 else if (numConcreteSubclasses == 0)
                 {
