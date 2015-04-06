@@ -50,10 +50,8 @@ import org.datanucleus.util.StringUtils;
  * <h3>Supported options</h3>
  * This generator supports
  * <ul>
- * <li><b>selectNucleusType</b> : adds a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the 
- *     class name.</li>
- * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table
- *     collection.</li>
+ * <li><b>selectNucleusType</b> : adds a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the class name.</li>
+ * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table collection.</li>
  * </ul>
  */
 public class UnionStatementGenerator extends AbstractStatementGenerator
@@ -143,13 +141,10 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
      * @param joinElementMapping Mapping in the join table to link to the element
      */
     public UnionStatementGenerator(RDBMSStoreManager storeMgr, ClassLoaderResolver clr, 
-            Class candidateType, boolean includeSubclasses,
-            DatastoreIdentifier candidateTableAlias, String candidateTableGroupName,
-            Table joinTable, DatastoreIdentifier joinTableAlias, 
-            JavaTypeMapping joinElementMapping)
+            Class candidateType, boolean includeSubclasses, DatastoreIdentifier candidateTableAlias, String candidateTableGroupName,
+            Table joinTable, DatastoreIdentifier joinTableAlias, JavaTypeMapping joinElementMapping)
     {
-        super(storeMgr, clr, candidateType, includeSubclasses, candidateTableAlias, candidateTableGroupName,
-            joinTable, joinTableAlias, joinElementMapping);
+        super(storeMgr, clr, candidateType, includeSubclasses, candidateTableAlias, candidateTableGroupName, joinTable, joinTableAlias, joinElementMapping);
     }
 
     /* (non-Javadoc)
@@ -171,8 +166,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
     {
         // Find set of possible candidates (including subclasses of subclasses)
         Collection<String> candidateClassNames = new ArrayList<String>();
-        AbstractClassMetaData acmd = 
-            storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
+        AbstractClassMetaData acmd = storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
         candidateClassNames.add(acmd.getFullClassName());
         if (includeSubclasses)
         {
@@ -219,8 +213,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         {
             // Either passed invalid classes, or no concrete classes with available tables present!
             throw new NucleusException("Attempt to generate SQL statement using UNIONs for " + 
-                candidateType.getName() + 
-                " yet there are no concrete classes with their own table available");
+                candidateType.getName() + " yet there are no concrete classes with their own table available");
         }
 
         SQLStatement stmt = null;
@@ -285,8 +278,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
             // INNER JOIN from the root candidate table to this candidates table
             JavaTypeMapping candidateIdMapping = candidateTable.getIdMapping();
             JavaTypeMapping tableIdMapping = table.getIdMapping();
-            SQLTable tableSqlTbl = stmt.innerJoin(null, candidateIdMapping, table, null, tableIdMapping, null,
-                stmt.getPrimaryTable().getGroupName());
+            SQLTable tableSqlTbl = stmt.innerJoin(null, candidateIdMapping, table, null, tableIdMapping, null, stmt.getPrimaryTable().getGroupName());
             tblGroupName = tableSqlTbl.getGroupName();
         }
 
@@ -302,8 +294,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
             if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
             {
                 // Get the MetaData for the target class since that holds the "value"
-                AbstractClassMetaData targetCmd = 
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
+                AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
                 discriminatorValue = targetCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue();
             }
 
@@ -318,8 +309,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), tblGroupName);
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping,
-                    storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -333,8 +323,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
 
             if (subclassTable == null)
             {
-                AbstractClassMetaData targetSubCmd = 
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(subclassName, clr);
+                AbstractClassMetaData targetSubCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(subclassName, clr);
                 AbstractClassMetaData[] targetSubCmds = storeMgr.getClassesManagingTableForClass(targetSubCmd, clr);
                 subclassTables = new DatastoreClass[targetSubCmds.length];
                 for (int i=0;i<targetSubCmds.length;i++)
@@ -357,9 +346,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping tableIdMapping = table.getIdMapping();
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, tableIdMapping, subclassTables[i], null, 
-                    		subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
-
+                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, tableIdMapping, subclassTables[i], null, subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
                     SQLExpression nullExpr = new NullLiteral(stmt, null, null, null);
                     stmt.whereAnd(subclassIdExpr.eq(nullExpr), false);
@@ -404,22 +391,19 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         if (hasOption(OPTION_ALLOW_NULLS))
         {
             // Put element table in same table group since all relates to the elements
-            candidateSQLTable = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null, 
-                candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            candidateSQLTable = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
         }
         else
         {
             // Put element table in same table group since all relates to the elements
-            candidateSQLTable = stmt.innerJoin(null, joinElementMapping, candidateTable, null,
-                candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            candidateSQLTable = stmt.innerJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
         }
 
         if (table != candidateTable)
         {
             // INNER JOIN from the root candidate table to this candidates table
             JavaTypeMapping tableIdMapping = table.getIdMapping();
-            stmt.innerJoin(candidateSQLTable, candidateIdMapping, table, null, tableIdMapping, null,
-                stmt.getPrimaryTable().getGroupName());
+            stmt.innerJoin(candidateSQLTable, candidateIdMapping, table, null, tableIdMapping, null, stmt.getPrimaryTable().getGroupName());
         }
 
         // Add any discriminator restriction in the table for the specified class
@@ -445,8 +429,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
 
             if (subclassTable == null)
             {
-                AbstractClassMetaData targetSubCmd = 
-                    storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(subclassName, clr);
+                AbstractClassMetaData targetSubCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(subclassName, clr);
                 AbstractClassMetaData[] targetSubCmds = storeMgr.getClassesManagingTableForClass(targetSubCmd, clr);
                 subclassTables = new DatastoreClass[targetSubCmds.length];
                 for (int i=0;i<targetSubCmds.length;i++)
@@ -468,9 +451,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                     // Adds FROM clause of "LEFT OUTER JOIN {subTable} ON ..."
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, joinElementMapping, subclassTables[i], null,
-                            subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
-
+                    SQLTable sqlTableSubclass = stmt.leftOuterJoin(null, joinElementMapping, subclassTables[i], null, subclassIdMapping, null, stmt.getPrimaryTable().getGroupName());
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
                     SQLExpression nullExpr = new NullLiteral(stmt, null, null, null);
                     stmt.whereAnd(subclassIdExpr.eq(nullExpr), false);

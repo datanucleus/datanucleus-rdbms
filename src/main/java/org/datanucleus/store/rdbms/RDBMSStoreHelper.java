@@ -28,6 +28,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
+import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -72,9 +73,7 @@ public class RDBMSStoreHelper
         DatastoreClass primaryTable = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
 
         // Form the query to find which one of these classes has the instance with this id
-        DiscriminatorStatementGenerator stmtGen =
-            new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(cmd.getFullClassName()), true,
-                null, null);
+        DiscriminatorStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(cmd.getFullClassName()), true, null, null);
         stmtGen.setOption(StatementGenerator.OPTION_RESTRICT_DISCRIM);
         SQLStatement sqlStmt = stmtGen.getStatement();
 
@@ -102,8 +101,7 @@ public class RDBMSStoreHelper
 
             try
             {
-                PreparedStatement ps =
-                    SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmt, ec, mconn, null, null);
+                PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmt, ec, mconn, null, null);
                 String statement = sqlStmt.getSelectStatement().toSQL();
                 try
                 {
@@ -115,8 +113,7 @@ public class RDBMSStoreHelper
                             while (rs.next())
                             {
                                 DiscriminatorMetaData dismd = discrimMapping.getTable().getDiscriminatorMetaData();
-                                return RDBMSQueryUtils.getClassNameFromDiscriminatorResultSetRow(
-                                    discrimMapping, dismd, rs, ec);
+                                return RDBMSQueryUtils.getClassNameFromDiscriminatorResultSetRow(discrimMapping, dismd, rs, ec);
                             }
                         }
                     }
@@ -153,8 +150,7 @@ public class RDBMSStoreHelper
      * @param rootCmds Metadata for the classes at the root
      * @return Name of the class with this identity (or null if none found)
      */
-    public static String getClassNameForIdUsingUnion(RDBMSStoreManager storeMgr, ExecutionContext ec, Object id,
-            List<AbstractClassMetaData> rootCmds)
+    public static String getClassNameForIdUsingUnion(RDBMSStoreManager storeMgr, ExecutionContext ec, Object id, List<AbstractClassMetaData> rootCmds)
     {
         // Check for input error
         if (rootCmds == null || rootCmds.isEmpty() || id == null)
@@ -173,6 +169,11 @@ public class RDBMSStoreHelper
         while (rootCmdIter.hasNext())
         {
             AbstractClassMetaData rootCmd = rootCmdIter.next();
+            if (rootCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            {
+                // TODO This branch needs forming from the subclass(es) and then merging into a Union
+            }
+
             DatastoreClass rootTbl = storeMgr.getDatastoreClass(rootCmd.getFullClassName(), clr);
             if (rootTbl == null)
             {
@@ -186,9 +187,7 @@ public class RDBMSStoreHelper
                 {
                     for (int i=0;i<subcmds.length;i++)
                     {
-                        UnionStatementGenerator stmtGen =
-                            new UnionStatementGenerator(storeMgr, clr, clr.classForName(subcmds[i].getFullClassName()), true,
-                                null, null);
+                        UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(subcmds[i].getFullClassName()), true, null, null);
                         stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                         if (sqlStmtMain == null)
                         {
@@ -205,9 +204,7 @@ public class RDBMSStoreHelper
             }
             else
             {
-                UnionStatementGenerator stmtGen =
-                    new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootCmd.getFullClassName()), true,
-                        null, null);
+                UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootCmd.getFullClassName()), true, null, null);
                 stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 if (sqlStmtMain == null)
                 {
@@ -222,6 +219,7 @@ public class RDBMSStoreHelper
             }
         }
 
+        // TODO Each UnionStatementGenerator part needs to do this since the mapping of fieldExpr may differ across subclasses
         // WHERE (object id) = ?
         JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
         JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
@@ -241,8 +239,7 @@ public class RDBMSStoreHelper
 
             try
             {
-                PreparedStatement ps =
-                    SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmtMain, ec, mconn, null, null);
+                PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmtMain, ec, mconn, null, null);
                 String statement = sqlStmtMain.getSelectStatement().toSQL();
                 try
                 {
@@ -280,7 +277,7 @@ public class RDBMSStoreHelper
         }
         catch (SQLException sqe)
         {
-            NucleusLogger.DATASTORE.error(sqe);
+            NucleusLogger.DATASTORE.error("Exception with UNION statement", sqe);
             throw new NucleusDataStoreException(sqe.toString());
         }
 

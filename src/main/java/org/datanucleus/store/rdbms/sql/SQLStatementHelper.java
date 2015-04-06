@@ -65,6 +65,7 @@ import org.datanucleus.store.rdbms.table.PersistableJoinTable;
 import org.datanucleus.store.rdbms.table.SecondaryDatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Series of convenience methods to help the process of generating SQLStatements.
@@ -908,8 +909,8 @@ public class SQLStatementHelper
                     AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
                     if (ownerParentCmds.length > 1)
                     {
-                        throw new NucleusUserException("Relation (" + mmd.getFullFieldName() + 
-                        ") with multiple related tables (using subclass-table). Not supported");
+                        NucleusLogger.QUERY.info("Relation (" + mmd.getFullFieldName() + ") with multiple related tables (using subclass-table). Not supported so selecting FK of related object only");
+                        return true;
                     }
 
                     relatedTbl = storeMgr.getDatastoreClass(ownerParentCmds[0].getFullClassName(), clr);
