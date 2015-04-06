@@ -249,13 +249,13 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         }
     }
 
-	/**
-	 * Method to create the repository for ids to be stored.
-	 * @return Whether it was created successfully.
-	 */
-	protected boolean createRepository()
-	{
-        RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
+    /**
+     * Method to create the repository for ids to be stored.
+     * @return Whether it was created successfully.
+     */
+    protected boolean createRepository()
+    {
+        RDBMSStoreManager srm = (RDBMSStoreManager) storeMgr;
         if (!srm.getSchemaHandler().isAutoCreateTables())
         {
             throw new NucleusUserException(Localiser.msg("040011", sequenceTable));
@@ -275,7 +275,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         {
             throw new ValueGenerationException("Exception thrown calling table.exists() for " + sequenceTable, sqle);
         }
-	}
+    }
 
     /**
      * Method to initialise the sequence table used for storing the sequence values.
