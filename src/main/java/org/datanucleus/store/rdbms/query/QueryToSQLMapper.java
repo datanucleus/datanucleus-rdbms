@@ -2735,6 +2735,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             {
                                 // Member is in own table, so move to that SQL table mapping
                                 relTable = storeMgr.getDatastoreClass(relCmd.getFullClassName(), clr);
+                                if (relTable == null)
+                                {
+                                    throw new NucleusUserException("Reference to PrimaryExpression " + primExpr + " yet this needs to join relation " + mmd.getFullFieldName() + 
+                                        " and the other type has no table (subclass-table?). Try casting to the explicit type");
+                                }
                                 relMapping = relTable.getIdMapping();
 
                                 // Join to other table unless we already have the join in place

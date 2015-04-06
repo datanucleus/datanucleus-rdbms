@@ -28,7 +28,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
-import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -169,11 +168,6 @@ public class RDBMSStoreHelper
         while (rootCmdIter.hasNext())
         {
             AbstractClassMetaData rootCmd = rootCmdIter.next();
-            if (rootCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
-            {
-                // TODO This branch needs forming from the subclass(es) and then merging into a Union
-            }
-
             DatastoreClass rootTbl = storeMgr.getDatastoreClass(rootCmd.getFullClassName(), clr);
             if (rootTbl == null)
             {
@@ -193,10 +187,25 @@ public class RDBMSStoreHelper
                         {
                             sampleCmd = subcmds[i];
                             sqlStmtMain = stmtGen.getStatement();
+
+                            // WHERE (object id) = ?
+                            JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
+                            JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                            SQLExpression fieldExpr = exprFactory.newExpression(sqlStmtMain, sqlStmtMain.getPrimaryTable(), idMapping);
+                            SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmtMain, idParamMapping, id, "ID");
+                            sqlStmtMain.whereAnd(fieldExpr.eq(fieldVal), true);
                         }
                         else
                         {
                             SQLStatement sqlStmt = stmtGen.getStatement();
+
+                            // WHERE (object id) = ?
+                            JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
+                            JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                            SQLExpression fieldExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), idMapping);
+                            SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmt, idParamMapping, id, "ID");
+                            sqlStmt.whereAnd(fieldExpr.eq(fieldVal), true);
+
                             sqlStmtMain.union(sqlStmt);
                         }
                     }
@@ -210,22 +219,29 @@ public class RDBMSStoreHelper
                 {
                     sampleCmd = rootCmd;
                     sqlStmtMain = stmtGen.getStatement();
+
+                    // WHERE (object id) = ?
+                    JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
+                    JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                    SQLExpression fieldExpr = exprFactory.newExpression(sqlStmtMain, sqlStmtMain.getPrimaryTable(), idMapping);
+                    SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmtMain, idParamMapping, id, "ID");
+                    sqlStmtMain.whereAnd(fieldExpr.eq(fieldVal), true);
                 }
                 else
                 {
                     SQLStatement sqlStmt = stmtGen.getStatement();
+
+                    // WHERE (object id) = ?
+                    JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
+                    JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                    SQLExpression fieldExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), idMapping);
+                    SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmt, idParamMapping, id, "ID");
+                    sqlStmt.whereAnd(fieldExpr.eq(fieldVal), true);
+
                     sqlStmtMain.union(sqlStmt);
                 }
             }
         }
-
-        // TODO Each UnionStatementGenerator part needs to do this since the mapping of fieldExpr may differ across subclasses
-        // WHERE (object id) = ?
-        JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
-        JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
-        SQLExpression fieldExpr = exprFactory.newExpression(sqlStmtMain, sqlStmtMain.getPrimaryTable(), idMapping);
-        SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmtMain, idParamMapping, id, "ID");
-        sqlStmtMain.whereAnd(fieldExpr.eq(fieldVal), true);
 
         // Perform the query
         try
