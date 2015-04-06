@@ -2701,11 +2701,29 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             if (primExpr.getParent() != null && primExpr.getParent().getOperator() == Expression.OP_CAST)
                             {
                                 // Cast and not an interface field, so do a join to the table of the persistable object
-                                if (!(mapping instanceof ReferenceMapping))
+                                if (mapping instanceof ReferenceMapping)
                                 {
                                     // Don't join with interface field since represents multiple implementations
                                     // and the cast will be a restrict on which implementation to join to
-                                    forceJoin = Boolean.TRUE;
+                                }
+                                else
+                                {
+                                    AbstractClassMetaData relCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                                    if (relCmd != null && !relCmd.isEmbeddedOnly())
+                                    {
+                                        DatastoreClass relTable = storeMgr.getDatastoreClass(relCmd.getFullClassName(), clr);
+                                        if (relTable == null)
+                                        {
+                                        }
+                                        else
+                                        {
+                                            forceJoin = Boolean.TRUE;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        forceJoin = Boolean.TRUE;
+                                    }
                                 }
                             }
                         }
@@ -2737,8 +2755,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 relTable = storeMgr.getDatastoreClass(relCmd.getFullClassName(), clr);
                                 if (relTable == null)
                                 {
-                                    throw new NucleusUserException("Reference to PrimaryExpression " + primExpr + " yet this needs to join relation " + mmd.getFullFieldName() + 
-                                        " and the other type has no table (subclass-table?). Try casting to the explicit type");
+                                    // No table for the related type (subclass-table), so see if this class has a single subclass with its own table
+                                    Collection<String> relSubclassNames = storeMgr.getSubClassesForClass(relCmd.getFullClassName(), false, clr);
+                                    if (relSubclassNames != null && relSubclassNames.size() == 1)
+                                    {
+                                        String relSubclassName = relSubclassNames.iterator().next();
+                                        relTable = storeMgr.getDatastoreClass(relSubclassName, clr);
+                                        // TODO Cater for this having no table and next level yes etc
+                                        if (relTable != null)
+                                        {
+                                            relCmd = ec.getMetaDataManager().getMetaDataForClass(relSubclassName, clr);
+                                        }
+                                    }
+                                    if (relTable == null)
+                                    {
+                                        // No table as such, so likely using subclass-table at other side and we don't know where to join to
+                                        throw new NucleusUserException("Reference to PrimaryExpression " + primExpr + " yet this needs to join relation " + mmd.getFullFieldName() + 
+                                                " and the other type has no table (subclass-table?). Maybe use a CAST to the appropriate subclass?");
+                                    }
                                 }
                                 relMapping = relTable.getIdMapping();
 
