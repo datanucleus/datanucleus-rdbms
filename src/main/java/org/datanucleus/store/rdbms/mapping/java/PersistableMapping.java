@@ -155,9 +155,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 {
                     if (cmds.length > 1)
                     {
+                        // TODO Only log this when it is really necessary. In some situations it is fine
                         NucleusLogger.PERSISTENCE.warn("Field " + mmd.getFullFieldName() + " represents either a 1-1 relation, " +
                             "or a N-1 relation where the other end uses \"subclass-table\" inheritance strategy and more " +
-                        "than 1 subclasses with a table. This is not fully supported");
+                            "than 1 subclasses with a table. This is not fully supported");
                     }
                 }
                 else
