@@ -246,7 +246,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (getRelationDiscriminatorMapping() != null)
+                    if (relationDiscriminatorMapping != null)
                     {
                         BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
@@ -296,9 +296,9 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
                 // Insert the join table row
                 int jdbcPosition = 1;
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, getElementMapping());
-                jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, orderId, jdbcPosition, getOrderMapping());
-                if (getRelationDiscriminatorMapping() != null)
+                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, orderId, jdbcPosition, orderMapping);
+                if (relationDiscriminatorMapping != null)
                 {
                     jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                 }

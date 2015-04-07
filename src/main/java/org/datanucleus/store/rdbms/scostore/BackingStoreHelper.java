@@ -87,12 +87,10 @@ public class BackingStoreHelper
      * @param ecs store
      * @return The next position in the JDBC statement
      */
-    public static int populateRelationDiscriminatorInStatement(ExecutionContext ec, PreparedStatement ps, 
-            int jdbcPosition, ElementContainerStore ecs)
+    public static int populateRelationDiscriminatorInStatement(ExecutionContext ec, PreparedStatement ps, int jdbcPosition, ElementContainerStore ecs)
     {
         ecs.getRelationDiscriminatorMapping().setObject(ec, ps, 
-            MappingHelper.getMappingIndices(jdbcPosition, ecs.getRelationDiscriminatorMapping()),
-            ecs.getRelationDiscriminatorValue());
+            MappingHelper.getMappingIndices(jdbcPosition, ecs.getRelationDiscriminatorMapping()), ecs.getRelationDiscriminatorValue());
         return jdbcPosition + ecs.getRelationDiscriminatorMapping().getNumberOfDatastoreMappings();
     }
 

@@ -91,12 +91,15 @@ public class FKArrayStore extends AbstractArrayStore
 
         if (ClassUtils.isReferenceType(element_class))
         {
-            // Take the metadata for the first implementation of the reference type
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
-            if (emd != null)
+            elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
+            if (elementIsPersistentInterface)
             {
-                // Pretend we have a relationship with this one implementation
-                elementType = emd.getFullClassName();
+                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
+            }
+            else
+            {
+                // Take the metadata for the first implementation of the reference type
+                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
             }
         }
         else
@@ -110,10 +113,13 @@ public class FKArrayStore extends AbstractArrayStore
         }
 
         elementInfo = getElementInformationForClass();
+        if (elementInfo == null || elementInfo.length == 0)
+        {
+            throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
+        }
         if (elementInfo != null && elementInfo.length > 1)
         {
-            throw new NucleusUserException(Localiser.msg("056045", 
-                ownerMemberMetaData.getFullFieldName()));
+            throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));
         }
 
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
@@ -130,8 +136,7 @@ public class FKArrayStore extends AbstractArrayStore
             AbstractMemberMetaData eofmd = (eoCmd != null ? eoCmd.getMetaDataForMember(mappedByFieldName) : null);
             if (eofmd == null)
             {
-                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), 
-                    mappedByFieldName, element_class.getName()));
+                throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mappedByFieldName, element_class.getName()));
             }
 
             // Check that the type of the element "mapped-by" field is consistent with the owner type
@@ -145,13 +150,11 @@ public class FKArrayStore extends AbstractArrayStore
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056046", 
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                throw new NucleusUserException(Localiser.msg("056046", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
             }
             if (isEmbeddedMapping(ownerMapping))
             {
-                throw new NucleusUserException(Localiser.msg("056026",
-                    ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
             }
         }
         else
@@ -161,16 +164,14 @@ public class FKArrayStore extends AbstractArrayStore
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             if (ownerMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056047",
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+                throw new NucleusUserException(Localiser.msg("056047", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
             }
         }
 
         orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
         if (orderMapping == null)
         {
-            throw new NucleusUserException(Localiser.msg("056048", 
-                mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+            throw new NucleusUserException(Localiser.msg("056048", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
         }
 
         relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
@@ -231,8 +232,7 @@ public class FKArrayStore extends AbstractArrayStore
                         }
                         else
                         {
-                            NucleusLogger.PERSISTENCE.info(">> FKArrayStore.updateElementFK : " +
-                                "need to set table in statement but dont know table where to store " + element);
+                            NucleusLogger.PERSISTENCE.info(">> FKArrayStore.updateElementFK : need to set table in statement but dont know table where to store " + element);
                         }
                     }
                     if (owner == null)
@@ -249,8 +249,7 @@ public class FKArrayStore extends AbstractArrayStore
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
-                    jdbcPosition = 
-                        BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
 
                     sqlControl.executeStatementUpdate(ec, mconn, updateFkStmt, ps, true);
                     retval = true;
@@ -469,8 +468,7 @@ public class FKArrayStore extends AbstractArrayStore
                     for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
                     {
                         stmt.append(", ");
-                        stmt.append(
-                            relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + " = NULL");
+                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + " = NULL");
                     }
                 }
 
@@ -644,8 +642,7 @@ public class FKArrayStore extends AbstractArrayStore
             String elementType = ownerMemberMetaData.getArray().getElementType();
             if (ClassUtils.isReferenceType(clr.classForName(elementType)))
             {
-                String[] clsNames =
-                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+                String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                 Class[] cls = new Class[clsNames.length];
                 for (int i=0; i<clsNames.length; i++)
                 {
@@ -655,14 +652,12 @@ public class FKArrayStore extends AbstractArrayStore
             }
             else
             {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
-                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
             }
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass,
-                fp, sqlStmt.getPrimaryTable(), emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), emd, 0);
         }
         else
         {
@@ -677,13 +672,25 @@ public class FKArrayStore extends AbstractArrayStore
                 // Select the required fields (of the element class)
                 if (sqlStmt == null)
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass,
-                        fp, subStmt.getPrimaryTable(), emd, 0);
+                    if (elementInfo.length > 1)
+                    {
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, iteratorMappingClass, elementInfo[i].getAbstractClassMetaData());
+                    }
+                    else
+                    {
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                    }
                 }
                 else
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
-                        fp, subStmt.getPrimaryTable(), emd, 0);
+                    if (elementInfo.length > 1)
+                    {
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, null, elementInfo[i].getAbstractClassMetaData());
+                    }
+                    else
+                    {
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                    }
                 }
 
                 if (sqlStmt == null)
@@ -700,8 +707,7 @@ public class FKArrayStore extends AbstractArrayStore
         if (addRestrictionOnOwner)
         {
             // Apply condition to filter by owner
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -710,8 +716,7 @@ public class FKArrayStore extends AbstractArrayStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -720,8 +725,7 @@ public class FKArrayStore extends AbstractArrayStore
         if (orderMapping != null)
         {
             // Order by the ordering column, when present
-            SQLTable orderSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+            SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
             SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
             boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

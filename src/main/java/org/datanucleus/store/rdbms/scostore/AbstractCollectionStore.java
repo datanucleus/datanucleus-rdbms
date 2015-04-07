@@ -38,7 +38,6 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -135,8 +134,6 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
     protected String getUpdateEmbeddedElementStmt(JavaTypeMapping fieldMapping)
     {
         JavaTypeMapping ownerMapping = getOwnerMapping();
-        Table containerTable = getContainerTable();
-        JavaTypeMapping elementMapping = getElementMapping();
 
         StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
         for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
@@ -191,7 +188,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                     jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
-                        ps, jdbcPosition, ((JoinTable) getContainerTable()).getOwnerMemberMetaData(), getElementMapping(), getEmd(), this);
+                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, emd, this);
 
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     modified = true;
@@ -250,10 +247,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
     private String getContainsStatementString(Object element)
     {
         JavaTypeMapping ownerMapping = getOwnerMapping();
-        Table containerTable = getContainerTable();
         boolean elementsAreSerialised = isElementsAreSerialised();
-        JavaTypeMapping elementMapping = getElementMapping();
-        ElementContainerStore.ElementInfo[] elementInfo = getElementInfo();
 
         StringBuilder stmt = new StringBuilder("SELECT ");
         String containerAlias = "THIS";
@@ -266,7 +260,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ").append(getContainerTable().toString()).append(" ").append(containerAlias);
+        stmt.append(" FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
         // TODO Add join to owner if ownerMapping is for supertable
 
         // Add join to element table if required (only allows for 1 element table currently)
@@ -366,9 +360,6 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
     {
         boolean retval;
 
-        Table containerTable = getContainerTable();
-        JavaTypeMapping elementMapping = getElementMapping();
-        ElementContainerStore.ElementInfo[] elementInfo = getElementInfo();
         String stmt = getContainsStmt(element);
         try
         {

@@ -106,8 +106,16 @@ public class FKListStore extends AbstractListStore
         Class element_class = clr.classForName(elementType);
         if (ClassUtils.isReferenceType(element_class))
         {
-            // Take the metadata for the first implementation of the reference type
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
+            elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
+            if (elementIsPersistentInterface)
+            {
+                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
+            }
+            else
+            {
+                // Take the metadata for the first implementation of the reference type
+                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
+            }
         }
         else
         {
@@ -120,20 +128,15 @@ public class FKListStore extends AbstractListStore
         }
 
         elementInfo = getElementInformationForClass();
-        if (elementInfo.length == 1 && ClassUtils.isReferenceType(element_class))
+        if (elementInfo == null || elementInfo.length == 0)
+        {
+            throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
+        }
+        else if (elementInfo.length == 1 && ClassUtils.isReferenceType(element_class))
         {
             // Special case : reference element type (interface/object) and single "implementation"
             elementType = emd.getFullClassName();
         }
-        /*if (elementInfo.length > 1)
-        {
-            throw new NucleusUserException(Localiser.msg("056031", ownerMemberMetaData.getFullFieldName()));
-        }
-        else*/ if (elementInfo.length == 0)
-        {
-            throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
-        }
-        NucleusLogger.GENERAL.info(">> FKListStore mmd=" + ownerMemberMetaData.getFullFieldName() + " elementInfo=" + StringUtils.objectArrayToString(elementInfo));
 
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
         elementsAreEmbedded = false; // Can't embed element when using FK relation
@@ -327,13 +330,6 @@ public class FKListStore extends AbstractListStore
         }
 
         ExecutionContext ec = op.getExecutionContext();
-        JavaTypeMapping ownerMapping = getOwnerMapping();
-        JavaTypeMapping orderMapping = getOrderMapping();
-        JavaTypeMapping elementMapping = getElementMapping();
-        ElementContainerStore.ElementInfo[] elementInfo = getElementInfo();
-        JavaTypeMapping relationDiscriminatorMapping = getRelationDiscriminatorMapping();
-        AbstractMemberMetaData ownerMemberMetaData = getOwnerMemberMetaData();
-
         String updateFkStmt = getUpdateFkStmt(element);
         boolean retval;
         try
@@ -813,7 +809,7 @@ public class FKListStore extends AbstractListStore
                     {
                         int jdbcPosition = 1;
                         jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        if (getRelationDiscriminatorMapping() != null)
+                        if (relationDiscriminatorMapping != null)
                         {
                             BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                         }

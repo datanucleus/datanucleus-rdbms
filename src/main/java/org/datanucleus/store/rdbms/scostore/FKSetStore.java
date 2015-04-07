@@ -99,7 +99,6 @@ public class FKSetStore extends AbstractSetStore
         // Load the element class
         elementType = colmd.getElementType();
         Class element_class = clr.classForName(elementType);
-
         if (ClassUtils.isReferenceType(element_class))
         {
             elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
@@ -111,11 +110,6 @@ public class FKSetStore extends AbstractSetStore
             {
                 // Take the metadata for the first implementation of the reference type
                 emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
-                if (emd != null)
-                {
-                    // Pretend we have a relationship with this one implementation
-                    //elementType = emd.getFullClassName();
-                }
             }
         }
         else

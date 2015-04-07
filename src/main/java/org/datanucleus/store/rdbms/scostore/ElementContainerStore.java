@@ -173,19 +173,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
         super(storeMgr, clr);
     }
 
-    public ElementInfo[] getElementInfo()
-    {
-        return elementInfo;
-    }
-
     public JavaTypeMapping getElementMapping()
     {
         return elementMapping;
-    }
-
-    public JavaTypeMapping getOrderMapping()
-    {
-        return orderMapping;
     }
 
     public JavaTypeMapping getRelationDiscriminatorMapping()
@@ -495,7 +485,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             synchronized (this)
             {
                 StringBuilder stmt = new StringBuilder("INSERT INTO ");
-                stmt.append(getContainerTable().toString());
+                stmt.append(containerTable.toString());
                 stmt.append(" (");
                 for (int i = 0; i < getOwnerMapping().getNumberOfDatastoreMappings(); i++)
                 {
@@ -506,23 +496,23 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     stmt.append(getOwnerMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 }
 
-                for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
                 {
-                    stmt.append(",").append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(",").append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 }
 
-                if (getOrderMapping() != null)
+                if (orderMapping != null)
                 {
-                    for (int i = 0; i < getOrderMapping().getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(getOrderMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
-                if (getRelationDiscriminatorMapping() != null)
+                if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < getRelationDiscriminatorMapping().getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(getRelationDiscriminatorMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
 
@@ -536,23 +526,23 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     stmt.append(((AbstractDatastoreMapping) getOwnerMapping().getDatastoreMapping(i)).getInsertionInputParameter());
                 }
 
-                for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
                 {
-                    stmt.append(",").append(((AbstractDatastoreMapping) getElementMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                    stmt.append(",").append(((AbstractDatastoreMapping) elementMapping.getDatastoreMapping(0)).getInsertionInputParameter());
                 }
 
-                if (getOrderMapping() != null)
+                if (orderMapping != null)
                 {
-                    for (int i = 0; i < getOrderMapping().getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(((AbstractDatastoreMapping) getOrderMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(0)).getInsertionInputParameter());
                     }
                 }
-                if (getRelationDiscriminatorMapping() != null)
+                if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < getRelationDiscriminatorMapping().getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(((AbstractDatastoreMapping) getRelationDiscriminatorMapping().getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(((AbstractDatastoreMapping) relationDiscriminatorMapping.getDatastoreMapping(0)).getInsertionInputParameter());
                     }
                 }
 
@@ -580,7 +570,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (getRelationDiscriminatorMapping() != null)
+                    if (relationDiscriminatorMapping != null)
                     {
                         BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
@@ -619,7 +609,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(getContainerTable().toString()).append(" WHERE ");
+                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
                 if (getRelationDiscriminatorMapping() != null)
                 {
@@ -650,18 +640,18 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (getElementInfo() != null && getElementInfo().length == 1)
+                    if (elementInfo != null && elementInfo.length == 1)
                     {
                         // TODO Allow for multiple element types (e.g interface implementations)
-                        for (int i = 0; i < getElementInfo().length; i++)
+                        for (int i = 0; i < elementInfo.length; i++)
                         {
-                            if (getElementInfo()[i].getDiscriminatorMapping() != null)
+                            if (elementInfo[i].getDiscriminatorMapping() != null)
                             {
-                                jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, getElementInfo()[i], clr);
+                                jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[i], clr);
                             }
                         }
                     }
-                    if (getRelationDiscriminatorMapping() != null)
+                    if (relationDiscriminatorMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
@@ -717,7 +707,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * If the element is in a different table to the container then an INNER JOIN will be present to
      * link the two tables, and table aliases will be present also.
      * TODO Update this to allow for getting the size when more than 1 element table.
-     *
+     * TODO Change to use SQLStatement so we can more easily extend it to do UNIONs etc.
      * @return The Statement returning the size of the container.
      */
     protected String getSizeStmt()
@@ -732,27 +722,25 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             String containerAlias = "THIS";
             String joinedElementAlias = "ELEM";
-            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ").append(getContainerTable().toString()).append(" ").append(containerAlias);
+            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
 
             // Add join to element table if required (only allows for 1 element table currently)
             boolean joinedDiscrim = false;
-            if (getElementInfo() != null && getElementInfo().length == 1 &&
-                getElementInfo()[0].getDatastoreClass() != getContainerTable() &&
-                getElementInfo()[0].getDiscriminatorMapping() != null)
+            if (elementInfo != null && elementInfo.length == 1 && elementInfo[0].getDatastoreClass() != containerTable && elementInfo[0].getDiscriminatorMapping() != null)
             {
                 // TODO Allow for more than 1 possible element table
                 // Need join to the element table to restrict the discriminator
                 joinedDiscrim = true;
-                JavaTypeMapping elemIdMapping = getElementInfo()[0].getDatastoreClass().getIdMapping();
+                JavaTypeMapping elemIdMapping = elementInfo[0].getDatastoreClass().getIdMapping();
                 stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
-                stmt.append(getElementInfo()[0].getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
-                for (int i = 0; i < getElementMapping().getNumberOfDatastoreMappings(); i++)
+                stmt.append(elementInfo[0].getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
+                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(" AND ");
                     }
-                    stmt.append(containerAlias).append(".").append(getElementMapping().getDatastoreMapping(i).getColumn().getIdentifier());
+                    stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier());
                     stmt.append("=");
                     stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(i).getColumn().getIdentifier());
                 }
@@ -773,14 +761,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 }
             }
 
-            if (getElementInfo() != null && getElementInfo().length == 1)
+            if (elementInfo != null && elementInfo.length == 1)
             {
                 // TODO Support more than one element table
                 // Add a discriminator filter for collections with an element discriminator
                 StringBuilder discrStmt = new StringBuilder();
-                for (int i = 0; i < getElementInfo().length; i++)
+                for (int i = 0; i < elementInfo.length; i++)
                 {
-                    ElementInfo elemInfo = getElementInfo()[i];
+                    ElementInfo elemInfo = elementInfo[i];
 
                     if (elemInfo.getDiscriminatorMapping() != null)
                     {
@@ -840,7 +828,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     if (allowNulls)
                     {
                         stmt.append(" OR ");
-                        stmt.append(getElementInfo()[0].getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                        stmt.append(elementInfo[0].getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
                         stmt.append(" IS NULL");
                     }
                     stmt.append(")");

@@ -527,7 +527,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, getOrderMapping());
+                    jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
                     if (relationDiscriminatorMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);

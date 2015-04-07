@@ -280,10 +280,6 @@ public class JoinListStore extends AbstractListStore
                     PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, addStmt, batched);
                     try
                     {
-                        JavaTypeMapping orderMapping = getOrderMapping();
-                        JavaTypeMapping elementMapping = getElementMapping();
-                        JavaTypeMapping relationDiscriminatorMapping = getRelationDiscriminatorMapping();
-
                         jdbcPosition = 1;
                         jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
