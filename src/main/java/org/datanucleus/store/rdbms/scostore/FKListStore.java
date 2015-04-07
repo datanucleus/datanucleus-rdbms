@@ -33,7 +33,6 @@ import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
@@ -105,16 +104,10 @@ public class FKListStore extends AbstractListStore
         // Load the element class
         elementType = colmd.getElementType();
         Class element_class = clr.classForName(elementType);
-
         if (ClassUtils.isReferenceType(element_class))
         {
             // Take the metadata for the first implementation of the reference type
             emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
-            if (emd != null)
-            {
-                // Pretend we have a relationship with this one implementation TODO Cater for interfaces with multiple implementations
-                elementType = emd.getFullClassName();
-            }
         }
         else
         {
@@ -127,14 +120,20 @@ public class FKListStore extends AbstractListStore
         }
 
         elementInfo = getElementInformationForClass();
-        if (elementInfo.length > 1)
+        if (elementInfo.length == 1 && ClassUtils.isReferenceType(element_class))
+        {
+            // Special case : reference element type (interface/object) and single "implementation"
+            elementType = emd.getFullClassName();
+        }
+        /*if (elementInfo.length > 1)
         {
             throw new NucleusUserException(Localiser.msg("056031", ownerMemberMetaData.getFullFieldName()));
         }
-        else if (elementInfo.length == 0)
+        else*/ if (elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
         }
+        NucleusLogger.GENERAL.info(">> FKListStore mmd=" + ownerMemberMetaData.getFullFieldName() + " elementInfo=" + StringUtils.objectArrayToString(elementInfo));
 
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
         elementsAreEmbedded = false; // Can't embed element when using FK relation
@@ -144,23 +143,22 @@ public class FKListStore extends AbstractListStore
         String mappedByFieldName = mmd.getMappedBy();
         if (mappedByFieldName != null)
         {
-            // 1-N FK bidirectional
-            // The element class has a field for the owner.
-            AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mappedByFieldName);
+            // 1-N FK bidirectional - the element class has a field for the owner.
+            AbstractMemberMetaData eofmd = elementInfo[0].getAbstractClassMetaData().getMetaDataForMember(mappedByFieldName);
             if (eofmd == null)
             {
+                // Field for owner not found in element
                 throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mappedByFieldName, element_class.getName()));
             }
-
-            // Check that the type of the element "mapped-by" field is consistent with the owner type
             if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
             {
+                // Type of the element "mapped-by" field is not consistent with the owner type
                 throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(), 
                     eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
             }
 
             String ownerFieldName = eofmd.getName();
-            ownerFieldNumber = emd.getAbsolutePositionOfMember(ownerFieldName);
+            ownerFieldNumber = elementInfo[0].getAbstractClassMetaData().getAbsolutePositionOfMember(ownerFieldName);
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null)
             {
@@ -846,57 +844,56 @@ public class FKListStore extends AbstractListStore
      * @param index The position that the element is being stored at in the list
      * @return Whether the element was inserted
      */
-    protected boolean validateElementForWriting(final ObjectProvider op, Object element, final int index)
+    protected boolean validateElementForWriting(final ObjectProvider op, final Object element, final int index)
     {
         final Object newOwner = op.getObject();
+
+        ElementInfo info = null;
+        for (int i=0;i<elementInfo.length;i++)
+        {
+            if (elementInfo[i].getClassName().equals(element.getClass().getName()))
+            {
+                info = elementInfo[i];
+                break;
+            }
+        }
+
+        final DatastoreClass elementTable;
+        if (storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType))
+        {
+            elementTable = storeMgr.getDatastoreClass(storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr);
+        }
+        else
+        {
+            elementTable = storeMgr.getDatastoreClass(element.getClass().getName(), clr);
+        }
+        final JavaTypeMapping orderMapping;
+        if (info != null)
+        {
+            orderMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+        }
+        else
+        {
+            orderMapping = this.orderMapping;
+        }
 
         // Check if element is ok for use in the datastore, specifying any external mappings that may be required
         boolean inserted = super.validateElementForWriting(op.getExecutionContext(), element, new FieldValues()
         {
-            public void fetchFields(ObjectProvider esm)
+            public void fetchFields(ObjectProvider elemOP)
             {
                 // Find the (element) table storing the FK back to the owner
-                boolean isPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType);
-                DatastoreClass elementTable = null;
-                if (isPersistentInterface)
-                {
-                    elementTable = storeMgr.getDatastoreClass(
-                        storeMgr.getNucleusContext().getMetaDataManager().getImplementationNameForPersistentInterface(elementType), clr);
-                }
-                else
-                {
-                    elementTable = storeMgr.getDatastoreClass(elementType, clr);
-                }
-                if (elementTable == null)
-                {
-                    // "subclass-table", persisted into table of other class
-                    AbstractClassMetaData[] managingCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
-                    if (managingCmds != null && managingCmds.length > 0)
-                    {
-                        // Find which of these subclasses is appropriate for this element
-                        for (int i=0;i<managingCmds.length;i++)
-                        {
-                            Class tblCls = clr.classForName(managingCmds[i].getFullClassName());
-                            if (tblCls.isAssignableFrom(esm.getObject().getClass()))
-                            {
-                                elementTable = storeMgr.getDatastoreClass(managingCmds[i].getFullClassName(), clr);
-                                break;
-                            }
-                        }
-                    }
-                }
-
                 if (elementTable != null)
                 {
                     JavaTypeMapping externalFKMapping = elementTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
-                        esm.setAssociatedValue(externalFKMapping, op.getObject());
+                        elemOP.setAssociatedValue(externalFKMapping, op.getObject());
                     }
                     if (relationDiscriminatorMapping != null)
                     {
-                        esm.setAssociatedValue(relationDiscriminatorMapping, relationDiscriminatorValue);
+                        elemOP.setAssociatedValue(relationDiscriminatorMapping, relationDiscriminatorValue);
                     }
                     if (orderMapping != null && index >= 0)
                     {
@@ -914,33 +911,34 @@ public class FKListStore extends AbstractListStore
                             {
                                 indexValue = Integer.valueOf(index);
                             }
-                            esm.replaceFieldMakeDirty(orderMapping.getMemberMetaData().getAbsoluteFieldNumber(), indexValue);
+                            elemOP.replaceFieldMakeDirty(orderMapping.getMemberMetaData().getAbsoluteFieldNumber(), indexValue);
                         }
                         else
                         {
                             // Order is stored in a surrogate column so save its vaue for the element to use later
-                            esm.setAssociatedValue(orderMapping, Integer.valueOf(index));
+                            elemOP.setAssociatedValue(orderMapping, Integer.valueOf(index));
                         }
                     }
                 }
+
                 if (ownerFieldNumber >= 0)
                 {
                     // TODO This is ManagedRelations - move into RelationshipManager
                     // Managed Relations : 1-N bidir, so make sure owner is correct at persist
-                    Object currentOwner = esm.provideField(ownerFieldNumber);
+                    Object currentOwner = elemOP.provideField(ownerFieldNumber);
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
                         NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(esm.getObject())));
-                        esm.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
+                            StringUtils.toJVMIDString(elemOP.getObject())));
+                        elemOP.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
                     }
                     else if (currentOwner != newOwner && op.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor is it being attached
                         // Inconsistent owner, so throw exception
                         throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
-                            StringUtils.toJVMIDString(esm.getObject()), StringUtils.toJVMIDString(currentOwner)));
+                            StringUtils.toJVMIDString(elemOP.getObject()), StringUtils.toJVMIDString(currentOwner)));
                     }
                 }
             }
@@ -1472,11 +1470,25 @@ public class FKListStore extends AbstractListStore
                 // Select the required fields (of the element class)
                 if (sqlStmt == null)
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), emd, 0);
+                    if (elementInfo.length > 1)
+                    {
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, stmtClassMapping, elementInfo[i].getAbstractClassMetaData());
+                    }
+                    else
+                    {
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                    }
                 }
                 else
                 {
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), emd, 0);
+                    if (elementInfo.length > 1)
+                    {
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, null, elementInfo[i].getAbstractClassMetaData());
+                    }
+                    else
+                    {
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                    }
                 }
 
                 if (sqlStmt == null)

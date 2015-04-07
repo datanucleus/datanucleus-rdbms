@@ -52,14 +52,10 @@ import org.datanucleus.util.Localiser;
  * This is used to represent either a collection or an array.
  * There are the following types of situation that we try to cater for with respect to elements.
  * <UL>
- * <LI><B>element-type</B> is PC with "new-table" or "superclass-table" inheritance. 
- * In this case we will have
- * <I>elementInfo</I> with 1 entry.</LI>
+ * <LI><B>element-type</B> is PC with "new-table" or "superclass-table" inheritance. In this case we will have <I>elementInfo</I> with 1 entry.</LI>
  * <LI><B>element-type</B> is PC with "subclass-table" inheritance. In this case we will have <I>elementInfo</I>
- * with "n" entries (1 for each subclass type with its own table). We also have <I>emd</I> being the MetaData
- * for the element-type.</LI>
- * <LI><B>element-type</B> is Reference type. In this case we will have <I>elementInfo</I> with "n" entries
- * (1 for each implementation type).</LI>
+ * with "n" entries (1 for each subclass type with its own table). We also have <I>emd</I> being the MetaData for the element-type.</LI>
+ * <LI><B>element-type</B> is Reference type. In this case we will have <I>elementInfo</I> with "n" entries (1 for each implementation type).</LI>
  * <LI><B>element-type</B> is non-PC. In this case we have no <I>elementInfo</I> and no <I>emd</I></LI>
  * </UL>
  */
@@ -297,7 +293,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * @param clr The ClassLoaderResolver
      * @param element The element to validate
      * @return Whether it is valid.
-     **/ 
+     */ 
     protected boolean validateElementType(ClassLoaderResolver clr, Object element)
     {
         if (element == null)
@@ -307,8 +303,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
         Class primitiveElementClass = ClassUtils.getPrimitiveTypeForType(element.getClass());
         if (primitiveElementClass != null)
-        {
-            
+        {            
             // Allow for the element type being primitive, and the user wanting to store its wrapper
             String elementTypeWrapper = elementType;
             Class elementTypeClass = clr.classForName(elementType);
@@ -318,12 +313,43 @@ public abstract class ElementContainerStore extends BaseContainerStore
             }
             return clr.isAssignableFrom(elementTypeWrapper, element.getClass());
         }
+
+        String elementType = null;
+        if (ownerMemberMetaData.hasCollection()) 
+        {
+            elementType = ownerMemberMetaData.getCollection().getElementType();
+        }
+        else if (ownerMemberMetaData.hasArray())
+        {
+            elementType = ownerMemberMetaData.getArray().getElementType();
+        }
+        else
+        {
+            elementType = this.elementType;
+        }
+
+        Class elementCls = clr.classForName(elementType);
+        if (!storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType) && elementCls.isInterface())
+        {
+            // Collection of interface types, so check against the available implementations TODO Check against allowed implementation in metadata
+            String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
+            if (clsNames != null && clsNames.length > 0)
+            {
+                for (int i=0;i<clsNames.length;i++)
+                {
+                    if (clsNames[i].equals(element.getClass().getName()))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
         return clr.isAssignableFrom(elementType, element.getClass());
     }
 
     /**
-     * Method to check if an element is already persistent or is persistent but managed by 
-     * a different persistence manager.
+     * Method to check if an element is already persistent or is persistent but managed by a different persistence manager.
      * @param op The ObjectProvider of this owner
      * @param element The element
      * @return Whether it is valid for reading.
@@ -338,8 +364,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         if (element != null && !elementsAreEmbedded && !elementsAreSerialised)
         {
             ExecutionContext ec = op.getExecutionContext();
-            if ((!ec.getApiAdapter().isPersistent(element) ||
-                 ec != ec.getApiAdapter().getExecutionContext(element)) && !ec.getApiAdapter().isDetached(element))
+            if ((!ec.getApiAdapter().isPersistent(element) || ec != ec.getApiAdapter().getExecutionContext(element)) && !ec.getApiAdapter().isDetached(element))
             {
                 return false;
             }
