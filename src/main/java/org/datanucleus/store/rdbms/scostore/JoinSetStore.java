@@ -991,7 +991,6 @@ public class JoinSetStore extends AbstractSetStore
             iteratorMappingClass = new StatementClassMapping();
             for (int i = 0; i < elementInfo.length; i++)
             {
-                // TODO This will only work if all element types have a discriminator
                 final int elementNo = i;
                 final Class elementCls = clr.classForName(elementInfo[elementNo].getClassName());
                 SQLStatement elementStmt = null;
@@ -1035,19 +1034,24 @@ public class JoinSetStore extends AbstractSetStore
                     elementStmt = stmtGen.getStatement();
                 }
 
+                // TODO What if the first elementInfo has fields selected in one order and then the second in a different order?
                 if (sqlStmt == null)
                 {
                     sqlStmt = elementStmt;
+
+                    // Select the required fields
+                    SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[i].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
                 }
                 else
                 {
+                    // Select the required fields
+                    SQLTable elementSqlTbl = elementStmt.getTable(elementInfo[i].getDatastoreClass(), elementStmt.getPrimaryTable().getGroupName());
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(elementStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
+
                     sqlStmt.union(elementStmt);
                 }
             }
-
-            // Select the required fields
-            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
         }
 
         if (addRestrictionOnOwner)
@@ -1070,6 +1074,7 @@ public class JoinSetStore extends AbstractSetStore
 
         if (orderMapping != null)
         {
+            // TODO If we have multiple roots then cannot allow this
             // Order by the ordering column, when present
             SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
             SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
