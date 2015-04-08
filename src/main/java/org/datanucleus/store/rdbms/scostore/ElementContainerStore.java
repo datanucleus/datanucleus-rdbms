@@ -46,6 +46,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Representation of the store of an element-based container.
@@ -76,17 +77,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
     /** Statement for removing an element from the container. */
     protected String removeStmt;
 
-    /** Whether we are using a discriminator in the "size" statement. */
-    protected boolean usingDiscriminatorInSizeStmt = false;
-
     /**
      * Information for the elements of this container.
      * When the "element-type" table is new-table, or superclass-table then there is 1 value here.
      * When the "element-type" table uses subclass-table, or when it is a reference type then there can be multiple.
+     * When the element is embedded/serialised (into join table) this will be null.
      */
     protected ElementInfo[] elementInfo;
 
-    /** Inner class wrapping the information required for a valid element type. */
     public static class ElementInfo
     {
         AbstractClassMetaData cmd; // MetaData for the element class
@@ -97,32 +95,26 @@ public abstract class ElementContainerStore extends BaseContainerStore
             this.cmd = cmd;
             this.table = table;
         }
-
         public String getClassName()
         {
             return cmd.getFullClassName();
         }
-
         public AbstractClassMetaData getAbstractClassMetaData()
         {
             return cmd;
         }
-
         public DatastoreClass getDatastoreClass()
         {
             return table;
         }
-
         public DiscriminatorStrategy getDiscriminatorStrategy()
         {
             return cmd.getDiscriminatorStrategyForTable();
         }
-
         public JavaTypeMapping getDiscriminatorMapping()
         {
             return table.getDiscriminatorMapping(false);
         }
-
         public String toString()
         {
             return "ElementInfo : [class=" + cmd.getFullClassName() + " table=" + table + "]";
@@ -639,21 +631,40 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (elementInfo != null && elementInfo.length == 1)
+                    if (elementInfo == null)
                     {
-                        // TODO Allow for multiple element types (e.g interface implementations)
-                        for (int i = 0; i < elementInfo.length; i++)
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                    }
+                    else
+                    {
+                        boolean usingJoinTable = (elementInfo[0].getDatastoreClass() != containerTable);
+                        if (usingJoinTable)
                         {
-                            if (elementInfo[i].getDiscriminatorMapping() != null)
+                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                            if (elementInfo[0].getDiscriminatorMapping() != null)
                             {
-                                jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[i], clr);
+                                jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[0], clr);
+                            }
+                            if (relationDiscriminatorMapping != null)
+                            {
+                                jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                             }
                         }
-                    }
-                    if (relationDiscriminatorMapping != null)
-                    {
-                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                        else
+                        {
+                            for (int i=0;i<elementInfo.length;i++)
+                            {
+                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                                if (elementInfo[i].getDiscriminatorMapping() != null)
+                                {
+                                    jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[i], clr);
+                                }
+                                if (relationDiscriminatorMapping != null)
+                                {
+                                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                                }
+                            }
+                        }
                     }
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, sizeStmt, ps);
@@ -665,12 +676,26 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         }
 
                         numRows = rs.getInt(1);
+
+                        if (elementInfo != null && elementInfo.length > 1)
+                        {
+                            while (rs.next())
+                            {
+                                numRows = numRows + rs.getInt(1);
+                            }
+                        }
+
                         JDBCUtils.logWarnings(rs);
                     }
                     finally
                     {
                         rs.close();
                     }
+                }
+                catch (SQLException sqle)
+                {
+                    NucleusLogger.GENERAL.error("Exception in size", sqle);
+                    throw sqle;
                 }
                 finally
                 {
@@ -691,7 +716,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     }
 
     /**
-     * Generate statement for getting the size of thecontainer.
+     * Generate statement for getting the size of the container.
      * The order part is only present when an order mapping is used.
      * The discriminator part is only present when the element has a discriminator.
      * <PRE>
@@ -706,77 +731,105 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * The discriminator part includes all subclasses of the element type.
      * If the element is in a different table to the container then an INNER JOIN will be present to
      * link the two tables, and table aliases will be present also.
-     * TODO Update this to allow for getting the size when more than 1 element table.
-     * TODO Change to use SQLStatement so we can more easily extend it to do UNIONs etc.
      * @return The Statement returning the size of the container.
      */
     protected String getSizeStmt()
     {
-        if (sizeStmt != null && !usingDiscriminatorInSizeStmt)
+        if (sizeStmt != null)
         {
-            // Statement exists and didnt need any discriminator when setting up the statement so just reuse it
+            // Statement exists and didn't need any discriminator when setting up the statement so just reuse it
             return sizeStmt;
         }
 
         synchronized (this)
         {
+            boolean usingDiscriminatorInSizeStmt = false;
             String containerAlias = "THIS";
-            String joinedElementAlias = "ELEM";
-            StringBuilder stmt = new StringBuilder("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
-
-            // Add join to element table if required (only allows for 1 element table currently)
-            boolean joinedDiscrim = false;
-            if (elementInfo != null && elementInfo.length == 1 && elementInfo[0].getDatastoreClass() != containerTable && elementInfo[0].getDiscriminatorMapping() != null)
+            StringBuilder stmt = new StringBuilder();
+            if (elementInfo == null)
             {
-                // TODO Allow for more than 1 possible element table
-                // Need join to the element table to restrict the discriminator
-                joinedDiscrim = true;
-                JavaTypeMapping elemIdMapping = elementInfo[0].getDatastoreClass().getIdMapping();
-                stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
-                stmt.append(elementInfo[0].getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
-                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+                // Serialised/embedded elements in a join table
+                stmt.append("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
+                stmt.append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
+                if (orderMapping != null)
                 {
-                    if (i > 0)
+                    // If an ordering is present, restrict to items where the index is not null to
+                    // eliminate records that are added but may not be positioned yet.
+                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                     {
                         stmt.append(" AND ");
+                        stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(">=0");
                     }
-                    stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier());
-                    stmt.append("=");
-                    stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(i).getColumn().getIdentifier());
                 }
-            }
-            // TODO Add join to owner if ownerMapping is for supertable
-
-            stmt.append(" WHERE ");
-            BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
-            if (orderMapping != null)
-            {
-                // If an ordering is present, restrict to items where the index is not null to
-                // eliminate records that are added but may not be positioned yet.
-                for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                if (relationDiscriminatorMapping != null)
                 {
-                    stmt.append(" AND ");
-                    stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
-                    stmt.append(">=0");
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
                 }
+                sizeStmt = stmt.toString();
+                return sizeStmt;
             }
 
-            if (elementInfo != null && elementInfo.length == 1)
+            // Either using join table with element table(s), or FK in element table(s)
+            String joinedElementAlias = "ELEM";
+            boolean usingJoinTable = (elementInfo[0].getDatastoreClass() != containerTable);
+
+            if (usingJoinTable)
             {
-                // TODO Support more than one element table
+                // Join table collection array, so do COUNT of join table
+                ElementInfo elemInfo = elementInfo[0];
+
+                stmt.append("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
+
+                // Add join to element table if required (only allows for 1 element table currently)
+                boolean joinedDiscrim = false;
+                if (usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
+                {
+                    // Need join to the element table to restrict the discriminator
+                    joinedDiscrim = true;
+                    JavaTypeMapping elemIdMapping = elemInfo.getDatastoreClass().getIdMapping();
+                    stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
+                    stmt.append(elemInfo.getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
+                    for (int j = 0; j < elementMapping.getNumberOfDatastoreMappings(); j++)
+                    {
+                        if (j > 0)
+                        {
+                            stmt.append(" AND ");
+                        }
+                        stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                        stmt.append("=");
+                        stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                    }
+                }
+                // TODO Add join to owner if ownerMapping is for supertable
+
+                stmt.append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
+                if (orderMapping != null)
+                {
+                    // If an ordering is present, restrict to items where the index is not null to
+                    // eliminate records that are added but may not be positioned yet.
+                    for (int j = 0; j < orderMapping.getNumberOfDatastoreMappings(); j++)
+                    {
+                        stmt.append(" AND ");
+                        stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                        stmt.append(">=0");
+                    }
+                }
+
                 // Add a discriminator filter for collections with an element discriminator
                 StringBuilder discrStmt = new StringBuilder();
-                for (int i = 0; i < elementInfo.length; i++)
+                if (elemInfo.getDiscriminatorMapping() != null)
                 {
-                    ElementInfo elemInfo = elementInfo[i];
+                    usingDiscriminatorInSizeStmt = true;
+                    JavaTypeMapping discrimMapping = elemInfo.getDiscriminatorMapping();
 
-                    if (elemInfo.getDiscriminatorMapping() != null)
+                    Collection<String> classNames = storeMgr.getSubClassesForClass(elemInfo.getClassName(), true, clr);
+                    classNames.add(elemInfo.getClassName());
+                    for (String className : classNames)
                     {
-                        usingDiscriminatorInSizeStmt = true;
-
-                        JavaTypeMapping discrimMapping = elemInfo.getDiscriminatorMapping();
-                        // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
-                        Class cls = clr.classForName(elemInfo.getClassName());
+                        Class cls = clr.classForName(className);
                         if (!Modifier.isAbstract(cls.getModifiers()))
                         {
                             for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
@@ -793,31 +846,6 @@ public abstract class ElementContainerStore extends BaseContainerStore
                                 discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
                             }
                         }
-
-                        Collection<String> subclasses = storeMgr.getSubClassesForClass(elemInfo.getClassName(), true, clr);
-                        if (subclasses != null && subclasses.size() > 0)
-                        {
-                            for (String subclass : subclasses)
-                            {
-                                cls = clr.classForName(subclass);
-                                if (!Modifier.isAbstract(cls.getModifiers()))
-                                {
-                                    for (int k = 0; k < discrimMapping.getNumberOfDatastoreMappings(); k++)
-                                    {
-                                        if (discrStmt.length() > 0)
-                                        {
-                                            discrStmt.append(" OR ");
-                                        }
-
-                                        discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
-                                        discrStmt.append(".");
-                                        discrStmt.append(discrimMapping.getDatastoreMapping(k).getColumn().getIdentifier().toString());
-                                        discrStmt.append("=");
-                                        discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(k)).getUpdateInputParameter());
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
 
@@ -828,19 +856,121 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     if (allowNulls)
                     {
                         stmt.append(" OR ");
-                        stmt.append(elementInfo[0].getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                        stmt.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
                         stmt.append(" IS NULL");
                     }
                     stmt.append(")");
                 }
+                if (relationDiscriminatorMapping != null)
+                {
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
+                }
+                
             }
-            if (relationDiscriminatorMapping != null)
+            else
             {
-                BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
+                // ForeignKey collection/array, so UNION all of the element COUNTs
+                for (int i=0;i<elementInfo.length;i++)
+                {
+                    if (i > 0)
+                    {
+                        stmt.append(" UNION ");
+                    }
+                    ElementInfo elemInfo = elementInfo[i];
+
+                    stmt.append("SELECT COUNT(*),").append("'" + elemInfo.getAbstractClassMetaData().getName() + "'").append(" FROM ").append(elemInfo.getDatastoreClass().toString()).append(" ").append(containerAlias);
+
+                    // Add join to element table if required (only allows for 1 element table currently)
+                    boolean joinedDiscrim = false;
+                    if (usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
+                    {
+                        // Need join to the element table to restrict the discriminator
+                        joinedDiscrim = true;
+                        JavaTypeMapping elemIdMapping = elemInfo.getDatastoreClass().getIdMapping();
+                        stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
+                        stmt.append(elemInfo.getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
+                        for (int j = 0; j < elementMapping.getNumberOfDatastoreMappings(); j++)
+                        {
+                            if (j > 0)
+                            {
+                                stmt.append(" AND ");
+                            }
+                            stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                            stmt.append("=");
+                            stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                        }
+                    }
+                    // TODO Add join to owner if ownerMapping is for supertable
+
+                    stmt.append(" WHERE ");
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
+                    if (orderMapping != null)
+                    {
+                        // If an ordering is present, restrict to items where the index is not null to
+                        // eliminate records that are added but may not be positioned yet.
+                        for (int j = 0; j < orderMapping.getNumberOfDatastoreMappings(); j++)
+                        {
+                            stmt.append(" AND ");
+                            stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                            stmt.append(">=0");
+                        }
+                    }
+
+                    // Add a discriminator filter for collections with an element discriminator
+                    StringBuilder discrStmt = new StringBuilder();
+                    if (elemInfo.getDiscriminatorMapping() != null)
+                    {
+                        usingDiscriminatorInSizeStmt = true;
+                        JavaTypeMapping discrimMapping = elemInfo.getDiscriminatorMapping();
+
+                        Collection<String> classNames = storeMgr.getSubClassesForClass(elemInfo.getClassName(), true, clr);
+                        classNames.add(elemInfo.getClassName());
+                        for (String className : classNames)
+                        {
+                            Class cls = clr.classForName(className);
+                            if (!Modifier.isAbstract(cls.getModifiers()))
+                            {
+                                for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
+                                {
+                                    if (discrStmt.length() > 0)
+                                    {
+                                        discrStmt.append(" OR ");
+                                    }
+
+                                    discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
+                                    discrStmt.append(".");
+                                    discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                                    discrStmt.append("=");
+                                    discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                                }
+                            }
+                        }
+                    }
+
+                    if (discrStmt.length() > 0)
+                    {
+                        stmt.append(" AND (");
+                        stmt.append(discrStmt);
+                        if (allowNulls)
+                        {
+                            stmt.append(" OR ");
+                            stmt.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                            stmt.append(" IS NULL");
+                        }
+                        stmt.append(")");
+                    }
+                    if (relationDiscriminatorMapping != null)
+                    {
+                        BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
+                    }
+                }
             }
 
-            sizeStmt = stmt.toString();
-            return sizeStmt;
+            if (!usingDiscriminatorInSizeStmt)
+            {
+                sizeStmt = stmt.toString();
+            }
+            return stmt.toString();
         }
     }
 }
