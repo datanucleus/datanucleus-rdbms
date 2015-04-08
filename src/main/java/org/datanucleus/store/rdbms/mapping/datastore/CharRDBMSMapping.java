@@ -24,7 +24,6 @@ package org.datanucleus.store.rdbms.mapping.datastore;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,7 +43,6 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping of a CHAR RDBMS type.
@@ -419,16 +417,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else if (value instanceof java.sql.Timestamp)
                 {
-                    Calendar cal = storeMgr.getCalendarForDateTimezone();
-                    if (cal != null)
-                    {
-                        // Note that passing the calendar to oracle makes it loses milliseconds
-                        ps.setTimestamp(param, (Timestamp) value, cal);
-                    }
-                    else
-                    {
-                        ps.setTimestamp(param, (Timestamp) value);
-                    }
+                    ps.setString(param, ((java.sql.Timestamp)value).toString());
                 }
                 else if (value instanceof java.util.Date)
                 {
@@ -496,8 +485,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_TIMESTAMP))
                 {
-                    Calendar cal = storeMgr.getCalendarForDateTimezone();
-                    value = TypeConversionHelper.stringToTimestamp(s, cal);
+                    value = java.sql.Timestamp.valueOf(s);
                 }
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_DATE))
                 {
