@@ -637,7 +637,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     }
                     else
                     {
-                        boolean usingJoinTable = (elementInfo[0].getDatastoreClass() != containerTable);
+                        boolean usingJoinTable = usingJoinTable();
                         if (usingJoinTable)
                         {
                             jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
@@ -773,7 +773,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
             // Either using join table with element table(s), or FK in element table(s)
             String joinedElementAlias = "ELEM";
-            boolean usingJoinTable = (elementInfo[0].getDatastoreClass() != containerTable);
+            boolean usingJoinTable = usingJoinTable();
 
             if (usingJoinTable)
             {

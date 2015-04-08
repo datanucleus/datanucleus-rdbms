@@ -257,7 +257,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
     private String getContainsStatementString(Object element)
     {
         boolean elementsAreSerialised = isElementsAreSerialised();
-        boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
+        boolean usingJoinTable = usingJoinTable();
         Table selectTable = null;
         JavaTypeMapping ownerMapping = null;
         JavaTypeMapping elemMapping = null;
@@ -400,7 +400,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
                     // Needs to pass TCK M-N relation test
-                    boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
+                    boolean usingJoinTable = usingJoinTable();
                     ElementInfo elemInfo = getElementInfoForElement(element);
                     if (!usingJoinTable && elemInfo != null && elemInfo.getDiscriminatorMapping() != null)
                     {
@@ -470,7 +470,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString());
 
         // Add join to element table if required (only allows for 1 element table currently)
-        /*            ElementContainerStore.ElementInfo[] elementInfo = ecs.getElementInfo();
+/*      ElementContainerStore.ElementInfo[] elementInfo = ecs.getElementInfo();
         boolean joinedDiscrim = false;
         if (elementInfo != null && elementInfo[0].getDatastoreClass() != containerTable &&
             elementInfo[0].getDiscriminatorMapping() != null)

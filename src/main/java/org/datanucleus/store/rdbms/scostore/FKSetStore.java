@@ -251,29 +251,36 @@ public class FKSetStore extends AbstractSetStore
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
-                int jdbcPosition = 1;
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
                 try
                 {
-                    // TODO ownerMapping is for a particular elementInfo so need to use the right one when we have multiple
-                    if (owner == null)
+                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    JavaTypeMapping ownerMapping = null;
+                    if (ownerMemberMetaData.getMappedBy() != null)
                     {
-                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                            null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                        ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
                     }
                     else
                     {
-                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping),
-                            op.getObject(), op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                        ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    }
+                    JavaTypeMapping elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+
+                    int jdbcPosition = 1;
+                    if (owner == null)
+                    {
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                    }
+                    else
+                    {
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), op.getObject(), op, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
-
                     if (relationDiscriminatorMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
-
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elemMapping);
 
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     retval = true;
@@ -940,29 +947,30 @@ public class FKSetStore extends AbstractSetStore
 
     private String getUpdateFkStatementString(Object element)
     {
-        JavaTypeMapping elemMapping = elementMapping;
+        JavaTypeMapping ownerMapping = this.ownerMapping;
+        JavaTypeMapping elemMapping = this.elementMapping;
+        JavaTypeMapping relDiscrimMapping = this.relationDiscriminatorMapping;
         Table table = containerTable;
         if (elementInfo.length > 1)
         {
             ElementInfo elemInfo = getElementInfoForElement(element);
             if (elemInfo != null)
             {
+                table = elemInfo.getDatastoreClass();
                 if (ownerMemberMetaData.getMappedBy() != null)
                 {
-                    elemMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
+                    ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
                 }
                 else
                 {
-                    elemMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 }
+                elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
             }
         }
 
-        StringBuilder stmt = new StringBuilder("UPDATE ");
-        // TODO If ownerMapping is not for containerTable then use ownerMapping table in the UPDATE
-        stmt.append(table.toString());
-
-        stmt.append(" SET ");
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -973,14 +981,14 @@ public class FKSetStore extends AbstractSetStore
             stmt.append("=");
             stmt.append(((AbstractDatastoreMapping)ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
         }
-        if (relationDiscriminatorMapping != null)
+        if (relDiscrimMapping != null)
         {
-            for (int i=0; i<relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i=0; i<relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping)relationDiscriminatorMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(((AbstractDatastoreMapping)relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
             }
         }
 

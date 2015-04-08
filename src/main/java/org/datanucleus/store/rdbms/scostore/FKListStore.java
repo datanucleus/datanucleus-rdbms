@@ -61,6 +61,7 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -341,11 +342,20 @@ public class FKListStore extends AbstractListStore
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, updateFkStmt, false);
                 try
                 {
-                    int jdbcPosition = 1;
-                    if (elementInfo.length > 1)
+                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    JavaTypeMapping ownerMapping = null;
+                    if (ownerMemberMetaData.getMappedBy() != null)
                     {
-                        storeMgr.getDatastoreClass(element.getClass().getName(), clr);
+                        ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
                     }
+                    else
+                    {
+                        ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    }
+                    JavaTypeMapping elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+                    JavaTypeMapping orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+
+                    int jdbcPosition = 1;
                     if (owner == null)
                     {
                         if (ownerMemberMetaData != null)
@@ -370,8 +380,7 @@ public class FKListStore extends AbstractListStore
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
-
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elemMapping);
 
                     sqlControl.executeStatementUpdate(ec, mconn, updateFkStmt, ps, true);
                     retval = true;
@@ -1084,18 +1093,32 @@ public class FKListStore extends AbstractListStore
 
     private String getUpdateFkStatementString(Object element)
     {
-        // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
-        StringBuilder stmt = new StringBuilder("UPDATE ");
+        JavaTypeMapping ownerMapping = this.ownerMapping;
+        JavaTypeMapping elemMapping = this.elementMapping;
+        JavaTypeMapping orderMapping = this.orderMapping;
+        JavaTypeMapping relDiscrimMapping = this.relationDiscriminatorMapping;
+        Table table = containerTable;
         if (elementInfo.length > 1)
         {
-            stmt.append("?");
+            ElementInfo elemInfo = getElementInfoForElement(element);
+            if (elemInfo != null)
+            {
+                table = elemInfo.getDatastoreClass();
+                if (ownerMemberMetaData.getMappedBy() != null)
+                {
+                    ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
+                }
+                else
+                {
+                    ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                }
+                elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+                orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+            }
         }
-        else
-        {
-            // Could use elementInfo[0].getDatastoreClass but need to allow for relation in superclass table
-            stmt.append(containerTable.toString());
-        }
-        stmt.append(" SET ");
+
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
         for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -1116,19 +1139,19 @@ public class FKListStore extends AbstractListStore
                 stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
             }
         }
-        if (relationDiscriminatorMapping != null)
+        if (relDiscrimMapping != null)
         {
-            for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping) relationDiscriminatorMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(((AbstractDatastoreMapping) relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
             }
         }
 
         stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, null, true);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elemMapping, element, elementsAreSerialised, null, true);
 
         return stmt.toString();
     }
