@@ -844,15 +844,7 @@ public class FKListStore extends AbstractListStore
     {
         final Object newOwner = op.getObject();
 
-        ElementInfo info = null;
-        for (int i=0;i<elementInfo.length;i++)
-        {
-            if (elementInfo[i].getClassName().equals(element.getClass().getName()))
-            {
-                info = elementInfo[i];
-                break;
-            }
-        }
+        ElementInfo info = getElementInfoForElement(element);
 
         final DatastoreClass elementTable;
         if (storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType))

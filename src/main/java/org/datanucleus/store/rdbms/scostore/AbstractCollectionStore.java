@@ -29,6 +29,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
@@ -38,6 +39,7 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.table.JoinTable;
+import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.CollectionStore;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -228,26 +230,65 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
      */
     private String getContainsStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (containsStmt != null)
         {
-            // The statement is based on the element passed in so don't cache
-            return getContainsStatementString(element);
+            return containsStmt;
         }
 
-        if (containsStmt == null)
+        synchronized (this)
         {
-            synchronized (this)
+            boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
+            String stmt = getContainsStatementString(element);
+            if (usingJoinTable)
             {
-                containsStmt = getContainsStatementString(element);
+                if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+                {
+                    // The statement is based on the element passed in so don't cache
+                    return stmt;
+                }
+
+                // Cache the statement if same for any element
+                containsStmt = stmt;
             }
+            return stmt;
         }
-        return containsStmt;
     }
 
     private String getContainsStatementString(Object element)
     {
-        JavaTypeMapping ownerMapping = getOwnerMapping();
         boolean elementsAreSerialised = isElementsAreSerialised();
+        boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
+        Table selectTable = null;
+        JavaTypeMapping ownerMapping = null;
+        JavaTypeMapping elemMapping = null;
+        JavaTypeMapping relDiscrimMapping = null;
+        ElementInfo elemInfo = null;
+        if (usingJoinTable)
+        {
+            selectTable = this.containerTable;
+            ownerMapping = this.ownerMapping;
+            elemMapping = this.elementMapping;
+            relDiscrimMapping = this.relationDiscriminatorMapping;
+        }
+        else
+        {
+            elemInfo = getElementInfoForElement(element);
+            // TODO What if no suitable elementInfo found?
+            if (elemInfo != null)
+            {
+                selectTable = elemInfo.getDatastoreClass();
+                elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+                if (ownerMemberMetaData.getMappedBy() != null)
+                {
+                    ownerMapping = selectTable.getMemberMapping(elemInfo.getAbstractClassMetaData().getMetaDataForMember(ownerMemberMetaData.getMappedBy()));
+                }
+                else
+                {
+                    ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                }
+                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+            }
+        }
 
         StringBuilder stmt = new StringBuilder("SELECT ");
         String containerAlias = "THIS";
@@ -260,7 +301,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
         }
-        stmt.append(" FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
+        stmt.append(" FROM ").append(selectTable.toString()).append(" ").append(containerAlias);
         // TODO Add join to owner if ownerMapping is for supertable
 
         // Add join to element table if required (only allows for 1 element table currently)
@@ -287,38 +328,21 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, elementsAreSerialised, containerAlias, false);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elemMapping, element, elementsAreSerialised, containerAlias, false);
 
         // TODO Remove the "containerTable == " clause and make discriminator restriction part of the JoinTable statement too
         // Needs to pass TCK M-M relationship test. see contains(ObjectProvider, Object) method also
-        JavaTypeMapping discrimMapping = (elementInfo != null ? elementInfo[0].getDiscriminatorMapping() : null);
-        if (elementInfo != null && containerTable == elementInfo[0].getDatastoreClass() && discrimMapping != null)
+        if (!usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
         {
             // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
-            StringBuilder discrimStr = new StringBuilder();
-
             // Element table has discriminator so restrict to the element-type and subclasses
             // Add WHERE for the element and each subclass type so we restrict to valid element types TODO Is the element itself included?
-            Class cls = clr.classForName(elementInfo[0].getClassName());
-            if (!Modifier.isAbstract(cls.getModifiers()))
+            StringBuilder discrimStr = new StringBuilder();
+            Collection<String> classNames = storeMgr.getSubClassesForClass(elemInfo.getClassName(), true, clr);
+            classNames.add(elemInfo.getClassName());
+            for (String className : classNames)
             {
-                if (joinedDiscrim)
-                {
-                    discrimStr.append(joinedElementAlias);
-                }
-                else
-                {
-                    discrimStr.append(containerAlias);
-                }
-                discrimStr.append(".").append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
-                discrimStr.append(" = ");
-                discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter());
-            }
-
-            Collection<String> subclasses = storeMgr.getSubClassesForClass(elementInfo[0].getClassName(), true, clr);
-            for (String subclass : subclasses)
-            {
-                cls = clr.classForName(subclass);
+                Class cls = clr.classForName(className);
                 if (!Modifier.isAbstract(cls.getModifiers()))
                 {
                     if (discrimStr.length() > 0)
@@ -334,23 +358,21 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
                     {
                         discrimStr.append(containerAlias);
                     }
-                    discrimStr.append(".").append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    discrimStr.append(".").append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
                     discrimStr.append(" = ");
-                    discrimStr.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter());
+                    discrimStr.append(((AbstractDatastoreMapping) elemInfo.getDiscriminatorMapping().getDatastoreMapping(0)).getUpdateInputParameter());
                 }
             }
-
-            // Add discriminator clause if anything present
             if (discrimStr.length() > 0)
             {
                 stmt.append(" AND (").append(discrimStr.toString()).append(")");
             }
         }
 
-        if (relationDiscriminatorMapping != null)
+        if (relDiscrimMapping != null)
         {
             // Relation uses shared resource (FK, JoinTable) so restrict to this particular relation
-            BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, relDiscrimMapping, containerAlias, false);
         }
 
         return stmt.toString();
@@ -378,9 +400,11 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
                     // Needs to pass TCK M-N relation test
-                    if (elementInfo != null && elementInfo[0].getDiscriminatorMapping() != null && elementInfo[0].getDatastoreClass() == containerTable)
+                    boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
+                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    if (!usingJoinTable && elemInfo != null && elemInfo.getDiscriminatorMapping() != null)
                     {
-                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[0], clr);
+                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elemInfo, clr);
                     }
                     if (relationDiscriminatorMapping != null)
                     {

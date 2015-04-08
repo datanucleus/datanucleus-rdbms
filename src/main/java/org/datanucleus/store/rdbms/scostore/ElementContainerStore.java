@@ -124,7 +124,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     /** MetaData for the "element-type" class. Not used for reference types since no metadata is present for the declared type. */
     protected AbstractClassMetaData emd;
 
-    /** Table containing the link between owner and element. Not set when using FK relations. */
+    /** Table containing the link between owner and element. */
     protected Table containerTable;
 
     /** Mapping for the element. */
@@ -972,5 +972,44 @@ public abstract class ElementContainerStore extends BaseContainerStore
             }
             return stmt.toString();
         }
+    }
+
+    protected ElementInfo getElementInfoForElement(Object element)
+    {
+        if (elementInfo == null)
+        {
+            return null;
+        }
+        ElementInfo elemInfo = null;
+
+        for (int i=0;i<elementInfo.length;i++)
+        {
+            if (elementInfo[i].getClassName().equals(element.getClass().getName()))
+            {
+                elemInfo = elementInfo[i];
+                break;
+            }
+        }
+        if (elemInfo == null)
+        {
+            Class elementCls = element.getClass();
+            for (int i=0;i<elementInfo.length;i++)
+            {
+                Class elemInfoCls = clr.classForName(elementInfo[i].getClassName());
+                if (elemInfoCls.isAssignableFrom(elementCls))
+                {
+                    elemInfo = elementInfo[i];
+                    break;
+                }
+            }
+        }
+        return elemInfo;
+    }
+
+    protected boolean usingJoinTable()
+    {
+        // elementInfo == null means embedded/serialised into join table
+        // elementInfo[0].datastoreClass will be element table when using join table (as container table)
+        return (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
     }
 }

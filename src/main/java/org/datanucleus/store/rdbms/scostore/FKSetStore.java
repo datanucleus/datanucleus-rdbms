@@ -944,22 +944,16 @@ public class FKSetStore extends AbstractSetStore
         Table table = containerTable;
         if (elementInfo.length > 1)
         {
-            for (int i=0;i<elementInfo.length;i++)
+            ElementInfo elemInfo = getElementInfoForElement(element);
+            if (elemInfo != null)
             {
-                ElementInfo info = elementInfo[i];
-                Class implCls = clr.classForName(info.getClassName());
-                if (element.getClass().isAssignableFrom(implCls))
+                if (ownerMemberMetaData.getMappedBy() != null)
                 {
-                    table = info.getDatastoreClass();
-                    if (ownerMemberMetaData.getMappedBy() != null)
-                    {
-                        elemMapping = info.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
-                    }
-                    else
-                    {
-                        elemMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                    }
-                    break;
+                    elemMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
+                }
+                else
+                {
+                    elemMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 }
             }
         }
