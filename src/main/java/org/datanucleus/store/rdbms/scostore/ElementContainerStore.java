@@ -202,8 +202,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
     /**
      * Convenience method to find the element information relating to the element type.
-     * Used specifically for the "element-type" of a collection/array to find the elements
-     * which have table information. Not used for reference types.
+     * Used specifically for the "element-type" of a collection/array to find the elements which have table information.
      * @return Element information relating to the element type
      */
     protected ElementInfo[] getElementInformationForClass()
@@ -331,7 +330,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     }
 
     /**
-     * Method to check if an element is already persistent or is persistent but managed by a different persistence manager.
+     * Method to check if an element is already persistent or is persistent but managed by a different ExecutionContext.
      * @param op The ObjectProvider of this owner
      * @param element The element
      * @return Whether it is valid for reading.
@@ -356,8 +355,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     }
 
     /**
-     * Method to check if an element is already persistent, or is managed by a different
-     * Persistencemanager. If not persistent, this will persist it.
+     * Method to check if an element is already persistent, or is managed by a different ExecutionContext. If not persistent, this will persist it.
      * @param ec execution context
      * @param element The element
      * @param fieldValues any initial field values to use if persisting the element
@@ -422,7 +420,41 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 dependentElements.add(iter.next());
             }
         }
-        executeClear(ownerOP);
+
+        String clearStmt = getClearStmt();
+        try
+        {
+            ExecutionContext ec = ownerOP.getExecutionContext();
+            ManagedConnection mconn = storeMgr.getConnection(ec);
+            SQLController sqlControl = storeMgr.getSQLController();
+            try
+            {
+                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearStmt, false);
+                try
+                {
+                    int jdbcPosition = 1;
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                    if (relationDiscriminatorMapping != null)
+                    {
+                        BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                    }
+
+                    sqlControl.executeStatementUpdate(ec, mconn, clearStmt, ps, true);
+                }
+                finally
+                {
+                    sqlControl.closeStatement(mconn, ps);
+                }
+            }
+            finally
+            {
+                mconn.release();
+            }
+        }
+        catch (SQLException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
+        }
 
         // Cascade-delete
         if (dependentElements != null && dependentElements.size() > 0)
@@ -444,13 +476,31 @@ public abstract class ElementContainerStore extends BaseContainerStore
     }
 
     /**
-     * Method to return the size of the container.
-     * @param op The ObjectProvider.
-     * @return The size.
+     * Generate statement for clearing the (join table) container.
+     * <PRE>
+     * DELETE FROM CONTAINERTABLE WHERE OWNERCOL = ? [AND RELATION_DISCRIM=?]
+     * </PRE>
+     * TODO Add a discriminator restriction on this statement so we only clear ones with a valid discriminator value
+     * @return Statement for clearing the container.
      */
-    public int size(ObjectProvider op)
+    protected String getClearStmt()
     {
-        return getSize(op);
+        if (clearStmt == null)
+        {
+            synchronized (this)
+            {
+                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+                if (getRelationDiscriminatorMapping() != null)
+                {
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
+                }
+
+                clearStmt = stmt.toString();
+            }
+        }
+
+        return clearStmt;
     }
 
     /**
@@ -462,12 +512,11 @@ public abstract class ElementContainerStore extends BaseContainerStore
     }
 
     /**
-     * Generates the statement for adding items.
+     * Generates the statement for adding items to a (join table) container.
      * The EMBEDDEDFIELDX columns are only added for embedded PC elements.
      * <PRE>
      * INSERT INTO COLLTABLE (OWNERCOL,[ELEMENTCOL],[EMBEDDEDFIELD1, EMBEDDEDFIELD2,...],[ORDERCOL]) VALUES (?,?,?)
      * </PRE>
-     *
      * @return The Statement for adding an item
      */
     protected String getAddStmtForJoinTable()
@@ -547,72 +596,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
         return addStmt;
     }
 
-    public void executeClear(ObjectProvider ownerOP)
-    {
-        String clearStmt = getClearStmt();
-        try
-        {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
-            try
-            {
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearStmt, false);
-                try
-                {
-                    int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (relationDiscriminatorMapping != null)
-                    {
-                        BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                    }
-
-                    sqlControl.executeStatementUpdate(ec, mconn, clearStmt, ps, true);
-                }
-                finally
-                {
-                    sqlControl.closeStatement(mconn, ps);
-                }
-            }
-            finally
-            {
-                mconn.release();
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
-        }
-    }
-
     /**
-     * Generate statement for clearing the container.
-     * <PRE>
-     * DELETE FROM CONTAINERTABLE WHERE OWNERCOL = ? [AND RELATION_DISCRIM=?]
-     * </PRE>
-     * TODO Add a discriminator restriction on this statement so we only clear ones with a
-     * valid discriminator value
-     *
-     * @return Statement for clearing the container.
+     * Method to return the size of the container.
+     * @param op The ObjectProvider.
+     * @return The size.
      */
-    protected String getClearStmt()
+    public int size(ObjectProvider op)
     {
-        if (clearStmt == null)
-        {
-            synchronized (this)
-            {
-                StringBuilder stmt = new StringBuilder("DELETE FROM ").append(containerTable.toString()).append(" WHERE ");
-                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-                if (getRelationDiscriminatorMapping() != null)
-                {
-                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
-                }
-
-                clearStmt = stmt.toString();
-            }
-        }
-
-        return clearStmt;
+        return getSize(op);
     }
 
     public int getSize(ObjectProvider ownerOP)
@@ -637,8 +628,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     }
                     else
                     {
-                        boolean usingJoinTable = usingJoinTable();
-                        if (usingJoinTable)
+                        if (usingJoinTable())
                         {
                             jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                             if (elementInfo[0].getDiscriminatorMapping() != null)
@@ -771,20 +761,17 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 return sizeStmt;
             }
 
-            // Either using join table with element table(s), or FK in element table(s)
-            String joinedElementAlias = "ELEM";
-            boolean usingJoinTable = usingJoinTable();
-
-            if (usingJoinTable)
+            if (usingJoinTable())
             {
-                // Join table collection array, so do COUNT of join table
+                // Join table collection/array, so do COUNT of join table
+                String joinedElementAlias = "ELEM";
                 ElementInfo elemInfo = elementInfo[0];
 
                 stmt.append("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
 
                 // Add join to element table if required (only allows for 1 element table currently)
                 boolean joinedDiscrim = false;
-                if (usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
+                if (elemInfo.getDiscriminatorMapping() != null)
                 {
                     // Need join to the element table to restrict the discriminator
                     joinedDiscrim = true;
@@ -865,7 +852,6 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
                 }
-                
             }
             else
             {
@@ -878,29 +864,8 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     }
                     ElementInfo elemInfo = elementInfo[i];
 
-                    stmt.append("SELECT COUNT(*),").append("'" + elemInfo.getAbstractClassMetaData().getName() + "'").append(" FROM ").append(elemInfo.getDatastoreClass().toString()).append(" ").append(containerAlias);
-
-                    // Add join to element table if required (only allows for 1 element table currently)
-                    boolean joinedDiscrim = false;
-                    if (usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
-                    {
-                        // Need join to the element table to restrict the discriminator
-                        joinedDiscrim = true;
-                        JavaTypeMapping elemIdMapping = elemInfo.getDatastoreClass().getIdMapping();
-                        stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
-                        stmt.append(elemInfo.getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
-                        for (int j = 0; j < elementMapping.getNumberOfDatastoreMappings(); j++)
-                        {
-                            if (j > 0)
-                            {
-                                stmt.append(" AND ");
-                            }
-                            stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(j).getColumn().getIdentifier());
-                            stmt.append("=");
-                            stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(j).getColumn().getIdentifier());
-                        }
-                    }
-                    // TODO Add join to owner if ownerMapping is for supertable
+                    stmt.append("SELECT COUNT(*),").append("'" + elemInfo.getAbstractClassMetaData().getName() + "'");
+                    stmt.append(" FROM ").append(elemInfo.getDatastoreClass().toString()).append(" ").append(containerAlias);
 
                     stmt.append(" WHERE ");
                     BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, containerAlias, true);
@@ -937,9 +902,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                                         discrStmt.append(" OR ");
                                     }
 
-                                    discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
-                                    discrStmt.append(".");
-                                    discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                                    discrStmt.append(containerAlias).append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                                     discrStmt.append("=");
                                     discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
                                 }

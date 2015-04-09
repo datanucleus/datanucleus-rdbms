@@ -268,6 +268,15 @@ public class FKListStore extends AbstractListStore
                 PreparedStatement ps2 = sqlControl.getStatementForUpdate(mconn, setStmt, false);
                 try
                 {
+                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    JavaTypeMapping elemMapping = this.elementMapping;
+                    JavaTypeMapping orderMapping = this.orderMapping;
+                    if (elemInfo != null)
+                    {
+                        elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+                        orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                    }
+
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps2, jdbcPosition, this);
                     if (orderMapping != null)
@@ -278,7 +287,7 @@ public class FKListStore extends AbstractListStore
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps2, jdbcPosition, this);
                     }
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps2, element, jdbcPosition, elementMapping);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps2, element, jdbcPosition, elemMapping);
 
                     sqlControl.executeStatementUpdate(ec, mconn, setStmt, ps2, true);
                 }
@@ -1238,28 +1247,45 @@ public class FKListStore extends AbstractListStore
      */
     private String getSetStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (setStmt != null)
         {
-            // Don't cache since depends on the element
-            return getSetStatementString(element);
+            return setStmt;
         }
 
-        if (setStmt == null)
+        String stmt = getSetStatementString(element);
+        if (elementInfo.length == 1)
         {
-            synchronized (this)
-            {
-                setStmt = getSetStatementString(element);
-            }
+            setStmt = stmt;
         }
-        return setStmt;
+        return stmt;
     }
 
     private String getSetStatementString(Object element)
     {
+        ElementInfo elemInfo = getElementInfoForElement(element);
+        Table table = this.containerTable;
+        JavaTypeMapping ownerMapping = this.ownerMapping;
+        JavaTypeMapping elemMapping = this.elementMapping;
+        JavaTypeMapping relDiscrimMapping = this.relationDiscriminatorMapping;
+        JavaTypeMapping orderMapping = this.orderMapping;
+        if (elemInfo != null)
+        {
+            table = elemInfo.getDatastoreClass();
+            elemMapping = elemInfo.getDatastoreClass().getIdMapping();
+            if (ownerMemberMetaData.getMappedBy() != null)
+            {
+                ownerMapping = table.getMemberMapping(elemInfo.getAbstractClassMetaData().getMetaDataForMember(ownerMemberMetaData.getMappedBy()));
+            }
+            else
+            {
+                ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+            }
+            orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        }
+
         // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
-        StringBuilder stmt = new StringBuilder("UPDATE ");
-        stmt.append(containerTable.toString()); // TODO Allow for multiple element tables
-        stmt.append(" SET ");
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
         for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -1281,19 +1307,19 @@ public class FKListStore extends AbstractListStore
                 stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
             }
         }
-        if (relationDiscriminatorMapping != null)
+        if (relDiscrimMapping != null)
         {
-            for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append(" = ");
-                stmt.append(((AbstractDatastoreMapping) relationDiscriminatorMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(((AbstractDatastoreMapping) relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
             }
         }
 
         stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForElement(stmt, elementMapping, element, isElementsAreSerialised(), null, true);
+        BackingStoreHelper.appendWhereClauseForElement(stmt, elemMapping, element, isElementsAreSerialised(), null, true);
 
         return stmt.toString();
     }

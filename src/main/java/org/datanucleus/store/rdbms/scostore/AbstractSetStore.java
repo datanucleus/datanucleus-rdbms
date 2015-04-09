@@ -205,17 +205,44 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
                     try
                     {
                         // Process the remove
-                        int[] rc = internalRemove(op, mconn, batched, element, !batched || (batched && !iter.hasNext()));
-                        if (rc != null)
+                        int[] rc = null;
+                        String removeStmt = getRemoveStmt(element);
+                        try
                         {
-                            for (int i=0;i<rc.length;i++)
+                            PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, removeStmt, batched);
+                            try
                             {
-                                if (rc[i] > 0)
+                                int jdbcPosition = 1;
+                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                                if (relationDiscriminatorMapping != null)
                                 {
-                                    // At least one record was inserted
-                                    modified = true;
+                                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                                }
+
+                                // Execute the statement
+                                rc = sqlControl.executeStatementUpdate(ec, mconn, removeStmt, ps, !batched || (batched && !iter.hasNext()));
+
+                                if (rc != null)
+                                {
+                                    for (int i=0;i<rc.length;i++)
+                                    {
+                                        if (rc[i] > 0)
+                                        {
+                                            // At least one record was inserted
+                                            modified = true;
+                                        }
+                                    }
                                 }
                             }
+                            finally
+                            {
+                                sqlControl.closeStatement(mconn, ps);
+                            }
+                        }
+                        catch (SQLException e)
+                        {
+                            throw new MappedDatastoreException("SQLException", e);
                         }
                     }
                     catch (MappedDatastoreException mde)
@@ -245,38 +272,5 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
         }
 
         return modified;
-    }
-
-    private int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
-    throws MappedDatastoreException
-    {
-        ExecutionContext ec = op.getExecutionContext();
-        SQLController sqlControl = storeMgr.getSQLController();
-        String removeStmt = getRemoveStmt(element);
-        try
-        {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, removeStmt, batched);
-            try
-            {
-                int jdbcPosition = 1;
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
-                if (relationDiscriminatorMapping != null)
-                {
-                    jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                }
-
-                // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, removeStmt, ps, executeNow);
-            }
-            finally
-            {
-                sqlControl.closeStatement(conn, ps);
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new MappedDatastoreException("SQLException", e);
-        }
     }
 }

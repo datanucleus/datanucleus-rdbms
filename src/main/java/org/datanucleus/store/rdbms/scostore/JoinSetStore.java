@@ -372,7 +372,17 @@ public class JoinSetStore extends AbstractSetStore
             ManagedConnection mconn = storeMgr.getConnection(ec);
             try
             {
-                preGetNextIDForOrderColumn(mconn);
+                SQLController sqlControl = storeMgr.getSQLController();
+                try
+                {
+                    // Process all waiting batched statements before we start our work
+                    sqlControl.processStatementsForConnection(mconn);
+                }
+                catch (SQLException e)
+                {
+                    throw new MappedDatastoreException("SQLException", e);
+                }
+
                 int nextOrderID = 0;
                 if (orderMapping != null)
                 {
@@ -705,13 +715,6 @@ public class JoinSetStore extends AbstractSetStore
         }
     }
 
-    /**
-     * Generate statement for checking the existence of an owner-element relation (used for M-N).
-     * <PRE>
-     * SELECT 1 FROM JOINTABLE WHERE OWNERCOL = ? AND ELEMENTCOL = ?
-     * </PRE>
-     * @return Statement for locating an owner-element relation in the join table
-     */
     private synchronized String getLocateStmt(Object element)
     {
         if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
@@ -730,6 +733,14 @@ public class JoinSetStore extends AbstractSetStore
         return locateStmt;
     }
 
+    /**
+     * Generate statement for checking the existence of an owner-element relation (used for M-N).
+     * <PRE>
+     * SELECT 1 FROM JOINTABLE WHERE OWNERCOL = ? AND ELEMENTCOL = ?
+     * </PRE>
+     * @param element The element to locate
+     * @return Statement for locating an owner-element relation in the join table
+     */
     private String getLocateStatementString(Object element)
     {
         StringBuilder stmt = new StringBuilder("SELECT 1 FROM ").append(containerTable.toString()).append(" WHERE ");
@@ -741,50 +752,6 @@ public class JoinSetStore extends AbstractSetStore
         }
 
         return stmt.toString();
-    }
-
-    protected void preGetNextIDForOrderColumn(ManagedConnection mconn) throws MappedDatastoreException
-    {
-        SQLController sqlControl = storeMgr.getSQLController();
-        try
-        {
-            // Process all waiting batched statements before we start our work
-            sqlControl.processStatementsForConnection(mconn);
-        }
-        catch (SQLException e)
-        {
-            throw new MappedDatastoreException("SQLException", e);
-        }
-    }
-
-    /**
-     * Generate statement for obtaining the maximum id for the order column.
-     * <PRE>
-     * SELECT MAX(SCOID) FROM SETTABLE
-     * WHERE OWNERCOL=?
-     * [AND RELATION_DISCRIM=?]
-     * </PRE>
-     * @return The Statement returning the higher id
-     */
-    private synchronized String getMaxOrderColumnIdStmt()
-    {
-        if (maxOrderColumnIdStmt == null)
-        {
-            synchronized (this)
-            {
-                StringBuilder stmt = new StringBuilder("SELECT MAX(" + orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
-                stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
-                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-                if (relationDiscriminatorMapping != null)
-                {
-                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
-                }
-
-                maxOrderColumnIdStmt = stmt.toString();
-            }
-        }
-
-        return maxOrderColumnIdStmt;
     }
 
     protected int getNextIDForOrderColumn(ObjectProvider op)
@@ -844,6 +811,36 @@ public class JoinSetStore extends AbstractSetStore
         }
 
         return nextID;
+    }
+
+    /**
+     * Generate statement for obtaining the maximum id for the order column.
+     * <PRE>
+     * SELECT MAX(SCOID) FROM SETTABLE
+     * WHERE OWNERCOL=?
+     * [AND RELATION_DISCRIM=?]
+     * </PRE>
+     * @return The Statement returning the higher id
+     */
+    private synchronized String getMaxOrderColumnIdStmt()
+    {
+        if (maxOrderColumnIdStmt == null)
+        {
+            synchronized (this)
+            {
+                StringBuilder stmt = new StringBuilder("SELECT MAX(" + orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
+                stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
+                BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+                if (relationDiscriminatorMapping != null)
+                {
+                    BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, null, false);
+                }
+
+                maxOrderColumnIdStmt = stmt.toString();
+            }
+        }
+
+        return maxOrderColumnIdStmt;
     }
 
     /**

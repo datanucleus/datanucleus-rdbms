@@ -383,6 +383,7 @@ public class FKArrayStore extends AbstractArrayStore
         }
         else
         {
+            // TODO Cater for multiple element roots
             // TODO If the relation is bidirectional we need to clear the owner in the element
             String clearNullifyStmt = getClearNullifyStmt();
             try
@@ -580,8 +581,7 @@ public class FKArrayStore extends AbstractArrayStore
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
 
                 try

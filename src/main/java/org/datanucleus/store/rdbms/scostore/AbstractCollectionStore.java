@@ -106,8 +106,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
     }
 
     /**
-     * Method to verify if the association owner vs elements contains
-     * a specific element in the association 
+     * Method to verify if the specified element is contained in this collection.
      * @param op ObjectProvider
      * @param element The element
      * @return Whether it contains the element 
@@ -118,82 +117,46 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         {
             return false;
         }
-        return containsInternal(op, element);
-    }
 
-    /**
-     * Generate statement for update the field of an embedded element.
-     * <PRE>
-     * UPDATE SETTABLE
-     * SET EMBEDDEDFIELD1 = ?
-     * WHERE OWNERCOL=?
-     * AND ELEMENTCOL = ?
-     * </PRE>
-     *
-     * @param fieldMapping The mapping for the field within the embedded object to be updated
-     * @return Statement for updating an embedded element in the Set
-     */
-    protected String getUpdateEmbeddedElementStmt(JavaTypeMapping fieldMapping)
-    {
-        JavaTypeMapping ownerMapping = getOwnerMapping();
-
-        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
-        for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
-        {
-            if (i > 0)
-            {
-                stmt.append(",");
-            }
-            stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
-            stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping) fieldMapping.getDatastoreMapping(i)).getUpdateInputParameter());
-        }
-
-        stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-
-        EmbeddedElementPCMapping embeddedMapping = (EmbeddedElementPCMapping) elementMapping;
-        for (int i = 0; i < embeddedMapping.getNumberOfJavaTypeMappings(); i++)
-        {
-            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
-            if (m != null)
-            {
-                for (int j = 0; j < m.getNumberOfDatastoreMappings(); j++)
-                {
-                    stmt.append(" AND ");
-                    stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
-                    stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) m.getDatastoreMapping(j)).getUpdateInputParameter());
-                }
-            }
-        }
-        return stmt.toString();
-    }
-
-    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
-    {
-        boolean modified = false;
-        String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
+        boolean retval;
+        String stmt = getContainsStmt(element);
         try
         {
             ExecutionContext ec = op.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
-
             try
             {
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
                 try
                 {
                     int jdbcPosition = 1;
-                    fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
-                    jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
-                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, emd, this);
+                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
 
-                    sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
-                    modified = true;
+                    // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
+                    // Needs to pass TCK M-N relation test
+                    boolean usingJoinTable = usingJoinTable();
+                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    if (!usingJoinTable && elemInfo != null && elemInfo.getDiscriminatorMapping() != null)
+                    {
+                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elemInfo, clr);
+                    }
+                    if (relationDiscriminatorMapping != null)
+                    {
+                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                    }
+
+                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
+                    try
+                    {
+                        retval = rs.next();
+                        JDBCUtils.logWarnings(rs);
+                    }
+                    finally
+                    {
+                        rs.close();
+                    }
                 }
                 finally
                 {
@@ -207,11 +170,9 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         }
         catch (SQLException e)
         {
-            NucleusLogger.DATASTORE_PERSIST.error("Exception updating embedded element in collection", e);
-            // TODO Update this localised message to reflect that it is the update of an embedded element
-            throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056008", stmt), e);
         }
-        return modified;
+        return retval;
     }
 
     /**
@@ -237,9 +198,8 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
 
         synchronized (this)
         {
-            boolean usingJoinTable = (elementInfo == null || (elementInfo[0].getDatastoreClass() != containerTable));
             String stmt = getContainsStatementString(element);
-            if (usingJoinTable)
+            if (usingJoinTable())
             {
                 if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
                 {
@@ -378,49 +338,30 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         return stmt.toString();
     }
 
-    protected boolean containsInternal(ObjectProvider op, Object element)
+    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
     {
-        boolean retval;
-
-        String stmt = getContainsStmt(element);
+        boolean modified = false;
+        String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
         try
         {
             ExecutionContext ec = op.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
+
             try
             {
-                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
                 try
                 {
                     int jdbcPosition = 1;
+                    fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
+                    jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
+                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, emd, this);
 
-                    jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
-
-                    // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
-                    // Needs to pass TCK M-N relation test
-                    boolean usingJoinTable = usingJoinTable();
-                    ElementInfo elemInfo = getElementInfoForElement(element);
-                    if (!usingJoinTable && elemInfo != null && elemInfo.getDiscriminatorMapping() != null)
-                    {
-                        jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elemInfo, clr);
-                    }
-                    if (relationDiscriminatorMapping != null)
-                    {
-                        jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                    }
-
-                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
-                    try
-                    {
-                        retval = rs.next();
-                        JDBCUtils.logWarnings(rs);
-                    }
-                    finally
-                    {
-                        rs.close();
-                    }
+                    sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                    modified = true;
                 }
                 finally
                 {
@@ -434,9 +375,60 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056008", stmt), e);
+            NucleusLogger.DATASTORE_PERSIST.error("Exception updating embedded element in collection", e);
+            // TODO Update this localised message to reflect that it is the update of an embedded element
+            throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
         }
-        return retval;
+        return modified;
+    }
+
+    /**
+     * Generate statement for update the field of an embedded element.
+     * <PRE>
+     * UPDATE SETTABLE
+     * SET EMBEDDEDFIELD1 = ?
+     * WHERE OWNERCOL=?
+     * AND ELEMENTCOL = ?
+     * </PRE>
+     *
+     * @param fieldMapping The mapping for the field within the embedded object to be updated
+     * @return Statement for updating an embedded element in the Set
+     */
+    protected String getUpdateEmbeddedElementStmt(JavaTypeMapping fieldMapping)
+    {
+        JavaTypeMapping ownerMapping = getOwnerMapping();
+
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
+        for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(",");
+            }
+            stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(" = ");
+            stmt.append(((AbstractDatastoreMapping) fieldMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+        }
+
+        stmt.append(" WHERE ");
+        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+        EmbeddedElementPCMapping embeddedMapping = (EmbeddedElementPCMapping) elementMapping;
+        for (int i = 0; i < embeddedMapping.getNumberOfJavaTypeMappings(); i++)
+        {
+            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
+            if (m != null)
+            {
+                for (int j = 0; j < m.getNumberOfDatastoreMappings(); j++)
+                {
+                    stmt.append(" AND ");
+                    stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(((AbstractDatastoreMapping) m.getDatastoreMapping(j)).getUpdateInputParameter());
+                }
+            }
+        }
+        return stmt.toString();
     }
 
     /**
