@@ -18,15 +18,15 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.method;
 
 /**
- * Expression handler to invoke the SQL RADIANS function.
- * For use in evaluating RADIANS({expr}) where the RDBMS supports this function.
- * Returns a NumericExpression "RADIANS({numericExpr})".
+ * Expression handler to invoke the SQL DEGREES function.
+ * For use in evaluating DEGREES({expr}) where the RDBMS supports this function.
+ * Returns a NumericExpression "DEGREES({numericExpr})".
  */
-public class RadiansFunction extends SimpleNumericMethod
+public class DegreesFunction extends SimpleNumericMethod
 {
     protected String getFunctionName()
     {
-        return "RADIANS";
+        return "DEGREES";
     }
 
     /* (non-Javadoc)
