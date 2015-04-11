@@ -971,6 +971,7 @@ Contributors:
         <sql-method method="Math.sin" evaluator="org.datanucleus.store.rdbms.sql.method.MathSinMethod"/>
         <sql-method method="Math.sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.MathSqrtMethod"/>
         <sql-method method="Math.tan" evaluator="org.datanucleus.store.rdbms.sql.method.MathTanMethod"/>
+        <sql-method method="Math.toRadians" evaluator="org.datanucleus.store.rdbms.sql.method.MathToRadiansMethod"/>
         <sql-method method="JDOHelper.getObjectId"
             evaluator="org.datanucleus.store.rdbms.sql.method.JDOHelperGetObjectIdMethod"/>
         <sql-method method="JDOHelper.getVersion"
