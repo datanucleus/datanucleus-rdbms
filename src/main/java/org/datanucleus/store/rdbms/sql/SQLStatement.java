@@ -39,6 +39,7 @@ import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
+import org.datanucleus.store.rdbms.sql.expression.ResultAliasExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
@@ -2060,9 +2061,11 @@ public class SQLStatement
                         orderStmt.append(" " + orderNullDirectives[i]);
                     }
                 }
+                // TODO Cater for ResultAliasExpression, so we just put the order aliasName
             }
             else
             {
+                // TODO Cater for ResultAliasExpression, so we just put the order aliasName
                 // Order using column aliases "NUCORDER{i}"
                 orderStmt = new SQLText();
                 boolean needsSelect = dba.supportsOption(DatastoreAdapter.INCLUDE_ORDERBY_COLS_IN_SELECT);
@@ -2075,31 +2078,45 @@ public class SQLStatement
 
                     if (needsSelect && !aggregated)
                     {
-                        // Order by the "NUCORDER?" if we need them to be selected and it isn't an aggregate
-                        String orderString = "NUCORDER" + i;
-                        if (orderingExpressions[i].getNumberOfSubExpressions() == 1)
+                        if (orderingExpressions[i] instanceof ResultAliasExpression)
                         {
-                            orderStmt.append(dba.getOrderString(rdbmsMgr, orderString, orderingExpressions[i]));
+                            orderStmt.append(dba.getOrderString(rdbmsMgr, ((ResultAliasExpression)orderingExpressions[i]).getResultAlias(), orderingExpressions[i]));
                         }
                         else
                         {
-                            DatastoreMapping[] mappings = orderingExpressions[i].getJavaTypeMapping().getDatastoreMappings();
-                            for (int j=0;j<mappings.length;j++)
+                            // Order by the "NUCORDER?" if we need them to be selected and it isn't an aggregate
+                            String orderString = "NUCORDER" + i;
+                            if (orderingExpressions[i].getNumberOfSubExpressions() == 1)
                             {
-                                String alias = orderString + "_" + j;
-                                orderStmt.append(dba.getOrderString(rdbmsMgr, alias, orderingExpressions[i]));
-
-                                if (j < mappings.length-1)
+                                orderStmt.append(dba.getOrderString(rdbmsMgr, orderString, orderingExpressions[i]));
+                            }
+                            else
+                            {
+                                DatastoreMapping[] mappings = orderingExpressions[i].getJavaTypeMapping().getDatastoreMappings();
+                                for (int j=0;j<mappings.length;j++)
                                 {
-                                    orderStmt.append(',');
+                                    String alias = orderString + "_" + j;
+                                    orderStmt.append(dba.getOrderString(rdbmsMgr, alias, orderingExpressions[i]));
+
+                                    if (j < mappings.length-1)
+                                    {
+                                        orderStmt.append(',');
+                                    }
                                 }
                             }
                         }
                     }
                     else
                     {
-                        // Order by the "THIS.COLUMN" otherwise
-                        orderStmt.append(dba.getOrderString(rdbmsMgr, orderingExpressions[i].toSQLText().toSQL(), orderingExpressions[i]));
+                        if (orderingExpressions[i] instanceof ResultAliasExpression)
+                        {
+                            orderStmt.append(dba.getOrderString(rdbmsMgr, ((ResultAliasExpression)orderingExpressions[i]).getResultAlias(), orderingExpressions[i]));
+                        }
+                        else
+                        {
+                            // Order by the "THIS.COLUMN" otherwise
+                            orderStmt.append(dba.getOrderString(rdbmsMgr, orderingExpressions[i].toSQLText().toSQL(), orderingExpressions[i]));
+                        }
                     }
 
                     if (orderingDirections[i])
@@ -2155,7 +2172,11 @@ public class SQLStatement
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
                     String orderExpr = "NUCORDER" + i;
-                    if (orderingExpressions[i].getNumberOfSubExpressions() == 1 || aggregated)
+                    if (orderingExpressions[i] instanceof ResultAliasExpression)
+                    {
+                        // Nothing to do since this is ordering by a result alias
+                    }
+                    else if (orderingExpressions[i].getNumberOfSubExpressions() == 1 || aggregated)
                     {
                         if (unions != null)
                         {

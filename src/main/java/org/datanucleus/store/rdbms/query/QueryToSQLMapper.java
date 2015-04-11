@@ -108,6 +108,7 @@ import org.datanucleus.store.rdbms.sql.expression.NewObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
+import org.datanucleus.store.rdbms.sql.expression.ResultAliasExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
@@ -205,6 +206,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     /** Map of SQLTable/mapping keyed by the name of the primary that it relates to. */
     Map<String, SQLTableMapping> sqlTableByPrimary = new HashMap<String, SQLTableMapping>();
+
+    /** Aliases defined in the result, populated during compileResult. */
+    Set<String> resultAliases = null;
 
     /** Map of the join primary expression string keyed by the join alias (explicit joins only). */
     Map<String, String> explicitJoinPrimaryByAlias = null;
@@ -647,6 +651,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             for (int i=0;i<resultExprs.length;i++)
             {
                 String alias = resultExprs[i].getAlias();
+                if (alias != null && resultAliases == null)
+                {
+                    resultAliases = new HashSet<String>();
+                }
+
                 if (resultExprs[i] instanceof InvokeExpression)
                 {
                     InvokeExpression invokeExpr = (InvokeExpression)resultExprs[i];
@@ -720,6 +729,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -746,6 +756,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             idx.setColumnPositions(cols);
                             if (alias != null)
                             {
+                                resultAliases.add(alias);
                                 idx.setColumnAlias(alias);
                             }
                             resultDefinition.addMappingForResultExpression(i, idx);
@@ -757,6 +768,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             idx.setColumnPositions(cols);
                             if (alias != null)
                             {
+                                resultAliases.add(alias);
                                 idx.setColumnAlias(alias);
                             }
                             resultDefinition.addMappingForResultExpression(i, idx);
@@ -773,6 +785,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -794,6 +807,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -808,6 +822,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -829,6 +844,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -842,6 +858,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
+                        resultAliases.add(alias);
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
@@ -980,7 +997,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             for (int i = 0; i < orderingExpr.length; i++)
             {
                 OrderExpression orderExpr = (OrderExpression)orderingExpr[i];
-                orderSqlExprs[i] = (SQLExpression)orderExpr.getLeft().evaluate(this);
+                Expression expr = orderExpr.getLeft();
+                if (expr instanceof PrimaryExpression)
+                {
+                    PrimaryExpression orderPrimExpr = (PrimaryExpression)expr;
+                    if (orderPrimExpr.getTuples().size() == 1 && resultAliases != null)
+                    {
+                        if (resultAliases.contains(orderPrimExpr.getId().toLowerCase()))
+                        {
+                            // Order by a result alias
+                            orderSqlExprs[i] = new ResultAliasExpression(stmt, orderPrimExpr.getId());
+                        }
+                    }
+                }
+
+                if (orderSqlExprs[i] == null)
+                {
+                    orderSqlExprs[i] = (SQLExpression)orderExpr.getLeft().evaluate(this);
+                }
+
                 String orderDir = orderExpr.getSortOrder();
                 directions[i] = ((orderDir == null || orderDir.equals("ascending")) ? false : true);
                 if (stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
