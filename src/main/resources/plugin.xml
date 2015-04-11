@@ -931,6 +931,7 @@ Contributors:
         <sql-method method="sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
         <sql-method method="sum" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
         <sql-method method="tan" evaluator="org.datanucleus.store.rdbms.sql.method.TanFunction"/>
+        <sql-method method="radians" evaluator="org.datanucleus.store.rdbms.sql.method.RadiansFunction"/>
         <sql-method method="ABS" evaluator="org.datanucleus.store.rdbms.sql.method.AbsFunction"/>
         <sql-method method="ACOS" evaluator="org.datanucleus.store.rdbms.sql.method.AcosFunction"/>
         <sql-method method="ASIN" evaluator="org.datanucleus.store.rdbms.sql.method.AsinFunction"/>
@@ -951,6 +952,7 @@ Contributors:
         <sql-method method="SQRT" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
         <sql-method method="SUM" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
         <sql-method method="TAN" evaluator="org.datanucleus.store.rdbms.sql.method.TanFunction"/>
+        <sql-method method="RADIANS" evaluator="org.datanucleus.store.rdbms.sql.method.RadiansFunction"/>
         <sql-method method="COALESCE" evaluator="org.datanucleus.store.rdbms.sql.method.CoalesceFunction"/>
         <sql-method method="NULLIF" evaluator="org.datanucleus.store.rdbms.sql.method.NullIfFunction"/>
         <sql-method method="INDEX" evaluator="org.datanucleus.store.rdbms.sql.method.IndexFunction"/>
