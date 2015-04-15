@@ -176,8 +176,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
 
         try
         {
-            // pass the calendar to oracle makes it loses milliseconds
-            // value = rs.getTimestamp(param,cal);
+            // TODO pass the calendar to Oracle or HSQLDB makes it loses milliseconds
             if (cal != null)
             {
                 value = rs.getTimestamp(param, cal);
@@ -198,8 +197,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    // JDBC driver has returned something other than a java.sql.Timestamp
-                    // so we convert it to a Timestamp using its string form.
+                    // JDBC driver has returned something other than a java.sql.Timestamp so we convert it to a Timestamp using its string form.
                     value = s == null ? null : TypeConversionHelper.stringToTimestamp(s, cal);
                 }
             }
