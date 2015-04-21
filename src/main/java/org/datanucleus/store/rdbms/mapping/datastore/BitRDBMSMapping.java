@@ -21,7 +21,6 @@ import java.sql.Types;
 
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
@@ -49,12 +48,8 @@ public class BitRDBMSMapping extends BooleanRDBMSMapping
         return true;
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.BIT, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.BIT);
+        return Types.BIT;
     }
 }

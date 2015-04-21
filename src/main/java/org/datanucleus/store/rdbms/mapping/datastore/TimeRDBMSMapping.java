@@ -29,7 +29,6 @@ import java.util.Date;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -54,13 +53,9 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
 		initTypeInfo();
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.TIME, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.TIME);
+        return Types.TIME;
     }
 
     /**
@@ -75,7 +70,7 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getTypeInfo().getDataType());
+                ps.setNull(param, getJDBCType());
             }
             else if (value instanceof Calendar)
             {

@@ -25,7 +25,6 @@ import java.sql.Types;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -49,17 +48,9 @@ public class OtherRDBMSMapping extends AbstractDatastoreMapping
         initTypeInfo();
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#getTypeInfo()
-     */
-    @Override
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.OTHER, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.OTHER);
+        return Types.OTHER;
     }
 
     /* (non-Javadoc)

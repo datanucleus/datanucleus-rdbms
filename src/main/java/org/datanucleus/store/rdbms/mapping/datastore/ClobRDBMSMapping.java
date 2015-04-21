@@ -31,7 +31,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -50,18 +49,10 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
     {
         super(mapping, storeMgr, col);
     }
-    
-    /**
-     * Accessor for the type info for this datastore field
-     * @return Type info for the datastore field
-     */
-    public SQLTypeInfo getTypeInfo()
+
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.CLOB, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.CLOB);
+        return Types.CLOB;
     }
 
     public void setString(PreparedStatement ps, int param, String value)
@@ -88,7 +79,7 @@ public class ClobRDBMSMapping extends LongVarcharRDBMSMapping
             {
                 if (value == null)
                 {
-                    ps.setNull(param, getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
                 else
                 {

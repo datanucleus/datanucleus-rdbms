@@ -26,7 +26,6 @@ import java.sql.Types;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
@@ -45,16 +44,12 @@ public class LongVarBinaryRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
 		super(mapping, storeMgr, col);
 	}
 
-    /**
-     * Accessor for the type info of the JDBC type being represented.
-     * @return The type info
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#getJDBCType()
      */
-    public SQLTypeInfo getTypeInfo()
+    @Override
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARBINARY, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARBINARY);
+        return Types.LONGVARBINARY;
     }
 }

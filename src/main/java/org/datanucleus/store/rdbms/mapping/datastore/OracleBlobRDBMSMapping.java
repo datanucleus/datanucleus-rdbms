@@ -50,7 +50,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.OracleAdapter;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -267,12 +266,9 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         return (String)getObject(resultSet, exprIndex);
     }
 
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping#getTypeInfo()
-     */
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.BLOB);
+        return Types.BLOB;
     }
 
     /**

@@ -34,7 +34,6 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -51,13 +50,9 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         super(mapping, storeMgr, col);
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.NCHAR, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.NCHAR);
+        return Types.NCHAR;
     }
 
     /**
@@ -126,7 +121,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                 }
                 else
                 {
-                    ps.setNull(param,getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
             }
             else if (value.length() == 0)
@@ -304,7 +299,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getTypeInfo().getDataType());
+                ps.setNull(param, getJDBCType());
             }
             else
             {

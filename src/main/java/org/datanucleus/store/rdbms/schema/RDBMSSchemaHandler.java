@@ -340,34 +340,29 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get column info for catalog + schema + tableName
-                return getRDBMSTableInfoForTable((Connection)connection, 
-                    (String)values[0], (String)values[1], (String)values[2]);
+                return getRDBMSTableInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
             else if (name.equalsIgnoreCase("indices") && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get index info for catalog + schema + tableName
-                return getRDBMSTableIndexInfoForTable((Connection)connection, 
-                    (String)values[0], (String)values[1], (String)values[2]);
+                return getRDBMSTableIndexInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
             else if (name.equalsIgnoreCase("primary-keys") && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get PK info for catalog + schema + tableName
-                return getRDBMSTablePKInfoForTable((Connection)connection, 
-                    (String)values[0], (String)values[1], (String)values[2]);
+                return getRDBMSTablePKInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
             else if (name.equalsIgnoreCase("foreign-keys") && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get FK info for catalog + schema + tableName
-                return getRDBMSTableFKInfoForTable((Connection)connection, 
-                    (String)values[0], (String)values[1], (String)values[2]);
+                return getRDBMSTableFKInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
         }
 
-        throw new NucleusException("Attempt to get schema information for component " + name +
-            " but this is not supported by RDBMSSchemaHandler");
+        throw new NucleusException("Attempt to get schema information for component " + name + " but this is not supported by RDBMSSchemaHandler");
     }
 
     /**
@@ -428,8 +423,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown finding table type using DatabaseMetaData.getTables()", sqle);
+            throw new NucleusDataStoreException("Exception thrown finding table type using DatabaseMetaData.getTables()", sqle);
         }
 
         return tableType;
@@ -485,8 +479,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown retrieving type information from datastore", sqle);
+            throw new NucleusDataStoreException("Exception thrown retrieving type information from datastore", sqle);
         }
 
         // Cache it
@@ -565,8 +558,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown while querying foreign keys for table=" + tableName, sqle);
+            throw new NucleusDataStoreException("Exception thrown while querying foreign keys for table=" + tableName, sqle);
         }
         return info;
     }
@@ -639,8 +631,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown while querying primary keys for table=" + tableName, sqle);
+            throw new NucleusDataStoreException("Exception thrown while querying primary keys for table=" + tableName, sqle);
         }
         return info;
     }
@@ -996,8 +987,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 String tableName = getIdentifierForUseWithDatabaseMetaData((String)tableNames.iterator().next());
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", 
-                        tableName, catalogName, schemaName));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", tableName, catalogName, schemaName));
                 }
                 rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, tableName, null);
             }
@@ -1006,8 +996,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 // Multiple tables so just retrieve all for this catalog/schema
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", 
-                        StringUtils.collectionToString(tableNames), catalogName, schemaName));
+                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050028", StringUtils.collectionToString(tableNames), catalogName, schemaName));
                 }
                 rs = getDatastoreAdapter().getColumns(conn, catalogName, schemaName, null, null);
             }
@@ -1100,8 +1089,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             catch (SQLException sqle)
             {
                 // TODO Localise
-                throw new NucleusDataStoreException(
-                    "Exception thrown closing results of DatabaseMetaData.getColumns()", sqle);
+                throw new NucleusDataStoreException("Exception thrown closing results of DatabaseMetaData.getColumns()", sqle);
             }
         }
 

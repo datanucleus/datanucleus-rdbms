@@ -33,7 +33,6 @@ import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
@@ -96,17 +95,9 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
         return true;
     }
 
-    /**
-     * Accessor for type info
-     * @return The type info for the datastore mapping
-     */
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.SMALLINT, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.SMALLINT);
+        return Types.SMALLINT;
     }
 
     /**
@@ -247,8 +238,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001", "short", 
-                "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001", "short", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -269,8 +259,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002", "short", 
-                "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002", "short", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -326,7 +315,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    ps.setNull(param, getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
             }
             else

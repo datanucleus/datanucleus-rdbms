@@ -106,6 +106,8 @@ Contributors:
             validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.initializeColumnInfo" datastore="true" value="ALL"
             validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.useDefaultSqlType" datastore="true" value="true"
+            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.stringDefaultLength" datastore="true" value="255"
             validator="org.datanucleus.properties.IntegerPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.stringLengthExceededAction" datastore="true" value="EXCEPTION"

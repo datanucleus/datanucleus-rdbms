@@ -27,7 +27,6 @@ import java.sql.Types;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -63,13 +62,9 @@ public class LongVarcharRDBMSMapping extends AbstractDatastoreMapping
 		initTypeInfo();
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARCHAR, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARCHAR);
+        return Types.LONGVARCHAR;
     }
 
     public void setString(PreparedStatement ps, int param, String value)
@@ -84,7 +79,7 @@ public class LongVarcharRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    ps.setNull(param,getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
             }
             else
@@ -120,7 +115,7 @@ public class LongVarcharRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getTypeInfo().getDataType());
+                ps.setNull(param, getJDBCType());
             }
             else
             {

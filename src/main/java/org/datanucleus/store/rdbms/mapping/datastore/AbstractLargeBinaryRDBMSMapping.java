@@ -89,7 +89,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
                 }
                 else
                 {
-                    ps.setNull(param, getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
             }
             catch (SQLException sqle)

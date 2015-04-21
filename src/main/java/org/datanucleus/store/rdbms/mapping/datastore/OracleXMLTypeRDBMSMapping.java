@@ -26,7 +26,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.OracleTypeInfo;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -50,10 +49,10 @@ public class OracleXMLTypeRDBMSMapping extends CharRDBMSMapping
     {
         initTypeInfo();
     }
-    
-    public SQLTypeInfo getTypeInfo()
+
+    public int getJDBCType()
     {
-        return storeMgr.getSQLTypeInfoForJDBCType(OracleTypeInfo.TYPES_SYS_XMLTYPE);
+        return OracleTypeInfo.TYPES_SYS_XMLTYPE;
     }
 
     /**
@@ -104,11 +103,11 @@ public class OracleXMLTypeRDBMSMapping extends CharRDBMSMapping
             {
                 if (column.isDefaultable() && column.getDefaultValue() != null)
                 {
-                    ps.setString(param,column.getDefaultValue().toString().trim());
+                    ps.setString(param, column.getDefaultValue().toString().trim());
                 }
                 else
                 {
-                    ps.setNull(param,getTypeInfo().getDataType(), "SYS.XMLTYPE");
+                    ps.setNull(param, getJDBCType(), "SYS.XMLTYPE");
                 }
             }
             else

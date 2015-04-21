@@ -91,6 +91,11 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         return true;
     }
 
+    public int getJDBCType()
+    {
+        return Types.TINYINT;
+    }
+
     public SQLTypeInfo getTypeInfo()
     {
         if (column != null && column.getColumnMetaData().getSqlType() != null)

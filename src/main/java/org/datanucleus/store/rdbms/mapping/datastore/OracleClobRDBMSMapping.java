@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -43,7 +42,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.OracleAdapter;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -74,11 +72,6 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         {
             throw new ColumnDefinitionException("Invalid length specified for CLOB column " + column + ", must be 'unlimited'");
         }
-    }
-
-    public SQLTypeInfo getTypeInfo()
-    {
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.CLOB);
     }
 
     public String getInsertionInputParameter()

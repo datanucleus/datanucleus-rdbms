@@ -31,7 +31,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -57,17 +56,9 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
         super(mapping, storeMgr, col);
     }
 
-    /**
-     * Accessor for the RDBMS BLOB type being represented.
-     * @return TypeInfo for the BLOB type.
-     */
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.BLOB, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.BLOB);
+        return Types.BLOB;
     }
 
     /*
@@ -127,7 +118,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                     }
                     else
                     {
-                        ps.setNull(param, getTypeInfo().getDataType());
+                        ps.setNull(param, getJDBCType());
                     }
                 }
                 else
@@ -145,7 +136,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
                     }
                     else
                     {
-                        ps.setNull(param, getTypeInfo().getDataType());
+                        ps.setNull(param, getJDBCType());
                     }
                 }
                 else

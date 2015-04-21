@@ -20,7 +20,6 @@ package org.datanucleus.store.rdbms.mapping.datastore;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.DB2TypeInfo;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**
@@ -51,13 +50,9 @@ public class DB2DatalinkRDBMSMapping extends CharRDBMSMapping
 		initTypeInfo();
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(DB2TypeInfo.DATALINK, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(DB2TypeInfo.DATALINK);
+        return DB2TypeInfo.DATALINK;
     }
 
     public String getInsertionInputParameter()

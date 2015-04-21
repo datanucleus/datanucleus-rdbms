@@ -33,7 +33,6 @@ import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
@@ -59,17 +58,9 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
         initTypeInfo();
     }
 
-    /**
-     * Accessor for the type info for this column.
-     * @return Datastore type info
-     */
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.TIMESTAMP, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.TIMESTAMP);
+        return Types.TIMESTAMP;
     }
 
     /**
@@ -83,11 +74,11 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
         try
         {
             Calendar cal = storeMgr.getCalendarForDateTimezone();
-            // Note that passing the calendar to oracle makes it loses milliseconds
+            // Note that passing the calendar to oracle/hsqldb makes it loses milliseconds
 
             if (value == null)
             {
-                ps.setNull(param, getTypeInfo().getDataType());
+                ps.setNull(param, getJDBCType());
             }
             else if (value instanceof java.sql.Timestamp)
             {

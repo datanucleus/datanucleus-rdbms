@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.FileMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
@@ -52,13 +51,9 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         initTypeInfo();
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARBINARY, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.LONGVARBINARY);
+        return Types.LONGVARBINARY;
     }
 
     /*
@@ -73,7 +68,7 @@ public class BinaryStreamRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                ps.setNull(param, Types.LONGVARBINARY);
+                ps.setNull(param, getJDBCType());
             }
             else if (value instanceof File)
             {

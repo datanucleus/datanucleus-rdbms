@@ -24,7 +24,9 @@ import java.sql.ResultSet;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
+import org.datanucleus.store.rdbms.mapping.RDBMSMappingManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -81,10 +83,56 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
     }
 
     /**
+     * Sets the TypeInfo for the columns of the Mapping. Mappings using two or more columns using different
+     * TypeInfo(s) should overwrite this method to appropriate set the TypeInfo (SQL type) for all the columns
+     */
+    protected void initTypeInfo()
+    {
+        SQLTypeInfo typeInfo = getTypeInfo();
+        if (typeInfo == null)
+        {
+            throw new UnsupportedDataTypeException(Localiser.msg("055000", column));
+        }
+
+        if (column != null)
+        {
+            column.setTypeInfo(typeInfo);
+        }
+    }
+
+    /**
+     * Method to return the java.sql.Types type that this relates to.
+     * @return The JDBC "type"
+     */
+    public abstract int getJDBCType();
+
+    /**
      * Accessor for the (SQL) type info for this datastore type.
+     * Finds the SQLTypeInfo using the JDBC Type for this mapping. Override if you want a different method.
      * @return The type info
      */
-    public abstract SQLTypeInfo getTypeInfo();
+    public SQLTypeInfo getTypeInfo()
+    {
+        if (column != null)
+        {
+            if (column.getColumnMetaData().getSqlType() != null)
+            {
+                return storeMgr.getSQLTypeInfoForJDBCType(getJDBCType(), column.getColumnMetaData().getSqlType());
+            }
+
+            if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DEFAULT_SQL_TYPE))
+            {
+                // This caters for when the JDBC driver has multiple sql-type for this jdbc-type, so we pick the default one specified in plugin.xml
+                String sqlTypeDflt = ((RDBMSMappingManager)storeMgr.getMappingManager()).getDefaultSqlTypeForJavaType(getJavaTypeMapping().getJavaType().getName(),
+                    storeMgr.getDatastoreAdapter().getNameForJDBCType(getJDBCType()));
+                if (sqlTypeDflt != null)
+                {
+                    return storeMgr.getSQLTypeInfoForJDBCType(getJDBCType(), sqlTypeDflt);
+                }
+            }
+        }
+        return storeMgr.getSQLTypeInfoForJDBCType(getJDBCType());
+    }
 
     /**
      * Accessor for whether the mapping is nullable.
@@ -144,24 +192,6 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
     public Column getColumn()
     {
         return column;
-    }
-
-    /**
-     * Sets the TypeInfo for the columns of the Mapping. Mappings using two or more columns using different
-     * TypeInfo(s) should overwrite this method to appropriate set the TypeInfo (SQL type) for all the columns
-     */
-    protected void initTypeInfo()
-    {
-        SQLTypeInfo typeInfo = getTypeInfo();
-        if (typeInfo == null)
-        {
-            throw new UnsupportedDataTypeException(Localiser.msg("055000", column));
-        }
-
-        if (column != null)
-        {
-            column.setTypeInfo(typeInfo);
-        }
     }
 
     public boolean equals(Object obj)

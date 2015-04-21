@@ -42,6 +42,7 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME = "datanucleus.rdbms.datastoreAdapterClassName";
     public static final String PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS = "datanucleus.rdbms.omitDatabaseMetaDataGetColumns";
     public static final String PROPERTY_RDBMS_ALLOW_COLUMN_REUSE = "datanucleus.rdbms.allowColumnReuse";
+    public static final String PROPERTY_RDBMS_DEFAULT_SQL_TYPE = "datanucleus.rdbms.useDefaultSqlType";
 
     public static final String PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY = "datanucleus.rdbms.adapter.informixUseSerialForIdentity";
 

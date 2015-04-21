@@ -30,7 +30,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping;
-import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
@@ -73,13 +72,9 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         initTypeInfo();
     }
 
-    public SQLTypeInfo getTypeInfo()
+    public int getJDBCType()
     {
-        if (column != null && column.getColumnMetaData().getSqlType() != null)
-        {
-            return storeMgr.getSQLTypeInfoForJDBCType(Types.BIGINT, column.getColumnMetaData().getSqlType());
-        }
-        return storeMgr.getSQLTypeInfoForJDBCType(Types.BIGINT);
+        return Types.BIGINT;
     }
 
     public void setInt(PreparedStatement ps, int param, int value)
@@ -193,7 +188,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    ps.setNull(param, getTypeInfo().getDataType());
+                    ps.setNull(param, getJDBCType());
                 }
             }
             else

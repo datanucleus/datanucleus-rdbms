@@ -111,6 +111,35 @@ public class RDBMSMappingManager implements MappingManager
         this.clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
     }
 
+    public String getDefaultSqlTypeForJavaType(String javaType, String jdbcType)
+    {
+        if (javaType == null || jdbcType == null)
+        {
+            return null;
+        }
+        Collection coll = (Collection)datastoreMappingsByJavaType.get(javaType);
+        if (coll != null && coll.size() > 0)
+        {
+            // Check existing mappings to see if we already have a mapping for this jdbc/sql-type combo
+            String sqlType = null;
+            Iterator collIter = coll.iterator();
+            while (collIter.hasNext())
+            {
+                RDBMSTypeMapping typeMapping = (RDBMSTypeMapping)collIter.next();
+                if (typeMapping.jdbcType.equalsIgnoreCase(jdbcType))
+                {
+                    sqlType = typeMapping.sqlType;
+                    if (typeMapping.isDefault)
+                    {
+                        return sqlType;
+                    }
+                }
+            }
+            return sqlType;
+        }
+        return null;
+    }
+
     /**
      * Load all datastore mappings defined in the associated plugins.
      * We handle RDBMS datastore mappings so refer to rdbms-mapping-class, jdbc-type, sql-type in particular.
