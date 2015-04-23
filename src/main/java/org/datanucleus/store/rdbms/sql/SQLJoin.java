@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Representation of a join in an SQL statement.
@@ -156,10 +157,15 @@ public class SQLJoin
 
             if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
             {
-                st.append(" ON ");
                 if (condition != null)
                 {
+                    st.append(" ON ");
                     st.append(condition.toSQLText());
+                }
+                else
+                {
+                    NucleusLogger.DATASTORE_RETRIEVE.warn("Join condition has no 'on' condition defined! table=" + table + 
+                        " type=" + type + " joinedTable=" + joinedTable);
                 }
             }
 
