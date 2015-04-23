@@ -1175,8 +1175,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
+                        SQLTable joinSqlTbl = null;
+                        if (leftMmd.hasCollection())
+                        {
+                            joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(), null, null);
+                        }
+                        else if (leftMmd.hasMap())
+                        {
+                            joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null);
+                        }
 
                         if (i == 0)
                         {
@@ -1213,8 +1221,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
+                        SQLTable joinSqlTbl = null;
+                        if (leftMmd.hasCollection())
+                        {
+                            joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(), null, null);
+                        }
+                        else if (leftMmd.hasMap())
+                        {
+                            joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null);
+                        }
 
                         if (i == 0)
                         {
@@ -1251,20 +1267,38 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
                     {
                         // 1-N with join table to right table, so join from right to join table
-                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(leftMmd);
+                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
                         SQLTable joinSqlTbl = stmt.innerJoin(rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
-                        if (i == 0)
+                        if (leftMmd.hasCollection())
                         {
-                            // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getElementMapping());
-                            stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                            if (i == 0)
+                            {
+                                // Add where clause join table to outer table
+                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                                SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping());
+                                stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                            }
+                            else
+                            {
+                                // Join to left table
+                                lSqlTbl = stmt.innerJoin(joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            }
                         }
-                        else
+                        else if (leftMmd.hasMap())
                         {
-                            // Join to left table
-                            lSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            if (i == 0)
+                            {
+                                // Add where clause join table to outer table
+                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                                SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((MapTable)joinTbl).getValueMapping());
+                                stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                            }
+                            else
+                            {
+                                // Join to left table
+                                lSqlTbl = stmt.innerJoin(joinSqlTbl, ((MapTable)joinTbl).getValueMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null);
+                            }
                         }
                     }
                     else
@@ -1466,7 +1500,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 tblMmd = mmd;
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
-                                    // Add join to join table
+                                    // Add join to join table TODO join to related table (value)
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
@@ -1568,7 +1602,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 tblMmd = mmd;
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
-                                    // Add join to join table
+                                    // Add join to join table TODO join to related table (value)
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
@@ -1713,7 +1747,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 tblMmd = mmd;
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
-                                    // Add join to join table
+                                    // Add join to join table TODO join to related table (value)
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
