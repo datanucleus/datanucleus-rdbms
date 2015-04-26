@@ -720,10 +720,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             {
                                 AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
                                 JavaTypeMapping selMapping = embMapping.getJavaTypeMapping(selMmd.getName());
-                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
-                                StatementMappingIndex idx = new StatementMappingIndex(selMapping);
-                                idx.setColumnPositions(cols);
-                                map.addMappingForMember(membersToSelect[j], idx);
+                                if (selMapping.includeInFetchStatement())
+                                {
+                                    int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
+                                    StatementMappingIndex idx = new StatementMappingIndex(selMapping);
+                                    idx.setColumnPositions(cols);
+                                    map.addMappingForMember(membersToSelect[j], idx);
+                                }
                             }
 
                             resultDefinition.addMappingForResultExpression(i, map);
