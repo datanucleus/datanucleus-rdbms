@@ -93,15 +93,22 @@ public class MapKeyMethod extends AbstractSQLMethod
             {
                 // Add join to join table
                 MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
-                SQLTable joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
+                SQLTable joinSqlTbl = stmt.getTable(mapJoinAlias);
+                if (joinSqlTbl == null)
+                {
+                    joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
+                }
 
                 // Return key expression
                 if (mapmd.getKeyClassMetaData(clr, mmgr) != null && !mapmd.isEmbeddedKey())
                 {
-                    // Persistable key so join to its table
+                    // Persistable key so join to its table (default to "{mapJoinAlias}_KEY")
                     DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
-                    SQLTable keySqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getKeyMapping(), keyTable, null, keyTable.getIdMapping(), null, null);
-
+                    SQLTable keySqlTbl = stmt.getTable(mapJoinAlias+"_KEY");
+                    if (keySqlTbl == null)
+                    {
+                        keySqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getKeyMapping(), keyTable, mapJoinAlias+"_KEY", keyTable.getIdMapping(), null, null);
+                    }
                     return exprFactory.newExpression(stmt, keySqlTbl, keyTable.getIdMapping());
                 }
 

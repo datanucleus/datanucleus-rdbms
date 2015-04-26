@@ -93,15 +93,22 @@ public class MapValueMethod extends AbstractSQLMethod
             {
                 // Add join to join table
                 MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
-                SQLTable joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
+                SQLTable joinSqlTbl = stmt.getTable(mapJoinAlias);
+                if (joinSqlTbl == null)
+                {
+                    joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
+                }
 
                 // Return value expression
                 if (mapmd.getValueClassMetaData(clr, mmgr) != null && !mapmd.isEmbeddedValue())
                 {
-                    // Persistable value so join to its table
+                    // Persistable value so join to its table (default to "{mapJoinAlias}_VALUE")
                     DatastoreClass valTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
-                    SQLTable valueSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getValueMapping(), valTable, null, valTable.getIdMapping(), null, null);
-
+                    SQLTable valueSqlTbl = stmt.getTable(mapJoinAlias+"_VALUE");
+                    if (valueSqlTbl == null)
+                    {
+                        valueSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getValueMapping(), valTable, mapJoinAlias+"_VALUE", valTable.getIdMapping(), null, null);
+                    }
                     return exprFactory.newExpression(stmt, valueSqlTbl, valTable.getIdMapping());
                 }
 

@@ -117,13 +117,6 @@ public interface QueryGenerator
     public void bindParameter(String paramName, Class type);
 
     /**
-     * Method to return the SQLTable for the specified primary expression "alias".
-     * @param alias The alias ("this", fieldName)
-     * @return The SQLTable for this if it exists
-     */
-    public SQLTable getSQLTableForAlias(String alias);
-
-    /**
      * Convenience method to resolve a class name.
      * @param className The class name
      * @return The class it relates to (if found)
