@@ -3103,7 +3103,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         {
             return m;
         }
-        else if (mmd.isPrimaryKey() && pkMappings != null)
+        if (mmd.isPrimaryKey() && pkMappings != null)
         {
             // pkMappings aren't in memberMappingsMap when in subclasses
             for (int i=0;i<pkMappings.length;i++)
@@ -3112,6 +3112,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 {
                     return pkMappings[i];
                 }
+            }
+        }
+
+        Iterator<Map.Entry<AbstractMemberMetaData, JavaTypeMapping>> memberMapIter = memberMappingsMap.entrySet().iterator();
+        while (memberMapIter.hasNext())
+        {
+            // If we have overridden this member then it may have a different AbstractMemberMetaData passed in (i.e the override)
+            Map.Entry<AbstractMemberMetaData, JavaTypeMapping> entry = memberMapIter.next();
+            if (entry.getKey().getFullFieldName().equals(mmd.getFullFieldName()))
+            {
+                return entry.getValue();
             }
         }
 
