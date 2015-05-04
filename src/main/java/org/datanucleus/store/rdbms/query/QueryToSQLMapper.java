@@ -112,8 +112,10 @@ import org.datanucleus.store.rdbms.sql.expression.ResultAliasExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SubqueryExpressionComponent;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
@@ -3635,6 +3637,23 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     private boolean checkCaseExpressionsConsistent(SQLExpression expr1, SQLExpression expr2)
     {
+        if (expr1 instanceof NumericExpression && expr2 instanceof NumericExpression)
+        {
+            return true;
+        }
+        else if (expr1 instanceof StringExpression && expr2 instanceof StringExpression)
+        {
+            return true;
+        }
+        else if (expr1 instanceof BooleanExpression && expr2 instanceof BooleanExpression)
+        {
+            return true;
+        }
+        else if (expr1 instanceof TemporalExpression && expr2 instanceof TemporalExpression)
+        {
+            return true;
+        }
+
         if (expr1.getClass().isAssignableFrom(expr2.getClass()) || expr2.getClass().isAssignableFrom(expr1.getClass()))
         {
             return true;
