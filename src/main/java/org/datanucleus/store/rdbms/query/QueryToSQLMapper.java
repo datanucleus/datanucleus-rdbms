@@ -1986,7 +1986,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     setSQLTableMappingForAlias(joinAlias, tblMapping);
                 }
 
-                DyadicExpression joinOnExpr = joinExpr.getOnExpression();
+                Expression joinOnExpr = joinExpr.getOnExpression();
                 if (joinOnExpr != null)
                 {
                     // Convert the ON expression to a BooleanExpression and AND it to the most recent SQLTable at the end of this chain
