@@ -577,9 +577,17 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param tableIdentifier Identifier for the table
      * @return The StoreData for this table (if managed).
      */
-    public synchronized StoreData[] getStoreDataForDatastoreContainerObject(DatastoreIdentifier tableIdentifier)
+    public StoreData[] getStoreDataForDatastoreContainerObject(DatastoreIdentifier tableIdentifier)
     {
-        return storeDataMgr.getStoreDataForProperties("tableId", tableIdentifier, "table-owner", "true");
+        schemaLock.readLock().lock();
+
+        try {
+            return storeDataMgr.getStoreDataForProperties("tableId", tableIdentifier, "table-owner", "true");
+        }
+
+        finally {
+            schemaLock.readLock().unlock();
+        }
     }
 
     /**
