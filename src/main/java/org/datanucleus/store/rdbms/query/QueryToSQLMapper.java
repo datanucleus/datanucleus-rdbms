@@ -100,8 +100,11 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
+import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
+import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.NewObjectExpression;
@@ -2348,6 +2351,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     protected Object processLiteral(Literal expr)
     {
         Object litValue = expr.getLiteral();
+        SQLExpression sqlExpr = getSQLLiteralForLiteralValue(litValue);
+        stack.push(sqlExpr);
+        return sqlExpr;
+    }
+
+    protected SQLExpression getSQLLiteralForLiteralValue(Object litValue)
+    {
         if (litValue instanceof Class)
         {
             // Convert Class literals (instanceof) into StringLiteral
@@ -2359,16 +2369,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (litStr.startsWith("{d ") || litStr.startsWith("{t ") || litStr.startsWith("{ts "))
             {
                 JavaTypeMapping m = exprFactory.getMappingForType(Date.class, false);
-                SQLExpression sqlExpr = exprFactory.newLiteral(stmt, m, litValue);
-                stack.push(sqlExpr);
-                return sqlExpr;
+                return exprFactory.newLiteral(stmt, m, litValue);
             }
         }
 
         JavaTypeMapping m = (litValue != null) ? exprFactory.getMappingForType(litValue.getClass(), false) : null;
-        SQLExpression sqlExpr = exprFactory.newLiteral(stmt, m, litValue);
-        stack.push(sqlExpr);
-        return sqlExpr;
+        return exprFactory.newLiteral(stmt, m, litValue);
     }
 
     /* (non-Javadoc)
@@ -3265,6 +3271,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             throw new NucleusException("Dont currently support invoke expression " + invokedExpr);
         }
 
+        if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equalsIgnoreCase("JPQL"))
+        {
+            // JPQL "MEMBER OF" will be passed through from generic compilation as "contains" since we don't know types at that point
+            operation = "containsValue";
+        }
+
+        // Process the arguments for invoking
         List args = expr.getArguments();
         List sqlExprArgs = null;
         if (args != null)
@@ -3695,6 +3708,35 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
+        if (right.getParameterName() != null)
+        {
+            setNotPrecompilable();
+            if (right instanceof CollectionLiteral)
+            {
+                CollectionLiteral collLit = (CollectionLiteral)right;
+                Collection coll = (Collection) collLit.getValue();
+                if (left instanceof NumericExpression || left instanceof StringExpression || left instanceof BooleanExpression || left instanceof CharacterExpression)
+                {
+                    SQLExpression[] sqlExprs = new SQLExpression[coll.size()];
+                    int i = 0;
+                    for (Object elem : coll)
+                    {
+                        sqlExprs[i++] = getSQLLiteralForLiteralValue(elem);
+                    }
+                    SQLExpression inExpr = new InExpression(left, sqlExprs);
+                    stack.push(inExpr);
+                    return inExpr;
+                }
+            }
+            else
+            {
+                // Single valued parameter, so use equality
+                SQLExpression inExpr = new BooleanExpression(left, Expression.OP_EQ, right);
+                stack.push(inExpr);
+                return inExpr;
+            }
+        }
+
         SQLExpression inExpr = left.in(right, false);
         stack.push(inExpr);
         return inExpr;
@@ -3708,6 +3750,36 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
+        if (right.getParameterName() != null)
+        {
+            setNotPrecompilable();
+            if (right instanceof CollectionLiteral)
+            {
+                CollectionLiteral collLit = (CollectionLiteral)right;
+                Collection coll = (Collection) collLit.getValue();
+                if (left instanceof NumericExpression || left instanceof StringExpression || left instanceof BooleanExpression || left instanceof CharacterExpression)
+                {
+                    SQLExpression[] sqlExprs = new SQLExpression[coll.size()];
+                    int i = 0;
+                    for (Object elem : coll)
+                    {
+                        sqlExprs[i++] = getSQLLiteralForLiteralValue(elem);
+                    }
+                    SQLExpression inExpr = new InExpression(left, sqlExprs);
+                    inExpr.not();
+                    stack.push(inExpr);
+                    return inExpr;
+                }
+            }
+            else
+            {
+                // Single valued parameter, so use equality
+                SQLExpression inExpr = new BooleanExpression(left, Expression.OP_NOTEQ, right);
+                stack.push(inExpr);
+                return inExpr;
+            }
+        }
+
         SQLExpression inExpr = left.in(right, true);
         stack.push(inExpr);
         return inExpr;
