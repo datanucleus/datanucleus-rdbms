@@ -1343,12 +1343,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Iterator<String> iter = joinPrimExpr.getTuples().iterator();
                 String rootId = iter.next();
                 String joinTableGroupName = null;
-                if (rootId.equalsIgnoreCase(candidateAlias) && candidateCmd.getName().equals(cmd.getName()))
+
+                if (rootId.equalsIgnoreCase(candidateAlias))
                 {
                     // Join relative to the candidate
                     // Name table group of joined-to as per the relation
                     // Note : this will only work for one level out from the candidate TODO Extend this
+                    cmd = candidateCmd;
                     joinTableGroupName = joinPrimExpr.getId();
+                    sqlTbl = candSqlTbl;
                 }
                 else
                 {
