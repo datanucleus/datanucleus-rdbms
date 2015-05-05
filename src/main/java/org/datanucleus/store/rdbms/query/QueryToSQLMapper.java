@@ -1442,6 +1442,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 {
                                     sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
+                                else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                {
+                                    sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                }
                                 else
                                 {
                                     sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
@@ -1463,6 +1467,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
@@ -1473,6 +1481,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getMemberMapping(mmd), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                     }
                                     else
                                     {
@@ -1500,6 +1512,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
                                         sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        SQLTable joinSqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                        sqlTbl = stmt.rightOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                    }
                                     else
                                     {
                                         SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
@@ -1512,6 +1529,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName);
                                     }
                                     else
                                     {
@@ -1543,6 +1564,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                             stmt.innerJoin(sqlTbl, joinTbl.getValueMapping(), relTable, aliasForJoin+"_VALUE", relTable.getIdMapping(), null, joinTableGroupName);
                                         }
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                        if (!embeddedValue)
+                                        {
+                                            relTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
+                                            stmt.rightOuterJoin(sqlTbl, joinTbl.getValueMapping(), relTable, aliasForJoin+"_VALUE", relTable.getIdMapping(), null, joinTableGroupName);
+                                        }
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
@@ -1569,6 +1599,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
@@ -1589,6 +1623,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
                                     else
                                     {
@@ -1614,6 +1652,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
                                         sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        SQLTable joinSqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                        sqlTbl = stmt.rightOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                    }
                                     else
                                     {
                                         SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
@@ -1627,6 +1670,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName);
                                     }
                                     else
                                     {
@@ -1660,6 +1707,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                             stmt.innerJoin(sqlTbl, joinTbl.getValueMapping(), relTable, aliasForJoin+"_VALUE", relTable.getIdMapping(), null, joinTableGroupName);
                                         }
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                        if (!embeddedValue)
+                                        {
+                                            // Join to value table and use that
+                                            relTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
+                                            stmt.rightOuterJoin(sqlTbl, joinTbl.getValueMapping(), relTable, aliasForJoin+"_VALUE", relTable.getIdMapping(), null, joinTableGroupName);
+                                        }
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
@@ -1687,6 +1744,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
@@ -1708,6 +1769,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
@@ -1727,6 +1792,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             {
                                 SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
                                 sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                            }
+                            else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                            {
+                                SQLTable joinSqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                                sqlTbl = stmt.rightOuterJoin(joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                             }
                             else
                             {
@@ -1751,6 +1821,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     SQLTable joinSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
                                     sqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
+                                else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                {
+                                    SQLTable joinSqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                                    sqlTbl = stmt.rightOuterJoin(joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                }
                                 else
                                 {
                                     SQLTable joinSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
@@ -1764,6 +1839,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                 {
                                     sqlTbl = stmt.innerJoin(sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
+                                }
+                                else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                {
+                                    sqlTbl = stmt.rightOuterJoin(sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName);
                                 }
                                 else
                                 {
@@ -1786,6 +1865,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
                                     }
                                     else
                                     {
@@ -1816,6 +1899,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null);
@@ -1838,6 +1925,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
                                     else
                                     {
                                         sqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null);
@@ -1859,6 +1950,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (joinType == JoinType.JOIN_INNER || joinType == JoinType.JOIN_INNER_FETCH)
                                     {
                                         sqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
+                                    }
+                                    else if (joinType == JoinType.JOIN_RIGHT_OUTER || joinType == JoinType.JOIN_RIGHT_OUTER_FETCH)
+                                    {
+                                        sqlTbl = stmt.rightOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null);
                                     }
                                     else
                                     {
