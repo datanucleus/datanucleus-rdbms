@@ -22,14 +22,19 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
+import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL COALESCE function.
  * For use in evaluating COALESCE({expr [,expr2[,expr3]]}) where the RDBMS supports this function.
- * Returns a NumericExpression "COALESCE({numericExpr})".
+ * All args must be of consistent expression types.
+ * Returns an SQLExpression "COALESCE({expr})".
  */
 public class CoalesceFunction extends AbstractSQLMethod
 {
@@ -40,48 +45,93 @@ public class CoalesceFunction extends AbstractSQLMethod
     {
         if (expr == null)
         {
-            Class cls = Integer.class;
-            int clsLevel = 0;
+            // Find expression type that this handles - all expressions need to be consistent in our implementation
+            Class exprType = null;
 
-            // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
+            Class cls = null;
+            int clsLevel = 0;
             for (int i=0;i<args.size();i++)
             {
                 SQLExpression argExpr = args.get(i);
-                Class argType = argExpr.getJavaTypeMapping().getJavaType();
-                // TODO Support COALESCE on non-Numeric arguments
-                if (argType == String.class)
+                if (exprType == null)
                 {
-                    throw new NucleusException("COALESCE not yet supported on String arguments");
+                    if (argExpr instanceof NumericExpression)
+                    {
+                        exprType = NumericExpression.class;
+                        cls = Integer.class;
+                    }
+                    else if (argExpr instanceof StringExpression)
+                    {
+                        exprType = StringExpression.class;
+                        cls = String.class;
+                    }
+                    else if (argExpr instanceof TemporalExpression)
+                    {
+                        exprType = TemporalExpression.class;
+                        cls = argExpr.getJavaTypeMapping().getJavaType();
+                    }
+                    else
+                    {
+                        exprType = argExpr.getClass();
+                        cls = argExpr.getJavaTypeMapping().getJavaType();
+                    }
+                }
+                else
+                {
+                    if (!exprType.isAssignableFrom(argExpr.getClass()))
+                    {
+                        throw new NucleusUserException("COALESCE invocation first argument of type " + exprType.getName() + " yet subsequent argument of type " + argExpr.getClass().getName());
+                    }
                 }
 
-                if (clsLevel < 5 && (argType == double.class || argType == Double.class))
+                if (exprType == NumericExpression.class)
                 {
-                    cls = Double.class;
-                    clsLevel = 5;
-                }
-                else if (clsLevel < 4 && (argType == float.class || argType == Float.class))
-                {
-                    cls = Float.class;
-                    clsLevel = 4;
-                }
-                else if (clsLevel < 3 && argType == BigDecimal.class)
-                {
-                    cls = BigDecimal.class;
-                    clsLevel = 3;
-                }
-                else if (clsLevel < 2 && argType == BigInteger.class)
-                {
-                    cls = BigInteger.class;
-                    clsLevel = 2;
-                }
-                else if (clsLevel < 1 && (argType == long.class || argType == Long.class))
-                {
-                    cls = Long.class;
-                    clsLevel = 1;
+                    // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
+                    Class argType = argExpr.getJavaTypeMapping().getJavaType();
+                    if (clsLevel < 5 && (argType == double.class || argType == Double.class))
+                    {
+                        cls = Double.class;
+                        clsLevel = 5;
+                    }
+                    else if (clsLevel < 4 && (argType == float.class || argType == Float.class))
+                    {
+                        cls = Float.class;
+                        clsLevel = 4;
+                    }
+                    else if (clsLevel < 3 && argType == BigDecimal.class)
+                    {
+                        cls = BigDecimal.class;
+                        clsLevel = 3;
+                    }
+                    else if (clsLevel < 2 && argType == BigInteger.class)
+                    {
+                        cls = BigInteger.class;
+                        clsLevel = 2;
+                    }
+                    else if (clsLevel < 1 && (argType == long.class || argType == Long.class))
+                    {
+                        cls = Long.class;
+                        clsLevel = 1;
+                    }
                 }
             }
 
-            return new NumericExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+            if (exprType == NumericExpression.class)
+            {
+                return new NumericExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+            }
+            else if (exprType == StringExpression.class)
+            {
+                return new StringExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+            }
+            else if (exprType == TemporalExpression.class)
+            {
+                return new TemporalExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+            }
+            else
+            {
+                return new ObjectExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+            }
         }
 
         throw new NucleusException(Localiser.msg("060002", "COALESCE", expr));

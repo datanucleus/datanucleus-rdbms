@@ -22,14 +22,19 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
+import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to invoke the SQL NULLIF function.
  * For use in evaluating NULLIF({expr [,expr2[,expr3]]}) where the RDBMS supports this function.
- * Returns a NumericExpression "NULLIF({numericExpr})".
+ * All args must be of consistent expression types.
+ * Returns an SQLExpression "NULLIF({expr})".
  */
 public class NullIfFunction extends AbstractSQLMethod
 {
@@ -40,40 +45,94 @@ public class NullIfFunction extends AbstractSQLMethod
     {
         if (expr == null)
         {
+            // Find expression type that this handles - all expressions need to be consistent in our implementation
+            Class exprType = null;
+
             Class cls = Integer.class;
             int clsLevel = 0;
             // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
             for (int i=0;i<args.size();i++)
             {
                 SQLExpression argExpr = args.get(i);
-                Class argType = argExpr.getJavaTypeMapping().getJavaType();
-                if (clsLevel < 5 && (argType == double.class || argType == Double.class))
+                if (exprType == null)
                 {
-                    cls = Double.class;
-                    clsLevel = 5;
+                    if (argExpr instanceof NumericExpression)
+                    {
+                        exprType = NumericExpression.class;
+                        cls = Integer.class;
+                    }
+                    else if (argExpr instanceof StringExpression)
+                    {
+                        exprType = StringExpression.class;
+                        cls = String.class;
+                    }
+                    else if (argExpr instanceof TemporalExpression)
+                    {
+                        exprType = TemporalExpression.class;
+                        cls = argExpr.getJavaTypeMapping().getJavaType();
+                    }
+                    else
+                    {
+                        exprType = argExpr.getClass();
+                        cls = argExpr.getJavaTypeMapping().getJavaType();
+                    }
                 }
-                else if (clsLevel < 4 && (argType == float.class || argType == Float.class))
+                else
                 {
-                    cls = Float.class;
-                    clsLevel = 4;
+                    if (!exprType.isAssignableFrom(argExpr.getClass()))
+                    {
+                        throw new NucleusUserException("NULLIF invocation first argument of type " + exprType.getName() + " yet subsequent argument of type " + argExpr.getClass().getName());
+                    }
                 }
-                else if (clsLevel < 3 && argType == BigDecimal.class)
+
+                if (exprType == NumericExpression.class)
                 {
-                    cls = BigDecimal.class;
-                    clsLevel = 3;
-                }
-                else if (clsLevel < 2 && argType == BigInteger.class)
-                {
-                    cls = BigInteger.class;
-                    clsLevel = 2;
-                }
-                else if (clsLevel < 1 && (argType == long.class || argType == Long.class))
-                {
-                    cls = Long.class;
-                    clsLevel = 1;
+                    // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
+                    Class argType = argExpr.getJavaTypeMapping().getJavaType();
+                    if (clsLevel < 5 && (argType == double.class || argType == Double.class))
+                    {
+                        cls = Double.class;
+                        clsLevel = 5;
+                    }
+                    else if (clsLevel < 4 && (argType == float.class || argType == Float.class))
+                    {
+                        cls = Float.class;
+                        clsLevel = 4;
+                    }
+                    else if (clsLevel < 3 && argType == BigDecimal.class)
+                    {
+                        cls = BigDecimal.class;
+                        clsLevel = 3;
+                    }
+                    else if (clsLevel < 2 && argType == BigInteger.class)
+                    {
+                        cls = BigInteger.class;
+                        clsLevel = 2;
+                    }
+                    else if (clsLevel < 1 && (argType == long.class || argType == Long.class))
+                    {
+                        cls = Long.class;
+                        clsLevel = 1;
+                    }
                 }
             }
-            return new NumericExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+
+            if (exprType == NumericExpression.class)
+            {
+                return new NumericExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+            }
+            else if (exprType == StringExpression.class)
+            {
+                return new StringExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+            }
+            else if (exprType == TemporalExpression.class)
+            {
+                return new TemporalExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+            }
+            else
+            {
+                return new ObjectExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+            }
         }
 
         throw new NucleusException(Localiser.msg("060002", "NULLIF", expr));

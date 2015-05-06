@@ -3700,6 +3700,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         boolean numericCase = false;
         boolean booleanCase = false;
+        boolean stringCase = false;
         List<ExpressionPair> conditions = expr.getConditions();
         Iterator<ExpressionPair> whenExprIter = conditions.iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
@@ -3726,6 +3727,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             else if (actionSqlExprs[i] instanceof BooleanExpression)
             {
                 booleanCase = true;
+            }
+            else if (actionSqlExprs[i] instanceof StringExpression)
+            {
+                stringCase = true;
             }
 
             i++;
@@ -3756,6 +3761,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         else if (booleanCase)
         {
             caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+        }
+        else if (stringCase)
+        {
+            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseStringExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
         }
         else
         {
