@@ -42,11 +42,18 @@ public class CoalesceFunction extends AbstractSQLMethod
         {
             Class cls = Integer.class;
             int clsLevel = 0;
+
             // Priority order is Double, Float, BigDecimal, BigInteger, Long, Integer
             for (int i=0;i<args.size();i++)
             {
                 SQLExpression argExpr = args.get(i);
                 Class argType = argExpr.getJavaTypeMapping().getJavaType();
+                // TODO Support COALESCE on non-Numeric arguments
+                if (argType == String.class)
+                {
+                    throw new NucleusException("COALESCE not yet supported on String arguments");
+                }
+
                 if (clsLevel < 5 && (argType == double.class || argType == Double.class))
                 {
                     cls = Double.class;
@@ -73,6 +80,7 @@ public class CoalesceFunction extends AbstractSQLMethod
                     clsLevel = 1;
                 }
             }
+
             return new NumericExpression(stmt, getMappingForClass(cls), "COALESCE", args);
         }
 
