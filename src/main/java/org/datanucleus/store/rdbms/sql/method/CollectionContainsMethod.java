@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
+import org.datanucleus.store.rdbms.sql.expression.IllegalExpressionOperationException;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -309,7 +310,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 else
                 {
                     // Add restrict to element
-                    stmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                    addRestrictionOnElement(stmt, elemIdExpr, elemExpr);
                 }
             }
             else
@@ -350,7 +351,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                     else
                     {
                         // Add restrict to element
-                        stmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                        addRestrictionOnElement(stmt, elemIdExpr, elemExpr);
                     }
                 }
                 else
@@ -364,7 +365,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                     else
                     {
                         // Add restrict to element
-                        stmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                        addRestrictionOnElement(stmt, elemIdExpr, elemExpr);
                     }
                 }
             }
@@ -406,7 +407,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             {
                 // Add restrict to element
                 SQLExpression elemIdExpr = exprFactory.newExpression(stmt, elemSqlTbl, elemTbl.getIdMapping());
-                stmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                addRestrictionOnElement(stmt, elemIdExpr, elemExpr);
             }
         }
 
@@ -494,7 +495,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 else
                 {
                     // Add restrict to element
-                    subStmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                    addRestrictionOnElement(subStmt, elemIdExpr, elemExpr);
                 }
             }
             else
@@ -524,7 +525,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 else
                 {
                     // Add restrict to element
-                    subStmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                    addRestrictionOnElement(subStmt, elemIdExpr, elemExpr);
                 }
             }
         }
@@ -573,11 +574,26 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             {
                 // Add restrict to element
                 SQLExpression elemIdExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), elemTbl.getIdMapping());
-                subStmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+                addRestrictionOnElement(subStmt, elemIdExpr, elemExpr);
             }
         }
 
         return new BooleanSubqueryExpression(stmt, "EXISTS", subStmt);
+    }
+
+    protected void addRestrictionOnElement(SQLStatement stmt, SQLExpression elemIdExpr, SQLExpression elemExpr)
+    {
+        try
+        {
+            stmt.whereAnd(elemIdExpr.eq(elemExpr), true);
+        }
+        catch (IllegalExpressionOperationException ieoe)
+        {
+            NucleusLogger.QUERY.warn("Collection.contains element expression supplied is inconsistent with element type of this collection : " + ieoe.getMessage());
+            JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
+            BooleanExpression notContainedExpr = exprFactory.newLiteral(stmt, m, false).eq(exprFactory.newLiteral(stmt, m, true));
+            stmt.whereAnd(notContainedExpr, true);
+        }
     }
 
     protected boolean elementTypeCompatible(Class elementType, Class collectionElementType)
