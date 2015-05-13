@@ -997,6 +997,10 @@ Contributors:
         <sql-method method="SQL_numeric" evaluator="org.datanucleus.store.rdbms.sql.method.SQLNumericMethod"/>
         <sql-method method="SQL_function" evaluator="org.datanucleus.store.rdbms.sql.method.SQLFunctionMethod"/>
 
+        <sql-method class="java.lang.Character" method="toUpperCase"
+            evaluator="org.datanucleus.store.rdbms.sql.method.StringToUpperMethod"/>
+        <sql-method class="java.lang.CHaracter" method="toLowerCase"
+            evaluator="org.datanucleus.store.rdbms.sql.method.StringToLowerMethod"/>
         <sql-method class="java.lang.Enum" method="ordinal"
             evaluator="org.datanucleus.store.rdbms.sql.method.EnumOrdinalMethod"/>
         <sql-method class="java.lang.Enum" method="toString"

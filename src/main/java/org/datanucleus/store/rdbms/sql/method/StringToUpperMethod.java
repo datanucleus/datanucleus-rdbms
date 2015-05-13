@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.expression.CharacterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
@@ -46,14 +47,26 @@ public class StringToUpperMethod extends SimpleStringMethod
             throw new NucleusException(Localiser.msg("060015", "toUpperCase", "StringExpression"));
         }
 
-        if (!expr.isParameter() && expr instanceof StringLiteral)
+        if (!expr.isParameter())
         {
-            String val = (String)((StringLiteral)expr).getValue();
-            if (val != null)
+            if (expr instanceof StringLiteral)
             {
-                val = val.toUpperCase();
+                String val = (String)((StringLiteral)expr).getValue();
+                if (val != null)
+                {
+                    val = val.toUpperCase();
+                }
+                return new StringLiteral(stmt, expr.getJavaTypeMapping(), val, null);
             }
-            return new StringLiteral(stmt, expr.getJavaTypeMapping(), val, null);
+            else if (expr instanceof CharacterLiteral)
+            {
+                String val = (String)((CharacterLiteral)expr).getValue();
+                if (val != null)
+                {
+                    val = val.toUpperCase();
+                }
+                return new CharacterLiteral(stmt, expr.getJavaTypeMapping(), val, null);
+            }
         }
 
         return super.getExpression(expr, null);
