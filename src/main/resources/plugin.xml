@@ -927,6 +927,7 @@ Contributors:
         <sql-method method="exp" evaluator="org.datanucleus.store.rdbms.sql.method.ExpFunction"/>
         <sql-method method="floor" evaluator="org.datanucleus.store.rdbms.sql.method.FloorFunction"/>
         <sql-method method="log" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction"/>
+        <sql-method method="log" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction2" datastore="postgresql"/>
         <sql-method method="max" evaluator="org.datanucleus.store.rdbms.sql.method.MaxFunction"/>
         <sql-method method="min" evaluator="org.datanucleus.store.rdbms.sql.method.MinFunction"/>
         <sql-method method="sin" evaluator="org.datanucleus.store.rdbms.sql.method.SinFunction"/>
