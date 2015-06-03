@@ -1001,6 +1001,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
             if (!expectedMappingType.isAssignableFrom(m.getClass()))
             {
+                NucleusLogger.PERSISTENCE.warn("Member " + mmd.getFullFieldName() + " in table=" + ownerTable + " has mapping=" + m + " but expected mapping type=" + expectedMappingType);
                 throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), type.getName(), mmd.getTypeName());
             }
         }
