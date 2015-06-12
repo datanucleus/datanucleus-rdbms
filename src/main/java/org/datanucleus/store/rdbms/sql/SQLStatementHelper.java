@@ -534,6 +534,26 @@ public class SQLStatementHelper
     public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd, int maxFetchDepth)
     {
+        selectFetchPlanOfSourceClassInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, sourceCmd, maxFetchDepth, null);
+    }
+
+    /**
+     * Method to select all fetch plan members for the "source" class.
+     * If the passed FetchPlan is null then the default fetch group fields will be selected.
+     * The source class is defined by the supplied meta-data, and the SQLTable that we are selecting from.
+     * The supplied statement and mapping definition are updated during this method.
+     * @param stmt The statement
+     * @param mappingDefinition Mapping definition for result columns (populated with column positions
+     *                          of any selected mappings if provided as input)
+     * @param fetchPlan FetchPlan in use
+     * @param sourceSqlTbl SQLTable for the source class that we select from
+     * @param sourceCmd Meta-data for the source class
+     * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
+     * @param inputJoinType Optional join type to use for subobjects (otherwise decide join type internally)
+     */
+    public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+            SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd, int maxFetchDepth, JoinType inputJoinType)
+    {
         DatastoreClass sourceTbl = (DatastoreClass)sourceSqlTbl.getTable();
         int[] fieldNumbers;
         if (fetchPlan != null)
@@ -551,7 +571,7 @@ public class SQLStatementHelper
         for (int i=0;i<fieldNumbers.length;i++)
         {
             AbstractMemberMetaData mmd = sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-            selectMemberOfSourceInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchDepth);
+            selectMemberOfSourceInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchDepth, inputJoinType);
         }
 
         if (sourceCmd.getIdentityType() == IdentityType.DATASTORE)
@@ -607,9 +627,10 @@ public class SQLStatementHelper
      * @param mmd Meta-data for the field/property in the source that we are selecting
      * @param clr ClassLoader resolver
      * @param maxFetchPlanLimit Max fetch depth from this point to select (0 implies no other objects)
+     * @param inputJoinType Optional join type to use for subobjects (otherwise decide join type internally)
      */
     public static void selectMemberOfSourceInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
-            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit)
+            SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JoinType inputJoinType)
     {
         boolean selectSubobjects = false;
         if (maxFetchPlanLimit > 0)
@@ -645,7 +666,7 @@ public class SQLStatementHelper
                 {
                     // Related object with FK at this side
                     selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, 
-                        maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl);
+                        maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl, inputJoinType);
                 }
                 else if (selectSubobjects && (!mmd.isEmbedded() && !mmd.isSerialized()) && relationType == RelationType.MANY_TO_ONE_BI)
                 {
@@ -679,7 +700,8 @@ public class SQLStatementHelper
                     {
                         // N-1 bidirectional FK relation
                         // Related object with FK at this side, so join/select related object as required
-                        selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchPlanLimit, m, tableGroupName, stmtMapping, sqlTbl);
+                        selectFK = selectFetchPlanFieldsOfFKRelatedObject(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchPlanLimit, m, tableGroupName, 
+                            stmtMapping, sqlTbl, inputJoinType);
                     }
                 }
                 if (selectFK)
@@ -761,8 +783,13 @@ public class SQLStatementHelper
                     if (relatedTypeMapping == null)
                     {
                         // Join the 1-1 relation
+                        JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
+                        if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                        {
+                            inputJoinType = joinType;
+                        }
                         relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
-                            relatedMapping, relatedTbl, null, discrimValues, tableGroupName, null);
+                            relatedMapping, relatedTbl, null, discrimValues, tableGroupName, joinType);
 
                         // Select the id mapping in the related table
                         int[] colNumbers = stmt.select(relatedSqlTbl, relatedTbl.getIdMapping(), null);
@@ -797,8 +824,13 @@ public class SQLStatementHelper
                         else
                         {
                             // Join the 1-1 relation
+                            JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
+                            if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                            {
+                                inputJoinType = joinType;
+                            }
                             relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
-                                relatedMapping, relationTbl, null, null, tableGroupName, null);
+                                relatedMapping, relationTbl, null, null, tableGroupName, joinType);
                         }
 
                         // Select the id mapping in the subclass of the related table
@@ -812,7 +844,7 @@ public class SQLStatementHelper
                     {
                         // Select the fetch-plan fields of the related object
                         StatementClassMapping subMappingDefinition = new StatementClassMapping(null, mmd.getName());
-                        selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedMmd.getAbstractClassMetaData(), maxFetchPlanLimit-1);
+                        selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedMmd.getAbstractClassMetaData(), maxFetchPlanLimit-1, inputJoinType);
                         if (mappingDefinition != null)
                         {
                             mappingDefinition.addMappingDefinitionForMember(mmd.getAbsoluteFieldNumber(), subMappingDefinition);
@@ -881,7 +913,7 @@ public class SQLStatementHelper
      */
     private static boolean selectFetchPlanFieldsOfFKRelatedObject(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
-            StatementMappingIndex stmtMapping, SQLTable sqlTbl)
+            StatementMappingIndex stmtMapping, SQLTable sqlTbl, JoinType inputJoinType)
     {
         boolean selectFK = true;
         if (mmd.fetchFKOnly())
@@ -926,12 +958,17 @@ public class SQLStatementHelper
                 if (relatedSqlTbl == null)
                 {
                     // Join the 1-1 relation
-                    relatedSqlTbl = addJoinForOneToOneRelation(stmt, m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, null);
+                    JoinType joinType = getJoinTypeForOneToOneRelationJoin(m, sqlTbl, inputJoinType);
+                    if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                    {
+                        inputJoinType = joinType;
+                    }
+                    relatedSqlTbl = addJoinForOneToOneRelation(stmt, m, sqlTbl, relatedTbl.getIdMapping(), relatedTbl, null, null, tableGroupName, joinType);
                 }
 
                 StatementClassMapping subMappingDefinition =
                     new StatementClassMapping(mmd.getClassName(), mmd.getName());
-                selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1);
+                selectFetchPlanOfSourceClassInStatement(stmt, subMappingDefinition, fetchPlan, relatedSqlTbl, relatedCmd, maxFetchPlanLimit-1, inputJoinType);
                 if (mappingDefinition != null)
                 {
                     if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
@@ -993,13 +1030,8 @@ public class SQLStatementHelper
     {
         if (joinType == null)
         {
-            joinType = JoinType.LEFT_OUTER_JOIN; // Default to LEFT OUTER join
-            if (sourceMapping != sourceSqlTbl.getTable().getIdMapping())
-            {
-                // ID in target, FK in source, so check for not nullable in source (what we are selecting)
-                // If nullable then LEFT OUTER join, otherwise INNER join
-                joinType = (sourceMapping.isNullable() ? JoinType.LEFT_OUTER_JOIN : JoinType.INNER_JOIN);
-            }
+            // Fallback to nullability logic since no type specified
+            joinType = getJoinTypeForOneToOneRelationJoin(sourceMapping, sourceSqlTbl, joinType);
         }
 
         SQLTable targetSqlTbl = null;
@@ -1025,6 +1057,30 @@ public class SQLStatementHelper
         }
 
         return targetSqlTbl;
+    }
+
+    /**
+     * Convenience method to return the join type to use for the specified 1-1 relation.
+     * If the join type isn't provided and ID is in the target and FK in the source and the FK is 
+     * not nullable then an "inner join" is used, otherwise a "left outer join" is used to cater for null values. 
+     * @param sourceMapping Mapping of the relation in the source table
+     * @param sourceSqlTbl Source table in the SQLStatement
+     * @param joinType Join type to use if already known; will be returned if not null
+     * @return Join type that should be used for this 1-1 relation
+     */
+    public static JoinType getJoinTypeForOneToOneRelationJoin(JavaTypeMapping sourceMapping, SQLTable sourceSqlTbl, JoinType joinType)
+    {
+        if (joinType == null)
+        {
+            joinType = JoinType.LEFT_OUTER_JOIN; // Default to LEFT OUTER join
+            if (sourceMapping != sourceSqlTbl.getTable().getIdMapping())
+            {
+                // ID in target, FK in source, so check for not nullable in source (what we are selecting)
+                // If nullable then LEFT OUTER join, otherwise INNER join
+                joinType = (sourceMapping.isNullable() ? JoinType.LEFT_OUTER_JOIN : JoinType.INNER_JOIN);
+            }
+        }
+        return joinType;
     }
 
     /**

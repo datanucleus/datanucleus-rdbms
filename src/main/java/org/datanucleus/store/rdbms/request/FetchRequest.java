@@ -472,7 +472,7 @@ public class FetchRequest extends Request
                                 }
                             }
                         }
-                        SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth);
+                        SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
                         number++;
                     }
 
