@@ -48,7 +48,7 @@ import org.datanucleus.util.NucleusLogger;
  * Abstract representation of a store of a Collection.
  * Contains all common parts of storing Sets and Lists.
  */
-public abstract class AbstractCollectionStore extends ElementContainerStore implements CollectionStore
+public abstract class AbstractCollectionStore<E> extends ElementContainerStore implements CollectionStore<E>
 {
     protected String containsStmt;
 
@@ -70,7 +70,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
      * @param value The value
      * @return true if the datastore was updated
      */
-    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value)
+    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value)
     {
         boolean modified = false;
         if (elementMapping != null && elementMapping instanceof EmbeddedElementPCMapping)
@@ -338,7 +338,7 @@ public abstract class AbstractCollectionStore extends ElementContainerStore impl
         return stmt.toString();
     }
 
-    public boolean updateEmbeddedElement(ObjectProvider op, Object element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
+    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
     {
         boolean modified = false;
         String stmt = getUpdateEmbeddedElementStmt(fieldMapping);

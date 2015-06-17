@@ -71,7 +71,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * RDBMS-specific implementation of an {@link ListStore} using foreign keys.
  */
-public class FKListStore extends AbstractListStore
+public class FKListStore<E> extends AbstractListStore<E>
 {
     /** Field number of owner link in element class. */
     private final int ownerFieldNumber;
@@ -227,10 +227,10 @@ public class FKListStore extends AbstractListStore
      * @param allowDependentField Whether to enable dependent-field deletes during the set
      * @return The value before setting.
      */
-    public Object set(ObjectProvider op, int index, Object element, boolean allowDependentField)
+    public E set(ObjectProvider op, int index, Object element, boolean allowDependentField)
     {
         validateElementForWriting(op, element, -1); // Last argument means don't set the position on any INSERT
-        Object oldElement = get(op, index);
+        E oldElement = get(op, index);
 //        return set(op, index, element, allowDependentField, oldElement);
 
         try
@@ -461,7 +461,7 @@ public class FKListStore extends AbstractListStore
      * @param size Current size of list (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection c, int size)
+    protected boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection<E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -967,7 +967,7 @@ public class FKListStore extends AbstractListStore
      * @param endIdx The end index in the list (only for indexed lists)
      * @return The List Iterator
      */
-    protected ListIterator listIterator(ObjectProvider op, int startIdx, int endIdx)
+    protected ListIterator<E> listIterator(ObjectProvider op, int startIdx, int endIdx)
     {
         ExecutionContext ec = op.getExecutionContext();
         Transaction tx = ec.getTransaction();

@@ -56,7 +56,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * Abstract representation of the backing store for a Map.
  */
-public abstract class AbstractMapStore extends BaseContainerStore implements MapStore
+public abstract class AbstractMapStore<K, V> extends BaseContainerStore implements MapStore<K, V>
 {
     /** Flag to set whether the iterator statement will use a discriminator or not. */
     protected boolean iterateUsingDiscriminator = false;
@@ -252,7 +252,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @param key The key of the object to retrieve.
      * @return The value for this key.
      */
-    public Object get(ObjectProvider op, Object key)
+    public V get(ObjectProvider op, Object key)
     {
         try
         {
@@ -269,13 +269,13 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @param op ObjectProvider for the Map
      * @param m The Map to add
      */
-    public void putAll(ObjectProvider op, Map m)
+    public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
     {
         Iterator i = m.entrySet().iterator();
 
         while (i.hasNext())
         {
-            Map.Entry e = (Map.Entry)i.next();
+            Map.Entry<K, V> e = (Map.Entry)i.next();
             put(op, e.getKey(), e.getValue());
         }
     }
@@ -405,7 +405,7 @@ public abstract class AbstractMapStore extends BaseContainerStore implements Map
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found
      */
-    protected abstract Object getValue(ObjectProvider op, Object key)
+    protected abstract V getValue(ObjectProvider op, Object key)
     throws NoSuchElementException;
 
     /**

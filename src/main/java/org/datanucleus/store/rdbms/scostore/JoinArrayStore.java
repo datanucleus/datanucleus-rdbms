@@ -57,7 +57,7 @@ import org.datanucleus.util.Localiser;
 /**
  * RDBMS-specific implementation of a Join ArrayStore
  */
-public class JoinArrayStore extends AbstractArrayStore
+public class JoinArrayStore<E> extends AbstractArrayStore<E>
 {
     /**
      * Constructor for an RDBMS implementation of a join array store.
@@ -114,8 +114,7 @@ public class JoinArrayStore extends AbstractArrayStore
                         elementInfo = getElementInformationForClass();
                         if (elementInfo != null && elementInfo.length > 1)
                         {
-                            throw new NucleusUserException(Localiser.msg("056045", 
-                                ownerMemberMetaData.getFullFieldName()));
+                            throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));
                         }
                     }
                     else
@@ -135,7 +134,7 @@ public class JoinArrayStore extends AbstractArrayStore
      * Method to return an iterator to the array.
      * @param ownerOP ObjectProvider for the owner of the array
      */
-    public Iterator iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
 
@@ -211,8 +210,7 @@ public class JoinArrayStore extends AbstractArrayStore
                         }
                         else
                         {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, 
-                                iteratorMappingClass, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
                             return new ArrayStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
@@ -292,8 +290,7 @@ public class JoinArrayStore extends AbstractArrayStore
                     String elementType = ownerMemberMetaData.getCollection().getElementType();
                     if (ClassUtils.isReferenceType(clr.classForName(elementType)))
                     {
-                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(
-                            elementType, clr);
+                        String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
                         Class[] cls = new Class[clsNames.length];
                         for (int j = 0; j < clsNames.length; j++)
                         {
@@ -323,8 +320,7 @@ public class JoinArrayStore extends AbstractArrayStore
                 else
                 {
                     // No discriminator, but subclasses so use UNIONs
-                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null,
-                        null, containerTable, null, elementMapping);
+                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                     stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     if (allowNulls) 
                     {
@@ -345,17 +341,14 @@ public class JoinArrayStore extends AbstractArrayStore
             }
 
             // Select the required fields
-            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(),
-                sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass,
-                fp, elementSqlTbl, emd, 0);
+            SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
         }
 
         if (addRestrictionOnOwner)
         {
             // Apply condition on join-table owner field to filter by owner
-            SQLTable ownerSqlTbl =
-                    SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
             SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
             sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -364,8 +357,7 @@ public class JoinArrayStore extends AbstractArrayStore
         if (relationDiscriminatorMapping != null)
         {
             // Apply condition on distinguisher field to filter by distinguisher (when present)
-            SQLTable distSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
+            SQLTable distSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), relationDiscriminatorMapping);
             SQLExpression distExpr = exprFactory.newExpression(sqlStmt, distSqlTbl, relationDiscriminatorMapping);
             SQLExpression distVal = exprFactory.newLiteral(sqlStmt, relationDiscriminatorMapping, relationDiscriminatorValue);
             sqlStmt.whereAnd(distExpr.eq(distVal), true);
@@ -374,8 +366,7 @@ public class JoinArrayStore extends AbstractArrayStore
         if (orderMapping != null)
         {
             // Order by the ordering column, when present
-            SQLTable orderSqlTbl =
-                SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
+            SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
             SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
             boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);

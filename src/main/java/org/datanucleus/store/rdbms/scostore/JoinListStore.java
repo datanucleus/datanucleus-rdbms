@@ -70,7 +70,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * RDBMS-specific implementation of a {@link ListStore} using join table.
  */
-public class JoinListStore extends AbstractListStore
+public class JoinListStore<E> extends AbstractListStore<E>
 {
     private String setStmt;
 
@@ -170,7 +170,7 @@ public class JoinListStore extends AbstractListStore
      * @param size Current size of list if known. -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(ObjectProvider op, int start, boolean atEnd, Collection c, int size)
+    protected boolean internalAdd(ObjectProvider op, int start, boolean atEnd, Collection<E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -326,11 +326,11 @@ public class JoinListStore extends AbstractListStore
      * @param allowDependentField Whether to allow dependent field deletes
      * @return The value before setting.
      */
-    public Object set(ObjectProvider op, int index, Object element, boolean allowDependentField)
+    public E set(ObjectProvider op, int index, Object element, boolean allowDependentField)
     {
         ExecutionContext ec = op.getExecutionContext();
         validateElementForWriting(ec, element, null);
-        Object oldElement = get(op, index);
+        E oldElement = get(op, index);
 
         // Check for dynamic schema updates prior to update
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
@@ -708,7 +708,7 @@ public class JoinListStore extends AbstractListStore
      * @param endIdx End index in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected ListIterator listIterator(ObjectProvider op, int startIdx, int endIdx)
+    protected ListIterator<E> listIterator(ObjectProvider op, int startIdx, int endIdx)
     {
         ExecutionContext ec = op.getExecutionContext();
         Transaction tx = ec.getTransaction();

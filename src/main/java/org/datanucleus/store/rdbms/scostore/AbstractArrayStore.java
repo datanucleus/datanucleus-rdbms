@@ -42,8 +42,9 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of the backing store for an array.
+ * @param <E> Type of element in this array
  */
-public abstract class AbstractArrayStore extends ElementContainerStore implements ArrayStore
+public abstract class AbstractArrayStore<E> extends ElementContainerStore implements ArrayStore<E>
 {
     /**
      * Constructor.
@@ -60,9 +61,9 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
      * @param op SM for the owner
      * @return The array (as a List of objects)
      */
-    public List getArray(ObjectProvider op)
+    public List<E> getArray(ObjectProvider op)
     {
-        Iterator iter = iterator(op);
+        Iterator<E> iter = iterator(op);
         List elements = new ArrayList();
         while (iter.hasNext())
         {
@@ -133,10 +134,10 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
                 processBatchedWrites(mconn);
 
                 // Loop through all elements to be added
-                Object element = null;
+                E element = null;
                 for (int i = 0; i < length; i++)
                 {
-                    element = Array.get(array, i);
+                    element = (E) Array.get(array, i);
 
                     try
                     {
@@ -191,7 +192,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
      * @param position The position to add this element at
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider op, Object element, int position)
+    public boolean add(ObjectProvider op, E element, int position)
     {
         ExecutionContext ec = op.getExecutionContext();
         validateElementForWriting(ec, element, null);
@@ -229,7 +230,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
      * @param ownerOP ObjectProvider for the container.
      * @return The Iterator
      */
-    public abstract Iterator iterator(ObjectProvider ownerOP);
+    public abstract Iterator<E> iterator(ObjectProvider ownerOP);
 
     public void clearInternal(ObjectProvider ownerOP)
     {
@@ -281,7 +282,7 @@ public abstract class AbstractArrayStore extends ElementContainerStore implement
      * @return Whether a row was inserted
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    public int[] internalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
+    public int[] internalAdd(ObjectProvider op, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
             throws MappedDatastoreException
     {
         ExecutionContext ec = op.getExecutionContext();

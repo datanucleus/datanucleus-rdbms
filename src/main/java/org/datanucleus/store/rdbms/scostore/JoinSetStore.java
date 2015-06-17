@@ -69,7 +69,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * RDBMS-specific implementation of a {@link SetStore} using join table.
  */
-public class JoinSetStore extends AbstractSetStore
+public class JoinSetStore<E> extends AbstractSetStore<E>
 {
     /** Statement to check the existence of an owner-element relation. */
     protected String locateStmt;
@@ -175,10 +175,10 @@ public class JoinSetStore extends AbstractSetStore
         if (existing.size() != coll.size())
         {
             // Add any elements that aren't already present
-            Iterator iter = coll.iterator();
+            Iterator<E> iter = coll.iterator();
             while (iter.hasNext())
             {
-                Object elem = iter.next();
+                E elem = iter.next();
                 if (!existing.contains(elem))
                 {
                     add(op, elem, 0);
@@ -240,7 +240,7 @@ public class JoinSetStore extends AbstractSetStore
      * @param element Element to add
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider op, Object element, int size)
+    public boolean add(ObjectProvider op, E element, int size)
     {
         // Check that the object is valid for writing
         ExecutionContext ec = op.getExecutionContext();
@@ -321,7 +321,7 @@ public class JoinSetStore extends AbstractSetStore
      * @param elements Collection of elements to add
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider op, Collection elements, int size)
+    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -333,7 +333,7 @@ public class JoinSetStore extends AbstractSetStore
 
         // Validate all elements for writing
         ExecutionContext ec = op.getExecutionContext();
-        Iterator iter = elements.iterator();
+        Iterator<E> iter = elements.iterator();
         while (iter.hasNext())
         {
             Object element = iter.next();
@@ -392,7 +392,7 @@ public class JoinSetStore extends AbstractSetStore
 
                 // Loop through all elements to be added
                 iter = elements.iterator();
-                Object element = null;
+                E element = null;
                 while (iter.hasNext())
                 {
                     element = iter.next();
@@ -652,7 +652,7 @@ public class JoinSetStore extends AbstractSetStore
         return exists;
     }
 
-    protected int[] doInternalAdd(ObjectProvider op, Object element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
+    protected int[] doInternalAdd(ObjectProvider op, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
     throws MappedDatastoreException
     {
         // Check for dynamic schema updates prior to addition
@@ -848,7 +848,7 @@ public class JoinSetStore extends AbstractSetStore
      * @param ownerOP ObjectProvider for the set.
      * @return Iterator for the set.
      */
-    public Iterator iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
 

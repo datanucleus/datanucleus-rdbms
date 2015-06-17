@@ -75,7 +75,7 @@ import org.datanucleus.util.Localiser;
  * RDBMS-specific implementation of an {@link MapStore} where either the value has a FK to the owner (and the key
  * stored in the value), or whether the key has a FK to the owner (and the value stored in the key).
  */
-public class FKMapStore extends AbstractMapStore
+public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 {
     /** Statement for updating a foreign key for the map. */
     private String updateFkStmt;
@@ -443,7 +443,7 @@ public class FKMapStore extends AbstractMapStore
      * @param newValue The value to store.
      * @return The value stored.
      **/
-    public Object put(final ObjectProvider op, final Object newKey, Object newValue)
+    public V put(final ObjectProvider op, final K newKey, V newValue)
     {
         if (keyFieldNumber >= 0)
         {
@@ -457,7 +457,7 @@ public class FKMapStore extends AbstractMapStore
         }
 
         // Check if there is an existing value for this key
-        Object oldValue = get(op, newKey);
+        V oldValue = get(op, newKey);
         if (oldValue != newValue)
         {
             if (vmd != null)
@@ -574,17 +574,17 @@ public class FKMapStore extends AbstractMapStore
                             ec.getApiAdapter().getIdForObject(newKey));
                     }
 
-                    ObjectProvider vsm = ec.findObjectProvider(newKey);
+                    ObjectProvider valOP = ec.findObjectProvider(newKey);
 
                     // Ensure the current owner field is loaded, and replace with new key
                     if (ownerFieldNumber >= 0)
                     {
-                        vsm.isLoaded(ownerFieldNumber);
-                        Object oldOwner = vsm.provideField(ownerFieldNumber);
-                        vsm.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
+                        valOP.isLoaded(ownerFieldNumber);
+                        Object oldOwner = valOP.provideField(ownerFieldNumber);
+                        valOP.replaceFieldMakeDirty(ownerFieldNumber, newOwner);
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(vsm).relationChange(ownerFieldNumber, oldOwner, newOwner);
+                            ec.getRelationshipManager(valOP).relationChange(ownerFieldNumber, oldOwner, newOwner);
                         }
                     }
                     else
@@ -593,12 +593,12 @@ public class FKMapStore extends AbstractMapStore
                     }
 
                     // Ensure the current value field is loaded, and replace with new value
-                    vsm.isLoaded(valueFieldNumber);
-                    oldValue = vsm.provideField(valueFieldNumber); // TODO Should we update the local variable ?
-                    vsm.replaceFieldMakeDirty(valueFieldNumber, newValue);
+                    valOP.isLoaded(valueFieldNumber);
+                    oldValue = (V) valOP.provideField(valueFieldNumber); // TODO Should we update the local variable ?
+                    valOP.replaceFieldMakeDirty(valueFieldNumber, newValue);
                     if (ec.getManageRelations())
                     {
-                        ec.getRelationshipManager(vsm).relationChange(valueFieldNumber, oldValue, newValue);
+                        ec.getRelationshipManager(valOP).relationChange(valueFieldNumber, oldValue, newValue);
                     }
                 }
                 else
@@ -668,7 +668,7 @@ public class FKMapStore extends AbstractMapStore
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public Object remove(ObjectProvider op, Object key)
+    public V remove(ObjectProvider op, Object key)
     {
         if (!allowNulls && key == null)
         {
@@ -685,7 +685,7 @@ public class FKMapStore extends AbstractMapStore
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public Object remove(ObjectProvider op, Object key, Object oldValue)
+    public V remove(ObjectProvider op, Object key, Object oldValue)
     {
         ExecutionContext ec = op.getExecutionContext();
         if (keyFieldNumber >= 0)
@@ -817,7 +817,7 @@ public class FKMapStore extends AbstractMapStore
             }
         }
 
-        return oldValue;
+        return (V) oldValue;
     }
 
     /**
@@ -1099,7 +1099,7 @@ public class FKMapStore extends AbstractMapStore
      * @return The value for this key
      * @throws NoSuchElementException if the key was not found
      */
-    protected Object getValue(ObjectProvider ownerOP, Object key)
+    protected V getValue(ObjectProvider ownerOP, Object key)
     throws NoSuchElementException
     {
         if (!validateKeyForReading(ownerOP, key))
@@ -1218,7 +1218,7 @@ public class FKMapStore extends AbstractMapStore
         {
             throw new NucleusDataStoreException(Localiser.msg("056014", stmt), e);
         }
-        return value;
+        return (V) value;
     }
 
     /**

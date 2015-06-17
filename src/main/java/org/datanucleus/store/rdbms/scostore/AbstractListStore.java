@@ -51,7 +51,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Abstract representation of a backing store for a List.
  */
-public abstract class AbstractListStore extends AbstractCollectionStore implements ListStore
+public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> implements ListStore<E>
 {
     /** Whether the list is indexed. If false then it will have no orderMapping. */
     protected boolean indexedList = true;
@@ -100,7 +100,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param endIdx The end point in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected abstract ListIterator listIterator(ObjectProvider op, int startIdx, int endIdx);
+    protected abstract ListIterator<E> listIterator(ObjectProvider op, int startIdx, int endIdx);
 
     /**
      * Method to add an element to the List.
@@ -109,7 +109,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param size Size of the current list (if known, -1 if not)
      * @return Whether it was added successfully.
      */
-    public boolean add(ObjectProvider op, Object element, int size)
+    public boolean add(ObjectProvider op, E element, int size)
     {
         return internalAdd(op, 0, true, Collections.singleton(element), size);
     }
@@ -120,7 +120,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param index The location to add at
      * @param op The ObjectProvider.
      */
-    public void add(ObjectProvider op, Object element, int index, int size)
+    public void add(ObjectProvider op, E element, int index, int size)
     {
         internalAdd(op, index, false, Collections.singleton(element), size);
     }
@@ -132,7 +132,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether they were added successfully.
      */
-    public boolean addAll(ObjectProvider op, Collection elements, int size)
+    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
     {
         return internalAdd(op, 0, true, elements, size);
     }
@@ -159,7 +159,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection elements, int size);
+    protected abstract boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection<E> elements, int size);
 
     /**
      * Method to retrieve an element from the List.
@@ -167,9 +167,9 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param index The index of the element required.
      * @return The object
      */
-    public Object get(ObjectProvider op, int index)
+    public E get(ObjectProvider op, int index)
     {
-        ListIterator iter = listIterator(op, index, index);
+        ListIterator<E> iter = listIterator(op, index, index);
         if (iter == null || !iter.hasNext())
         {
             return null;
@@ -177,7 +177,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
         if (!indexedList)
         {
             // Restrict to the actual element since can't be done in the query
-            Object obj = null;
+            E obj = null;
             int position = 0;
             while (iter.hasNext())
             {
@@ -268,9 +268,9 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param size Current size of the list (if known). -1 if not known
      * @return The object that was removed
      */
-    public Object remove(ObjectProvider op, int index, int size)
+    public E remove(ObjectProvider op, int index, int size)
     {
-        Object element = get(op, index);
+        E element = get(op, index);
         if (indexedList)
         {
             // Remove the element at this position
@@ -325,7 +325,7 @@ public abstract class AbstractListStore extends AbstractCollectionStore implemen
      * @param endIdx To index (exclusive)
      * @return Sub List of elements in this range.
      */
-    public java.util.List subList(ObjectProvider op, int startIdx, int endIdx)
+    public java.util.List<E> subList(ObjectProvider op, int startIdx, int endIdx)
     {
         ListIterator iter = listIterator(op, startIdx, endIdx);
         java.util.List list = new ArrayList();

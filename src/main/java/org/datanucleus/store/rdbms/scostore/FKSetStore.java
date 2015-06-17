@@ -68,7 +68,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * RDBMS-specific implementation of an {@link SetStore} using foreign keys.
  */
-public class FKSetStore extends AbstractSetStore
+public class FKSetStore<E> extends AbstractSetStore<E>
 {
     /** Field number of owner link in element class. */
     private final int ownerFieldNumber;
@@ -336,10 +336,10 @@ public class FKSetStore extends AbstractSetStore
         if (existing.size() != coll.size())
         {
             // Add any elements that aren't already present
-            Iterator iter = coll.iterator();
+            Iterator<E> iter = coll.iterator();
             while (iter.hasNext())
             {
-                Object elem = iter.next();
+                E elem = iter.next();
                 if (!existing.contains(elem))
                 {
                     add(op, elem, 0);
@@ -354,7 +354,7 @@ public class FKSetStore extends AbstractSetStore
      * @param element Element to be added
      * @return Success indicator
      */
-    public boolean add(final ObjectProvider op, Object element, int size)
+    public boolean add(final ObjectProvider op, E element, int size)
     {
         if (element == null)
         {
@@ -487,7 +487,7 @@ public class FKSetStore extends AbstractSetStore
             Object elementId = ec.getApiAdapter().getIdForObject(element);
             if (elementId != null)
             {
-                element = ec.findObject(elementId, false, false, element.getClass().getName());
+                element = (E) ec.findObject(elementId, false, false, element.getClass().getName());
                 if (element != null)
                 {
                     elementOP = ec.findObjectProvider(element);
@@ -540,7 +540,7 @@ public class FKSetStore extends AbstractSetStore
      * @param elements Elements to be added
      * @return Success indicator
      */
-    public boolean addAll(ObjectProvider op, Collection elements, int size)
+    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -548,7 +548,7 @@ public class FKSetStore extends AbstractSetStore
         }
 
         boolean success = false;
-        Iterator iter = elements.iterator();
+        Iterator<E> iter = elements.iterator();
         while (iter.hasNext())
         {
             if (add(op, iter.next(), -1))
@@ -856,6 +856,7 @@ public class FKSetStore extends AbstractSetStore
      * UPDATE LISTTABLE SET OWNERCOL=NULL [,DISTINGUISHER=NULL]
      * WHERE OWNERCOL=?
      * </PRE>
+     * @param info ElementInfo for the element
      * @return The Statement for clearing items for the owner.
      */
     protected String getClearNullifyStmt(ElementInfo info)
@@ -1003,7 +1004,7 @@ public class FKSetStore extends AbstractSetStore
      * @param op ObjectProvider for the owner.
      * @return Iterator for the set.
      */
-    public Iterator iterator(ObjectProvider op)
+    public Iterator<E> iterator(ObjectProvider op)
     {
         ExecutionContext ec = op.getExecutionContext();
 

@@ -49,7 +49,7 @@ import org.datanucleus.util.StringUtils;
  * Abstract representation of the backing store for a Set/Collection.
  * Can be used for a join table set, or a map key set.
  */
-public abstract class AbstractSetStore extends AbstractCollectionStore implements SetStore
+public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> implements SetStore<E>
 {
     /**
      * Constructor.
@@ -67,7 +67,7 @@ public abstract class AbstractSetStore extends AbstractCollectionStore implement
      * @param op ObjectProvider for the set. 
      * @return Iterator for the set.
      */
-    public abstract Iterator iterator(ObjectProvider op);
+    public abstract Iterator<E> iterator(ObjectProvider op);
 
     /**
      * Removes the association to one element

@@ -69,7 +69,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * RDBMS-specific implementation of an {@link MapStore} using join table.
  */
-public class JoinMapStore extends AbstractMapStore
+public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 {
     private String putStmt;
     private String updateStmt;
@@ -165,8 +165,8 @@ public class JoinMapStore extends AbstractMapStore
      * Method to put all elements from a Map into our Map.
      * @param op ObjectProvider for the Map
      * @param m The Map to add
-     **/
-    public void putAll(ObjectProvider op, Map m)
+     */
+    public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
     {
         if (m == null || m.size() == 0)
         {
@@ -270,13 +270,13 @@ public class JoinMapStore extends AbstractMapStore
      * @param value The value to store.
      * @return The value stored.
      **/
-    public Object put(ObjectProvider op, Object key, Object value)
+    public V put(ObjectProvider op, K key, V value)
     {
         validateKeyForWriting(op, key);
         validateValueForWriting(op, value);
 
         boolean exists = false;
-        Object oldValue;
+        V oldValue;
         try
         {
             oldValue = getValue(op, key);
@@ -336,14 +336,14 @@ public class JoinMapStore extends AbstractMapStore
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public Object remove(ObjectProvider op, Object key)
+    public V remove(ObjectProvider op, Object key)
     {
         if (!validateKeyForReading(op, key))
         {
             return null;
         }
 
-        Object oldValue;
+        V oldValue;
         boolean exists;
         try
         {
@@ -388,7 +388,7 @@ public class JoinMapStore extends AbstractMapStore
      * @param key Key of the item to remove.
      * @return The value that was removed.
      */
-    public Object remove(ObjectProvider op, Object key, Object oldValue)
+    public V remove(ObjectProvider op, Object key, Object oldValue)
     {
         if (!validateKeyForReading(op, key))
         {
@@ -415,7 +415,7 @@ public class JoinMapStore extends AbstractMapStore
             }
         }
 
-        return oldValue;
+        return (V) oldValue;
     }
 
     /**
@@ -655,7 +655,7 @@ public class JoinMapStore extends AbstractMapStore
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found
      */
-    protected Object getValue(ObjectProvider ownerOP, Object key)
+    protected V getValue(ObjectProvider ownerOP, Object key)
     throws NoSuchElementException
     {
         if (!validateKeyForReading(ownerOP, key))
@@ -774,7 +774,7 @@ public class JoinMapStore extends AbstractMapStore
         {
             throw new NucleusDataStoreException(Localiser.msg("056014", stmt), e);
         }
-        return value;
+        return (V) value;
     }
 
     /**
