@@ -61,7 +61,7 @@ import org.datanucleus.util.NucleusLogger;
 /**
  * RDBMS-specific implementation of an FK ArrayStore.
  */
-public class FKArrayStore extends AbstractArrayStore
+public class FKArrayStore<E> extends AbstractArrayStore<E>
 {
     /** Statement for nullifying a FK in the element. */
     private String clearNullifyStmt;
@@ -203,7 +203,7 @@ public class FKArrayStore extends AbstractArrayStore
      * @param index The index position (or -1 if not known)
      * @return Whether it was performed successfully
      */
-    private boolean updateElementFk(ObjectProvider ownerOP, Object element, Object owner, int index)
+    private boolean updateElementFk(ObjectProvider ownerOP, E element, Object owner, int index)
     {
         if (element == null)
         {
@@ -509,7 +509,7 @@ public class FKArrayStore extends AbstractArrayStore
         int length = Array.getLength(array);
         for (int i=0;i<length;i++)
         {
-            Object obj = Array.get(array, i);
+            E obj = (E)Array.get(array, i);
             updateElementFk(ownerOP, obj, ownerOP.getObject(), i);
         }
 
@@ -521,7 +521,7 @@ public class FKArrayStore extends AbstractArrayStore
      * @param ownerOP ObjectProvider for the set.
      * @return Iterator for the set.
      */
-    public Iterator iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
 

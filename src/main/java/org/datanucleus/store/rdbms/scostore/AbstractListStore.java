@@ -78,7 +78,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param op ObjectProvider for the container.
      * @return The Iterator
      */
-    public Iterator iterator(ObjectProvider op)
+    public Iterator<E> iterator(ObjectProvider op)
     {
         return listIterator(op);
     }
@@ -88,7 +88,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param op ObjectProvider for the container.
      * @return The List Iterator
      */
-    public ListIterator listIterator(ObjectProvider op)
+    public ListIterator<E> listIterator(ObjectProvider op)
     {
         return listIterator(op, -1, -1);
     }
@@ -145,7 +145,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider op, Collection elements, int index, int size)
+    public boolean addAll(ObjectProvider op, Collection<E> elements, int index, int size)
     {
         return internalAdd(op, index, false, elements, size);
     }

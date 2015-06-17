@@ -37,20 +37,21 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * ListStore iterator for RDBMS datastores.
+ * @param <E> Element type of the list store
  */
-public class ListStoreIterator implements ListIterator
+public class ListStoreIterator<E> implements ListIterator<E>
 {
     private final ObjectProvider op;
 
-    private final ListIterator delegate;
+    private final ListIterator<E> delegate;
 
-    private Object lastElement = null;
+    private E lastElement = null;
 
     private int currentIndex = -1;
 
-    private final AbstractListStore abstractListStore;
+    private final AbstractListStore<E> abstractListStore;
 
-    ListStoreIterator(ObjectProvider op, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore als)
+    ListStoreIterator(ObjectProvider op, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
     throws MappedDatastoreException
     {
         this.op = op;
@@ -115,11 +116,11 @@ public class ListStoreIterator implements ListIterator
         delegate = results.listIterator();
     }
 
-    public void add(Object o)
+    public void add(E elem)
     {
         currentIndex = delegate.nextIndex();
-        abstractListStore.add(op, o, currentIndex, -1);
-        delegate.add(o);
+        abstractListStore.add(op, elem, currentIndex, -1);
+        delegate.add(elem);
         lastElement = null;
     }
 
@@ -133,7 +134,7 @@ public class ListStoreIterator implements ListIterator
         return delegate.hasPrevious();
     }
 
-    public Object next()
+    public E next()
     {
         currentIndex = delegate.nextIndex();
         lastElement = delegate.next();
@@ -146,7 +147,7 @@ public class ListStoreIterator implements ListIterator
         return delegate.nextIndex();
     }
 
-    public Object previous()
+    public E previous()
     {
         currentIndex = delegate.previousIndex();
         lastElement = delegate.previous();
@@ -173,17 +174,16 @@ public class ListStoreIterator implements ListIterator
         currentIndex = -1;
     }
 
-    public synchronized void set(Object o)
+    public synchronized void set(E elem)
     {
         if (lastElement == null)
         {
             throw new IllegalStateException("No entry to replace");
         }
 
-        abstractListStore.set(op, currentIndex, o, true);
-        delegate.set(o);
-
-        lastElement = o;
+        abstractListStore.set(op, currentIndex, elem, true);
+        delegate.set(elem);
+        lastElement = elem;
     }
 
     protected AbstractMemberMetaData getOwnerMemberMetaData(Table containerTable)

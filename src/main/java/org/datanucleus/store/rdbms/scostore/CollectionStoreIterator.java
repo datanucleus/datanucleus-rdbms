@@ -36,16 +36,17 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * RDBMS-specific implementation of {@link Iterator} for Collections/Sets.
+ * @param <E> Type of element in the collection backing store
  */
-class CollectionStoreIterator implements Iterator
+class CollectionStoreIterator<E> implements Iterator<E>
 {
     private final AbstractCollectionStore collStore;
     private final ObjectProvider op;
     private final ExecutionContext ec;
-    private final Iterator delegate;
-    private Object lastElement = null;
+    private final Iterator<E> delegate;
+    private E lastElement = null;
 
-    CollectionStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore store)
+    CollectionStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
         throws MappedDatastoreException
     {
         this.op = op;
@@ -110,7 +111,7 @@ class CollectionStoreIterator implements Iterator
         return delegate.hasNext();
     }
 
-    public Object next()
+    public E next()
     {
         lastElement = delegate.next();
 
