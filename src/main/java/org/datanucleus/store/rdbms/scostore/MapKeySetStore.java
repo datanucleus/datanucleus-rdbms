@@ -54,11 +54,12 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 
 /**
- * RDBMS-specific implementation of a SetStore for map keys.
+ * Implementation of a backing SetStore for map keys.
  */
-class MapKeySetStore extends AbstractSetStore
+class MapKeySetStore<K> extends AbstractSetStore<K>
 {
-    protected final MapStore mapStore;
+    /** Backing store for the map. */
+    protected final MapStore<K, ?> mapStore;
 
     /** JDBC statement to use for retrieving keys of the map (locking). */
     private String iteratorStmtLocked = null;
@@ -75,7 +76,7 @@ class MapKeySetStore extends AbstractSetStore
      * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
      */
-    MapKeySetStore(MapTable mapTable, MapStore mapStore, ClassLoaderResolver clr)
+    MapKeySetStore(MapTable mapTable, MapStore<K, ?> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -97,7 +98,7 @@ class MapKeySetStore extends AbstractSetStore
      * @param keyMapping mapping in the map table to the key
      * @param ownerMmd metadata for the owning field/property
      */
-    MapKeySetStore(Table mapTable, MapStore mapStore, ClassLoaderResolver clr, 
+    MapKeySetStore(Table mapTable, MapStore<K, ?> mapStore, ClassLoaderResolver clr, 
         JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, AbstractMemberMetaData ownerMmd)
     {
         super(mapTable.getStoreManager(), clr);
@@ -138,82 +139,29 @@ class MapKeySetStore extends AbstractSetStore
         } 
     }
 
-    /**
-     * Method to add an element. Overridden because we want to prevent it.
-     * @param op ObjectProvider of collection.
-     * @param element Element to add.
-     * @return Whether it was successful
-     **/
-    public boolean add(ObjectProvider op, Object element, int size)
+    public boolean add(ObjectProvider op, K key, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    /**
-     * Method to add a collection of elements. Overridden because we want to prevent it.
-     * @param op ObjectProvider of collection.
-     * @param elements Elements to add.
-     * @return Whether it was successful
-     **/
-    public boolean addAll(ObjectProvider op, Collection elements, int size)
+    public boolean addAll(ObjectProvider op, Collection keys, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    /**
-     * Method to remove an element. Overridden because we want to prevent it.
-     * @param op ObjectProvider of collection.
-     * @param element Element to remove.
-     * @return Whether it was successful
-     **/
-    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider op, Object key, int size, boolean allowDependentField)
     {
-        if (!canRemove())
-        {
-            throw new UnsupportedOperationException("Cannot remove from an inverse map through its key set");
-        }
-
-        return super.remove(op, element, size, allowDependentField);
+        throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    /**
-     * Method to remove a collection of elements. Overridden because we want to prevent it.
-     * @param op ObjectProvider of collection.
-     * @param elements Elements to remove.
-     * @return Whether it was successful
-     **/
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider op, Collection keys, int size)
     {
-        if (!canRemove())
-        {
-            throw new UnsupportedOperationException("Cannot remove from an inverse map through its key set");
-        }
-
-        return super.removeAll(op, elements, size);
+        throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    /**
-     * Method to clear the collection. Overridden because we want to prevent it.
-     * @param op ObjectProvider of collection.
-     **/
     public void clear(ObjectProvider op)
     {
-        if (!canClear())
-        {
-            throw new UnsupportedOperationException("Cannot clear an inverse map through its key set");
-        }
-
-        super.clear(op);
-    }
-
-    protected boolean canRemove()
-    {
-        return false;
-    }
-
-    protected boolean canClear()
-    {
-        return false;
+        throw new UnsupportedOperationException("Cannot clear a map through its key set");
     }
 
     /**
@@ -221,7 +169,7 @@ class MapKeySetStore extends AbstractSetStore
      * @param ownerOP ObjectProvider for the set. 
      * @return Iterator for the set.
      */
-    public Iterator iterator(ObjectProvider ownerOP)
+    public Iterator<K> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         if (iteratorStmtLocked == null)
@@ -348,8 +296,7 @@ class MapKeySetStore extends AbstractSetStore
                 // MAP_TYPE_KEY_IN_VALUE, MAP_TYPE_JOIN
                 // Join to join table and select key fields
                 JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping,
-                    containerTable, null, elementMapping, null, null);
+                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
@@ -384,8 +331,7 @@ class MapKeySetStore extends AbstractSetStore
                     sqlStmt = stmtGen.getStatement();
 
                     JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping,
-                        containerTable, null, elementMapping, null, null);
+                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
                         ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
@@ -414,8 +360,7 @@ class MapKeySetStore extends AbstractSetStore
 
         // Apply condition on owner field to filter by owner
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, containerSqlTbl, ownerMapping);
+        SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, containerSqlTbl, ownerMapping);
         SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
         SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
         sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);

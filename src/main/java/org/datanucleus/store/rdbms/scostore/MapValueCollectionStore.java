@@ -59,9 +59,9 @@ import org.datanucleus.util.Localiser;
 /**
  * RDBMS-specific implementation of a CollectionStore for map values.
  */
-class MapValueCollectionStore extends AbstractCollectionStore
+class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 {
-    protected final MapStore mapStore;
+    protected final MapStore<?, V> mapStore;
 
     protected final JavaTypeMapping keyMapping;
 
@@ -83,7 +83,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
      * @param clr The ClassLoaderResolver
      * @param storeMgr Manager for the datastore
      */
-    MapValueCollectionStore(MapTable mapTable, MapStore mapStore, ClassLoaderResolver clr)
+    MapValueCollectionStore(MapTable mapTable, MapStore<?, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -116,7 +116,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
      * @param valueMapping mapping to the key/value
      * @param ownerMmd Metadata for the owning member
      */
-    MapValueCollectionStore(DatastoreClass mapTable, MapStore mapStore, ClassLoaderResolver clr, 
+    MapValueCollectionStore(DatastoreClass mapTable, MapStore<?, V> mapStore, ClassLoaderResolver clr, 
         JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, AbstractMemberMetaData ownerMmd)
     {
         super(mapTable.getStoreManager(), clr);
@@ -166,73 +166,38 @@ class MapValueCollectionStore extends AbstractCollectionStore
         }
     }
 
-    /**
-     * Method to add a value to the Map. Not supported.
-     * @param op ObjectProvider for the owner
-     * @param element The value to add
-     * @return Whether it was added correctly.
-     */
-    public boolean add(ObjectProvider op, Object element, int size)
+    public boolean add(ObjectProvider op, V value, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    /**
-     * Method to add entries to the Map. Not supported.
-     * @param op ObjectProvider for the owner
-     * @param elements The values to add
-     * @return Whether it was added correctly.
-     */
-    public boolean addAll(ObjectProvider op, Collection elements, int size)
+    public boolean addAll(ObjectProvider op, Collection<V> values, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    /**
-     * Method to remove a value from the Map.
-     * @param op ObjectProvider for the owner
-     * @param element The value to remove
-     * @return Whether it was removed correctly.
-     */
-    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider op, Object value, int size, boolean allowDependentField)
     {
-        if (!validateElementForReading(op, element))
+        // TODO Why does this even allow the possibility of removal via the values store?
+        if (!validateElementForReading(op, value))
         {
             return false;
         }
 
-        return remove(op, element);
+        return remove(op, value);
     }
 
-    /**
-     * Method to remove values from the map via the value collection.
-     * @param op ObjectProvider for the owner
-     */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider op, Collection values, int size)
     {
         throw new NucleusUserException("Cannot remove values from a map through its values collection");
     }
 
-    /**
-     * Method to clear the map.
-     * @param op ObjectProvider for the owner
-     */
     public void clear(ObjectProvider op)
     {
-        if (canClear())
-        {
-            throw new NucleusUserException("Cannot clear a map through its values collection");
-        }
-
-        super.clear(op);
+        throw new NucleusUserException("Cannot clear a map through its values collection");
     }
 
-    protected boolean canClear()
-    {
-        return false;
-    }
-
-    protected boolean remove(ObjectProvider op, Object element)
+    protected boolean remove(ObjectProvider op, Object value)
     {
         if (findKeyStmt == null)
         {
@@ -256,7 +221,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
+                    BackingStoreHelper.populateElementInStatement(ec, ps, value, jdbcPosition, elementMapping);
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, findKeyStmt, ps);
                     try
@@ -331,7 +296,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
      * @param ownerOP ObjectProvider for the set. 
      * @return Iterator for the set.
      **/
-    public Iterator iterator(ObjectProvider ownerOP)
+    public Iterator<V> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         if (iteratorStmtLocked == null)
@@ -360,8 +325,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
 
                 try
@@ -421,8 +385,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
         final Class valueCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
-        if (emd != null && emd.getDiscriminatorStrategyForTable() != null &&
-            emd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
+        if (emd != null && emd.getDiscriminatorStrategyForTable() != null && emd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
         {
             // Map<?, PC> where value has discriminator
             if (ClassUtils.isReferenceType(valueCls))
@@ -448,8 +411,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
             {
                 // Join to key table and select value fields
                 JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping,
-                    containerTable, null, elementMapping, null, null);
+                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
@@ -468,8 +430,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
             {
                 // Join to join table and select value fields
                 JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping,
-                    containerTable, null, elementMapping, null, null);
+                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
@@ -491,8 +452,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
                     sqlStmt = stmtGen.getStatement();
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping,
-                        containerTable, null, elementMapping, null, null);
+                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
                         ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
@@ -543,8 +503,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
                     sqlStmt = stmtGen.getStatement();
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping,
-                        containerTable, null, elementMapping, null, null);
+                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
                         ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
@@ -561,8 +520,7 @@ class MapValueCollectionStore extends AbstractCollectionStore
 
         // Apply condition on owner field to filter by owner
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, containerSqlTbl, ownerMapping);
+        SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, containerSqlTbl, ownerMapping);
         SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
         SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
         sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
