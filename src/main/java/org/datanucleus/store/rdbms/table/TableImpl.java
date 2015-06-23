@@ -886,7 +886,7 @@ public abstract class TableImpl extends AbstractTable
      * Currently returns an empty list.
      * @return List of candidate keys.
      */
-    protected List getExpectedCandidateKeys()
+    protected List<CandidateKey> getExpectedCandidateKeys()
     {
         assertIsInitialized();
         return new ArrayList();
@@ -897,11 +897,11 @@ public abstract class TableImpl extends AbstractTable
      * @param clr The ClassLoaderResolver
      * @return Set of indices expected.
      */
-    protected Set getExpectedIndices(ClassLoaderResolver clr)
+    protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
-        HashSet indices = new HashSet();
+        HashSet<Index> indices = new HashSet();
 
         /*
          * For each foreign key, add to the list an index made up of the "from"
@@ -1243,13 +1243,13 @@ public abstract class TableImpl extends AbstractTable
         assertIsInitialized();
 
         HashMap stmtsByFKName = new HashMap();
-        List expectedForeignKeys = getExpectedForeignKeys(clr);
-        Iterator i = expectedForeignKeys.iterator();
+        List<ForeignKey> expectedForeignKeys = getExpectedForeignKeys(clr);
+        Iterator<ForeignKey> i = expectedForeignKeys.iterator();
         int n = 1;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         while (i.hasNext())
         {
-            ForeignKey fk = (ForeignKey) i.next();
+            ForeignKey fk = i.next();
             if (!actualForeignKeysByName.containsValue(fk))
             {
                 // If no name assigned, make one up
@@ -1286,13 +1286,13 @@ public abstract class TableImpl extends AbstractTable
         assertIsInitialized();
 
         HashMap stmtsByCKName = new HashMap();
-        List expectedCandidateKeys = getExpectedCandidateKeys();
-        Iterator i = expectedCandidateKeys.iterator();
+        List<CandidateKey> expectedCandidateKeys = getExpectedCandidateKeys();
+        Iterator<CandidateKey> i = expectedCandidateKeys.iterator();
         int n = 1;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         while (i.hasNext())
         {
-            CandidateKey ck = (CandidateKey) i.next();
+            CandidateKey ck = i.next();
             if (!actualCandidateKeysByName.containsValue(ck))
             {
                 // If no name assigned, make one up
@@ -1370,14 +1370,14 @@ public abstract class TableImpl extends AbstractTable
     {
         assertIsInitialized();
         HashMap stmtsByIdxName = new HashMap();
-        Set expectedIndices = getExpectedIndices(clr);
+        Set<Index> expectedIndices = getExpectedIndices(clr);
 
         int n = 1;
-        Iterator i = expectedIndices.iterator();
+        Iterator<Index> i = expectedIndices.iterator();
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         while (i.hasNext())
         {
-            Index idx = (Index) i.next();
+            Index idx = i.next();
             if (isIndexReallyNeeded(idx, actualIndicesByName.values()))
             {
                 // If no name assigned, make one up

@@ -1826,7 +1826,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
         else
         {
-            // Return the superclass sicne we don't have it
+            // Return the superclass since we don't have it
             return getSuperDatastoreClass().getBaseDatastoreClassWithMember(mmd);
         }
     }
@@ -1848,7 +1848,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
-    protected Set getExpectedIndices(ClassLoaderResolver clr)
+    protected Set<Index> getExpectedIndices(ClassLoaderResolver clr)
     {
         // Auto mode allows us to decide which indices are needed as well as using what is in the users MetaData
         boolean autoMode = false;
@@ -1857,7 +1857,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             autoMode = true;
         }
 
-        Set indices = new HashSet();
+        Set<Index> indices = new HashSet();
 
         // Add on any user-required indices for the fields/properties
         Set memberNumbersSet = memberMappingsMap.keySet();
@@ -2162,7 +2162,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr The ClassLoaderResolver
      * @return The expected foreign keys.
      */
-    public List getExpectedForeignKeys(ClassLoaderResolver clr)
+    public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
@@ -2173,7 +2173,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             autoMode = true;
         }
 
-        ArrayList foreignKeys = new ArrayList();
+        ArrayList<ForeignKey> foreignKeys = new ArrayList();
 
         // Check each field for FK requirements (user-defined, or required)
         // <field><foreign-key>...</foreign-key></field>
@@ -2289,8 +2289,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr ClassLoader resolver
      * @param embeddedMapping The embedded PC mapping
      */
-    private void addExpectedForeignKeysForEmbeddedPCField(List foreignKeys, boolean autoMode, ClassLoaderResolver clr, 
-            EmbeddedPCMapping embeddedMapping)
+    private void addExpectedForeignKeysForEmbeddedPCField(List foreignKeys, boolean autoMode, ClassLoaderResolver clr, EmbeddedPCMapping embeddedMapping)
     {
         for (int i=0;i<embeddedMapping.getNumberOfJavaTypeMappings();i++)
         {
@@ -2449,12 +2448,20 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Accessor for the expected candidate keys for this table.
      * @return The expected candidate keys.
      */
-    protected List getExpectedCandidateKeys()
+    protected List<CandidateKey> getExpectedCandidateKeys()
     {
         assertIsInitialized();
 
         // The candidate keys required by the basic table
-        List candidateKeys = super.getExpectedCandidateKeys();
+        List<CandidateKey> candidateKeys = super.getExpectedCandidateKeys();
+
+        // Add any constraints required for a FK map
+        Iterator<CandidateKey> cks = candidateKeysByMapField.values().iterator();
+        while (cks.hasNext())
+        {
+            CandidateKey ck = cks.next();
+            candidateKeys.add(ck);
+        }
 
         // Add on any user-required candidate keys for the fields
         Set fieldNumbersSet = memberMappingsMap.keySet();
@@ -2653,9 +2660,6 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
 
-        // Unique constraints creation
-        stmts.addAll(getSQLAddUniqueConstraintsStatements());
-
         return stmts;
     }
 
@@ -2683,29 +2687,6 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         // Drop this table
         stmts.add(dba.getDropTableStatement(this));
-
-        return stmts;
-    }
-
-    private List getSQLAddUniqueConstraintsStatements()
-    {
-        ArrayList stmts = new ArrayList();
-        int ckNum = 0;
-        IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-
-        Iterator<CandidateKey> cks = candidateKeysByMapField.values().iterator();
-        while (cks.hasNext())
-        {
-            DatastoreIdentifier ckName = idFactory.newCandidateKeyIdentifier(this, ++ckNum);
-            CandidateKey ck = cks.next();
-            ck.setName(ckName.getName());
-
-            String ckSql = dba.getAddCandidateKeyStatement(ck, idFactory);
-            if (ckSql != null)
-            {
-                stmts.add(ckSql);
-            }
-        }
 
         return stmts;
     }
