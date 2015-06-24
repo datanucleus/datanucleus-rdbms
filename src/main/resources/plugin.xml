@@ -1094,6 +1094,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="sapdb"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
+        <sql-method class="java.lang.String" method="substring" datastore="postgresql"
+            evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring5Method"/>
         <sql-method class="java.lang.String" method="toUpperCase"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringToUpperMethod"/>
         <sql-method class="java.lang.String" method="toLowerCase"
