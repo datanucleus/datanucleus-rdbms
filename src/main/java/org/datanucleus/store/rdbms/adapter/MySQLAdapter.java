@@ -39,6 +39,7 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the MySQL database.
+ * Note that this also supports the MariaDB database.
  */
 public class MySQLAdapter extends BaseDatastoreAdapter
 {
@@ -50,8 +51,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      * an incomplete list.
      * <p>
      * This list was produced based on the reserved word list in the MySQL
-     * Manual (Version 4.0.10-gamma) at 
-     * http://www.mysql.com/doc/en/Reserved_words.html.
+     * Manual (Version 4.0.10-gamma) at http://www.mysql.com/doc/en/Reserved_words.html.
      */
     public static final String NONSQL92_RESERVED_WORDS =
         "ANALYZE,AUTO_INCREMENT,BDB,BERKELEYDB,BIGINT,BINARY,BLOB,BTREE," +
@@ -119,9 +119,12 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(STORED_PROCEDURES);
 
-        // Mysql DATETIME/TIMESTAMP doesn't store millisecs!
-        // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
-        supportedOptions.remove(DATETIME_STORES_MILLISECS);
+        if (!driverName.equalsIgnoreCase("mariadb-jdbc"))
+        {
+            // Mysql DATETIME/TIMESTAMP doesn't store millisecs! yet MariaDB seems to
+            // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
+            supportedOptions.remove(DATETIME_STORES_MILLISECS);
+        }
     }
 
     /**
