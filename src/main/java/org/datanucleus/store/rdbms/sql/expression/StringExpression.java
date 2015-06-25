@@ -472,7 +472,7 @@ public class StringExpression extends SQLExpression
         {
             StringExpression strExpr = (StringExpression)stmt.getSQLExpressionFactory().invokeOperation(
                 "numericToString", expr, null).encloseInParentheses();
-            return new StringExpression(this, Expression.OP_CONCAT, strExpr);
+            return new StringExpression(this, Expression.OP_CONCAT, strExpr).encloseInParentheses();
         }
         else if (expr instanceof NullLiteral)
         {
