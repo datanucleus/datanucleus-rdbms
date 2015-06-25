@@ -103,6 +103,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.remove(TX_ISOLATION_NONE);
         supportedOptions.remove(ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE);
+        supportedOptions.remove(TX_ISOLATION_READ_UNCOMMITTED); // Not supported in PostgreSQL AFAIK
     }
 
     /**
