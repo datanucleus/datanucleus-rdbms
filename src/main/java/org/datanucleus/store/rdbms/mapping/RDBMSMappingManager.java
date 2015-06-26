@@ -1319,7 +1319,7 @@ public class RDBMSMappingManager implements MappingManager
 
     /**
      * Accessor for a datastore mapping class for the specified java type (and optional jdbc type or sql type).
-     * @param fieldName Name of the field (if known)
+     * @param fieldName Name of the field (if known, for logging only)
      * @param javaType The java type
      * @param jdbcType The JDBC type
      * @param sqlType The SQL Type
