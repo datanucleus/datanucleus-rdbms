@@ -2278,6 +2278,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
     {
+        // TODO If the user has generated the schema and the column for this field is an autoincrement column then select IDENTITY
         if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY))
         {
             // Use legacy process for deciding which strategy to use
