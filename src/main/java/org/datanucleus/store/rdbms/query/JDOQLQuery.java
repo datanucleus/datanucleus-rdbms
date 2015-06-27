@@ -1032,8 +1032,12 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     {
                         NucleusLogger.GENERAL.debug("Note that query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query.");
                     }
+                    // TODO Continue this bulk fetch process to multivalued fields of this field
                 }
-                // TODO Continue this bulk fetch process to fields of fields that are fetched
+                else if (RelationType.isRelationSingleValued(fpRelType))
+                {
+                    // TODO Check for multivalued fields of this 1-1/N-1 field
+                }
             }
         }
 
