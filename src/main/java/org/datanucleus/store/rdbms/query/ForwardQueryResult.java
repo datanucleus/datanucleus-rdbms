@@ -51,13 +51,13 @@ import org.datanucleus.util.NucleusLogger;
  * this QueryResult will skip the unrequired records and just return the range requested.
  * </p>
  */
-public final class ForwardQueryResult extends AbstractRDBMSQueryResult implements java.io.Serializable
+public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> implements java.io.Serializable
 {
     /** Whether there are still more rows to be processed in the ResultSet. */
     protected boolean moreResultSetRows;
 
     /** The Result Objects. */
-    protected List resultObjs = new ArrayList();
+    protected List<E> resultObjs = new ArrayList();
 
     protected List resultIds = null;
 
@@ -168,7 +168,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
      * Accessor for the next object from the ResultSet.
      * @return The next element from the ResultSet. 
      */
-    protected Object nextResultSetElement()
+    protected E nextResultSetElement()
     {
         if (rof == null)
         {
@@ -178,18 +178,18 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
 
         // Convert this row into its associated object and save it
         ExecutionContext ec = query.getExecutionContext();
-        Object nextElement = rof.getObject(ec, rs);
+        E nextElement = (E) rof.getObject(ec, rs);
         JDBCUtils.logWarnings(rs);
         resultObjs.add(nextElement);
         if (resultIds != null)
         {
-            resultIds.add(ec.getApiAdapter().getIdForObject(nextElement));
+            resultIds.add(api.getIdForObject(nextElement));
         }
 
         // Process any bulk loaded members
         if (bulkLoadedValueByMemberNumber != null)
         {
-            Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(ec.getApiAdapter().getIdForObject(nextElement));
+            Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(nextElement));
             if (memberValues != null)
             {
                 ObjectProvider op = ec.findObjectProvider(nextElement);
@@ -228,7 +228,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
         }
         catch (SQLException e)
         {
-            throw ec.getApiAdapter().getDataStoreExceptionForException(Localiser.msg("052601",e.getMessage()), e);
+            throw api.getDataStoreExceptionForException(Localiser.msg("052601",e.getMessage()), e);
         }
 
         return nextElement;
@@ -291,7 +291,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
                 }
                 else
                 {
-                    throw query.getExecutionContext().getApiAdapter().getUserExceptionForException("Exception thrown while loading remaining rows of query", re);
+                    throw api.getUserExceptionForException("Exception thrown while loading remaining rows of query", re);
                 }
             }
         }
@@ -303,7 +303,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
      * Accessor for an iterator for the results.
      * @return The iterator
      */
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new QueryResultIterator();
     }
@@ -312,7 +312,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
      * Accessor for an iterator for the results.
      * @return The iterator
      */
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         return new QueryResultIterator();
     }
@@ -320,12 +320,12 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
     /**
      * An Iterator results of a pm.query.execute().iterator()
      */
-    private class QueryResultIterator extends AbstractQueryResultIterator
+    private class QueryResultIterator extends AbstractQueryResultIterator<E>
     {
         private int nextRowNum = 0;
 
         /** hold the last element **/
-        Object currentElement = null;
+        E currentElement = null;
 
         public boolean hasNext()
         {
@@ -368,7 +368,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
-        public Object next()
+        public E next()
         {
             synchronized (ForwardQueryResult.this)
             {
@@ -417,7 +417,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
-        public Object previous()
+        public E previous()
         {
             throw new UnsupportedOperationException("Not yet implemented");
         }
@@ -473,7 +473,7 @@ public final class ForwardQueryResult extends AbstractRDBMSQueryResult implement
      * @param index The index of the element
      * @return The element at index
      */
-    public synchronized Object get(int index)
+    public synchronized E get(int index)
     {
         assertIsOpen();
 

@@ -55,10 +55,10 @@ import org.datanucleus.util.WeakValueMap;
  * If there is no transaction present, or if the FetchPlan is in "greedy" mode, and where caching is being used
  * will load all results at startup. Otherwise results are only loaded when accessed.
  */
-public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implements java.io.Serializable
+public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> implements java.io.Serializable
 {
     /** Map of ResultSet object values, keyed by the list index ("0", "1", etc). */
-    private Map<Integer, Object> resultsObjsByIndex = null;
+    private Map<Integer, E> resultsObjsByIndex = null;
 
     protected Map<Integer, Object> resultIds = null;
 
@@ -209,12 +209,12 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
      * @param index The list index position
      * @return The result object
      */
-    protected Object getObjectForIndex(int index)
+    protected E getObjectForIndex(int index)
     {
         if (resultsObjsByIndex != null)
         {
             // Caching objects, so check the cache for this index
-            Object obj = resultsObjsByIndex.get(index);
+            E obj = resultsObjsByIndex.get(index);
             if (obj != null)
             {
                 // Already retrieved so return it
@@ -231,14 +231,14 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             // ResultSet is numbered 1, 2, ... N
             // List is indexed 0, 1, 2, ... N-1
             rs.absolute(index+1);
-            Object obj = rof.getObject(query.getExecutionContext(), rs);
+            E obj = (E) rof.getObject(query.getExecutionContext(), rs);
             JDBCUtils.logWarnings(rs);
 
             // Process any bulk loaded members
             if (bulkLoadedValueByMemberNumber != null)
             {
                 ExecutionContext ec = query.getExecutionContext();
-                Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(ec.getApiAdapter().getIdForObject(obj));
+                Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(obj));
                 if (memberValues != null)
                 {
                     ObjectProvider op = ec.findObjectProvider(obj);
@@ -258,7 +258,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                 resultsObjsByIndex.put(index, obj);
                 if (resultIds != null)
                 {
-                    resultIds.put(index, query.getExecutionContext().getApiAdapter().getIdForObject(obj));
+                    resultIds.put(index, api.getIdForObject(obj));
                 }
             }
 
@@ -266,8 +266,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
         }
         catch (SQLException sqe)
         {
-            throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(
-                Localiser.msg("052601", sqe.getMessage()), sqe);
+            throw api.getDataStoreExceptionForException(Localiser.msg("052601", sqe.getMessage()), sqe);
         }
     }
 
@@ -337,7 +336,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
      * Accessor for an iterator for the results.
      * @return The iterator
      */
-    public Iterator iterator()
+    public Iterator<E> iterator()
     {
         return new QueryResultIterator();
     }
@@ -346,7 +345,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
      * Accessor for an iterator for the results.
      * @return The iterator
      */
-    public ListIterator listIterator()
+    public ListIterator<E> listIterator()
     {
         return new QueryResultIterator();
     }
@@ -354,7 +353,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
     /**
      * An Iterator results of a pm.query.execute().iterator()
      */
-    private class QueryResultIterator extends AbstractQueryResultIterator
+    private class QueryResultIterator extends AbstractQueryResultIterator<E>
     {
         private int iterRowNum = 0; // The index of the next object
 
@@ -421,7 +420,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             }
         }
 
-        public Object next()
+        public E next()
         {
             synchronized (ScrollableQueryResult.this)
             {
@@ -436,9 +435,8 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
                     throw new NoSuchElementException("No next element");
                 }
 
-                Object obj = getObjectForIndex(iterRowNum);
+                E obj = getObjectForIndex(iterRowNum);
                 iterRowNum++;
-
                 return obj;
             }
         }
@@ -456,7 +454,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             return size();
         }
 
-        public Object previous()
+        public E previous()
         {
             synchronized (ScrollableQueryResult.this)
             {
@@ -505,7 +503,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
      * @param index The index of the element
      * @return The element at index
      */
-    public synchronized Object get(int index)
+    public synchronized E get(int index)
     {
         assertIsOpen();
         if (index < 0 || index >= size())
@@ -546,7 +544,7 @@ public final class ScrollableQueryResult extends AbstractRDBMSQueryResult implem
             }
             catch (SQLException sqle)
             {
-                throw query.getExecutionContext().getApiAdapter().getDataStoreExceptionForException(Localiser.msg("052601", sqle.getMessage()), sqle);
+                throw api.getDataStoreExceptionForException(Localiser.msg("052601", sqle.getMessage()), sqle);
             }
 
             if (applyRangeChecks)

@@ -44,10 +44,9 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Abstract representation of a QueryResult for RDBMS queries.
- * Based on the assumption that we have a JDBC ResultSet, and we are extracting the results using
- * a ResultObjectFactory.
+ * Based on the assumption that we have a JDBC ResultSet, and we are extracting the results using a ResultObjectFactory.
  */
-public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
+public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
 {
     private static final long serialVersionUID = 7264180157109169910L;
 
@@ -208,7 +207,7 @@ public abstract class AbstractRDBMSQueryResult extends AbstractQueryResult
 
     private void addOwnerMemberValue(AbstractMemberMetaData mmd, Object owner, Object element)
     {
-        Object ownerId = query.getExecutionContext().getApiAdapter().getIdForObject(owner);
+        Object ownerId = api.getIdForObject(owner);
         Map<Integer, Object> fieldValuesForOwner = bulkLoadedValueByMemberNumber.get(ownerId);
         if (fieldValuesForOwner == null)
         {
