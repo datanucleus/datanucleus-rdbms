@@ -90,7 +90,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
         {
             ExecutionContext ec = query.getExecutionContext();
             AbstractMemberMetaData mmd = iterStmt.getBackingStore().getOwnerMemberMetaData();
-            if (mmd.hasCollection())
+            if (mmd.hasCollection() || mmd.hasArray())
             {
                 ElementContainerStore backingStore = (ElementContainerStore) iterStmt.getBackingStore();
                 if (backingStore.isElementsAreEmbedded() || backingStore.isElementsAreSerialised())
@@ -153,7 +153,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                     }
                 }
             }
-            else
+            else if (mmd.hasMap())
             {
                 // TODO Cater for maps
             }

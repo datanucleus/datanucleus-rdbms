@@ -128,7 +128,6 @@ public class BulkFetchExistsHelper
 
         if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore || backingStore instanceof JoinArrayStore)
         {
-            // TODO This only provides an EXISTS query; should also allow for INNER JOIN option
             // Set/List/array using join-table : Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
             // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
@@ -168,7 +167,6 @@ public class BulkFetchExistsHelper
         }
         else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore || backingStore instanceof FKArrayStore)
         {
-            // TODO This only provides an EXISTS query; should also allow for INNER JOIN option
             // Set/List/array using foreign-key : Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
             // WHERE EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND ELEM_TBL.OWNER_ID = OWNER_TBL.ID)
