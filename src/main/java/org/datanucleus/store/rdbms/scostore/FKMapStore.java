@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
@@ -1192,8 +1193,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(vmd, 
-                                getMappingDef, false, null, clr.classForName(valueType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, vmd, getMappingDef, false, null, clr.classForName(valueType));
                             value = rof.getObject(ec, rs);
                         }
 

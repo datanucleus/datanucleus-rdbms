@@ -32,8 +32,9 @@ import org.datanucleus.store.query.QueryResult;
  * Another implementation could return all columns of the result set as separate objects.
  * </p>
  * @see QueryResult
+ * @param <T> Type of the returned object
  */
-public interface ResultObjectFactory
+public interface ResultObjectFactory<T>
 {
     /**
      * Instantiates object(s) from the current row of the given result set.
@@ -41,5 +42,5 @@ public interface ResultObjectFactory
      * @param rs The result set which will be used to convert the current row into the returned object(s).
      * @return The object(s) for this row of the ResultSet.
      */
-    Object getObject(ExecutionContext ec, ResultSet rs);
+    T getObject(ExecutionContext ec, ResultSet rs);
 }

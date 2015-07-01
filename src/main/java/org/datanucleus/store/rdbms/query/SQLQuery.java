@@ -1225,7 +1225,7 @@ public final class SQLQuery extends Query
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionMappingIdx);
         }
 
-        return storeMgr.newResultObjectFactory(candidateCmd, mappingDefinition, ignoreCache, getFetchPlan(), getCandidateClass());
+        return new PersistentClassROF(storeMgr, candidateCmd, mappingDefinition, ignoreCache, getFetchPlan(), getCandidateClass());
     }
 
     /**

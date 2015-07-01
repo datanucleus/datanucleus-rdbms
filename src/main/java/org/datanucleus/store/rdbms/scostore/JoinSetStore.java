@@ -48,6 +48,7 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.fieldmanager.DynamicSchemaFieldManager;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -920,7 +921,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, emd, iteratorMappingClass, false, null, clr.classForName(elementType));
                             return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }

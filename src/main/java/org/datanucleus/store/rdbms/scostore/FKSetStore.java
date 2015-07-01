@@ -48,6 +48,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -1074,7 +1075,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingClass, false, null, clr.classForName(elementType));
 
                         return new CollectionStoreIterator(op, rs, rof, this);
                     }

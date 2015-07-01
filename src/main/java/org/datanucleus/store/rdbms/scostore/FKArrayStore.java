@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
@@ -595,7 +596,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                             throw new NucleusException("Cannot have FK array with non-persistent objects");
                         }
 
-                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new ArrayStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

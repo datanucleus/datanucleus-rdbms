@@ -40,7 +40,7 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 class CollectionStoreIterator<E> implements Iterator<E>
 {
-    private final AbstractCollectionStore collStore;
+    private final AbstractCollectionStore<E> collStore;
     private final ObjectProvider op;
     private final ExecutionContext ec;
     private final Iterator<E> delegate;

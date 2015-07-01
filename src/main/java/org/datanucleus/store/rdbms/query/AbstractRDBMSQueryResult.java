@@ -54,7 +54,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     protected ResultSet rs;
 
     /** ResultObjectFactory for converting the result set into objects. */
-    protected ResultObjectFactory rof;
+    protected ResultObjectFactory<E> rof;
 
     /** Map of field values, keyed by the "id" of the object. The value is a "Map<fieldNumber, fieldValue>". */
     protected Map<Object, Map<Integer, Object>> bulkLoadedValueByMemberNumber;
@@ -68,7 +68,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
      * @param rof The factory to retrieve results from
      * @param rs The ResultSet from the Query Statement
      */
-    public AbstractRDBMSQueryResult(Query query, ResultObjectFactory rof, ResultSet rs)
+    public AbstractRDBMSQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs)
     {
         super(query);
         this.rof = rof;
@@ -143,7 +143,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 }
                 else
                 {
-                    ResultObjectFactory scoROF = ((RDBMSStoreManager)query.getStoreManager()).newResultObjectFactory(backingStore.getEmd(), 
+                    ResultObjectFactory<E> scoROF = new PersistentClassROF((RDBMSStoreManager)query.getStoreManager(), backingStore.getEmd(),
                         iterStmt.getStatementClassMapping(), false, null, 
                         ec.getClassLoaderResolver().classForName(backingStore.getOwnerMemberMetaData().getCollection().getElementType()));
                     while (rs.next())

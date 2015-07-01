@@ -74,7 +74,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @param candidates Candidate elements
      * @throws SQLException if can't read ResultSet
      */
-    public ForwardQueryResult(Query query, ResultObjectFactory rof, ResultSet rs, Collection candidates)
+    public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, Collection candidates)
     throws SQLException
     {
         super(query, rof, rs);
@@ -178,7 +178,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
 
         // Convert this row into its associated object and save it
         ExecutionContext ec = query.getExecutionContext();
-        E nextElement = (E) rof.getObject(ec, rs);
+        E nextElement = rof.getObject(ec, rs);
         JDBCUtils.logWarnings(rs);
         resultObjs.add(nextElement);
         if (resultIds != null)

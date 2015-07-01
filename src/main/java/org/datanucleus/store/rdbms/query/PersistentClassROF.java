@@ -57,12 +57,12 @@ import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
 
 /**
- * ResultObjectFactory that takes a JDBC ResultSet and create a persistable object instance for
- * each row in the ResultSet. We use information in the result set to determine the object type; this
- * can be a discriminator column, or can be a special "NucleusType" column defined just for result
- * processing.
+ * ResultObjectFactory that takes a JDBC ResultSet and create a persistable object instance for each row in the ResultSet. 
+ * We use information in the result set to determine the object type; this can be a discriminator column, or can be a 
+ * special "NucleusType" column defined just for result processing.
+ * @param <T> Type of the persistent object that this creates
  */
-public final class PersistentClassROF implements ResultObjectFactory
+public final class PersistentClassROF<T> implements ResultObjectFactory<T>
 {
     protected final RDBMSStoreManager storeMgr;
 
@@ -70,7 +70,7 @@ public final class PersistentClassROF implements ResultObjectFactory
     protected final AbstractClassMetaData acmd;
 
     /** Persistent class that this factory will generate (may be the base class). */
-    private Class persistentClass;
+    private Class<T> persistentClass;
 
     /** Mapping for the statement to members of this class (and sub-objects). */
     protected StatementClassMapping stmtMapping = null;
@@ -94,7 +94,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
     public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData acmd, StatementClassMapping mappingDefinition,
-                           boolean ignoreCache, FetchPlan fetchPlan, Class persistentClass)
+                           boolean ignoreCache, FetchPlan fetchPlan, Class<T> persistentClass)
     {
         if (mappingDefinition == null)
         {
@@ -110,24 +110,12 @@ public final class PersistentClassROF implements ResultObjectFactory
     }
 
     /**
-     * Method to update the persistent class that the result object factory requires.
-     * This is used where we have an Extent(BaseClass) and we pass it to a JDOQL query but the query
-     * has been specified with a persistent class that is a subclass. So we use this method to restrict
-     * the results further.
-     * @param cls The Class the result factory requires.
-     */
-    public void setPersistentClass(Class cls)
-    {
-        this.persistentClass = cls;
-    }
-
-    /**
      * Method to convert the current ResultSet row into an Object.
      * @param ec execution context
      * @param rs The ResultSet from the Query.
      * @return The (persisted) object.
      */
-    public Object getObject(final ExecutionContext ec, final ResultSet rs)
+    public T getObject(final ExecutionContext ec, final ResultSet rs)
     {
         // Find the class of the returned object in this row of the ResultSet
         String className = null;
@@ -310,7 +298,7 @@ public final class PersistentClassROF implements ResultObjectFactory
         }
 
         // Extract the object from the ResultSet
-        Object obj = null;
+        T obj = null;
         boolean needToSetVersion = false;
         if (persistentClass.isInterface() && !cmd.isImplementationOfPersistentDefinition())
         {
@@ -389,7 +377,7 @@ public final class PersistentClassROF implements ResultObjectFactory
                 }
                 if (mappedFieldNumbers == null)
                 {
-                    obj = ec.findObject(id, false, requiresInheritanceCheck, null);
+                    obj = (T) ec.findObject(id, false, requiresInheritanceCheck, null);
                     needToSetVersion = true;
                 }
                 else
@@ -409,7 +397,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             Object id = ec.newObjectId(classNameForId, null);
             if (mappedFieldNumbers == null)
             {
-                obj = ec.findObject(id, false, requiresInheritanceCheck, null);
+                obj = (T) ec.findObject(id, false, requiresInheritanceCheck, null);
                 needToSetVersion = true;
             }
             else
@@ -449,6 +437,67 @@ public final class PersistentClassROF implements ResultObjectFactory
     }
 
     /**
+     * Returns a PC instance from a ResultSet row with a datastore identity.
+     * @param ec execution context
+     * @param resultSet The ResultSet
+     * @param mappingDefinition The mapping info for the result class
+     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
+     * @param cmd MetaData for the class
+     * @param oid The object id
+     * @param pcClass The persistable class (where we know the instance type required, null if not)
+     * @param cmd Metadata for the class
+     * @param surrogateVersion Surrogate version (if applicable)
+     * @return The Object
+     */
+    private T getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
+            final int[] fieldNumbers, Object oid, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
+    {
+        if (oid == null)
+        {
+            return null;
+        }
+
+        return (T) ec.findObject(oid, new FieldValues()
+        {
+            public void fetchFields(ObjectProvider op)
+            {
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                op.replaceFields(fieldNumbers, fm, false);
+
+                // Set version
+                if (surrogateVersion != null)
+                {
+                    // Surrogate version field
+                    op.setVersion(surrogateVersion);
+                }
+                else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
+                {
+                    // Version stored in a normal field
+                    VersionMetaData vermd = cmd.getVersionMetaData();
+                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
+                    if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
+                    {
+                        Object verFieldValue = op.provideField(versionFieldNumber);
+                        if (verFieldValue != null)
+                        {
+                            op.setVersion(verFieldValue);
+                        }
+                    }
+                }
+            }
+            public void fetchNonLoadedFields(ObjectProvider sm)
+            {
+                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
+                sm.replaceNonLoadedFields(fieldNumbers, fm);
+            }
+            public FetchPlan getFetchPlanForLoading()
+            {
+                return fetchPlan;
+            }
+        }, pcClass, ignoreCache, false);
+    }
+
+    /**
      * Returns a PC instance from a ResultSet row with an application identity.
      * @param ec execution context
      * @param resultSet The ResultSet
@@ -460,7 +509,7 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param surrogateVersion Surrogate version if available
      * @return The object with this application identity
      */
-    private Object getObjectForApplicationId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
+    private T getObjectForApplicationId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
             final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, boolean requiresInheritanceCheck, final Object surrogateVersion)
     {
         Object id = getIdentityForResultSetRow(storeMgr, resultSet, mappingDefinition, ec, cmd, pcClass, requiresInheritanceCheck);
@@ -470,7 +519,7 @@ public final class PersistentClassROF implements ResultObjectFactory
             pcClass = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentitySimple(id));
         }
 
-        return ec.findObject(id, new FieldValues()
+        return (T) ec.findObject(id, new FieldValues()
         {
             public void fetchFields(ObjectProvider op)
             {
@@ -521,9 +570,8 @@ public final class PersistentClassROF implements ResultObjectFactory
      * @param inheritanceCheck Whether need an inheritance check (may be for a subclass)
      * @return The identity (if found) or null (if either not sure of inheritance, or not known).
      */
-    public static Object getIdentityForResultSetRow(RDBMSStoreManager storeMgr, final ResultSet resultSet, 
-            final StatementClassMapping mappingDefinition, ExecutionContext ec, AbstractClassMetaData cmd, 
-            Class pcClass, boolean inheritanceCheck)
+    public static Object getIdentityForResultSetRow(RDBMSStoreManager storeMgr, final ResultSet resultSet, final StatementClassMapping mappingDefinition,
+            ExecutionContext ec, AbstractClassMetaData cmd, Class pcClass, boolean inheritanceCheck)
     {
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
@@ -597,67 +645,5 @@ public final class PersistentClassROF implements ResultObjectFactory
             return id;
         }
         return null;
-    }
-
-    /**
-     * Returns a PC instance from a ResultSet row with a datastore identity.
-     * @param ec execution context
-     * @param resultSet The ResultSet
-     * @param mappingDefinition The mapping info for the result class
-     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param cmd MetaData for the class
-     * @param oid The object id
-     * @param pcClass The persistable class (where we know the instance type required, null if not)
-     * @param cmd Metadata for the class
-     * @param surrogateVersion Surrogate version (if applicable)
-     * @return The Object
-     */
-    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, 
-            final StatementClassMapping mappingDefinition, final int[] fieldNumbers,
-            Object oid, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
-    {
-        if (oid == null)
-        {
-            return null;
-        }
-
-        return ec.findObject(oid, new FieldValues()
-        {
-            public void fetchFields(ObjectProvider op)
-            {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
-                op.replaceFields(fieldNumbers, fm, false);
-
-                // Set version
-                if (surrogateVersion != null)
-                {
-                    // Surrogate version field
-                    op.setVersion(surrogateVersion);
-                }
-                else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
-                {
-                    // Version stored in a normal field
-                    VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
-                    if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
-                    {
-                        Object verFieldValue = op.provideField(versionFieldNumber);
-                        if (verFieldValue != null)
-                        {
-                            op.setVersion(verFieldValue);
-                        }
-                    }
-                }
-            }
-            public void fetchNonLoadedFields(ObjectProvider sm)
-            {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
-                sm.replaceNonLoadedFields(fieldNumbers, fm);
-            }
-            public FetchPlan getFetchPlanForLoading()
-            {
-                return fetchPlan;
-            }
-        }, pcClass, ignoreCache, false);
     }
 }

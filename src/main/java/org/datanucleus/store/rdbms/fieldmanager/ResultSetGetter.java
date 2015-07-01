@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.types.SCOUtils;
@@ -162,7 +163,7 @@ public class ResultSetGetter extends AbstractFieldManager
                 {
                     ClassLoaderResolver clr = ec.getClassLoaderResolver();
                     AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                    ResultObjectFactory relationROF = storeMgr.newResultObjectFactory(relatedCmd, relationMappings, false, ec.getFetchPlan(), mmd.getType());
+                    ResultObjectFactory relationROF = new PersistentClassROF(storeMgr, relatedCmd, relationMappings, false, ec.getFetchPlan(), mmd.getType());
                     value = relationROF.getObject(ec, resultSet);
                 }
                 else

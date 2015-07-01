@@ -64,6 +64,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
 
     /** Position of first result (origin=0). */
     int startIndex = 0;
+
     /** Position of last result (origin=0, set when known). */
     int endIndex = -1;
 
@@ -76,7 +77,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
      * @param rs The ResultSet from the Query Statement
      * @param candidates the Candidates collection. Pass this argument only when distinct = false
      */
-    public ScrollableQueryResult(Query query, ResultObjectFactory rof, ResultSet rs, Collection candidates)
+    public ScrollableQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, Collection candidates)
     {
         super(query, rof, rs);
 
@@ -231,7 +232,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             // ResultSet is numbered 1, 2, ... N
             // List is indexed 0, 1, 2, ... N-1
             rs.absolute(index+1);
-            E obj = (E) rof.getObject(query.getExecutionContext(), rs);
+            E obj = rof.getObject(query.getExecutionContext(), rs);
             JDBCUtils.logWarnings(rs);
 
             // Process any bulk loaded members

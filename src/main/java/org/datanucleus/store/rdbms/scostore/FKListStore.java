@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -1039,7 +1040,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
 
-                        rof = storeMgr.newResultObjectFactory(emd, resultMapping, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, emd, resultMapping, false, null, clr.classForName(elementType));
                         return new ListStoreIterator(op, rs, rof, this);
                     }
                     finally

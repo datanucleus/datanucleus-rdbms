@@ -520,6 +520,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Inner class representing an iterator for the Set.
+     * TODO Provide an option where a PersistentClassROF is provided for key and/or value so we can load fetch plan fields rather than just id.
      */
     public static abstract class SetIterator implements Iterator
     {
@@ -548,18 +549,11 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             {
                 Object key = null;
                 Object value = null;
-
-                int ownerFieldNum = -1;
-                if (ownerMmd != null)
-                {
-                    ownerFieldNum = ownerMmd.getAbsoluteFieldNumber();
-                }
+                int ownerFieldNum = (ownerMmd != null) ? ownerMmd.getAbsoluteFieldNumber() : -1;
 
                 // TODO If key is persistable and has inheritance, use discriminator to determine type
                 JavaTypeMapping keyMapping = setStore.getKeyMapping();
-                if (keyMapping instanceof EmbeddedKeyPCMapping ||
-                    keyMapping instanceof SerialisedPCMapping ||
-                    keyMapping instanceof SerialisedReferenceMapping)
+                if (keyMapping instanceof EmbeddedKeyPCMapping || keyMapping instanceof SerialisedPCMapping || keyMapping instanceof SerialisedReferenceMapping)
                 {
                     key = keyMapping.getObject(ec, rs, keyResultCols, op, ownerFieldNum);
                 }
@@ -567,12 +561,11 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 {
                     key = keyMapping.getObject(ec, rs, keyResultCols);
                 }
+                // TODO Where we pass in rof then key = keyrof.getObject(ec, rs);
 
                 // TODO If value is persistable and has inheritance, use discriminator to determine type
                 JavaTypeMapping valueMapping = setStore.getValueMapping();
-                if (valueMapping instanceof EmbeddedValuePCMapping ||
-                    valueMapping instanceof SerialisedPCMapping ||
-                    valueMapping instanceof SerialisedReferenceMapping)
+                if (valueMapping instanceof EmbeddedValuePCMapping || valueMapping instanceof SerialisedPCMapping || valueMapping instanceof SerialisedReferenceMapping)
                 {
                     value = valueMapping.getObject(ec, rs, valueResultCols, op, ownerFieldNum);
                 }
@@ -580,6 +573,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 {
                     value = valueMapping.getObject(ec, rs, valueResultCols);
                 }
+                // TODO Where we pass in rof then value = valrof.getObject(ec, rs);
 
                 results.add(new EntryImpl(op, key, value, setStore.getMapStore()));
             }

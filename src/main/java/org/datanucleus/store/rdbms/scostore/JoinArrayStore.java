@@ -39,6 +39,7 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
@@ -210,7 +211,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = storeMgr.newResultObjectFactory(emd, iteratorMappingClass, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, emd, iteratorMappingClass, false, null, clr.classForName(elementType));
                             return new ArrayStoreIterator(ownerOP, rs, rof, this);
                         }
                     }

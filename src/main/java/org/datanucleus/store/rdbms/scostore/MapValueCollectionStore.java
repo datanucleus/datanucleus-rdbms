@@ -40,6 +40,7 @@ import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
@@ -340,7 +341,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                             return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
 
-                        rof = storeMgr.newResultObjectFactory(emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

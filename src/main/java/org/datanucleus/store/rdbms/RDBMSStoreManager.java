@@ -74,7 +74,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.datanucleus.ClassConstants;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.FetchPlan;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
@@ -134,8 +133,6 @@ import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
-import org.datanucleus.store.rdbms.query.PersistentClassROF;
-import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
@@ -3718,11 +3715,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public boolean allowsBatching()
     {
         return (dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0);
-    }
-
-    public ResultObjectFactory newResultObjectFactory(AbstractClassMetaData acmd, StatementClassMapping mappingDefinition, boolean ignoreCache, FetchPlan fetchPlan, Class persistentClass)
-    {
-        return new PersistentClassROF(this, acmd, mappingDefinition, ignoreCache, fetchPlan, persistentClass);
     }
 
     public boolean usesBackedSCOWrappers()
