@@ -462,7 +462,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (keySetStore == null)
         {
-            keySetStore = newMapKeySetStore();
+            keySetStore = new MapKeySetStore((MapTable)mapTable, this, clr);
         }
         return keySetStore;
     }
@@ -475,7 +475,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (valueSetStore == null)
         {
-            valueSetStore = newMapValueCollectionStore();
+            valueSetStore = new MapValueCollectionStore((MapTable)mapTable, this, clr);
         }
         return valueSetStore;
     }
@@ -488,7 +488,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (entrySetStore == null)
         {
-            entrySetStore = newMapEntrySetStore();
+            entrySetStore =  new MapEntrySetStore((MapTable)mapTable, this, clr);
         }
         return entrySetStore;
     }
@@ -804,8 +804,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 valueCls = clr.classForName(vmd.getFullClassName());
             }
-            UnionStatementGenerator stmtGen =
-                new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
+            UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
             stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
             getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
             sqlStmt = stmtGen.getStatement();
@@ -818,8 +817,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         // Apply condition on owner field to filter by owner
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+        SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
         SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
         SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
         sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
@@ -834,8 +832,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             // if object mapping (BLOB) use like
             SQLExpression keyExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), keyMapping);
             SQLExpression keyVal = exprFactory.newLiteralParameter(sqlStmt, keyMapping, null, "KEY");
-            sqlStmt.whereAnd(new org.datanucleus.store.rdbms.sql.expression.BooleanExpression(keyExpr,
-                Expression.OP_LIKE, keyVal), true);
+            sqlStmt.whereAnd(new org.datanucleus.store.rdbms.sql.expression.BooleanExpression(keyExpr, Expression.OP_LIKE, keyVal), true);
         }
         else
         {
@@ -956,21 +953,6 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    protected SetStore newMapKeySetStore()
-    {
-        return new MapKeySetStore((MapTable)mapTable, this, clr);
-    }
-
-    protected CollectionStore newMapValueCollectionStore()
-    {
-        return new MapValueCollectionStore((MapTable)mapTable, this, clr);
-    }
-
-    protected SetStore newMapEntrySetStore()
-    {
-        return new MapEntrySetStore((MapTable)mapTable, this, clr);
-    }
-
     /**
      * Method to process an "update" statement (where the key already has a value in the join table).
      * @param ownerOP ObjectProvider for the owner
@@ -981,8 +963,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param executeNow Whether to execute the statement now or wait til any batch
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected void internalUpdate(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value,
-                                  boolean executeNow) throws MappedDatastoreException
+    protected void internalUpdate(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) throws MappedDatastoreException
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
@@ -993,13 +974,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 int jdbcPosition = 1;
                 if (valueMapping != null)
                 {
-                    jdbcPosition = BackingStoreHelper.populateValueInStatement(ec, ps, value, 
-                        jdbcPosition, valueMapping);
+                    jdbcPosition = BackingStoreHelper.populateValueInStatement(ec, ps, value, jdbcPosition, valueMapping);
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value,
-                        ps, jdbcPosition, (JoinTable)mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, (JoinTable)mapTable, this);
                 }
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
@@ -1048,21 +1027,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 int jdbcPosition = 1;
                 if (valueMapping != null)
                 {
-                    jdbcPosition = BackingStoreHelper.populateValueInStatement(ec, ps, value,
-                        jdbcPosition, valueMapping);
+                    jdbcPosition = BackingStoreHelper.populateValueInStatement(ec, ps, value, jdbcPosition, valueMapping);
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value,
-                        ps, jdbcPosition, (JoinTable)mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, (JoinTable)mapTable, this);
                 }
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 if (adapterMapping != null)
                 {
                     // Only set the adapter mapping if we have a new object
                     long nextIDAdapter = getNextIDForAdapterColumn(ownerOP);
-                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping),
-                        Long.valueOf(nextIDAdapter));
+                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(nextIDAdapter));
                     jdbcPosition += adapterMapping.getNumberOfDatastoreMappings();
                 }
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
@@ -1083,8 +1059,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Accessor for the higher id when elements primary key can't be part of
-     * the primary key by datastore limitations like BLOB types can't be
-     * primary keys.
+     * the primary key by datastore limitations like BLOB types can't be primary keys.
      * @param op ObjectProvider for container
      * @return The next id
      */
@@ -1151,8 +1126,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      */
     private String getMaxAdapterColumnIdStmt()
     {
-        StringBuilder stmt = new StringBuilder("SELECT MAX(" + 
-            adapterMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
+        StringBuilder stmt = new StringBuilder("SELECT MAX(" + adapterMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
         stmt.append(" FROM ");
         stmt.append(mapTable.toString());
         stmt.append(" WHERE ");

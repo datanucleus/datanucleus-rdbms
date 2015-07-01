@@ -112,8 +112,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param ownerMmd Metadata for the owning field/property
      */
     MapEntrySetStore(Table mapTable, MapStore<K, V> mapStore, ClassLoaderResolver clr, 
-        JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, JavaTypeMapping valueMapping,
-        AbstractMemberMetaData ownerMmd)
+        JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, JavaTypeMapping valueMapping, AbstractMemberMetaData ownerMmd)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -125,13 +124,29 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         this.ownerMemberMetaData = ownerMmd;
     }
 
-    /**
-     * Accessor for whether this store has an order mapping to allow for duplicates, or ordering.
-     * @return Whether it has an order mapping.
-     */
     public boolean hasOrderMapping()
     {
         return false;
+    }
+
+    public MapStore<K, V> getMapStore()
+    {
+        return mapStore;
+    }
+
+    public JavaTypeMapping getOwnerMapping()
+    {
+        return ownerMapping;
+    }
+
+    public JavaTypeMapping getKeyMapping()
+    {
+        return keyMapping;
+    }
+
+    public JavaTypeMapping getValueMapping()
+    {
+        return valueMapping;
     }
 
     /**
@@ -146,15 +161,6 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     {
         // Do nothing since of no use here
         return false;
-    }
-
-    /**
-     * Accessor for the owner mapping.
-     * @return The owner mapping
-     */
-    public JavaTypeMapping getOwnerMapping()
-    {
-        return ownerMapping;
     }
 
     protected boolean validateElementType(Object element)
@@ -252,21 +258,6 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     public void clear(ObjectProvider op)
     {
         mapStore.clear(op);
-    }
-
-    public MapStore<K, V> getMapStore()
-    {
-        return mapStore;
-    }
-
-    public JavaTypeMapping getKeyMapping()
-    {
-        return keyMapping;
-    }
-
-    public JavaTypeMapping getValueMapping()
-    {
-        return valueMapping;
     }
 
     public int size(ObjectProvider op)
