@@ -31,6 +31,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -48,7 +49,6 @@ import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
-import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
@@ -86,10 +86,10 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     /**
      * Constructor for a store of the entries in a map when represented in a join table.
      * @param mapTable Table for the map
-     * @param mapStore Store in use by the Map
+     * @param mapStore Backing store for the Map using join table
      * @param clr ClassLoader resolver
      */
-    MapEntrySetStore(MapTable mapTable, MapStore<K, V> mapStore, ClassLoaderResolver clr)
+    MapEntrySetStore(MapTable mapTable, JoinMapStore<K, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -104,24 +104,19 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     /**
      * Constructor for a store of the entries in a map when represented by either the key table or value table.
      * @param mapTable The table storing the map relation (key table or value table)
-     * @param mapStore The backing store for the map itself
+     * @param mapStore The backing store for the FK map itself
      * @param clr ClassLoader resolver
-     * @param ownerMapping Mapping from this table to the owner
-     * @param keyMapping Mapping of the key (in this table)
-     * @param valueMapping Mapping of the value (in this table)
-     * @param ownerMmd Metadata for the owning field/property
      */
-    MapEntrySetStore(Table mapTable, MapStore<K, V> mapStore, ClassLoaderResolver clr, 
-        JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, JavaTypeMapping valueMapping, AbstractMemberMetaData ownerMmd)
+    MapEntrySetStore(Table mapTable, FKMapStore<K, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
         this.mapTable = mapTable;
         this.mapStore = mapStore;
-        this.ownerMapping = ownerMapping;
-        this.keyMapping   = keyMapping;
-        this.valueMapping = valueMapping;
-        this.ownerMemberMetaData = ownerMmd;
+        this.ownerMapping = mapStore.getOwnerMapping();
+        this.keyMapping = mapStore.getKeyMapping();
+        this.valueMapping = mapStore.getValueMapping();
+        this.ownerMemberMetaData = mapStore.getOwnerMemberMetaData();
     }
 
     public boolean hasOrderMapping()
@@ -383,12 +378,6 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        AbstractMemberMetaData ownerMemberMetaData = mapStore.getOwnerMemberMetaData();
-                        if (mapTable instanceof JoinTable)
-                        {
-                            ownerMemberMetaData = ((JoinTable) mapTable).getOwnerMemberMetaData();
-                        }
-
                         return new SetIterator(ownerOP, this, ownerMemberMetaData, rs, iteratorKeyResultCols, iteratorValueResultCols)
                         {
                             protected boolean next(Object rs) throws MappedDatastoreException
@@ -445,10 +434,24 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         SQLStatement sqlStmt = new SQLStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
 
+        MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
+        if (mapType == MapType.MAP_TYPE_JOIN)
+        {
+            
+        }
+        else if (mapType == MapType.MAP_TYPE_KEY_IN_VALUE)
+        {
+            
+        }
+        else if (mapType == MapType.MAP_TYPE_VALUE_IN_KEY)
+        {
+            
+        }
+
         // Select the key mapping
         // TODO If key is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForKey = sqlStmt.getPrimaryTable();
-        if (keyMapping.getTable() != sqlStmt.getPrimaryTable().getTable())
+        if (keyMapping.getTable() != mapTable)
         {
             entrySqlTblForKey = sqlStmt.getTableForDatastoreContainer(keyMapping.getTable());
             if (entrySqlTblForKey == null)
@@ -463,7 +466,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         // Select the value mapping
         // TODO If value is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForVal = sqlStmt.getPrimaryTable();
-        if (valueMapping.getTable() != sqlStmt.getPrimaryTable().getTable())
+        if (valueMapping.getTable() != mapTable)
         {
             entrySqlTblForVal = sqlStmt.getTableForDatastoreContainer(valueMapping.getTable());
             if (entrySqlTblForVal == null)

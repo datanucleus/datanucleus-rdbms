@@ -27,7 +27,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.ObjectProvider;
@@ -73,11 +72,11 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
 
     /**
      * Constructor where a join table is used to store the map relation.
-     * @param mapTable The table for the map (join table)
+     * @param mapTable Join table used by the map (join table)
      * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
      */
-    MapKeySetStore(MapTable mapTable, MapStore<K, ?> mapStore, ClassLoaderResolver clr)
+    MapKeySetStore(MapTable mapTable, JoinMapStore<K, ?> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -95,20 +94,16 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
      * @param mapTable Table holding the map relation (key or value)
      * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
-     * @param ownerMapping mapping in the map table back to the owner
-     * @param keyMapping mapping in the map table to the key
-     * @param ownerMmd metadata for the owning field/property
      */
-    MapKeySetStore(Table mapTable, MapStore<K, ?> mapStore, ClassLoaderResolver clr, 
-        JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, AbstractMemberMetaData ownerMmd)
+    MapKeySetStore(Table mapTable, FKMapStore<K, ?> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
         this.mapStore = mapStore;
         this.containerTable = mapTable;
-        this.ownerMemberMetaData = ownerMmd;
-        this.ownerMapping = ownerMapping;
-        this.elementMapping = keyMapping;
+        this.ownerMemberMetaData = mapStore.getOwnerMemberMetaData();
+        this.ownerMapping = mapStore.getOwnerMapping();
+        this.elementMapping = mapStore.getKeyMapping();
 
         initialize(clr);
     }
@@ -123,15 +118,15 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         elementsAreSerialised = isEmbeddedMapping(elementMapping);
 
         // Load the element class
-        Class element_class = clr.classForName(elementType);
+        Class elementCls = clr.classForName(elementType);
 
-        if (ClassUtils.isReferenceType(element_class))
+        if (ClassUtils.isReferenceType(elementCls))
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class, null, clr);
+            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(elementCls, null, clr);
         }
         else
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(elementCls, clr);
         }
         if (emd != null)
         {

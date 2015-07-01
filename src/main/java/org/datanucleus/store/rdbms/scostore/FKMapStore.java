@@ -928,7 +928,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized SetStore keySetStore()
     {
-        return new MapKeySetStore(valueTable, this, clr, ownerMapping, keyMapping, ownerMemberMetaData);
+        return new MapKeySetStore(valueTable, this, clr);
     }
 
     /**
@@ -937,7 +937,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized CollectionStore valueCollectionStore()
     {
-        return new MapValueCollectionStore(valueTable, this, clr, ownerMapping, valueMapping, ownerMemberMetaData);
+        return new MapValueCollectionStore(valueTable, this, clr);
     }
 
     /**
@@ -946,7 +946,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized SetStore entrySetStore()
     {
-        return new MapEntrySetStore(valueTable, this, clr, ownerMapping, keyMapping, valueMapping, ownerMemberMetaData);
+        return new MapEntrySetStore(valueTable, this, clr);
     }
 
     /**

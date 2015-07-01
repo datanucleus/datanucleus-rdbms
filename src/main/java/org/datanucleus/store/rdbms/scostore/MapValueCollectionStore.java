@@ -28,7 +28,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.ObjectProvider;
@@ -79,12 +78,12 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
     /**
      * Constructor where a join table is used to store the map relation.
-     * @param mapTable Table used by the map
-     * @param mapStore Backing store used by the map
+     * @param mapTable Join table used by the map
+     * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
      * @param storeMgr Manager for the datastore
      */
-    MapValueCollectionStore(MapTable mapTable, MapStore<?, V> mapStore, ClassLoaderResolver clr)
+    MapValueCollectionStore(MapTable mapTable, JoinMapStore<?, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
@@ -97,15 +96,6 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         this.ownerMemberMetaData = mapTable.getOwnerMemberMetaData();
 
         initialize(clr);
-
-        if (keyMapping != null)
-        {
-            findKeyStmt = getFindKeyStmt();
-        }
-        else
-        {
-            findKeyStmt = null;
-        }
     }
 
     /**
@@ -113,32 +103,19 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
      * @param mapTable Table handling the map relation (can be key table or value table)
      * @param mapStore Backing store for the map
      * @param clr ClassLoader resolver
-     * @param ownerMapping mapping back to the owner
-     * @param valueMapping mapping to the key/value
-     * @param ownerMmd Metadata for the owning member
      */
-    MapValueCollectionStore(DatastoreClass mapTable, MapStore<?, V> mapStore, ClassLoaderResolver clr, 
-        JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, AbstractMemberMetaData ownerMmd)
+    MapValueCollectionStore(DatastoreClass mapTable, FKMapStore<?, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
         this.containerTable = mapTable;
         this.mapStore = mapStore;
-        this.ownerMapping = ownerMapping;
+        this.ownerMapping = mapStore.getOwnerMapping();
         this.keyMapping = null;
-        this.elementMapping = valueMapping;
-        this.ownerMemberMetaData = ownerMmd;
+        this.elementMapping = mapStore.getValueMapping();
+        this.ownerMemberMetaData = mapStore.getOwnerMemberMetaData();
 
         initialize(clr);
-
-        if (keyMapping != null)
-        {
-            findKeyStmt = getFindKeyStmt();
-        }
-        else
-        {
-            findKeyStmt = null;
-        }
     }
 
     /**
@@ -164,6 +141,15 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         {
             elementType = emd.getFullClassName();
             elementInfo = getElementInformationForClass();
+        }
+
+        if (keyMapping != null)
+        {
+            findKeyStmt = getFindKeyStmt();
+        }
+        else
+        {
+            findKeyStmt = null;
         }
     }
 
