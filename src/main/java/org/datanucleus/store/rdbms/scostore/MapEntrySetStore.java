@@ -536,10 +536,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         /**
          * Constructor for iterating the Set of entries.
          * @param op the ObjectProvider
-         * @param rs the ResultSet
          * @param setStore the set store
          * @param ownerMmd the owner member meta data - can be null (for non-joinTable cases)
-         * @throws MappedDatastoreException
+         * @param rs the ResultSet
+         * @param keyResultCols Column(s) for the key id
+         * @param valueResultCols Column(s) for the value id
+         * @throws MappedDatastoreException Thrown if an error occurs extracting the results
          */
         protected SetIterator(ObjectProvider op, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
                 ResultSet rs, int[] keyResultCols, int[] valueResultCols) throws MappedDatastoreException
