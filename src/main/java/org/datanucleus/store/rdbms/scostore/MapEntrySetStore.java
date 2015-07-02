@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
@@ -107,7 +108,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param mapStore The backing store for the FK map itself
      * @param clr ClassLoader resolver
      */
-    MapEntrySetStore(Table mapTable, FKMapStore<K, V> mapStore, ClassLoaderResolver clr)
+    MapEntrySetStore(DatastoreClass mapTable, FKMapStore<K, V> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 

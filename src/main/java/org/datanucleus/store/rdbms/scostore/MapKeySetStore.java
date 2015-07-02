@@ -47,8 +47,8 @@ import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.MapTable;
-import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.MapStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -95,7 +95,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
      * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
      */
-    MapKeySetStore(Table mapTable, FKMapStore<K, ?> mapStore, ClassLoaderResolver clr)
+    MapKeySetStore(DatastoreClass mapTable, FKMapStore<K, ?> mapStore, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
 
