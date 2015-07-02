@@ -2446,7 +2446,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     catalogMatches = false;
                 }
+                if (catalog == null && identifier.getCatalogName() != null)
+                {
+                    catalogMatches = false;
+                }
                 if (schema != null && identifier.getSchemaName() != null && !schema.equals(identifier.getSchemaName()))
+                {
+                    schemaMatches = false;
+                }
+                if (schema == null && identifier.getSchemaName() != null)
                 {
                     schemaMatches = false;
                 }
