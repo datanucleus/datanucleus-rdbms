@@ -108,12 +108,12 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     public void initialize(AbstractMemberMetaData mmd, Table table, 
             ClassLoaderResolver clr)
     {
-    	super.initialize(mmd, table, clr);
+        super.initialize(mmd, table, clr);
 
-    	prepareDatastoreMapping(clr);
+        prepareDatastoreMapping(clr);
     }
 
-	/**
+    /**
      * Method to prepare the PC mapping and add its associated datastore mappings.
      * @param clr The ClassLoaderResolver
      */
@@ -288,13 +288,13 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
-	 * Method to set an object in the datastore.
-	 * @param ec The ExecutionContext
-	 * @param ps The Prepared Statement
-	 * @param param The parameter ids in the statement
-	 * @param value The value to put in the statement at these ids
-	 * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
-	 */
+     * Method to set an object in the datastore.
+     * @param ec The ExecutionContext
+     * @param ps The Prepared Statement
+     * @param param The parameter ids in the statement
+     * @param value The value to put in the statement at these ids
+     * @throws NotYetFlushedException if an object hasn't yet been flushed to the datastore
+     */
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] param, Object value)
     {
         setObject(ec, ps, param, value, null, -1);
@@ -439,8 +439,18 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
                 if (valueOP.isWaitingToBeFlushedToDatastore())
                 {
-                    // Related object is not yet flushed to the datastore so flush it so we can set the FK
-                    valueOP.flush();
+                    try
+                    {
+                        // Related object is not yet flushed to the datastore so flush it so we can set the FK
+                        valueOP.flush();
+                    }
+                    catch (NotYetFlushedException nfe)
+                    {
+                        // Could not flush it, maybe it has a relation to this object! so set as null TODO check nullability
+                        ownerOP.updateFieldAfterInsert(value, ownerFieldNumber);
+                        setObjectAsNull(ec, ps, param);
+                        return;
+                    }
                 }
             }
             else
