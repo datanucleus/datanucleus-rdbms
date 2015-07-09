@@ -2421,8 +2421,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Convenience accessor of the Table objects managed in this datastore at this point.
-     * @param catalog Name of the catalog to restrict the collection by
-     * @param schema Name of the schema to restrict the collection by
+     * @param catalog Name of the catalog to restrict the collection by (or null to not restrict)
+     * @param schema Name of the schema to restrict the collection by (or null to not restrict)
      * @return Collection of tables
      */
     public Collection<Table> getManagedTables(String catalog, String schema)
