@@ -138,12 +138,12 @@ public class H2Adapter extends BaseDatastoreAdapter
 
     public String getCreateDatabaseStatement(String catalogName, String schemaName)
     {
-        return "CREATE SCHEMA IF NOT EXISTS " + catalogName;
+        return "CREATE SCHEMA IF NOT EXISTS " + schemaName;
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)
     {
-        return "DROP SCHEMA IF EXISTS " + catalogName;
+        return "DROP SCHEMA IF EXISTS " + schemaName;
     }
 
     /**

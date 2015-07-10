@@ -56,6 +56,9 @@ import org.datanucleus.util.StringUtils;
  * <li><b>primary-keys</b> : PK info for a table</li>
  * <li><b>indices</b> : Indices info for a table</li>
  * <li><b>columns</b> : Columns info for a table</li>
+ * <li><b>column</b> : Column info for a column of a table</li>
+ * <li><b>schemas</b> : Schemas info</li>
+ * <li><b>catalogs</b> : Catalogs info</li>
  * </ul>
  */
 public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
@@ -64,6 +67,16 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     protected final long COLUMN_INFO_EXPIRATION_MS = 5*60*1000;
 
     protected final RDBMSStoreManager rdbmsStoreMgr;
+
+    public static final String TYPE_TYPES = "types";
+    public static final String TYPE_TABLES = "tables";
+    public static final String TYPE_FKS = "foreign-keys";
+    public static final String TYPE_PKS = "primary-keys";
+    public static final String TYPE_INDICES = "indices";
+    public static final String TYPE_COLUMNS = "columns";
+    public static final String TYPE_COLUMN = "column";
+    public static final String TYPE_SCHEMA = "schema";
+    public static final String TYPE_CATALOG = "catalog";
 
     /** 
      * Map of schema data, keyed by its symbolic name where the data is cached. 
@@ -97,20 +110,27 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     @Override
     public void createSchema(String schemaName, Properties props, Object connection)
     {
+        // TODO Take in catalog also
         try
         {
             RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
-            String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+            String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(rdbmsStoreMgr.getCatalogName(), schemaName);
 
-            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.NONE);
-            Connection conn = (Connection) mconn.getConnection();
+            ManagedConnection mconn = null;
+            Connection conn = (Connection)connection;
+            if (connection == null)
+            {
+                mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+                conn = (Connection)mconn.getConnection();
+            }
+
             Statement stmt = null;
             try
             {
                 stmt = conn.createStatement();
-                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase executing " + stmtText);
+                NucleusLogger.DATASTORE_SCHEMA.debug(stmtText);
                 boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase execute returned " + success);
+                NucleusLogger.DATASTORE_SCHEMA.debug("createSchema returned " + success);
             }
             catch (SQLException sqle)
             {
@@ -129,7 +149,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                     {
                     }
                 }
-                mconn.release();
+                if (mconn != null)
+                {
+                    mconn.release();
+                }
             }
         }
         catch (UnsupportedOperationException uoe)
@@ -144,20 +167,27 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     @Override
     public void deleteSchema(String schemaName, Properties props, Object connection)
     {
+        // TODO Take in catalog also
         try
         {
             RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
-            String stmtText = getDatastoreAdapter().getDropDatabaseStatement(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
+            String stmtText = getDatastoreAdapter().getDropDatabaseStatement(rdbmsStoreMgr.getCatalogName(), schemaName);
 
-            ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.NONE);
-            Connection conn = (Connection) mconn.getConnection();
+            ManagedConnection mconn = null;
+            Connection conn = (Connection)connection;
+            if (connection == null)
+            {
+                mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+                conn = (Connection)mconn.getConnection();
+            }
+
             Statement stmt = null;
             try
             {
                 stmt = conn.createStatement();
-                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase executing " + stmtText);
+                NucleusLogger.DATASTORE_SCHEMA.debug(stmtText);
                 boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("dropDatabase execute returned " + success);
+                NucleusLogger.DATASTORE_SCHEMA.debug("deleteSchema returned " + success);
             }
             catch (SQLException sqle)
             {
@@ -176,7 +206,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                     {
                     }
                 }
-                mconn.release();
+                if (mconn != null)
+                {
+                    mconn.release();
+                }
             }
         }
         catch (UnsupportedOperationException uoe)
@@ -224,37 +257,27 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      *     Types information is loaded on the first call and is cached thereafter.</li>
      * <li><b>tables</b> : return all currently loaded tables, with their columns. 
      *     Returns an RDBMSSchemaInfo. When a table has been loaded for more than a period of
-     *     time and is requested again we discard the cached info and go to the datastore in case
-     *     it has been updated.</li>
+     *     time and is requested again we discard the cached info and go to the datastore in case it has been updated.</li>
      * </ul>
      * When there is only one "value" the following are supported usages:-
      * <ul>
-     * <li><b>foreign-keys</b> : return all foreign keys for a Table, where the Table is passed in.
-     *     Returns an RDBMSTableFKInfo</li>
-     * <li><b>primary-keys</b> : return all primary keys for a Table, where the Table is passed in.
-     *     Returns an RDBMSTablePFKInfo</li>
-     * <li><b>indices</b> : return all indices for a Table, where the Table is passed in.
-     *     Returns an RDBMSTableIndexInfo</li>
-     * <li><b>columns</b> : return all columns for a Table, where the Table is passed in.
-     *     Returns an RDBMSTableInfo.</li> 
+     * <li><b>foreign-keys</b> : return all foreign keys for a Table, where the Table is passed in. Returns an RDBMSTableFKInfo</li>
+     * <li><b>primary-keys</b> : return all primary keys for a Table, where the Table is passed in. Returns an RDBMSTablePFKInfo</li>
+     * <li><b>indices</b> : return all indices for a Table, where the Table is passed in. Returns an RDBMSTableIndexInfo</li>
+     * <li><b>columns</b> : return all columns for a Table, where the Table is passed in. Returns an RDBMSTableInfo.</li>
+     * <li><b>schema</b> : return the schema info (catalog+schema) where the schema name is passed in. Returns null if not present in the database.</li>
      * </ul>
      * When there are two "values" the following are supported usages:-
      * <ul>
-     * <li><b>columns</b> : return column info for the supplied Table and column name.
-     *     Returns an RDBMSTableInfo.</li>
-     * <li><b>tables</b> : return table information for the supplied catalog and schema names.
-     *     Returns an RDBMSSchemaInfo</li>
+     * <li><b>columns</b> : return column info for the supplied Table and column name. Returns an RDBMSTableInfo.</li>
+     * <li><b>tables</b> : return table information for the supplied catalog and schema names. Returns an RDBMSSchemaInfo</li>
      * </ul>
      * When there are 3 "values" the following are supported usages:-
      * <ul>
-     * <li><b>foreign-keys</b> : return all foreign keys for a Table, where the catalog+schema+table is passed in.
-     *     Returns an RDBMSTableFKInfo</li>
-     * <li><b>primary-keys</b> : return all primary keys for a Table, where the catalog+schema+table is passed in.
-     *     Returns an RDBMSTablePFKInfo</li>
-     * <li><b>indices</b> : return all indices for a Table, where the catalog+schema+table is passed in.
-     *     Returns an RDBMSTableIndexInfo</li>
-     * <li><b>columns</b> : return all columns for a Table, where the catalog+schema+table is passed in.
-     *     Returns an RDBMSTableInfo.</li> 
+     * <li><b>foreign-keys</b> : return all foreign keys for a Table, where the catalog+schema+table is passed in. Returns an RDBMSTableFKInfo</li>
+     * <li><b>primary-keys</b> : return all primary keys for a Table, where the catalog+schema+table is passed in. Returns an RDBMSTablePFKInfo</li>
+     * <li><b>indices</b> : return all indices for a Table, where the catalog+schema+table is passed in. Returns an RDBMSTableIndexInfo</li>
+     * <li><b>columns</b> : return all columns for a Table, where the catalog+schema+table is passed in. Returns an RDBMSTableInfo.</li> 
      * </ul>
      * @param connection Connection to the datastore
      * @param name Name of the schema component to return.
@@ -265,10 +288,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     {
         if (values == null)
         {
-            if (name.equalsIgnoreCase("types"))
+            if (name.equalsIgnoreCase(TYPE_TYPES))
             {
                 // Types information
-                StoreSchemaData info = schemaDataByName.get("types");
+                StoreSchemaData info = schemaDataByName.get(TYPE_TYPES);
                 if (info == null)
                 {
                     // No types info defined yet so load it
@@ -276,10 +299,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 }
                 return info;
             }
-            else if (name.equalsIgnoreCase("tables"))
+            else if (name.equalsIgnoreCase(TYPE_TABLES))
             {
                 // Tables-columns information
-                StoreSchemaData info = schemaDataByName.get("tables");
+                StoreSchemaData info = schemaDataByName.get(TYPE_TABLES);
                 if (info == null)
                 {
                     // TODO Initialise tables if not yet defined ?
@@ -294,22 +317,22 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         else if (values.length == 1)
         {
-            if (name.equalsIgnoreCase("foreign-keys") && values[0] instanceof Table)
+            if (name.equalsIgnoreCase(TYPE_FKS) && values[0] instanceof Table)
             {
                 // Get Foreign keys for a table, where the value is a Table
                 return getRDBMSTableFKInfoForTable((Connection)connection, (Table)values[0]);
             }
-            else if (name.equalsIgnoreCase("primary-keys") && values[0] instanceof Table)
+            else if (name.equalsIgnoreCase(TYPE_PKS) && values[0] instanceof Table)
             {
                 // Get Primary keys for a table, where the value is a Table
                 return getRDBMSTablePKInfoForTable((Connection)connection, (Table)values[0]);
             }
-            else if (name.equalsIgnoreCase("indices") && values[0] instanceof Table)
+            else if (name.equalsIgnoreCase(TYPE_INDICES) && values[0] instanceof Table)
             {
                 // Get Indices for a table, where the value is a Table
                 return getRDBMSTableIndexInfoForTable((Connection)connection, (Table)values[0]);
             }
-            else if (name.equalsIgnoreCase("columns") && values[0] instanceof Table)
+            else if (name.equalsIgnoreCase(TYPE_COLUMNS) && values[0] instanceof Table)
             {
                 // Get columns for a table, where the value is a Table
                 return getRDBMSTableInfoForTable((Connection)connection, (Table)values[0]);
@@ -321,40 +344,45 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
         else if (values.length == 2)
         {
-            if (name.equalsIgnoreCase("tables"))
+            if (name.equalsIgnoreCase(TYPE_TABLES))
             {
                 // Get all tables for the specified catalog/schema (value is catalog name, value2 is schema name)
                 return getRDBMSSchemaInfoForCatalogSchema((Connection)connection, (String)values[0], (String)values[1]);
             }
-            if (name.equalsIgnoreCase("column") && values[0] instanceof Table && values[1] instanceof String)
+            else if (name.equalsIgnoreCase(TYPE_COLUMN) && values[0] instanceof Table && values[1] instanceof String)
             {
                 // Get column info for specified column of a table (value is table, value2 is column name)
                 return getRDBMSColumnInfoForColumn((Connection)connection, (Table)values[0], (String)values[1]);
+            }
+            else if (name.equalsIgnoreCase(TYPE_SCHEMA))
+            {
+                // Schema information, where the value is the schema name
+                return getRDBMSSchemasInfo((Connection)connection, (String)values[0], (String)values[1]);
             }
 
             return getSchemaData(connection, name, null);
         }
         else if (values.length == 3)
         {
-            if (name.equalsIgnoreCase("columns") && 
+            if (name.equalsIgnoreCase(TYPE_COLUMNS) && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get column info for catalog + schema + tableName
                 return getRDBMSTableInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
-            else if (name.equalsIgnoreCase("indices") && 
+            else if (name.equalsIgnoreCase(TYPE_INDICES) && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get index info for catalog + schema + tableName
                 return getRDBMSTableIndexInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
-            else if (name.equalsIgnoreCase("primary-keys") && 
+            else if (name.equalsIgnoreCase(TYPE_PKS) && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get PK info for catalog + schema + tableName
                 return getRDBMSTablePKInfoForTable((Connection)connection, (String)values[0], (String)values[1], (String)values[2]);
             }
-            else if (name.equalsIgnoreCase("foreign-keys") && 
+            else if (name.equalsIgnoreCase(TYPE_FKS) && 
                 values[0] instanceof String && values[1] instanceof String && values[2] instanceof String)
             {
                 // Get FK info for catalog + schema + tableName
@@ -483,9 +511,81 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
 
         // Cache it
-        schemaDataByName.put("types", info);
+        schemaDataByName.put(TYPE_TYPES, info);
 
         return info;        
+    }
+
+    /**
+     * Convenience method to read the schemas information for this datastore.
+     * @param conn Connection to the datastore
+     * @param schemaName Name of the schema to check for
+     * @param catalogName Name of the catalog to check for
+     * @return The RDBMSTypesInfo
+     */
+    protected RDBMSSchemaInfo getRDBMSSchemasInfo(Connection conn, String schemaName, String catalogName)
+    {
+        try
+        {
+            if (conn == null)
+            {
+                // No connection provided so nothing to return
+                return null;
+            }
+
+            DatabaseMetaData dmd = conn.getMetaData();
+            ResultSet rs = dmd.getSchemas();
+            try
+            {
+                while (rs.next())
+                {
+                    String catalog = rs.getString("TABLE_CATALOG");
+                    boolean catalogCorrect = false;
+                    if (StringUtils.isWhitespace(catalogName) && StringUtils.isWhitespace(catalog))
+                    {
+                        catalogCorrect = true;
+                    }
+                    else if (catalogName != null && catalogName.equals(catalog))
+                    {
+                        catalogCorrect = true;
+                    }
+                    else if (catalog != null && StringUtils.isWhitespace(catalogName) && catalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
+                    {
+                        catalogCorrect = true;
+                    }
+
+                    String schema = rs.getString("TABLE_SCHEM");
+                    boolean schemaCorrect = false;
+                    if (StringUtils.isWhitespace(schemaName) && StringUtils.isWhitespace(schema))
+                    {
+                        schemaCorrect = true;
+                    }
+                    else if (schemaName != null && schemaName.equals(schema))
+                    {
+                        schemaCorrect = true;
+                    }
+                    else if (schema != null && StringUtils.isWhitespace(schemaName) && schema.equals(((RDBMSStoreManager)storeMgr).getSchemaName()))
+                    {
+                        schemaCorrect = true;
+                    }
+
+                    if (schemaCorrect && catalogCorrect)
+                    {
+                        return new RDBMSSchemaInfo(catalog, schema);
+                    }
+                }
+            }
+            finally
+            {
+                rs.close();
+            }
+        }
+        catch (SQLException sqle)
+        {
+            throw new NucleusDataStoreException("Exception thrown retrieving schema information from datastore", sqle);
+        }
+
+        return null;
     }
 
     /**
@@ -764,8 +864,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 String colTableName = rs.getString(3);
                 if (StringUtils.isWhitespace(colTableName))
                 {
-                    // JDBC driver should return the table name as a minimum
-                    // TODO Localise
+                    // JDBC driver should return the table name as a minimum TODO Localise
                     throw new NucleusDataStoreException(
                         "Invalid 'null' table name identifier returned by database. " +
                         "Check with your JDBC driver vendor (ref:DatabaseMetaData.getColumns).");
@@ -864,12 +963,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      */
     protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, String catalogName, String schemaName, String tableName)
     {
-        RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(conn, "tables", null);
+        RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(conn, TYPE_TABLES, null);
         if (info == null)
         {
             // No schema info defined yet
             info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
-            schemaDataByName.put("tables", info);
+            schemaDataByName.put(TYPE_TABLES, info);
         }
 
         // Check existence
@@ -963,11 +1062,11 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             return;
         }
 
-        RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(connection, "tables", null);
+        RDBMSSchemaInfo info = (RDBMSSchemaInfo)getSchemaData(connection, TYPE_TABLES, null);
         if (info == null)
         {
             info = new RDBMSSchemaInfo(rdbmsStoreMgr.getCatalogName(), rdbmsStoreMgr.getSchemaName());
-            schemaDataByName.put("tables", info);
+            schemaDataByName.put(TYPE_TABLES, info);
         }
 
         // Get timestamp to mark the tables that are refreshed

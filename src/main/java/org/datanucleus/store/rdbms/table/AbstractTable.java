@@ -53,6 +53,7 @@ import org.datanucleus.store.rdbms.exceptions.MissingTableException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaInfo;
 import org.datanucleus.store.schema.table.MemberColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -515,7 +516,7 @@ public abstract class AbstractTable implements Table
      * @param conn Connection to the datastore.
      * @return true if the table was created
      * @throws SQLException Thrown if an error occurs creating the table.
-     **/
+     */
     public boolean create(Connection conn)
     throws SQLException
     {
@@ -524,6 +525,20 @@ public abstract class AbstractTable implements Table
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
             NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057029", this));
+        }
+
+        if (storeMgr.getSchemaHandler().isAutoCreateSchema())
+        {
+            if (identifier.getSchemaName() != null || identifier.getCatalogName() != null)
+            {
+                // Make sure the specified catalog/schema exists
+                RDBMSSchemaInfo info = (RDBMSSchemaInfo)storeMgr.getSchemaHandler().getSchemaData(conn, RDBMSSchemaHandler.TYPE_SCHEMA, new Object[] {getSchemaName(), getCatalogName()});
+                NucleusLogger.DATASTORE_SCHEMA.debug("Check of existence of catalog=" + identifier.getCatalogName() + " schema=" + identifier.getSchemaName() + " returned " + (info != null));
+                if (info == null)
+                {
+                    storeMgr.getSchemaHandler().createSchema(identifier.getSchemaName(), null, conn);
+                }
+            }
         }
 
         List createStmts = getSQLCreateStatements(null);
@@ -536,7 +551,7 @@ public abstract class AbstractTable implements Table
      * Method to drop this table.
      * @param conn Connection to the datastore.
      * @throws SQLException Thrown if an error occurs dropping the table.
-     **/
+     */
     public void drop(Connection conn)
     throws SQLException
     {
