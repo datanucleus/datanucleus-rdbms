@@ -185,6 +185,14 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                 }
             }
         }
+        if (catalogName != null)
+        {
+            catalogName = getIdentifierInAdapterCase(catalogName);
+        }
+        if (schemaName != null)
+        {
+            schemaName = getIdentifierInAdapterCase(schemaName);
+        }
 
         // No user-specified name, so generate a default using the previously created fallback
         if (identifierName == null)
@@ -302,6 +310,14 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
             {
                 identifierName += tableSuffix;
             }
+        }
+        if (catalogName != null)
+        {
+            catalogName = getIdentifierInAdapterCase(catalogName);
+        }
+        if (schemaName != null)
+        {
+            schemaName = getIdentifierInAdapterCase(schemaName);
         }
 
         // Generate the table identifier now that we have the identifier name

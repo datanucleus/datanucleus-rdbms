@@ -164,6 +164,14 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 }
             }
         }
+        if (catalogName != null)
+        {
+            catalogName = getIdentifierInAdapterCase(catalogName);
+        }
+        if (schemaName != null)
+        {
+            schemaName = getIdentifierInAdapterCase(schemaName);
+        }
 
         // No user-specified name, so generate a default using the previously created fallback
         if (identifierName == null)
@@ -266,6 +274,14 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                     schemaName = this.defaultSchemaName;
                 }
             }
+        }
+        if (catalogName != null)
+        {
+            catalogName = getIdentifierInAdapterCase(catalogName);
+        }
+        if (schemaName != null)
+        {
+            schemaName = getIdentifierInAdapterCase(schemaName);
         }
 
         // No user-specified name, so generate a default using the previously created fallback
