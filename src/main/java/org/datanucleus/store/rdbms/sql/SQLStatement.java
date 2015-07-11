@@ -1686,6 +1686,14 @@ public class SQLStatement
             else
             {
                 sql.append(" " + dba.getSelectForUpdateText());
+                if (dba.supportsOption(DatastoreAdapter.SELECT_FOR_UPDATE_NOWAIT))
+                {
+                    Boolean nowait = (Boolean) getValueForExtension("for-update-nowait");
+                    if (nowait != null)
+                    {
+                        sql.append(" NOWAIT");
+                    }
+                }
             }
         }
         if (lock && !dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE) &&

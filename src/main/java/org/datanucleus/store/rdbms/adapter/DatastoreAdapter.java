@@ -296,10 +296,11 @@ public interface DatastoreAdapter
      */
     public static final String AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF = "AutoIncrementPkInCreateTableColumnDef";
 
-    /**
-     * Whether this datastore supports SELECT ... FOR UPDATE.
-     */
+    /** Whether this datastore supports SELECT ... FOR UPDATE. */
     public static final String LOCK_WITH_SELECT_FOR_UPDATE = "LockWithSelectForUpdate";
+
+    /** Whether this datastore supports SELECT ... FOR UPDATE NOWAIT. */
+    public static final String SELECT_FOR_UPDATE_NOWAIT = "SelectForUpdateNoWait";
 
     /**
      * Whether the lock option (when doing SELECT FOR UPDATE) is to be placed after the FROM.

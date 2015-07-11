@@ -97,6 +97,9 @@ public class JPQLQuery extends AbstractJPQLQuery
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to false to comply with JPA spec 4.11. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
+    /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
+    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.forUpdateNowait";
+
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
 
@@ -855,6 +858,10 @@ public class JPQLQuery extends AbstractJPQLQuery
         // Set any extensions
         boolean useUpdateLock = RDBMSQueryUtils.useUpdateLockForQuery(this);
         stmt.addExtension("lock-for-update", Boolean.valueOf(useUpdateLock));
+        if (getBooleanExtensionProperty(EXTENSION_FOR_UPDATE_NOWAIT, false))
+        {
+            stmt.addExtension("for-update-nowait", Boolean.TRUE);
+        }
 
         datastoreCompilation.setSQL(stmt.getSelectStatement().toString());
         datastoreCompilation.setStatementParameters(stmt.getSelectStatement().getParametersForStatement());

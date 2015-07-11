@@ -82,6 +82,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(POSTGRESQL_RESERVED_WORDS));
 
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(SELECT_FOR_UPDATE_NOWAIT);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(IDENTITY_COLUMNS);

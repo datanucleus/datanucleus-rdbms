@@ -144,6 +144,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         }
 
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(SELECT_FOR_UPDATE_NOWAIT);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(NULL_EQUALS_EMPTY_STRING);
         supportedOptions.add(ANALYSIS_METHODS);
