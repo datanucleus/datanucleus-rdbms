@@ -976,10 +976,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Asserts the current mapping for the member is the one expected.
      * @param mmd MetaData for the member
      * @param clr ClassLoader resolver
-     * @param type Type of object
+     * @param preferredType Preferred type of object (if any, otherwise if null will use metadata)
      * @param expectedMappingType Mapping type expected
      */
-    private void assertCompatibleFieldType(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type, Class expectedMappingType)
+    private void assertCompatibleFieldType(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class preferredType, Class expectedMappingType)
     {
         DatastoreClass ownerTable = getDatastoreClass(mmd.getClassName(), clr);
         if (ownerTable == null)
@@ -998,8 +998,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
             if (!expectedMappingType.isAssignableFrom(m.getClass()))
             {
+                String requiredType = (preferredType != null ? preferredType.getName() : mmd.getTypeName());
                 NucleusLogger.PERSISTENCE.warn("Member " + mmd.getFullFieldName() + " in table=" + ownerTable + " has mapping=" + m + " but expected mapping type=" + expectedMappingType);
-                throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), type.getName(), mmd.getTypeName());
+                throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), requiredType, m.getType());
             }
         }
     }
