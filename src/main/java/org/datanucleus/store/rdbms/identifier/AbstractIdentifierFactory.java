@@ -543,7 +543,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Method to use to generate an identifier for a datastore field.
+     * Method to use to generate an identifier for a datastore field in the default catalog/schema.
      * The passed name will not be changed (other than in its case) although it may
      * be truncated to fit the maximum length permitted for a datastore field identifier.
      * @param identifierName The identifier name
@@ -558,6 +558,45 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
             String baseID = truncate(key, dba.getDatastoreIdentifierMaxLength(IdentifierType.TABLE));
             identifier = new TableIdentifier(this, baseID);
             setCatalogSchemaForTable((TableIdentifier)identifier);
+            tables.put(key, identifier);
+        }
+        return identifier;
+    }
+
+    /**
+     * Method to use to generate an identifier for a datastore field.
+     * The passed name will not be changed (other than in its case) although it may
+     * be truncated to fit the maximum length permitted for a datastore field identifier.
+     * @param identifierName The identifier name for the table
+     * @param catalogName Optional catalog name (null means not set)
+     * @param schemaName Optional schema name (null means not set)
+     * @return The DatastoreIdentifier for the table
+     */
+    public DatastoreIdentifier newTableIdentifier(String identifierName, String catalogName, String schemaName)
+    {
+        String tableName = identifierName.replace(quoteString, ""); // Allow for quotes on input name
+        String key = (StringUtils.isWhitespace(catalogName) ? "" : (catalogName + ".")) + (StringUtils.isWhitespace(schemaName) ? "" : (schemaName + ".")) + tableName;
+        DatastoreIdentifier identifier = tables.get(key);
+        if (identifier == null)
+        {
+            String baseID = truncate(tableName, dba.getDatastoreIdentifierMaxLength(IdentifierType.TABLE));
+            identifier = new TableIdentifier(this, baseID);
+            if (catalogName == null && schemaName == null)
+            {
+                // Set to default catalog/schema
+                setCatalogSchemaForTable((TableIdentifier)identifier);
+            }
+            else
+            {
+                if (catalogName != null)
+                {
+                    identifier.setCatalogName(catalogName);
+                }
+                if (schemaName != null)
+                {
+                    identifier.setSchemaName(schemaName);
+                }
+            }
             tables.put(key, identifier);
         }
         return identifier;

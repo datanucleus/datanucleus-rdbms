@@ -214,16 +214,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
         }
 
         // Generate the table identifier now that we have the identifier name
-        DatastoreIdentifier identifier = newTableIdentifier(identifierName);
-        if (schemaName != null)
-        {
-            identifier.setSchemaName(schemaName);
-        }
-        if (catalogName != null)
-        {
-            identifier.setCatalogName(catalogName);
-        }
-
+        DatastoreIdentifier identifier = newTableIdentifier(identifierName, catalogName, schemaName);
         return identifier;
     }
 
@@ -294,16 +285,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
         }
 
         // Generate the table identifier now that we have the identifier name
-        DatastoreIdentifier identifier = newTableIdentifier(identifierName);
-        if (schemaName != null)
-        {
-            identifier.setSchemaName(schemaName);
-        }
-        if (catalogName != null)
-        {
-            identifier.setCatalogName(catalogName);
-        }
-
+        DatastoreIdentifier identifier = newTableIdentifier(identifierName, catalogName, schemaName);
         return identifier;
     }
 

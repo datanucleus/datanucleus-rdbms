@@ -61,13 +61,24 @@ public interface IdentifierFactory
     DatastoreIdentifier newIdentifier(IdentifierType identifierType, String identifierName);
 
     /**
-     * Method to use to generate an identifier for a table with the supplied name.
+     * Method to use to generate an identifier for a table with the supplied name in the default catalog/schema.
      * The passed name will not be changed (other than in its case) although it may
      * be truncated to fit the maximum length permitted for a table identifier.
      * @param identifierName The identifier name
      * @return The DatastoreIdentifier for the table
      */
     DatastoreIdentifier newTableIdentifier(String identifierName);
+
+    /**
+     * Method to use to generate an identifier for a table with the supplied name.
+     * The passed name will not be changed (other than in its case) although it may
+     * be truncated to fit the maximum length permitted for a table identifier.
+     * @param identifierName The identifier name for the table
+     * @param catalogName Optional catalog name
+     * @param schemaName Optional schema name
+     * @return The DatastoreIdentifier for the table
+     */
+    DatastoreIdentifier newTableIdentifier(String identifierName, String catalogName, String schemaName);
 
     /**
      * Method to return a Table identifier for the specified class.
