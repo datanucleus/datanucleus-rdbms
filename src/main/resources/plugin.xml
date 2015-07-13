@@ -947,6 +947,7 @@ Contributors:
         <sql-method method="CEIL" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
         <sql-method method="COS" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
         <sql-method method="COUNT" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
+        <sql-method method="COUNTSTAR" evaluator="org.datanucleus.store.rdbms.sql.method.CountStarFunction"/>
         <sql-method method="EXP" evaluator="org.datanucleus.store.rdbms.sql.method.ExpFunction"/>
         <sql-method method="FLOOR" evaluator="org.datanucleus.store.rdbms.sql.method.FloorFunction"/>
         <sql-method method="LOG" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction"/>

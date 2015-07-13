@@ -32,4 +32,9 @@ public class AggregateNumericExpression extends NumericExpression
     {
         super(stmt, mapping, functionName, args);
     }
+
+    public AggregateNumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String sql)
+    {
+        super(stmt, mapping, sql);
+    }
 }
