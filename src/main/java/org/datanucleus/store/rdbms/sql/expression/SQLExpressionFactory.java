@@ -310,13 +310,36 @@ public class SQLExpressionFactory
     }
 
     /**
+     * Method to allow a user to register an SQLMethod at runtime without utilising the plugin mechanism.
+     * Will throw a NucleusUserException if this class+method already has an SQLMethod defined.
+     * @param className Class name (or null if "static")
+     * @param methodName Name of the method/function
+     * @param method The SQLMethod to invoke when this method is encountered
+     * @param datastoreDependent Whether the usage of this method is datastore dependent (true means just for the current datastore, false means for all)
+     */
+    public void registerMethod(String className, String methodName, SQLMethod method, boolean datastoreDependent)
+    {
+        String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
+
+        // Try to find datastore-dependent evaluator for class+method
+        MethodKey methodKey = getSQLMethodKey(datastoreDependent ? null : datastoreId, className, methodName);
+        if (methodNamesSupported.contains(methodKey))
+        {
+            throw new NucleusUserException("SQLMethod already defined for class=" + className + " method=" + methodName);
+        }
+        methodNamesSupported.add(methodKey);
+
+        methodByClassMethodName.put(methodKey, method);
+    }
+
+    /**
      * Accessor for the method defined by the class/method names and supplied args.
      * Throws a NucleusException is the method is not supported.
      * Note that if the class name passed in is not for a listed class with that method defined then
      * will check all remaining defined methods for a superclass. TODO Make more efficient lookups
      * @param className Class we are invoking the method on
      * @param methodName Name of the method
-     * @param args Any arguments to the method call
+     * @param args Any arguments to the method call (ignored currently) TODO Check the arguments
      * @return The method
      */
     public SQLMethod getMethod(String className, String methodName, List args)
