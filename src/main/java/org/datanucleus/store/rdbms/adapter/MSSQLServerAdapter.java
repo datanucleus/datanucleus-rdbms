@@ -126,6 +126,14 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
             supportedOptions.add(SEQUENCES);
             supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         }
+
+        if (datastoreMajorVersion >= 12)
+        {
+            // SQLServer 2014+ support these features (what about earlier?)
+            supportedOptions.add(OPERATOR_BITWISE_AND);
+            supportedOptions.add(OPERATOR_BITWISE_OR);
+            supportedOptions.add(OPERATOR_BITWISE_XOR);
+        }
     }
 
     /**
