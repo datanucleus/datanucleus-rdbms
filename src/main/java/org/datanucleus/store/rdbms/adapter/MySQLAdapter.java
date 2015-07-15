@@ -125,6 +125,10 @@ public class MySQLAdapter extends BaseDatastoreAdapter
             // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
             supportedOptions.remove(DATETIME_STORES_MILLISECS);
         }
+
+        supportedOptions.add(OPERATOR_BITWISE_AND);
+        supportedOptions.add(OPERATOR_BITWISE_OR);
+        supportedOptions.add(OPERATOR_BITWISE_XOR);
     }
 
     /**

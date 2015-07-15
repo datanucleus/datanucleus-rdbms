@@ -353,9 +353,7 @@ public interface DatastoreAdapter
     /** Whether we support NULLS directives in ORDER expressions. */
     public static final String ORDERBY_NULLS_DIRECTIVES = "OrderByWithNullsDirectives";
 
-    /**
-     * Whether this datastore supports stored procedures.
-     */
+    /** Whether this datastore supports stored procedures. */
     public static final String STORED_PROCEDURES = "StoredProcs";
 
     public static final String FK_UPDATE_ACTION_CASCADE = "FkUpdateActionCascade";
@@ -379,6 +377,10 @@ public interface DatastoreAdapter
     public static final String RESULTSET_TYPE_SCROLL_INSENSITIVE = "ResultSetTypeScrollInsens";
 
     public static final String HOLD_CURSORS_OVER_COMMIT = "HoldCursorsOverCommit";
+
+    public static final String OPERATOR_BITWISE_AND = "BitwiseAndOperator";
+    public static final String OPERATOR_BITWISE_OR = "BitwiseOrOperator";
+    public static final String OPERATOR_BITWISE_XOR = "BitwiseXOrOperator";
 
     /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.

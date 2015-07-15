@@ -322,7 +322,7 @@ public abstract class SQLExpression
     }
 
     /**
-     * Conditional And. Evaluates its right-hand operand only if the value of its left-hand operand is true.
+     * Conditional AND. Evaluates its right-hand operand only if the value of its left-hand operand is true.
      * @param expr the right-hand operand
      * @return the result value is true if both operand values are true; otherwise, the result is false.
      */
@@ -543,6 +543,26 @@ public abstract class SQLExpression
         st.prepend("DISTINCT (");
         st.append(")");
         return this;
+    }
+
+    /**
+     * BITWISE AND operation.
+     * @param expr expression representing the bitset
+     * @return the bitwise AND expression
+     */
+    public SQLExpression bitAnd(SQLExpression expr)
+    {
+        throw new IllegalExpressionOperationException("Bitwise AND on " + expr, this);
+    }
+
+    /**
+     * BITWISE OR operation.
+     * @param expr expression representing the bitset
+     * @return the bitwise OR expression
+     */
+    public SQLExpression bitOr(SQLExpression expr)
+    {
+        throw new IllegalExpressionOperationException("Bitwise OR on " + expr, this);
     }
 
     /**

@@ -372,4 +372,24 @@ public class NumericExpression extends SQLExpression
     {
         return this.neg().sub(new IntegerLiteral(stmt, mapping,BigInteger.ONE, parameterName));
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.sql.expression.SQLExpression#bitAnd(org.datanucleus.store.rdbms.sql.expression.SQLExpression)
+     */
+    @Override
+    public SQLExpression bitAnd(SQLExpression expr)
+    {
+        // TODO Support BITWISE AND
+        return super.bitAnd(expr);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.sql.expression.SQLExpression#bitOr(org.datanucleus.store.rdbms.sql.expression.SQLExpression)
+     */
+    @Override
+    public SQLExpression bitOr(SQLExpression expr)
+    {
+        // TODO Support BITWISE OR
+        return super.bitOr(expr);
+    }
 }
