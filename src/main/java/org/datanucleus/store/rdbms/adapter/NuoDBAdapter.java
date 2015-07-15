@@ -103,6 +103,10 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(TX_ISOLATION_NONE);
 
         supportedOptions.remove(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
+
+        supportedOptions.add(OPERATOR_BITWISE_AND);
+        supportedOptions.add(OPERATOR_BITWISE_OR);
+        supportedOptions.add(OPERATOR_BITWISE_XOR);
     }
 
     public String getVendorID()
