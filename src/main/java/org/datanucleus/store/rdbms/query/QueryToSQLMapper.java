@@ -2149,6 +2149,92 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitAndExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitAndExpression(Expression expr)
+    {
+        SQLExpression rightExpr = stack.pop();
+        SQLExpression leftExpr = stack.pop();
+        if (rightExpr instanceof BooleanExpression && leftExpr instanceof BooleanExpression)
+        {
+            // Handle as Boolean logical AND
+            stack.push(leftExpr);
+            stack.push(rightExpr);
+            return processAndExpression(expr);
+        }
+        else if (rightExpr instanceof NumericExpression && leftExpr instanceof NumericExpression)
+        {
+            if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.OPERATOR_BITWISE_AND))
+            {
+                SQLExpression bitAndExpr = new NumericExpression(leftExpr, Expression.OP_BIT_AND, rightExpr).encloseInParentheses();
+                stack.push(bitAndExpr);
+                return bitAndExpr;
+            }
+        }
+
+        throw new NucleusUserException("Operation BITWISE AND is not supported for " + leftExpr + " and " + rightExpr + " for this datastore");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitOrExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitOrExpression(Expression expr)
+    {
+        SQLExpression rightExpr = stack.pop();
+        SQLExpression leftExpr = stack.pop();
+        if (rightExpr instanceof BooleanExpression && leftExpr instanceof BooleanExpression)
+        {
+            // Handle as Boolean logical OR
+            stack.push(leftExpr);
+            stack.push(rightExpr);
+            return processOrExpression(expr);
+        }
+        else if (rightExpr instanceof NumericExpression && leftExpr instanceof NumericExpression)
+        {
+            if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.OPERATOR_BITWISE_OR))
+            {
+                SQLExpression bitExpr = new NumericExpression(leftExpr, Expression.OP_BIT_OR, rightExpr).encloseInParentheses();
+                stack.push(bitExpr);
+                return bitExpr;
+            }
+        }
+
+        // TODO Support BITWISE OR for more cases
+        throw new NucleusUserException("Operation BITWISE OR is not supported for " + leftExpr + " and " + rightExpr + " is not supported by this datastore");
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processBitXorExpression(org.datanucleus.query.expression.Expression)
+     */
+    @Override
+    protected Object processBitXorExpression(Expression expr)
+    {
+        SQLExpression rightExpr = stack.pop();
+        SQLExpression leftExpr = stack.pop();
+        if (rightExpr instanceof BooleanExpression && leftExpr instanceof BooleanExpression)
+        {
+            // Handle as Boolean logical OR
+            stack.push(leftExpr);
+            stack.push(rightExpr);
+            return processOrExpression(expr);
+        }
+        else if (rightExpr instanceof NumericExpression && leftExpr instanceof NumericExpression)
+        {
+            if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.OPERATOR_BITWISE_XOR))
+            {
+                SQLExpression bitExpr = new NumericExpression(leftExpr, Expression.OP_BIT_XOR, rightExpr).encloseInParentheses();
+                stack.push(bitExpr);
+                return bitExpr;
+            }
+        }
+
+        // TODO Support BITWISE XOR for more cases
+        throw new NucleusUserException("Operation BITWISE XOR is not supported for " + leftExpr + " and " + rightExpr + " is not supported by this datastore");
+    }
+
+    /* (non-Javadoc)
      * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processEqExpression(org.datanucleus.query.expression.Expression)
      */
     protected Object processEqExpression(Expression expr)
