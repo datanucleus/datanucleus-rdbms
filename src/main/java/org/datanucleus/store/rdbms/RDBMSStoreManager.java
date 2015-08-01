@@ -3696,6 +3696,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         set.add(StoreManager.OPTION_QUERY_CANCEL);
         set.add(StoreManager.OPTION_DATASTORE_TIMEOUT);
 
+        // JDOQL Bitwise are only supported if supported by the datastore
+        if (dba.supportsOption(DatastoreAdapter.OPERATOR_BITWISE_AND))
+        {
+            set.add(StoreManager.OPTION_QUERY_JDOQL_BITWISE_OPS);
+        }
+
         return set;
     }
 
