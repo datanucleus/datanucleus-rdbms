@@ -155,12 +155,12 @@ public class TableUtils
         }
 
         // Verify if a unique index is needed
-        boolean unique = imd.isUnique();
+        boolean unique = (imd == null ? false : imd.isUnique());
 
-        Index index = new Index(table, unique, imd.getValueForExtension("extended-setting"));
+        Index index = new Index(table, unique, (imd != null ? imd.getValueForExtension("extended-setting") : null));
 
         // Set the index name if required
-        if (imd.getName() != null)
+        if (imd != null && imd.getName() != null)
         {
             IdentifierFactory idFactory = table.getStoreManager().getIdentifierFactory();
             DatastoreIdentifier idxId = idFactory.newIdentifier(IdentifierType.INDEX, imd.getName());
