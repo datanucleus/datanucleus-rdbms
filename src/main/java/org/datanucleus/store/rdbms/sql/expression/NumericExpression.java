@@ -126,6 +126,7 @@ public class NumericExpression extends SQLExpression
         }
         else
         {
+            // TODO If the user has JPQL "FUNCTION(...)" we don't know the result type of the function, hence it comes through as ObjectExpression. Improve this?
             return super.eq(expr);
         }
     }
