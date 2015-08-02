@@ -901,7 +901,7 @@ public abstract class TableImpl extends AbstractTable
     {
         assertIsInitialized();
 
-        HashSet<Index> indices = new HashSet();
+        Set<Index> indices = new HashSet();
 
         /*
          * For each foreign key, add to the list an index made up of the "from"
@@ -1373,11 +1373,11 @@ public abstract class TableImpl extends AbstractTable
         Set<Index> expectedIndices = getExpectedIndices(clr);
 
         int n = 1;
-        Iterator<Index> i = expectedIndices.iterator();
+        Iterator<Index> indexIter = expectedIndices.iterator();
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-        while (i.hasNext())
+        while (indexIter.hasNext())
         {
-            Index idx = i.next();
+            Index idx = indexIter.next();
             if (isIndexReallyNeeded(idx, actualIndicesByName.values()))
             {
                 // If no name assigned, make one up
