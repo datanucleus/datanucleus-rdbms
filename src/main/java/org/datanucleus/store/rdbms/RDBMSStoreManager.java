@@ -2344,7 +2344,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (sqlTypeInfo == null)
                 {
                     // fallback to DEFAULT
-                    NucleusLogger.DATASTORE_SCHEMA.info("Attempt to find JDBC driver 'typeInfo' for jdbc-type=" + dba.getNameForJDBCType(jdbcType) +
+                    NucleusLogger.DATASTORE_SCHEMA.debug("Attempt to find JDBC driver 'typeInfo' for jdbc-type=" + dba.getNameForJDBCType(jdbcType) +
                         " but sql-type=" + sqlType + " is not found. Using default sql-type for this jdbc-type.");
                     sqlTypeInfo = (SQLTypeInfo) jdbcTypeInfo.getChild("DEFAULT");
                 }
