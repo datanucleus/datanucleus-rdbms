@@ -26,6 +26,7 @@ package org.datanucleus.store.rdbms.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -758,16 +759,42 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Accessor for the indices for this table. 
-     * This includes both the user-defined indices (via MetaData), and the ones required by 
-     * foreign keys (required by relationships).
+     * This includes both the user-defined indices (via MetaData), and the ones required by foreign keys.
      * @param clr The ClassLoaderResolver
      * @return The indices
      */
     protected Set getExpectedIndices(ClassLoaderResolver clr)
     {
-        // The indices required by foreign keys (BaseTable)
-        Set indices = super.getExpectedIndices(clr);
+        Set indices = new HashSet();
 
+        // Index for FK back to owner
+        if (mmd.getIndexMetaData() != null)
+        {
+            Index index = TableUtils.getIndexForField(this, mmd.getIndexMetaData(), ownerMapping);
+            if (index != null)
+            {
+                indices.add(index);
+            }
+        }
+        else if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getIndexMetaData() != null)
+        {
+            Index index = TableUtils.getIndexForField(this, mmd.getJoinMetaData().getIndexMetaData(), ownerMapping);
+            if (index != null)
+            {
+                indices.add(index);
+            }
+        }
+        else
+        {
+            // Fallback to an index for the foreign-key to the owner
+            Index index = TableUtils.getIndexForField(this, null, ownerMapping);
+            if (index != null)
+            {
+                indices.add(index);
+            }
+        }
+
+        // Index for the key FK (if required)
         if (keyMapping instanceof EmbeddedKeyPCMapping)
         {
             // Add all indices required by fields of the embedded key
@@ -798,7 +825,17 @@ public class MapTable extends JoinTable implements DatastoreMap
                 }
             }
         }
+        else
+        {
+            // Fallback to an index for any foreign-key to the key
+            Index index = TableUtils.getIndexForField(this, null, keyMapping);
+            if (index != null)
+            {
+                indices.add(index);
+            }
+        }
 
+        // Index for the value FK (if required)
         if (valueMapping instanceof EmbeddedValuePCMapping)
         {
             // Add all indices required by fields of the embedded value
@@ -827,6 +864,15 @@ public class MapTable extends JoinTable implements DatastoreMap
                 {
                     indices.add(index);
                 }
+            }
+        }
+        else
+        {
+            // Fallback to an index for any foreign-key to the value
+            Index index = TableUtils.getIndexForField(this, null, valueMapping);
+            if (index != null)
+            {
+                indices.add(index);
             }
         }
 

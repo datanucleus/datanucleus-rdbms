@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.table;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -448,10 +449,11 @@ public abstract class ElementContainerTable extends JoinTable
      */
     protected Set getExpectedIndices(ClassLoaderResolver clr)
     {
-        // The indices required by foreign keys (BaseTable)
-        Set indices = super.getExpectedIndices(clr);
+        assertIsInitialized();
 
-        // Check owner for specified indices
+        Set<Index> indices = new HashSet();
+
+        // Index for FK back to owner
         if (mmd.getIndexMetaData() != null)
         {
             Index index = TableUtils.getIndexForField(this, mmd.getIndexMetaData(), ownerMapping);
@@ -468,8 +470,17 @@ public abstract class ElementContainerTable extends JoinTable
                 indices.add(index);
             }
         }
+        else
+        {
+            // Fallback to an index for the foreign-key to the owner
+            Index index = TableUtils.getIndexForField(this, null, ownerMapping);
+            if (index != null)
+            {
+                indices.add(index);
+            }
+        }
 
-        // Check element for specified indices
+        // Index for FK to element (if required)
         if (elementMapping instanceof EmbeddedElementPCMapping)
         {
             // Add all indices required by fields of the embedded element
@@ -500,11 +511,20 @@ public abstract class ElementContainerTable extends JoinTable
                     indices.add(index);
                 }
             }
+            else
+            {
+                // Fallback to an index for any foreign-key to the element
+                Index index = TableUtils.getIndexForField(this, null, elementMapping);
+                if (index != null)
+                {
+                    indices.add(index);
+                }
+            }
         }
 
-        // Check order for specified indices
         if (orderMapping != null)
         {
+            // Index for ordering?
             if (mmd.getOrderMetaData() != null && mmd.getOrderMetaData().getIndexMetaData() != null)
             {
                 Index index = TableUtils.getIndexForField(this, mmd.getOrderMetaData().getIndexMetaData(), orderMapping);
