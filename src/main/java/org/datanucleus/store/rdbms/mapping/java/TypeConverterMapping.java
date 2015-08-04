@@ -117,13 +117,14 @@ public class TypeConverterMapping extends SingleFieldMapping
     }
 
     /**
-     * Method that takes the converted type and sets it in the PreparedStatement at the specified position.
+     * Method that takes the member value and sets the datastore value in the PreparedStatement at the specified position.
      * @param ps The PreparedStatement
      * @param exprIndex The position in the statement
-     * @param convertedValue The converted value (to use in the datastore)
+     * @param memberValue The member value for this field
      */
-    protected void setValue(PreparedStatement ps, int[] exprIndex, Object convertedValue)
+    protected void setDatastoreFromMemberValue(PreparedStatement ps, int[] exprIndex, Object memberValue)
     {
+        Object convertedValue = converter.toDatastoreType(memberValue);
         if (convertedValue == null)
         {
             getDatastoreMapping(0).setObject(ps, exprIndex[0], null);
@@ -170,6 +171,60 @@ public class TypeConverterMapping extends SingleFieldMapping
         }
     }
 
+    /**
+     * Method that retrieves the datastore value and converts it back to the member value.
+     * @param resultSet The result set
+     * @param exprIndex The position in the result set
+     * @return The member value
+     */
+    protected Object getMemberValueFromDatastore(ResultSet resultSet, int[] exprIndex)
+    {
+        Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, String.class);
+        Object datastoreValue = null;
+        if (Boolean.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getBoolean(resultSet, exprIndex[0]);
+        }
+        else if (Byte.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getByte(resultSet, exprIndex[0]);
+        }
+        else if (Character.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getChar(resultSet, exprIndex[0]);
+        }
+        else if (Double.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getDouble(resultSet, exprIndex[0]);
+        }
+        else if (Float.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getFloat(resultSet, exprIndex[0]);
+        }
+        else if (Integer.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
+        }
+        else if (Long.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+        }
+        else if (Short.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getShort(resultSet, exprIndex[0]);
+        }
+        else if (String.class.isAssignableFrom(datastoreType))
+        {
+            datastoreValue = getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
+        }
+        else
+        {
+            datastoreValue = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        }
+
+        return converter.toMemberType(datastoreValue);
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setBoolean(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], boolean)
      */
@@ -181,7 +236,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -195,8 +250,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return false;
         }
 
-        Boolean datastoreValue = getDatastoreMapping(0).getBoolean(resultSet, exprIndex[0]);
-        return (Boolean)converter.toMemberType(datastoreValue);
+        return (Boolean)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -210,7 +264,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -224,8 +278,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Byte datastoreValue = getDatastoreMapping(0).getByte(resultSet, exprIndex[0]);
-        return (Byte)converter.toMemberType(datastoreValue);
+        return (Byte)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -239,7 +292,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -253,8 +306,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Character datastoreValue = getDatastoreMapping(0).getChar(resultSet, exprIndex[0]);
-        return (Character)converter.toMemberType(datastoreValue);
+        return (Character)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -268,7 +320,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -282,8 +334,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Double datastoreValue = getDatastoreMapping(0).getDouble(resultSet, exprIndex[0]);
-        return (Double)converter.toMemberType(datastoreValue);
+        return (Double)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -297,7 +348,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -311,8 +362,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Float datastoreValue = getDatastoreMapping(0).getFloat(resultSet, exprIndex[0]);
-        return (Float)converter.toMemberType(datastoreValue);
+        return (Float)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -326,7 +376,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -340,8 +390,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Integer datastoreValue = getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
-        return (Integer)converter.toMemberType(datastoreValue);
+        return (Integer)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -355,7 +404,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -369,8 +418,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Long datastoreValue = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
-        return (Long)converter.toMemberType(datastoreValue);
+        return (Long)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -384,7 +432,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -398,8 +446,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return 0;
         }
 
-        Short datastoreValue = getDatastoreMapping(0).getShort(resultSet, exprIndex[0]);
-        return (Short)converter.toMemberType(datastoreValue);
+        return (Short)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -413,7 +460,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        setValue(ps, exprIndex, converter.toDatastoreType(value));
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
@@ -427,8 +474,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return null;
         }
 
-        String datastoreValue = getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? (String)converter.toMemberType(datastoreValue) : null);
+        return (String)getMemberValueFromDatastore(resultSet, exprIndex);
     }
 
     /* (non-Javadoc)
@@ -442,7 +488,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], converter.toDatastoreType(value));
+        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
     }
 
     /* (non-Javadoc)
@@ -456,7 +502,6 @@ public class TypeConverterMapping extends SingleFieldMapping
             return null;
         }
 
-        Object datastoreValue = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
-        return (datastoreValue != null ? converter.toMemberType(datastoreValue) : null);
+        return getMemberValueFromDatastore(resultSet, exprIndex);
     }
 }
