@@ -370,8 +370,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Initialise any properties controlling the adapter
                 // Just use properties matching the pattern "datanucleus.rdbms.adapter.*"
                 Map<String, Object> dbaProps = new HashMap();
-                Map<String, Object> omfProps = ctx.getConfiguration().getPersistenceProperties();
-                Iterator<Map.Entry<String, Object>> propIter = omfProps.entrySet().iterator();
+                Map<String, Object> persistenceProps = ctx.getConfiguration().getPersistenceProperties();
+                Iterator<Map.Entry<String, Object>> propIter = persistenceProps.entrySet().iterator();
                 while (propIter.hasNext())
                 {
                     Map.Entry<String, Object> entry = propIter.next();
@@ -3237,10 +3237,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
             tablesRecentlyInitialized.clear();
             int numTablesInitializedInit = 0;
+            int numStoreDataInit = 0;
+            RDBMSStoreData[] rdbmsStoreData = storeDataMgr.getManagedStoreData().toArray(new RDBMSStoreData[storeDataMgr.size()]);
             do
             {
-                RDBMSStoreData[] rdbmsStoreData = storeDataMgr.getManagedStoreData().toArray(new RDBMSStoreData[storeDataMgr.size()]);
-
+                numStoreDataInit = rdbmsStoreData.length;
                 numTablesInitializedInit = tablesRecentlyInitialized.size();
                 for (int i=0; i<rdbmsStoreData.length; i++)
                 {
@@ -3271,8 +3272,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
                 }
+
+                rdbmsStoreData = storeDataMgr.getManagedStoreData().toArray(new RDBMSStoreData[storeDataMgr.size()]);
             }
-            while (tablesRecentlyInitialized.size() > numTablesInitializedInit);
+            while ((tablesRecentlyInitialized.size() > numTablesInitializedInit) || (rdbmsStoreData.length > numStoreDataInit));
 
             // Post initialisation of tables
             for (int j=0; j<tablesRecentlyInitialized.size(); j++)
