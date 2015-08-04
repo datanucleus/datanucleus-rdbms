@@ -116,6 +116,60 @@ public class TypeConverterMapping extends SingleFieldMapping
         return mmd != null ? mmd.getType() : storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
     }
 
+    /**
+     * Method that takes the converted type and sets it in the PreparedStatement at the specified position.
+     * @param ps The PreparedStatement
+     * @param exprIndex The position in the statement
+     * @param convertedValue The converted value (to use in the datastore)
+     */
+    protected void setValue(PreparedStatement ps, int[] exprIndex, Object convertedValue)
+    {
+        if (convertedValue == null)
+        {
+            getDatastoreMapping(0).setObject(ps, exprIndex[0], null);
+        }
+        else if (convertedValue instanceof Boolean)
+        {
+            getDatastoreMapping(0).setBoolean(ps, exprIndex[0], (Boolean)convertedValue);
+        }
+        else if (convertedValue instanceof Byte)
+        {
+            getDatastoreMapping(0).setByte(ps, exprIndex[0], (Byte)convertedValue);
+        }
+        else if (convertedValue instanceof Character)
+        {
+            getDatastoreMapping(0).setChar(ps, exprIndex[0], (Character)convertedValue);
+        }
+        else if (convertedValue instanceof Double)
+        {
+            getDatastoreMapping(0).setDouble(ps, exprIndex[0], (Double)convertedValue);
+        }
+        else if (convertedValue instanceof Float)
+        {
+            getDatastoreMapping(0).setFloat(ps, exprIndex[0], (Float)convertedValue);
+        }
+        else if (convertedValue instanceof Integer)
+        {
+            getDatastoreMapping(0).setInt(ps, exprIndex[0], (Integer)convertedValue);
+        }
+        else if (convertedValue instanceof Long)
+        {
+            getDatastoreMapping(0).setLong(ps, exprIndex[0], (Long)convertedValue);
+        }
+        else if (convertedValue instanceof Short)
+        {
+            getDatastoreMapping(0).setShort(ps, exprIndex[0], (Short)convertedValue);
+        }
+        else if (convertedValue instanceof String)
+        {
+            getDatastoreMapping(0).setString(ps, exprIndex[0], (String)convertedValue);
+        }
+        else
+        {
+            getDatastoreMapping(0).setObject(ps, exprIndex[0], convertedValue);
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.mapping.SingleFieldMapping#setBoolean(org.datanucleus.store.ExecutionContext, java.lang.Object, int[], boolean)
      */
@@ -127,7 +181,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setBoolean(ps, exprIndex[0], (Boolean)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -156,7 +210,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setByte(ps, exprIndex[0], (Byte)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -185,7 +239,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setChar(ps, exprIndex[0], (Character)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -214,7 +268,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setDouble(ps, exprIndex[0], (Double)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -243,7 +297,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setFloat(ps, exprIndex[0], (Float)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -272,7 +326,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setInt(ps, exprIndex[0], (Integer)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -301,7 +355,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setLong(ps, exprIndex[0], (Long)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -330,7 +384,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setShort(ps, exprIndex[0], (Short)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
@@ -359,7 +413,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setString(ps, exprIndex[0], (String)converter.toDatastoreType(value));
+        setValue(ps, exprIndex, converter.toDatastoreType(value));
     }
 
     /* (non-Javadoc)
