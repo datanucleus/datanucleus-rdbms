@@ -488,7 +488,7 @@ public class TypeConverterMapping extends SingleFieldMapping
             return;
         }
 
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
+        setDatastoreFromMemberValue(ps, exprIndex, value);
     }
 
     /* (non-Javadoc)
