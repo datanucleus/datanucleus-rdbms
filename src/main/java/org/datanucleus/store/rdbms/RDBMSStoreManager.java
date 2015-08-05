@@ -227,10 +227,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     protected MappingManager mappingManager;
 
     /**
-     * Map of DatastoreClass keyed by StateManager, for objects currently being inserted.
+     * Map of DatastoreClass keyed by ObjectProvider, for objects currently being inserted.
      * Defines to what level an object is inserted in the datastore.
      */
-    protected Map<ObjectProvider, DatastoreClass> insertedDatastoreClassByStateManager = new ConcurrentHashMap();
+    protected Map<ObjectProvider, DatastoreClass> insertedDatastoreClassByObjectProvider = new ConcurrentHashMap();
 
     /** 
      * Lock object aimed at providing a lock on the schema definition managed here, preventing
@@ -269,19 +269,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<String, Store>();
 
     /**
-     * Constructs a new RDBMSManager. On successful return the new RDBMSManager
-     * will have successfully connected to the database with the given
-     * credentials and determined the schema name, but will not have inspected
-     * the schema contents any further. The contents (tables, views, etc.) will
-     * be subsequently created and/or validated on-demand as the application
+     * Constructs a new RDBMSManager. 
+     * On successful return the new RDBMSManager will have successfully connected to the database with the given
+     * credentials and determined the schema name, but will not have inspected the schema contents any further. 
+     * The contents (tables, views, etc.) will be subsequently created and/or validated on-demand as the application
      * accesses persistent classes.
-     * 
      * @param clr the ClassLoaderResolver
-     * @param ctx The corresponding Context. This factory's non-tx data source will be 
-     *     used to get database connections as needed to perform management functions.
+     * @param ctx The corresponding Context. This factory's non-tx data source will be used to get database connections as needed to perform management functions.
      * @param props Properties for the datastore
-     * @exception NucleusDataStoreException If the database could not be accessed or the name of the
-     *                schema could not be determined.
+     * @exception NucleusDataStoreException If the database could not be accessed or the name of the schema could not be determined.
      */
     public RDBMSStoreManager(ClassLoaderResolver clr, PersistenceNucleusContext ctx, Map<String, Object> props)
     {
@@ -830,7 +826,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return true;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(op);
+        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(op);
         if (latestTable == null)
         {
             // Not yet inserted anything
@@ -882,7 +878,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return false;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(op);
+        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(op);
         if (latestTable != null)
         {
             DatastoreClass datastoreCls = latestTable;
@@ -908,13 +904,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void setObjectIsInsertedToLevel(ObjectProvider op, DatastoreClass table)
     {
-        insertedDatastoreClassByStateManager.put(op, table);
+        insertedDatastoreClassByObjectProvider.put(op, table);
 
         if (table.managesClass(op.getClassMetaData().getFullClassName()))
         {
             // Full insertion has just completed so update activity state in StateManager
             op.changeActivityState(ActivityState.INSERTING_CALLBACKS);
-            insertedDatastoreClassByStateManager.remove(op);
+            insertedDatastoreClassByObjectProvider.remove(op);
         }
     }
 
