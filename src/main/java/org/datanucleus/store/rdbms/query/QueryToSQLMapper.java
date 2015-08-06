@@ -107,6 +107,7 @@ import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.NewObjectExpression;
+import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
@@ -2708,12 +2709,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 while (tuplesIter.hasNext())
                 {
                     String fieldName = tuplesIter.next();
-                    objValue = getValueForObjectField(objValue, fieldName);
-                    setNotPrecompilable(); // Using literal value of parameter, so cannot precompile it
                     if (objValue == null)
                     {
+                        NucleusLogger.QUERY.warn(">> Compilation of " + expr + " : need to direct through field \"" + fieldName + "\" on null value, hence not compilable!");
+                        // Null value, and we have further path to navigate TODO Handle this "NPE"
                         break;
                     }
+                    objValue = getValueForObjectField(objValue, fieldName);
+                    setNotPrecompilable(); // Using literal value of parameter, so cannot precompile it
                 }
 
                 if (objValue == null)
@@ -3414,8 +3417,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected Object processInvokeExpression(InvokeExpression expr)
     {
-        String operation = expr.getOperation();
-
         // Find object that we invoke on
         Expression invokedExpr = expr.getLeft();
         SQLExpression invokedSqlExpr = null;
@@ -3474,6 +3475,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             throw new NucleusException("Dont currently support invoke expression " + invokedExpr);
         }
 
+        if (invokedSqlExpr instanceof NullLiteral)
+        {
+            // We cannot invoke anything on a null TODO Handle this "NPE"
+            NucleusLogger.QUERY.warn(">> Compilation of InvokeExpression needs to invoke method \"" + expr.getOperation() + "\" on " + invokedSqlExpr + " but not possible");
+        }
+
+        String operation = expr.getOperation();
         if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equalsIgnoreCase("JPQL"))
         {
             // JPQL "MEMBER OF" will be passed through from generic compilation as "contains" since we don't know types at that point
@@ -3542,7 +3550,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
             }
 
-            if (expr.getOperation() != null && expr.getOperation().equals("INDEX"))
+            if (operation.equals("INDEX"))
             {
                 // Special case of index expression
                 List<Expression> indexArgs = expr.getArguments();
