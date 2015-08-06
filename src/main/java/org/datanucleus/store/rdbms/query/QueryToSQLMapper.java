@@ -3347,8 +3347,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             else if (expr.getSymbol() != null && expr.getSymbol().getValueType() != null)
             {
+                Class valueType = expr.getSymbol().getValueType();
+                if (!paramValueSet)
+                {
+                    if (valueType.isInterface())
+                    {
+                        // Special case where we have an interface parameter (not set), and don't know the type, so we pick the first implementation just to get something that works
+                        // This is recompiled when the parameter is provided so is just for use in "compile()"
+                        String[] implNames = storeMgr.getMetaDataManager().getClassesImplementingInterface(valueType.getName(), clr);
+                        if (implNames != null && implNames.length > 0)
+                        {
+                            valueType = clr.classForName(implNames[0]);
+                            setNotPrecompilable();
+                        }
+                    }
+                }
+
                 // Use the declared type of the parameter (explicit params)
-                m = exprFactory.getMappingForType(expr.getSymbol().getValueType(), false);
+                m = exprFactory.getMappingForType(valueType, false);
             }
         }
 
