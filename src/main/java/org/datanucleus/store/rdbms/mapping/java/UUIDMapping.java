@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for fields of type java.util.UUID.
@@ -99,6 +100,10 @@ public class UUIDMapping extends SingleFieldMapping
             {
                 // Use specified converter (if found)
                 converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
+                if (converter == null)
+                {
+                    throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+                }
             }
             else
             {

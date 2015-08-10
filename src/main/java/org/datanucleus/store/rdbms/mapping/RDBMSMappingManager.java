@@ -345,7 +345,10 @@ public class RDBMSMappingManager implements MappingManager
             if (mmd.getTypeConverterName() != null)
             {
                 conv = typeMgr.getTypeConverterForName(mmd.getTypeConverterName());
-                // TODO Exception if not found
+                if (conv == null)
+                {
+                    throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+                }
             }
             else
             {

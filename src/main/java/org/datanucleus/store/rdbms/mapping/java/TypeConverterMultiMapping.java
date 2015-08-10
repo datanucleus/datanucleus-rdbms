@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.MultiColumnConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter to multiple columns.
@@ -80,6 +81,10 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         {
             // Use specified converter (if found)
             converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
+            if (converter == null)
+            {
+                throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+            }
         }
         else if (conv != null)
         {

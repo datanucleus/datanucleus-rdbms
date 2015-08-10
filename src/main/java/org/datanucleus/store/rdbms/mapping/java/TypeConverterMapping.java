@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
+import org.datanucleus.util.Localiser;
 
 /**
  * Mapping where the member has its value converted to/from some storable datastore type using a TypeConverter.
@@ -65,6 +66,10 @@ public class TypeConverterMapping extends SingleFieldMapping
         {
             // Use specified converter (if found)
             converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
+            if (converter == null)
+            {
+                throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+            }
         }
         else if (conv != null)
         {
