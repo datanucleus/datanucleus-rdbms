@@ -39,7 +39,6 @@ import org.datanucleus.store.types.ElementContainerHandler;
  */
 public class SingleCollectionMapping extends JavaTypeMapping implements MappingCallbacks
 {
-
     private JavaTypeMapping wrappedMapping;
 
     private Class wrappedTypeClass;
@@ -182,6 +181,8 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
 
     private class WrappedMemberMetaData extends AbstractMemberMetaData
     {
+        private static final long serialVersionUID = 8346519560709746659L;
+
         private AbstractMemberMetaData singleCollectionMetadata;
 
         public WrappedMemberMetaData(AbstractMemberMetaData fmd, Class type, ClassLoaderResolver clr)
