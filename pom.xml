@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>datanucleus-rdbms</artifactId>
-    <version>4.1.3-SNAPSHOT</version>
+    <version>5.0.0-m1-SNAPSHOT</version>
 
     <name>DataNucleus RDBMS plugin</name>
     <description>
@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <dn.core.version>4.1.0-release</dn.core.version>
+        <dn.core.version>4.9</dn.core.version>
     </properties>
 
     <repositories>
