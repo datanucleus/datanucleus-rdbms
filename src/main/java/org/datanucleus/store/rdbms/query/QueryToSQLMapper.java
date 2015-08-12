@@ -911,8 +911,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 maxFetchDepth = 3; // TODO Arbitrary
             }
+
             if (options.contains(OPTION_SELECT_CANDIDATE_ID_ONLY))
             {
+                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
+            }
+            else if (parentMapper != null && resultDefinitionForClass == null)
+            {
+                // Subquery, with no result specified, so select id only
                 SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
             }
             else if (stmt.allUnionsForSamePrimaryTable())
