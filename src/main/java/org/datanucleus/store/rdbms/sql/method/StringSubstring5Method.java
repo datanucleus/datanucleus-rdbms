@@ -60,7 +60,7 @@ public class StringSubstring5Method extends AbstractSQLMethod
             }
 
             // Create a new StringExpression and manually update its SQL
-            StringExpression strExpr = new StringExpression(stmt, null, null);
+            StringExpression strExpr = new StringExpression(stmt, null, getMappingForClass(String.class));
             SQLText sql = strExpr.toSQLText();
             sql.append("SUBSTRING(").append(expr).append(" FROM CAST(").append(startExpr.add(one)).append(" AS INTEGER))");
             return strExpr;
@@ -82,7 +82,7 @@ public class StringSubstring5Method extends AbstractSQLMethod
             }
 
             // Create a new StringExpression and manually update its SQL
-            StringExpression strExpr = new StringExpression(stmt, null, null);
+            StringExpression strExpr = new StringExpression(stmt, null, getMappingForClass(String.class));
             SQLText sql = strExpr.toSQLText();
             sql.append("SUBSTRING(").append(expr).append(" FROM CAST(").append(startExpr.add(one)).append(" AS INTEGER) FOR CAST(").append(endExpr.sub(startExpr)).append(" AS INTEGER))");
             return strExpr;
