@@ -309,6 +309,25 @@ public class SQLExpressionFactory
         return null;
     }
 
+    public boolean isMethodRegistered(String className, String methodName)
+    {
+        // Try to find datastore-dependent evaluator for class+method
+        MethodKey methodKey = getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName);
+        if (methodNamesSupported.contains(methodKey))
+        {
+            return true;
+        }
+
+        // Try to find datastore-independent evaluator for class+method
+        methodKey = getSQLMethodKey(null, className, methodName);
+        if (methodNamesSupported.contains(methodKey))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Method to allow a user to register an SQLMethod at runtime without utilising the plugin mechanism.
      * Will throw a NucleusUserException if this class+method already has an SQLMethod defined.
