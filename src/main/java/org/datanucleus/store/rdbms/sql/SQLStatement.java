@@ -2111,6 +2111,11 @@ public class SQLStatement
                 // Order using column aliases "NUCORDER{i}"
                 orderStmt = new SQLText();
                 boolean needsSelect = dba.supportsOption(DatastoreAdapter.INCLUDE_ORDERBY_COLS_IN_SELECT);
+                if (parent != null)
+                {
+                    // Don't select ordering columns with subqueries, since we will select just the required column(s)
+                    needsSelect = false;
+                }
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
                     if (i > 0)
@@ -2183,7 +2188,7 @@ public class SQLStatement
     {
         // TODO Cater for these columns already being selected but with no alias, so add the alias
         // to the already selected column
-        if (orderingExpressions != null)
+        if (orderingExpressions != null && parent == null) // Don't do this for subqueries, since we will be selecting just the necessary column(s)
         {
             // Add any ordering columns to the SELECT
             DatastoreAdapter dba = getDatastoreAdapter();
