@@ -27,6 +27,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
@@ -35,8 +36,9 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * ResultSet getter implementation of a field manager.
@@ -155,16 +157,31 @@ public class ResultSetGetter extends AbstractFieldManager
         }
         else
         {
-            if (RelationType.isRelationSingleValued(relationType))
+            if (mmd.isSingleCollection())
+            {
+                StatementClassMapping relationMappings = resultMappings.getMappingDefinitionForMemberPosition(fieldNumber);
+                if (relationMappings != null)
+                {
+                    Class type = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
+                    value = processSubObjectFields(type, relationMappings);
+                    
+                    TypeManager typeManager = ec.getTypeManager();
+                    ElementContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
+                    value = containerHandler.newContainer(value);
+                }
+                else
+                {
+                    value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions());
+                }
+            }
+            else if (RelationType.isRelationSingleValued(relationType))
             {
                 // Process fields of sub-object if available in this result set
                 StatementClassMapping relationMappings = resultMappings.getMappingDefinitionForMemberPosition(fieldNumber);
                 if (relationMappings != null)
                 {
-                    ClassLoaderResolver clr = ec.getClassLoaderResolver();
-                    AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                    ResultObjectFactory relationROF = new PersistentClassROF(storeMgr, relatedCmd, relationMappings, false, ec.getFetchPlan(), mmd.getType());
-                    value = relationROF.getObject(ec, resultSet);
+
+                    value = processSubObjectFields(mmd.getType(), relationMappings);
                 }
                 else
                 {
@@ -192,5 +209,15 @@ public class ResultSetGetter extends AbstractFieldManager
             }
         }
         return value;
+    }
+
+    private Object processSubObjectFields(Class fieldType, StatementClassMapping relationMappings)
+    {
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+        AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(fieldType, clr);
+        
+        ResultObjectFactory relationROF = new PersistentClassROF(storeMgr, relatedCmd, relationMappings, false, ec.getFetchPlan(), fieldType);
+        
+        return relationROF.getObject(ec, resultSet);
     }
 }

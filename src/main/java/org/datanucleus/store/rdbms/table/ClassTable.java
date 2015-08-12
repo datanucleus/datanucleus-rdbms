@@ -626,7 +626,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             needsFKToContainerOwner = true;
                         }
                     }
-                    else if (relationType == RelationType.ONE_TO_MANY_UNI)
+                    else if (relationType == RelationType.ONE_TO_MANY_UNI && !mmd.isSingleCollection() )
                     {
                         if (mmd.getJoinMetaData() == null)
                         {

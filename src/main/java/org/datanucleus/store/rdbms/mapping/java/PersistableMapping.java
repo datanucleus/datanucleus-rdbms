@@ -25,6 +25,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import static org.datanucleus.store.types.SCOUtils.singleCollectionValue;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Collection;
@@ -65,7 +67,10 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.scostore.PersistableRelationStore;
+import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.SCOCollection;
+import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.TypeManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -742,6 +747,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     public void postInsert(ObjectProvider op)
     {
         Object pc = op.provideField(mmd.getAbsoluteFieldNumber());
+        TypeManager typeManager = op.getExecutionContext().getTypeManager();        
+        pc = mmd.isSingleCollection() ? singleCollectionValue(typeManager, pc) : pc;
+        
         if (pc == null)
         {
             // Has been set to null so nothing to do
@@ -761,6 +769,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 throw new NucleusUserException("You have a field " + mmd.getFullFieldName() + " that is 1-1 bidir yet cannot find the equivalent field at the other side. Why is that?");
             }
             Object relatedValue = otherOP.provideField(relatedMmd.getAbsoluteFieldNumber());
+            
+            relatedValue = relatedMmd.isSingleCollection() ? singleCollectionValue(typeManager, relatedValue) : relatedValue;
+            
             if (relatedValue == null)
             {
                 // Managed Relations : Other side not set so update it in memory
@@ -769,7 +780,15 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     NucleusLogger.PERSISTENCE.debug(Localiser.msg("041018", op.getObjectAsPrintable(), mmd.getFullFieldName(),
                         StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName()));
                 }
-                otherOP.replaceField(relatedMmd.getAbsoluteFieldNumber(), op.getObject());
+
+                Object replaceValue = op.getObject();
+                if (relatedMmd.isSingleCollection())
+                {
+                    ElementContainerHandler containerHandler = typeManager.getContainerHandler(relatedMmd.getType());
+					replaceValue = containerHandler.newContainer(op.getObject());
+                }
+                        
+                otherOP.replaceField(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
             }
             else if (relatedValue != op.getObject())
             {
@@ -824,6 +843,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     public void postUpdate(ObjectProvider op)
     {
         Object pc = op.provideField(mmd.getAbsoluteFieldNumber());
+        pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
         ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
         RelationType relationType = mmd.getRelationType(clr);
         if (pc == null)
@@ -879,6 +899,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
 
         Object pc = op.provideField(fieldNumber);
+        pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
         if (pc == null)
         {
             // Null value so nothing to do

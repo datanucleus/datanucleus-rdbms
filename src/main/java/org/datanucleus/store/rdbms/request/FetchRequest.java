@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -454,17 +455,28 @@ public class FetchRequest extends Request
                         // The depth is the number of levels down to load in this statement.
                         // 0 is to load just this objects fields (as with JPOX, and DataNucleus up to 1.1.3)
                         int depth = 0;
-                        if (mapping instanceof PersistableMapping)
+                        
+                        AbstractMemberMetaData mmdToUse = mmd;
+                        JavaTypeMapping mappingToUse = mapping;
+                        
+                        if ( mapping instanceof SingleCollectionMapping ){
+                        	// Check the wrapped type
+                        	mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
+                        	mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
+                        }
+                        
+                        if (mappingToUse instanceof PersistableMapping)
                         {
                             depth = 1;
-                            if (Modifier.isAbstract(mmd.getType().getModifiers()))
+                            if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
                             {
-                                DatastoreClass relTable = table.getStoreManager().getDatastoreClass(mmd.getTypeName(), clr);
+                                String typeName = mmdToUse.getTypeName();
+								DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
                                 if (relTable != null && relTable.getDiscriminatorMapping(false) == null)
                                 {
                                     // 1-1 relation to base class with no discriminator and has subclasses
                                     // hence no way of determining the exact type, hence no point in fetching it
-                                    String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(mmd.getTypeName(), false);
+                                    String[] subclasses = table.getStoreManager().getMetaDataManager().getSubclassesForClass(typeName, false);
                                     if (subclasses != null && subclasses.length > 0)
                                     {
                                         depth = 0;

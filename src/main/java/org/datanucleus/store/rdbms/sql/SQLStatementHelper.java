@@ -743,7 +743,8 @@ public class SQLStatementHelper
                     }
                     else
                     {
-                        clsNames = new String[] { mmd.getTypeName() };
+                        String typeName = mmd.isSingleCollection() ? mmd.getCollection().getElementType() : mmd.getTypeName();
+                        clsNames = new String[] { typeName };
                     }
 
                     DatastoreClass relatedTbl = storeMgr.getDatastoreClass(clsNames[0], clr);
@@ -924,8 +925,10 @@ public class SQLStatementHelper
         {
             RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
+            Class type = mmd.isSingleCollection() ? clr.classForName(mmd.getCollection().getElementType()) : mmd.getType(); 
+            
             // select fetch plan fields of this object
-            AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+            AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
             if (relatedCmd != null)
             {
                 if (relatedCmd.isEmbeddedOnly())

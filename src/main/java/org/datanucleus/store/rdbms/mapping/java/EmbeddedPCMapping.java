@@ -26,6 +26,7 @@ import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.types.TypeManager;
 
 /**
  * Mapping for a PC object embedded within another PC object (1-1 relation).
@@ -183,6 +184,8 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         }
 
         Object value = ownerOP.provideField(theMmd.getAbsoluteFieldNumber()); // Owner (non-embedded) PC
+        TypeManager typeManager = ownerOP.getExecutionContext().getTypeManager();
+        value = mmd.isSingleCollection() ? typeManager.getContainerAdapter(value).iterator().next() : value;
         if (value == null)
         {
             return null;

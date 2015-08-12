@@ -799,6 +799,9 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleCollectionMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.CollectionLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.CollectionExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.SingleCollectionLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.SingleCollectionExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>

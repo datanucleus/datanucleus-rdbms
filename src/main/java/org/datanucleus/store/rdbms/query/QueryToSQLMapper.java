@@ -3078,7 +3078,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                             else
                             {
-                                relCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getTypeName(), clr);
+                                String typeName = mmd.isSingleCollection() ? mmd.getCollection().getElementType() : mmd.getTypeName();
+                                relCmd = ec.getMetaDataManager().getMetaDataForClass(typeName, clr);
                             }
 
                             if (relCmd != null && relCmd.isEmbeddedOnly())

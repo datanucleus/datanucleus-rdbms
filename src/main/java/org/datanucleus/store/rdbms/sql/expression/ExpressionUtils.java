@@ -38,6 +38,7 @@ import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
+import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -539,6 +540,10 @@ public class ExpressionUtils
         if (litMapping instanceof PersistableMapping && exprMapping instanceof ReferenceMapping)
         {
             // Can compare implementation with reference
+            return;
+        }
+        if (litMapping instanceof SingleCollectionMapping)
+        {
             return;
         }
 
