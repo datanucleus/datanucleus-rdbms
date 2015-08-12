@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.datanucleus</groupId>
             <artifactId>datanucleus-core</artifactId>
-            <version>[${dn.core.version}, )</version>
+            <version>[${dn.core.version}, 4.9)</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
