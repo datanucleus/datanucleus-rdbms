@@ -1993,9 +1993,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Expression joinOnExpr = joinExpr.getOnExpression();
                 if (joinOnExpr != null)
                 {
-                    // Convert the ON expression to a BooleanExpression and AND it to the most recent SQLTable at the end of this chain
+                    // Convert the ON expression to a BooleanExpression
+                    processingOnClause = true;
                     joinOnExpr.evaluate(this);
                     BooleanExpression joinOnSqlExpr = (BooleanExpression) stack.pop();
+                    processingOnClause = false;
+
+                    // Add the ON expression to the most recent SQLTable at the end of this chain
                     SQLJoin join = stmt.getJoinForTable(sqlTbl);
                     join.addAndCondition(joinOnSqlExpr);
                 }
@@ -2006,6 +2010,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
     }
 
+    boolean processingOnClause = false;
+    public boolean processingOnClause()
+    {
+        return processingOnClause;
+    }
+    
     /**
      * Convenience method to convert a NewObjectExpression into a StatementNewObjectMapping.
      * Handles recursive new object calls (where a new object is an arg to a new object construction).

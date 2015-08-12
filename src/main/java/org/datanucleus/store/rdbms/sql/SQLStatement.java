@@ -1178,7 +1178,41 @@ public class SQLStatement
             {
                 joins = new ArrayList<SQLJoin>();
             }
-            joins.add(join);
+
+            int position = -1;
+            if (queryGenerator != null && queryGenerator.processingOnClause())
+            {
+                // We are processing an ON condition, and this JOIN has been forced, so position it dependent on what it joins from
+                if (primaryTable == sourceTable)
+                {
+                    if (joins.size() > 0)
+                    {
+                        position = 0;
+                    }
+                }
+                else
+                {
+                    int i=1;
+                    for (SQLJoin sqlJoin : joins)
+                    {
+                        if (sqlJoin.getJoinedTable() == sourceTable)
+                        {
+                            position = i;
+                            break;
+                        }
+                        i++;
+                    }
+                }
+            }
+
+            if (position >= 0)
+            {
+                joins.add(position, join);
+            }
+            else
+            {
+                joins.add(join);
+            }
         }
         else
         {
