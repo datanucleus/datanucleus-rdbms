@@ -1993,9 +1993,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Expression joinOnExpr = joinExpr.getOnExpression();
                 if (joinOnExpr != null)
                 {
-                    // Convert the ON expression to a BooleanExpression and AND it to the most recent SQLTable at the end of this chain
+                    // Convert the ON expression to a BooleanExpression
+                    processingOnClause = true;
                     joinOnExpr.evaluate(this);
                     BooleanExpression joinOnSqlExpr = (BooleanExpression) stack.pop();
+                    processingOnClause = false;
+
+                    // Add the ON expression to the most recent SQLTable at the end of this chain
                     SQLJoin join = stmt.getJoinForTable(sqlTbl);
                     join.addAndCondition(joinOnSqlExpr);
                 }
@@ -2004,6 +2008,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Move on to next join in the chain
             rightExpr = rightExpr.getRight();
         }
+    }
+
+    boolean processingOnClause = false;
+    public boolean processingOnClause()
+    {
+        return processingOnClause;
     }
 
     /**

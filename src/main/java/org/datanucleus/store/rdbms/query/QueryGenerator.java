@@ -107,6 +107,8 @@ public interface QueryGenerator
      */
     public boolean hasExplicitJoins();
 
+    public boolean processingOnClause();
+
     /**
      * Method to bind the specified parameter to the defined type.
      * If the parameter is already bound (declared in the query perhaps, or bound via an earlier usage) then 
