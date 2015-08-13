@@ -1011,7 +1011,7 @@ public class FKListStore<E> extends AbstractListStore<E>
 
         if (tx.getSerializeRead() != null && tx.getSerializeRead())
         {
-            sqlStmt.addExtension("lock-for-update", true);
+            sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }
         String stmt = sqlStmt.getSelectStatement().toSQL();
 

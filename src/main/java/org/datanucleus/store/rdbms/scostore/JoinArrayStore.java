@@ -175,7 +175,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
 
         if (ec.getTransaction().getSerializeRead() != null && ec.getTransaction().getSerializeRead())
         {
-            sqlStmt.addExtension("lock-for-update", true);
+            sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }
         String stmt = sqlStmt.getSelectStatement().toSQL();
 

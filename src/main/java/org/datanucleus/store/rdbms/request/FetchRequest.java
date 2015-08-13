@@ -264,7 +264,7 @@ public class FetchRequest extends Request
 
             // Generate the unlocked and locked JDBC statements
             statementUnlocked = sqlStatement.getSelectStatement().toSQL();
-            sqlStatement.addExtension("lock-for-update", Boolean.TRUE);
+            sqlStatement.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.TRUE);
             statementLocked = sqlStatement.getSelectStatement().toSQL();
         }
     }

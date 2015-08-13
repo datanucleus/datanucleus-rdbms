@@ -981,10 +981,10 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         // Set any extensions
         boolean useUpdateLock = RDBMSQueryUtils.useUpdateLockForQuery(this);
-        stmt.addExtension("lock-for-update", Boolean.valueOf(useUpdateLock));
+        stmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.valueOf(useUpdateLock));
         if (getBooleanExtensionProperty(EXTENSION_FOR_UPDATE_NOWAIT, false))
         {
-            stmt.addExtension("for-update-nowait", Boolean.TRUE);
+            stmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE_NOWAIT, Boolean.TRUE);
         }
 
         datastoreCompilation.setSQL(stmt.getSelectStatement().toString());

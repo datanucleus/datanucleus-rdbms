@@ -175,7 +175,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 // Generate the statement, and statement mapping/parameter information
                 SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
                 iteratorStmtUnlocked = sqlStmt.getSelectStatement().toSQL();
-                sqlStmt.addExtension("lock-for-update", true);
+                sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
                 iteratorStmtLocked = sqlStmt.getSelectStatement().toSQL();
             }
         }

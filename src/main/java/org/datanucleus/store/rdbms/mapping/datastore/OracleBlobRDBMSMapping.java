@@ -315,7 +315,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         // Generate "SELECT {blobColumn} FROM TABLE WHERE ID=? FOR UPDATE" statement
         SQLStatement sqlStmt = new SQLStatement(storeMgr, table, null, null);
         sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
-        sqlStmt.addExtension("lock-for-update", true);
+        sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
         sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
         StatementClassMapping mappingDefinition = new StatementClassMapping();

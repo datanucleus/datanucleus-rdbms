@@ -95,7 +95,7 @@ public class RDBMSStoreHelper
             SQLController sqlControl = storeMgr.getSQLController();
             if (ec.getSerializeReadForClass(cmd.getFullClassName()))
             {
-                sqlStmt.addExtension("lock-for-update", true);
+                sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
             }
 
             try
@@ -250,7 +250,7 @@ public class RDBMSStoreHelper
             SQLController sqlControl = storeMgr.getSQLController();
             if (ec.getSerializeReadForClass(sampleCmd.getFullClassName()))
             {
-                sqlStmtMain.addExtension("lock-for-update", true);
+                sqlStmtMain.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
             }
 
             try

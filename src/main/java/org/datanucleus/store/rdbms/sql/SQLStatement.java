@@ -91,6 +91,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class SQLStatement
 {
+    public static final String EXTENSION_LOCK_FOR_UPDATE = "lock-for-update";
+    public static final String EXTENSION_LOCK_FOR_UPDATE_NOWAIT = "for-update-nowait";
+
     /** Map of SQLTable naming instance keyed by the name of the naming scheme. */
     protected static final Map<String, SQLTableNamer> tableNamerByName = new ConcurrentHashMap<String, SQLTableNamer>();
 
@@ -1536,7 +1539,7 @@ public class SQLStatement
 
         DatastoreAdapter dba = getDatastoreAdapter();
         boolean lock = false;
-        Boolean val = (Boolean)getValueForExtension("lock-for-update");
+        Boolean val = (Boolean)getValueForExtension(EXTENSION_LOCK_FOR_UPDATE);
         if (val != null)
         {
             lock = val.booleanValue();
@@ -1722,7 +1725,7 @@ public class SQLStatement
                 sql.append(" " + dba.getSelectForUpdateText());
                 if (dba.supportsOption(DatastoreAdapter.SELECT_FOR_UPDATE_NOWAIT))
                 {
-                    Boolean nowait = (Boolean) getValueForExtension("for-update-nowait");
+                    Boolean nowait = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE_NOWAIT);
                     if (nowait != null)
                     {
                         sql.append(" NOWAIT");

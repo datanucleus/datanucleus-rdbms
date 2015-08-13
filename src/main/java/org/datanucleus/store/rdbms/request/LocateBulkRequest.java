@@ -234,7 +234,7 @@ public class LocateBulkRequest extends BulkRequest
         // Generate the appropriate JDBC statement allowing for locking
         if (lock)
         {
-            sqlStatement.addExtension("lock-for-update", Boolean.TRUE);
+            sqlStatement.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.TRUE);
             return sqlStatement.getSelectStatement().toSQL();
         }
         return sqlStatement.getSelectStatement().toSQL();
