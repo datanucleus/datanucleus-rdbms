@@ -609,8 +609,7 @@ public class ObjectExpression extends SQLExpression
         if (mapping instanceof EmbeddedMapping)
         {
             // Don't support embedded instanceof expressions
-            AbstractClassMetaData fieldCmd = storeMgr.getMetaDataManager().getMetaDataForClass(
-                mapping.getType(), clr);
+            AbstractClassMetaData fieldCmd = storeMgr.getMetaDataManager().getMetaDataForClass(mapping.getType(), clr);
             if (fieldCmd.hasDiscriminatorStrategy())
             {
                 // Embedded field with inheritance so add discriminator restriction
@@ -625,8 +624,7 @@ public class ObjectExpression extends SQLExpression
                 }
                 else
                 {
-                    discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                        typeCmd.getDiscriminatorMetaData().getValue());
+                    discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, typeCmd.getDiscriminatorMetaData().getValue());
                 }
                 BooleanExpression typeExpr = (not ? discExpr.ne(discVal) : discExpr.eq(discVal));
 
@@ -634,17 +632,14 @@ public class ObjectExpression extends SQLExpression
                 while (subclassIter.hasNext())
                 {
                     String subclassName = subclassIter.next();
-                    AbstractClassMetaData subtypeCmd =
-                        storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
+                    AbstractClassMetaData subtypeCmd = storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
                     if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                     {
-                        discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                            subtypeCmd.getFullClassName());
+                        discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
                     }
                     else
                     {
-                        discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping,
-                            subtypeCmd.getDiscriminatorMetaData().getValue());
+                        discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getDiscriminatorMetaData().getValue());
                     }
                     BooleanExpression subtypeExpr = (not ? discExpr.ne(discVal) : discExpr.eq(discVal));
 
@@ -687,8 +682,7 @@ public class ObjectExpression extends SQLExpression
                 else
                 {
                     // No subclasses with tables to join to, so throw a user error
-                    throw new NucleusUserException(Localiser.msg("037005", 
-                        mapping.getMemberMetaData().getFullFieldName()));
+                    throw new NucleusUserException(Localiser.msg("037005", mapping.getMemberMetaData().getFullFieldName()));
                 }
             }
             else
@@ -708,8 +702,7 @@ public class ObjectExpression extends SQLExpression
                     targetSqlTbl = stmt.getTable(memberTable, null);
                     if (targetSqlTbl == null)
                     {
-                        targetSqlTbl = stmt.innerJoin(getSQLTable(), mapping, memberTable, null, memberTable.getIdMapping(),
-                            null, null);
+                        targetSqlTbl = stmt.innerJoin(getSQLTable(), mapping, memberTable, null, memberTable.getIdMapping(), null, null);
                     }
                 }
                 else
@@ -723,8 +716,7 @@ public class ObjectExpression extends SQLExpression
                 BooleanExpression discExpr = null;
                 if (!Modifier.isAbstract(type.getModifiers()))
                 {
-                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, type.getName(),
-                        dismd, discMapping, discSqlTbl, clr);
+                    discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, type.getName(), dismd, discMapping, discSqlTbl, clr);
                 }
 
                 Iterator subclassIter = storeMgr.getSubClassesForClass(type.getName(), true, clr).iterator();
@@ -767,16 +759,14 @@ public class ObjectExpression extends SQLExpression
                     // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
                     if (cmds.length > 1)
                     {
-                        NucleusLogger.QUERY.warn(Localiser.msg("037006",
-                            mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
+                        NucleusLogger.QUERY.warn(Localiser.msg("037006", mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
                     }
                     table = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
                 }
                 else
                 {
                     // No subclasses with tables to join to, so throw a user error
-                    throw new NucleusUserException(Localiser.msg("037005",
-                        mapping.getMemberMetaData().getFullFieldName()));
+                    throw new NucleusUserException(Localiser.msg("037005", mapping.getMemberMetaData().getFullFieldName()));
                 }
             }
             else
@@ -801,12 +791,12 @@ public class ObjectExpression extends SQLExpression
                     // a). we have unions for the member, so restrict to just the applicable unions
                     // Note that this is only really valid is wanting "a instanceof SUB1".
                     // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
+                    // TODO What if this "OP_IS" is in the SELECT clause???
                     // TODO How do we handle those cases?
                     Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                     if (type.isAssignableFrom(mainCandidateCls) == not)
                     {
-                        SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(
-                            exprFactory.newLiteral(stmt, m, false));
+                        SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
                         stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
                     }
 
@@ -818,15 +808,13 @@ public class ObjectExpression extends SQLExpression
                         Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
                         if (type.isAssignableFrom(unionCandidateCls) == not)
                         {
-                            SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(
-                                exprFactory.newLiteral(unionStmt, m, false));
+                            SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
                             unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
                         }
                     }
 
                     // Just return true since we applied the condition direct to the unions
-                    SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(
-                        exprFactory.newLiteral(stmt, m, true));
+                    SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
                     return (BooleanExpression)returnExpr;
                 }
 
@@ -844,8 +832,7 @@ public class ObjectExpression extends SQLExpression
             {
                 // Inner join will likely not give the right result
                 NucleusLogger.QUERY.debug("InstanceOf for " + table +
-                    " but no discriminator so adding inner join to " + instanceofTable +
-                        " : in some cases with UNIONs this may fail");
+                    " but no discriminator so adding inner join to " + instanceofTable + " : in some cases with UNIONs this may fail");
             }
             stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
                 instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
@@ -861,7 +848,6 @@ public class ObjectExpression extends SQLExpression
 
     public SQLExpression invoke(String methodName, List args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Object.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Object.class.getName(), methodName, this, args);
     }
 }
