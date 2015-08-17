@@ -748,6 +748,8 @@ public class ObjectExpression extends SQLExpression
             }
 
             // No discriminator, so the following is likely incomplete.
+            NucleusLogger.QUERY.warn("TYPE/INSTANCEOF operator for class=" + memberCmd.getFullClassName() + " on table=" + memberTable + " for type=" + instanceofClassName +
+                " but there is no discriminator. Any subsequent handling is likely incorrect TODO");
 
             // Join to member table
             DatastoreClass table = null;
