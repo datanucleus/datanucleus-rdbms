@@ -719,11 +719,11 @@ public class ObjectExpression extends SQLExpression
                     discExpr = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, type.getName(), dismd, discMapping, discSqlTbl, clr);
                 }
 
-                Iterator subclassIter = storeMgr.getSubClassesForClass(type.getName(), true, clr).iterator();
+                Iterator<String> subclassIter = storeMgr.getSubClassesForClass(type.getName(), true, clr).iterator();
                 boolean multiplePossibles = false;
                 while (subclassIter.hasNext())
                 {
-                    String subclassName = (String)subclassIter.next();
+                    String subclassName = subclassIter.next();
                     Class subclass = clr.classForName(subclassName);
                     if (Modifier.isAbstract(subclass.getModifiers()))
                     {
@@ -746,6 +746,8 @@ public class ObjectExpression extends SQLExpression
                 }
                 return ((not && discExpr!=null) ? discExpr.not() : discExpr);
             }
+
+            // No discriminator, so the following is likely incomplete.
 
             // Join to member table
             DatastoreClass table = null;
@@ -777,7 +779,7 @@ public class ObjectExpression extends SQLExpression
 
             if (table.managesClass(type.getName()))
             {
-                // This type is managed in this table so must be an instance TODO Is this correct, what if using discrim?
+                // This type is managed in this table so must be an instance TODO Is this correct, what if member is using discrim?
                 JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
                 return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
             }
