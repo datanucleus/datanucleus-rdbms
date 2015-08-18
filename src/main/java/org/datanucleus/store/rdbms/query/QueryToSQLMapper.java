@@ -2997,6 +2997,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 " since the class " + cmd.getFullClassName() + " is managed in multiple tables");
                         }
                     }
+                    if (table == null)
+                    {
+                        throw new NucleusUserException("Unable to find table for primary " + primaryName + " table for class=" + cmd.getFullClassName() + 
+                            " is null : is the field correct? or using some inheritance pattern?");
+                    }
                     mapping = table.getMemberMapping(mmd);
                     sqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(theStmt, sqlMapping.table, mapping);
                 }
