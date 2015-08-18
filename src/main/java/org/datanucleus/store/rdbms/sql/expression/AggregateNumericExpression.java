@@ -26,7 +26,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  * Expression for an aggregate function.
  * Allows us to distinguish aggregate expressions from other numeric expressions.
  */
-public class AggregateNumericExpression extends NumericExpression
+public class AggregateNumericExpression extends NumericExpression implements AggregateExpression
 {
     public AggregateNumericExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
     {

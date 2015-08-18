@@ -26,7 +26,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
  * Expression for an aggregate function.
  * Allows us to distinguish aggregate expressions from other temporal expressions.
  */
-public class AggregateTemporalExpression extends TemporalExpression
+public class AggregateTemporalExpression extends TemporalExpression implements AggregateExpression
 {
     public AggregateTemporalExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
     {
