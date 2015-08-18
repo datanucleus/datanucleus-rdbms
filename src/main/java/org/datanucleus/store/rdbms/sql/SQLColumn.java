@@ -64,6 +64,20 @@ public class SQLColumn
         return alias;
     }
 
+    public String getColumnSelectString()
+    {
+        String str = null;
+        if (table.getAlias() != null)
+        {
+            str = table.getAlias() + "." + column.getIdentifier().toString();
+        }
+        else
+        {
+            str = table.getTable() + "." + column.getIdentifier().toString();
+        }
+        return column.applySelectFunction(str);
+    }
+
     /**
      * Stringifier method to return this "column" in a form for use in SQL statements.
      * This can be of the following form(s)
