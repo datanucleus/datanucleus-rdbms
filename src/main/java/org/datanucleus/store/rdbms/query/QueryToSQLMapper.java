@@ -1410,7 +1410,28 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         AbstractMemberMetaData mmd = cmd.getMetaDataForMember(ids[k]);
                         if (mmd == null)
                         {
-                            throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet " + ids[k] + " is not found. Fix your input");
+                            if (joinType == JoinType.JOIN_LEFT_OUTER || joinType == JoinType.JOIN_LEFT_OUTER_FETCH)
+                            {
+                                // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
+                                String[] subclasses = mmgr.getSubclassesForClass(cmd.getFullClassName(), true);
+                                for (int l=0;l<subclasses.length;l++)
+                                {
+                                    AbstractClassMetaData subCmd = mmgr.getMetaDataForClass(subclasses[l], clr);
+                                    if (subCmd != null)
+                                    {
+                                        mmd = subCmd.getMetaDataForMember(ids[k]);
+                                        if (mmd != null)
+                                        {
+                                            cmd = subCmd;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (mmd == null)
+                            {
+                                throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet " + ids[k] + " is not found. Fix your input");
+                            }
                         }
                         tblMmd = null;
 
