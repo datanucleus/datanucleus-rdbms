@@ -35,6 +35,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.query.QueryGenerator;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
+import org.datanucleus.store.rdbms.sql.expression.AggregateStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
@@ -170,6 +171,25 @@ public class SQLStatement
 
     /** The number of records to be retrieved in any range restriction. */
     protected long rangeCount = -1;
+
+    protected class SelectedItem
+    {
+        SQLText sqlText;
+        String alias;
+        public SelectedItem(SQLText st, String alias)
+        {
+            this.sqlText = st;
+            this.alias = alias;
+        }
+        public SQLText getSQLText()
+        {
+            return sqlText;
+        }
+        public String getAlias()
+        {
+            return alias;
+        }
+    }
 
     /**
      * Constructor for an SQL statement.
@@ -423,7 +443,7 @@ public class SQLStatement
 
         invalidateStatement();
 
-        if (expr instanceof AggregateNumericExpression || expr instanceof AggregateTemporalExpression)
+        if (expr instanceof AggregateNumericExpression || expr instanceof AggregateTemporalExpression || expr instanceof AggregateStringExpression)
         {
             aggregated = true;
         }
@@ -2291,6 +2311,7 @@ public class SQLStatement
      */
     protected int selectSQLExpressionInternal(SQLExpression expr, String alias)
     {
+        // TODO Avoid squashing down to SQL, and preserve SQLText
         String exprStr = expr.toSQLText().toSQL();
         if (alias != null)
         {
