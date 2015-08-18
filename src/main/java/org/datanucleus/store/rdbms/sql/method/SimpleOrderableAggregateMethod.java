@@ -24,9 +24,11 @@ import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
+import org.datanucleus.store.rdbms.sql.expression.AggregateStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalSubqueryExpression;
@@ -68,6 +70,10 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
             if (argExpr instanceof TemporalExpression)
             {
                 return new AggregateTemporalExpression(stmt, m, getFunctionName(), args);
+            }
+            else if (argExpr instanceof StringExpression)
+            {
+                return new AggregateStringExpression(stmt, m, getFunctionName(), args);
             }
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }

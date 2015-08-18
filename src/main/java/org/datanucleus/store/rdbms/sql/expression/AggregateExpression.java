@@ -13,23 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-    ...
-**********************************************************************/
+     ...
+ **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
-import java.util.List;
-
-import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
-
 /**
- * Expression for an aggregate function.
- * Allows us to distinguish aggregate expressions from other string expressions.
+ * Representation of an aggregation expression.
  */
-public class AggregateStringExpression extends StringExpression implements AggregateExpression
+public interface AggregateExpression
 {
-    public AggregateStringExpression(SQLStatement stmt, JavaTypeMapping mapping, String functionName, List args)
-    {
-        super(stmt, mapping, functionName, args);
-    }
 }

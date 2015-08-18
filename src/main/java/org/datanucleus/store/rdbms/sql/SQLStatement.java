@@ -34,8 +34,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.query.QueryGenerator;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
-import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
-import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
+import org.datanucleus.store.rdbms.sql.expression.AggregateExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
@@ -420,7 +419,7 @@ public class SQLStatement
 
         invalidateStatement();
 
-        if (expr instanceof AggregateNumericExpression || expr instanceof AggregateTemporalExpression)
+        if (expr instanceof AggregateExpression)
         {
             aggregated = true;
         }
@@ -2289,6 +2288,7 @@ public class SQLStatement
      */
     protected int selectSQLExpressionInternal(SQLExpression expr, String alias)
     {
+        // TODO Retain SQLText so we don't squash out parameters
         String exprStr = expr.toSQLText().toSQL();
         if (alias != null)
         {
