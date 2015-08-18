@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.store.rdbms.sql.expression.StringSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalSubqueryExpression;
 import org.datanucleus.util.Localiser;
@@ -94,6 +95,10 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
         if (argExpr instanceof TemporalExpression)
         {
             subqExpr = new TemporalSubqueryExpression(stmt, subStmt);
+        }
+        else if (argExpr instanceof StringExpression)
+        {
+            subqExpr = new StringSubqueryExpression(stmt, subStmt);
         }
         else
         {
