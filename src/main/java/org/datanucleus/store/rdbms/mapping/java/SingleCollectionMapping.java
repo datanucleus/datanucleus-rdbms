@@ -105,7 +105,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
     {
         Object object = wrappedMapping.getObject(ec, rs, exprIndex);
         ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(mmd.getType());
-        return containerHandler.newContainer(object);
+        return containerHandler.newContainer(mmd, object);
     }
 
     @Override

@@ -167,7 +167,7 @@ public class ResultSetGetter extends AbstractFieldManager
                     
                     TypeManager typeManager = ec.getTypeManager();
                     ElementContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
-                    value = containerHandler.newContainer(value);
+                    value = containerHandler.newContainer(mmd, value);
                 }
                 else
                 {

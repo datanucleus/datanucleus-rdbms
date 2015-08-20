@@ -785,7 +785,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 if (relatedMmd.isSingleCollection())
                 {
                     ElementContainerHandler containerHandler = typeManager.getContainerHandler(relatedMmd.getType());
-					replaceValue = containerHandler.newContainer(op.getObject());
+					replaceValue = containerHandler.newContainer(relatedMmd, op.getObject());
                 }
                         
                 otherOP.replaceField(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
