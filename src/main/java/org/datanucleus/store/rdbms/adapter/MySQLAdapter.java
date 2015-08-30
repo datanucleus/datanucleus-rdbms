@@ -121,11 +121,12 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(STORED_PROCEDURES);
 
+        // MySQL DATETIME/TIMESTAMP doesn't store millisecs!
+        // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
+        supportedOptions.remove(DATETIME_STORES_MILLISECS);
         if (!driverName.equalsIgnoreCase("mariadb-jdbc"))
         {
-            // Mysql DATETIME/TIMESTAMP doesn't store millisecs! yet MariaDB seems to
-            // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
-            supportedOptions.remove(DATETIME_STORES_MILLISECS);
+            // TODO Do different for MariaDB?
         }
 
         supportedOptions.add(OPERATOR_BITWISE_AND);
