@@ -1684,4 +1684,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     {
         return false;
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.DatastoreAdapter#validToIndexMapping(org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping)
+     */
+    @Override
+    public boolean validToIndexMapping(JavaTypeMapping mapping)
+    {
+        return true;
+    }
 }
