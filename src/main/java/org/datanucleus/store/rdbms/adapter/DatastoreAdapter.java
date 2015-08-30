@@ -994,4 +994,11 @@ public interface DatastoreAdapter
      * @return the pattern string.
      **/
     String getPatternExpressionZeroMoreCharacters();
+
+    /**
+     * Method to return whether the specified mapping is indexable. Allows a datastore to not index particular column types.
+     * @param mapping The mapping
+     * @return Whether it is indexable
+     */
+    boolean validToIndexMapping(JavaTypeMapping mapping);
 }

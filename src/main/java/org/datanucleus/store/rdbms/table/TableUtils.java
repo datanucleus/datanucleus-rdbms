@@ -153,6 +153,10 @@ public class TableUtils
             // No columns in this mapping so we can hardly index it!
             return null;
         }
+        if (!table.getStoreManager().getDatastoreAdapter().validToIndexMapping(fieldMapping))
+        {
+            return null;
+        }
 
         // Verify if a unique index is needed
         boolean unique = (imd == null ? false : imd.isUnique());

@@ -28,6 +28,8 @@ import java.util.Properties;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
+import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -375,5 +377,19 @@ public class MySQLAdapter extends BaseDatastoreAdapter
     public String getEscapePatternExpression()
     {
         return "ESCAPE '\\\\'";
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#validToIndexMapping(org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping)
+     */
+    @Override
+    public boolean validToIndexMapping(JavaTypeMapping mapping)
+    {
+        // TODO Improve this to omit BLOB/CLOB only
+        if (mapping instanceof SerialisedMapping)
+        {
+            return false;
+        }
+        return super.validToIndexMapping(mapping);
     }
 }
