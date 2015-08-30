@@ -458,13 +458,13 @@ public class FetchRequest extends Request
                         
                         AbstractMemberMetaData mmdToUse = mmd;
                         JavaTypeMapping mappingToUse = mapping;
-                        
-                        if ( mapping instanceof SingleCollectionMapping ){
-                        	// Check the wrapped type
-                        	mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
-                        	mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
+                        if (mapping instanceof SingleCollectionMapping)
+                        {
+                            // Check the wrapped type
+                            mappingToUse = ((SingleCollectionMapping) mapping).getWrappedMapping();
+                            mmdToUse = ((SingleCollectionMapping) mapping).getWrappedMapping().getMemberMetaData();
                         }
-                        
+
                         if (mappingToUse instanceof PersistableMapping)
                         {
                             depth = 1;

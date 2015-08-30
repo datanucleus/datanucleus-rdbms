@@ -86,19 +86,20 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         return wrappedMapping == null ? false : wrappedMapping.hasSimpleDatastoreRepresentation();
     }
 
-	@Override
-	public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object container) {
-		Object value = null;
+    @Override
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object container)
+    {
+        Object value = null;
+        if (container != null)
+        {
+            ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(mmd.getType());
+            ContainerAdapter containerAdapter = containerHandler.getAdapter(container);
+            Iterator iterator = containerAdapter.iterator();
+            value = iterator.hasNext() ? iterator.next() : null;
+        }
 
-		if (container != null) {
-			ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(mmd.getType());
-			ContainerAdapter containerAdapter = containerHandler.getAdapter(container);
-			Iterator iterator = containerAdapter.iterator();
-			value = iterator.hasNext() ? iterator.next() : null;
-		}
-
-		wrappedMapping.setObject(ec, ps, pos, value);
-	}
+        wrappedMapping.setObject(ec, ps, pos, value);
+    }
 
     @Override
     public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex)
@@ -215,10 +216,11 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         {
             return singleCollectionMetadata.getAbsoluteFieldNumber();
         }
-        
+
         @Override
-        public boolean isDependent() {
-        	return super.isDependent() || getCollection().isDependentElement();
+        public boolean isDependent()
+        {
+            return super.isDependent() || getCollection().isDependentElement();
         }
 
         @Override
