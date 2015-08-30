@@ -762,6 +762,11 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         if (relationType == RelationType.ONE_TO_ONE_BI)
         {
             ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+            
+            if ( otherOP == null) {
+            	return;
+            }
+            
             AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, op.getObject(), pc);
             if (relatedMmd == null)
             {

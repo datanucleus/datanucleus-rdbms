@@ -215,6 +215,11 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         {
             return singleCollectionMetadata.getAbsoluteFieldNumber();
         }
+        
+        @Override
+        public boolean isDependent() {
+        	return super.isDependent() || getCollection().isDependentElement();
+        }
 
         @Override
         public String toString()
