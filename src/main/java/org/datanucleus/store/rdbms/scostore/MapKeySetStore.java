@@ -131,7 +131,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         if (emd != null)
         {
             elementType = emd.getFullClassName();
-            elementInfo = getComponentInformationForClass();
+            elementInfo = getComponentInformationForClass(elementType, emd);
         } 
     }
 

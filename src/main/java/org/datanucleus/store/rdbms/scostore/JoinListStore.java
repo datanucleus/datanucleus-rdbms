@@ -136,7 +136,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 {
                     if (!elementsAreEmbedded)
                     {
-                        elementInfo = getComponentInformationForClass();
+                        elementInfo = getComponentInformationForClass(elementType, emd);
                         /*if (elementInfo != null && elementInfo.length > 1)
                         {
                             throw new NucleusUserException(Localiser.msg("056031", 

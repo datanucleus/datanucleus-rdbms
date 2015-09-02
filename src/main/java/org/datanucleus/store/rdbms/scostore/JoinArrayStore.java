@@ -112,7 +112,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                     this.elementType  = emd.getFullClassName();
                     if (!elementsAreEmbedded && !elementsAreSerialised)
                     {
-                        elementInfo = getComponentInformationForClass();
+                        elementInfo = getComponentInformationForClass(elementType, emd);
                         if (elementInfo != null && elementInfo.length > 1)
                         {
                             throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));

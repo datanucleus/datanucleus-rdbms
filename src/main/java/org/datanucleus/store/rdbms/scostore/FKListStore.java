@@ -129,7 +129,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getComponentInformationForClass();
+        elementInfo = getComponentInformationForClass(elementType, emd);
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));

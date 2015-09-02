@@ -140,7 +140,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         if (emd != null)
         {
             elementType = emd.getFullClassName();
-            elementInfo = getComponentInformationForClass();
+            elementInfo = getComponentInformationForClass(elementType, emd);
         }
 
         if (keyMapping != null)

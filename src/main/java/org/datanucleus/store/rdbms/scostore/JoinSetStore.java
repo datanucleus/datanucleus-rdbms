@@ -126,7 +126,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
                 if (emd != null && !elementsAreEmbedded)
                 {
-                    elementInfo = getComponentInformationForClass();
+                    elementInfo = getComponentInformationForClass(elementType, emd);
                 }
                 else
                 {

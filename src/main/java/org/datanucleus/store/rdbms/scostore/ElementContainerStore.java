@@ -37,7 +37,6 @@ import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -161,66 +160,6 @@ public abstract class ElementContainerStore extends BaseContainerStore
     public boolean isElementsAreEmbedded()
     {
         return elementsAreEmbedded;
-    }
-
-    /**
-     * Convenience method to find the element information relating to the element type.
-     * Used specifically for the "element-type" of a collection/array to find the elements which have table information.
-     * @return Element information relating to the element type
-     */
-    protected ComponentInfo[] getComponentInformationForClass()
-    {
-        ComponentInfo[] info = null;
-
-        DatastoreClass rootTbl;
-        String[] clsNames;
-        if (clr.classForName(elementType).isInterface())
-        {
-            // Collection<interface>, so find implementations of the interface
-            clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(elementType, clr);
-            rootTbl = null;
-        }
-        else
-        {
-            clsNames = new String[] {elementType};
-            rootTbl = storeMgr.getDatastoreClass(elementType, clr);
-        }
-
-        if (rootTbl == null)
-        {
-            if (clr.classForName(elementType).isInterface())
-            {
-                info = new ComponentInfo[clsNames.length];
-                for (int i=0;i<clsNames.length;i++)
-                {
-                    AbstractClassMetaData implCmd = storeMgr.getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
-                    DatastoreClass table = storeMgr.getDatastoreClass(clsNames[i], clr);
-                    info[i] = new ComponentInfo(implCmd, table);
-                }
-            }
-            else
-            {
-                AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
-                info = new ComponentInfo[subclassCmds.length];
-                for (int i=0;i<subclassCmds.length;i++)
-                {
-                    DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
-                    info[i] = new ComponentInfo(subclassCmds[i], table);
-                }
-            }
-        }
-        else
-        {
-            info = new ComponentInfo[clsNames.length];
-            for (int i=0; i<clsNames.length; i++)
-            {
-                AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
-                DatastoreClass table = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
-                info[i] = new ComponentInfo(cmd, table);
-            }
-        }
-
-        return info;
     }
 
     /**
