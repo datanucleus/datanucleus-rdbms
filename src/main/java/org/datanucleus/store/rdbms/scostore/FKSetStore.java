@@ -123,7 +123,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getElementInformationForClass();
+        elementInfo = getComponentInformationForClass();
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
@@ -255,7 +255,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
                 try
                 {
-                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    ComponentInfo elemInfo = getComponentInfoForElement(element);
                     JavaTypeMapping ownerMapping = null;
                     if (ownerMemberMetaData.getMappedBy() != null)
                     {
@@ -860,7 +860,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * @param info ElementInfo for the element
      * @return The Statement for clearing items for the owner.
      */
-    protected String getClearNullifyStmt(ElementInfo info)
+    protected String getClearNullifyStmt(ComponentInfo info)
     {
         if (elementInfo.length == 1 && clearNullifyStmt != null)
         {
@@ -955,7 +955,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         Table table = containerTable;
         if (elementInfo.length > 1)
         {
-            ElementInfo elemInfo = getElementInfoForElement(element);
+            ComponentInfo elemInfo = getComponentInfoForElement(element);
             if (elemInfo != null)
             {
                 table = elemInfo.getDatastoreClass();

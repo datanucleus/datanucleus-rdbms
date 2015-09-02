@@ -113,7 +113,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getElementInformationForClass();
+        elementInfo = getComponentInformationForClass();
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));

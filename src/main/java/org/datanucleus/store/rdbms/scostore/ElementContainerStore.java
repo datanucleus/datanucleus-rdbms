@@ -32,7 +32,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
-import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -83,43 +82,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * When the "element-type" table uses subclass-table, or when it is a reference type then there can be multiple.
      * When the element is embedded/serialised (into join table) this will be null.
      */
-    protected ElementInfo[] elementInfo;
-
-    public static class ElementInfo
-    {
-        AbstractClassMetaData cmd; // MetaData for the element class
-        DatastoreClass table; // Table storing the element
-
-        public ElementInfo(AbstractClassMetaData cmd, DatastoreClass table)
-        {
-            this.cmd = cmd;
-            this.table = table;
-        }
-        public String getClassName()
-        {
-            return cmd.getFullClassName();
-        }
-        public AbstractClassMetaData getAbstractClassMetaData()
-        {
-            return cmd;
-        }
-        public DatastoreClass getDatastoreClass()
-        {
-            return table;
-        }
-        public DiscriminatorStrategy getDiscriminatorStrategy()
-        {
-            return cmd.getDiscriminatorStrategyForTable();
-        }
-        public JavaTypeMapping getDiscriminatorMapping()
-        {
-            return table.getDiscriminatorMapping(false);
-        }
-        public String toString()
-        {
-            return "ElementInfo : [class=" + cmd.getFullClassName() + " table=" + table + "]";
-        }
-    }
+    protected ComponentInfo[] elementInfo;
 
     /** MetaData for the "element-type" class. Not used for reference types since no metadata is present for the declared type. */
     protected AbstractClassMetaData emd;
@@ -205,9 +168,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * Used specifically for the "element-type" of a collection/array to find the elements which have table information.
      * @return Element information relating to the element type
      */
-    protected ElementInfo[] getElementInformationForClass()
+    protected ComponentInfo[] getComponentInformationForClass()
     {
-        ElementInfo[] info = null;
+        ComponentInfo[] info = null;
 
         DatastoreClass rootTbl;
         String[] clsNames;
@@ -227,33 +190,33 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             if (clr.classForName(elementType).isInterface())
             {
-                info = new ElementInfo[clsNames.length];
+                info = new ComponentInfo[clsNames.length];
                 for (int i=0;i<clsNames.length;i++)
                 {
                     AbstractClassMetaData implCmd = storeMgr.getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
                     DatastoreClass table = storeMgr.getDatastoreClass(clsNames[i], clr);
-                    info[i] = new ElementInfo(implCmd, table);
+                    info[i] = new ComponentInfo(implCmd, table);
                 }
             }
             else
             {
                 AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
-                info = new ElementInfo[subclassCmds.length];
+                info = new ComponentInfo[subclassCmds.length];
                 for (int i=0;i<subclassCmds.length;i++)
                 {
                     DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
-                    info[i] = new ElementInfo(subclassCmds[i], table);
+                    info[i] = new ComponentInfo(subclassCmds[i], table);
                 }
             }
         }
         else
         {
-            info = new ElementInfo[clsNames.length];
+            info = new ComponentInfo[clsNames.length];
             for (int i=0; i<clsNames.length; i++)
             {
                 AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
                 DatastoreClass table = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
-                info[i] = new ElementInfo(cmd, table);
+                info[i] = new ComponentInfo(cmd, table);
             }
         }
 
@@ -765,7 +728,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             {
                 // Join table collection/array, so do COUNT of join table
                 String joinedElementAlias = "ELEM";
-                ElementInfo elemInfo = elementInfo[0];
+                ComponentInfo elemInfo = elementInfo[0];
 
                 stmt.append("SELECT COUNT(*) FROM ").append(containerTable.toString()).append(" ").append(containerAlias);
 
@@ -862,7 +825,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     {
                         stmt.append(" UNION ");
                     }
-                    ElementInfo elemInfo = elementInfo[i];
+                    ComponentInfo elemInfo = elementInfo[i];
 
                     stmt.append("SELECT COUNT(*),").append("'" + elemInfo.getAbstractClassMetaData().getName() + "'");
                     stmt.append(" FROM ").append(elemInfo.getDatastoreClass().toString()).append(" ").append(containerAlias);
@@ -937,13 +900,13 @@ public abstract class ElementContainerStore extends BaseContainerStore
         }
     }
 
-    protected ElementInfo getElementInfoForElement(Object element)
+    protected ComponentInfo getComponentInfoForElement(Object element)
     {
         if (elementInfo == null)
         {
             return null;
         }
-        ElementInfo elemInfo = null;
+        ComponentInfo elemInfo = null;
 
         for (int i=0;i<elementInfo.length;i++)
         {

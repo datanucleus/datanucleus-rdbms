@@ -95,12 +95,12 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                 // Array of reference types (interfaces/Objects)
                 String[] implNames = MetaDataUtils.getInstance().getImplementationNamesForReferenceField(ownerMemberMetaData,
                     FieldRole.ROLE_ARRAY_ELEMENT, clr, storeMgr.getMetaDataManager());
-                elementInfo = new ElementInfo[implNames.length];
+                elementInfo = new ComponentInfo[implNames.length];
                 for (int i=0;i<implNames.length;i++)
                 {
                     DatastoreClass table = storeMgr.getDatastoreClass(implNames[i], clr);
                     AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implNames[i], clr);
-                    elementInfo[i] = new ElementInfo(cmd, table);
+                    elementInfo[i] = new ComponentInfo(cmd, table);
                 }
             }
             else
@@ -112,7 +112,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                     this.elementType  = emd.getFullClassName();
                     if (!elementsAreEmbedded && !elementsAreSerialised)
                     {
-                        elementInfo = getElementInformationForClass();
+                        elementInfo = getComponentInformationForClass();
                         if (elementInfo != null && elementInfo.length > 1)
                         {
                             throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));

@@ -129,7 +129,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getElementInformationForClass();
+        elementInfo = getComponentInformationForClass();
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
@@ -269,7 +269,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 PreparedStatement ps2 = sqlControl.getStatementForUpdate(mconn, setStmt, false);
                 try
                 {
-                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    ComponentInfo elemInfo = getComponentInfoForElement(element);
                     JavaTypeMapping elemMapping = this.elementMapping;
                     JavaTypeMapping orderMapping = this.orderMapping;
                     if (elemInfo != null)
@@ -352,7 +352,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, updateFkStmt, false);
                 try
                 {
-                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    ComponentInfo elemInfo = getComponentInfoForElement(element);
                     JavaTypeMapping ownerMapping = null;
                     if (ownerMemberMetaData.getMappedBy() != null)
                     {
@@ -863,7 +863,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     {
         final Object newOwner = op.getObject();
 
-        ElementInfo info = getElementInfoForElement(element);
+        ComponentInfo info = getComponentInfoForElement(element);
 
         final DatastoreClass elementTable;
         if (storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType))
@@ -1110,7 +1110,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         Table table = containerTable;
         if (elementInfo.length > 1)
         {
-            ElementInfo elemInfo = getElementInfoForElement(element);
+            ComponentInfo elemInfo = getComponentInfoForElement(element);
             if (elemInfo != null)
             {
                 table = elemInfo.getDatastoreClass();
@@ -1263,7 +1263,7 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     private String getSetStatementString(Object element)
     {
-        ElementInfo elemInfo = getElementInfoForElement(element);
+        ComponentInfo elemInfo = getComponentInfoForElement(element);
         Table table = this.containerTable;
         JavaTypeMapping ownerMapping = this.ownerMapping;
         JavaTypeMapping elemMapping = this.elementMapping;

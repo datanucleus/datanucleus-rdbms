@@ -68,7 +68,7 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * RDBMS-specific implementation of an {@link MapStore} using join table.
+ * RDBMS-specific implementation of a {@link MapStore} using join table.
  */
 public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 {
@@ -120,13 +120,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         this.valuesAreEmbedded = mapTable.isEmbeddedValue();
         this.valuesAreSerialised = mapTable.isSerialisedValue();
 
-        Class key_class=clr.classForName(keyType);
-        kmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(key_class, clr);
+        kmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
+
         Class value_class=clr.classForName(valueType);
         if (ClassUtils.isReferenceType(value_class))
         {
-            NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", 
-                ownerMemberMetaData.getFullFieldName(), value_class.getName()));
+            // Map of reference value types (interfaces/Objects)
+            NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", ownerMemberMetaData.getFullFieldName(), value_class.getName()));
             vmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class,null,clr);
             if (vmd != null)
             {

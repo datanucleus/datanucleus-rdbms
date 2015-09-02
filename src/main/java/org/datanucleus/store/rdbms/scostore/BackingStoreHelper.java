@@ -234,8 +234,7 @@ public class BackingStoreHelper
      * @return The next position in the JDBC statement
      */
     public static int populateElementDiscriminatorInStatement(ExecutionContext ec, PreparedStatement ps,
-            int jdbcPosition, boolean includeSubclasses, ElementContainerStore.ElementInfo info,
-            ClassLoaderResolver clr)
+            int jdbcPosition, boolean includeSubclasses, ComponentInfo info, ClassLoaderResolver clr)
     {
         DiscriminatorStrategy strategy = info.getDiscriminatorStrategy();
         JavaTypeMapping discrimMapping = info.getDiscriminatorMapping();

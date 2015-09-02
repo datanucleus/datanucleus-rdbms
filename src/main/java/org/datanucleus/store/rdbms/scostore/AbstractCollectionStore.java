@@ -137,7 +137,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
                     // Needs to pass TCK M-N relation test
                     boolean usingJoinTable = usingJoinTable();
-                    ElementInfo elemInfo = getElementInfoForElement(element);
+                    ComponentInfo elemInfo = getComponentInfoForElement(element);
                     if (!usingJoinTable && elemInfo != null && elemInfo.getDiscriminatorMapping() != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elemInfo, clr);
@@ -222,7 +222,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         JavaTypeMapping ownerMapping = null;
         JavaTypeMapping elemMapping = null;
         JavaTypeMapping relDiscrimMapping = null;
-        ElementInfo elemInfo = null;
+        ComponentInfo elemInfo = null;
         if (usingJoinTable)
         {
             selectTable = this.containerTable;
@@ -232,7 +232,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         }
         else
         {
-            elemInfo = getElementInfoForElement(element);
+            elemInfo = getComponentInfoForElement(element);
             // TODO What if no suitable elementInfo found?
             if (elemInfo != null)
             {
