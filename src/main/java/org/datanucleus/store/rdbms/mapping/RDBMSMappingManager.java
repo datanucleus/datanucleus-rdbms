@@ -1745,13 +1745,17 @@ public class RDBMSMappingManager implements MappingManager
 
         if (!(mmd.getParent() instanceof AbstractClassMetaData))
         {
-            // Embedded so cant be datastore-attributed
+            // Embedded so can't be datastore-attributed
         }
         else
         {
-            if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()))
+            if (!mmd.getClassName(true).equals(mmd.getAbstractClassMetaData().getFullClassName()))
             {
-                if (tbl instanceof DatastoreClass)
+                // Overriding member, so ignore
+            }
+            else
+            {
+                if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
                 {
                     if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
                     {
