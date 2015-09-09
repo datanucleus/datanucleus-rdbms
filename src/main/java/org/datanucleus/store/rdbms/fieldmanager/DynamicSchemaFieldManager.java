@@ -17,7 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.fieldmanager;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -31,8 +33,9 @@ import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.rdbms.table.ElementContainerTable;
+import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.util.ClassUtils;
@@ -109,7 +112,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
 
                 processInterfaceMappingForValue(intfMapping, value, mmd, ec);
             }
-            else if (mmd.hasCollection())
+            else if (mmd.hasCollection() || mmd.hasArray())
             {
                 boolean hasJoin = false;
                 if (mmd.getJoinMetaData() != null)
@@ -130,25 +133,82 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
                     return;
                 }
 
-                Collection coll = (Collection)value;
-                if (coll.isEmpty())
+                Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
+                ElementContainerTable collTbl = (ElementContainerTable)joinTbl;
+                JavaTypeMapping elemMapping = collTbl.getElementMapping();
+                if (elemMapping instanceof InterfaceMapping)
+                {
+                    InterfaceMapping intfMapping = (InterfaceMapping)elemMapping;
+                    if (mmd.hasCollection())
+                    {
+                        Collection coll = (Collection)value;
+                        if (coll.isEmpty())
+                        {
+                            return;
+                        }
+
+                        // Update value mapping using first element. Maybe we should do the same for all elements?
+                        Object elementValue = coll.iterator().next();
+                        processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
+                    }
+                    else if (mmd.hasArray())
+                    {
+                        if (Array.getLength(value) == 0)
+                        {
+                            return;
+                        }
+
+                        // Update value mapping using first element. Maybe we should do the same for all elements?
+                        Object elementValue = Array.get(value,  0);
+                        processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
+                    }
+                }
+            }
+            else if (mmd.hasMap())
+            {
+                boolean hasJoin = false;
+                if (mmd.getJoinMetaData() != null)
+                {
+                    hasJoin = true;
+                }
+                else
+                {
+                    AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
+                    if (relMmds != null && relMmds[0].getJoinMetaData() != null)
+                    {
+                        hasJoin = true;
+                    }
+                }
+                if (!hasJoin)
+                {
+                    // Not join table so no supported schema updates
+                    return;
+                }
+
+                Map map = (Map)value;
+                if (map.isEmpty())
                 {
                     return;
                 }
 
                 Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
-                CollectionTable collTbl = (CollectionTable)joinTbl;
-                JavaTypeMapping elemMapping = collTbl.getElementMapping();
-                if (elemMapping instanceof InterfaceMapping)
+                MapTable mapTbl = (MapTable)joinTbl;
+                JavaTypeMapping keyMapping = mapTbl.getKeyMapping();
+                if (keyMapping instanceof InterfaceMapping)
                 {
-                    InterfaceMapping intfMapping = (InterfaceMapping)elemMapping;
-                    processInterfaceMappingForValue(intfMapping, coll.iterator().next(), mmd, ec);
+                    // Update key mapping using first key. Maybe we should do the same for all keys?
+                    InterfaceMapping intfMapping = (InterfaceMapping)keyMapping;
+                    Object keyValue = map.keySet().iterator().next();
+                    processInterfaceMappingForValue(intfMapping, keyValue, mmd, ec);
                 }
-            }
-            else if (mmd.hasMap())
-            {
-                NucleusLogger.DATASTORE_SCHEMA.debug("TODO : Support dynamic schema updates for Map field " + mmd.getFullFieldName());
-                // TODO Cater for Map<NonPC, Interface>
+                JavaTypeMapping valMapping = mapTbl.getValueMapping();
+                if (valMapping instanceof InterfaceMapping)
+                {
+                    // Update value mapping using first value. Maybe we should do the same for all values?
+                    InterfaceMapping intfMapping = (InterfaceMapping)valMapping;
+                    Object valValue = map.values().iterator().next();
+                    processInterfaceMappingForValue(intfMapping, valValue, mmd, ec);
+                }
             }
         }
     }
@@ -225,8 +285,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
     {
     }
 
-    protected void processInterfaceMappingForValue(InterfaceMapping intfMapping, Object value,
-            AbstractMemberMetaData mmd, ExecutionContext ec)
+    protected void processInterfaceMappingForValue(InterfaceMapping intfMapping, Object value, AbstractMemberMetaData mmd, ExecutionContext ec)
     {
         if (intfMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
         {
