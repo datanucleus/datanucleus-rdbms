@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
@@ -157,14 +156,14 @@ public abstract class AbstractClassTable extends TableImpl
      */
     protected JavaTypeMapping getMappingForMemberName(String memberName)
     {
-        Set<AbstractMemberMetaData> fields = memberMappingsMap.keySet();
-        Iterator<AbstractMemberMetaData> fieldsIter = fields.iterator();
-        while (fieldsIter.hasNext())
+        Iterator<Map.Entry<AbstractMemberMetaData, JavaTypeMapping>> memberMapEntryIter = memberMappingsMap.entrySet().iterator();
+        while (memberMapEntryIter.hasNext())
         {
-            AbstractMemberMetaData mmd = fieldsIter.next();
+            Map.Entry<AbstractMemberMetaData, JavaTypeMapping> memberMapEntry = memberMapEntryIter.next();
+            AbstractMemberMetaData mmd = memberMapEntry.getKey();
             if (mmd.getFullFieldName().equals(memberName))
             {
-                return memberMappingsMap.get(mmd);
+                return memberMapEntry.getValue();
             }
         }
         return null;
@@ -596,12 +595,12 @@ public abstract class AbstractClassTable extends TableImpl
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
 
-        Set fieldNumbersSet = memberMappingsMap.keySet();
-        Iterator iter = fieldNumbersSet.iterator();
-        while (iter.hasNext())
+        Iterator<Map.Entry<AbstractMemberMetaData, JavaTypeMapping>> memberMapEntryIter = memberMappingsMap.entrySet().iterator();
+        while (memberMapEntryIter.hasNext())
         {
-            AbstractMemberMetaData mmd = (AbstractMemberMetaData) iter.next();
-            JavaTypeMapping memberMapping = memberMappingsMap.get(mmd);
+            Map.Entry<AbstractMemberMetaData, JavaTypeMapping> memberMapEntry = memberMapEntryIter.next();
+            AbstractMemberMetaData mmd = memberMapEntry.getKey();
+            JavaTypeMapping memberMapping = memberMapEntry.getValue();
             if (memberMapping != null)
             {
                 if (!mmd.isPrimaryKey())

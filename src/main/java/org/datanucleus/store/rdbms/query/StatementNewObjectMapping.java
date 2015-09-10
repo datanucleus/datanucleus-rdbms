@@ -87,12 +87,12 @@ public class StatementNewObjectMapping
         StringBuilder str = new StringBuilder("StatementNewObject: " + cls.getName() + "(");
         if (ctrArgMappings != null)
         {
-            Iterator<Integer> keyIter = ctrArgMappings.keySet().iterator();
-            while (keyIter.hasNext())
+            Iterator<Map.Entry<Integer, Object>> ctrArgEntryIter = ctrArgMappings.entrySet().iterator();
+            while (ctrArgEntryIter.hasNext())
             {
-                Integer position = keyIter.next();
-                str.append(ctrArgMappings.get(position));
-                if (keyIter.hasNext())
+                Map.Entry<Integer, Object> ctrArgEntry = ctrArgEntryIter.next();
+                str.append(ctrArgEntry.getValue());
+                if (ctrArgEntryIter.hasNext())
                 {
                     str.append(",");
                 }

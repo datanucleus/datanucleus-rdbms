@@ -365,12 +365,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Initialise any SecondaryTables
         if (secondaryTables != null)
         {
-            Set secondaryTableNames = secondaryTables.keySet();
-            Iterator secondaryTableNamesIter = secondaryTableNames.iterator();
-            while (secondaryTableNamesIter.hasNext())
+            Iterator<Map.Entry<String, SecondaryTable>> secondaryTableEntryIter = secondaryTables.entrySet().iterator();
+            while (secondaryTableEntryIter.hasNext())
             {
-                String secondaryTableName = (String)secondaryTableNamesIter.next();
-                SecondaryTable second = secondaryTables.get(secondaryTableName);
+                Map.Entry<String, SecondaryTable> secondaryTableEntry = secondaryTableEntryIter.next();
+                SecondaryTable second = secondaryTableEntry.getValue();
                 if (!second.isInitialized())
                 {
                     second.initialize(clr);

@@ -561,22 +561,28 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         RDBMSMappingManager mapMgr = (RDBMSMappingManager)storeMgr.getMappingManager();
         RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
 
-        for (int jdbcType : supportedJdbcTypesById.keySet())
+        Iterator<Map.Entry<Integer, String>> entryIter = supportedJdbcTypesById.entrySet().iterator();
+        while (entryIter.hasNext())
         {
+            Map.Entry<Integer, String> entry = entryIter.next();
+            int jdbcType = entry.getKey();
             if (types.getChild("" + jdbcType) == null)
             {
                 // JDBC type not supported by adapter so deregister the mapping
                 // Means that we don't need to add "excludes" definitions to plugin.xml
-                mapMgr.deregisterDatastoreMappingsForJDBCType(supportedJdbcTypesById.get(jdbcType));
+                mapMgr.deregisterDatastoreMappingsForJDBCType(entry.getValue());
             }
         }
-        for (int jdbcType : unsupportedJdbcTypesById.keySet())
+        entryIter = unsupportedJdbcTypesById.entrySet().iterator();
+        while (entryIter.hasNext())
         {
+            Map.Entry<Integer, String> entry = entryIter.next();
+            int jdbcType = entry.getKey();
             if (types.getChild("" + jdbcType) == null)
             {
                 // JDBC type not supported by adapter so deregister the mapping
                 // Means that we don't need to add "excludes" definitions to plugin.xml
-                mapMgr.deregisterDatastoreMappingsForJDBCType(unsupportedJdbcTypesById.get(jdbcType));
+                mapMgr.deregisterDatastoreMappingsForJDBCType(entry.getValue());
             }
         }
     }
