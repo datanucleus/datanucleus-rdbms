@@ -56,7 +56,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     /** ResultObjectFactory for converting the result set into objects. */
     protected ResultObjectFactory<E> rof;
 
-    /** Map of field values, keyed by the "id" of the object. The value is a "Map<fieldNumber, fieldValue>". */
+    /** Map of field values, keyed by the "id" of the object. The value is a "Map&lt;fieldNumber, fieldValue&gt;". */
     protected Map<Object, Map<Integer, Object>> bulkLoadedValueByMemberNumber;
 
     /** Default to closing the statement when closing the resultSet, but allow override. */
