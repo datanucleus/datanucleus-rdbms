@@ -1598,22 +1598,22 @@ public class SQLStatement
             while (selectItemIter.hasNext())
             {
                 SelectedItem selectedItem = selectItemIter.next();
+                SQLText selectedST = selectedItem.getSQLText();
+                sql.append(selectedST);
 
-                String selectedStr = selectedItem.getSQLText().toSQL();
                 if (selectedItem.getAlias() != null)
                 {
-                    selectedStr += " AS " + selectedItem.getAlias();
+                    sql.append(" AS " + selectedItem.getAlias());
                 }
                 else
                 {
                     if (addAliasToAllSelects)
                     {
                         // This query needs an alias on all selects, so add "DN_{X}"
-                        selectedStr += " AS DN_" + autoAliasNum;
+                        sql.append(" AS DN_" + autoAliasNum);
                         autoAliasNum++;
                     }
                 }
-                sql.append(selectedStr);
 
                 if (selectItemIter.hasNext())
                 {
