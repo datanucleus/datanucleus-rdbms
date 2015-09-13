@@ -121,7 +121,7 @@ public class SQLStatement
     protected List<SQLStatement> unions = null;
 
     /** List of select objects. */
-    protected List<String> selects = new ArrayList();
+    protected List<SelectedItem> selectedItems = new ArrayList();
 
     /** Array of update expressions when the statement is an UPDATE. */
     protected SQLExpression[] updates = null;
@@ -166,6 +166,46 @@ public class SQLStatement
 
     /** The number of records to be retrieved in any range restriction. */
     protected long rangeCount = -1;
+
+    protected class SelectedItem
+    {
+        SQLText sqlText;
+        String alias;
+        public SelectedItem(SQLText st, String alias)
+        {
+            this.sqlText = st;
+            this.alias = alias;
+        }
+        public SQLText getSQLText()
+        {
+            return sqlText;
+        }
+        public String getAlias()
+        {
+            return alias;
+        }
+        public int hashCode()
+        {
+            return sqlText.hashCode() ^ (alias != null ? alias.hashCode() : 0);
+        }
+        public boolean equals(Object other)
+        {
+            if (other == null || !(other instanceof SelectedItem))
+            {
+                return false;
+            }
+            SelectedItem otherItem = (SelectedItem)other;
+            if (!sqlText.equals(otherItem.sqlText))
+            {
+                return false;
+            }
+            if ((alias != null && !alias.equals(otherItem.alias)) || (otherItem.alias != null && !otherItem.alias.equals(alias)))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
 
     /**
      * Constructor for an SQL statement.
@@ -400,7 +440,7 @@ public class SQLStatement
      */
     public int getNumberOfSelects()
     {
-        return selects.size();
+        return selectedItems.size();
     }
 
     /**
@@ -424,28 +464,17 @@ public class SQLStatement
             aggregated = true;
         }
 
-        // TODO By squashing all selects down to Strings we lose info about parameters in select expressions. Needs fixing if we ever want to put parameters in the SELECT clause
         int[] selected = new int[expr.getNumberOfSubExpressions()];
         if (expr.getNumberOfSubExpressions() > 1)
         {
             for (int i=0;i<expr.getNumberOfSubExpressions();i++)
             {
-                String exprStr = expr.getSubExpression(i).toSQLText().toSQL();
-                if (alias != null)
-                {
-                    exprStr += " AS " + alias + i;
-                }
-                selected[i] = selectItem(exprStr);
+                selected[i] = selectItem(expr.getSubExpression(i).toSQLText(), alias != null ? (alias + i) : null);
             }
         }
         else
         {
-            String exprStr = expr.toSQLText().toSQL();
-            if (alias != null)
-            {
-                exprStr += " AS " + alias;
-            }
-            selected[0] = selectItem(exprStr);
+            selected[0] = selectItem(expr.toSQLText(), alias);
         }
 
         if (unions != null)
@@ -503,7 +532,7 @@ public class SQLStatement
             }
 
             SQLColumn col = new SQLColumn(table, mappings[i].getColumn(), colAlias);
-            selected[i] = selectItem(col.toString());
+            selected[i] = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null);
         }
 
         if (applyToUnions && unions != null)
@@ -566,7 +595,7 @@ public class SQLStatement
             colAlias = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
         }
         SQLColumn col = new SQLColumn(table, column, colAlias);
-        int position = selectItem(col.toString());
+        int position = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null);
 
         if (unions != null)
         {
@@ -584,40 +613,34 @@ public class SQLStatement
 
     /**
      * Internal method to find the position of an item in the select list and return the position
-     * if found (first position is 1). If the item is not found then it is added and the new position
-     * returned.
-     * @param item The item
+     * if found (first position is 1). If the item is not found then it is added and the new position returned.
+     * @param st SQLText to select
+     * @param alias Optional alias
      * @return Position in the select list (first position is 1)
      */
-    private int selectItem(String item)
+    private int selectItem(SQLText st, String alias)
     {
-        if (selects.contains(item))
+        SelectedItem item = new SelectedItem(st, alias);
+        if (selectedItems.contains(item))
         {
             // Already have a select item with this exact name so just return with that
-            return selects.indexOf(item) + 1;
+            return selectedItems.indexOf(item) + 1;
         }
 
-        int numberSelected = selects.size();
+        int numberSelected = selectedItems.size();
         for (int i=0;i<numberSelected;i++)
         {
-            String selectedItem = selects.get(i);
-            if (selectedItem.startsWith(item + " "))
+            SelectedItem selectedItem = selectedItems.get(i);
+            if (selectedItem.getSQLText().equals(st))
             {
-                // We already have the same column but with an alias
-                return (i+1);
-            }
-            else if (item.startsWith(selectedItem + " "))
-            {
-                // We are trying to add an aliased form of something that already exists
-                // so swap what is there already for our aliased variant
-                selects.set(i, item);
+                // We already have the same column but different alias
                 return (i+1);
             }
         }
 
         // The item doesn't exist so add it and return its new position
-        selects.add(item);
-        return selects.indexOf(item) + 1;
+        selectedItems.add(item);
+        return selectedItems.indexOf(item) + 1;
     }
 
     // --------------------------------- UPDATE --------------------------------------
@@ -1561,7 +1584,7 @@ public class SQLStatement
 
         addOrderingColumnsToSelect();
 
-        if (selects.isEmpty())
+        if (selectedItems.isEmpty())
         {
             // Nothing selected so select all
             sql.append("*");
@@ -1569,23 +1592,28 @@ public class SQLStatement
         else
         {
             int autoAliasNum = 0;
-            Iterator<String> selectIter = selects.iterator();
-            while (selectIter.hasNext())
+            Iterator<SelectedItem> selectItemIter = selectedItems.iterator();
+            while (selectItemIter.hasNext())
             {
-                String selected = selectIter.next();
-                if (addAliasToAllSelects)
+                SelectedItem selectedItem = selectItemIter.next();
+                SQLText selectedST = selectedItem.getSQLText();
+                sql.append(selectedST);
+
+                if (selectedItem.getAlias() != null)
                 {
-                    // This query needs an alias on all selects, so add "DN_{X}"
-                    if (selected.indexOf(" AS ") < 0)
+                    sql.append(" AS " + selectedItem.getAlias());
+                }
+                else
+                {
+                    if (addAliasToAllSelects)
                     {
-                        // Needs alias adding
-                        selected += " AS DN_" + autoAliasNum;
+                        // This query needs an alias on all selects, so add "DN_{X}"
+                        sql.append(" AS DN_" + autoAliasNum);
                         autoAliasNum++;
                     }
                 }
 
-                sql.append(selected);
-                if (selectIter.hasNext())
+                if (selectItemIter.hasNext())
                 {
                     sql.append(',');
                 }
@@ -1780,23 +1808,21 @@ public class SQLStatement
                 // This apparently works for DB2 (unverified, but claimed by IBM employee)
                 SQLText userSql = sql;
                 sql = new SQLText("SELECT ");
-                Iterator<String> selectIter = selects.iterator();
-                while (selectIter.hasNext())
+                Iterator<SelectedItem> selectedItemIter = selectedItems.iterator();
+                while (selectedItemIter.hasNext())
                 {
-                    String selectExpr = selectIter.next();
+                    SelectedItem selectedItemExpr = selectedItemIter.next();
                     sql.append("subq.");
-                    String selectedCol = selectExpr;
-                    int dotIndex = selectedCol.indexOf(" AS ");
-                    if (dotIndex > 0)
+                    String selectedCol = selectedItemExpr.getSQLText().toSQL();
+                    if (selectedItemExpr.getAlias() != null)
                     {
-                        // Use column alias where possible
-                        selectedCol = selectedCol.substring(dotIndex + 4);
+                        selectedCol = selectedItemExpr.getAlias();
                     }
-                    else 
+                    else
                     {
                         // strip out qualifier when encountered from column name since we are adding a new qualifier above.
                         // NOTE THAT THIS WILL FAIL IF THE ORIGINAL QUERY HAD "A0.COL1, B0.COL1" IN THE SELECT
-                        dotIndex = selectedCol.indexOf(".");
+                        int dotIndex = selectedCol.indexOf(".");
                         if (dotIndex > 0) 
                         {
                             // Remove qualifier name and the dot
@@ -1805,7 +1831,7 @@ public class SQLStatement
                     }
 
                     sql.append(selectedCol);
-                    if (selectIter.hasNext())
+                    if (selectedItemIter.hasNext())
                     {
                         sql.append(',');
                     }
@@ -2199,15 +2225,14 @@ public class SQLStatement
                 // Add the ordering columns to the selected list, saving the positions
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
-                    selects.add(orderingExpressions[i].toSQLText().toString());
-                    orderingColumnIndexes[i] = selects.size();
-
+                    orderingColumnIndexes[i] = selectItem(orderingExpressions[i].toSQLText(), null);
                     if (unions != null)
                     {
                         Iterator<SQLStatement> iterator = unions.iterator();
                         while (iterator.hasNext())
                         {
-                            iterator.next().selectSQLExpressionInternal(orderingExpressions[i], null);
+                            SQLStatement stmt = iterator.next();
+                            stmt.selectItem(orderingExpressions[i].toSQLText(), null);
                         }
                     }
                 }
@@ -2217,7 +2242,7 @@ public class SQLStatement
                 // Order using column aliases "NUCORDER{i}"
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
-                    String orderExpr = "NUCORDER" + i;
+                    String orderExprAlias = "NUCORDER" + i;
                     if (orderingExpressions[i] instanceof ResultAliasExpression)
                     {
                         // Nothing to do since this is ordering by a result alias
@@ -2230,25 +2255,11 @@ public class SQLStatement
                             while (iterator.hasNext())
                             {
                                 SQLStatement stmt = iterator.next();
-                                if (aggregated)
-                                {
-                                    stmt.selectSQLExpressionInternal(orderingExpressions[i], null);
-                                }
-                                else
-                                {
-                                    stmt.selectSQLExpressionInternal(orderingExpressions[i], orderExpr);
-                                }
+                                stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias);
                             }
                         }
 
-                        if (aggregated)
-                        {
-                            selectSQLExpressionInternal(orderingExpressions[i], null);
-                        }
-                        else
-                        {
-                            selectSQLExpressionInternal(orderingExpressions[i], orderExpr);
-                        }
+                        selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias);
                     }
                     else
                     {
@@ -2257,11 +2268,10 @@ public class SQLStatement
                         DatastoreMapping[] mappings = m.getDatastoreMappings();
                         for (int j=0;j<mappings.length;j++)
                         {
-                            String alias = orderExpr + "_" + j;
+                            String alias = orderExprAlias + "_" + j;
                             DatastoreIdentifier aliasId = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
                             SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
-                            String selectedName = col.toString();
-                            selectItem(selectedName);
+                            selectItem(new SQLText(col.getColumnSelectString()), alias);
 
                             if (unions != null)
                             {
@@ -2269,7 +2279,7 @@ public class SQLStatement
                                 while (iterator.hasNext())
                                 {
                                     SQLStatement stmt = iterator.next();
-                                    stmt.selectItem(selectedName);
+                                    stmt.selectItem(new SQLText(col.getColumnSelectString()), alias);
                                 }
                             }
                         }
@@ -2277,24 +2287,6 @@ public class SQLStatement
                 }
             }
         }
-    }
-
-    /**
-     * Convenience method for selecting columns when generating the SQL text.
-     * Does the same as selectSQLExpression except doesn't invalidate the SQL.
-     * @param expr The expression
-     * @param alias The alias to use
-     * @return The position of this column
-     */
-    protected int selectSQLExpressionInternal(SQLExpression expr, String alias)
-    {
-        // TODO Retain SQLText so we don't squash out parameters
-        String exprStr = expr.toSQLText().toSQL();
-        if (alias != null)
-        {
-            exprStr += " AS " + alias;
-        }
-        return selectItem(exprStr);
     }
 
     /**

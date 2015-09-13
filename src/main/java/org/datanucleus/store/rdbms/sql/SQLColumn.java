@@ -93,4 +93,18 @@ public class SQLColumn
         }
         return column.applySelectFunction(str);
     }
+
+    public String getColumnSelectString()
+    {
+        String str = null;
+        if (table.getAlias() != null)
+        {
+            str = table.getAlias() + "." + column.getIdentifier().toString();
+        }
+        else
+        {
+            str = table.getTable() + "." + column.getIdentifier().toString();
+        }
+        return column.applySelectFunction(str);
+    }
 }
