@@ -136,9 +136,6 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
             // Create a SCO wrapper with the entries loaded
             replaceFieldWithWrapper(ownerOP, value);
-
-            // Make sure all are flushed
-            ec.flushInternal(true);
         }
         else
         {
