@@ -274,7 +274,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
         if (loadResultsAtCommit && isOpen() && moreResultSetRows)
         {
             // Query connection closing message
-            NucleusLogger.QUERY.info(Localiser.msg("052606", query.toString()));
+            NucleusLogger.QUERY.debug(Localiser.msg("052606", query.toString()));
 
             try
             {
