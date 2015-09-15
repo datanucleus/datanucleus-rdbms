@@ -294,7 +294,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         if (loadResultsAtCommit && isOpen())
         {
             // Query connection closing message
-            NucleusLogger.QUERY.info(Localiser.msg("052606", query.toString()));
+            NucleusLogger.QUERY.debug(Localiser.msg("052606", query.toString()));
 
             if (endIndex < 0)
             {
