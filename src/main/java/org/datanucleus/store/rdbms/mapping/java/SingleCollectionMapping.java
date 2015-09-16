@@ -26,6 +26,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ElementMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
@@ -51,10 +52,9 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         wrappedTypeClass = clr.classForName(wrappedTypeName);
 
         WrappedMemberMetaData wmmd = new WrappedMemberMetaData(mmd, wrappedTypeClass, clr);
+
         // Get the actual mapping that handles the the wrapped type
-        wrappedMapping = table.getStoreManager().getMappingManager().getMapping(wrappedTypeClass, collectionMetaData.isSerializedElement(),
-            collectionMetaData.isEmbeddedElement(), null);
-        wrappedMapping.initialize(wmmd, table, clr);
+        wrappedMapping = table.getStoreManager().getMappingManager().getMapping(table, wmmd, clr, FieldRole.ROLE_FIELD);
 
         super.initialize(mmd, table, clr);
     }
