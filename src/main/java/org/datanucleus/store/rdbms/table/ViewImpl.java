@@ -95,7 +95,7 @@ public abstract class ViewImpl extends AbstractTable
         {
             throw new MissingTableException(getCatalogName(), getSchemaName(), this.toString());
         }
-        else if (!tableType.equals("VIEW"))
+        else if (!tableType.equals("VIEW")) // TODO Allow "MATERIALIZED VIEW" that some RDBMS support (e.g PostgreSQL)
         {
             throw new NotAViewException(this.toString(), tableType);
         }
