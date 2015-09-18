@@ -469,33 +469,29 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
     }
 
     /**
-     * Convenience method to add a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the
-     * class name.
+     * Convenience method to add a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the class name.
      * @param stmt SQLStatement
      * @param className Name of the class
      */
     private void addTypeSelectForClass(SQLStatement stmt, String className)
     {
-        if (hasOption(OPTION_SELECT_NUCLEUS_TYPE))
+        // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
+        /*if (hasOption(OPTION_ALLOW_NULLS))
         {
-            // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
-            /*if (hasOption(OPTION_ALLOW_NULLS))
-            {
-                NullLiteral nullLtl = new NullLiteral(stmt, null, null, null);
-                stmt.select(nullLtl, NUC_TYPE_COLUMN);
-            }
-            else
-            {*/
-                // Add SELECT of dummy column accessible as "NUCLEUS_TYPE" containing the classname
-                JavaTypeMapping m = storeMgr.getMappingManager().getMapping(String.class);
-                String nuctypeName = className;
-                if (maxClassNameLength > nuctypeName.length())
-                {
-                    nuctypeName = StringUtils.leftAlignedPaddedString(nuctypeName, maxClassNameLength);
-                }
-                StringLiteral lit = new StringLiteral(stmt, m, nuctypeName, null);
-                stmt.select(lit, NUC_TYPE_COLUMN);
-            /*}*/
+            NullLiteral nullLtl = new NullLiteral(stmt, null, null, null);
+            stmt.select(nullLtl, NUC_TYPE_COLUMN);
         }
+        else
+        {*/
+        // Add SELECT of dummy column accessible as "NUCLEUS_TYPE" containing the classname
+        JavaTypeMapping m = storeMgr.getMappingManager().getMapping(String.class);
+        String nuctypeName = className;
+        if (maxClassNameLength > nuctypeName.length())
+        {
+            nuctypeName = StringUtils.leftAlignedPaddedString(nuctypeName, maxClassNameLength);
+        }
+        StringLiteral lit = new StringLiteral(stmt, m, nuctypeName, null);
+        stmt.select(lit, NUC_TYPE_COLUMN);
+        /*}*/
     }
 }
