@@ -1601,14 +1601,14 @@ public class SQLStatement
 
                 if (selectedItem.getAlias() != null)
                 {
-                    sql.append(" AS " + selectedItem.getAlias());
+                    sql.append(" AS ").append(rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItem.getAlias()));
                 }
                 else
                 {
                     if (addAliasToAllSelects)
                     {
                         // This query needs an alias on all selects, so add "DN_{X}"
-                        sql.append(" AS DN_" + autoAliasNum);
+                        sql.append(" AS ").append(rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("DN_" + autoAliasNum));
                         autoAliasNum++;
                     }
                 }
@@ -1816,7 +1816,7 @@ public class SQLStatement
                     String selectedCol = selectedItemExpr.getSQLText().toSQL();
                     if (selectedItemExpr.getAlias() != null)
                     {
-                        selectedCol = selectedItemExpr.getAlias();
+                        selectedCol = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(selectedItemExpr.getAlias());
                     }
                     else
                     {
@@ -2128,7 +2128,6 @@ public class SQLStatement
                         orderStmt.append(" " + orderNullDirectives[i]);
                     }
                 }
-                // TODO Cater for ResultAliasExpression, so we just put the order aliasName
             }
             else
             {
@@ -2143,6 +2142,10 @@ public class SQLStatement
                 }
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
+                    SQLExpression orderExpr = orderingExpressions[i];
+                    boolean orderDirection = orderingDirections[i];
+                    String orderNullDirective = (orderNullDirectives != null && orderNullDirectives.length > 0 ? orderNullDirectives[i] : null);
+
                     if (i > 0)
                     {
                         orderStmt.append(',');
@@ -2150,25 +2153,27 @@ public class SQLStatement
 
                     if (needsSelect && !aggregated)
                     {
-                        if (orderingExpressions[i] instanceof ResultAliasExpression)
+                        if (orderExpr instanceof ResultAliasExpression)
                         {
-                            orderStmt.append(dba.getOrderString(rdbmsMgr, ((ResultAliasExpression)orderingExpressions[i]).getResultAlias(), orderingExpressions[i]));
+                            String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(((ResultAliasExpression)orderExpr).getResultAlias());
+                            addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
                         }
                         else
                         {
                             // Order by the "NUCORDER?" if we need them to be selected and it isn't an aggregate
                             String orderString = "NUCORDER" + i;
-                            if (orderingExpressions[i].getNumberOfSubExpressions() == 1)
+                            if (orderExpr.getNumberOfSubExpressions() == 1)
                             {
-                                orderStmt.append(dba.getOrderString(rdbmsMgr, orderString, orderingExpressions[i]));
+                                String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderString);
+                                addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
                             }
                             else
                             {
-                                DatastoreMapping[] mappings = orderingExpressions[i].getJavaTypeMapping().getDatastoreMappings();
+                                DatastoreMapping[] mappings = orderExpr.getJavaTypeMapping().getDatastoreMappings();
                                 for (int j=0;j<mappings.length;j++)
                                 {
-                                    String alias = orderString + "_" + j;
-                                    orderStmt.append(dba.getOrderString(rdbmsMgr, alias, orderingExpressions[i]));
+                                    String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderString + "_" + j);
+                                    addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
 
                                     if (j < mappings.length-1)
                                     {
@@ -2180,29 +2185,34 @@ public class SQLStatement
                     }
                     else
                     {
-                        if (orderingExpressions[i] instanceof ResultAliasExpression)
+                        if (orderExpr instanceof ResultAliasExpression)
                         {
-                            orderStmt.append(dba.getOrderString(rdbmsMgr, ((ResultAliasExpression)orderingExpressions[i]).getResultAlias(), orderingExpressions[i]));
+                            String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(((ResultAliasExpression)orderExpr).getResultAlias());
+                            addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
                         }
                         else
                         {
                             // Order by the "THIS.COLUMN" otherwise
-                            orderStmt.append(dba.getOrderString(rdbmsMgr, orderingExpressions[i].toSQLText().toSQL(), orderingExpressions[i]));
+                            addOrderComponent(orderStmt, orderExpr.toSQLText().toSQL(), orderExpr, orderDirection, orderNullDirective, dba);
                         }
-                    }
-
-                    if (orderingDirections[i])
-                    {
-                        orderStmt.append(" DESC");
-                    }
-                    if (orderNullDirectives != null && orderNullDirectives[i] != null)
-                    {
-                        orderStmt.append(" " + orderNullDirectives[i]);
                     }
                 }
             }
         }
         return orderStmt;
+    }
+
+    protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, String orderNullDirective, DatastoreAdapter dba)
+    {
+        orderST.append(dba.getOrderString(rdbmsMgr, orderString, orderExpr));
+        if (orderDirection)
+        {
+            orderST.append(" DESC");
+        }
+        if (orderNullDirective != null)
+        {
+            orderST.append(" " + orderNullDirective);
+        }
     }
 
     /**
@@ -2211,8 +2221,7 @@ public class SQLStatement
      */
     protected void addOrderingColumnsToSelect()
     {
-        // TODO Cater for these columns already being selected but with no alias, so add the alias
-        // to the already selected column
+        // TODO Cater for these columns already being selected but with no alias, so add the alias to the already selected column
         if (orderingExpressions != null && parent == null) // Don't do this for subqueries, since we will be selecting just the necessary column(s)
         {
             // Add any ordering columns to the SELECT
@@ -2243,6 +2252,7 @@ public class SQLStatement
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
                     String orderExprAlias = "NUCORDER" + i;
+                    orderExprAlias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderExprAlias);
                     if (orderingExpressions[i] instanceof ResultAliasExpression)
                     {
                         // Nothing to do since this is ordering by a result alias
