@@ -784,6 +784,100 @@ public class SQLStatement
     }
 
     /**
+     * Method to form a join to the specified table using the provided mappings, with the join also being applied to any UNIONed statements.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param sourceMapping Mapping in this table to join from
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
+            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
+    {
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
+    }
+
+    /**
+     * Method to form a join to the specified table using the provided mappings.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param sourceMapping Mapping in this table to join from
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @param applyToUnions Whether to apply to any unioned statements
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
+            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
+    {
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, applyToUnions);
+    }
+
+    /**
+     * Method to form a join to the specified table using the provided mappings.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param sourceMapping Mapping in this table to join from
+     * @param sourceParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param targetParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
+     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @param applyToUnions Whether to apply to any unioned statements
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
+            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
+    {
+        invalidateStatement();
+
+        // Create the SQLTable to join to.
+        if (tables == null)
+        {
+            tables = new HashMap();
+        }
+        if (tableGrpName == null)
+        {
+            tableGrpName = "Group" + tableGroups.size();
+        }
+        if (targetAlias == null)
+        {
+            targetAlias = generateTableAlias(target, tableGrpName);
+        }
+        if (sourceTable == null)
+        {
+            sourceTable = primaryTable;
+        }
+        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
+        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
+        putSQLTableInGroup(targetTbl, tableGrpName, joinType);
+
+        addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the join to all unions
+            Iterator<SQLStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SQLStatement stmt = unionIter.next();
+                stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
+            }
+        }
+
+        return targetTbl;
+    }
+
+    /**
      * Method to form an inner join to the specified table using the provided mappings.
      * Will be applied to all unioned statements.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
@@ -798,7 +892,7 @@ public class SQLStatement
     public SQLTable innerJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
     {
-        return innerJoin(sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName);
+        return join(JoinType.INNER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -818,43 +912,7 @@ public class SQLStatement
     public SQLTable innerJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
             Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
     {
-        invalidateStatement();
-
-        // Create the SQLTable to join to.
-        if (tables == null)
-        {
-            tables = new HashMap();
-        }
-        if (tableGrpName == null)
-        {
-            tableGrpName = "Group" + tableGroups.size();
-        }
-        if (targetAlias == null)
-        {
-            targetAlias = generateTableAlias(target, tableGrpName);
-        }
-        if (sourceTable == null)
-        {
-            sourceTable = primaryTable;
-        }
-        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
-        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
-        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.INNER_JOIN);
-
-        join(JoinType.INNER_JOIN, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
-
-        if (unions != null)
-        {
-            // Apply the join to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.innerJoin(sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName);
-            }
-        }
-
-        return targetTbl;
+        return join(JoinType.INNER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -872,7 +930,7 @@ public class SQLStatement
     public SQLTable leftOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
     {
-        return leftOuterJoin(sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName);
+        return join(JoinType.LEFT_OUTER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -892,43 +950,7 @@ public class SQLStatement
     public SQLTable leftOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
             Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
     {
-        invalidateStatement();
-
-        // Create the SQLTable to join to.
-        if (tables == null)
-        {
-            tables = new HashMap();
-        }
-        if (tableGrpName == null)
-        {
-            tableGrpName = "Group" + tableGroups.size();
-        }
-        if (targetAlias == null)
-        {
-            targetAlias = generateTableAlias(target, tableGrpName);
-        }
-        if (sourceTable == null)
-        {
-            sourceTable = primaryTable;
-        }
-        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
-        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
-        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.LEFT_OUTER_JOIN);
-
-        join(SQLJoin.JoinType.LEFT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
-
-        if (unions != null)
-        {
-            // Apply the join to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.leftOuterJoin(sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName);
-            }
-        }
-
-        return targetTbl;
+        return join(JoinType.LEFT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -946,7 +968,7 @@ public class SQLStatement
     public SQLTable rightOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
     {
-        return rightOuterJoin(sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName);
+        return join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -966,43 +988,7 @@ public class SQLStatement
     public SQLTable rightOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
             Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
     {
-        invalidateStatement();
-
-        // Create the SQLTable to join to.
-        if (tables == null)
-        {
-            tables = new HashMap();
-        }
-        if (tableGrpName == null)
-        {
-            tableGrpName = "Group" + tableGroups.size();
-        }
-        if (targetAlias == null)
-        {
-            targetAlias = generateTableAlias(target, tableGrpName);
-        }
-        if (sourceTable == null)
-        {
-            sourceTable = primaryTable;
-        }
-        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
-        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
-        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.RIGHT_OUTER_JOIN);
-
-        join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
-
-        if (unions != null)
-        {
-            // Apply the join to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.rightOuterJoin(sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName);
-            }
-        }
-
-        return targetTbl;
+        return join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -1034,7 +1020,7 @@ public class SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
 
-        join(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
+        addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
 
         if (unions != null)
         {
@@ -1170,7 +1156,7 @@ public class SQLStatement
      * @param targetParentMapping Optional parent of this target mapping (when joining an impl of an interface)
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      */
-    protected void join(SQLJoin.JoinType joinType, 
+    protected void addJoin(SQLJoin.JoinType joinType, 
             SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
             SQLTable targetTable, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping,
             Object[] discrimValues)
