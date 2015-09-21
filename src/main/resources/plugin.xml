@@ -1085,6 +1085,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring4Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="sybase"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring2Method"/>
+        <sql-method class="java.lang.String" method="substring" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="db2"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="derby"
