@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -1171,6 +1172,10 @@ public class SQLStatement
             // What if we have a cross join, and want to change to inner join?
             NucleusLogger.DATASTORE.debug("Attempt to join to " + targetTable + " but join already exists");
             return;
+        }
+        if (joinType == JoinType.RIGHT_OUTER_JOIN && !rdbmsMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.RIGHT_OUTER_JOIN))
+        {
+            throw new NucleusUserException("RIGHT OUTER JOIN is not supported by this datastore");
         }
 
         // Add the table to the referenced tables for this statement

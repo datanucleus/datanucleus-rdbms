@@ -54,6 +54,8 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
 
+        supportedOptions.remove(RIGHT_OUTER_JOIN);
+
         // SQLite (xerial driver) returns 0 for these! The 18 chosen here is totally arbitrary
         maxTableNameLength = MAX_IDENTIFIER_LENGTH;
         maxColumnNameLength = MAX_IDENTIFIER_LENGTH;

@@ -71,6 +71,9 @@ public interface DatastoreAdapter
     /** Whether "Types.BIT" is really mapped as BOOLEAN. */
     public static final String BIT_IS_REALLY_BOOLEAN = "BitIsReallyBoolean";
 
+    /** Do we support right outer join? */
+    public static final String RIGHT_OUTER_JOIN = "RightOuterJoin";
+
     /** Whether we support Boolean comparisons. */
     public static final String BOOLEAN_COMPARISON = "BooleanExpression";
 

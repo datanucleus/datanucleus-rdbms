@@ -93,7 +93,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 {
     protected Map<Integer, String> supportedJdbcTypesById = new HashMap();
     protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap();
-
     /** The set of reserved keywords for this datastore. */
     protected final HashSet<String> reservedKeywords = new HashSet();
 
@@ -423,6 +422,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(RESULTSET_TYPE_FORWARD_ONLY);
         supportedOptions.add(RESULTSET_TYPE_SCROLL_SENSITIVE);
         supportedOptions.add(RESULTSET_TYPE_SCROLL_INSENSITIVE);
+
+        supportedOptions.add(RIGHT_OUTER_JOIN);
 
         supportedOptions.add(ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE);
         supportedOptions.add(VIEWS);
