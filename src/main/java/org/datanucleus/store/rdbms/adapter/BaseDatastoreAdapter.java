@@ -1565,16 +1565,16 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param conn Connection to use
      * @param catalog The catalog (null if none)
      * @param schema The schema (null if none)
-     * @param table The table (null if all)
-     * @param columnNamePattern The column name (null if all)
+     * @param tableNamePattern The table name pattern (null if all)
+     * @param columnNamePattern The column name pattern (null if all)
      * @return ResultSet containing the table/column information
      * @throws SQLException Thrown if an error occurs
      */
-    public ResultSet getColumns(Connection conn, String catalog, String schema, String table, String columnNamePattern)
+    public ResultSet getColumns(Connection conn, String catalog, String schema, String tableNamePattern, String columnNamePattern)
     throws SQLException
     {
         DatabaseMetaData dmd = conn.getMetaData();
-        return dmd.getColumns(catalog, schema, table, columnNamePattern);
+        return dmd.getColumns(catalog, schema, tableNamePattern, columnNamePattern);
     }
 
     public String toString()
