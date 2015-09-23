@@ -191,7 +191,7 @@ public class ColumnImpl implements Column
     @Override
     public JdbcType getJdbcType()
     {
-        return JdbcType.getEnumByValue(typeInfo.getDataType());
+        return typeInfo != null ? JdbcType.getEnumByValue(typeInfo.getDataType()) : null;
     }
 
     /* (non-Javadoc)
