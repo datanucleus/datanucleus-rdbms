@@ -1159,24 +1159,32 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay2Method"/>
         <sql-method class="java.util.Date" method="getDay" datastore="postgresql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay3Method"/>
+        <sql-method class="java.util.Date" method="getDay" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay4Method"/>
         <sql-method class="java.util.Date" method="getDate"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDayMethod"/>
         <sql-method class="java.util.Date" method="getDate" datastore="oracle"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay2Method"/>
         <sql-method class="java.util.Date" method="getDate" datastore="postgresql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay3Method"/>
+        <sql-method class="java.util.Date" method="getDate" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay4Method"/>
         <sql-method class="java.util.Date" method="getMonth"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonthMethod"/>
         <sql-method class="java.util.Date" method="getMonth" datastore="oracle"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth2Method"/>
         <sql-method class="java.util.Date" method="getMonth" datastore="postgresql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth3Method"/>
+        <sql-method class="java.util.Date" method="getMonth" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth4Method"/>
         <sql-method class="java.util.Date" method="getYear"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYearMethod"/>
         <sql-method class="java.util.Date" method="getYear" datastore="oracle"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear2Method"/>
         <sql-method class="java.util.Date" method="getYear" datastore="postgresql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear3Method"/>
+        <sql-method class="java.util.Date" method="getYear" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear4Method"/>
         <sql-method class="java.util.Date" method="getHour"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHourMethod"/>
         <sql-method class="java.util.Date" method="getHour" datastore="oracle"
@@ -1185,6 +1193,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour3Method"/>
         <sql-method class="java.util.Date" method="getHour" datastore="sqlserver"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour4Method"/>
+        <sql-method class="java.util.Date" method="getHour" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour5Method"/>
         <sql-method class="java.util.Date" method="getMinute"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinuteMethod"/>
         <sql-method class="java.util.Date" method="getMinute" datastore="oracle"
@@ -1193,6 +1203,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute3Method"/>
         <sql-method class="java.util.Date" method="getMinute" datastore="sqlserver"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute4Method"/>
+        <sql-method class="java.util.Date" method="getMinute" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute5Method"/>
         <sql-method class="java.util.Date" method="getSecond"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecondMethod"/>
         <sql-method class="java.util.Date" method="getSecond" datastore="oracle"
@@ -1203,6 +1215,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond4Method"/>
         <sql-method class="java.util.Date" method="getSecond" datastore="hsql"
             evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond5Method"/>
+        <sql-method class="java.util.Date" method="getSecond" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond6Method"/>
 
         <sql-method class="java.util.Map" method="mapKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapKeyMethod"/>
         <sql-method class="java.util.Map" method="mapValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapValueMethod"/>
