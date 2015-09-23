@@ -437,25 +437,6 @@ public class RDBMSMappingManager implements MappingManager
             {
                 // Non-embedded/non-serialised - Just get the basic mapping for the type
                 Class memberType = mmd.getType();
-                IdentityStrategy strategy = mmd.getValueStrategy();
-                if (strategy != null)
-                {
-                    String strategyName = strategy.toString();
-                    if (strategy == IdentityStrategy.NATIVE)
-                    {
-                        strategyName = storeMgr.getStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
-                    }
-                    if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
-                    {
-                        memberType = storeMgr.getDatastoreAdapter().getAutoIncrementJavaTypeForType(memberType);
-                        if (memberType != mmd.getType())
-                        {
-                            NucleusLogger.DATASTORE_SCHEMA.debug("Member " + mmd.getFullFieldName() + " uses IDENTITY strategy and rather than using memberType of " + mmd.getTypeName() +
-                                " for the column type, using " + memberType + " since the datastore requires that");
-                        }
-                    }
-                }
-
                 mcd = getMappingClass(memberType, false, false, mmd.getColumnMetaData(), mmd.getFullFieldName());
 
                 if (mmd.getParent() instanceof EmbeddedMetaData && mmd.getRelationType(clr) != RelationType.NONE)
@@ -1588,6 +1569,29 @@ public class RDBMSMappingManager implements MappingManager
                     jdbcType = mmd.getColumnMetaData()[index].getJdbcTypeName();
                     sqlType = mmd.getColumnMetaData()[index].getSqlType();
                 }
+
+                // Special case where we have IDENTITY strategy and the datastore imposes a limitation on the required datastore type
+                IdentityStrategy strategy = mmd.getValueStrategy();
+                if (strategy != null)
+                {
+                    String strategyName = strategy.toString();
+                    if (strategy == IdentityStrategy.NATIVE)
+                    {
+                        strategyName = storeMgr.getStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
+                    }
+                    if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
+                    {
+                        Class requestedType = clr.classForName(javaType);
+                        Class requiredType = storeMgr.getDatastoreAdapter().getAutoIncrementJavaTypeForType(requestedType);
+                        if (requiredType != mmd.getType())
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.debug("Member " + mmd.getFullFieldName() + " uses IDENTITY strategy and rather than using memberType of " + mmd.getTypeName() +
+                                    " for the column type, using " + requiredType + " since the datastore requires that");
+                        }
+                        javaType = requiredType.getName();
+                    }
+                }
+
                 if (mmd.isSerialized())
                 {
                     javaType = ClassNameConstants.JAVA_IO_SERIALIZABLE;
