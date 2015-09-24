@@ -539,21 +539,6 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             {
                 while (rs.next())
                 {
-                    String catalog = rs.getString("TABLE_CATALOG");
-                    boolean catalogCorrect = false;
-                    if (StringUtils.isWhitespace(catalogName) && StringUtils.isWhitespace(catalog))
-                    {
-                        catalogCorrect = true;
-                    }
-                    else if (catalogName != null && catalogName.equals(catalog))
-                    {
-                        catalogCorrect = true;
-                    }
-                    else if (catalog != null && StringUtils.isWhitespace(catalogName) && catalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
-                    {
-                        catalogCorrect = true;
-                    }
-
                     String schema = rs.getString("TABLE_SCHEM");
                     boolean schemaCorrect = false;
                     if (StringUtils.isWhitespace(schemaName) && StringUtils.isWhitespace(schema))
@@ -567,6 +552,33 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                     else if (schema != null && StringUtils.isWhitespace(schemaName) && schema.equals(((RDBMSStoreManager)storeMgr).getSchemaName()))
                     {
                         schemaCorrect = true;
+                    }
+
+                    boolean catalogCorrect = false;
+                    String catalog = catalogName;
+                    try
+                    {
+                        catalog = rs.getString("TABLE_CATALOG");
+                        if (StringUtils.isWhitespace(catalogName) && StringUtils.isWhitespace(catalog))
+                        {
+                            catalogCorrect = true;
+                        }
+                        else if (catalogName != null && catalogName.equals(catalog))
+                        {
+                            catalogCorrect = true;
+                        }
+                        else if (catalog != null && StringUtils.isWhitespace(catalogName) && catalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
+                        {
+                            catalogCorrect = true;
+                        }
+                    }
+                    catch (SQLException sqle)
+                    {
+                        // This datastore doesn't return catalog (e.g Oracle)
+                        if (catalogName == null)
+                        {
+                            catalogCorrect = true;
+                        }
                     }
 
                     if (schemaCorrect && catalogCorrect)
