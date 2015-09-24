@@ -2057,6 +2057,22 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
 
+        if (cmd.getIdentityType() == IdentityType.APPLICATION)
+        {
+            // Make sure there is no reuse of PK fields that cause a duplicate index for the PK. Remove it if required
+            PrimaryKey pk = getPrimaryKey();
+            Iterator<Index> indicesIter = indices.iterator();
+            while (indicesIter.hasNext())
+            {
+                Index idx = indicesIter.next();
+                if (idx.getColumnList().equals(pk.getColumnList()))
+                {
+                    NucleusLogger.DATASTORE_SCHEMA.debug("Index " + idx + " is for the same columns as the PrimaryKey so being removed from expected set of indices. PK is always indexed");
+                    indicesIter.remove();
+                }
+            }
+        }
+
         return indices;
     }
 
