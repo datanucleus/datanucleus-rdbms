@@ -19,7 +19,7 @@ __Dependencies__ : See file [pom.xml](pom.xml)
 ## Datastore Adapters
 
 Each supported datastore will have an associated "adapter" stored under 
-[org.datanucleus.store.rdbms.adapter](https://github.com/datanucleus/datanucleus-rdbms/tree/master/src/java/org/datanucleus/store/rdbms/adapter), 
+[org.datanucleus.store.rdbms.adapter](https://github.com/datanucleus/datanucleus-rdbms/tree/master/src/main/java/org/datanucleus/store/rdbms/adapter), 
 so if planning on supporting or improving support for an RDBMS database this is the place to look (as well as in 
 [plugin.xml](https://github.com/datanucleus/datanucleus-rdbms/blob/master/plugin.xml)).
 
