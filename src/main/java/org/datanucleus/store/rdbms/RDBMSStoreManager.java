@@ -2869,43 +2869,47 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         // Initialise all tables/views for the classes
                         List<Table>[] toValidate = initializeClassTables(classNames, clr);
 
-                        if (toValidate[0] != null && toValidate[0].size() > 0)
+                        if (!performingDeleteSchemaForClasses)
                         {
-                            // Validate the tables
-                            List[] result = performTablesValidation(toValidate[0], clr);
-                            tablesCreated = result[0];
-                            tableConstraintsCreated = result[1];
-                            autoCreateErrors = result[2];
-                        }
-
-                        if (toValidate[1] != null && toValidate[1].size() > 0)
-                        {
-                            // Validate the views
-                            List[] result = performViewsValidation(toValidate[1]);
-                            viewsCreated = result[0];
-                            autoCreateErrors.addAll(result[1]);
-                        }
-
-                        // Process all errors from the above
-                        if (autoCreateErrors.size() > 0)
-                        {
-                            // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
-                            Iterator errorsIter = autoCreateErrors.iterator();
-                            while (errorsIter.hasNext())
+                            // Not performing delete of schema for classes so create in datastore if required
+                            if (toValidate[0] != null && toValidate[0].size() > 0)
                             {
-                                Throwable exc = (Throwable)errorsIter.next();
-                                if (rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
-                                {
-                                    NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
-                                }
-                                else
-                                {
-                                    NucleusLogger.DATASTORE.error(Localiser.msg("050044", exc));
-                                }
+                                // Validate the tables
+                                List[] result = performTablesValidation(toValidate[0], clr);
+                                tablesCreated = result[0];
+                                tableConstraintsCreated = result[1];
+                                autoCreateErrors = result[2];
                             }
-                            if (!rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
+
+                            if (toValidate[1] != null && toValidate[1].size() > 0)
                             {
-                                throw new NucleusDataStoreException(Localiser.msg("050043"), (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
+                                // Validate the views
+                                List[] result = performViewsValidation(toValidate[1]);
+                                viewsCreated = result[0];
+                                autoCreateErrors.addAll(result[1]);
+                            }
+
+                            // Process all errors from the above
+                            if (autoCreateErrors.size() > 0)
+                            {
+                                // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
+                                Iterator errorsIter = autoCreateErrors.iterator();
+                                while (errorsIter.hasNext())
+                                {
+                                    Throwable exc = (Throwable)errorsIter.next();
+                                    if (rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
+                                    {
+                                        NucleusLogger.DATASTORE.warn(Localiser.msg("050044", exc));
+                                    }
+                                    else
+                                    {
+                                        NucleusLogger.DATASTORE.error(Localiser.msg("050044", exc));
+                                    }
+                                }
+                                if (!rdbmsMgr.getSchemaHandler().isAutoCreateWarnOnError())
+                                {
+                                    throw new NucleusDataStoreException(Localiser.msg("050043"), (Throwable[])autoCreateErrors.toArray(new Throwable[autoCreateErrors.size()]));
+                                }
                             }
                         }
 
@@ -3319,7 +3323,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 List<Table> tmpTablesToValidate = new ArrayList();
                 for (Table tbl : tablesToValidate)
                 {
-                    // This just checks the identifier name - see hashCode of Table. The commented out code below was the original, maybe useful if we find an example that needs it
+                    // This just checks the identifier name - see hashCode of Table
                     if (!tmpTablesToValidate.contains(tbl))
                     {
                         tmpTablesToValidate.add(tbl);
@@ -4107,6 +4111,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
+    boolean performingDeleteSchemaForClasses = false;
+
     public void deleteSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
@@ -4124,6 +4130,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             FileWriter ddlFileWriter = null;
             try
             {
+                performingDeleteSchemaForClasses = true;
                 if (ddlFilename != null)
                 {
                     // Open the DDL file for writing
@@ -4199,6 +4206,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 finally
                 {
+                    performingDeleteSchemaForClasses = false;
                     if (ddlFileWriter != null)
                     {
                         this.ddlWriter = null;

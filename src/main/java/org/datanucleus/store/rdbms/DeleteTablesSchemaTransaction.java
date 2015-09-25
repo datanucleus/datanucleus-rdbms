@@ -28,17 +28,19 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.StoreDataManager;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.ClassView;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.rdbms.table.ViewImpl;
+import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Schema transaction for deleting all known tables.
+ * Schema transaction for deleting all known tables/views.
  */
 public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
 {
@@ -121,10 +123,16 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         }
                     }
 
-                    ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                    // Drop view if exists in the datastore
+                    StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
+                    if (info != null)
+                    {
+                        ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                    }
                 }
 
                 // Remove table constraints
+                Map<TableImpl, Boolean> schemaExistsForTableMap = new HashMap();
                 Iterator tablesIter = baseTablesByName.values().iterator();
                 while (tablesIter.hasNext())
                 {
@@ -148,7 +156,13 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         }
                     }
 
-                    tbl.dropConstraints(getCurrentConnection());
+                    // Drop constraints if exists in the datastore
+                    StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {tbl});
+                    schemaExistsForTableMap.put(tbl, info != null);
+                    if (info != null)
+                    {
+                        tbl.dropConstraints(getCurrentConnection());
+                    }
                 }
 
                 // Remove tables
@@ -175,7 +189,12 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         }
                     }
 
-                    tbl.drop(getCurrentConnection());
+                    // Drop table if exists in the datastore
+                    Boolean schemaExists = schemaExistsForTableMap.get(tbl);
+                    if (schemaExists != null && schemaExists == Boolean.TRUE)
+                    {
+                        tbl.drop(getCurrentConnection());
+                    }
                 }
             }
             catch (Exception e)
