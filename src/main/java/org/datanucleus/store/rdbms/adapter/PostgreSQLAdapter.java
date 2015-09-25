@@ -326,12 +326,11 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     public String getDropTableStatement(Table table)
     {
         /* DROP TABLE t CASCADE is supported beginning in 7.3 */
-        if (datastoreMajorVersion < 7 ||
-            (datastoreMajorVersion == 7 && datastoreMinorVersion < 3))
+        if (datastoreMajorVersion < 7 || (datastoreMajorVersion == 7 && datastoreMinorVersion < 3))
         {
             return "DROP TABLE " + table.toString();
         }
-        return "DROP TABLE " + table.toString() + " CASCADE";
+        return super.getDropTableStatement(table);
     }
 
     /**
