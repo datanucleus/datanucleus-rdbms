@@ -210,19 +210,6 @@ public class H2Adapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Returns the appropriate SQL to drop the given table.
-     * It should return something like:
-     * <pre>DROP TABLE FOO</pre>
-     *
-     * @param table     The table to drop.
-     * @return  The text of the SQL statement.
-     */
-    public String getDropTableStatement(Table table)
-    {
-        return "DROP TABLE " + table.toString();
-    }
-
-    /**
      * Accessor for the auto-increment sql statement for this datastore.
      * @param table Name of the table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
