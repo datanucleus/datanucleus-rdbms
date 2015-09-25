@@ -338,6 +338,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
      */
     public String getDropTableStatement(Table table)
     {
+        // TODO Now supports CASCADE
         return "DROP TABLE " + table.toString();
     }
 
