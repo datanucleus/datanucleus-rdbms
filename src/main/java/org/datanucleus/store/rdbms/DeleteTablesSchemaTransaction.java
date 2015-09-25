@@ -76,6 +76,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             {
                 NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
 
+                // Build up map of tables and views TODO Why use maps?
                 Map baseTablesByName = new HashMap();
                 Map viewsByName = new HashMap();
                 for (Iterator i = storeDataMgr.getManagedStoreData().iterator(); i.hasNext();)
@@ -99,9 +100,8 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         }
                     }
                 }
-                
-                // Remove tables, table constraints and views in
-                // reverse order from which they were created
+
+                // Remove views
                 Iterator viewsIter = viewsByName.values().iterator();
                 while (viewsIter.hasNext())
                 {
@@ -124,6 +124,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
                 }
 
+                // Remove table constraints
                 Iterator tablesIter = baseTablesByName.values().iterator();
                 while (tablesIter.hasNext())
                 {
@@ -150,6 +151,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     tbl.dropConstraints(getCurrentConnection());
                 }
 
+                // Remove tables
                 tablesIter = baseTablesByName.values().iterator();
                 while (tablesIter.hasNext())
                 {
