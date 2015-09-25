@@ -99,6 +99,7 @@ import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SQLTableGroup;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
@@ -1481,27 +1482,55 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 JavaTypeMapping otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
                                 if (otherMapping == null)
                                 {
-                                    // Polymorphic join : cannot find the member in the candidate, so need to pick which UNION TODO Implement this
-                                    /*NucleusLogger.GENERAL.info(">>    stmt primary cand=" + stmt.getCandidateClassName());
+                                    // Polymorphic join? : cannot find this member in the candidate of the main statement, so need to pick which UNION
+                                    String tblGroupName = sqlTbl.getGroupName();
+                                    SQLTableGroup grp = stmt.getTableGroup(tblGroupName);
+                                    SQLTable nextSqlTbl = null;
+
+                                    // Try to find subtable in the same group that has a mapping for this member (and join from that)
+                                    SQLTable[] grpTbls = grp.getTables();
+                                    for (SQLTable grpTbl : grpTbls)
+                                    {
+                                        if (grpTbl.getTable().getMemberMapping(mmd) != null)
+                                        {
+                                            otherMapping = grpTbl.getTable().getMemberMapping(mmd);
+                                            break;
+                                        }
+                                    }
+                                    SQLTable newSqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, false);
+                                    if (newSqlTbl != null)
+                                    {
+                                        nextSqlTbl = newSqlTbl;
+                                    }
+
                                     List<SQLStatement> unionStmts = stmt.getUnions();
                                     for (SQLStatement unionStmt : unionStmts)
                                     {
-                                        NucleusLogger.GENERAL.info(">>    stmt union cand=" + unionStmt.getCandidateClassName());
-                                        SQLTableGroup grp = unionStmt.getTableGroup(sqlTbl.getGroupName());
-                                        SQLTable[] grpTbls = grp.getTables();
-                                        for (SQLTable grpTbl : grpTbls)
+                                        // Repeat the process for any unioned statements, find a subtable in the same group (and join from that)
+                                        otherMapping = null;
+                                        grp = unionStmt.getTableGroup(tblGroupName);
+                                        SQLTable[] unionGrpTbls = grp.getTables();
+                                        for (SQLTable grpTbl : unionGrpTbls)
                                         {
                                             if (grpTbl.getTable().getMemberMapping(mmd) != null)
                                             {
-//                                                otherMapping = grpTbl.getTable().getMemberMapping(mmd);
-                                                NucleusLogger.GENERAL.info(">> FOUND tbl=" + grpTbl);
+                                                otherMapping = grpTbl.getTable().getMemberMapping(mmd);
                                                 break;
                                             }
                                         }
-                                    }*/
-                                }
+                                        newSqlTbl = unionStmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, false);
+                                        if (newSqlTbl != null)
+                                        {
+                                            nextSqlTbl = newSqlTbl;
+                                        }
+                                    }
 
-                                sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    sqlTbl = nextSqlTbl;
+                                }
+                                else
+                                {
+                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                }
                             }
                             tblIdMapping = sqlTbl.getTable().getIdMapping();
                             tblMappingSqlTbl = sqlTbl;

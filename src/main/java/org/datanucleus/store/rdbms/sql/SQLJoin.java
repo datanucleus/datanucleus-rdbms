@@ -165,8 +165,9 @@ public class SQLJoin
                 }
                 else
                 {
+                    st.append(" ON 1=0");
                     NucleusLogger.DATASTORE_RETRIEVE.warn("Join condition has no 'on' condition defined! table=" + table + 
-                        " type=" + type + " joinedTable=" + joinedTable);
+                        " type=" + type + " joinedTable=" + joinedTable + " : so using ON clause as 1=0");
                 }
             }
 
