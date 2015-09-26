@@ -133,6 +133,10 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false"
             validator="org.datanucleus.properties.BooleanPropertyValidator"/>
 
+        <persistence-property name="datanucleus.rdbms.mysql.engineType" datastore="true"/>
+        <persistence-property name="datanucleus.rdbms.mysql.collation" datastore="true"/>
+        <persistence-property name="datanucleus.rdbms.mysql.characterSet" datastore="true"/>
+
         <!-- TODO Rename these to "datanucleus.rdbms.connectionPool.*" or move to "core" -->
         <persistence-property name="datanucleus.connectionPool.maxStatements" datastore="true" value="0"
             validator="org.datanucleus.properties.IntegerPropertyValidator"/>

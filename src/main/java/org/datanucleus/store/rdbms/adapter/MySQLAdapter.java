@@ -247,14 +247,37 @@ public class MySQLAdapter extends BaseDatastoreAdapter
     {
         StringBuilder createStmt = new StringBuilder(super.getCreateTableStatement(table, columns, props, factory));
 
+        // Check for specification of the "engine"
         String engineType = "INNODB";
-        if (props != null)
+        if (props != null && props.containsKey("mysql-engine-type"))
         {
-            // Check for specification of the "engine"
-            if (props.containsKey("mysql-engine-type"))
-            {
-                engineType = props.getProperty("mysql-engine-type");
-            }
+            engineType = props.getProperty("mysql-engine-type");
+        }
+        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.engineType"))
+        {
+            engineType = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.engineType");
+        }
+
+        // Check for specification of the "collation"
+        String collation = null;
+        if (props != null && props.contains("collation"))
+        {
+            collation = props.getProperty("mysql-collation");
+        }
+        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.collation"))
+        {
+            collation = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.collation");
+        }
+
+        // Check for specification of the "charset"
+        String charset = null;
+        if (props != null && props.contains("characterSet"))
+        {
+            charset = props.getProperty("mysql-character-set");
+        }
+        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.characterSet"))
+        {
+            charset = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.characterSet");
         }
 
         boolean engineKeywordPresent = false;
@@ -275,6 +298,14 @@ public class MySQLAdapter extends BaseDatastoreAdapter
             createStmt.append(" TYPE=" + engineType);
         }
 
+        if (collation != null)
+        {
+            createStmt.append(" COLLATION=").append(collation);
+        }
+        if (charset != null)
+        {
+            createStmt.append(" CHARACTER SET=").append(charset);
+        }
         return createStmt.toString();
     }
 
