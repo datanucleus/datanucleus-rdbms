@@ -813,25 +813,29 @@ public class MapTable extends JoinTable implements DatastoreMap
                 }
             }
         }
-        else if (mmd.getKeyMetaData() != null)
+        else
         {
-            IndexMetaData idxmd = mmd.getKeyMetaData().getIndexMetaData();
-            if (idxmd != null)
+            KeyMetaData keymd = mmd.getKeyMetaData();
+            if (keymd != null && keymd.getIndexMetaData() != null)
             {
+                IndexMetaData idxmd = mmd.getKeyMetaData().getIndexMetaData();
                 Index index = TableUtils.getIndexForField(this, idxmd, keyMapping);
                 if (index != null)
                 {
                     indices.add(index);
                 }
             }
-        }
-        else
-        {
-            // Fallback to an index for any foreign-key to the key
-            Index index = TableUtils.getIndexForField(this, null, keyMapping);
-            if (index != null)
+            else
             {
-                indices.add(index);
+                // Fallback to an index for any foreign-key to the key
+                if (keyMapping instanceof PersistableMapping)
+                {
+                    Index index = TableUtils.getIndexForField(this, null, keyMapping);
+                    if (index != null)
+                    {
+                        indices.add(index);
+                    }
+                }
             }
         }
 
@@ -854,25 +858,29 @@ public class MapTable extends JoinTable implements DatastoreMap
                 }
             }
         }
-        else if (mmd.getValueMetaData() != null)
+        else
         {
-            IndexMetaData idxmd = mmd.getValueMetaData().getIndexMetaData();
-            if (idxmd != null)
+            ValueMetaData valmd = mmd.getValueMetaData();
+            if (valmd != null && valmd.getIndexMetaData() != null)
             {
+                IndexMetaData idxmd = mmd.getValueMetaData().getIndexMetaData();
                 Index index = TableUtils.getIndexForField(this, idxmd, valueMapping);
                 if (index != null)
                 {
                     indices.add(index);
                 }
             }
-        }
-        else
-        {
-            // Fallback to an index for any foreign-key to the value
-            Index index = TableUtils.getIndexForField(this, null, valueMapping);
-            if (index != null)
+            else
             {
-                indices.add(index);
+                // Fallback to an index for any foreign-key to the value
+                if (valueMapping instanceof PersistableMapping)
+                {
+                    Index index = TableUtils.getIndexForField(this, null, valueMapping);
+                    if (index != null)
+                    {
+                        indices.add(index);
+                    }
+                }
             }
         }
 

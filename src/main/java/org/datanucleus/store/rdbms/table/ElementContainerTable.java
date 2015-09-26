@@ -514,10 +514,13 @@ public abstract class ElementContainerTable extends JoinTable
             else
             {
                 // Fallback to an index for any foreign-key to the element
-                Index index = TableUtils.getIndexForField(this, null, elementMapping);
-                if (index != null)
+                if (elementMapping instanceof PersistableMapping)
                 {
-                    indices.add(index);
+                    Index index = TableUtils.getIndexForField(this, null, elementMapping);
+                    if (index != null)
+                    {
+                        indices.add(index);
+                    }
                 }
             }
         }
