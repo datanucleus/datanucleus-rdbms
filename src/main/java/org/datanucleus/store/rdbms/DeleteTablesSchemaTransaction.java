@@ -121,13 +121,16 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                    }
-
-                    // Drop view if exists in the datastore
-                    StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
-                    if (info != null)
-                    {
                         ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                    }
+                    else
+                    {
+                        // Drop view if exists in the datastore
+                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
+                        if (info != null)
+                        {
+                            ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                        }
                     }
                 }
 
@@ -154,14 +157,17 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                    }
-
-                    // Drop constraints if exists in the datastore
-                    StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {tbl});
-                    schemaExistsForTableMap.put(tbl, info != null);
-                    if (info != null)
-                    {
                         tbl.dropConstraints(getCurrentConnection());
+                    }
+                    else
+                    {
+                        // Drop constraints if exists in the datastore
+                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {tbl});
+                        schemaExistsForTableMap.put(tbl, info != null);
+                        if (info != null)
+                        {
+                            tbl.dropConstraints(getCurrentConnection());
+                        }
                     }
                 }
 
@@ -187,13 +193,16 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                    }
-
-                    // Drop table if exists in the datastore
-                    Boolean schemaExists = schemaExistsForTableMap.get(tbl);
-                    if (schemaExists != null && schemaExists == Boolean.TRUE)
-                    {
                         tbl.drop(getCurrentConnection());
+                    }
+                    else
+                    {
+                        // Drop table if exists in the datastore
+                        Boolean schemaExists = schemaExistsForTableMap.get(tbl);
+                        if (schemaExists != null && schemaExists == Boolean.TRUE)
+                        {
+                            tbl.drop(getCurrentConnection());
+                        }
                     }
                 }
             }
