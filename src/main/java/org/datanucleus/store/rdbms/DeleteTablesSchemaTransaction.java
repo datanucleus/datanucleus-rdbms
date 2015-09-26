@@ -28,11 +28,13 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.StoreDataManager;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.ClassView;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.rdbms.table.ViewImpl;
+import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -76,6 +78,7 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             {
                 NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
 
+                // Build up map of tables and views TODO Why use maps?
                 Map baseTablesByName = new HashMap();
                 Map viewsByName = new HashMap();
                 for (Iterator i = storeDataMgr.getManagedStoreData().iterator(); i.hasNext();)
@@ -99,9 +102,8 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         }
                     }
                 }
-                
-                // Remove tables, table constraints and views in
-                // reverse order from which they were created
+
+                // Remove views
                 Iterator viewsIter = viewsByName.values().iterator();
                 while (viewsIter.hasNext())
                 {
@@ -119,11 +121,21 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
+                        ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
                     }
-
-                    ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                    else
+                    {
+                        // Drop view if exists in the datastore
+                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
+                        if (info != null)
+                        {
+                            ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                        }
+                    }
                 }
 
+                // Remove table constraints
+                Map<TableImpl, Boolean> schemaExistsForTableMap = new HashMap();
                 Iterator tablesIter = baseTablesByName.values().iterator();
                 while (tablesIter.hasNext())
                 {
@@ -145,11 +157,21 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
+                        tbl.dropConstraints(getCurrentConnection());
                     }
-
-                    tbl.dropConstraints(getCurrentConnection());
+                    else
+                    {
+                        // Drop constraints if exists in the datastore
+                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {tbl});
+                        schemaExistsForTableMap.put(tbl, info != null);
+                        if (info != null)
+                        {
+                            tbl.dropConstraints(getCurrentConnection());
+                        }
+                    }
                 }
 
+                // Remove tables
                 tablesIter = baseTablesByName.values().iterator();
                 while (tablesIter.hasNext())
                 {
@@ -171,9 +193,17 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
+                        tbl.drop(getCurrentConnection());
                     }
-
-                    tbl.drop(getCurrentConnection());
+                    else
+                    {
+                        // Drop table if exists in the datastore
+                        Boolean schemaExists = schemaExistsForTableMap.get(tbl);
+                        if (schemaExists != null && schemaExists == Boolean.TRUE)
+                        {
+                            tbl.drop(getCurrentConnection());
+                        }
+                    }
                 }
             }
             catch (Exception e)
