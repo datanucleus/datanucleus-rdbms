@@ -1098,8 +1098,6 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="derby"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="firebird"
-            evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="informix"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
         <sql-method class="java.lang.String" method="substring" datastore="oracle"
