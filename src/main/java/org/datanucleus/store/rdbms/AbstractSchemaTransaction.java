@@ -32,16 +32,15 @@ import org.datanucleus.util.StringUtils;
 /**
  * An abstract base class for RDBMSManager transactions that perform some schema operation on the database.
  * <p>
- * Management transactions may be retried in the face of SQL exceptions to work around failures caused by 
- * transient conditions, such as DB deadlocks.
+ * Management transactions may be retried in the face of SQL exceptions to work around failures caused by transient conditions, such as DB deadlocks.
  * </p>
  */
 public abstract class AbstractSchemaTransaction
 {
-    protected RDBMSStoreManager rdbmsMgr;
-
+    protected final RDBMSStoreManager rdbmsMgr;
     protected final int isolationLevel;
     protected final int maxRetries;
+
     protected ManagedConnection mconn;
     private Connection conn;
 
@@ -54,7 +53,7 @@ public abstract class AbstractSchemaTransaction
     {
         this.rdbmsMgr = rdbmsMgr;
         this.isolationLevel = isolationLevel;
-        maxRetries = rdbmsMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CLASS_ADDER_MAX_RETRIES);
+        this.maxRetries = rdbmsMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CLASS_ADDER_MAX_RETRIES);
     }
 
     /**
@@ -131,8 +130,7 @@ public abstract class AbstractSchemaTransaction
                                     {
                                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                                         {
-                                            NucleusLogger.DATASTORE_SCHEMA.debug(
-                                                Localiser.msg("050053", StringUtils.toJVMIDString(conn)));
+                                            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050053", StringUtils.toJVMIDString(conn)));
                                         }
                                         conn.commit();
                                     }
@@ -140,8 +138,7 @@ public abstract class AbstractSchemaTransaction
                                     {
                                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                                         {
-                                            NucleusLogger.DATASTORE_SCHEMA.debug(
-                                                Localiser.msg("050054", StringUtils.toJVMIDString(conn)));
+                                            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050054", StringUtils.toJVMIDString(conn)));
                                         }
                                         conn.rollback();
                                     }
@@ -156,8 +153,7 @@ public abstract class AbstractSchemaTransaction
                     {
                         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_SCHEMA.debug(
-                                Localiser.msg("050055", StringUtils.toJVMIDString(conn)));
+                            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050055", StringUtils.toJVMIDString(conn)));
                         }
                         mconn.release();
 
