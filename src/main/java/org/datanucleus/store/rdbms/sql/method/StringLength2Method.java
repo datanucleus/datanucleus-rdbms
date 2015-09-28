@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.adapter.FirebirdAdapter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -31,8 +33,9 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
 
 /**
- * Expression handler to evaluate {stringExpression}.length().
- * Returns a NumericExpression <pre>STRLEN({stringExpr})</pre>.
+ * Expression handler to evaluate {stringExpression}.length() with Firebird.
+ * Firebird v1 uses STRLEN, whereas Firebird v2 has CHAR_LENGTH.
+ * Returns a NumericExpression <pre>STRLEN({stringExpr})</pre> or NumericExpression <pre>CHAR_LENGTH({stringExpr})</pre>.
  */
 public class StringLength2Method extends AbstractSQLMethod
 {
@@ -41,8 +44,36 @@ public class StringLength2Method extends AbstractSQLMethod
      */
     public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
+        DatastoreAdapter dba = stmt.getDatastoreAdapter();
+        if (!(dba instanceof FirebirdAdapter))
+        {
+            throw new NucleusException("StringLength2Method being used for evaluation of String.length yet this is for Firebird ONLY. Please report this");
+        }
+        FirebirdAdapter fba = (FirebirdAdapter)dba;
+        if (fba.supportsCharLengthFunction())
+        {
+            // Firebird v2+ support CHAR_LENGTH
+            if (!expr.isParameter() && expr instanceof StringLiteral)
+            {
+                JavaTypeMapping m = exprFactory.getMappingForType(int.class, false);
+                String val = (String)((StringLiteral)expr).getValue();
+                return new IntegerLiteral(stmt, m, Integer.valueOf(val.length()), null);
+            }
+            else if (expr instanceof StringExpression || expr instanceof ParameterLiteral)
+            {
+                ArrayList funcArgs = new ArrayList();
+                funcArgs.add(expr);
+                return new NumericExpression(stmt, getMappingForClass(int.class), "CHAR_LENGTH", funcArgs);
+            }
+            else
+            {
+                throw new NucleusException(Localiser.msg("060001", "length", expr));
+            }
+        }
+
         if (expr instanceof StringLiteral)
         {
+            // Firebird v1 requires STRLEN
             JavaTypeMapping m = exprFactory.getMappingForType(int.class, false);
             String val = (String)((StringLiteral)expr).getValue();
             return new IntegerLiteral(stmt, m, Integer.valueOf(val.length()), null);
