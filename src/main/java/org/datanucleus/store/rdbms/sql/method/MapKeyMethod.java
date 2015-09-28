@@ -77,6 +77,10 @@ public class MapKeyMethod extends AbstractSQLMethod
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
+
+        // Use the statement of the table for this Map expression, since it could be in an outer query
+        stmt = mapExpr.getSQLTable().getSQLStatement();
+
         if (mmd != null)
         {
             MapMetaData mapmd = mmd.getMap();

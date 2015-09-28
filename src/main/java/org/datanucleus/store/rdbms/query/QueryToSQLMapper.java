@@ -2696,6 +2696,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             // This sqlMapping is for something joined in a FROM clause, so set the alias on the returned MapExpression to avoid doing the same joins
             String alias = getAliasForSQLTableMapping(sqlMapping);
+            if (alias == null && parentMapper != null)
+            {
+                alias = parentMapper.getAliasForSQLTableMapping(sqlMapping);
+            }
             ((MapExpression)sqlExpr).setAliasForMapTable(alias);
         }
 
