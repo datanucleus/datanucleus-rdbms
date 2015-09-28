@@ -2951,6 +2951,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                         }
 
+                        // TODO If the only remaining component of the PrimaryExpression is the "id" and not persistable itself then don't join.
                         if (iter.hasNext() || Boolean.TRUE.equals(forceJoin))
                         {
                             AbstractClassMetaData relCmd = null;
