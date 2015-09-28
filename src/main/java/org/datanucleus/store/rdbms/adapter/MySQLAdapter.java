@@ -300,7 +300,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         if (collation != null)
         {
-            createStmt.append(" COLLATION=").append(collation);
+            createStmt.append(" COLLATE=").append(collation);
         }
         if (charset != null)
         {
