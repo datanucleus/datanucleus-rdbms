@@ -355,6 +355,8 @@ public interface DatastoreAdapter
 
     /** Whether we support NULLS directives in ORDER expressions. */
     public static final String ORDERBY_NULLS_DIRECTIVES = "OrderByWithNullsDirectives";
+    /** Whether we support ordering of NULLs using ISNULL. */
+    public static final String ORDERBY_NULLS_USING_ISNULL = "OrderByNullsUsingIsNull";
 
     /** Whether this datastore supports stored procedures. */
     public static final String STORED_PROCEDURES = "StoredProcs";
