@@ -311,13 +311,17 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
     /**
      * Method to return the DROP TABLE statement.
-     * Override the default omitting the CASCADE part since MySQL doesn't support that.
      * @param table The table
      * @return The drop statement
      **/ 
     public String getDropTableStatement(Table table)
     {
-        return "DROP TABLE " + table.toString();
+        if (datastoreMajorVersion < 5)
+        {
+            // Earlier versions of MySQL didn't support the CASCADE keyword, whereas now it does but does nothing
+            return "DROP TABLE " + table.toString();
+        }
+        return super.getDropTableStatement(table);
     }
 
     /**
