@@ -1009,7 +1009,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression[] orderingExpr = compilation.getExprOrdering();
             SQLExpression[] orderSqlExprs = new SQLExpression[orderingExpr.length];
             boolean[] directions = new boolean[orderingExpr.length];
-            String[] nullOrders = new String[orderingExpr.length];
+            NullOrderingType[] nullOrders = new NullOrderingType[orderingExpr.length];
             for (int i = 0; i < orderingExpr.length; i++)
             {
                 OrderExpression orderExpr = (OrderExpression)orderingExpr[i];
@@ -1034,14 +1034,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                 String orderDir = orderExpr.getSortOrder();
                 directions[i] = ((orderDir == null || orderDir.equals("ascending")) ? false : true);
-                if (stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
-                {
-                    NullOrderingType nullOrder = orderExpr.getNullOrder();
-                    if (nullOrder != null)
-                    {
-                        nullOrders[i] = (nullOrder == NullOrderingType.NULLS_FIRST ? "NULLS FIRST" : "NULLS LAST");
-                    }
-                }
+                nullOrders[i] = orderExpr.getNullOrder();
             }
             stmt.setOrdering(orderSqlExprs, directions, nullOrders);
             compileComponent = null;
