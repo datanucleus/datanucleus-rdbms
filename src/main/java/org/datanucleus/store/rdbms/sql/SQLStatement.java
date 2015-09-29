@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.query.NullOrderingType;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -163,7 +164,7 @@ public class SQLStatement
     protected boolean[] orderingDirections = null;
 
     /** Directives for null handling of any ORDER BY expressions (1 for each orderingExpressions entry). */
-    protected String[] orderNullDirectives = null;
+    protected NullOrderingType[] orderNullDirectives = null;
 
     /** The offset for any range restriction. */
     protected long rangeOffset = -1;
@@ -1504,7 +1505,7 @@ public class SQLStatement
      * @param descending Whether each expression is ascending/descending
      * @param nullOrders Ordering for nulls (if provided)
      */
-    public void setOrdering(SQLExpression[] exprs, boolean[] descending, String[] nullOrders)
+    public void setOrdering(SQLExpression[] exprs, boolean[] descending, NullOrderingType[] nullOrders)
     {
         if (exprs != null && descending != null && exprs.length != descending.length)
         {
@@ -2116,9 +2117,10 @@ public class SQLStatement
                     {
                         orderStmt.append(" DESC");
                     }
-                    if (orderNullDirectives != null && orderNullDirectives[i] != null)
+                    if (orderNullDirectives != null && orderNullDirectives[i] != null && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
                     {
-                        orderStmt.append(" " + orderNullDirectives[i]);
+                        // Apply "NULLS [FIRST | LAST]" since supported by this datastore
+                        orderStmt.append(" " + (orderNullDirectives[i] == NullOrderingType.NULLS_FIRST ? "NULLS FIRST" : "NULLS LAST"));
                     }
                 }
             }
@@ -2137,7 +2139,7 @@ public class SQLStatement
                 {
                     SQLExpression orderExpr = orderingExpressions[i];
                     boolean orderDirection = orderingDirections[i];
-                    String orderNullDirective = (orderNullDirectives != null && orderNullDirectives.length > 0 ? orderNullDirectives[i] : null);
+                    NullOrderingType orderNullDirective = (orderNullDirectives != null ? orderNullDirectives[i] : null);
 
                     if (i > 0)
                     {
@@ -2195,16 +2197,16 @@ public class SQLStatement
         return orderStmt;
     }
 
-    protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, String orderNullDirective, DatastoreAdapter dba)
+    protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, NullOrderingType orderNullDirective, DatastoreAdapter dba)
     {
         orderST.append(dba.getOrderString(rdbmsMgr, orderString, orderExpr));
-        if (orderDirection)
+
+        orderST.append(orderDirection ? " DESC" : "");
+
+        if (orderNullDirective != null && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
         {
-            orderST.append(" DESC");
-        }
-        if (orderNullDirective != null)
-        {
-            orderST.append(" " + orderNullDirective);
+            // Apply "NULLS [FIRST | LAST]" directly since supported by this datastore
+            orderST.append(" " + (orderNullDirective == NullOrderingType.NULLS_FIRST ? "NULLS FIRST" : "NULLS LAST"));
         }
     }
 
