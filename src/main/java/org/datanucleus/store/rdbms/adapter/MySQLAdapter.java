@@ -120,6 +120,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(STORED_PROCEDURES);
+        supportedOptions.add(ORDERBY_NULLS_USING_ISNULL);
 
         // MySQL DATETIME/TIMESTAMP doesn't store millisecs!
         // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
