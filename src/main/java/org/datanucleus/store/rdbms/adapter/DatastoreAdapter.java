@@ -68,6 +68,9 @@ public interface DatastoreAdapter
     /** Whether we support sequences. */
     public static final String SEQUENCES = "Sequences";
 
+    /** Support for JDO compatible UUID-STRING value generation. */
+    public static final String VALUE_GENERATION_UUID_STRING = "ValueGeneratorUUIDString";
+
     /** Whether "Types.BIT" is really mapped as BOOLEAN. */
     public static final String BIT_IS_REALLY_BOOLEAN = "BitIsReallyBoolean";
 

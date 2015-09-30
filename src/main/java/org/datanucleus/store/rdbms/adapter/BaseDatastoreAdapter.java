@@ -457,6 +457,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
         supportedOptions.add(SUBQUERY_IN_HAVING);
 
+        supportedOptions.add(VALUE_GENERATION_UUID_STRING);
+
         supportedOptions.add(FK_DELETE_ACTION_CASCADE);
         supportedOptions.add(FK_DELETE_ACTION_RESTRICT);
         supportedOptions.add(FK_DELETE_ACTION_DEFAULT);

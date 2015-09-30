@@ -510,6 +510,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 return false; // adapter doesn't support sequences so we don't
             }
+            else if (strategy.equalsIgnoreCase("uuid-string"))
+            {
+                return dba.supportsOption(DatastoreAdapter.VALUE_GENERATION_UUID_STRING);
+            }
             return true;
         }
         return false;
