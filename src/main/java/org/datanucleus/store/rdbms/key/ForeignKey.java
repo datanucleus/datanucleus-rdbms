@@ -207,6 +207,16 @@ public class ForeignKey extends Key
         setColumn(columns.size(), col, refCol);
     }
 
+    public DatastoreClass getRefTable()
+    {
+        return refTable;
+    }
+
+    public String getRefColumnList()
+    {
+        return getColumnList(refColumns);
+    }
+
     /**
      * Set the datastore field for the specified position <code>seq</code>
      * @param seq the specified position
