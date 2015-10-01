@@ -149,6 +149,15 @@ public class HSQLAdapter extends BaseDatastoreAdapter
             false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
+        if (datastoreMajorVersion >= 2)
+        {
+            // LONGVARBINARY - not present after v2.0
+            sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
+                "LONGVARBINARY", (short)Types.LONGVARBINARY, 2147483647, "'", "'", null, 1, false, (short)3,
+                false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
+            addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
+        }
+
         // LONGVARCHAR - not present in 2.0+
         sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
             "LONGVARCHAR", (short)Types.LONGVARCHAR, 2147483647, "'", "'", null, 1, true, (short)3,
