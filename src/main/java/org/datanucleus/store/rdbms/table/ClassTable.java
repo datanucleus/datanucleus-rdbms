@@ -2220,7 +2220,21 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     ForeignKey fk = TableUtils.getForeignKeyForPCField(memberMapping, mmd, autoMode, storeMgr, clr);
                     if (fk != null)
                     {
-                        foreignKeys.add(fk);
+                        // Check for dups (can happen if we override a persistent property for 1-1/N-1 in a subclass)
+                        boolean exists = false;
+                        for (ForeignKey theFK : foreignKeys)
+                        {
+                            if (theFK.getColumnList().equals(fk.getColumnList()) && theFK.getTable().equals(fk.getTable()) && 
+                                theFK.getRefColumnList().equals(fk.getRefColumnList()) && theFK.getRefTable().equals(fk.getRefTable()))
+                            {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists)
+                        {
+                            foreignKeys.add(fk);
+                        }
                     }
                 }
             }
