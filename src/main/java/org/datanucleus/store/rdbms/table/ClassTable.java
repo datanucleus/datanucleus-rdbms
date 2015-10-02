@@ -2223,8 +2223,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         boolean exists = false;
                         for (ForeignKey theFK : foreignKeys)
                         {
-                            if (theFK.getColumnList().equals(fk.getColumnList()) && theFK.getTable().equals(fk.getTable()) && 
-                                theFK.getRefColumnList().equals(fk.getRefColumnList()) && theFK.getRefTable().equals(fk.getRefTable()))
+                            if (theFK.isEqual(fk))
                             {
                                 exists = true;
                                 break;

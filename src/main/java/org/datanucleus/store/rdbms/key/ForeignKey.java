@@ -289,6 +289,26 @@ public class ForeignKey extends Key
         return super.equals(obj);
     }
 
+    public boolean isEqual(ForeignKey fk)
+    {
+        String colList = getColumnList();
+        String refColList = getRefColumnList();
+        if (colList == null && fk.getColumnList() != null)
+        {
+            return false;
+        }
+        if (refColList == null && fk.getRefColumnList() != null)
+        {
+            return false;
+        }
+        if (colList.equals(fk.getColumnList()) && getTable() == fk.getTable() && 
+            refColList.equals(fk.getRefColumnList()) && getRefTable().equals(fk.getRefTable()))
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Stringify method. Generates the foreign key statement ready for use in an SQL call.
      * @return String version of this object.
