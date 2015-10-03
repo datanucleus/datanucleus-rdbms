@@ -430,8 +430,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     {
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057024", toString(), theCmd.getFullClassName(), 
-                theCmd.getInheritanceMetaData().getStrategy().toString()));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057024", toString(), theCmd.getFullClassName(), theCmd.getInheritanceMetaData().getStrategy().toString()));
         }
 
         managingClassCurrent = theCmd.getFullClassName();
@@ -943,6 +942,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     AbstractMemberMetaData mmd = baseCmd.getMetaDataForManagedMemberAtRelativePosition(relFieldNum);
                     if (mmd.isPrimaryKey())
                     {
+                        AbstractMemberMetaData overriddenMmd = cmd.getOverriddenMember(mmd.getName());
+                        if (overriddenMmd != null)
+                        {
+                            // PK field is overridden so use the overriding definition
+                            mmd = overriddenMmd;
+                        }
+
                         if (mmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
                         {
                             membersToAdd[pkFieldNum++] = mmd;
@@ -954,11 +960,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
-                        if ((mmd.getValueStrategy() == IdentityStrategy.IDENTITY) && 
-                            !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
+                        if ((mmd.getValueStrategy() == IdentityStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
-                            throw new NucleusException(Localiser.msg("057020",
-                                cmd.getFullClassName(), mmd.getName())).setFatal();
+                            throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), mmd.getName())).setFatal();
                         }
                     }
                 }
@@ -984,8 +988,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         if ((fmd.getValueStrategy() == IdentityStrategy.IDENTITY) && 
                             !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
-                            throw new NucleusException(Localiser.msg("057020",
-                                cmd.getFullClassName(), fmd.getName())).setFatal();
+                            throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), fmd.getName())).setFatal();
                         }
                     }
                 }
