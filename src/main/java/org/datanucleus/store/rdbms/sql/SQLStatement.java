@@ -2203,7 +2203,7 @@ public class SQLStatement
         {
             NucleusLogger.DATASTORE_RETRIEVE.warn("Query contains NULLS directive yet this datastore doesn't provide any support for handling this. Nulls directive will be ignored");
         }
-            
+
         String orderParam = dba.getOrderString(rdbmsMgr, orderString, orderExpr);
         if (orderNullDirective == NullOrderingType.NULLS_LAST && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && orderExpr.getSQLTable() != null)
         {
