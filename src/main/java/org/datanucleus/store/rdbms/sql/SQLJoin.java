@@ -165,8 +165,9 @@ public class SQLJoin
                 }
                 else
                 {
+                    // No "on" condition, so join as "1=0" (i.e no join, likely polymorphic join or some such)
                     st.append(" ON 1=0");
-                    NucleusLogger.DATASTORE_RETRIEVE.warn("Join condition has no 'on' condition defined! table=" + table + 
+                    NucleusLogger.DATASTORE_RETRIEVE.debug("Join condition has no 'on' condition defined! table=" + table + 
                         " type=" + type + " joinedTable=" + joinedTable + " : so using ON clause as 1=0");
                 }
             }
