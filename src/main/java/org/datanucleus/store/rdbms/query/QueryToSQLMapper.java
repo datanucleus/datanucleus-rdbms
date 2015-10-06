@@ -3536,7 +3536,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 if ((keyword.equalsIgnoreCase("SOME") || keyword.equalsIgnoreCase("ALL") || keyword.equalsIgnoreCase("ANY")) &&
                     !storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.SOME_ANY_ALL_SUBQUERY_EXPRESSIONS))
                 {
-                    throw new NucleusException("Datastore does not support SOME|ALL|ANY{subquery}");
+                    throw new NucleusException("'SOME|ALL|ANY{subquery}' is not supported by this datastore");
                 }
 
                 // Apply keyword (e.g ALL, SOME, ANY) to numeric expressions
