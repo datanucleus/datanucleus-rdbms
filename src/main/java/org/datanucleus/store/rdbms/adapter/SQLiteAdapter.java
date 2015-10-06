@@ -26,6 +26,8 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 
@@ -226,6 +228,31 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     {
         // ALTER TABLE ADD CONSTRAINT Syntax not supported
         return null;
+    }
+
+    /**
+     * Method to return the SQLText for an UPDATE TABLE statement.
+     * Returns the SQLText for <code>UPDATE SCH1.TBL1 SET x1 = val1, x2 = val2</code> since SQLite doesn't allow any aliases in UPDATEs.
+     * @param tbl The primary table
+     * @param setSQL The SQLText for the SET component
+     * @return SQLText for the update statement
+     */
+    public SQLText getUpdateTableStatement(SQLTable tbl, SQLText setSQL)
+    {
+        SQLText sql = new SQLText("UPDATE ").append(tbl.getTable().toString()); // "UPDATE SCH1.TBL1"
+        sql.append(" ").append(setSQL); // " SET x1 = val1, x2 = val2"
+        return sql;
+    }
+
+    /**
+     * Method to return the basic SQL for a DELETE TABLE statement.
+     * Returns the String as <code>DELETE FROM SCH1.TBL1</code> since SQLite doesn't allow any aliases in DELETEs.
+     * @param tbl The SQLTable to delete
+     * @return The delete table string
+     */
+    public String getDeleteTableStatement(SQLTable tbl)
+    {
+        return "DELETE FROM " + tbl.getTable().toString(); // "DELETE FROM SCH1.TBL1"
     }
 
     /**
