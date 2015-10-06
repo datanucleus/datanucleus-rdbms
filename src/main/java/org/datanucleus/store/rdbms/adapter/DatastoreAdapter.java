@@ -74,6 +74,9 @@ public interface DatastoreAdapter
     /** Do we support right outer join? */
     public static final String RIGHT_OUTER_JOIN = "RightOuterJoin";
 
+    /** Do we support SOME|ALL|ANY {subquery}. */
+    public static final String SOME_ANY_ALL_SUBQUERY_EXPRESSIONS = "SomeAllAnySubqueries";
+
     /** Whether we support Boolean comparisons. */
     public static final String BOOLEAN_COMPARISON = "BooleanExpression";
 
