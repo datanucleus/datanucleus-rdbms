@@ -424,6 +424,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(RESULTSET_TYPE_SCROLL_INSENSITIVE);
 
         supportedOptions.add(RIGHT_OUTER_JOIN);
+        supportedOptions.add(SOME_ANY_ALL_SUBQUERY_EXPRESSIONS);
 
         supportedOptions.add(ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE);
         supportedOptions.add(VIEWS);
