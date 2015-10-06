@@ -1048,6 +1048,8 @@ Contributors:
             evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf5Method"/>
         <sql-method class="java.lang.String" method="indexOf" datastore="sybase"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method"/>
+        <sql-method class="java.lang.String" method="indexOf" datastore="sqlite"
+            evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method"/>
         <sql-method class="java.lang.String" method="length"
             evaluator="org.datanucleus.store.rdbms.sql.method.StringLengthMethod"/>
         <sql-method class="java.lang.String" method="length" datastore="derby"
