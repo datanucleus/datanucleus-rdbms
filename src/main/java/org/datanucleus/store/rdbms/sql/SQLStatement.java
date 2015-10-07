@@ -268,6 +268,7 @@ public class SQLStatement
         this.parent = parentStmt;
         this.rdbmsMgr = rdbmsMgr;
 
+        // Set the namer, using any override extension, otherwise the RDBMS default
         String namingStrategy = rdbmsMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_SQL_TABLE_NAMING_STRATEGY);
         if (extensions != null && extensions.containsKey(EXTENSION_SQL_TABLE_NAMING_STRATEGY))
         {
@@ -279,7 +280,7 @@ public class SQLStatement
         if (alias == null)
         {
             // No alias provided so generate one
-            alias = rdbmsMgr.getIdentifierFactory().newTableIdentifier(generateTableAlias(table, tableGrpName));
+            alias = rdbmsMgr.getIdentifierFactory().newTableIdentifier(namer.getAliasForTable(this, table, tableGrpName));
         }
         this.primaryTable = new SQLTable(this, table, alias, tableGrpName);
         putSQLTableInGroup(primaryTable, tableGrpName, null);
@@ -901,7 +902,7 @@ public class SQLStatement
         }
         if (targetAlias == null)
         {
-            targetAlias = generateTableAlias(target, tableGrpName);
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
         }
         if (sourceTable == null)
         {
@@ -1064,7 +1065,7 @@ public class SQLStatement
         }
         if (targetAlias == null)
         {
-            targetAlias = generateTableAlias(target, tableGrpName);
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
         }
         DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
@@ -1376,19 +1377,8 @@ public class SQLStatement
     }
 
     /**
-     * Method to generate the alias to be used for a joined table.
-     * Names tables according to the extension "table-naming-strategy".
-     * @param tbl Table object
-     * @param groupName Name of the table group
-     * @return The alias to use
-     */
-    protected String generateTableAlias(Table tbl, String groupName)
-    {
-        return namer.getAliasForTable(this, tbl, groupName);
-    }
-
-    /**
      * Method to return the namer for a particular schema.
+     * If there is no instantiated namer for this schema then instantiates one.
      * @param namingSchema Table naming schema to use
      * @return The namer
      */

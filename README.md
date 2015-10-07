@@ -51,5 +51,5 @@ an object with 2 tables (B0, B1) and these have relations to other objects with 
 __t-scheme__ will name tables based on the table number in the statement as a whole and doesn't use the table group for anything. So you get 
 table aliases like T0, T1, T2, T3, T4, T5, etc.
 
-To define which namer plugin you want to use, set the extension __datanucleus.sqlTableNamingStrategy__ on the SQLStatement and by the persistence
+To define which namer plugin you want to use, either set the extension __table-naming-strategy__ on the SQLStatement and by the persistence
 property __datanucleus.rdbms.sqlTableNamingStrategy__ at construction of the PMF/EMF.
