@@ -84,14 +84,15 @@ import org.datanucleus.util.StringUtils;
  * in the statement. Where the alias is not provided then we use a table "namer" (definable on the
  * plugin-point "org.datanucleus.store.rdbms.sql_tablenamer"). The table namer can define names
  * simply based on the table number, or based on table group and the number of tables in the group
- * etc etc. To select a particular table "namer", set the extension "datanucleus.sqlTableNamingStrategy"
- * to the key of the namer plugin. The default is "alpha-scheme" which bases table names on the
- * group and number in that group.
+ * etc etc. 
+ * To select a particular table "namer", set the extension "table-naming-strategy" to the key of the namer plugin. 
+ * The default is "alpha-scheme" which bases table names on the group and number in that group.
  * 
  * <b>Note that this class is not intended to be thread-safe. It is used by a single ExecutionContext</b>
  */
 public class SQLStatement
 {
+    public static final String EXTENSION_SQL_TABLE_NAMING_STRATEGY = "table-naming-strategy";
     public static final String EXTENSION_LOCK_FOR_UPDATE = "lock-for-update";
     public static final String EXTENSION_LOCK_FOR_UPDATE_NOWAIT = "for-update-nowait";
 
@@ -109,6 +110,8 @@ public class SQLStatement
 
     /** Context of any query generation. */
     protected QueryGenerator queryGenerator = null;
+
+    protected SQLTableNamer namer = null;
 
     /** Name of class that this statement selects (optional, only typically for unioned statements). */
     protected String candidateClassName = null;
@@ -221,7 +224,20 @@ public class SQLStatement
      */
     public SQLStatement(RDBMSStoreManager rdbmsMgr, Table table, DatastoreIdentifier alias, String tableGroupName)
     {
-        this(null, rdbmsMgr, table, alias, tableGroupName);
+        this(null, rdbmsMgr, table, alias, tableGroupName, null);
+    }
+
+    /**
+     * Constructor for an SQL statement.
+     * @param rdbmsMgr The datastore manager
+     * @param table The primary table
+     * @param alias Alias for this table
+     * @param tableGroupName Name of candidate table-group (if any). Uses "Group0" if not provided
+     * @param extensions Any extensions (optional)
+     */
+    public SQLStatement(RDBMSStoreManager rdbmsMgr, Table table, DatastoreIdentifier alias, String tableGroupName, Map<String, Object> extensions)
+    {
+        this(null, rdbmsMgr, table, alias, tableGroupName, extensions);
     }
 
     /**
@@ -231,13 +247,34 @@ public class SQLStatement
      * @param table The primary table
      * @param alias Alias for this table
      * @param tableGroupName Name of candidate table-group (if any). Uses "Group0" if not provided
+     * @param extensions Any extensions (optional)
      */
     public SQLStatement(SQLStatement parentStmt, RDBMSStoreManager rdbmsMgr, Table table, DatastoreIdentifier alias, String tableGroupName)
     {
+        this(parentStmt, rdbmsMgr, table, alias, tableGroupName, null);
+    }
+
+    /**
+     * Constructor for an SQL statement that is a subquery of another statement.
+     * @param parentStmt Parent statement
+     * @param rdbmsMgr The datastore manager
+     * @param table The primary table
+     * @param alias Alias for this table
+     * @param tableGroupName Name of candidate table-group (if any). Uses "Group0" if not provided
+     * @param extensions Any extensions (optional)
+     */
+    public SQLStatement(SQLStatement parentStmt, RDBMSStoreManager rdbmsMgr, Table table, DatastoreIdentifier alias, String tableGroupName, Map<String, Object> extensions)
+    {
         this.parent = parentStmt;
         this.rdbmsMgr = rdbmsMgr;
-        String namerStrategy = rdbmsMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_SQL_TABLE_NAMING_STRATEGY);
-        addExtension("datanucleus.sqlTableNamingStrategy", namerStrategy);
+
+        String namingStrategy = rdbmsMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_SQL_TABLE_NAMING_STRATEGY);
+        if (extensions != null && extensions.containsKey(EXTENSION_SQL_TABLE_NAMING_STRATEGY))
+        {
+            namingStrategy = (String) extensions.get(EXTENSION_SQL_TABLE_NAMING_STRATEGY);
+        }
+        namer = getTableNamer(namingStrategy);
+
         String tableGrpName = (tableGroupName != null ? tableGroupName : "Group0");
         if (alias == null)
         {
@@ -335,7 +372,18 @@ public class SQLStatement
      */
     public void addExtension(String key, Object value)
     {
+        if (key == null)
+        {
+            return;
+        }
         invalidateStatement();
+
+        if (key.equals(EXTENSION_SQL_TABLE_NAMING_STRATEGY))
+        {
+            namer = getTableNamer((String) value);
+            return;
+        }
+
         if (extensions == null)
         {
             extensions = new HashMap();
@@ -1329,24 +1377,23 @@ public class SQLStatement
 
     /**
      * Method to generate the alias to be used for a joined table.
-     * Names tables according to the extension "datanucleus.sqlTableNamingStrategy".
+     * Names tables according to the extension "table-naming-strategy".
      * @param tbl Table object
      * @param groupName Name of the table group
      * @return The alias to use
      */
-    protected synchronized String generateTableAlias(Table tbl, String groupName)
+    protected String generateTableAlias(Table tbl, String groupName)
     {
-        String namingSchema = null;
-        if (extensions != null)
-        {
-            namingSchema = (String)extensions.get("datanucleus.sqlTableNamingStrategy");
-        }
-        if (namingSchema == null)
-        {
-            // Fall-back to "alpha-scheme" : Tables called A0, A1, A2, B0, ... etc
-            namingSchema = "alpha-scheme";
-        }
+        return namer.getAliasForTable(this, tbl, groupName);
+    }
 
+    /**
+     * Method to return the namer for a particular schema.
+     * @param namingSchema Table naming schema to use
+     * @return The namer
+     */
+    protected synchronized SQLTableNamer getTableNamer(String namingSchema)
+    {
         SQLTableNamer namer = tableNamerByName.get(namingSchema);
         if (namer == null)
         {
@@ -1362,8 +1409,7 @@ public class SQLStatement
             }
             tableNamerByName.put(namingSchema, namer);
         }
-
-        return namer.getAliasForTable(this, tbl, groupName);
+        return namer;
     }
 
     // --------------------------------- WHERE --------------------------------------
