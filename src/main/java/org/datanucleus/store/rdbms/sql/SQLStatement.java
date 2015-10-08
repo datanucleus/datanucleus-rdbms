@@ -2242,15 +2242,18 @@ public class SQLStatement
         }
 
         String orderParam = dba.getOrderString(rdbmsMgr, orderString, orderExpr);
-        if (orderNullDirective == NullOrderingType.NULLS_LAST && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && orderExpr.getSQLTable() != null)
+        if (orderNullDirective == NullOrderingType.NULLS_LAST)
         {
-            // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
-            orderST.append("ISNULL(").append(orderParam).append("),");
-        }
-        else if (orderNullDirective == NullOrderingType.NULLS_LAST && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL) && orderExpr.getSQLTable() != null)
-        {
-            // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
-            orderST.append(orderParam).append(" IS NULL,");
+            if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && orderExpr.getSQLTable() != null)
+            {
+                // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                orderST.append("ISNULL(").append(orderParam).append("),");
+            }
+            else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL) && orderExpr.getSQLTable() != null)
+            {
+                // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                orderST.append(orderParam).append(" IS NULL,");
+            }
         }
 
         orderST.append(orderParam);
