@@ -52,6 +52,8 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
         supportedOptions.add(FK_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF);
+        supportedOptions.add(ORDERBY_NULLS_USING_COLUMN_IS_NULL);
+
         supportedOptions.remove(TX_ISOLATION_READ_COMMITTED);
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);

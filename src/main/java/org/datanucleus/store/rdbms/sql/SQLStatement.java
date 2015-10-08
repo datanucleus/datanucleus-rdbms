@@ -2235,7 +2235,8 @@ public class SQLStatement
 
     protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, NullOrderingType orderNullDirective, DatastoreAdapter dba)
     {
-        if (orderNullDirective != null && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
+        if (orderNullDirective != null && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES) &&
+            !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL))
         {
             NucleusLogger.DATASTORE_RETRIEVE.warn("Query contains NULLS directive yet this datastore doesn't provide any support for handling this. Nulls directive will be ignored");
         }
@@ -2245,6 +2246,11 @@ public class SQLStatement
         {
             // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
             orderST.append("ISNULL(").append(orderParam).append("),");
+        }
+        else if (orderNullDirective == NullOrderingType.NULLS_LAST && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL) && orderExpr.getSQLTable() != null)
+        {
+            // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
+            orderST.append(orderParam).append(" IS NULL,");
         }
 
         orderST.append(orderParam);
