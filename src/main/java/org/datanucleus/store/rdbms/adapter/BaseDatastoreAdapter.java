@@ -442,6 +442,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(MULTITABLES_WITH_SELECT_FOR_UPDATE);
 
         supportedOptions.add(PERSIST_OF_UNASSIGNED_CHAR);
+        // TODO If the datastore supports CHECK in CREATE, we should turn off CHECK in END statement, and vice versa.
         supportedOptions.add(CHECK_IN_CREATE_STATEMENTS);
         supportedOptions.add(GET_GENERATED_KEYS_STATEMENT);
         supportedOptions.add(BOOLEAN_COMPARISON);
