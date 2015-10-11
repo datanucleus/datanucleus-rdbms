@@ -162,9 +162,23 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     else
                     {
                         // Drop constraints if exists in the datastore
-                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {tbl});
-                        schemaExistsForTableMap.put(tbl, info != null);
-                        if (info != null)
+                        boolean exists = false;
+                        try
+                        {
+                            // Check table type as way of detecting existence
+                            String tableType = ((RDBMSSchemaHandler)rdbmsMgr.getSchemaHandler()).getTableType(getCurrentConnection(), tbl);
+                            if (tableType != null)
+                            {
+                                exists = true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            exists = false;
+                        }
+
+                        schemaExistsForTableMap.put(tbl, exists);
+                        if (exists)
                         {
                             tbl.dropConstraints(getCurrentConnection());
                         }
