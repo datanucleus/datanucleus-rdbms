@@ -422,7 +422,13 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
         while (tokens.hasMoreTokens())
         {
-            stmts.add(tokens.nextToken());
+            String token = tokens.nextToken();
+            if (token.startsWith("--"))
+            {
+                // Ignore comment lines because some RDBMS will not handle these
+                continue;
+            }
+            stmts.add(token);
         }
 
         return stmts;
