@@ -50,6 +50,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
+        supportedOptions.add(GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES);
 
         // Firebird doesn't hold cursors over commit so have to load all results before committing connection
         supportedOptions.remove(HOLD_CURSORS_OVER_COMMIT);
