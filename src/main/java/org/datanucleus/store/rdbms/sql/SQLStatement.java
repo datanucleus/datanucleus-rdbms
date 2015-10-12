@@ -173,10 +173,12 @@ public class SQLStatement
     {
         SQLText sqlText;
         String alias;
-        public SelectedItem(SQLText st, String alias)
+        boolean primary = true;
+        public SelectedItem(SQLText st, String alias, boolean primary)
         {
             this.sqlText = st;
             this.alias = alias;
+            this.primary = primary;
         }
         public SQLText getSQLText()
         {
@@ -185,6 +187,10 @@ public class SQLStatement
         public String getAlias()
         {
             return alias;
+        }
+        public boolean isPrimary()
+        {
+            return primary;
         }
         public int hashCode()
         {
@@ -461,9 +467,15 @@ public class SQLStatement
 
         invalidateStatement();
 
+        boolean primary = true;
         if (expr instanceof AggregateExpression)
         {
             aggregated = true;
+            primary = false;
+        }
+        else if (expr.getSQLTable() == null || expr.getJavaTypeMapping() == null)
+        {
+            primary = false;
         }
 
         int[] selected = new int[expr.getNumberOfSubExpressions()];
@@ -471,12 +483,12 @@ public class SQLStatement
         {
             for (int i=0;i<expr.getNumberOfSubExpressions();i++)
             {
-                selected[i] = selectItem(expr.getSubExpression(i).toSQLText(), alias != null ? (alias + i) : null);
+                selected[i] = selectItem(expr.getSubExpression(i).toSQLText(), alias != null ? (alias + i) : null, primary);
             }
         }
         else
         {
-            selected[0] = selectItem(expr.toSQLText(), alias);
+            selected[0] = selectItem(expr.toSQLText(), alias, primary);
         }
 
         if (unions != null)
@@ -534,7 +546,7 @@ public class SQLStatement
             }
 
             SQLColumn col = new SQLColumn(table, mappings[i].getColumn(), colAlias);
-            selected[i] = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null);
+            selected[i] = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null, true);
         }
 
         if (applyToUnions && unions != null)
@@ -597,7 +609,7 @@ public class SQLStatement
             colAlias = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
         }
         SQLColumn col = new SQLColumn(table, column, colAlias);
-        int position = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null);
+        int position = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null, true);
 
         if (unions != null)
         {
@@ -618,11 +630,12 @@ public class SQLStatement
      * if found (first position is 1). If the item is not found then it is added and the new position returned.
      * @param st SQLText to select
      * @param alias Optional alias
+     * @param primary Whether this is a primary select (column)
      * @return Position in the select list (first position is 1)
      */
-    private int selectItem(SQLText st, String alias)
+    private int selectItem(SQLText st, String alias, boolean primary)
     {
-        SelectedItem item = new SelectedItem(st, alias);
+        SelectedItem item = new SelectedItem(st, alias, primary);
         if (selectedItems.contains(item))
         {
             // Already have a select item with this exact name so just return with that
@@ -1649,6 +1662,33 @@ public class SQLStatement
                     groupBy.add(exprText);
                 }
             }
+
+            if (dba.supportsOption(DatastoreAdapter.GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES))
+            {
+                // Check that all select items are represented in the grouping for those RDBMS that need that
+                for (SelectedItem selItem : selectedItems)
+                {
+                    if (selItem.isPrimary())
+                    {
+                        String selSQL = selItem.getSQLText().toSQL();
+                        boolean selExists = false;
+                        for (SQLExpression grpExpr : groupingExpressions)
+                        {
+                            String grpExprSQL = grpExpr.toSQLText().toSQL();
+                            if (grpExprSQL.equals(selSQL))
+                            {
+                                selExists = true;
+                                break;
+                            }
+                        }
+                        if (!selExists)
+                        {
+                            groupBy.add(selSQL);
+                        }
+                    }
+                }
+            }
+
             if (groupBy.size() > 0 && aggregated)
             {
                 sql.append(" GROUP BY ");
@@ -2247,14 +2287,14 @@ public class SQLStatement
                 // Add the ordering columns to the selected list, saving the positions
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
-                    orderingColumnIndexes[i] = selectItem(orderingExpressions[i].toSQLText(), null);
+                    orderingColumnIndexes[i] = selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
                     if (unions != null)
                     {
                         Iterator<SQLStatement> iterator = unions.iterator();
                         while (iterator.hasNext())
                         {
                             SQLStatement stmt = iterator.next();
-                            stmt.selectItem(orderingExpressions[i].toSQLText(), null);
+                            stmt.selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
                         }
                     }
                 }
@@ -2278,11 +2318,11 @@ public class SQLStatement
                             while (iterator.hasNext())
                             {
                                 SQLStatement stmt = iterator.next();
-                                stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias);
+                                stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
                             }
                         }
 
-                        selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias);
+                        selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
                     }
                     else
                     {
@@ -2294,7 +2334,7 @@ public class SQLStatement
                             String alias = orderExprAlias + "_" + j;
                             DatastoreIdentifier aliasId = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
                             SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
-                            selectItem(new SQLText(col.getColumnSelectString()), alias);
+                            selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
 
                             if (unions != null)
                             {
@@ -2302,7 +2342,7 @@ public class SQLStatement
                                 while (iterator.hasNext())
                                 {
                                     SQLStatement stmt = iterator.next();
-                                    stmt.selectItem(new SQLText(col.getColumnSelectString()), alias);
+                                    stmt.selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
                                 }
                             }
                         }

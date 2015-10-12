@@ -164,6 +164,9 @@ public interface DatastoreAdapter
 
     public static final String ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE = "TableAliasInUpdateSet";
 
+    /** Whether the GROUP BY has to include all primary expressions selected. */
+    public static final String GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES = "GroupByIncludesAllSelectPrimaries";
+
     /**
      * Whether the database server supports persist of an unassigned character ("0x0").
      * If not, any unassigned character will be replaced by " " (space) on persist.
