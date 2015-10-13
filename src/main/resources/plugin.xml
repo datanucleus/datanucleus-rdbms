@@ -1283,6 +1283,7 @@ Contributors:
     <extension point="org.datanucleus.store.rdbms.sql_tablenamer">
         <sql-tablenamer name="t-scheme" class="org.datanucleus.store.rdbms.sql.SQLTableTNamer"/>
         <sql-tablenamer name="alpha-scheme" class="org.datanucleus.store.rdbms.sql.SQLTableAlphaNamer"/>
+        <sql-tablenamer name="table-name" class="org.datanucleus.store.rdbms.sql.SQLTableNameNamer"/>
     </extension>
 
     <!-- DATASTORE ADAPTERS -->

@@ -551,7 +551,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                 if (leftSqlExpr != null)
                 {
-                    if (!stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE))
+                    if (!stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_STATEMENT_ALLOW_TABLE_ALIAS_IN_SET_CLAUSE))
                     {
                         // This datastore doesn't allow table alias in UPDATE SET clause, so just use column name
                         for (int j=0;j<leftSqlExpr.getNumberOfSubExpressions();j++)
