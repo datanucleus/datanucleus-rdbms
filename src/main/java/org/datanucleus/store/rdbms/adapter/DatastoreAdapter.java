@@ -151,9 +151,7 @@ public interface DatastoreAdapter
      */
     public static final String ALTER_TABLE_DROP_FOREIGN_KEY_CONSTRAINT = "AlterTableDropForeignKey_Syntax";
 
-    /**
-     * Whether this datastore supports deferred constraints.
-     */
+    /** Whether this datastore supports deferred constraints. */
     public static final String DEFERRED_CONSTRAINTS = "DeferredConstraints";
 
     public static final String DISTINCT_WITH_SELECT_FOR_UPDATE = "DistinctWithSelectForUpdate";
@@ -162,7 +160,8 @@ public interface DatastoreAdapter
     public static final String ORDERING_WITH_SELECT_FOR_UPDATE = "OrderingWithSelectForUpdate";
     public static final String MULTITABLES_WITH_SELECT_FOR_UPDATE = "MultipleTablesWithSelectForUpdate";
 
-    public static final String ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE = "TableAliasInUpdateSet";
+    public static final String UPDATE_STATEMENT_ALLOW_TABLE_ALIAS_IN_SET_CLAUSE = "UpdateStmtAllowTableAliasInSet";
+    public static final String UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE = "UpdateDeleteStmtAllowTableAliasInWhere";
 
     /** Whether the GROUP BY has to include all primary expressions selected. */
     public static final String GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES = "GroupByIncludesAllSelectPrimaries";

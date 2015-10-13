@@ -30,6 +30,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -1161,8 +1162,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // Generate statement for candidate
             DatastoreClass table = bulkTable.table;
-
-            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null);
+            Map<String, Object> extensions = null;
+            if (!storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE))
+            {
+                extensions = new HashMap<String, Object>();
+                extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
+            }
+            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 
@@ -1269,7 +1275,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // Generate statement for candidate
             DatastoreClass table = bulkTable.table;
-            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null);
+            Map<String, Object> extensions = null;
+            if (!storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE))
+            {
+                extensions = new HashMap<String, Object>();
+                extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
+            }
+            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 

@@ -427,7 +427,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(RIGHT_OUTER_JOIN);
         supportedOptions.add(SOME_ANY_ALL_SUBQUERY_EXPRESSIONS);
 
-        supportedOptions.add(ALLOW_TABLE_ALIAS_IN_UPDATE_SET_CLAUSE);
+        supportedOptions.add(UPDATE_STATEMENT_ALLOW_TABLE_ALIAS_IN_SET_CLAUSE);
+        supportedOptions.add(UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE);
+
         supportedOptions.add(VIEWS);
         supportedOptions.add(DATETIME_STORES_MILLISECS);
         supportedOptions.add(ESCAPE_EXPRESSION_IN_LIKE_PREDICATE);
