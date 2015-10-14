@@ -24,23 +24,16 @@ import java.util.Map;
 
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementParameter;
 
 /**
  * Datastore-specific (RDBMS) compilation information for a java query.
- * Can represent a single SQL statement, or can represent multiple SQL statements all with the same
- * results and parameters.
+ * Can represent a single SQL statement, or can represent multiple SQL statements all with the same results and parameters.
  */
 public class RDBMSQueryCompilation
 {
-    /** Generated SQL statement. */
-    String sql = null;
-
-    /** SQL Statements when it equates to multiple statements. */
-    List<String> sqls = null;
-
-    /** Flags for each SQL statement whether they count towards the overall "count" of the operation. */
-    List<Boolean> sqlUseInCountFlags = null;
+    List<StatementCompilation> statementCompilations = new ArrayList(1);
 
     /** Result mappings when the result is for a candidate (can be null). */
     StatementClassMapping resultsDefinitionForClass = null;
@@ -58,44 +51,81 @@ public class RDBMSQueryCompilation
 
     boolean precompilable = true;
 
+    public class StatementCompilation
+    {
+        SQLStatement stmt;
+        String sql;
+        boolean useInCount = true;
+        public StatementCompilation(SQLStatement stmt, String sql, boolean useInCount)
+        {
+            this.stmt = stmt;
+            this.sql = sql;
+            this.useInCount = useInCount;
+        }
+        public SQLStatement getStatement()
+        {
+            return stmt;
+        }
+        public String getSQL()
+        {
+            return sql;
+        }
+        public boolean useInCount()
+        {
+            return useInCount;
+        }
+        public void setSQL(String sql)
+        {
+            this.sql = sql;
+        }
+    }
+
     public RDBMSQueryCompilation()
     {
     }
 
+    public int getNumberOfStatements()
+    {
+        return this.statementCompilations.size();
+    }
+    public void clearStatements()
+    {
+        this.statementCompilations.clear();
+    }
+
+    public void addStatement(SQLStatement stmt, String sql, boolean useInCount)
+    {
+        statementCompilations.add(new StatementCompilation(stmt, sql, useInCount));
+    }
+
+    public List<StatementCompilation> getStatementCompilations()
+    {
+        return statementCompilations;
+    }
+
+    /**
+     * Convenience mutator for the SQL to invoke, when we only have 1 statement associated with this compilation.
+     * Use addStatement/getStatementCompilations to set the SQLs when we have multiple statements.
+     * @param sql The SQL to be invoked, overwriting any previous SQL set here
+     */
     public void setSQL(String sql)
     {
-        this.sql = sql;
-        this.sqls = null;
+        clearStatements();
+        addStatement(null, sql, true);
     }
 
-    public void setSQL(List<String> sqls, List<Boolean> sqlUseInCountFlags)
-    {
-        this.sql = null;
-        if (this.sqls == null)
-        {
-            this.sqls = new ArrayList<String>(sqls.size());
-        }
-        this.sqls.addAll(sqls);
-        if (this.sqlUseInCountFlags == null)
-        {
-            this.sqlUseInCountFlags = new ArrayList<Boolean>(sqlUseInCountFlags.size());
-        }
-        this.sqlUseInCountFlags.addAll(sqlUseInCountFlags);
-    }
-
+    /**
+     * Convenience accessor for the SQL to invoke, when we only have 1 statement associated with this compilation.
+     * Use getStatementCompilations to get the SQLs when we have multiple statements.
+     * @return The SQL to be invoked
+     */
     public String getSQL()
     {
-        return sql;
-    }
-
-    public List<String> getSQLs()
-    {
-        return sqls;
-    }
-
-    public List<Boolean> getSQLUseInCountFlags()
-    {
-        return sqlUseInCountFlags;
+        if (statementCompilations.isEmpty())
+        {
+            return null;
+        }
+        return statementCompilations.get(0).getSQL();
     }
 
     public void setPrecompilable(boolean precompilable)
