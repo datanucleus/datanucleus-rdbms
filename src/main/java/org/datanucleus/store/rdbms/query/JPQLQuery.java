@@ -969,40 +969,6 @@ public class JPQLQuery extends AbstractJPQLQuery
     }
 
     /**
-     * Method to return the names of the extensions supported by this query.
-     * To be overridden by subclasses where they support additional extensions.
-     * @return The supported extension names
-     */
-    public Set<String> getSupportedExtensions()
-    {
-        Set<String> supported = super.getSupportedExtensions();
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
-        return supported;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.query.Query#processesRangeInDatastoreQuery()
-     */
-    @Override
-    public boolean processesRangeInDatastoreQuery()
-    {
-        if (range == null)
-        {
-            // No range specified so makes no difference
-            return true;
-        }
-
-        RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
-        boolean using_limit_where_clause = (dba.getRangeByLimitEndOfStatementClause(fromInclNo, toExclNo).length() > 0);
-        boolean using_rownum = (dba.getRangeByRowNumberColumn().length() > 0) || (dba.getRangeByRowNumberColumn2().length() > 0);
-
-        return using_limit_where_clause || using_rownum;
-    }
-
-    /**
      * Method to compile the query for RDBMS for a bulk update.
      * @param parameterValues The parameter values (if any)
      * @param candidateCmd Meta-data for the candidate class
@@ -1223,6 +1189,40 @@ public class JPQLQuery extends AbstractJPQLQuery
         {
             datastoreCompilation.setSQL(sqls, sqlCountFlags);
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.query.Query#processesRangeInDatastoreQuery()
+     */
+    @Override
+    public boolean processesRangeInDatastoreQuery()
+    {
+        if (range == null)
+        {
+            // No range specified so makes no difference
+            return true;
+        }
+
+        RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
+        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        boolean using_limit_where_clause = (dba.getRangeByLimitEndOfStatementClause(fromInclNo, toExclNo).length() > 0);
+        boolean using_rownum = (dba.getRangeByRowNumberColumn().length() > 0) || (dba.getRangeByRowNumberColumn2().length() > 0);
+
+        return using_limit_where_clause || using_rownum;
+    }
+
+    /**
+     * Method to return the names of the extensions supported by this query.
+     * To be overridden by subclasses where they support additional extensions.
+     * @return The supported extension names
+     */
+    public Set<String> getSupportedExtensions()
+    {
+        Set<String> supported = super.getSupportedExtensions();
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
+        return supported;
     }
 
     /**

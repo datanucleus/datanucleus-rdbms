@@ -1322,20 +1322,6 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         }
     }
 
-    /**
-     * Method to return the names of the extensions supported by this query.
-     * To be overridden by subclasses where they support additional extensions.
-     * @return The supported extension names
-     */
-    public Set<String> getSupportedExtensions()
-    {
-        Set<String> supported = super.getSupportedExtensions();
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
-        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
-        return supported;
-    }
-
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.Query#processesRangeInDatastoreQuery()
      */
@@ -1354,6 +1340,20 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         boolean using_rownum = (dba.getRangeByRowNumberColumn().length() > 0) || (dba.getRangeByRowNumberColumn2().length() > 0);
 
         return using_limit_where_clause || using_rownum;
+    }
+
+    /**
+     * Method to return the names of the extensions supported by this query.
+     * To be overridden by subclasses where they support additional extensions.
+     * @return The supported extension names
+     */
+    public Set<String> getSupportedExtensions()
+    {
+        Set<String> supported = super.getSupportedExtensions();
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
+        supported.add(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
+        return supported;
     }
 
     /**
