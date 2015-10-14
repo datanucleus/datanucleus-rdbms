@@ -1256,6 +1256,11 @@ public class JPQLQuery extends AbstractJPQLQuery
         super.setExtensions(extensions);
     }
 
+    public RDBMSQueryCompilation getDatastoreCompilation()
+    {
+        return datastoreCompilation;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.Query#getNativeQuery()
      */
