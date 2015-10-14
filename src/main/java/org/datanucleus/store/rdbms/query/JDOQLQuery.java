@@ -1386,6 +1386,11 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         super.setExtensions(extensions);
     }
 
+    public RDBMSQueryCompilation getDatastoreCompilation()
+    {
+        return datastoreCompilation;
+    }
+
     /* (non-Javadoc)
      * @see org.datanucleus.store.query.Query#getNativeQuery()
      */
