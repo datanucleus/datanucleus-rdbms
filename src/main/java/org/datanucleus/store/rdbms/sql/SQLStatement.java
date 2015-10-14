@@ -264,6 +264,7 @@ public class SQLStatement
      * @param table The primary table
      * @param alias Alias for this table
      * @param tableGroupName Name of candidate table-group (if any). Uses "Group0" if not provided
+     * @param extensions Optional extensions
      */
     public SQLStatement(SQLStatement parentStmt, RDBMSStoreManager rdbmsMgr, Table table, DatastoreIdentifier alias, String tableGroupName, Map<String, Object> extensions)
     {
