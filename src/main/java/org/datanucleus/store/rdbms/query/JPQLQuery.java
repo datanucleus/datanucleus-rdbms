@@ -68,6 +68,7 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.query.RDBMSQueryCompilation.StatementCompilation;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
@@ -676,36 +677,20 @@ public class JPQLQuery extends AbstractJPQLQuery
                 else if (type == Query.BULK_UPDATE || type == Query.BULK_DELETE)
                 {
                     long bulkResult = 0;
-                    if (datastoreCompilation.getSQL() != null)
+                    List<StatementCompilation> stmtCompilations = datastoreCompilation.getStatementCompilations();
+                    Iterator<StatementCompilation> stmtCompileIter = stmtCompilations.iterator();
+                    while (stmtCompileIter.hasNext())
                     {
-                        // Process single bulk statement
-                        ps = sqlControl.getStatementForUpdate(mconn, datastoreCompilation.getSQL(), false);
+                        StatementCompilation stmtCompile = stmtCompileIter.next();
+                        ps = sqlControl.getStatementForUpdate(mconn, stmtCompile.getSQL(), false);
                         SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
                         RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
 
-                        int[] execResult = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
-                        bulkResult = execResult[0];
-                    }
-                    else
-                    {
-                        // Process multiple bulk statements and derive return value
-                        List<String> sqls = datastoreCompilation.getSQLs();
-                        List<Boolean> sqlUseInCountFlags = datastoreCompilation.getSQLUseInCountFlags();
-                        Iterator<Boolean> sqlUseInCountIter = sqlUseInCountFlags.iterator();
-                        for (String sql : sqls)
+                        int[] execResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
+                        if (stmtCompile.useInCount())
                         {
-                            Boolean useInCount = sqlUseInCountIter.next();
-                            ps = sqlControl.getStatementForUpdate(mconn, sql, false);
-                            SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
-                            RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
-
-                            int[] execResults = sqlControl.executeStatementUpdate(ec, mconn, toString(), ps, true);
-                            if (useInCount)
-                            {
-                                bulkResult += execResults[0];
-                            }
+                            bulkResult += execResults[0];
                         }
-                        
                     }
 
                     try
@@ -1022,8 +1007,8 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
         }
 
-        List<String> sqls = new ArrayList<String>();
-        List<Boolean> sqlCountFlags = new ArrayList<Boolean>();
+        List<SQLStatement> stmts = new ArrayList<SQLStatement>();
+        List<Boolean> stmtCountFlags = new ArrayList<Boolean>();
         for (BulkTable bulkTable : tables)
         {
             // Generate statement for candidate
@@ -1062,20 +1047,25 @@ public class JPQLQuery extends AbstractJPQLQuery
 
             if (stmt.hasUpdates())
             {
-                sqls.add(stmt.getUpdateStatement().toString());
-                sqlCountFlags.add(bulkTable.useInCount);
+                stmts.add(stmt);
+                stmtCountFlags.add(bulkTable.useInCount);
 
-                datastoreCompilation.setStatementParameters(stmt.getSelectStatement().getParametersForStatement());
+                datastoreCompilation.setStatementParameters(stmt.getUpdateStatement().getParametersForStatement());
             }
         }
 
-        if (sqls.size() == 1)
+        datastoreCompilation.clearStatements();
+        Iterator<SQLStatement> stmtIter = stmts.iterator();
+        Iterator<Boolean> stmtCountFlagsIter = stmtCountFlags.iterator();
+        while (stmtIter.hasNext())
         {
-            datastoreCompilation.setSQL(sqls.get(0));
-        }
-        else
-        {
-            datastoreCompilation.setSQL(sqls, sqlCountFlags);
+            SQLStatement stmt = stmtIter.next();
+            Boolean useInCount = stmtCountFlagsIter.next();
+            if (stmts.size() == 1)
+            {
+                useInCount = true;
+            }
+            datastoreCompilation.addStatement(stmt, stmt.getUpdateStatement().toSQL(), useInCount);
         }
     }
 
@@ -1137,8 +1127,8 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
         }
 
-        List<String> sqls = new ArrayList<String>();
-        List<Boolean> sqlCountFlags = new ArrayList<Boolean>();
+        List<SQLStatement> stmts = new ArrayList<SQLStatement>();
+        List<Boolean> stmtCountFlags = new ArrayList<Boolean>();
         for (BulkTable bulkTable : tables)
         {
             // Generate statement for candidate
@@ -1176,18 +1166,23 @@ public class JPQLQuery extends AbstractJPQLQuery
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
 
-            sqls.add(stmt.getDeleteStatement().toString());
-            sqlCountFlags.add(bulkTable.useInCount);
+            stmts.add(stmt);
+            stmtCountFlags.add(bulkTable.useInCount);
             datastoreCompilation.setStatementParameters(stmt.getDeleteStatement().getParametersForStatement());
         }
 
-        if (sqls.size() == 1)
+        datastoreCompilation.clearStatements();
+        Iterator<SQLStatement> stmtIter = stmts.iterator();
+        Iterator<Boolean> stmtCountFlagsIter = stmtCountFlags.iterator();
+        while (stmtIter.hasNext())
         {
-            datastoreCompilation.setSQL(sqls.get(0));
-        }
-        else
-        {
-            datastoreCompilation.setSQL(sqls, sqlCountFlags);
+            SQLStatement stmt = stmtIter.next();
+            Boolean useInCount = stmtCountFlagsIter.next();
+            if (stmts.size() == 1)
+            {
+                useInCount = true;
+            }
+            datastoreCompilation.addStatement(stmt, stmt.getDeleteStatement().toSQL(), useInCount);
         }
     }
 
