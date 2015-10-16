@@ -3741,7 +3741,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public boolean useBackedSCOWrapperForMember(AbstractMemberMetaData mmd, ExecutionContext ec)
     {
-        // Always use backed SCO wrappers for RDBMS
+        if ((mmd.hasCollection() || mmd.hasMap()) && mmd.hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+        {
+            // The only case where we don't use backed wrappers is for a Collection/Map that is using a converter for the whole field (so storing as a single column)
+            return false;
+        }
+
         return true;
     }
 
