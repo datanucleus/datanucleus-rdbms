@@ -279,7 +279,11 @@ public class JPQLQuery extends AbstractJPQLQuery
 
         // No cached compilation for this query in this datastore so compile it
         AbstractClassMetaData acmd = getCandidateClassMetaData();
-        if (type == Query.BULK_UPDATE)
+        if (type == Query.BULK_INSERT)
+        {
+            throw new NucleusException("We do not currently support JPQL INSERT queries with this datastore");
+        }
+        else if (type == Query.BULK_UPDATE)
         {
             datastoreCompilation = new RDBMSQueryCompilation();
             compileQueryUpdate(parameterValues, acmd);
@@ -675,6 +679,10 @@ public class JPQLQuery extends AbstractJPQLQuery
                             rs.close();
                         }
                     }
+                }
+                else if (type == Query.BULK_INSERT)
+                {
+                    throw new NucleusException("We do not currently support JPQL INSERT queries with this datastore");
                 }
                 else if (type == Query.BULK_UPDATE || type == Query.BULK_DELETE)
                 {
