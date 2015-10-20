@@ -42,7 +42,6 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Class providing an API for generating SQL statements.
@@ -1255,130 +1254,6 @@ public abstract class SQLStatement
     }
 
     /**
-     * Convenience method to reorder the joins to be in logical order.
-     * If a join needed to be changed during the generation process, it will have been removed and then
-     * the replacement added later. This method reorders the joins so that the joins are only relative to
-     * "known" tables.
-     */
-    private void reorderJoins(List knownJoins, List joinsToAdd)
-    {
-        if (joinsToAdd == null)
-        {
-            requiresJoinReorder = false;
-            return;
-        }
-
-        while (joinsToAdd.size() > 0)
-        {
-            Iterator<SQLJoin> joinIter = joinsToAdd.iterator();
-            int origSize = joinsToAdd.size();
-            while (joinIter.hasNext())
-            {
-                SQLJoin join = joinIter.next();
-                if (join.getType() == JoinType.CROSS_JOIN)
-                {
-                    // Cross joins don't relate to any other table so are fine
-                    knownJoins.add(join);
-                    joinIter.remove();
-                }
-                else if (join.getType() == JoinType.NON_ANSI_JOIN)
-                {
-                    // Non-ANSI joins use the WHERE clause so are fine
-                    knownJoins.add(join);
-                    joinIter.remove();
-                }
-                else if (join.getJoinedTable().equals(primaryTable))
-                {
-                    // Joins to the primary table are fine
-                    knownJoins.add(join);
-                    joinIter.remove();
-                }
-                else
-                {
-                    Iterator<SQLJoin> knownJoinIter = knownJoins.iterator();
-                    boolean valid = false;
-                    while (knownJoinIter.hasNext())
-                    {
-                        SQLJoin currentJoin = knownJoinIter.next();
-                        if (join.getJoinedTable().equals(currentJoin.getTable()))
-                        {
-                            valid = true;
-                            break;
-                        }
-                    }
-                    if (valid)
-                    {
-                        // Only used known joins so fine
-                        knownJoins.add(join);
-                        joinIter.remove();
-                    }
-                }
-            }
-
-            if (joinsToAdd.size() == origSize)
-            {
-                // Somehow the user has ended up with a circular pattern of joins
-                throw new NucleusException("Unable to reorder joins for SQL statement since circular!" +
-                    " Consider reordering the components in the WHERE clause : affected joins - " + StringUtils.collectionToString(joinsToAdd));
-            }
-        }
-        requiresJoinReorder = false;
-    }
-
-    /**
-     * Convenience method to return the JOIN clause implied by the "joins" List.
-     * @param lock Whether to add locking on the join clause (only for some RDBMS)
-     * @return The SQL for the join clause
-     */
-    protected SQLText getSqlForJoins(boolean lock)
-    {
-        SQLText sql = new SQLText();
-        DatastoreAdapter dba = getDatastoreAdapter();
-        if (requiresJoinReorder)
-        {
-            List<SQLJoin> theJoins = new ArrayList<SQLJoin>(joins.size());
-            reorderJoins(theJoins, joins);
-            joins = theJoins;
-        }
-        Iterator<SQLJoin> iter = joins.iterator();
-        while (iter.hasNext())
-        {
-            SQLJoin join = iter.next();
-            if (join.getType() == JoinType.CROSS_JOIN)
-            {
-                if (dba.supportsOption(DatastoreAdapter.ANSI_CROSSJOIN_SYNTAX))
-                {
-                    // ANSI-92 style joins, separate joins by space
-                    sql.append(" ").append(join.toSQLText(dba, lock));
-                }
-                else if (dba.supportsOption(DatastoreAdapter.CROSSJOIN_ASINNER11_SYNTAX))
-                {
-                    sql.append(" INNER JOIN " + join.getTable() + " ON 1=1");
-                }
-                else
-                {
-                    // "ANSI-86" style cross join, separate join by comma
-                    sql.append(",").append(join.getTable().toString());
-                }
-            }
-            else
-            {
-                if (dba.supportsOption(DatastoreAdapter.ANSI_JOIN_SYNTAX))
-                {
-                    // ANSI-92 style joins, separate joins by space
-                    sql.append(" ").append(join.toSQLText(dba, lock));
-                }
-                else
-                {
-                    // "ANSI-86" style joins, separate joins by comma
-                    sql.append(",").append(join.toSQLText(dba, lock));
-                }
-            }
-        }
-        return sql;
-    }
-
-    /**
      * Method to uncache the generated SQL (because some condition has changed).
      */
     protected void invalidateStatement()
@@ -1388,12 +1263,12 @@ public abstract class SQLStatement
 
     /**
      * Method to dump the statement to the supplied log (debug level).
-     * Logs the (SELECT or UPDATE) SQL that this statement equates to, and the TableGroup(s) and their associated tables.
+     * Logs the SQL that this statement equates to, and the TableGroup(s) and their associated tables.
      * @param logger The logger
      */
     public void log(NucleusLogger logger)
     {
-        // Log the statement (assumed to be SELECT)
+        // Log the statement
         logger.debug("SQLStatement : " + getSQLText());
 
         // Log the table groups
