@@ -17,10 +17,14 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
@@ -30,13 +34,18 @@ import org.datanucleus.store.rdbms.table.Table;
  * INSERT INTO {tbl} (col1, col2, ...)
  * SELECT ...
  * </pre>
+ * TODO Support INSERT INTO {tbl} (col1, col2, ...) VALUES (...)
  */
 public class InsertStatement extends SQLStatement
 {
+    List<SQLExpression> columnList = new ArrayList<SQLExpression>();
+
+    SelectStatement selectStmt;
+
     /**
-     * Constructor for an UPDATE statement.
+     * Constructor for an INSERT statement.
      * @param rdbmsMgr Store Manager
-     * @param table The primary table to UPDATE
+     * @param table The primary table to INSERT
      * @param alias Alias for the primary table
      * @param tableGroupName Group name for the primary table
      * @param extensions Any extensions (optional)
@@ -46,6 +55,16 @@ public class InsertStatement extends SQLStatement
         super(null, rdbmsMgr, table, alias, tableGroupName, extensions);
     }
 
+    public void addColumn(SQLExpression expr)
+    {
+        columnList.add(expr);
+    }
+
+    public void setSelectStatement(SelectStatement selectStmt)
+    {
+        this.selectStmt = selectStmt;
+    }
+
     public synchronized SQLText getSQLText()
     {
         if (sql != null)
@@ -53,7 +72,26 @@ public class InsertStatement extends SQLStatement
             return sql;
         }
 
-        // TODO Generate the statement
+        sql = new SQLText("INSERT INTO ");
+        sql.append(primaryTable.getTable().toString());
+        sql.append('(');
+        Iterator<SQLExpression> columnListIter = columnList.iterator();
+        while (columnListIter.hasNext())
+        {
+            SQLExpression colExpr = columnListIter.next();
+            sql.append(colExpr.toSQLText());
+            if (columnListIter.hasNext())
+            {
+                sql.append(',');
+            }
+        }
+        sql.append(") ");
+
+        if (selectStmt != null)
+        {
+            sql.append(selectStmt.getSQLText());
+        }
+
         return sql;
     }
 }
