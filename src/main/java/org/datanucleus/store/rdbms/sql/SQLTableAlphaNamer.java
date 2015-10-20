@@ -118,12 +118,12 @@ public class SQLTableAlphaNamer implements SQLTableNamer
             }
         }
 
-        if (stmt.parent != null)
+        if (stmt.getParentStatement() != null)
         {
             // Support 3 levels of subqueries. Any more than that and your query is inefficient anyway!
-            if (stmt.parent.parent != null)
+            if (stmt.getParentStatement().getParentStatement() != null)
             {
-                if (stmt.parent.parent.parent != null)
+                if (stmt.getParentStatement().getParentStatement().getParentStatement() != null)
                 {
                     return groupLetters + numTablesInGroup + "_SUB_SUB_SUB";
                 }

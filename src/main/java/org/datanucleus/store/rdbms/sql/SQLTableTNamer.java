@@ -49,12 +49,12 @@ public class SQLTableTNamer implements SQLTableNamer
             number = (numTables > 0 ? numTables + 1 : 1);
         }
 
-        if (stmt.parent != null)
+        if (stmt.getParentStatement() != null)
         {
             // Support 3 levels of subqueries. Any more than that and your query is inefficient anyway!
-            if (stmt.parent.parent != null)
+            if (stmt.getParentStatement().getParentStatement() != null)
             {
-                if (stmt.parent.parent.parent != null)
+                if (stmt.getParentStatement().getParentStatement().getParentStatement() != null)
                 {
                     return "T" + number + "_SUB_SUB_SUB";
                 }
