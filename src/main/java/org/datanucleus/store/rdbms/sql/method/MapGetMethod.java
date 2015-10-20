@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
@@ -168,7 +169,7 @@ public class MapGetMethod extends AbstractSQLMethod
             throw new NucleusException("Invalid map for " + mapExpr + " in get() call");
         }
 
-        SQLStatement subStmt = new SQLStatement(stmt, storeMgr, mapTbl, null, null);
+        SQLStatement subStmt = new SelectStatement(stmt, storeMgr, mapTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
         SQLExpression valExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), valMapping);
         subStmt.select(valExpr, null);

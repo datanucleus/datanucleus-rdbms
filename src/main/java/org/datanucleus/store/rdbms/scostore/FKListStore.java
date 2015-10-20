@@ -1013,7 +1013,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }
-        String stmt = sqlStmt.getSelectStatement().toSQL();
+        String stmt = sqlStmt.getSQLText().toSQL();
 
         try
         {

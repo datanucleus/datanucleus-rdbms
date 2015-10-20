@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
@@ -153,7 +154,7 @@ public class ListGetMethod extends AbstractSQLMethod
             }
         }
 
-        SQLStatement subStmt = new SQLStatement(stmt, storeMgr, listTbl, null, null);
+        SQLStatement subStmt = new SelectStatement(stmt, storeMgr, listTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
         SQLExpression valExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), elemMapping);
         subStmt.select(valExpr, null);

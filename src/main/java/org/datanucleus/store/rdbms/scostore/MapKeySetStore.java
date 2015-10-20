@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -174,9 +175,9 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
             {
                 // Generate the statement, and statement mapping/parameter information
                 SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
-                iteratorStmtUnlocked = sqlStmt.getSelectStatement().toSQL();
+                iteratorStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                iteratorStmtLocked = sqlStmt.getSelectStatement().toSQL();
+                iteratorStmtLocked = sqlStmt.getSQLText().toSQL();
             }
         }
 
@@ -335,7 +336,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 else
                 {
                     // Select of key in join table
-                    sqlStmt = new SQLStatement(storeMgr, containerTable, null, null);
+                    sqlStmt = new SelectStatement(storeMgr, containerTable, null, null);
                     sqlStmt.setClassLoaderResolver(clr);
                     containerSqlTbl = sqlStmt.getPrimaryTable();
                     SQLTable elemSqlTblForKey = containerSqlTbl;

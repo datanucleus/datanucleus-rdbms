@@ -86,7 +86,7 @@ public class SQLStatementHelper
             ExecutionContext ec, ManagedConnection mconn, String resultSetType, String resultSetConcurrency)
     throws SQLException
     {
-        SQLText sqlText = sqlStmt.getSelectStatement();
+        SQLText sqlText = sqlStmt.getSQLText();
         SQLController sqlControl = sqlStmt.getRDBMSManager().getSQLController();
 
         // Generate the statement using the statement text

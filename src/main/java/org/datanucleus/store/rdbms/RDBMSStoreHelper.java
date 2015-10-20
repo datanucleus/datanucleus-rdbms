@@ -101,7 +101,7 @@ public class RDBMSStoreHelper
             try
             {
                 PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmt, ec, mconn, null, null);
-                String statement = sqlStmt.getSelectStatement().toSQL();
+                String statement = sqlStmt.getSQLText().toSQL();
                 try
                 {
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
@@ -256,7 +256,7 @@ public class RDBMSStoreHelper
             try
             {
                 PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmtMain, ec, mconn, null, null);
-                String statement = sqlStmtMain.getSelectStatement().toSQL();
+                String statement = sqlStmtMain.getSQLText().toSQL();
                 try
                 {
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);

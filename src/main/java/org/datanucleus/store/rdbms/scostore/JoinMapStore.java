@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -671,9 +672,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Generate the statement, and statement mapping/parameter information
                 SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
-                getStmtUnlocked = sqlStmt.getSelectStatement().toSQL();
+                getStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                getStmtLocked = sqlStmt.getSelectStatement().toSQL();
+                getStmtLocked = sqlStmt.getSQLText().toSQL();
             }
         }
 
@@ -792,7 +793,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         if (valuesAreEmbedded || valuesAreSerialised)
         {
             // Value is stored in join table
-            sqlStmt = new SQLStatement(storeMgr, mapTable, null, null);
+            sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
             sqlStmt.setClassLoaderResolver(clr);
             sqlStmt.select(sqlStmt.getPrimaryTable(), valueMapping, null);
         }

@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
@@ -407,7 +408,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             if (keyCmd == null)
             {
                 // Map<Non-PC, ?>
-                subStmt = new SQLStatement(stmt, storeMgr, joinTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, joinTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -435,7 +436,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             {
                 // Map<PC, ?>
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(mmd.getMap().getKeyType(), clr);
-                subStmt = new SQLStatement(stmt, storeMgr, keyTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, keyTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -480,7 +481,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
             if (keyCmd == null)
             {
-                subStmt = new SQLStatement(stmt, storeMgr, valTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, valTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -507,7 +508,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             else
             {
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(mmd.getMap().getKeyType(), clr);
-                subStmt = new SQLStatement(stmt, storeMgr, keyTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, keyTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -547,7 +548,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
 
-            subStmt = new SQLStatement(stmt, storeMgr, keyTbl, null, null);
+            subStmt = new SelectStatement(stmt, storeMgr, keyTbl, null, null);
             subStmt.setClassLoaderResolver(clr);
             JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
             subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);

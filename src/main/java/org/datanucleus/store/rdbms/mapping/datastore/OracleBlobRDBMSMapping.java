@@ -53,6 +53,7 @@ import org.datanucleus.store.rdbms.adapter.OracleAdapter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
@@ -313,7 +314,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
         // Generate "SELECT {blobColumn} FROM TABLE WHERE ID=? FOR UPDATE" statement
-        SQLStatement sqlStmt = new SQLStatement(storeMgr, table, null, null);
+        SQLStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
         sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
         sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
@@ -366,7 +367,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
             }
         }
 
-        String textStmt = sqlStmt.getSelectStatement().toSQL();
+        String textStmt = sqlStmt.getSQLText().toSQL();
 
         if (sm.isEmbedded())
         {

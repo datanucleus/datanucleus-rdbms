@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.query.StatementParameterMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -351,9 +352,9 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             {
                 // Generate the statement, and statement mapping/parameter information
                 SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
-                iteratorStmtUnlocked = sqlStmt.getSelectStatement().toSQL();
+                iteratorStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                iteratorStmtLocked = sqlStmt.getSelectStatement().toSQL();
+                iteratorStmtLocked = sqlStmt.getSQLText().toSQL();
             }
         }
 
@@ -432,7 +433,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      */
     protected SQLStatement getSQLStatementForIterator(ObjectProvider ownerOP)
     {
-        SQLStatement sqlStmt = new SQLStatement(storeMgr, mapTable, null, null);
+        SQLStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
 
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();

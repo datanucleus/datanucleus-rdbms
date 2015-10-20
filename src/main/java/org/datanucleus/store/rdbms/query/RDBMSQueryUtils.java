@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -358,8 +359,7 @@ public class RDBMSQueryUtils extends QueryUtils
             {
                 DatastoreClass cls = iter.next();
 
-                SQLStatement tblStmt =
-                    new SQLStatement(parentStmt, storeMgr, cls, candidateAliasId, candidateTableGroupName);
+                SQLStatement tblStmt = new SelectStatement(parentStmt, storeMgr, cls, candidateAliasId, candidateTableGroupName);
                 tblStmt.setClassLoaderResolver(clr);
                 tblStmt.setCandidateClassName(cls.getType());
 

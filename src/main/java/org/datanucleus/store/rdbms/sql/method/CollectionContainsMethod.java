@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
@@ -475,7 +476,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             if (elemCmd == null)
             {
                 // Collection<Non-PC>
-                subStmt = new SQLStatement(stmt, storeMgr, joinTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, joinTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -502,7 +503,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             {
                 // Collection<PC>
                 DatastoreClass elemTbl = storeMgr.getDatastoreClass(elemType, clr);
-                subStmt = new SQLStatement(stmt, storeMgr, elemTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, elemTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -533,7 +534,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         {
             // FK Collection
             DatastoreClass elemTbl = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
-            subStmt = new SQLStatement(stmt, storeMgr, elemTbl, null, null);
+            subStmt = new SelectStatement(stmt, storeMgr, elemTbl, null, null);
             subStmt.setClassLoaderResolver(clr);
             JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
             subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);

@@ -268,7 +268,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         }
 
         // Start from an SQL SELECT of the candidate table
-        SQLStatement stmt = new SQLStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
+        SQLStatement stmt = new SelectStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
         stmt.setClassLoaderResolver(clr);
         stmt.setCandidateClassName(className);
 
@@ -380,7 +380,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         }
 
         // Start from an SQL SELECT of the join table
-        SQLStatement stmt = new SQLStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
+        SQLStatement stmt = new SelectStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
         stmt.setClassLoaderResolver(clr);
         stmt.setCandidateClassName(className);
 

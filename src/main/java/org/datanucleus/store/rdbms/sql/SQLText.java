@@ -361,7 +361,7 @@ public class SQLText
             else if (item instanceof SQLStatement)
             {
                 SQLStatement stmt = (SQLStatement) item;
-                SQLText st = stmt.getSelectStatement();
+                SQLText st = stmt.getSQLText();
                 sql.append(st.toSQL());
                 if (st.parameters != null)
                 {

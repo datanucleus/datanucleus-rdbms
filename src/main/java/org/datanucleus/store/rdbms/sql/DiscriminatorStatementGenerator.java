@@ -191,14 +191,14 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
         if (joinTable == null)
         {
             // Select of candidate table
-            stmt = new SQLStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
+            stmt = new SelectStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
             stmt.setClassLoaderResolver(clr);
             discrimSqlTbl = stmt.getPrimaryTable();
         }
         else
         {
             // Select of join table, with join to element table
-            stmt = new SQLStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
+            stmt = new SelectStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
             stmt.setClassLoaderResolver(clr);
 
             JavaTypeMapping candidateIdMapping = candidateTable.getIdMapping();

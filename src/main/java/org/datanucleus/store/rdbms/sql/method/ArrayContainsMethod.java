@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.ArrayExpression;
 import org.datanucleus.store.rdbms.sql.expression.ArrayLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
@@ -234,7 +235,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
             if (elemCmd == null)
             {
                 // Array<Non-PC>
-                subStmt = new SQLStatement(stmt, storeMgr, joinTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, joinTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
@@ -261,7 +262,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
             {
                 // Array<PC>
                 DatastoreClass elemTbl = storeMgr.getDatastoreClass(mmd.getArray().getElementType(), clr);
-                subStmt = new SQLStatement(stmt, storeMgr, elemTbl, null, null);
+                subStmt = new SelectStatement(stmt, storeMgr, elemTbl, null, null);
                 subStmt.setClassLoaderResolver(clr);
                 JavaTypeMapping oneMapping = storeMgr.getMappingManager().getMapping(Integer.class);
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);

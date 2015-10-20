@@ -1049,7 +1049,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         {
             sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }
-        String stmt = sqlStmt.getSelectStatement().toSQL();
+        String stmt = sqlStmt.getSQLText().toSQL();
 
         try
         {

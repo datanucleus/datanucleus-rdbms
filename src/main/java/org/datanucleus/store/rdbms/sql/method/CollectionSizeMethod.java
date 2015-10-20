@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -122,10 +123,9 @@ public class CollectionSizeMethod extends AbstractSQLMethod
             }
         }
 
-        SQLStatement subStmt = new SQLStatement(stmt, storeMgr, collectionTbl, null, null);
+        SQLStatement subStmt = new SelectStatement(stmt, storeMgr, collectionTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
-        JavaTypeMapping mapping =
-                storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
         SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
         ((StringLiteral)countExpr).generateStatementWithoutQuotes();
         subStmt.select(countExpr, null);

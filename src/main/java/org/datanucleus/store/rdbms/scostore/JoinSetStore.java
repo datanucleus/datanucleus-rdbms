@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -888,7 +889,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }
-        String stmt = sqlStmt.getSelectStatement().toSQL();
+        String stmt = sqlStmt.getSQLText().toSQL();
 
         try
         {
@@ -966,7 +967,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // Element = embedded, serialised (maybe Non-PC)
             // Just select the join table since we're going to return the embedded/serialised columns from it
-            sqlStmt = new SQLStatement(storeMgr, containerTable, null, null);
+            sqlStmt = new SelectStatement(storeMgr, containerTable, null, null);
             sqlStmt.setClassLoaderResolver(clr);
 
             // Select the element column - first select is assumed by SetStoreIterator
@@ -976,7 +977,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // Element = Reference type (interface/Object)
             // Just select the join table since we're going to return the implementation id columns only
-            sqlStmt = new SQLStatement(storeMgr, containerTable, null, null);
+            sqlStmt = new SelectStatement(storeMgr, containerTable, null, null);
             sqlStmt.setClassLoaderResolver(clr);
 
             // Select the reference column(s) - first select is assumed by SetStoreIterator

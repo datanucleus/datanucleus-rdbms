@@ -40,6 +40,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -74,7 +75,7 @@ public class LocateRequest extends Request
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        SQLStatement sqlStatement = new SQLStatement(storeMgr, table, null, null);
+        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         JavaTypeMapping m = storeMgr.getMappingManager().getMapping(Integer.class);
@@ -146,9 +147,9 @@ public class LocateRequest extends Request
         }
 
         // Generate the unlocked and locked JDBC statements
-        statementUnlocked = sqlStatement.getSelectStatement().toSQL();
+        statementUnlocked = sqlStatement.getSQLText().toSQL();
         sqlStatement.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.TRUE);
-        statementLocked = sqlStatement.getSelectStatement().toSQL();
+        statementLocked = sqlStatement.getSQLText().toSQL();
     }
 
     /**

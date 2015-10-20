@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
@@ -165,7 +166,7 @@ public class FetchRequest extends Request
         // TODO Can we skip the statement generation if we know there are no selectable fields?
 
         // Generate the statement for the requested members
-        SQLStatement sqlStatement = new SQLStatement(storeMgr, table, null, null);
+        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         Collection<MappingCallbacks> fetchCallbacks = new HashSet<MappingCallbacks>();
         numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
@@ -263,9 +264,9 @@ public class FetchRequest extends Request
             fieldsToFetch = str.toString();
 
             // Generate the unlocked and locked JDBC statements
-            statementUnlocked = sqlStatement.getSelectStatement().toSQL();
+            statementUnlocked = sqlStatement.getSQLText().toSQL();
             sqlStatement.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.TRUE);
-            statementLocked = sqlStatement.getSelectStatement().toSQL();
+            statementLocked = sqlStatement.getSQLText().toSQL();
         }
     }
 

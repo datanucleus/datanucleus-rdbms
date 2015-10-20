@@ -45,6 +45,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -87,7 +88,7 @@ public class LocateBulkRequest extends BulkRequest
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
 
-        SQLStatement sqlStatement = new SQLStatement(storeMgr, table, null, null);
+        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
 
         // SELECT fields we require
         resultMapping = new StatementClassMapping();
@@ -235,9 +236,9 @@ public class LocateBulkRequest extends BulkRequest
         if (lock)
         {
             sqlStatement.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, Boolean.TRUE);
-            return sqlStatement.getSelectStatement().toSQL();
+            return sqlStatement.getSQLText().toSQL();
         }
-        return sqlStatement.getSelectStatement().toSQL();
+        return sqlStatement.getSQLText().toSQL();
     }
 
     /**

@@ -71,10 +71,12 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.query.RDBMSQueryCompilation.StatementCompilation;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
+import org.datanucleus.store.rdbms.sql.DeleteStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -678,7 +680,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                 {
                                     Map.Entry<String, IteratorStatement> stmtIterEntry = scoStmtIter.next();
                                     IteratorStatement iterStmt = stmtIterEntry.getValue();
-                                    String iterStmtSQL = iterStmt.getSQLStatement().getSelectStatement().toSQL();
+                                    String iterStmtSQL = iterStmt.getSQLStatement().getSQLText().toSQL();
                                     NucleusLogger.DATASTORE_RETRIEVE.debug(">> JDOQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
@@ -955,8 +957,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             stmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE_NOWAIT, Boolean.TRUE);
         }
 
-        datastoreCompilation.setSQL(stmt.getSelectStatement().toString());
-        datastoreCompilation.setStatementParameters(stmt.getSelectStatement().getParametersForStatement());
+        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
 
         if (result == null && !(resultClass != null && resultClass != candidateClass))
         {
@@ -1066,8 +1068,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
         }
 
-        datastoreCompilation.setSQL(stmt.getSelectStatement().toString());
-        datastoreCompilation.setStatementParameters(stmt.getSelectStatement().getParametersForStatement());
+        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
     }
 
     /**
@@ -1136,7 +1138,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 extensions = new HashMap<String, Object>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
-            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null, extensions);
+            SQLStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 
@@ -1164,7 +1166,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 stmts.add(stmt);
                 stmtCountFlags.add(bulkTable.useInCount);
-                datastoreCompilation.setStatementParameters(stmt.getUpdateStatement().getParametersForStatement());
+                datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
             }
         }
 
@@ -1179,7 +1181,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 useInCount = true;
             }
-            datastoreCompilation.addStatement(stmt, stmt.getUpdateStatement().toSQL(), useInCount);
+            datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), useInCount);
         }
     }
 
@@ -1253,7 +1255,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 extensions = new HashMap<String, Object>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
-            SQLStatement stmt = new SQLStatement(storeMgr, table, null, null, extensions);
+            SQLStatement stmt = new DeleteStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 
@@ -1280,7 +1282,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
             stmts.add(stmt);
             stmtCountFlags.add(bulkTable.useInCount);
-            datastoreCompilation.setStatementParameters(stmt.getDeleteStatement().getParametersForStatement());
+            datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
         }
 
         datastoreCompilation.clearStatements();
@@ -1294,7 +1296,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 useInCount = true;
             }
-            datastoreCompilation.addStatement(stmt, stmt.getDeleteStatement().toSQL(), useInCount);
+            datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), useInCount);
         }
     }
 

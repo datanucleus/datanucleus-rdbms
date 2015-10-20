@@ -23,6 +23,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
@@ -81,7 +82,7 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
 
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
         SQLExpression argExpr = args.get(0);
-        SQLStatement subStmt = new SQLStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
+        SQLStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
         JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
