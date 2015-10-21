@@ -108,6 +108,7 @@ public class RDBMSQueryCompilation
      * Convenience mutator for the SQL to invoke, when we only have 1 statement associated with this compilation.
      * Use addStatement/getStatementCompilations to set the SQLs when we have multiple statements.
      * @param sql The SQL to be invoked, overwriting any previous SQL set here
+     * @deprecated Use addStatement instead so then we have the SQLStatement
      */
     public void setSQL(String sql)
     {
