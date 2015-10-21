@@ -35,18 +35,19 @@ public class RDBMSQueryCompilation
 {
     List<StatementCompilation> statementCompilations = new ArrayList(1);
 
-    /** Result mappings when the result is for a candidate (can be null). */
-    StatementClassMapping resultsDefinitionForClass = null;
-
-    /** Result mappings when the result is not for a candidate (can be null). */
-    StatementResultMapping resultsDefinition = null;
-
     /** Input parameter definitions, in the order used in the SQL. */
     List<SQLStatementParameter> inputParameters;
 
+    /** Map of input parameter name keyed by its position. Only for SELECT queries. */
     Map<Integer, String> inputParameterNameByPosition;
 
-    /** Map of statements to get SCO containers that are in the fetch plan (bulk fetch). */
+    /** Result mappings when the result is for a candidate (can be null). Only for SELECT queries. */
+    StatementClassMapping resultsDefinitionForClass = null;
+
+    /** Result mappings when the result is not for a candidate (can be null). Only for SELECT queries. */
+    StatementResultMapping resultsDefinition = null;
+
+    /** Map of statements to get SCO containers that are in the fetch plan (bulk fetch). Only for SELECT queries. */
     Map<String, IteratorStatement> scoIteratorStatementByMemberName;
 
     boolean precompilable = true;
