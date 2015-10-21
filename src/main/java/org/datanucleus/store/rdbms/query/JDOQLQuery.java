@@ -681,7 +681,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                     Map.Entry<String, IteratorStatement> stmtIterEntry = scoStmtIter.next();
                                     IteratorStatement iterStmt = stmtIterEntry.getValue();
                                     String iterStmtSQL = iterStmt.getSQLStatement().getSQLText().toSQL();
-                                    NucleusLogger.DATASTORE_RETRIEVE.debug(">> JDOQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
+                                    NucleusLogger.DATASTORE_RETRIEVE.debug("JDOQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
@@ -957,7 +957,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             stmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE_NOWAIT, Boolean.TRUE);
         }
 
-        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), false);
         datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
 
         if (result == null && !(resultClass != null && resultClass != candidateClass))
@@ -1068,7 +1068,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
         }
 
-        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), false);
         datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
     }
 
