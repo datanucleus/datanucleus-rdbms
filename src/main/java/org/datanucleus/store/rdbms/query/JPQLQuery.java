@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
@@ -71,17 +72,21 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.query.RDBMSQueryCompilation.StatementCompilation;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.rdbms.sql.DeleteStatement;
+import org.datanucleus.store.rdbms.sql.InsertStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.UpdateStatement;
+import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * RDBMS representation of a JPQL query for use by DataNucleus.
@@ -281,7 +286,8 @@ public class JPQLQuery extends AbstractJPQLQuery
         AbstractClassMetaData acmd = getCandidateClassMetaData();
         if (type == Query.BULK_INSERT)
         {
-            throw new NucleusException("We do not currently support JPQL INSERT queries with this datastore");
+            datastoreCompilation = new RDBMSQueryCompilation();
+            compileQueryInsert(parameterValues, acmd);
         }
         else if (type == Query.BULK_UPDATE)
         {
@@ -602,8 +608,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
                             // Create the required type of QueryResult
                             String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(this);
-                            if (resultSetType.equals("scroll-insensitive") ||
-                                    resultSetType.equals("scroll-sensitive"))
+                            if (resultSetType.equals("scroll-insensitive") || resultSetType.equals("scroll-sensitive"))
                             {
                                 qr = new ScrollableQueryResult(this, rof, rs, getResultDistinct() ? null : candidateCollection);
                             }
@@ -622,7 +627,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                     Map.Entry<String, IteratorStatement> stmtIterEntry = scoStmtIter.next();
                                     IteratorStatement iterStmt = stmtIterEntry.getValue();
                                     String iterStmtSQL = iterStmt.getSQLStatement().getSQLText().toSQL();
-                                    NucleusLogger.DATASTORE_RETRIEVE.debug(">> JPQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
+                                    NucleusLogger.DATASTORE_RETRIEVE.debug("JPQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
                                         PreparedStatement psSco = sqlControl.getStatementForQuery(mconn, iterStmtSQL);
@@ -680,11 +685,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         }
                     }
                 }
-                else if (type == Query.BULK_INSERT)
-                {
-                    throw new NucleusException("We do not currently support JPQL INSERT queries with this datastore");
-                }
-                else if (type == Query.BULK_UPDATE || type == Query.BULK_DELETE)
+                else if (type == Query.BULK_UPDATE || type == Query.BULK_DELETE || type == Query.BULK_INSERT)
                 {
                     long bulkResult = 0;
                     List<StatementCompilation> stmtCompilations = datastoreCompilation.getStatementCompilations();
@@ -859,7 +860,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             stmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE_NOWAIT, Boolean.TRUE);
         }
 
-        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), false);
         datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
 
         if (result == null && !(resultClass != null && resultClass != candidateClass))
@@ -959,8 +960,137 @@ public class JPQLQuery extends AbstractJPQLQuery
             SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, datastoreCompilation.getResultDefinitionForClass(), candidateCmd);
         }
 
-        datastoreCompilation.setSQL(stmt.getSQLText().toString());
+        datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), false);
         datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+    }
+
+    /**
+     * Method to compile the query for RDBMS for a bulk INSERT.
+     * @param parameterValues The parameter values (if any)
+     * @param candidateCmd Meta-data for the candidate class
+     */
+    protected void compileQueryInsert(Map parameterValues, AbstractClassMetaData candidateCmd)
+    {
+        if (StringUtils.isWhitespace(insertFields) || StringUtils.isWhitespace(insertSelectQuery))
+        {
+            // Nothing to INSERT
+            return;
+        }
+
+        List<String> fieldNames = new ArrayList<String>();
+        StringTokenizer fieldTokenizer = new StringTokenizer(insertFields, ",");
+        while (fieldTokenizer.hasMoreTokens())
+        {
+            String token = fieldTokenizer.nextToken().trim();
+            fieldNames.add(token);
+        }
+
+        // Generate statement for candidate and related classes in this inheritance tree
+        RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
+        DatastoreClass candidateTbl = storeMgr.getDatastoreClass(candidateCmd.getFullClassName(), clr);
+        if (candidateTbl == null)
+        {
+            // TODO Using subclass-table, so find the table(s) it can be persisted into
+            throw new NucleusDataStoreException("Bulk INSERT of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
+        }
+
+        InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
+
+        List<BulkTable> tables = new ArrayList<BulkTable>();
+        tables.add(new BulkTable(candidateTbl, true));
+        if (inhStr != InheritanceStrategy.COMPLETE_TABLE)
+        {
+            // Add deletion from superclass tables since we will have an entry there
+            while (candidateTbl.getSuperDatastoreClass() != null)
+            {
+                candidateTbl = candidateTbl.getSuperDatastoreClass();
+                tables.add(new BulkTable(candidateTbl, false));
+            }
+        }
+
+        Collection<String> subclassNames = storeMgr.getSubClassesForClass(candidateCmd.getFullClassName(), true, clr);
+        if (subclassNames != null && !subclassNames.isEmpty())
+        {
+            // Check for subclasses having their own tables and hence needing multiple DELETEs
+            Iterator<String> iter = subclassNames.iterator();
+            while (iter.hasNext())
+            {
+                String subclassName = iter.next();
+                DatastoreClass subclassTbl = storeMgr.getDatastoreClass(subclassName, clr);
+                if (candidateTbl != subclassTbl)
+                {
+                    // Only include BulkTable in count if using COMPLETE_TABLE strategy
+                    tables.add(0, new BulkTable(subclassTbl, inhStr == InheritanceStrategy.COMPLETE_TABLE));
+                }
+            }
+        }
+        if (tables.size() > 1)
+        {
+            throw new NucleusUserException("BULK INSERT only currently allows a single table, but this query implies INSERT into " + tables.size() + " tables!");
+        }
+
+        List<SQLStatement> stmts = new ArrayList<SQLStatement>();
+        List<Boolean> stmtCountFlags = new ArrayList<Boolean>();
+        for (BulkTable bulkTable : tables)
+        {
+            // Generate statement for candidate
+            InsertStatement stmt = new InsertStatement(storeMgr, bulkTable.table, null, null, null);
+            stmt.setClassLoaderResolver(clr);
+            stmt.setCandidateClassName(candidateCmd.getFullClassName());
+
+            // Set columns for this table
+            for (String fieldName : fieldNames)
+            {
+                AbstractMemberMetaData fieldMmd = candidateCmd.getMetaDataForMember(fieldName);
+                if (fieldMmd == null)
+                {
+                    // No such field
+                }
+                else
+                {
+                    JavaTypeMapping fieldMapping = bulkTable.table.getMemberMapping(fieldMmd);
+                    if (fieldMapping != null)
+                    {
+                        SQLExpression fieldExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(), fieldMapping);
+                        for (int i=0;i<fieldExpr.getNumberOfSubExpressions();i++)
+                        {
+                            ColumnExpression fieldColExpr = fieldExpr.getSubExpression(i);
+                            fieldColExpr.setOmitTableFromString(true);
+                        }
+                        stmt.addColumn(fieldExpr);
+                    }
+                    else
+                    {
+                        // Not in this table
+                    }
+                }
+            }
+
+            // Generate the select query and add it to the InsertStatement
+            JPQLQuery selectQuery = new JPQLQuery(storeMgr, ec, insertSelectQuery);
+            selectQuery.compile();
+            stmt.setSelectStatement((SelectStatement) selectQuery.getDatastoreCompilation().getStatementCompilations().get(0).getStatement());
+
+            // TODO if we have multiple tables then this will mean only using some of the columns in the selectSQL
+            stmts.add(stmt);
+            stmtCountFlags.add(bulkTable.useInCount);
+
+            datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+        }
+
+        datastoreCompilation.clearStatements();
+        Iterator<SQLStatement> stmtIter = stmts.iterator();
+        Iterator<Boolean> stmtCountFlagsIter = stmtCountFlags.iterator();
+        while (stmtIter.hasNext())
+        {
+            SQLStatement stmt = stmtIter.next();
+            Boolean useInCount = stmtCountFlagsIter.next();
+            if (stmts.size() == 1)
+            {
+                useInCount = true;
+            }
+            datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), useInCount);
+        }
     }
 
     /**
