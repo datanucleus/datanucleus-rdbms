@@ -1003,7 +1003,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             while (tbl.getSuperDatastoreClass() != null)
             {
                 tbl = tbl.getSuperDatastoreClass();
-                tables.add(new BulkTable(tbl, false));
+                tables.add(0, new BulkTable(tbl, false));
             }
         }
         if (tables.size() > 1)
@@ -1099,34 +1099,16 @@ public class JPQLQuery extends AbstractJPQLQuery
             throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
-        InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
-
+        // Find tables potentially affected by this UPDATE statement
         List<BulkTable> tables = new ArrayList<BulkTable>();
         tables.add(new BulkTable(candidateTbl, true));
-        if (inhStr != InheritanceStrategy.COMPLETE_TABLE)
+        if (candidateTbl.getSuperDatastoreClass() != null)
         {
-            // Add deletion from superclass tables since we will have an entry there
-            while (candidateTbl.getSuperDatastoreClass() != null)
+            DatastoreClass tbl = candidateTbl;
+            while (tbl.getSuperDatastoreClass() != null)
             {
-                candidateTbl = candidateTbl.getSuperDatastoreClass();
-                tables.add(new BulkTable(candidateTbl, false));
-            }
-        }
-
-        Collection<String> subclassNames = storeMgr.getSubClassesForClass(candidateCmd.getFullClassName(), true, clr);
-        if (subclassNames != null && !subclassNames.isEmpty())
-        {
-            // Check for subclasses having their own tables and hence needing multiple DELETEs
-            Iterator<String> iter = subclassNames.iterator();
-            while (iter.hasNext())
-            {
-                String subclassName = iter.next();
-                DatastoreClass subclassTbl = storeMgr.getDatastoreClass(subclassName, clr);
-                if (candidateTbl != subclassTbl)
-                {
-                    // Only include BulkTable in count if using COMPLETE_TABLE strategy
-                    tables.add(0, new BulkTable(subclassTbl, inhStr == InheritanceStrategy.COMPLETE_TABLE));
-                }
+                tbl = tbl.getSuperDatastoreClass();
+                tables.add(new BulkTable(tbl, false));
             }
         }
 
