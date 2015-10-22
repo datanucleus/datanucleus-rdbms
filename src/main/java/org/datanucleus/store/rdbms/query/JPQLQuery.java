@@ -994,34 +994,16 @@ public class JPQLQuery extends AbstractJPQLQuery
             throw new NucleusDataStoreException("Bulk INSERT of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
-        InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
-
+        // Find table(s) that need populating with this information
         List<BulkTable> tables = new ArrayList<BulkTable>();
         tables.add(new BulkTable(candidateTbl, true));
-        if (inhStr != InheritanceStrategy.COMPLETE_TABLE)
+        if (candidateTbl.getSuperDatastoreClass() != null)
         {
-            // Add deletion from superclass tables since we will have an entry there
-            while (candidateTbl.getSuperDatastoreClass() != null)
+            DatastoreClass tbl = candidateTbl;
+            while (tbl.getSuperDatastoreClass() != null)
             {
-                candidateTbl = candidateTbl.getSuperDatastoreClass();
-                tables.add(new BulkTable(candidateTbl, false));
-            }
-        }
-
-        Collection<String> subclassNames = storeMgr.getSubClassesForClass(candidateCmd.getFullClassName(), true, clr);
-        if (subclassNames != null && !subclassNames.isEmpty())
-        {
-            // Check for subclasses having their own tables and hence needing multiple DELETEs
-            Iterator<String> iter = subclassNames.iterator();
-            while (iter.hasNext())
-            {
-                String subclassName = iter.next();
-                DatastoreClass subclassTbl = storeMgr.getDatastoreClass(subclassName, clr);
-                if (candidateTbl != subclassTbl)
-                {
-                    // Only include BulkTable in count if using COMPLETE_TABLE strategy
-                    tables.add(0, new BulkTable(subclassTbl, inhStr == InheritanceStrategy.COMPLETE_TABLE));
-                }
+                tbl = tbl.getSuperDatastoreClass();
+                tables.add(new BulkTable(tbl, false));
             }
         }
         if (tables.size() > 1)
@@ -1070,6 +1052,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             JPQLQuery selectQuery = new JPQLQuery(storeMgr, ec, insertSelectQuery);
             selectQuery.compile();
             stmt.setSelectStatement((SelectStatement) selectQuery.getDatastoreCompilation().getStatementCompilations().get(0).getStatement());
+            selectQuery.closeAll();
 
             // TODO if we have multiple tables then this will mean only using some of the columns in the selectSQL
             stmts.add(stmt);

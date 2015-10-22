@@ -64,6 +64,10 @@ public class InsertStatement extends SQLStatement
     {
         this.selectStmt = selectStmt;
     }
+    public SelectStatement getSelectStatement()
+    {
+        return selectStmt;
+    }
 
     public synchronized SQLText getSQLText()
     {
