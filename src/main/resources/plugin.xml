@@ -315,7 +315,12 @@ Contributors:
         <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="false"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
             <excludes vendor-id="h2"/>
+            <excludes vendor-id="sqlanywhere"/>
         </mapping>
+        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BIT" default="true"
+             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
+            <includes vendor-id="sqlanywhere"/>
+	</mapping>
         <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="true"
              rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
             <includes vendor-id="h2"/>
@@ -1313,5 +1318,6 @@ Contributors:
         <datastore-adapter vendor-id="timesten" class-name="org.datanucleus.store.rdbms.adapter.TimesTenAdapter" priority="0"/>
         <datastore-adapter vendor-id="sqlite" class-name="org.datanucleus.store.rdbms.adapter.SQLiteAdapter" priority="0"/>
         <datastore-adapter vendor-id="virtuoso" class-name="org.datanucleus.store.rdbms.adapter.VirtuosoAdapter" priority="0"/>
+	<datastore-adapter vendor-id="sqlanywhere" class-name="org.datanucleus.store.rdbms.adapter.SQLAnywhereAdapter" priority="0"/>
     </extension>
 </plugin>
