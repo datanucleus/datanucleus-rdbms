@@ -750,6 +750,7 @@ public class ObjectExpression extends SQLExpression
             // No discriminator, so the following is likely incomplete.
             NucleusLogger.QUERY.warn("TYPE/INSTANCEOF operator for class=" + memberCmd.getFullClassName() + " on table=" + memberTable + " for type=" + instanceofClassName +
                 " but there is no discriminator. Any subsequent handling is likely incorrect TODO");
+            // TODO Update this handling so that we apply any constraint to the relevant UNION statement, so it excludes some and not others. Note this won't work for result clause
 
             // Join to member table
             DatastoreClass table = null;
