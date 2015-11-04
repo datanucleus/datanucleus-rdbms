@@ -56,6 +56,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -750,7 +751,7 @@ public class ObjectExpression extends SQLExpression
             // No discriminator, so the following is likely incomplete.
             NucleusLogger.QUERY.warn("TYPE/INSTANCEOF operator for class=" + memberCmd.getFullClassName() + " on table=" + memberTable + " for type=" + instanceofClassName +
                 " but there is no discriminator. Any subsequent handling is likely incorrect TODO");
-            // TODO Update this handling so that we apply any constraint to the relevant UNION statement, so it excludes some and not others. Note this won't work for result clause
+            // TODO Update this handling so that we apply any constraint to the relevant UNION statement, so it excludes some and not others
 
             // Join to member table
             DatastoreClass table = null;
@@ -791,36 +792,38 @@ public class ObjectExpression extends SQLExpression
             {
                 // This is member table, so just need to restrict to the instanceof type now
                 JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
-                if (stmt.getNumberOfUnions() > 0)
+                if (stmt instanceof SelectStatement)
                 {
-                    // a). we have unions for the member, so restrict to just the applicable unions
-                    // Note that this is only really valid is wanting "a instanceof SUB1".
-                    // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
-                    // TODO What if this "OP_IS" is in the SELECT clause???
-                    // TODO How do we handle those cases?
-                    Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
-                    if (type.isAssignableFrom(mainCandidateCls) == not)
+                    SelectStatement selectStmt = (SelectStatement)stmt;
+                    if (selectStmt.getNumberOfUnions() > 0)
                     {
-                        SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
-                        stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
-                    }
-
-                    List<SQLStatement> unionStmts = stmt.getUnions();
-                    Iterator<SQLStatement> iter = unionStmts.iterator();
-                    while (iter.hasNext())
-                    {
-                        SQLStatement unionStmt = iter.next();
-                        Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
-                        if (type.isAssignableFrom(unionCandidateCls) == not)
+                        // a). we have unions for the member, so restrict to just the applicable unions
+                        // Note that this is only really valid is wanting "a instanceof SUB1".
+                        // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
+                        // TODO What if this "OP_IS" is in the SELECT clause???
+                        // TODO How do we handle those cases?
+                        Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
+                        if (type.isAssignableFrom(mainCandidateCls) == not)
                         {
-                            SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
-                            unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                            SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                            stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
                         }
-                    }
 
-                    // Just return true since we applied the condition direct to the unions
-                    SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
-                    return (BooleanExpression)returnExpr;
+                        List<SQLStatement> unionStmts = selectStmt.getUnions();
+                        for (SQLStatement unionStmt : unionStmts)
+                        {
+                            Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
+                            if (type.isAssignableFrom(unionCandidateCls) == not)
+                            {
+                                SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
+                                unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                            }
+                        }
+
+                        // Just return true since we applied the condition direct to the unions
+                        SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
+                        return (BooleanExpression)returnExpr;
+                    }
                 }
 
                 // b). The member table doesn't manage the instanceof type, so do inner join to 
@@ -833,14 +836,7 @@ public class ObjectExpression extends SQLExpression
 
             // Do inner join to this table to impose the instanceOf
             DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-            if (stmt.getNumberOfUnions() > 0)
-            {
-                // Inner join will likely not give the right result
-                NucleusLogger.QUERY.debug("InstanceOf for " + table +
-                    " but no discriminator so adding inner join to " + instanceofTable + " : in some cases with UNIONs this may fail");
-            }
-            stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
-                instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+            stmt.innerJoin(this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
             JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
             return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
         }
