@@ -1517,27 +1517,30 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         nextSqlTbl = newSqlTbl;
                                     }
 
-                                    List<SelectStatement> unionStmts = ((SelectStatement)stmt).getUnions();
-                                    if (unionStmts != null)
+                                    if (stmt instanceof SelectStatement)
                                     {
-                                        for (SQLStatement unionStmt : unionStmts)
+                                        List<SelectStatement> unionStmts = ((SelectStatement)stmt).getUnions();
+                                        if (unionStmts != null)
                                         {
-                                            // Repeat the process for any unioned statements, find a subtable in the same group (and join from that)
-                                            otherMapping = null;
-                                            grp = unionStmt.getTableGroup(tblGroupName);
-                                            SQLTable[] unionGrpTbls = grp.getTables();
-                                            for (SQLTable grpTbl : unionGrpTbls)
+                                            for (SQLStatement unionStmt : unionStmts)
                                             {
-                                                if (grpTbl.getTable().getMemberMapping(mmd) != null)
+                                                // Repeat the process for any unioned statements, find a subtable in the same group (and join from that)
+                                                otherMapping = null;
+                                                grp = unionStmt.getTableGroup(tblGroupName);
+                                                SQLTable[] unionGrpTbls = grp.getTables();
+                                                for (SQLTable grpTbl : unionGrpTbls)
                                                 {
-                                                    otherMapping = grpTbl.getTable().getMemberMapping(mmd);
-                                                    break;
+                                                    if (grpTbl.getTable().getMemberMapping(mmd) != null)
+                                                    {
+                                                        otherMapping = grpTbl.getTable().getMemberMapping(mmd);
+                                                        break;
+                                                    }
                                                 }
-                                            }
-                                            newSqlTbl = unionStmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, false);
-                                            if (newSqlTbl != null)
-                                            {
-                                                nextSqlTbl = newSqlTbl;
+                                                newSqlTbl = unionStmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, false);
+                                                if (newSqlTbl != null)
+                                                {
+                                                    nextSqlTbl = newSqlTbl;
+                                                }
                                             }
                                         }
                                     }
