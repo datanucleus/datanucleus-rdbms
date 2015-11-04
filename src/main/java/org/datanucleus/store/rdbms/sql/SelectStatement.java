@@ -57,6 +57,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class SelectStatement extends SQLStatement
 {
+    /** Whether to make use of any UNIONs on this statement (for when we just want to use this statement on its own). */
+    protected boolean allowUnions = true;
+
     /** List of unioned SelectStatements (if any). */
     protected List<SelectStatement> unions = null;
 
@@ -256,7 +259,7 @@ public class SelectStatement extends SQLStatement
             selected[0] = selectItem(expr.toSQLText(), alias, primary);
         }
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Apply the select to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -314,7 +317,7 @@ public class SelectStatement extends SQLStatement
             selected[i] = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null, true);
         }
 
-        if (applyToUnions && unions != null)
+        if (applyToUnions && unions != null && allowUnions)
         {
             // Apply the select to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -376,7 +379,7 @@ public class SelectStatement extends SQLStatement
         SQLColumn col = new SQLColumn(table, column, colAlias);
         int position = selectItem(new SQLText(col.getColumnSelectString()), alias != null ? colAlias.toString() : null, true);
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Apply the select to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -439,7 +442,7 @@ public class SelectStatement extends SQLStatement
         groupingExpressions.add(expr);
         aggregated = true;
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Apply the grouping to all unions
             Iterator<SelectStatement> i = unions.iterator();
@@ -461,7 +464,7 @@ public class SelectStatement extends SQLStatement
         having = expr;
         aggregated = true;
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Apply the having to all unions
             Iterator<SelectStatement> i = unions.iterator();
@@ -671,7 +674,7 @@ public class SelectStatement extends SQLStatement
             sql.append(" HAVING ").append(having.toSQLText());
         }
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Add on any UNIONed statements
             if (!dba.supportsOption(DatastoreAdapter.UNION_SYNTAX))
@@ -1134,7 +1137,7 @@ public class SelectStatement extends SQLStatement
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
                     orderingColumnIndexes[i] = selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
-                    if (unions != null)
+                    if (unions != null && allowUnions)
                     {
                         Iterator<SelectStatement> iterator = unions.iterator();
                         while (iterator.hasNext())
@@ -1158,7 +1161,7 @@ public class SelectStatement extends SQLStatement
                     }
                     else if (orderingExpressions[i].getNumberOfSubExpressions() == 1 || aggregated)
                     {
-                        if (unions != null)
+                        if (unions != null && allowUnions)
                         {
                             Iterator<SelectStatement> iterator = unions.iterator();
                             while (iterator.hasNext())
@@ -1182,7 +1185,7 @@ public class SelectStatement extends SQLStatement
                             SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
                             selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
 
-                            if (unions != null)
+                            if (unions != null && allowUnions)
                             {
                                 Iterator<SelectStatement> iterator = unions.iterator();
                                 while (iterator.hasNext())
@@ -1198,9 +1201,14 @@ public class SelectStatement extends SQLStatement
         }
     }
 
+    public void setAllowUnions(boolean flag)
+    {
+        allowUnions = flag;
+    }
+
     public int getNumberOfUnions()
     {
-        if (unions == null)
+        if (unions == null || !allowUnions)
         {
             return 0;
         }
@@ -1221,7 +1229,7 @@ public class SelectStatement extends SQLStatement
      */
     public List<SelectStatement> getUnions()
     {
-        return unions;
+        return allowUnions ? unions : null;
     }
 
     /**
@@ -1244,7 +1252,7 @@ public class SelectStatement extends SQLStatement
      */
     public boolean allUnionsForSamePrimaryTable()
     {
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
@@ -1288,7 +1296,7 @@ public class SelectStatement extends SQLStatement
 
         addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        if (unions != null && applyToUnions)
+        if (unions != null && allowUnions && applyToUnions)
         {
             // Apply the join to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1326,7 +1334,7 @@ public class SelectStatement extends SQLStatement
 
         addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
 
-        if (unions != null)
+        if (unions != null && allowUnions)
         {
             // Apply the join to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1359,7 +1367,7 @@ public class SelectStatement extends SQLStatement
                 tables.remove(join.getTable().alias.getName());
                 String removedAliasName = join.getTable().alias.getName();
 
-                if (unions != null)
+                if (unions != null && allowUnions)
                 {
                     // Apply the join removal to all unions
                     Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1392,7 +1400,7 @@ public class SelectStatement extends SQLStatement
 
         super.whereAnd(expr, false);
 
-        if (unions != null && applyToUnions)
+        if (unions != null && allowUnions && applyToUnions)
         {
             // Apply the where to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1413,7 +1421,7 @@ public class SelectStatement extends SQLStatement
     {
         super.whereOr(expr, false);
 
-        if (unions != null && applyToUnions)
+        if (unions != null && allowUnions && applyToUnions)
         {
             // Apply the where to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
