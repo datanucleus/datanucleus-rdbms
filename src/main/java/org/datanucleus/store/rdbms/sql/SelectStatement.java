@@ -1192,4 +1192,48 @@ public class SelectStatement extends SQLStatement
             }
         }
     }
+
+    /**
+     * Accessor for the unioned statements.
+     * @return The unioned SQLStatements
+     */
+    public List<SQLStatement> getUnions()
+    {
+        return unions;
+    }
+
+    /**
+     * Method to union this SQL statement with another SQL statement.
+     * @param stmt The other SQL statement to union
+     */
+    public void union(SQLStatement stmt)
+    {
+        invalidateStatement();
+        if (unions == null)
+        {
+            unions = new ArrayList<SQLStatement>();
+        }
+        unions.add(stmt);
+    }
+
+    /**
+     * Convenience accessor for whether all unions of this statement are for the same primary table.
+     * @return Whether all unions have the same primary table
+     */
+    public boolean allUnionsForSamePrimaryTable()
+    {
+        if (unions != null)
+        {
+            Iterator<SQLStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SQLStatement unionStmt = unionIter.next();
+                if (!unionStmt.getPrimaryTable().equals(primaryTable))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.scostore.JoinSetStore;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLStatementParameter;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -231,27 +232,40 @@ public class BulkFetchExistsHelper
             stmtParams = new ArrayList<SQLStatementParameter>();
             stmtParams.addAll(datastoreCompilation.getStatementParameters());
 
-            int numUnions = sqlStmt.getNumberOfUnions();
-            for (int i=0;i<numUnions;i++)
+            if (sqlStmt instanceof SelectStatement)
             {
-                stmtParams.addAll(datastoreCompilation.getStatementParameters());
-            }
-
-            if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
-            {
-                // ParameterNameByPosition is only populated with implicit parameters
-                stmtParamNameByPosition = new HashMap<Integer, String>();
-                stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
-
-                int numParams = stmtParamNameByPosition.size();
+                SelectStatement selectStmt = (SelectStatement)sqlStmt;
+                int numUnions = selectStmt.getNumberOfUnions();
                 for (int i=0;i<numUnions;i++)
                 {
-                    Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
-                    while (paramEntryIter.hasNext())
+                    stmtParams.addAll(datastoreCompilation.getStatementParameters());
+                }
+
+                if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
+                {
+                    // ParameterNameByPosition is only populated with implicit parameters
+                    stmtParamNameByPosition = new HashMap<Integer, String>();
+                    stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
+
+                    int numParams = stmtParamNameByPosition.size();
+                    for (int i=0;i<numUnions;i++)
                     {
-                        Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
-                        stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
+                        Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
+                        while (paramEntryIter.hasNext())
+                        {
+                            Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
+                            stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
+                        }
                     }
+                }
+            }
+            else
+            {
+                if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
+                {
+                    // ParameterNameByPosition is only populated with implicit parameters
+                    stmtParamNameByPosition = new HashMap<Integer, String>();
+                    stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
                 }
             }
 

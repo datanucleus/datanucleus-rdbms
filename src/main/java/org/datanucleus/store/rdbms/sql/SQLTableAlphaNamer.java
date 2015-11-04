@@ -110,15 +110,19 @@ public class SQLTableAlphaNamer implements SQLTableNamer
 
             // Find max number of tables in this group (allow for unions too)
             numTablesInGroup = tableGrp.getNumberOfTables();
-            if (stmt.getNumberOfUnions() > 0)
+            if (stmt instanceof SelectStatement)
             {
-                List<SQLStatement> unionStmts = stmt.getUnions();
-                for (SQLStatement unionStmt : unionStmts)
+                SelectStatement selectStmt = (SelectStatement)stmt;
+                if (selectStmt.getNumberOfUnions() > 0)
                 {
-                    int num = unionStmt.getTableGroup(tableGrp.getName()).getNumberOfTables();
-                    if (num > numTablesInGroup)
+                    List<SQLStatement> unionStmts = selectStmt.getUnions();
+                    for (SQLStatement unionStmt : unionStmts)
                     {
-                        numTablesInGroup = num;
+                        int num = unionStmt.getTableGroup(tableGrp.getName()).getNumberOfTables();
+                        if (num > numTablesInGroup)
+                        {
+                            numTablesInGroup = num;
+                        }
                     }
                 }
             }
