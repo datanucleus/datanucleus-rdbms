@@ -42,7 +42,7 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Class to generate an SQLStatement for iterating through instances of a particular type (and 
+ * Class to generate a SelectStatement for iterating through instances of a particular type (and 
  * optionally subclasses). Based around the candidate type having subclasses and we use UNIONs to
  * return all possible types of candidate. Also allows select of a dummy column to return the
  * type for the part of the UNION that the object came from. Please refer to the specific constructors
@@ -159,8 +159,8 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
     private int maxClassNameLength = -1;
 
     /**
-     * Accessor for the SQL Statement for the candidate [+ subclasses].
-     * @return The SQL Statement returning objects with a UNION statement.
+     * Accessor for the SelectStatement for the candidate [+ subclasses].
+     * @return The SelectStatement returning objects with a UNION statement.
      */
     public SelectStatement getStatement()
     {
@@ -225,7 +225,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             if (joinTable == null)
             {
                 // Select of candidate table
-                candidateStmt = getSQLStatementForCandidate(candidateClassName);
+                candidateStmt = getSelectStatementForCandidate(candidateClassName);
             }
             else
             {
@@ -249,13 +249,12 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
     }
 
     /**
-     * Convenience method to return the SQLStatement for a particular class.
-     * Returns a SQLStatement with primaryTable of the "candidateTable", and which joins to
-     * the table of the class (if different).
+     * Convenience method to return the SelectStatement for a particular class.
+     * Returns a SelectStatement with primaryTable of the "candidateTable", and which joins to the table of the class (if different).
      * @param className The class name to generate the statement for
-     * @return The SQLStatement
+     * @return The SelectStatement
      */
-    protected SelectStatement getSQLStatementForCandidate(String className)
+    protected SelectStatement getSelectStatementForCandidate(String className)
     {
         DatastoreClass table = storeMgr.getDatastoreClass(className, clr);
         if (table == null)

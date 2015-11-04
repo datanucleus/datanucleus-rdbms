@@ -800,8 +800,8 @@ public class ObjectExpression extends SQLExpression
                         // a). we have unions for the member, so restrict to just the applicable unions
                         // Note that this is only really valid is wanting "a instanceof SUB1".
                         // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
-                        // TODO What if this "OP_IS" is in the SELECT clause???
-                        // TODO How do we handle those cases?
+                        // TODO What if this "OP_IS" is in the SELECT clause??? We would need to return one SQLExpression per union
+                        // TODO How do we handle those cases? We could return a UnionedBooleanExpression with one value per union? and apply to the where elsewhere not here
                         Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                         if (type.isAssignableFrom(mainCandidateCls) == not)
                         {

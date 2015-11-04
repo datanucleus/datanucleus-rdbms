@@ -35,7 +35,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Class to generate an SQLStatement for iterating through instances of a particular type (and 
+ * Class to generate a SelectStatement for iterating through instances of a particular type (and 
  * optionally subclasses). Based around the candidate type having subclasses the candidate has a 
  * discriminator column, and so can be used as the way of determining the type of the object.
  * Also allows select of the discriminator column to allow retrieval of the type of the object.
@@ -45,10 +45,8 @@ import org.datanucleus.store.rdbms.table.Table;
  * <h3>Supported options</h3>
  * This generator supports the following "options" :-
  * <ul>
- * <li><b>restrictDiscriminator</b> : Whether to add a WHERE clause to restrict the discriminator
- *     to only valid values (default="true")</li>
- * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table
- *     collection.</li>
+ * <li><b>restrictDiscriminator</b> : Whether to add a WHERE clause to restrict the discriminator to only valid values (default="true")</li>
+ * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table collection.</li>
  * </ul>
  */
 public class DiscriminatorStatementGenerator extends AbstractSelectStatementGenerator
@@ -181,8 +179,8 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
     }
 
     /**
-     * Accessor for the SQL Statement.
-     * @return The SQL Statement for iterating through objects with a discriminator column
+     * Accessor for the SelectStatement.
+     * @return The SelectStatement for iterating through objects with a discriminator column
      */
     public SelectStatement getStatement()
     {
@@ -205,14 +203,12 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             if (hasOption(OPTION_ALLOW_NULLS))
             {
                 // Put element table in same table group since all relates to the elements
-                discrimSqlTbl = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null,
-                    candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+                discrimSqlTbl = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
             }
             else
             {
                 // Put element table in same table group since all relates to the elements
-                discrimSqlTbl = stmt.innerJoin(null, joinElementMapping, candidateTable, null, 
-                    candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+                discrimSqlTbl = stmt.innerJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
             }
         }
 
@@ -220,13 +216,11 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
         if (discMapping != null)
         {
             // Allow for discriminator being in super-table of the candidate table
-            discrimSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, discrimSqlTbl,
-                discMapping);
+            discrimSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, discrimSqlTbl, discMapping);
         }
 
         DiscriminatorMetaData dismd = discrimSqlTbl.getTable().getDiscriminatorMetaData();
-        boolean hasDiscriminator =
-            (discMapping != null && dismd != null && dismd.getStrategy() != DiscriminatorStrategy.NONE);
+        boolean hasDiscriminator = (discMapping != null && dismd != null && dismd.getStrategy() != DiscriminatorStrategy.NONE);
 
         // Check if we can omit the discriminator restriction
         boolean restrictDiscriminator = hasOption(OPTION_RESTRICT_DISCRIM);
@@ -263,9 +257,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                         continue;
                     }
 
-                    BooleanExpression discExprCandidate =
-                        SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt,
-                            candidates[i].getName(), dismd, discMapping, discrimSqlTbl, clr);
+                    BooleanExpression discExprCandidate = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, candidates[i].getName(), dismd, discMapping, discrimSqlTbl, clr);
                     if (discExpr != null)
                     {
                         discExpr = discExpr.ior(discExprCandidate);
@@ -285,9 +277,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                         while (subclassIter.hasNext())
                         {
                             String subclassName = subclassIter.next();
-                            BooleanExpression discExprSub =
-                                SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName,
-                                    dismd, discMapping, discrimSqlTbl, clr);
+                            BooleanExpression discExprSub = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
                             discExpr = discExpr.ior(discExprSub);
                         }
                     }
@@ -314,9 +304,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                             continue;
                         }
 
-                        BooleanExpression discExprCandidate =
-                            SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName,
-                                dismd, discMapping, discrimSqlTbl, clr);
+                        BooleanExpression discExprCandidate = SQLStatementHelper.getExpressionForDiscriminatorForClass(stmt, subclassName, dismd, discMapping, discrimSqlTbl, clr);
                         if (discExpr == null)
                         {
                             discExpr = discExprCandidate;
