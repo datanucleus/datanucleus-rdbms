@@ -473,7 +473,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
      * @param stmt SQLStatement
      * @param className Name of the class
      */
-    private void addTypeSelectForClass(SQLStatement stmt, String className)
+    private void addTypeSelectForClass(SelectStatement stmt, String className)
     {
         // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
         /*if (hasOption(OPTION_ALLOW_NULLS))

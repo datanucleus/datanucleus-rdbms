@@ -469,7 +469,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 elemCmd = storeMgr.getMetaDataManager().getMetaDataForClass(elemType, clr);
             }
         }
-        SQLStatement subStmt = null;
+        SelectStatement subStmt = null;
         if (joinTbl != null)
         {
             // JoinTable Collection

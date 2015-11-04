@@ -75,7 +75,7 @@ public class LocateRequest extends Request
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
+        SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         JavaTypeMapping m = storeMgr.getMappingManager().getMapping(Integer.class);

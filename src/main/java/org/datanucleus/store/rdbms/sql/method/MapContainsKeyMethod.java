@@ -30,7 +30,6 @@ import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -401,7 +400,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
         MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
-        SQLStatement subStmt = null;
+        SelectStatement subStmt = null;
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
         {
             // JoinTable Map

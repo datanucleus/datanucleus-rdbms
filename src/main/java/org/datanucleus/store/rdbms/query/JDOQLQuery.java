@@ -861,7 +861,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         }
 
         // Generate statement for candidate(s)
-        SQLStatement stmt = null;
+        SelectStatement stmt = null;
         try
         {
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
@@ -1120,7 +1120,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 extensions = new HashMap<String, Object>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
-            SQLStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
+            UpdateStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 

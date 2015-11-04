@@ -27,7 +27,6 @@ import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
@@ -112,7 +111,7 @@ public class MapSizeMethod extends AbstractSQLMethod
             throw new NucleusException("Invalid map for " + expr + " in size() call");
         }
 
-        SQLStatement subStmt = new SelectStatement(stmt, storeMgr, mapTbl, null, null);
+        SelectStatement subStmt = new SelectStatement(stmt, storeMgr, mapTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
         SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");

@@ -75,7 +75,7 @@ public class RDBMSStoreHelper
         // Form the query to find which one of these classes has the instance with this id
         DiscriminatorStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(cmd.getFullClassName()), true, null, null);
         stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
-        SQLStatement sqlStmt = stmtGen.getStatement();
+        SelectStatement sqlStmt = stmtGen.getStatement();
 
         // Select the discriminator
         JavaTypeMapping discrimMapping = primaryTable.getDiscriminatorMapping(true);

@@ -257,7 +257,7 @@ public class SelectStatement extends SQLStatement
             Iterator<SQLStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SQLStatement stmt = unionIter.next();
+                SelectStatement stmt = (SelectStatement)unionIter.next();
                 stmt.select(expr, alias);
             }
         }
@@ -315,7 +315,7 @@ public class SelectStatement extends SQLStatement
             Iterator<SQLStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SQLStatement stmt = unionIter.next();
+                SelectStatement stmt = (SelectStatement)unionIter.next();
                 stmt.select(table, mapping, alias);
             }
         }
@@ -377,7 +377,7 @@ public class SelectStatement extends SQLStatement
             Iterator<SQLStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SQLStatement stmt = unionIter.next();
+                SelectStatement stmt = (SelectStatement)unionIter.next();
                 stmt.select(table, column, alias);
             }
         }
@@ -440,7 +440,7 @@ public class SelectStatement extends SQLStatement
             Iterator<SQLStatement> i = unions.iterator();
             while (i.hasNext())
             {
-                i.next().addGroupingExpression(expr);
+                ((SelectStatement)i.next()).addGroupingExpression(expr);
             }
         }
     }
@@ -462,7 +462,7 @@ public class SelectStatement extends SQLStatement
             Iterator<SQLStatement> i = unions.iterator();
             while (i.hasNext())
             {
-                i.next().setHaving(expr);
+                ((SelectStatement)i.next()).setHaving(expr);
             }
         }
     }
@@ -1134,7 +1134,7 @@ public class SelectStatement extends SQLStatement
                         Iterator<SQLStatement> iterator = unions.iterator();
                         while (iterator.hasNext())
                         {
-                            SQLStatement stmt = iterator.next();
+                            SelectStatement stmt = (SelectStatement)iterator.next();
                             stmt.selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
                         }
                     }
@@ -1158,7 +1158,7 @@ public class SelectStatement extends SQLStatement
                             Iterator<SQLStatement> iterator = unions.iterator();
                             while (iterator.hasNext())
                             {
-                                SQLStatement stmt = iterator.next();
+                                SelectStatement stmt = (SelectStatement)iterator.next();
                                 stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
                             }
                         }
@@ -1182,7 +1182,7 @@ public class SelectStatement extends SQLStatement
                                 Iterator<SQLStatement> iterator = unions.iterator();
                                 while (iterator.hasNext())
                                 {
-                                    SQLStatement stmt = iterator.next();
+                                    SelectStatement stmt = (SelectStatement)iterator.next();
                                     stmt.selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
                                 }
                             }

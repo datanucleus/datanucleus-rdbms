@@ -1124,7 +1124,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 extensions = new HashMap<String, Object>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
-            SQLStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
+            UpdateStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 

@@ -22,7 +22,6 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
@@ -69,8 +68,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
         SQLExpression argExpr = (SQLExpression)args.get(0);
-        SQLStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(),
-            argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
+        SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
         JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);

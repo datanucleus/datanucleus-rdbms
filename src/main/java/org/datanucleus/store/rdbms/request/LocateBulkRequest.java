@@ -88,7 +88,7 @@ public class LocateBulkRequest extends BulkRequest
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
 
-        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
+        SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
 
         // SELECT fields we require
         resultMapping = new StatementClassMapping();

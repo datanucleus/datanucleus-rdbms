@@ -194,7 +194,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
         // Generate "SELECT {clobColumn} FROM TABLE WHERE ID=? FOR UPDATE" statement
-        SQLStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
+        SelectStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
         sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
         sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());

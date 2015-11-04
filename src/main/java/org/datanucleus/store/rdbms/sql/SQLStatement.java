@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.query.NullOrderingType;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -39,7 +38,6 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
-import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.NucleusLogger;
 
@@ -290,117 +288,6 @@ public abstract class SQLStatement
             number += unioned.getNumberOfUnions();
         }
         return number;
-    }
-
-    // --------------------------------- SELECT --------------------------------------
-
-    /**
-     * Accessor for whether the statement restricts the results to distinct.
-     * @return Whether results are distinct
-     */
-    public boolean isDistinct()
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Mutator for whether the query returns distinct results.
-     * @param distinct Whether to return distinct
-     */
-    public void setDistinct(boolean distinct)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Accessor for the number of selected items in the SELECT clause.
-     * @return Number of selected items
-     */
-    public int getNumberOfSelects()
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Select an expression.
-     * This will be used when adding aggregates to the select clause (e.g "COUNT(*)").
-     * @param expr The expression to add to the select statement 
-     * @param alias Optional alias for this selected expression
-     * @return The index(es) of the expression in the select
-     */
-    public int[] select(SQLExpression expr, String alias)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Add a select clause for the specified field (via its mapping).
-     * If an alias is supplied and there are more than 1 column for this mapping then they will have
-     * names like "{alias}_n" where n is the column number (starting at 0).
-     * @param table The SQLTable to select from (null implies the primary table)
-     * @param mapping The mapping for the field
-     * @param alias optional alias
-     * @param applyToUnions Whether to apply to unions
-     * @return The column index(es) in the statement for the specified field (1 is first).
-     */
-    public int[] select(SQLTable table, JavaTypeMapping mapping, String alias, boolean applyToUnions)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Add a select clause for the specified field (via its mapping) and apply to unions.
-     * If an alias is supplied and there are more than 1 column for this mapping then they will have
-     * names like "{alias}_n" where n is the column number (starting at 0).
-     * @param table The SQLTable to select from (null implies the primary table)
-     * @param mapping The mapping for the field
-     * @param alias optional alias
-     * @return The column index(es) in the statement for the specified field (1 is first).
-     */
-    public int[] select(SQLTable table, JavaTypeMapping mapping, String alias)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Add a select clause for the specified column.
-     * @param table The SQLTable to select from (null implies the primary table)
-     * @param column The column
-     * @param alias Optional alias
-     * @return The column index in the statement for the specified column (1 is first).
-     */
-    public int select(SQLTable table, Column column, String alias)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Internal method to find the position of an item in the select list and return the position
-     * if found (first position is 1). If the item is not found then it is added and the new position returned.
-     * @param st SQLText for this selected item
-     * @param alias Any alias (optional)
-     * @param primary Whether this selected item is a primary component (i.e column)
-     * @return Position in the selectedItems list (first position is 1)
-     */
-    protected int selectItem(SQLText st, String alias, boolean primary)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    // --------------------------------- UPDATE --------------------------------------
-
-    /**
-     * Method to set the UPDATE clause of the statement.
-     * @param exprs The update clause expression
-     */
-    public void setUpdates(SQLExpression[] exprs)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    public boolean hasUpdates()
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
     }
 
     // --------------------------------- FROM --------------------------------------
@@ -973,8 +860,7 @@ public abstract class SQLStatement
     }
 
     /**
-     * Convenience method to generate the join condition between source and target tables for the supplied
-     * mappings.
+     * Convenience method to generate the join condition between source and target tables for the supplied mappings.
      * @param sourceTable Source table
      * @param sourceMapping Mapping in source table
      * @param sourceParentMapping Optional parent of this source mapping (if joining an impl of an interface)
@@ -995,8 +881,7 @@ public abstract class SQLStatement
             // Join condition(s) - INNER, LEFT OUTER, RIGHT OUTER joins
             if (sourceMapping.getNumberOfDatastoreMappings() != targetMapping.getNumberOfDatastoreMappings())
             {
-                throw new NucleusException("Cannot join from " + sourceMapping + " to " + targetMapping +
-                    " since they have different numbers of datastore columns!");
+                throw new NucleusException("Cannot join from " + sourceMapping + " to " + targetMapping + " since they have different numbers of datastore columns!");
             }
 
             SQLExpressionFactory factory = rdbmsMgr.getSQLExpressionFactory();
@@ -1145,52 +1030,6 @@ public abstract class SQLStatement
                 stmt.whereOr(expr, true);
             }
         }
-    }
-
-    // --------------------------------- GROUPING --------------------------------------
-
-    /**
-     * Method to add a grouping expression to the query.
-     * Adds the grouping to any unioned queries
-     * @param expr The expression
-     */
-    public void addGroupingExpression(SQLExpression expr)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    // --------------------------------- HAVING --------------------------------------
-
-    /**
-     * Mutator for the "having" expression.
-     * @param expr Boolean expression for the having clause
-     */
-    public void setHaving(BooleanExpression expr)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    // --------------------------------- ORDERING --------------------------------------
-
-    /**
-     * Mutator for the ordering criteria.
-     * @param exprs The expressions to order by
-     * @param descending Whether each expression is ascending/descending
-     */
-    public void setOrdering(SQLExpression[] exprs, boolean[] descending)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
-    }
-
-    /**
-     * Mutator for the ordering criteria.
-     * @param exprs The expressions to order by
-     * @param descending Whether each expression is ascending/descending
-     * @param nullOrders Ordering for nulls (if provided)
-     */
-    public void setOrdering(SQLExpression[] exprs, boolean[] descending, NullOrderingType[] nullOrders)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
     }
 
     /**

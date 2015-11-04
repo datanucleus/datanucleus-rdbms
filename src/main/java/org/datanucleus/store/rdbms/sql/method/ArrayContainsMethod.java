@@ -26,7 +26,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.ArrayExpression;
@@ -228,7 +227,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
         AbstractClassMetaData elemCmd =
             mmd.getArray().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
         ArrayTable joinTbl = (ArrayTable)storeMgr.getTable(mmd);
-        SQLStatement subStmt = null;
+        SelectStatement subStmt = null;
         if (joinTbl != null)
         {
             // JoinTable array
