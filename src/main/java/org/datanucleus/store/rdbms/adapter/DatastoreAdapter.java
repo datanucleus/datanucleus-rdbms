@@ -43,9 +43,9 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.ForeignKeyInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
@@ -962,7 +962,7 @@ public interface DatastoreAdapter
      * @param m The mapping that we want to select
      * @return Whether it is valid
      */
-    boolean validToSelectMappingInStatement(SQLStatement stmt, JavaTypeMapping m);
+    boolean validToSelectMappingInStatement(SelectStatement stmt, JavaTypeMapping m);
 
     /**
      * return whether this exception represents a cancelled statement.

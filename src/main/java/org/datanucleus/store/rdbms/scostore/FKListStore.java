@@ -57,7 +57,8 @@ import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -980,7 +981,7 @@ public class FKListStore<E> extends AbstractListStore<E>
 
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
         IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext().getClassLoaderResolver(), ec.getFetchPlan(), true, startIdx, endIdx);
-        SQLStatement sqlStmt = iterStmt.getSQLStatement();
+        SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping resultMapping = iterStmt.getStatementClassMapping();
 
         // Input parameter(s) - the owner
@@ -1467,7 +1468,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      */
     public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
         StatementClassMapping stmtClassMapping = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
@@ -1501,9 +1502,9 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                SQLStatement subStmt = stmtGen.getStatement();
+                SelectStatement subStmt = stmtGen.getStatement();
 
                 // Select the required fields (of the element class)
                 if (sqlStmt == null)

@@ -166,7 +166,7 @@ public class FetchRequest extends Request
         // TODO Can we skip the statement generation if we know there are no selectable fields?
 
         // Generate the statement for the requested members
-        SQLStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
+        SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
         Collection<MappingCallbacks> fetchCallbacks = new HashSet<MappingCallbacks>();
         numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
@@ -438,7 +438,7 @@ public class FetchRequest extends Request
      * @param clr ClassLoader resolver
      * @return Number of fields being fetched
      */
-    protected int processMembersOfClass(SQLStatement sqlStatement, AbstractMemberMetaData[] mmds, 
+    protected int processMembersOfClass(SelectStatement sqlStatement, AbstractMemberMetaData[] mmds, 
             DatastoreClass table, SQLTable sqlTbl, StatementClassMapping mappingDef, Collection fetchCallbacks, ClassLoaderResolver clr)
     {
         int number = 0;

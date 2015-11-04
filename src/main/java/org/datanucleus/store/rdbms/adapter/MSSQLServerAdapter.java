@@ -36,9 +36,9 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.MSSQLTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -476,7 +476,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
      * @param m The mapping that we want to select
      * @return Whether it is valid
      */
-    public boolean validToSelectMappingInStatement(SQLStatement stmt, JavaTypeMapping m)
+    public boolean validToSelectMappingInStatement(SelectStatement stmt, JavaTypeMapping m)
     {
         if (m.getNumberOfDatastoreMappings() <= 0)
         {

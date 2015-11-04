@@ -55,7 +55,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -784,9 +784,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param ownerOP ObjectProvider for the owning object
      * @return The SQLStatement
      */
-    protected SQLStatement getSQLStatementForGet(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForGet(ObjectProvider ownerOP)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         Class valueCls = clr.classForName(this.valueType);
@@ -806,7 +806,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 valueCls = clr.classForName(vmd.getFullClassName());
             }
             UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
-            stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+            stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
             getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
             sqlStmt = stmtGen.getStatement();
 

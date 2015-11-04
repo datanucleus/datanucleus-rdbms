@@ -37,7 +37,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
  * subclass with its own table then throws a NucleusException since there is no root table to select.
  * Accepts options controlling the generation of the SQL.
  */
-public abstract class AbstractStatementGenerator implements StatementGenerator
+public abstract class AbstractSelectStatementGenerator implements SelectStatementGenerator
 {
     /** Manager for the datastore. */
     protected final RDBMSStoreManager storeMgr;
@@ -84,7 +84,7 @@ public abstract class AbstractStatementGenerator implements StatementGenerator
      * @param candidateTableAlias Alias for the candidate (optional)
      * @param candidateTableGroupName Name of the table group for the candidate(s) (optional)
      */
-    public AbstractStatementGenerator(RDBMSStoreManager storeMgr, ClassLoaderResolver clr,
+    public AbstractSelectStatementGenerator(RDBMSStoreManager storeMgr, ClassLoaderResolver clr,
             Class candidateType, boolean subclasses, DatastoreIdentifier candidateTableAlias,
             String candidateTableGroupName)
     {
@@ -134,7 +134,7 @@ public abstract class AbstractStatementGenerator implements StatementGenerator
      * @param joinTableAlias Alias for the join table
      * @param joinElementMapping Mapping to the candidate from the join table
      */
-    public AbstractStatementGenerator(RDBMSStoreManager storeMgr, ClassLoaderResolver clr,
+    public AbstractSelectStatementGenerator(RDBMSStoreManager storeMgr, ClassLoaderResolver clr,
             Class candidateType, boolean subclasses, DatastoreIdentifier candidateTableAlias, 
             String candidateTableGroupName,
             Table joinTable, DatastoreIdentifier joinTableAlias, 
@@ -149,7 +149,7 @@ public abstract class AbstractStatementGenerator implements StatementGenerator
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.StatementGenerator#setOption(java.lang.String)
      */
-    public StatementGenerator setOption(String name)
+    public SelectStatementGenerator setOption(String name)
     {
         options.add(name);
         return this;
@@ -158,7 +158,7 @@ public abstract class AbstractStatementGenerator implements StatementGenerator
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.StatementGenerator#unsetOption(java.lang.String)
      */
-    public StatementGenerator unsetOption(String name)
+    public SelectStatementGenerator unsetOption(String name)
     {
         options.remove(name);
         return this;

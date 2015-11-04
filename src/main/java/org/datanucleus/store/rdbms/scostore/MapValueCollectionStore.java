@@ -47,7 +47,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -365,9 +365,9 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
      * @param ownerOP ObjectProvider for the owner object
      * @return The SQLStatement
      */
-    protected SQLStatement getSQLStatementForIterator(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         final Class valueCls = clr.classForName(elementType);
@@ -385,12 +385,12 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 {
                     cls[j] = clr.classForName(clsNames[j]);
                 }
-                StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null);
+                SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null);
                 sqlStmt = stmtGen.getStatement();
             }
             else
             {
-                StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, valueCls, true, null, null);
+                SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, valueCls, true, null, null);
                 sqlStmt = stmtGen.getStatement();
             }
             iterateUsingDiscriminator = true;
@@ -435,7 +435,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     // Select of value table, joining to key table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement();
 
@@ -470,7 +470,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 // Select of value in value table (allow union of possible value types)
                 iteratorMappingDef = new StatementClassMapping();
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                 sqlStmt = stmtGen.getStatement();
                 containerSqlTbl = sqlStmt.getPrimaryTable();
@@ -486,7 +486,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     // Select of value table, joining to key table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement();
 

@@ -433,7 +433,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      */
     protected SQLStatement getSQLStatementForIterator(ObjectProvider ownerOP)
     {
-        SQLStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
+        SelectStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
 
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();

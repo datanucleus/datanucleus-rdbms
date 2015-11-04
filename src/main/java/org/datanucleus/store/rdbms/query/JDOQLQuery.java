@@ -76,6 +76,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -680,7 +681,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                 {
                                     Map.Entry<String, IteratorStatement> stmtIterEntry = scoStmtIter.next();
                                     IteratorStatement iterStmt = stmtIterEntry.getValue();
-                                    String iterStmtSQL = iterStmt.getSQLStatement().getSQLText().toSQL();
+                                    String iterStmtSQL = iterStmt.getSelectStatement().getSQLText().toSQL();
                                     NucleusLogger.DATASTORE_RETRIEVE.debug("JDOQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
@@ -688,7 +689,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                         if (datastoreCompilation.getStatementParameters() != null)
                                         {
                                             BulkFetchExistsHelper helper = new BulkFetchExistsHelper(this);
-                                            helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
+                                            helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSelectStatement(), parameters);
                                         }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
@@ -1042,7 +1043,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         datastoreCompilation.setResultDefinitionForClass(resultsDef);
 
         // Generate statement for candidate(s)
-        SQLStatement stmt = null;
+        SelectStatement stmt = null;
         try
         {
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
@@ -1256,7 +1257,6 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
             }
-            options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();

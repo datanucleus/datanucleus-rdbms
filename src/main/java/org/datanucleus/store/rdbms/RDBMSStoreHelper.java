@@ -37,7 +37,8 @@ import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -73,7 +74,7 @@ public class RDBMSStoreHelper
 
         // Form the query to find which one of these classes has the instance with this id
         DiscriminatorStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(cmd.getFullClassName()), true, null, null);
-        stmtGen.setOption(StatementGenerator.OPTION_RESTRICT_DISCRIM);
+        stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
         SQLStatement sqlStmt = stmtGen.getStatement();
 
         // Select the discriminator
@@ -164,7 +165,7 @@ public class RDBMSStoreHelper
         Iterator<AbstractClassMetaData> rootCmdIter = rootCmds.iterator();
 
         AbstractClassMetaData sampleCmd = null; // Metadata for sample class in the tree so we can check if needs locking
-        SQLStatement sqlStmtMain = null;
+        SelectStatement sqlStmtMain = null;
         while (rootCmdIter.hasNext())
         {
             AbstractClassMetaData rootCmd = rootCmdIter.next();
@@ -182,7 +183,7 @@ public class RDBMSStoreHelper
                     for (int i=0;i<subcmds.length;i++)
                     {
                         UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(subcmds[i].getFullClassName()), true, null, null);
-                        stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                         if (sqlStmtMain == null)
                         {
                             sampleCmd = subcmds[i];
@@ -214,7 +215,7 @@ public class RDBMSStoreHelper
             else
             {
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootCmd.getFullClassName()), true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 if (sqlStmtMain == null)
                 {
                     sampleCmd = rootCmd;

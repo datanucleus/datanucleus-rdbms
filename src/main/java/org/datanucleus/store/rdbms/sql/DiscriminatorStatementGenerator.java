@@ -51,7 +51,7 @@ import org.datanucleus.store.rdbms.table.Table;
  *     collection.</li>
  * </ul>
  */
-public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
+public class DiscriminatorStatementGenerator extends AbstractSelectStatementGenerator
 {
     Class[] candidates = null;
 
@@ -184,9 +184,9 @@ public class DiscriminatorStatementGenerator extends AbstractStatementGenerator
      * Accessor for the SQL Statement.
      * @return The SQL Statement for iterating through objects with a discriminator column
      */
-    public SQLStatement getStatement()
+    public SelectStatement getStatement()
     {
-        SQLStatement stmt = null;
+        SelectStatement stmt = null;
         SQLTable discrimSqlTbl = null;
         if (joinTable == null)
         {

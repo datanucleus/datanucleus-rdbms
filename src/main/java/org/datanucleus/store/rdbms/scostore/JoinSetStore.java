@@ -55,7 +55,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -856,7 +856,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         // Generate the statement, and statement mapping/parameter information
         IteratorStatement iterStmt = getIteratorStatement(ec.getClassLoaderResolver(), ec.getFetchPlan(), true);
-        SQLStatement sqlStmt = iterStmt.sqlStmt;
+        SelectStatement sqlStmt = iterStmt.sqlStmt;
         StatementClassMapping iteratorMappingClass = iterStmt.stmtClassMapping;
 
         // Input parameter(s) - the owner
@@ -960,7 +960,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      */
     public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         StatementClassMapping iteratorMappingClass = null;
         if (elementsAreEmbedded || elementsAreSerialised)
@@ -992,7 +992,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             {
                 final int elementNo = i;
                 final Class elementCls = clr.classForName(elementInfo[elementNo].getClassName());
-                SQLStatement elementStmt = null;
+                SelectStatement elementStmt = null;
                 if (elementInfo[elementNo].getDiscriminatorStrategy() != null && elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
                 {
                     // The element uses a discriminator so just use that in the SELECT
@@ -1006,19 +1006,19 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                             cls[j] = clr.classForName(clsNames[j]);
                         }
 
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
-                            stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
+                            stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
                         elementStmt = stmtGen.getStatement();
                     }
                     else
                     {
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
-                            stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
+                            stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
                         elementStmt = stmtGen.getStatement();
                     }
@@ -1027,8 +1027,8 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 else
                 {
                     // No discriminator, but subclasses so use UNIONs
-                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
-                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement();
                 }

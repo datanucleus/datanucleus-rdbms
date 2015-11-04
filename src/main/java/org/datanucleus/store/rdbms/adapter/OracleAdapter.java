@@ -46,7 +46,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.schema.OracleTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -691,7 +691,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
      * @param m The mapping that we want to select
      * @return Whether it is valid
      */
-    public boolean validToSelectMappingInStatement(SQLStatement stmt, JavaTypeMapping m)
+    public boolean validToSelectMappingInStatement(SelectStatement stmt, JavaTypeMapping m)
     {
         if (m.getNumberOfDatastoreMappings() <= 0)
         {

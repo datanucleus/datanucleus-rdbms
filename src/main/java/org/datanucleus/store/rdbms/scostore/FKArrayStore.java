@@ -50,7 +50,8 @@ import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -533,7 +534,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
         // Generate the statement, and statement mapping/parameter information
         IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext().getClassLoaderResolver(), ownerOP.getExecutionContext().getFetchPlan(), true);
-        SQLStatement sqlStmt = iterStmt.getSQLStatement();
+        SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping iteratorMappingDef = iterStmt.getStatementClassMapping();
 
         // Input parameter(s) - the owner
@@ -633,7 +634,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
      */
     public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         StatementClassMapping iteratorMappingClass = new StatementClassMapping();
 
@@ -666,9 +667,9 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             {
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                SQLStatement subStmt = stmtGen.getStatement();
+                SelectStatement subStmt = stmtGen.getStatement();
 
                 // Select the required fields (of the element class)
                 if (sqlStmt == null)

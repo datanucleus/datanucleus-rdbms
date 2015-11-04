@@ -54,7 +54,7 @@ import org.datanucleus.util.StringUtils;
  * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table collection.</li>
  * </ul>
  */
-public class UnionStatementGenerator extends AbstractStatementGenerator
+public class UnionStatementGenerator extends AbstractSelectStatementGenerator
 {
     /** Name of column added when using "selectNucleusType" */
     public static final String NUC_TYPE_COLUMN = "NUCLEUS_TYPE";
@@ -162,7 +162,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
      * Accessor for the SQL Statement for the candidate [+ subclasses].
      * @return The SQL Statement returning objects with a UNION statement.
      */
-    public SQLStatement getStatement()
+    public SelectStatement getStatement()
     {
         // Find set of possible candidates (including subclasses of subclasses)
         Collection<String> candidateClassNames = new ArrayList<String>();
@@ -216,12 +216,12 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
                 candidateType.getName() + " yet there are no concrete classes with their own table available");
         }
 
-        SQLStatement stmt = null;
+        SelectStatement stmt = null;
         iter = candidateClassNames.iterator();
         while (iter.hasNext())
         {
             String candidateClassName = iter.next();
-            SQLStatement candidateStmt = null;
+            SelectStatement candidateStmt = null;
             if (joinTable == null)
             {
                 // Select of candidate table
@@ -255,7 +255,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
      * @param className The class name to generate the statement for
      * @return The SQLStatement
      */
-    protected SQLStatement getSQLStatementForCandidate(String className)
+    protected SelectStatement getSQLStatementForCandidate(String className)
     {
         DatastoreClass table = storeMgr.getDatastoreClass(className, clr);
         if (table == null)
@@ -268,7 +268,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         }
 
         // Start from an SQL SELECT of the candidate table
-        SQLStatement stmt = new SelectStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
+        SelectStatement stmt = new SelectStatement(parentStmt, storeMgr, candidateTable, candidateTableAlias, candidateTableGroupName);
         stmt.setClassLoaderResolver(clr);
         stmt.setCandidateClassName(className);
 
@@ -370,7 +370,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
      * @param className The class name to generate the statement for
      * @return The SQLStatement
      */
-    protected SQLStatement getSQLStatementForCandidateViaJoin(String className)
+    protected SelectStatement getSQLStatementForCandidateViaJoin(String className)
     {
         DatastoreClass table = storeMgr.getDatastoreClass(className, clr);
         if (table == null)
@@ -380,7 +380,7 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
         }
 
         // Start from an SQL SELECT of the join table
-        SQLStatement stmt = new SelectStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
+        SelectStatement stmt = new SelectStatement(parentStmt, storeMgr, joinTable, joinTableAlias, candidateTableGroupName);
         stmt.setClassLoaderResolver(clr);
         stmt.setCandidateClassName(className);
 

@@ -44,7 +44,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -248,9 +248,9 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
      * @param ownerOP ObjectProvider for the owner object
      * @return The SQLStatement
      */
-    protected SQLStatement getSQLStatementForIterator(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         final Class keyCls = clr.classForName(elementType);
@@ -307,7 +307,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 // Select of key in key table (allow union of possible key types)
                 iteratorMappingDef = new StatementClassMapping();
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
-                stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                 sqlStmt = stmtGen.getStatement();
                 containerSqlTbl = sqlStmt.getPrimaryTable();
@@ -323,7 +323,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     // Select of key table, joining to join table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
-                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement();
 

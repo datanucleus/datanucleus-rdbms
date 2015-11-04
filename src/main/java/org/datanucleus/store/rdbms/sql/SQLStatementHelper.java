@@ -427,7 +427,7 @@ public class SQLStatementHelper
      * @param mappingDefinition Mapping definition for result columns
      * @param candidateCmd The candidate class meta-data
      */
-    public static void selectIdentityOfCandidateInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd)
+    public static void selectIdentityOfCandidateInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd)
     {
         DatastoreClass candidateTbl = (DatastoreClass)stmt.getPrimaryTable().getTable();
 
@@ -501,7 +501,7 @@ public class SQLStatementHelper
             Iterator<SQLStatement> iter = unionStmts.iterator();
             while (iter.hasNext())
             {
-                SQLStatement unionStmt = iter.next();
+                SelectStatement unionStmt = (SelectStatement)iter.next();
                 selectIdentityOfCandidateInStatement(unionStmt, null, candidateCmd);
             }
         }
@@ -517,7 +517,7 @@ public class SQLStatementHelper
      * @param fetchPlan FetchPlan in use
      * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
      */
-    public static void selectFetchPlanOfCandidateInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd,
+    public static void selectFetchPlanOfCandidateInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, AbstractClassMetaData candidateCmd,
             FetchPlan fetchPlan, int maxFetchDepth)
     {
         selectFetchPlanOfSourceClassInStatement(stmt, mappingDefinition, fetchPlan, stmt.getPrimaryTable(), candidateCmd, maxFetchDepth);
@@ -536,7 +536,7 @@ public class SQLStatementHelper
      * @param sourceCmd Meta-data for the source class
      * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
      */
-    public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+    public static void selectFetchPlanOfSourceClassInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd, int maxFetchDepth)
     {
         selectFetchPlanOfSourceClassInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, sourceCmd, maxFetchDepth, null);
@@ -556,7 +556,7 @@ public class SQLStatementHelper
      * @param maxFetchDepth Max fetch depth from this point to select (0 implies no other objects)
      * @param inputJoinType Optional join type to use for subobjects (otherwise decide join type internally)
      */
-    public static void selectFetchPlanOfSourceClassInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+    public static void selectFetchPlanOfSourceClassInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractClassMetaData sourceCmd, int maxFetchDepth, JoinType inputJoinType)
     {
         DatastoreClass sourceTbl = (DatastoreClass)sourceSqlTbl.getTable();
@@ -634,7 +634,7 @@ public class SQLStatementHelper
      * @param maxFetchPlanLimit Max fetch depth from this point to select (0 implies no other objects)
      * @param inputJoinType Optional join type to use for subobjects (otherwise decide join type internally)
      */
-    public static void selectMemberOfSourceInStatement(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+    public static void selectMemberOfSourceInStatement(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JoinType inputJoinType)
     {
         boolean selectSubobjects = false;
@@ -917,7 +917,7 @@ public class SQLStatementHelper
      * Convenience method to join to and select all required FP fields of a related object where linked via an FK at this side.
      * @return Whether the caller should select the FK themselves (i.e we haven't selected anything)
      */
-    private static boolean selectFetchPlanFieldsOfFKRelatedObject(SQLStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
+    private static boolean selectFetchPlanFieldsOfFKRelatedObject(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
             SQLTable sourceSqlTbl, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int maxFetchPlanLimit, JavaTypeMapping m, String tableGroupName,
             StatementMappingIndex stmtMapping, SQLTable sqlTbl, JoinType inputJoinType)
     {

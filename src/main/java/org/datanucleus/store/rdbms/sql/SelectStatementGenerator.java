@@ -18,9 +18,9 @@ Contributors:
 package org.datanucleus.store.rdbms.sql;
 
 /**
- * Generator of SQLStatements.
+ * Generator of SQL SELECT Statements.
  */
-public interface StatementGenerator
+public interface SelectStatementGenerator
 {
     /** Option to allow null values as elements of an array or collection. */
     static final String OPTION_ALLOW_NULLS = "allowNulls";
@@ -35,7 +35,7 @@ public interface StatementGenerator
      * Accessor for the statement.
      * @return The SQLStatement
      */
-    SQLStatement getStatement();
+    SelectStatement getStatement();
 
     /**
      * Method to set the parent statement.
@@ -49,14 +49,14 @@ public interface StatementGenerator
      * @param name Name of the property
      * @return This generator
      */
-    StatementGenerator setOption(String name);
+    SelectStatementGenerator setOption(String name);
 
     /**
      * Method to unset a property.
      * @param name Name of the property
      * @return This generator
      */
-    StatementGenerator unsetOption(String name);
+    SelectStatementGenerator unsetOption(String name);
 
     /**
      * Whether the generator has a particular option set.

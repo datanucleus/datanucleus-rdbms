@@ -50,7 +50,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.DiscriminatorStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -302,11 +302,11 @@ public class RDBMSQueryUtils extends QueryUtils
      * @return The SQLStatement
      * @throws NucleusException if there are no tables for concrete classes in this query (hence would return null)
      */
-    public static SQLStatement getStatementForCandidates(RDBMSStoreManager storeMgr, SQLStatement parentStmt, 
+    public static SelectStatement getStatementForCandidates(RDBMSStoreManager storeMgr, SQLStatement parentStmt, 
             AbstractClassMetaData cmd, StatementClassMapping clsMapping, ExecutionContext ec, Class candidateCls, 
             boolean subclasses, String result, String candidateAlias, String candidateTableGroupName)
     {
-        SQLStatement stmt = null;
+        SelectStatement stmt = null;
 
         DatastoreIdentifier candidateAliasId = null;
         if (candidateAlias != null)
@@ -359,7 +359,7 @@ public class RDBMSQueryUtils extends QueryUtils
             {
                 DatastoreClass cls = iter.next();
 
-                SQLStatement tblStmt = new SelectStatement(parentStmt, storeMgr, cls, candidateAliasId, candidateTableGroupName);
+                SelectStatement tblStmt = new SelectStatement(parentStmt, storeMgr, cls, candidateAliasId, candidateTableGroupName);
                 tblStmt.setClassLoaderResolver(clr);
                 tblStmt.setCandidateClassName(cls.getType());
 
@@ -454,13 +454,13 @@ public class RDBMSQueryUtils extends QueryUtils
             {
                 DatastoreClass tbl = candidateTables.get(i);
                 Class cls = candidateClasses.get(i);
-                StatementGenerator stmtGen = null;
+                SelectStatementGenerator stmtGen = null;
                 if (tbl.getDiscriminatorMapping(true) != null || QueryUtils.resultHasOnlyAggregates(result))
                 {
                     // Either has a discriminator, or only selecting aggregates so need single select
                     stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, 
                         candidateAliasId, candidateTableGroupName);
-                    stmtGen.setOption(StatementGenerator.OPTION_RESTRICT_DISCRIM);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
                 }
                 else
                 {
@@ -469,12 +469,12 @@ public class RDBMSQueryUtils extends QueryUtils
                     if (result == null)
                     {
                         // Returning one row per candidate so include distinguisher column
-                        stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                         clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     }
                 }
                 stmtGen.setParentStatement(parentStmt);
-                SQLStatement tblStmt = stmtGen.getStatement();
+                SelectStatement tblStmt = stmtGen.getStatement();
 
                 if (stmt == null)
                 {

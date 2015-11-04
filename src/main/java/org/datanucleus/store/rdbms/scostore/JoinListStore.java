@@ -57,7 +57,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.StatementGenerator;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -717,7 +717,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
         IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext().getClassLoaderResolver(), ec.getFetchPlan(), true, startIdx, endIdx);
-        SQLStatement sqlStmt = iterStmt.getSQLStatement();
+        SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping resultMapping = iterStmt.getStatementClassMapping();
 
         // Input parameter(s) - the owner
@@ -909,7 +909,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      */
     public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
     {
-        SQLStatement sqlStmt = null;
+        SelectStatement sqlStmt = null;
         StatementClassMapping stmtClassMapping = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         if (elementsAreEmbedded || elementsAreSerialised)
@@ -941,7 +941,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 // TODO This will only work if all element types have a discriminator
                 final int elementNo = i;
                 final Class elementCls = clr.classForName(elementInfo[elementNo].getClassName());
-                SQLStatement elementStmt = null;
+                SelectStatement elementStmt = null;
                 if (elementInfo[elementNo].getDiscriminatorStrategy() != null && elementInfo[elementNo].getDiscriminatorStrategy() != DiscriminatorStrategy.NONE)
                 {
                     // The element uses a discriminator so just use that in the SELECT
@@ -955,19 +955,19 @@ public class JoinListStore<E> extends AbstractListStore<E>
                             cls[j] = clr.classForName(clsNames[j]);
                         }
 
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
-                            stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
+                            stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
                         elementStmt = stmtGen.getStatement();
                     }
                     else
                     {
-                        StatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
-                            stmtGen.setOption(StatementGenerator.OPTION_ALLOW_NULLS);
+                            stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
                         elementStmt = stmtGen.getStatement();
                     }
@@ -976,8 +976,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 else
                 {
                     // No discriminator, but subclasses so use UNIONs
-                    StatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
-                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement();
                 }

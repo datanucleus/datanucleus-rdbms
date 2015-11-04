@@ -19,7 +19,7 @@ package org.datanucleus.store.rdbms.scostore;
 
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.scostore.Store;
 
 /**
@@ -32,7 +32,7 @@ public class IteratorStatement
     Store backingStore;
 
     /** The SQL Statement for the iterator. */
-    SQLStatement sqlStmt = null;
+    SelectStatement sqlStmt = null;
 
     /** The class mapping for the element of the iterator. */
     StatementClassMapping stmtClassMapping = null;
@@ -40,7 +40,7 @@ public class IteratorStatement
     /** Mapping index for the owner in the statement (only specified on bulk fetch iterators). */
     StatementMappingIndex ownerMapIndex = null;
 
-    public IteratorStatement(Store store, SQLStatement stmt, StatementClassMapping stmtClassMapping)
+    public IteratorStatement(Store store, SelectStatement stmt, StatementClassMapping stmtClassMapping)
     {
         this.backingStore = store;
         this.sqlStmt = stmt;
@@ -50,7 +50,7 @@ public class IteratorStatement
     {
         return backingStore;
     }
-    public SQLStatement getSQLStatement()
+    public SelectStatement getSelectStatement()
     {
         return sqlStmt;
     }

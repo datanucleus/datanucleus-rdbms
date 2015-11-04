@@ -626,7 +626,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                 {
                                     Map.Entry<String, IteratorStatement> stmtIterEntry = scoStmtIter.next();
                                     IteratorStatement iterStmt = stmtIterEntry.getValue();
-                                    String iterStmtSQL = iterStmt.getSQLStatement().getSQLText().toSQL();
+                                    String iterStmtSQL = iterStmt.getSelectStatement().getSQLText().toSQL();
                                     NucleusLogger.DATASTORE_RETRIEVE.debug("JPQL Bulk-Fetch of " + iterStmt.getBackingStore().getOwnerMemberMetaData().getFullFieldName());
                                     try
                                     {
@@ -634,7 +634,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                         if (datastoreCompilation.getStatementParameters() != null)
                                         {
                                             BulkFetchExistsHelper helper = new BulkFetchExistsHelper(this);
-                                            helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSQLStatement(), parameters);
+                                            helper.applyParametersToStatement(psSco, datastoreCompilation, iterStmt.getSelectStatement(), parameters);
                                         }
                                         ResultSet rsSCO = sqlControl.executeStatementQuery(ec, mconn, iterStmtSQL, psSco);
                                         qr.registerMemberBulkResultSet(iterStmt, rsSCO);
@@ -945,7 +945,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         datastoreCompilation.setResultDefinitionForClass(resultsDef);
 
         // Generate statement for candidate(s)
-        SQLStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
+        SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
             datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
 
         if (stmt.allUnionsForSamePrimaryTable())
@@ -1266,7 +1266,6 @@ public class JPQLQuery extends AbstractJPQLQuery
             {
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
             }
-            options.add(QueryToSQLMapper.OPTION_BULK_DELETE_NO_RESULT);
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
             sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
             sqlMapper.compile();
