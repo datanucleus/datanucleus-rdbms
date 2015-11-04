@@ -816,7 +816,7 @@ public class ObjectExpression extends SQLExpression
                             if (type.isAssignableFrom(unionCandidateCls) == not)
                             {
                                 SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
-                                unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                                unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false); // TODO Avoid using whereAnd
                             }
                         }
 
@@ -824,13 +824,23 @@ public class ObjectExpression extends SQLExpression
                         SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
                         return (BooleanExpression)returnExpr;
                     }
+
+                    // No UNIONs so just check the main statement and return according to whether it is allowed
+                    Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
+                    if (type.isAssignableFrom(mainCandidateCls) == not)
+                    {
+                        SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                        return (BooleanExpression)returnExpr;
+                    }
+
+                    SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
+                    return (BooleanExpression)returnExpr;
                 }
 
                 // b). The member table doesn't manage the instanceof type, so do inner join to 
                 // the table of the instanceof to impose the instanceof condition
                 DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                stmt.innerJoin(this.table, this.table.getTable().getIdMapping(),
-                    instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+                stmt.innerJoin(this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
                 return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
             }
 
