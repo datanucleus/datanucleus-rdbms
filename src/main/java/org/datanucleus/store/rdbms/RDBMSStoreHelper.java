@@ -198,7 +198,7 @@ public class RDBMSStoreHelper
                         }
                         else
                         {
-                            SQLStatement sqlStmt = stmtGen.getStatement();
+                            SelectStatement sqlStmt = stmtGen.getStatement();
 
                             // WHERE (object id) = ?
                             JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
@@ -230,7 +230,7 @@ public class RDBMSStoreHelper
                 }
                 else
                 {
-                    SQLStatement sqlStmt = stmtGen.getStatement();
+                    SelectStatement sqlStmt = stmtGen.getStatement();
 
                     // WHERE (object id) = ?
                     JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
