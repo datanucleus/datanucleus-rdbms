@@ -185,7 +185,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     Map<String, Object> extensionsByName = null;
 
     /** SQL statement that we are updating. */
-    final SQLStatement stmt;
+    SQLStatement stmt;
 
     /** Definition of mapping for the results of this SQL statement (candidate). */
     final StatementClassMapping resultDefinitionForClass;
@@ -502,6 +502,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             // Apply the filter to the SQLStatement
             compileComponent = CompilationComponent.FILTER;
+
             if (QueryUtils.expressionHasOrOperator(compilation.getExprFilter()))
             {
                 compileProperties.put("Filter.OR", true);
@@ -512,14 +513,50 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 compileProperties.put("Filter.NOT", true);
             }
 
-            SQLExpression filterSqlExpr = (SQLExpression) compilation.getExprFilter().evaluate(this);
-            if (!(filterSqlExpr instanceof BooleanExpression))
+            if (stmt instanceof SelectStatement && ((SelectStatement)stmt).getNumberOfUnions() > 0)
             {
-                throw new QueryCompilerSyntaxException("Filter compiles to something that is not a boolean expression. Kindly fix your query : " + filterSqlExpr);
+                // Process each UNIONed statement separately TODO This is only necessary when the filter contains things like "instanceof"/"TYPE" so maybe detect that
+                List<SelectStatement> unionStmts = ((SelectStatement)stmt).getUnions();
+
+                // a). Main SelectStatement, disable unions while we process it
+                SQLStatement originalStmt = stmt;
+                ((SelectStatement) stmt).setAllowUnions(false);
+                SQLExpression filterSqlExpr = (SQLExpression) compilation.getExprFilter().evaluate(this);
+                if (!(filterSqlExpr instanceof BooleanExpression))
+                {
+                    throw new QueryCompilerSyntaxException("Filter compiles to something that is not a boolean expression. Kindly fix your query : " + filterSqlExpr);
+                }
+                BooleanExpression filterExpr = getBooleanExpressionForUseInFilter((BooleanExpression)filterSqlExpr);
+                stmt.whereAnd(filterExpr, true);
+                ((SelectStatement) stmt).setAllowUnions(true);
+
+                // b). UNIONed SelectStatements
+                for (SelectStatement unionStmt : unionStmts)
+                {
+                    stmt = unionStmt;
+                    stmt.setQueryGenerator(this);
+                    filterSqlExpr = (SQLExpression) compilation.getExprFilter().evaluate(this);
+                    if (!(filterSqlExpr instanceof BooleanExpression))
+                    {
+                        throw new QueryCompilerSyntaxException("Filter compiles to something that is not a boolean expression. Kindly fix your query : " + filterSqlExpr);
+                    }
+                    filterExpr = getBooleanExpressionForUseInFilter((BooleanExpression)filterSqlExpr);
+                    stmt.whereAnd(filterExpr, true);
+                    stmt.setQueryGenerator(null);
+                }
+                stmt = originalStmt;
             }
-            BooleanExpression filterExpr = (BooleanExpression)filterSqlExpr;
-            filterExpr = getBooleanExpressionForUseInFilter(filterExpr);
-            stmt.whereAnd(filterExpr, true);
+            else
+            {
+                SQLExpression filterSqlExpr = (SQLExpression) compilation.getExprFilter().evaluate(this);
+                if (!(filterSqlExpr instanceof BooleanExpression))
+                {
+                    throw new QueryCompilerSyntaxException("Filter compiles to something that is not a boolean expression. Kindly fix your query : " + filterSqlExpr);
+                }
+                BooleanExpression filterExpr = (BooleanExpression)filterSqlExpr;
+                filterExpr = getBooleanExpressionForUseInFilter(filterExpr);
+                stmt.whereAnd(filterExpr, true);
+            }
             compileComponent = null;
         }
     }

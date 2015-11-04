@@ -1296,7 +1296,7 @@ public class SelectStatement extends SQLStatement
 
         addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        if (unions != null && allowUnions && applyToUnions)
+        if (unions != null && applyToUnions)
         {
             // Apply the join to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1334,7 +1334,7 @@ public class SelectStatement extends SQLStatement
 
         addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
 
-        if (unions != null && allowUnions)
+        if (unions != null)
         {
             // Apply the join to all unions
             Iterator<SelectStatement> unionIter = unions.iterator();
@@ -1367,7 +1367,7 @@ public class SelectStatement extends SQLStatement
                 tables.remove(join.getTable().alias.getName());
                 String removedAliasName = join.getTable().alias.getName();
 
-                if (unions != null && allowUnions)
+                if (unions != null)
                 {
                     // Apply the join removal to all unions
                     Iterator<SelectStatement> unionIter = unions.iterator();
