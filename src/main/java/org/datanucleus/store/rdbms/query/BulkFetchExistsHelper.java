@@ -228,10 +228,10 @@ public class BulkFetchExistsHelper
         List<SQLStatementParameter> stmtParams = null;
         if (datastoreCompilation.getStatementParameters() != null)
         {
-            int numUnions = sqlStmt.getNumberOfUnions();
-
             stmtParams = new ArrayList<SQLStatementParameter>();
             stmtParams.addAll(datastoreCompilation.getStatementParameters());
+
+            int numUnions = sqlStmt.getNumberOfUnions();
             for (int i=0;i<numUnions;i++)
             {
                 stmtParams.addAll(datastoreCompilation.getStatementParameters());
@@ -242,6 +242,7 @@ public class BulkFetchExistsHelper
                 // ParameterNameByPosition is only populated with implicit parameters
                 stmtParamNameByPosition = new HashMap<Integer, String>();
                 stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
+
                 int numParams = stmtParamNameByPosition.size();
                 for (int i=0;i<numUnions;i++)
                 {

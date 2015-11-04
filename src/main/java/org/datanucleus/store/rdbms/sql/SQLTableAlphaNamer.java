@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql;
 
+import java.util.List;
+
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
@@ -108,12 +110,16 @@ public class SQLTableAlphaNamer implements SQLTableNamer
 
             // Find max number of tables in this group (allow for unions too)
             numTablesInGroup = tableGrp.getNumberOfTables();
-            for (int i=0;i<stmt.getNumberOfUnions();i++)
+            if (stmt.getNumberOfUnions() > 0)
             {
-                int num = stmt.unions.get(i).getTableGroup(tableGrp.getName()).getNumberOfTables();
-                if (num > numTablesInGroup)
+                List<SQLStatement> unionStmts = stmt.getUnions();
+                for (SQLStatement unionStmt : unionStmts)
                 {
-                    numTablesInGroup = num;
+                    int num = unionStmt.getTableGroup(tableGrp.getName()).getNumberOfTables();
+                    if (num > numTablesInGroup)
+                    {
+                        numTablesInGroup = num;
+                    }
                 }
             }
         }

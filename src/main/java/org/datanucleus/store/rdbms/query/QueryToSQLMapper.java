@@ -930,7 +930,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     // Subquery, with no result specified, so select id only
                     SQLStatementHelper.selectIdentityOfCandidateInStatement(selectStmt, resultDefinitionForClass, candidateCmd);
                 }
-                else if (stmt.allUnionsForSamePrimaryTable())
+                else if (selectStmt.allUnionsForSamePrimaryTable())
                 {
                     // Select fetch-plan members of the candidate (and optionally the next level of sub-objects)
                     // Don't select next level when we are processing a subquery

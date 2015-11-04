@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql;
 
+import java.util.List;
+
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
@@ -36,12 +38,16 @@ public class SQLTableTNamer implements SQLTableNamer
         {
             // Find max number of tables (allow for unions too)
             int numTables = stmt.getNumberOfTables();
-            for (int i=0;i<stmt.getNumberOfUnions();i++)
+            if (stmt.getNumberOfUnions() > 0)
             {
-                int num = stmt.unions.get(i).getNumberOfTables();
-                if (num > numTables)
+                List<SQLStatement> unionStmts = stmt.getUnions();
+                for (SQLStatement unionStmt : unionStmts)
                 {
-                    numTables = num;
+                    int num = unionStmt.getNumberOfTables();
+                    if (num > numTables)
+                    {
+                        numTables = num;
+                    }
                 }
             }
 
