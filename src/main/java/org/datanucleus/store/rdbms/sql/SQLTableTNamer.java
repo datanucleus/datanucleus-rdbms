@@ -38,7 +38,7 @@ public class SQLTableTNamer implements SQLTableNamer
         {
             // Find max number of tables (allow for unions too)
             int numTables = stmt.getNumberOfTables();
-            if (stmt.getNumberOfUnions() > 0)
+            if (stmt instanceof SelectStatement)
             {
                 SelectStatement selectStmt = (SelectStatement)stmt;
                 if (selectStmt.getNumberOfUnions() > 0)
