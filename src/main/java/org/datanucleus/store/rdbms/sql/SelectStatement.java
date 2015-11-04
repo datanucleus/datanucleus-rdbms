@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.AggregateExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
+import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ResultAliasExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.Column;
@@ -55,6 +57,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class SelectStatement extends SQLStatement
 {
+    /** List of unioned SelectStatements (if any). */
+    protected List<SelectStatement> unions = null;
+
     /** Whether the statement is distinct. */
     protected boolean distinct = false;
 
@@ -254,10 +259,10 @@ public class SelectStatement extends SQLStatement
         if (unions != null)
         {
             // Apply the select to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
+            Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SelectStatement stmt = (SelectStatement)unionIter.next();
+                SelectStatement stmt = unionIter.next();
                 stmt.select(expr, alias);
             }
         }
@@ -312,10 +317,10 @@ public class SelectStatement extends SQLStatement
         if (applyToUnions && unions != null)
         {
             // Apply the select to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
+            Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SelectStatement stmt = (SelectStatement)unionIter.next();
+                SelectStatement stmt = unionIter.next();
                 stmt.select(table, mapping, alias);
             }
         }
@@ -374,10 +379,10 @@ public class SelectStatement extends SQLStatement
         if (unions != null)
         {
             // Apply the select to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
+            Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
-                SelectStatement stmt = (SelectStatement)unionIter.next();
+                SelectStatement stmt = unionIter.next();
                 stmt.select(table, column, alias);
             }
         }
@@ -437,10 +442,10 @@ public class SelectStatement extends SQLStatement
         if (unions != null)
         {
             // Apply the grouping to all unions
-            Iterator<SQLStatement> i = unions.iterator();
+            Iterator<SelectStatement> i = unions.iterator();
             while (i.hasNext())
             {
-                ((SelectStatement)i.next()).addGroupingExpression(expr);
+                i.next().addGroupingExpression(expr);
             }
         }
     }
@@ -459,10 +464,10 @@ public class SelectStatement extends SQLStatement
         if (unions != null)
         {
             // Apply the having to all unions
-            Iterator<SQLStatement> i = unions.iterator();
+            Iterator<SelectStatement> i = unions.iterator();
             while (i.hasNext())
             {
-                ((SelectStatement)i.next()).setHaving(expr);
+                i.next().setHaving(expr);
             }
         }
     }
@@ -674,7 +679,7 @@ public class SelectStatement extends SQLStatement
                 throw new NucleusException(Localiser.msg("052504", "UNION")).setFatal();
             }
 
-            Iterator<SQLStatement> unionIter = unions.iterator();
+            Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
                 if (dba.supportsOption(DatastoreAdapter.USE_UNION_ALL))
@@ -686,7 +691,7 @@ public class SelectStatement extends SQLStatement
                     sql.append(" UNION ");
                 }
 
-                SQLStatement stmt = unionIter.next();
+                SelectStatement stmt = unionIter.next();
                 SQLText unionSql = stmt.getSQLText();
                 sql.append(unionSql);
             }
@@ -1131,10 +1136,10 @@ public class SelectStatement extends SQLStatement
                     orderingColumnIndexes[i] = selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
                     if (unions != null)
                     {
-                        Iterator<SQLStatement> iterator = unions.iterator();
+                        Iterator<SelectStatement> iterator = unions.iterator();
                         while (iterator.hasNext())
                         {
-                            SelectStatement stmt = (SelectStatement)iterator.next();
+                            SelectStatement stmt = iterator.next();
                             stmt.selectItem(orderingExpressions[i].toSQLText(), null, !aggregated);
                         }
                     }
@@ -1155,10 +1160,10 @@ public class SelectStatement extends SQLStatement
                     {
                         if (unions != null)
                         {
-                            Iterator<SQLStatement> iterator = unions.iterator();
+                            Iterator<SelectStatement> iterator = unions.iterator();
                             while (iterator.hasNext())
                             {
-                                SelectStatement stmt = (SelectStatement)iterator.next();
+                                SelectStatement stmt = iterator.next();
                                 stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
                             }
                         }
@@ -1179,10 +1184,10 @@ public class SelectStatement extends SQLStatement
 
                             if (unions != null)
                             {
-                                Iterator<SQLStatement> iterator = unions.iterator();
+                                Iterator<SelectStatement> iterator = unions.iterator();
                                 while (iterator.hasNext())
                                 {
-                                    SelectStatement stmt = (SelectStatement)iterator.next();
+                                    SelectStatement stmt = iterator.next();
                                     stmt.selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
                                 }
                             }
@@ -1193,11 +1198,28 @@ public class SelectStatement extends SQLStatement
         }
     }
 
+    public int getNumberOfUnions()
+    {
+        if (unions == null)
+        {
+            return 0;
+        }
+
+        int number = unions.size();
+        Iterator<SelectStatement> unionIterator = unions.iterator();
+        while (unionIterator.hasNext())
+        {
+            SelectStatement unioned = unionIterator.next();
+            number += unioned.getNumberOfUnions();
+        }
+        return number;
+    }
+
     /**
      * Accessor for the unioned statements.
      * @return The unioned SQLStatements
      */
-    public List<SQLStatement> getUnions()
+    public List<SelectStatement> getUnions()
     {
         return unions;
     }
@@ -1206,12 +1228,12 @@ public class SelectStatement extends SQLStatement
      * Method to union this SQL statement with another SQL statement.
      * @param stmt The other SQL statement to union
      */
-    public void union(SQLStatement stmt)
+    public void union(SelectStatement stmt)
     {
         invalidateStatement();
         if (unions == null)
         {
-            unions = new ArrayList<SQLStatement>();
+            unions = new ArrayList<SelectStatement>();
         }
         unions.add(stmt);
     }
@@ -1224,7 +1246,7 @@ public class SelectStatement extends SQLStatement
     {
         if (unions != null)
         {
-            Iterator<SQLStatement> unionIter = unions.iterator();
+            Iterator<SelectStatement> unionIter = unions.iterator();
             while (unionIter.hasNext())
             {
                 SQLStatement unionStmt = unionIter.next();
@@ -1235,5 +1257,171 @@ public class SelectStatement extends SQLStatement
             }
         }
         return true;
+    }
+
+    @Override
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
+            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
+    {
+        invalidateStatement();
+
+        // Create the SQLTable to join to.
+        if (tables == null)
+        {
+            tables = new HashMap();
+        }
+        if (tableGrpName == null)
+        {
+            tableGrpName = "Group" + tableGroups.size();
+        }
+        if (targetAlias == null)
+        {
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
+        }
+        if (sourceTable == null)
+        {
+            sourceTable = primaryTable;
+        }
+        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
+        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
+        putSQLTableInGroup(targetTbl, tableGrpName, joinType);
+
+        addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the join to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
+            }
+        }
+
+        return targetTbl;
+    }
+
+    @Override
+    public SQLTable crossJoin(Table target, String targetAlias, String tableGrpName)
+    {
+        invalidateStatement();
+
+        // Create the SQLTable to join to.
+        if (tables == null)
+        {
+            tables = new HashMap();
+        }
+        if (tableGrpName == null)
+        {
+            tableGrpName = "Group" + tableGroups.size();
+        }
+        if (targetAlias == null)
+        {
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
+        }
+        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
+        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
+        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
+
+        addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
+
+        if (unions != null)
+        {
+            // Apply the join to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.crossJoin(target, targetAlias, tableGrpName);
+            }
+        }
+
+        return targetTbl;
+    }
+
+    @Override
+    public String removeCrossJoin(SQLTable targetSqlTbl)
+    {
+        if (joins == null)
+        {
+            return null;
+        }
+
+        Iterator<SQLJoin> joinIter = joins.iterator();
+        while (joinIter.hasNext())
+        {
+            SQLJoin join = joinIter.next();
+            if (join.getTable().equals(targetSqlTbl) && join.getType() == JoinType.CROSS_JOIN)
+            {
+                joinIter.remove();
+                requiresJoinReorder = true;
+                tables.remove(join.getTable().alias.getName());
+                String removedAliasName = join.getTable().alias.getName();
+
+                if (unions != null)
+                {
+                    // Apply the join removal to all unions
+                    Iterator<SelectStatement> unionIter = unions.iterator();
+                    while (unionIter.hasNext())
+                    {
+                        SelectStatement stmt = unionIter.next();
+                        stmt.removeCrossJoin(targetSqlTbl);
+                    }
+                }
+
+                return removedAliasName;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Method to add an AND condition to the WHERE clause.
+     * @param expr The condition
+     * @param applyToUnions whether to apply this and to any UNIONs in the statement
+     */
+    public void whereAnd(BooleanExpression expr, boolean applyToUnions)
+    {
+        if (expr instanceof BooleanLiteral && !expr.isParameter() && (Boolean)((BooleanLiteral)expr).getValue())
+        {
+            // Where condition is "TRUE" so omit
+            return;
+        }
+
+        super.whereAnd(expr, false);
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the where to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.whereAnd(expr, true);
+            }
+        }
+    }
+
+    /**
+     * Method to add an OR condition to the WHERE clause.
+     * @param expr The condition
+     * @param applyToUnions Whether to apply to unions
+     */
+    public void whereOr(BooleanExpression expr, boolean applyToUnions)
+    {
+        super.whereOr(expr, false);
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the where to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.whereOr(expr, true);
+            }
+        }
     }
 }

@@ -809,8 +809,8 @@ public class ObjectExpression extends SQLExpression
                             stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
                         }
 
-                        List<SQLStatement> unionStmts = selectStmt.getUnions();
-                        for (SQLStatement unionStmt : unionStmts)
+                        List<SelectStatement> unionStmts = selectStmt.getUnions();
+                        for (SelectStatement unionStmt : unionStmts)
                         {
                             Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
                             if (type.isAssignableFrom(unionCandidateCls) == not)

@@ -1517,7 +1517,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         nextSqlTbl = newSqlTbl;
                                     }
 
-                                    List<SQLStatement> unionStmts = ((SelectStatement)stmt).getUnions();
+                                    List<SelectStatement> unionStmts = ((SelectStatement)stmt).getUnions();
                                     if (unionStmts != null)
                                     {
                                         for (SQLStatement unionStmt : unionStmts)

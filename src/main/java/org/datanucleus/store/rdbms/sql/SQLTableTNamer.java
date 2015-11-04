@@ -43,8 +43,8 @@ public class SQLTableTNamer implements SQLTableNamer
                 SelectStatement selectStmt = (SelectStatement)stmt;
                 if (selectStmt.getNumberOfUnions() > 0)
                 {
-                    List<SQLStatement> unionStmts = selectStmt.getUnions();
-                    for (SQLStatement unionStmt : unionStmts)
+                    List<SelectStatement> unionStmts = selectStmt.getUnions();
+                    for (SelectStatement unionStmt : unionStmts)
                     {
                         int num = unionStmt.getNumberOfTables();
                         if (num > numTables)

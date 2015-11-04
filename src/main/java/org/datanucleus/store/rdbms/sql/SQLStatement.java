@@ -100,10 +100,6 @@ public abstract class SQLStatement
     /** Parent statement, if this is a subquery SELECT. Must be set at construction. */
     protected SQLStatement parent = null;
 
-    // TODO Move this to SelectStatement. The problem is that the joins/WHERE code needs access to it.
-    /** List of unioned SQLStatements (if any). */
-    protected List<SQLStatement> unions = null;
-
     /** Primary table for this statement. */
     protected SQLTable primaryTable;
 
@@ -273,23 +269,6 @@ public abstract class SQLStatement
         return extensions.get(key);
     }
 
-    public int getNumberOfUnions()
-    {
-        if (unions == null)
-        {
-            return 0;
-        }
-
-        int number = unions.size();
-        Iterator<SQLStatement> unionIterator = unions.iterator();
-        while (unionIterator.hasNext())
-        {
-            SQLStatement unioned = unionIterator.next();
-            number += unioned.getNumberOfUnions();
-        }
-        return number;
-    }
-
     // --------------------------------- FROM --------------------------------------
 
     /**
@@ -426,7 +405,7 @@ public abstract class SQLStatement
      * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @param applyToUnions Whether to apply to any unioned statements
+     * @param applyToUnions Whether to apply to any unioned statements (only applies to SELECT statements)
      * @return SQLTable for the target
      */
     public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
@@ -447,7 +426,7 @@ public abstract class SQLStatement
      * @param targetParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @param applyToUnions Whether to apply to any unioned statements
+     * @param applyToUnions Whether to apply to any unioned statements (only applies to SELECT statements)
      * @return SQLTable for the target
      */
     public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
@@ -477,17 +456,6 @@ public abstract class SQLStatement
         putSQLTableInGroup(targetTbl, tableGrpName, joinType);
 
         addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
-
-        if (unions != null && applyToUnions)
-        {
-            // Apply the join to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
-            }
-        }
 
         return targetTbl;
     }
@@ -637,17 +605,6 @@ public abstract class SQLStatement
 
         addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
 
-        if (unions != null)
-        {
-            // Apply the join to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.crossJoin(target, targetAlias, tableGrpName);
-            }
-        }
-
         return targetTbl;
     }
 
@@ -724,17 +681,6 @@ public abstract class SQLStatement
                 tables.remove(join.getTable().alias.getName());
                 String removedAliasName = join.getTable().alias.getName();
 
-                if (unions != null)
-                {
-                    // Apply the join removal to all unions
-                    Iterator<SQLStatement> unionIter = unions.iterator();
-                    while (unionIter.hasNext())
-                    {
-                        SQLStatement stmt = unionIter.next();
-                        stmt.removeCrossJoin(targetSqlTbl);
-                    }
-                }
-
                 return removedAliasName;
             }
         }
@@ -749,7 +695,7 @@ public abstract class SQLStatement
      * @param groupName The group
      * @param joinType type of join to start this table group
      */
-    private void putSQLTableInGroup(SQLTable sqlTbl, String groupName, JoinType joinType)
+    protected void putSQLTableInGroup(SQLTable sqlTbl, String groupName, JoinType joinType)
     {
         SQLTableGroup tableGrp = tableGroups.get(groupName);
         if (tableGrp == null)
@@ -969,17 +915,17 @@ public abstract class SQLStatement
     /**
      * Method to add an AND condition to the WHERE clause.
      * @param expr The condition
-     * @param applyToUnions whether to apply this and to any UNIONs in the statement
+     * @param applyToUnions whether to apply this and to any UNIONs in the statement (only applies to SELECT statements)
      */
     public void whereAnd(BooleanExpression expr, boolean applyToUnions)
     {
-        invalidateStatement();
-
         if (expr instanceof BooleanLiteral && !expr.isParameter() && (Boolean)((BooleanLiteral)expr).getValue())
         {
             // Where condition is "TRUE" so omit
             return;
         }
+
+        invalidateStatement();
 
         if (where == null)
         {
@@ -989,23 +935,12 @@ public abstract class SQLStatement
         {
             where = where.and(expr);
         }
-
-        if (unions != null && applyToUnions)
-        {
-            // Apply the where to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.whereAnd(expr, true);
-            }
-        }
     }
 
     /**
      * Method to add an OR condition to the WHERE clause.
      * @param expr The condition
-     * @param applyToUnions Whether to apply to unions
+     * @param applyToUnions Whether to apply to unions (only applies to SELECT statements)
      */
     public void whereOr(BooleanExpression expr, boolean applyToUnions)
     {
@@ -1019,28 +954,6 @@ public abstract class SQLStatement
         {
             where = where.ior(expr);
         }
-
-        if (unions != null && applyToUnions)
-        {
-            // Apply the where to all unions
-            Iterator<SQLStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SQLStatement stmt = unionIter.next();
-                stmt.whereOr(expr, true);
-            }
-        }
-    }
-
-    /**
-     * Method to add a range constraint on any SELECT.
-     * This typically will use LIMIT/OFFSET where they are supported by the underlying RDBMS.
-     * @param offset The offset to start from
-     * @param count The number of records to return
-     */
-    public void setRange(long offset, long count)
-    {
-        throw new UnsupportedOperationException("Not supported on this query type");
     }
 
     public synchronized SQLText getSQLText()

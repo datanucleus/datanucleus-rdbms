@@ -495,13 +495,13 @@ public class SQLStatementHelper
             }
         }
 
-        List<SQLStatement> unionStmts = stmt.getUnions();
+        List<SelectStatement> unionStmts = stmt.getUnions();
         if (unionStmts != null)
         {
-            Iterator<SQLStatement> iter = unionStmts.iterator();
+            Iterator<SelectStatement> iter = unionStmts.iterator();
             while (iter.hasNext())
             {
-                SelectStatement unionStmt = (SelectStatement)iter.next();
+                SelectStatement unionStmt = iter.next();
                 selectIdentityOfCandidateInStatement(unionStmt, null, candidateCmd);
             }
         }

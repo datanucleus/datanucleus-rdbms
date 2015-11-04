@@ -811,7 +811,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
 
         // Generate statement for candidate(s)
-        SQLStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
+        SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
             datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, 
             compilation.getCandidateAlias(), compilation.getCandidateAlias());
 
