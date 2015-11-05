@@ -568,6 +568,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             compileComponent = CompilationComponent.RESULT;
 
+            // TODO We use this to process any Case/Dyadic expressions on a per UNION basis in case they require special processing. Could/should do this for other expression types too
+            boolean unionsPresent = stmt.getNumberOfUnions() > 0;
+
             // Select any result expressions
             Expression[] resultExprs = compilation.getExprResult();
             for (int i=0;i<resultExprs.length;i++)
@@ -698,7 +701,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else if (resultExprs[i] instanceof ParameterExpression)
                 {
-                    processParameterExpression((ParameterExpression)resultExprs[i], true); // Params are literals in result
+                    processParameterExpression((ParameterExpression)resultExprs[i], true); // Second argument : parameters are literals in result
                     SQLExpression sqlExpr = stack.pop();
                     validateExpressionForResult(sqlExpr);
                     int[] cols = stmt.select(sqlExpr, alias);
@@ -755,24 +758,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     StatementNewObjectMapping stmtMap = getStatementMappingForNewObjectExpression(sqlExpr, stmt);
                     resultDefinition.addMappingForResultExpression(i, stmtMap);
                 }
-                else if (resultExprs[i] instanceof DyadicExpression)
+                else if (resultExprs[i] instanceof DyadicExpression || resultExprs[i] instanceof CaseExpression)
                 {
-                    // Something like {a+b} perhaps. Maybe we should check for invalid expressions?
-                    resultExprs[i].evaluate(this);
-                    SQLExpression sqlExpr = stack.pop();
-                    int[] cols = stmt.select(sqlExpr, alias);
-                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(cols);
-                    if (alias != null)
-                    {
-                        resultAliases.add(alias);
-                        idx.setColumnAlias(alias);
-                    }
-                    resultDefinition.addMappingForResultExpression(i, idx);
-                }
-                else if (resultExprs[i] instanceof CaseExpression)
-                {
-                    if (stmt.getNumberOfUnions() > 0)
+                    if (unionsPresent)
                     {
                         // Process the first union, followed by each union statement, in case they have TYPE/instanceof
                         stmt.setAllowUnions(false);
@@ -789,23 +777,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         resultDefinition.addMappingForResultExpression(i, idx);
                         stmt.setAllowUnions(true);
 
-                        if (stmt.getNumberOfUnions() > 0)
+                        List<SelectStatement> unionStmts = stmt.getUnions();
+                        SelectStatement originalStmt = stmt;
+                        for (SelectStatement unionStmt : unionStmts)
                         {
-                            List<SelectStatement> unionStmts = stmt.getUnions();
-                            SelectStatement originalStmt = stmt;
-                            for (SelectStatement unionStmt : unionStmts)
-                            {
-                                this.stmt = unionStmt;
-                                unionStmt.setQueryGenerator(this);
-                                unionStmt.setAllowUnions(false);
-                                resultExprs[i].evaluate(this);
-                                sqlExpr = stack.pop();
-                                cols = unionStmt.select(sqlExpr, alias);
-                                unionStmt.setQueryGenerator(null);
-                                unionStmt.setAllowUnions(true);
-                            }
-                            this.stmt = originalStmt;
+                            this.stmt = unionStmt;
+                            unionStmt.setQueryGenerator(this);
+                            unionStmt.setAllowUnions(false);
+                            resultExprs[i].evaluate(this);
+                            sqlExpr = stack.pop();
+                            cols = unionStmt.select(sqlExpr, alias);
+                            unionStmt.setQueryGenerator(null);
+                            unionStmt.setAllowUnions(true);
                         }
+                        this.stmt = originalStmt;
                     }
                     else
                     {
