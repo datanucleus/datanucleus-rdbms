@@ -96,7 +96,6 @@ import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLJoin;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
-import org.datanucleus.store.rdbms.sql.DeleteStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -425,10 +424,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (stmt instanceof UpdateStatement)
         {
             compileUpdate((UpdateStatement)stmt);
-        }
-        else if (stmt instanceof DeleteStatement)
-        {
-            
         }
         else if (stmt instanceof SelectStatement)
         {
@@ -777,17 +772,55 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else if (resultExprs[i] instanceof CaseExpression)
                 {
-                    resultExprs[i].evaluate(this);
-                    SQLExpression sqlExpr = stack.pop();
-                    int[] cols = stmt.select(sqlExpr, alias);
-                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(cols);
-                    if (alias != null)
+                    if (stmt.getNumberOfUnions() > 0)
                     {
-                        resultAliases.add(alias);
-                        idx.setColumnAlias(alias);
+                        // Process the first union, followed by each union statement, in case they have TYPE/instanceof
+                        stmt.setAllowUnions(false);
+                        resultExprs[i].evaluate(this);
+                        SQLExpression sqlExpr = stack.pop();
+                        int[] cols = stmt.select(sqlExpr, alias);
+                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                        idx.setColumnPositions(cols);
+                        if (alias != null)
+                        {
+                            resultAliases.add(alias);
+                            idx.setColumnAlias(alias);
+                        }
+                        resultDefinition.addMappingForResultExpression(i, idx);
+                        stmt.setAllowUnions(true);
+
+                        if (stmt.getNumberOfUnions() > 0)
+                        {
+                            List<SelectStatement> unionStmts = stmt.getUnions();
+                            SelectStatement originalStmt = stmt;
+                            for (SelectStatement unionStmt : unionStmts)
+                            {
+                                this.stmt = unionStmt;
+                                unionStmt.setQueryGenerator(this);
+                                unionStmt.setAllowUnions(false);
+                                resultExprs[i].evaluate(this);
+                                sqlExpr = stack.pop();
+                                cols = unionStmt.select(sqlExpr, alias);
+                                unionStmt.setQueryGenerator(null);
+                                unionStmt.setAllowUnions(true);
+                            }
+                            this.stmt = originalStmt;
+                        }
                     }
-                    resultDefinition.addMappingForResultExpression(i, idx);
+                    else
+                    {
+                        resultExprs[i].evaluate(this);
+                        SQLExpression sqlExpr = stack.pop();
+                        int[] cols = stmt.select(sqlExpr, alias);
+                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                        idx.setColumnPositions(cols);
+                        if (alias != null)
+                        {
+                            resultAliases.add(alias);
+                            idx.setColumnAlias(alias);
+                        }
+                        resultDefinition.addMappingForResultExpression(i, idx);
+                    }
                 }
                 else
                 {
