@@ -2829,6 +2829,17 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 iter.next(); // Skip first tuple
             }
 
+            if (sqlMapping != null && first.equals(candidateAlias) && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            {
+                // Special case of using COMPLETE_TABLE for candidate and picked wrong table
+                SQLTable firstSqlTbl = stmt.getTable(first.toUpperCase());
+                if (firstSqlTbl != null && firstSqlTbl.getTable() != sqlMapping.table.getTable())
+                {
+                    // Cached the SQLTableMapping for one of the other inherited classes, so create our own
+                    sqlMapping = new SQLTableMapping(firstSqlTbl, sqlMapping.cmd, firstSqlTbl.getTable().getIdMapping());
+                }
+            }
+
             if (sqlMapping == null)
             {
                 if (parentMapper != null && parentMapper.hasSQLTableMappingForAlias(first))
