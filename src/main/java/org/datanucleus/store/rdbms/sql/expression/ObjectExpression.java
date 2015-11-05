@@ -749,9 +749,6 @@ public class ObjectExpression extends SQLExpression
             }
 
             // No discriminator, so the following is likely incomplete.
-            NucleusLogger.QUERY.warn("TYPE/INSTANCEOF operator for class=" + memberCmd.getFullClassName() + " on table=" + memberTable + " for type=" + instanceofClassName +
-                " but there is no discriminator. Any subsequent handling is likely incorrect TODO");
-            // TODO Update this handling so that we apply any constraint to the relevant UNION statement, so it excludes some and not others
 
             // Join to member table
             DatastoreClass table = null;
@@ -795,44 +792,44 @@ public class ObjectExpression extends SQLExpression
                 if (stmt instanceof SelectStatement)
                 {
                     SelectStatement selectStmt = (SelectStatement)stmt;
-                    if (selectStmt.getNumberOfUnions() > 0)
+                    if (selectStmt.getNumberOfUnions() == 0)
                     {
-                        // a). we have unions for the member, so restrict to just the applicable unions
-                        // Note that this is only really valid is wanting "a instanceof SUB1".
-                        // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
-                        // TODO What if this "OP_IS" is in the SELECT clause??? We would need to return one SQLExpression per union
-                        // TODO How do we handle those cases? We could return a UnionedBooleanExpression with one value per union? and apply to the where elsewhere not here
+                        // No UNIONs so just check the main statement and return according to whether it is allowed
                         Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                         if (type.isAssignableFrom(mainCandidateCls) == not)
                         {
-                            SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
-                            stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                            SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                            return (BooleanExpression)returnExpr;
                         }
 
-                        List<SelectStatement> unionStmts = selectStmt.getUnions();
-                        for (SelectStatement unionStmt : unionStmts)
-                        {
-                            Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
-                            if (type.isAssignableFrom(unionCandidateCls) == not)
-                            {
-                                SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
-                                unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false); // TODO Avoid using whereAnd
-                            }
-                        }
-
-                        // Just return true since we applied the condition direct to the unions
                         SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
                         return (BooleanExpression)returnExpr;
                     }
 
-                    // No UNIONs so just check the main statement and return according to whether it is allowed
+                    NucleusLogger.QUERY.warn("TYPE/INSTANCEOF operator for class=" + memberCmd.getFullClassName() + " on table=" + memberTable + " for type=" + instanceofClassName +
+                            " but there is no discriminator and using UNIONs. Any subsequent handling is likely incorrect TODO");
+                    // a). we have unions for the member, so restrict to just the applicable unions
+                    // Note that this is only really valid is wanting "a instanceof SUB1".
+                    // It fails when we want to do "a instanceof SUB1 || a instanceof SUB2"
+                    // TODO What if this "OP_IS" is in the SELECT clause??? Need to update QueryToSQLMapper.compileResult
                     Class mainCandidateCls = clr.classForName(stmt.getCandidateClassName());
                     if (type.isAssignableFrom(mainCandidateCls) == not)
                     {
-                        SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
-                        return (BooleanExpression)returnExpr;
+                        SQLExpression unionClauseExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
+                        stmt.whereAnd((BooleanExpression)unionClauseExpr, false);
+                    }
+                    List<SelectStatement> unionStmts = selectStmt.getUnions();
+                    for (SelectStatement unionStmt : unionStmts)
+                    {
+                        Class unionCandidateCls = clr.classForName(unionStmt.getCandidateClassName());
+                        if (type.isAssignableFrom(unionCandidateCls) == not)
+                        {
+                            SQLExpression unionClauseExpr = exprFactory.newLiteral(unionStmt, m, true).eq(exprFactory.newLiteral(unionStmt, m, false));
+                            unionStmt.whereAnd((BooleanExpression)unionClauseExpr, false); // TODO Avoid using whereAnd
+                        }
                     }
 
+                    // Just return true since we applied the condition direct to the unions
                     SQLExpression returnExpr = exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, true));
                     return (BooleanExpression)returnExpr;
                 }
