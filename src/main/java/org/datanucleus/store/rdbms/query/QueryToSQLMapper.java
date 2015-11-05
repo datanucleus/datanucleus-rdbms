@@ -2822,7 +2822,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         SQLTableMapping sqlMapping = null;
-
         List<String> tuples = primExpr.getTuples();
 
         // Find source object
@@ -2942,6 +2941,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     DatastoreClass table = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
                     if (table == null)
                     {
+                        if (cmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE && candidateCmd.getFullClassName().equals(cmd.getFullClassName()))
+                        {
+                            // Special case of a candidate having no table of its own and using COMPLETE_TABLE, so we use the candidate class for this statement (or UNION)
+                            table = storeMgr.getDatastoreClass(stmt.getCandidateClassName(), clr);
+                        }
+                    }
+                    if (table == null)
+                    {
                         AbstractClassMetaData[] subCmds = storeMgr.getClassesManagingTableForClass(cmd, clr);
                         if (subCmds.length == 1)
                         {
@@ -2958,7 +2965,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     if (table == null)
                     {
-                        throw new NucleusUserException("Unable to find table for primary " + primaryName + " table for class=" + cmd.getFullClassName() + " is null : is the field correct? or using some inheritance pattern?");
+                        throw new NucleusUserException("Unable to find table for primary " + primaryName + ". Table for class=" + cmd.getFullClassName() +
+                            " is null : is the field correct? or using some inheritance pattern?");
                     }
                     mapping = table.getMemberMapping(mmd);
                     sqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(theStmt, sqlMapping.table, mapping);
