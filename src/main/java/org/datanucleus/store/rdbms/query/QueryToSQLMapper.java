@@ -150,6 +150,12 @@ import org.datanucleus.util.StringUtils;
  * applies if the variable is (finally) bound using the equality operator (e.g var.field == this.field).
  * The extension should be set to "LEFTOUTERJOIN", "INNERJOIN"</li>
  * </ul>
+ * <p>
+ * TODO This class currently takes in an SQLStatement and updates it with filter, result, from etc. If the input statement is a UNION of statements
+ * it tries to update the statement by applying the filter, result etc across all UNIONs. This can cause problems in some situations, particularly
+ * around looking up tables when using COMPLETE_TABLE inheritance, or with TYPE/instanceOf operations. We currently work around these by some fixes
+ * to getSQLTableMappingForPrimaryExpression, and by manually going around the UNIONs. What may be a better long term solution would be to run this
+ * class on each of the UNIONed statements separately and merge them.
  */
 public class QueryToSQLMapper extends AbstractExpressionEvaluator implements QueryGenerator
 {
