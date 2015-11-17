@@ -36,7 +36,7 @@ import org.datanucleus.util.NucleusLogger;
  * This generator for RDBMS uses the "select max(column) from table" strategy. The block size is limited to 1.
  * MaxGenerator works with numbers, so clients using this generator must cast the ID to Long.
  */
-public class MaxGenerator extends AbstractRDBMSGenerator
+public class MaxGenerator extends AbstractRDBMSGenerator<Long>
 {
     /**
      * Constructor.
