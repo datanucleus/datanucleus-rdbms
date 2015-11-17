@@ -18,6 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.table;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -391,8 +392,13 @@ public abstract class AbstractClassTable extends TableImpl
             {
                 if (generator != null)
                 {
-                    // Use getStorageClass method if available
-                    valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                    ParameterizedType parameterizedType = (ParameterizedType) generator.getClass().getGenericSuperclass();
+                    valueGeneratedType = (Class) parameterizedType.getActualTypeArguments()[0];
+                    if (valueGeneratedType == null)
+                    {
+                        // Use getStorageClass method if available
+                        valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                    }
                 }
             }
             catch (Exception e)
