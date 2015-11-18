@@ -58,10 +58,13 @@ public class OracleArrayMapping extends ArrayMapping
                 Object[] arrElements = (Object[])value;
                 for (Object elem : arrElements)
                 {
-                    ObjectProvider elemOP = ec.findObjectProvider(elem);
-                    if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                    if (elem != null)
                     {
-                        elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        {
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                        }
                     }
                 }
             }

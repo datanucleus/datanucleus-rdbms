@@ -76,10 +76,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     Object[] collElements = value.toArray();
                     for (Object elem : collElements)
                     {
-                        ObjectProvider elemOP = ec.findObjectProvider(elem);
-                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        if (elem != null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            ObjectProvider elemOP = ec.findObjectProvider(elem);
+                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            {
+                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
                         }
                     }
                 }
@@ -195,10 +198,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                     Object[] collElements = value.toArray();
                     for (Object elem : collElements)
                     {
-                        ObjectProvider elemOP = ec.findObjectProvider(elem);
-                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        if (elem != null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            ObjectProvider elemOP = ec.findObjectProvider(elem);
+                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            {
+                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
                         }
                     }
                 }
