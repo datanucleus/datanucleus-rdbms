@@ -20,16 +20,17 @@ package org.datanucleus.store.rdbms.mapping.java;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
-import org.datanucleus.store.types.SCOUtils;
 
 /**
- * Oracle variant of the MapMapping for cases where we are serialising
- * the field into a single column. This is necessary so we can intercept perform
- * any necessary postInsert, postUpdate nonsense for inserting BLOBs
+ * Oracle variant of the MapMapping for cases where we are serialising the field into a single column. 
+ * This is necessary so we can perform any necessary postInsert, postUpdate nonsense for inserting BLOBs.
  */
 public class OracleMapMapping extends MapMapping
 {
@@ -42,15 +43,38 @@ public class OracleMapMapping extends MapMapping
     {
         if (containerIsStoredInSingleColumn())
         {
+            ExecutionContext ec = ownerOP.getExecutionContext();
             java.util.Map value = (java.util.Map) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
 
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
             {
-                // Make sure the keys/values are ok for proceeding
-                ExecutionContext ec = ownerOP.getExecutionContext();
-                SCOUtils.validateObjectsForWriting(ec, value.keySet());
-                SCOUtils.validateObjectsForWriting(ec, value.values());
+                if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
+                {
+                    // Make sure all persistable keys/values have ObjectProviders
+                    Set entries = value.entrySet();
+                    Iterator iter = entries.iterator();
+                    while (iter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)iter.next();
+                        if (mmd.getMap().keyIsPersistent())
+                        {
+                            Object key = entry.getKey();
+                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                        if (mmd.getMap().valueIsPersistent())
+                        {
+                            Object val = entry.getValue();
+                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                    }
+                }
             }
 
             // Generate the contents for the BLOB
@@ -86,14 +110,37 @@ public class OracleMapMapping extends MapMapping
     {
         if (containerIsStoredInSingleColumn())
         {
-            java.util.Map value = (java.util.Map) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = ownerOP.getExecutionContext();
+            Map value = (Map) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
-                // Make sure the keys/values are ok for proceeding
-                ExecutionContext ec = ownerOP.getExecutionContext();
-                SCOUtils.validateObjectsForWriting(ec, value.keySet());
-                SCOUtils.validateObjectsForWriting(ec, value.values());
+                if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
+                {
+                    // Make sure all persistable keys/values have ObjectProviders
+                    Set entries = value.entrySet();
+                    Iterator iter = entries.iterator();
+                    while (iter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)iter.next();
+                        if (mmd.getMap().keyIsPersistent())
+                        {
+                            Object key = entry.getKey();
+                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                        if (mmd.getMap().valueIsPersistent())
+                        {
+                            Object val = entry.getValue();
+                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                    }
+                }
             }
 
             postInsert(ownerOP);

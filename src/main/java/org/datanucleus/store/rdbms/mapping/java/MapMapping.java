@@ -73,9 +73,32 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
             {
-                // Make sure the keys/values are ok for proceeding
-                SCOUtils.validateObjectsForWriting(ec, value.keySet());
-                SCOUtils.validateObjectsForWriting(ec, value.values());
+                if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
+                {
+                    // Make sure all persistable keys/values have ObjectProviders
+                    Set entries = value.entrySet();
+                    Iterator iter = entries.iterator();
+                    while (iter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)iter.next();
+                        if (mmd.getMap().keyIsPersistent())
+                        {
+                            Object key = entry.getKey();
+                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                        if (mmd.getMap().valueIsPersistent())
+                        {
+                            Object val = entry.getValue();
+                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                    }
+                }
             }
             return;
         }
@@ -166,9 +189,32 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
             {
-                // Make sure the keys/values are ok for proceeding
-                SCOUtils.validateObjectsForWriting(ec, value.keySet());
-                SCOUtils.validateObjectsForWriting(ec, value.values());
+                if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
+                {
+                    // Make sure all persistable keys/values have ObjectProviders
+                    Set entries = value.entrySet();
+                    Iterator iter = entries.iterator();
+                    while (iter.hasNext())
+                    {
+                        Map.Entry entry = (Map.Entry)iter.next();
+                        if (mmd.getMap().keyIsPersistent())
+                        {
+                            Object key = entry.getKey();
+                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                        if (mmd.getMap().valueIsPersistent())
+                        {
+                            Object val = entry.getValue();
+                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            {
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            }
+                        }
+                    }
+                }
             }
             return;
         }

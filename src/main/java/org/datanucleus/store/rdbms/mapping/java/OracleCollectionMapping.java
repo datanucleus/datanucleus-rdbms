@@ -25,12 +25,10 @@ import java.util.Collection;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
-import org.datanucleus.store.types.SCOUtils;
 
 /**
- * Oracle variant of the CollectionMapping for cases where we are serialising
- * the field into a single column. This is necessary so we can intercept perform
- * any necessary postInsert, postUpdate nonsense for inserting BLOBs
+ * Oracle variant of the CollectionMapping for cases where we are serialising the field into a single column. 
+ * This is necessary so we can perform any necessary postInsert, postUpdate nonsense for inserting BLOBs.
  */
 public class OracleCollectionMapping extends CollectionMapping
 {
@@ -46,8 +44,22 @@ public class OracleCollectionMapping extends CollectionMapping
             ExecutionContext ec = ownerOP.getExecutionContext();
             Collection value = (Collection) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
 
-            // Make sure the elements are ok for proceeding
-            SCOUtils.validateObjectsForWriting(ec, value);
+            if (value != null)
+            {
+                if (mmd.getCollection().elementIsPersistent())
+                {
+                    // Make sure all persistable elements have ObjectProviders
+                    Object[] collElements = value.toArray();
+                    for (Object elem : collElements)
+                    {
+                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        {
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                        }
+                    }
+                }
+            }
 
             // Generate the contents for the BLOB
             byte[] bytes = new byte[0];
@@ -85,8 +97,22 @@ public class OracleCollectionMapping extends CollectionMapping
             ExecutionContext ec = ownerOP.getExecutionContext();
             Collection value = (Collection) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
 
-            // Make sure the elements are ok for proceeding
-            SCOUtils.validateObjectsForWriting(ec, value);
+            if (value != null)
+            {
+                if (mmd.getCollection().elementIsPersistent())
+                {
+                    // Make sure all persistable elements have ObjectProviders
+                    Object[] collElements = value.toArray();
+                    for (Object elem : collElements)
+                    {
+                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        {
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                        }
+                    }
+                }
+            }
 
             postInsert(ownerOP);
         }
