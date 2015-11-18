@@ -27,7 +27,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.scostore.ArrayStore;
-import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -82,15 +81,26 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         Object value = ownerOP.provideField(getAbsoluteFieldNumber());
-        if (containerIsStoredInSingleColumn())
+        if (value == null)
         {
-            // Check that the elements are not managed by other PM, or are not yet persisted
-            SCOUtils.validateObjectsForWriting(ec, value);
             return;
         }
 
-        if (value == null)
+        if (containerIsStoredInSingleColumn())
         {
+            if (mmd.getArray().elementIsPersistent())
+            {
+                // Make sure all persistable elements have ObjectProviders
+                Object[] arrElements = (Object[])value;
+                for (Object elem : arrElements)
+                {
+                    ObjectProvider elemOP = ec.findObjectProvider(elem);
+                    if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                    {
+                        elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                    }
+                }
+            }
             return;
         }
 
@@ -222,8 +232,22 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         Object value = ownerOP.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
-            // Check that the elements are not managed by other PM, or are not yet persisted
-            SCOUtils.validateObjectsForWriting(ec, value);
+            if (value != null)
+            {
+                if (mmd.getArray().elementIsPersistent())
+                {
+                    // Make sure all persistable elements have ObjectProviders
+                    Object[] arrElements = (Object[])value;
+                    for (Object elem : arrElements)
+                    {
+                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                        {
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                        }
+                    }
+                }
+            }
             return;
         }
 

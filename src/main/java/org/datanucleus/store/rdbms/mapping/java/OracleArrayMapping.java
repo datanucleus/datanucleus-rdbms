@@ -29,12 +29,12 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
-import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
 /**
- * Mapping for arrays for Oracle.
+ * Oracle variant of the ArrayMapping for cases where we are serialising the field into a single column. 
+ * This is necessary so we can perform any necessary postInsert, postUpdate nonsense for inserting BLOBs.
  */
 public class OracleArrayMapping extends ArrayMapping
 {
@@ -52,7 +52,20 @@ public class OracleArrayMapping extends ArrayMapping
                 return;
             }
             ExecutionContext ec = ownerOP.getExecutionContext();
-            SCOUtils.validateObjectsForWriting(ec, value);
+
+            if (mmd.getArray().elementIsPersistent())
+            {
+                // Make sure all persistable elements have ObjectProviders
+                Object[] arrElements = (Object[])value;
+                for (Object elem : arrElements)
+                {
+                    ObjectProvider elemOP = ec.findObjectProvider(elem);
+                    if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                    {
+                        elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                    }
+                }
+            }
 
             // Generate the contents for the BLOB
             byte[] bytes = new byte[0];
