@@ -81,7 +81,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                     while (iter.hasNext())
                     {
                         Map.Entry entry = (Map.Entry)iter.next();
-                        if (mmd.getMap().keyIsPersistent())
+                        if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
@@ -89,7 +89,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                                 ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
                             }
                         }
-                        if (mmd.getMap().valueIsPersistent())
+                        if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
@@ -197,7 +197,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                     while (iter.hasNext())
                     {
                         Map.Entry entry = (Map.Entry)iter.next();
-                        if (mmd.getMap().keyIsPersistent())
+                        if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
@@ -205,7 +205,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                                 ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
                             }
                         }
-                        if (mmd.getMap().valueIsPersistent())
+                        if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
