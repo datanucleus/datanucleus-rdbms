@@ -372,42 +372,46 @@ public abstract class AbstractClassTable extends TableImpl
                     " for the column type, using " + valueGeneratedType.getName() + " since the datastore requires that");
             }
         }
-        try
+        else
         {
-            // Create generator so we can find the generated type
-            // a). Try as unique generator first
-            AbstractGenerator generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+            try
+            {
+                // Create generator so we can find the generated type
+                // a). Try as unique generator first
+                AbstractGenerator generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
                     "org.datanucleus.store_valuegenerator", 
                     new String[] {"name", "unique"}, new String[] {strategyName, "true"},
                     "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
-            if (generator == null)
-            {
-                // b). Try as datastore-specific generator
-                generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_valuegenerator",
-                    new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
-                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
-            }
-            try
-            {
+                if (generator == null)
+                {
+                    // b). Try as datastore-specific generator
+                    generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                        "org.datanucleus.store_valuegenerator",
+                        new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
+                        "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+                }
                 if (generator != null)
                 {
-                    ParameterizedType parameterizedType = (ParameterizedType) generator.getClass().getGenericSuperclass();
-                    valueGeneratedType = (Class) parameterizedType.getActualTypeArguments()[0];
-                    if (valueGeneratedType == null)
+                    try
                     {
                         // Use getStorageClass method if available
                         valueGeneratedType = (Class) generator.getClass().getMethod("getStorageClass").invoke(null);
+                    }
+                    catch (Exception e)
+                    {
+                        if (generator.getClass().getGenericSuperclass() instanceof ParameterizedType)
+                        {
+                            // TODO Improve this so it works always
+                            ParameterizedType parameterizedType = (ParameterizedType) generator.getClass().getGenericSuperclass();
+                            valueGeneratedType = (Class) parameterizedType.getActualTypeArguments()[0];
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
+                NucleusLogger.VALUEGENERATION.warn("Error obtaining generator for strategy=" + strategyName, e);
             }
-        }
-        catch (Exception e)
-        {
-            NucleusLogger.VALUEGENERATION.warn("Error obtaining generator for strategy=" + strategyName, e);
         }
 
         storeMgr.getMappingManager().createDatastoreMapping(datastoreIDMapping, idColumn, valueGeneratedType.getName());
