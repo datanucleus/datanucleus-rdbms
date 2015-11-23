@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2003 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2015 Jeff Albion and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2015 Jeff Albion - New SAP SQL Anywhere Adapter
     ...
 **********************************************************************/
 package org.datanucleus.store.rdbms.adapter;
@@ -70,69 +69,88 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     public SQLAnywhereAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
-        
+
         // Determine the build versions of the database / driver
-        try { 
-            datastoreBuildVersion = Integer.parseInt(datastoreProductVersion.substring(datastoreProductVersion.lastIndexOf(".")+1));
-            if (driverName.equals("SQL Anywhere JDBC Driver")){
+        try
+        {
+            datastoreBuildVersion = Integer.parseInt(datastoreProductVersion.substring(datastoreProductVersion.lastIndexOf(".") + 1));
+            if (driverName.equals("SQL Anywhere JDBC Driver"))
+            {
                 usingjConnect = false;
-                driverBuildVersion = Integer.parseInt(driverVersion.substring(driverVersion.lastIndexOf(".")+1));
-            } else {
+                driverBuildVersion = Integer.parseInt(driverVersion.substring(driverVersion.lastIndexOf(".") + 1));
+            }
+            else
+            {
                 // Assume jConnect if it isn't SQLAJDBC
                 // TODO: jConnect version detection
                 driverBuildVersion = -1;
             }
-        } catch ( Throwable t ) {
+        }
+        catch (Throwable t)
+        {
             // Parsing error for the version, ignore
         }
-        
+
         // Determine the keyword list. This list is obtained from the JDBC driver using
         // DatabaseMetaData.getSQLKeywords(), but there are also user configurable options
         // Instead, attempt to query the set of reserved words for SQL Anywhere directly.
-        try {
-        	// Query the standard keywords
+        try
+        {
+            // Query the standard keywords
             Connection conn = metadata.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT \"reserved_word\" FROM sa_reserved_words() ORDER BY \"reserved_word\"");
-            while (rs.next()){
+            while (rs.next())
+            {
                 reservedKeywords.add(rs.getString(1).trim().toUpperCase());
             }
             rs.close();
             // Also use user-specified keywords, if they are specified
-            rs = stmt.executeQuery("SELECT \"option\", \"setting\" FROM SYS.SYSOPTION" + 
-                                   " WHERE \"option\" = 'reserved_keywords' or \"option\" = 'non_keywords'");
-            while (rs.next()){
-                if (rs.getString(1).toLowerCase().equals("reserved_keywords")){
+            rs = stmt.executeQuery("SELECT \"option\", \"setting\" FROM SYS.SYSOPTION" +
+                    " WHERE \"option\" = 'reserved_keywords' or \"option\" = 'non_keywords'");
+            while (rs.next())
+            {
+                if (rs.getString(1).toLowerCase().equals("reserved_keywords"))
+                {
                     String originalUserKeywords = rs.getString(2).trim().toUpperCase();
                     StringTokenizer tokens = new StringTokenizer(originalUserKeywords, ",");
                     Set<String> userReservedWordSet = new HashSet();
-                    while (tokens.hasMoreTokens()){
+                    while (tokens.hasMoreTokens())
+                    {
                         userReservedWordSet.add(tokens.nextToken().trim().toUpperCase());
                     }
                     // If LIMIT isn't enabled by the customized database keywords, set it to enable LIMIT
-                    if (!userReservedWordSet.contains("LIMIT")){
+                    if (!userReservedWordSet.contains("LIMIT"))
+                    {
                         userReservedWordSet.add("LIMIT");
                         conn.createStatement().executeUpdate("SET OPTION PUBLIC.reserved_keywords = 'LIMIT" +
-                           (originalUserKeywords.length() != 0 ? "," : "" ) + originalUserKeywords + "'");
+                                (originalUserKeywords.length() != 0 ? "," : "") + originalUserKeywords + "'");
                     }
                     reservedKeywords.addAll(userReservedWordSet);
-                // Allow the user to override and remove keywords for compatibility, if necessary
-                } else if (rs.getString(1).toLowerCase().equals("non_keywords")) {
+                    // Allow the user to override and remove keywords for compatibility, if necessary
+                }
+                else if (rs.getString(1).toLowerCase().equals("non_keywords"))
+                {
                     reservedKeywords.removeAll(
                         StringUtils.convertCommaSeparatedStringToSet(rs.getString(2).trim().toUpperCase()));
                 }
             }
             rs.close();
             stmt.close();
-        } catch (Throwable t){
+        }
+        catch (Throwable t)
+        {
             // JDBC metadata is still used for keywords, and assume LIMIT is set elsewhere
         }
-        
+
         // Provide supported / unsupported capabilities for SQL Anywhere
         // See: DatastoreAdapter.java for options, BaseDatastoreAdapter.java for defaults
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(STORED_PROCEDURES);
-        if (datastoreMajorVersion >= 12) { supportedOptions.add(SEQUENCES); }
+        if (datastoreMajorVersion >= 12)
+        {
+            supportedOptions.add(SEQUENCES);
+        }
         supportedOptions.add(PROJECTION_IN_TABLE_REFERENCE_JOINS);
         supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(CATALOGS_IN_TABLE_DEFINITIONS);
@@ -151,14 +169,14 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_OPTION_PLACED_AFTER_FROM);
         supportedOptions.add(OPERATOR_BITWISE_AND);
         supportedOptions.add(OPERATOR_BITWISE_OR);
-        supportedOptions.add(OPERATOR_BITWISE_XOR);     
-        supportedOptions.remove(GET_GENERATED_KEYS_STATEMENT);                  // Statement.getGeneratedKeys() not supported
-        supportedOptions.remove(DEFERRED_CONSTRAINTS);                          // No
-        supportedOptions.remove(ANSI_JOIN_SYNTAX);                              // Deprecated
-        supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX);                         // Deprecated
-        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);        // No
-        supportedOptions.remove(BOOLEAN_COMPARISON);                            // No
-                
+        supportedOptions.add(OPERATOR_BITWISE_XOR);
+        supportedOptions.remove(GET_GENERATED_KEYS_STATEMENT); // Statement.getGeneratedKeys() not supported
+        supportedOptions.remove(DEFERRED_CONSTRAINTS); // No
+        supportedOptions.remove(ANSI_JOIN_SYNTAX); // Deprecated
+        supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX); // Deprecated
+        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION); // No
+        supportedOptions.remove(BOOLEAN_COMPARISON); // No
+
         // Add the supported and unsupported JDBC types for lookups
         supportedJdbcTypesById.clear();
         supportedJdbcTypesById.put(Integer.valueOf(Types.BIGINT), "BIGINT");
@@ -189,13 +207,13 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         supportedJdbcTypesById.put(Integer.valueOf(Types.NCLOB), "LONG NVARCHAR");
         supportedJdbcTypesById.put(Integer.valueOf(Types.OTHER), "OTHER");
         unsupportedJdbcTypesById.clear();
-        unsupportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY");     // Maybe...?
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY"); // Maybe...?
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.DATALINK), "DATALINK");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.DISTINCT), "DISTINCT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.JAVA_OBJECT), "JAVA_OBJECT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.NULL), "NULL");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
-        unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");   // Maybe ROW would work here?
+        unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT"); // Maybe ROW would work here?
     }
 
     /**
@@ -206,7 +224,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn)
     {
         // Initialise the mappings available. Load all possible, and remove unsupported for this datastore
-        RDBMSStoreManager storeMgr = (RDBMSStoreManager)handler.getStoreManager();
+        RDBMSStoreManager storeMgr = (RDBMSStoreManager) handler.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
         MappingManager mapMgr = storeMgr.getMappingManager();
@@ -215,49 +233,47 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         // Load the types from plugin(s)
         handler.getSchemaData(mconn.getConnection(), "types", null);
     }
-    
+
     /**
-     * Returns the appropriate SQL to add a candidate key to its table.
-     * It should return something like:
+     * Returns the appropriate SQL to add a candidate key to its table. It should return something like:
+     * 
      * <pre>
      * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
      * ALTER TABLE FOO ADD UNIQUE (BAZ)
      * </pre>
-     *
      * @param ck An object describing the candidate key.
      * @param factory Identifier factory
      * @return The text of the SQL statement.
      */
     public String getAddCandidateKeyStatement(CandidateKey ck, IdentifierFactory factory)
     {
-	return super.getAddCandidateKeyStatement( ck, factory );
+        return super.getAddCandidateKeyStatement(ck, factory);
     }
-    
+
     public String getVendorID()
     {
         return "sqlanywhere";
     }
 
     public String getCreateDatabaseStatement(String catalogName, String schemaName)
-      throws UnsupportedOperationException
+        throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException("SQL Anywhere does not support CREATE DATABASE via a schema name");
     }
-    
+
     public String getDropDatabaseStatement(String catalogName, String schemaName)
-      throws UnsupportedOperationException
+        throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException("SQL Anywhere does not support DROP DATABASE via a schema name");
     }
 
     /**
-     * Returns the appropriate SQL to create the given table having the given
-     * columns. No column constraints or key definitions should be included.
-     * It should return something like:
+     * Returns the appropriate SQL to create the given table having the given columns. No column constraints
+     * or key definitions should be included. It should return something like:
+     * 
      * <pre>
      * CREATE TABLE FOO ( BAR VARCHAR(30), BAZ INTEGER )
      * </pre>
-     *
      * @param table The table to create.
      * @param columns The columns of the table.
      * @param props Properties for controlling the table creation
@@ -275,9 +291,9 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
 
         // CREATE TABLE with column specifiers
         createStmt.append("CREATE TABLE ").append(table.toString())
-                  .append(getContinuationString())
-                  .append("(")
-                  .append(getContinuationString());
+            .append(getContinuationString())
+            .append("(")
+            .append(getContinuationString());
         for (int i = 0; i < columns.length; ++i)
         {
             if (i > 0)
@@ -343,7 +359,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
                     }
                     uniqueConstraintStmt.append(columns[i].getIdentifier().toString());
                 }
-            }       
+            }
             if (uniqueConstraintStmt.length() > 1)
             {
                 uniqueConstraintStmt.append(")");
@@ -384,18 +400,18 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         if (supportsOption(CHECK_IN_END_CREATE_STATEMENTS))
         {
             StringBuilder checkConstraintStmt = new StringBuilder();
-	        for (int i = 0; i < columns.length; ++i)
-	        {
-	            if (columns[i].getConstraints() != null)
-	            {
-	                checkConstraintStmt.append(",").append(getContinuationString());
-	                checkConstraintStmt.append(indent).append(columns[i].getConstraints());
-	            }
-	        }
-	        if (checkConstraintStmt.length() > 1)
-	        {
-	            createStmt.append(checkConstraintStmt.toString());
-	        }
+            for (int i = 0; i < columns.length; ++i)
+            {
+                if (columns[i].getConstraints() != null)
+                {
+                    checkConstraintStmt.append(",").append(getContinuationString());
+                    checkConstraintStmt.append(indent).append(columns[i].getConstraints());
+                }
+            }
+            if (checkConstraintStmt.length() > 1)
+            {
+                createStmt.append(checkConstraintStmt.toString());
+            }
         }
 
         createStmt.append(getContinuationString()).append(")");
@@ -404,19 +420,18 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the DROP TABLE statement for SQL Anywhere
-     * SQL Anywhere doesn't support CASCADE so just return a simple 'DROP TABLE table-name'
+     * Accessor for the DROP TABLE statement for SQL Anywhere SQL Anywhere doesn't support CASCADE so just
+     * return a simple 'DROP TABLE table-name'
      * @param table The table to drop.
      * @return The DROP TABLE statement
      **/
-	public String getDropTableStatement(Table table)
-	{
-		return "DROP TABLE " + table.toString();
-	}
-	
-	/**
-     * The option to specify in "SELECT ... WITH (option)" to lock instances
-     * Null if not supported.
+    public String getDropTableStatement(Table table)
+    {
+        return "DROP TABLE " + table.toString();
+    }
+
+    /**
+     * The option to specify in "SELECT ... WITH (option)" to lock instances Null if not supported.
      * @return The option to specify with "SELECT ... WITH (option)"
      **/
     public String getSelectWithLockOption()
@@ -425,8 +440,8 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method to return the basic SQL for a DELETE TABLE statement.
-     * Returns the String as <code>DELETE MYTABLE FROM MYTABLE t1</code>.
+     * Method to return the basic SQL for a DELETE TABLE statement. Returns the String as
+     * <code>DELETE MYTABLE FROM MYTABLE t1</code>.
      * @param tbl The SQLTable to delete
      * @return The delete table string
      */
@@ -443,8 +458,8 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      */
     public String getAddPrimaryKeyStatement(PrimaryKey pk, IdentifierFactory factory)
     {
-        return null;   // supported in CREATE TABLE...
-        //return "ALTER TABLE " + pk.getTable().toString() + " ADD " +  pk.toString();
+        return null; // supported in CREATE TABLE...
+        // return "ALTER TABLE " + pk.getTable().toString() + " ADD " + pk.toString();
     }
 
     /**
@@ -456,13 +471,13 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     public String getAddForeignKeyStatement(ForeignKey fk, IdentifierFactory factory)
     {
         return null;
-        //return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk.toString();
+        // return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk.toString();
     }
-    
+
     /**
-     * Method to return the SQLText for an UPDATE TABLE statement.
-     * Returns the SQLText for <code>UPDATE T1 SET x1 = val1, x2 = val2 FROM MYTBL T1</code>.
-     * Override if the datastore doesn't support that standard syntax.
+     * Method to return the SQLText for an UPDATE TABLE statement. Returns the SQLText for
+     * <code>UPDATE T1 SET x1 = val1, x2 = val2 FROM MYTBL T1</code>. Override if the datastore doesn't
+     * support that standard syntax.
      * @param tbl The primary table
      * @param setSQL The SQLText for the SET component
      * @return SQLText for the update statement
@@ -499,12 +514,12 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         short dataType = info.getDataType();
         switch (dataType)
         {
-            case Types.DATE:
-            case Types.TIME:
-            case Types.TIMESTAMP:
-                info.setDecimalDigits(0);  // Ensure this is set to 0
+            case Types.DATE :
+            case Types.TIME :
+            case Types.TIMESTAMP :
+                info.setDecimalDigits(0); // Ensure this is set to 0
                 break;
-            default:
+            default :
                 break;
         }
 
@@ -530,10 +545,10 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     {
         return "NOT NULL DEFAULT AUTOINCREMENT";
     }
-    
+
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequence_name Name of the sequence
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
@@ -548,7 +563,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
-        
+
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
         stmt.append(sequence_name);
         if (min != null)
@@ -584,28 +599,30 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * @param conn Connection to database
      * @param catalogName Database catalog name
      * @param schemaName Database schema name
-     * @param sequence_name Name of the sequence 
+     * @param sequence_name Name of the sequence
      * @return The statement for getting the next id for the sequence
-     * @throws SQLException 
+     * @throws SQLException
      **/
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
     {
-        try {
-	    	Statement stmt = conn.createStatement();
-	        ResultSet rs = stmt.executeQuery("SELECT 1 FROM SYS.SYSSEQUENCE WHERE SEQUENCENAME = '" + seqName + "'");
-	        boolean sequenceFound = rs.next();
-	        rs.close();
-	        stmt.close();
-	        return sequenceFound;
-        } catch (Throwable t){
-        	return false;
+        try
+        {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT 1 FROM SYS.SYSSEQUENCE WHERE SEQUENCENAME = '" + seqName + "'");
+            boolean sequenceFound = rs.next();
+            rs.close();
+            stmt.close();
+            return sequenceFound;
+        }
+        catch (Throwable t)
+        {
+            return false;
         }
     }
-    
+
     /**
-     * Accessor for the statement for getting the next id from the sequence
-     * for this datastore.
-     * @param sequence_name Name of the sequence 
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequence_name Name of the sequence
      * @return The statement for getting the next id for the sequence
      **/
     public String getSequenceNextStmt(String sequence_name)
@@ -615,33 +632,33 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
-        StringBuilder stmt=new StringBuilder("SELECT ");
+        StringBuilder stmt = new StringBuilder("SELECT ");
         stmt.append(sequence_name);
         stmt.append(".nextval");
 
         return stmt.toString();
     }
-    
+
     /**
-     * The function to creates a unique value of type uniqueidentifier.
-     * SQL Anywhere generates 36-character hex uuids, with hypens
+     * The function to creates a unique value of type uniqueidentifier. SQL Anywhere generates 36-character
+     * hex uuids, with hypens
      * @return The SQL statement. e.g. "SELECT newid()"
      **/
     public String getSelectNewUUIDStmt()
     {
         return "SELECT newid()";
     }
-    
+
     /**
-     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle
-     * restriction of ranges using the LIMIT keyword.
+     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle restriction of
+     * ranges using the LIMIT keyword.
      * @param offset The offset to return from
      * @param count The number of items to return
      * @return The SQL to append to allow for ranges using LIMIT.
      */
     public String getRangeByLimitEndOfStatementClause(long offset, long count)
-       throws UnsupportedOperationException
-    
+        throws UnsupportedOperationException
+
     {
         if (offset >= 0 && count > 0)
         {
