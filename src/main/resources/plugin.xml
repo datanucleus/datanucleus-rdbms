@@ -1308,5 +1308,6 @@ Contributors:
         <datastore-adapter vendor-id="timesten" class-name="org.datanucleus.store.rdbms.adapter.TimesTenAdapter" priority="0"/>
         <datastore-adapter vendor-id="sqlite" class-name="org.datanucleus.store.rdbms.adapter.SQLiteAdapter" priority="0"/>
         <datastore-adapter vendor-id="virtuoso" class-name="org.datanucleus.store.rdbms.adapter.VirtuosoAdapter" priority="0"/>
+        <datastore-adapter vendor-id="sqlanywhere" class-name="org.datanucleus.store.rdbms.adapter.SQLAnywhereAdapter" priority="0"/>
     </extension>
 </plugin>
