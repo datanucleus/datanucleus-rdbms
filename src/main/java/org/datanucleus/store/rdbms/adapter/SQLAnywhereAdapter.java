@@ -31,14 +31,10 @@ import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.key.CandidateKey;
-import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -46,7 +42,6 @@ import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
-import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
@@ -217,24 +212,6 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Initialise the types for this datastore.
-     * @param handler SchemaHandler that we initialise the types for
-     * @param mconn Managed connection to use
-     */
-    public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn)
-    {
-        // Initialise the mappings available. Load all possible, and remove unsupported for this datastore
-        RDBMSStoreManager storeMgr = (RDBMSStoreManager) handler.getStoreManager();
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        MappingManager mapMgr = storeMgr.getMappingManager();
-        mapMgr.loadDatastoreMapping(pluginMgr, clr, getVendorID());
-
-        // Load the types from plugin(s)
-        handler.getSchemaData(mconn.getConnection(), "types", null);
-    }
-
-    /**
      * Returns the appropriate SQL to add a candidate key to its table. It should return something like:
      * 
      * <pre>
@@ -290,10 +267,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         }
 
         // CREATE TABLE with column specifiers
-        createStmt.append("CREATE TABLE ").append(table.toString())
-            .append(getContinuationString())
-            .append("(")
-            .append(getContinuationString());
+        createStmt.append("CREATE TABLE ").append(table.toString()).append(getContinuationString()).append("(").append(getContinuationString());
         for (int i = 0; i < columns.length; ++i)
         {
             if (i > 0)
