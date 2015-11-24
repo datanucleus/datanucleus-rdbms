@@ -116,6 +116,10 @@ public class SelectStatement extends SQLStatement
         {
             return primary;
         }
+        public void setAlias(String alias)
+        {
+            this.alias = alias;
+        }
         public int hashCode()
         {
             return sqlText.hashCode() ^ (alias != null ? alias.hashCode() : 0);
@@ -408,6 +412,17 @@ public class SelectStatement extends SQLStatement
         {
             // Already have a select item with this exact name so just return with that
             return selectedItems.indexOf(item) + 1;
+        }
+
+        // Check for same but previously had no alias, and now does, so put alias on existing
+        for (SelectedItem currentItem : selectedItems)
+        {
+            if (currentItem.getSQLText().toSQL().equals(st.toSQL()) && currentItem.getAlias() == null && alias != null && currentItem.isPrimary() == primary)
+            {
+                // Same but no alias on existing item, so add the alias
+                currentItem.setAlias(alias);
+                return selectedItems.indexOf(currentItem)+1;
+            }
         }
 
         int numberSelected = selectedItems.size();
