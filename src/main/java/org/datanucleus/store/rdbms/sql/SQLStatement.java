@@ -2340,25 +2340,24 @@ public class SQLStatement
                 // Order using column aliases "NUCORDER{i}"
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
-                    String orderExprAlias = "NUCORDER" + i;
-                    orderExprAlias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderExprAlias);
                     if (orderingExpressions[i] instanceof ResultAliasExpression)
                     {
                         // Nothing to do since this is ordering by a result alias
                     }
                     else if (orderingExpressions[i].getNumberOfSubExpressions() == 1 || aggregated)
                     {
+                        String alias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("NUCORDER" + i);
                         if (unions != null)
                         {
                             Iterator<SQLStatement> iterator = unions.iterator();
                             while (iterator.hasNext())
                             {
                                 SQLStatement stmt = iterator.next();
-                                stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
+                                stmt.selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : alias, !aggregated);
                             }
                         }
 
-                        selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : orderExprAlias, !aggregated);
+                        selectItem(orderingExpressions[i].toSQLText(), aggregated ? null : alias, !aggregated);
                     }
                     else
                     {
@@ -2367,7 +2366,7 @@ public class SQLStatement
                         DatastoreMapping[] mappings = m.getDatastoreMappings();
                         for (int j=0;j<mappings.length;j++)
                         {
-                            String alias = orderExprAlias + "_" + j;
+                            String alias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("NUCORDER" + i + "_" + j);
                             DatastoreIdentifier aliasId = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
                             SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
                             selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
