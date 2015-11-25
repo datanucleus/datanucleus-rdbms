@@ -1168,14 +1168,13 @@ public class SelectStatement extends SQLStatement
                 // Order using column aliases "NUCORDER{i}"
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
-                    String orderExprAlias = "NUCORDER" + i;
-                    orderExprAlias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderExprAlias);
                     if (orderingExpressions[i] instanceof ResultAliasExpression)
                     {
                         // Nothing to do since this is ordering by a result alias
                     }
                     else if (orderingExpressions[i].getNumberOfSubExpressions() == 1 || aggregated)
                     {
+                        String orderExprAlias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("NUCORDER" + i);
                         if (unions != null && allowUnions)
                         {
                             Iterator<SelectStatement> iterator = unions.iterator();
@@ -1195,7 +1194,7 @@ public class SelectStatement extends SQLStatement
                         DatastoreMapping[] mappings = m.getDatastoreMappings();
                         for (int j=0;j<mappings.length;j++)
                         {
-                            String alias = orderExprAlias + "_" + j;
+                            String alias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("NUCORDER" + i + "_" + j);
                             DatastoreIdentifier aliasId = rdbmsMgr.getIdentifierFactory().newColumnIdentifier(alias);
                             SQLColumn col = new SQLColumn(orderingExpressions[i].getSQLTable(), mappings[j].getColumn(), aliasId);
                             selectItem(new SQLText(col.getColumnSelectString()), alias, !aggregated);
