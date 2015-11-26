@@ -1138,7 +1138,6 @@ public class SelectStatement extends SQLStatement
      */
     protected void addOrderingColumnsToSelect()
     {
-        // TODO Cater for these columns already being selected but with no alias, so add the alias to the already selected column
         if (orderingExpressions != null && parent == null) // Don't do this for subqueries, since we will be selecting just the necessary column(s)
         {
             // Add any ordering columns to the SELECT
