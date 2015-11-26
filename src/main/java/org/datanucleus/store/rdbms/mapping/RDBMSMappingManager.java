@@ -362,8 +362,24 @@ public class RDBMSMappingManager implements MappingManager
             if (conv != null)
             {
                 // Create the mapping of the selected type
-                Class mc = TypeConverterMapping.class;
                 JavaTypeMapping m = null;
+                if (conv instanceof MultiColumnConverter)
+                {
+                    Class mc = TypeConverterMultiMapping.class;
+                    try
+                    {
+                        m = (JavaTypeMapping)mc.newInstance();
+                        m.setRoleForMember(FieldRole.ROLE_FIELD);
+                        ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, conv);
+                        return m;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
+                    }
+                }
+
+                Class mc = TypeConverterMapping.class;
                 try
                 {
                     m = (JavaTypeMapping)mc.newInstance();
