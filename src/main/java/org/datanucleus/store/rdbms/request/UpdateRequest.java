@@ -134,12 +134,31 @@ public class UpdateRequest extends Request
             {
                 // Version field
                 // TODO If the passed fields arent included in the statement (e.g SCO collection) update version?
-                AbstractMemberMetaData[] updateFmds = new AbstractMemberMetaData[reqFieldMetaData.length + 1];
+                int numUpdateFields = reqFieldMetaData.length;
+                boolean includesVersion = false;
+                for (int i=0;i<reqFieldMetaData.length;i++)
+                {
+                    if (reqFieldMetaData[i].getName().equals(versionMetaData.getFieldName()))
+                    {
+                        includesVersion = true;
+                        break;
+                    }
+                }
+                if (!includesVersion)
+                {
+                    numUpdateFields++;
+                }
+
+                AbstractMemberMetaData[] updateFmds = new AbstractMemberMetaData[numUpdateFields];
                 for (int i=0;i<reqFieldMetaData.length;i++)
                 {
                     updateFmds[i] = reqFieldMetaData[i];
                 }
-                updateFmds[updateFmds.length-1] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
+                if (!includesVersion)
+                {
+                    // Version not updated, so add it since we will be updating it
+                    updateFmds[updateFmds.length-1] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
+                }
                 table.provideMappingsForMembers(consumer, updateFmds, false);
             }
             else
@@ -378,8 +397,7 @@ public class UpdateRequest extends Request
                         {
                             // No object updated so either object disappeared or failed optimistic version checks
                             // TODO Batching : when we use batching here we need to process these somehow
-                            String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
-                                "" + currentVersion);
+                            String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + currentVersion);
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusOptimisticException(msg, op.getObject());
                         }
