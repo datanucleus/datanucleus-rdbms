@@ -142,6 +142,12 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         // Not present in PSQL 9.2.8 - just mirror what SMALLINT does
         sqlType = new PostgresqlTypeInfo("int2", (short)Types.TINYINT, 0, null, null, null, 1, false, (short)3, false, false, false, "int2", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
+
+        // Not present in PSQL 9.2.8
+        sqlType = new PostgresqlTypeInfo("text array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "text array", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
+        sqlType = new PostgresqlTypeInfo("int array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "int array", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
     }
 
     /**
@@ -182,6 +188,9 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
 
             // TODO Enable alternative OTHER types
             psqlTypes.put("" + Types.OTHER, "uuid");
+
+            psqlTypes.put("" + Types.ARRAY, "VARCHAR(255) ARRAY");
+            psqlTypes.put("" + Types.ARRAY, "INT ARRAY");
 
             // PostgreSQL provides 2 types for "char" mappings - "char" and "bpchar". PostgreSQL recommend
             // bpchar for default usage, but sadly you cannot say "bpchar(200)" in an SQL statement. Due to

@@ -32,27 +32,32 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ColumnMetaData;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.exceptions.NoDatastoreMappingException;
+import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 
 /**
- * Mapping for a field that represents a container of objects, such as a List,
- * a Set, a Collection, a Map, or an array. Has an owner table. 
+ * Mapping for a field that represents a container of objects, such as a List, a Set, a Collection, a Map, or an array. Has an owner table.
  * Can be represented in the following ways :-
  * <ul>
  * <li>Using a Join-Table, where the linkage between owner and elements/keys/values is stored in this table</li>
  * <li>Using a Foreign-Key in the element/key/value</li>
- * <li>Serialised into a single column in the owner table.</li>
  * <li>Embedded into the Join-Table</li>
  * <li>Serialised into a single-column in the Join-Table</li>
+ * <li>In a single column in the owner table, using serialisation</li>
+ * <li>In a single column in the owner table, using a converter</li>
  * </ul>
- * The contents of the container are backed by a store, handling interfacing with the datastore.
+ * The contents of the container are typically backed by a store, handling interfacing with the datastore. 
+ * Note that when storing in a single column there is no backing store.
  */
 public abstract class AbstractContainerMapping extends SingleFieldMapping
 {
@@ -96,13 +101,31 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         if (containerIsStoredInSingleColumn())
         {
             // Serialised collections/maps/arrays should just create a (typically BLOB) column as normal in the owning table
-            super.prepareDatastoreMapping();
+            MappingManager mmgr = storeMgr.getMappingManager();
+            ColumnMetaData colmd = null;
+            ColumnMetaData[] colmds = mmd.getColumnMetaData();
+            if (colmds != null && colmds.length > 0)
+            {
+                // Try the field column info
+                colmd = colmds[0];
+            }
+            else if (mmd.hasCollection() || mmd.hasArray())
+            {
+                // Fallback to the element column info
+                colmds = mmd.getElementMetaData().getColumnMetaData();
+                if (colmds != null && colmds.length > 0)
+                {
+                    colmd = colmds[0];
+                }
+            }
+
+            Column col = mmgr.createColumn(this, getJavaTypeForDatastoreMapping(0), colmd);
+            mmgr.createDatastoreMapping(this, mmd, 0, col);
         }
     }
 
     /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore
-     * field. This java-type must have an entry in the datastore mappings.
+     * Accessor for the name of the java-type actually used when mapping the particular datastore field. This java-type must have an entry in the datastore mappings.
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
@@ -110,6 +133,19 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     {
         if (containerIsStoredInSingleColumn())
         {
+            if (mmd.hasCollection() || mmd.hasArray())
+            {
+                ColumnMetaData[] colmds = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null);
+                if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                {
+                    // Check for using JDBC ARRAY type
+                    if (colmds[0].getJdbcType().equals(JdbcType.ARRAY))
+                    {
+                        return Collection.class.getName();
+                    }
+                }
+            }
+
             // Serialised container so just return serialised
             return ClassNameConstants.JAVA_IO_SERIALIZABLE;
         }

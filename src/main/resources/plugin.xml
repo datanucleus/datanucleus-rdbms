@@ -719,6 +719,16 @@ Contributors:
             <includes vendor-id="postgresql"/>
         </mapping>
 
+        <!-- Use Collection as the way to signal that we want an ARRAY type. -->
+        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="TEXT ARRAY" default="false"
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
+            <includes vendor-id="postgresql"/>
+        </mapping>
+        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="INT ARRAY" default="false"
+            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
+            <includes vendor-id="postgresql"/>
+        </mapping>
+
         <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true"
             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping">
         </mapping>
