@@ -112,7 +112,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             else if (mmd.hasCollection() || mmd.hasArray())
             {
                 // Fallback to the element column info
-                colmds = mmd.getElementMetaData().getColumnMetaData();
+                colmds = (mmd.getElementMetaData() != null) ? mmd.getElementMetaData().getColumnMetaData() : null;
                 if (colmds != null && colmds.length > 0)
                 {
                     colmd = colmds[0];
