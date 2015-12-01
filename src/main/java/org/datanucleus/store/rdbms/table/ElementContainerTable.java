@@ -129,7 +129,16 @@ public abstract class ElementContainerTable extends JoinTable
             columnMetaData = relatedMmds[0].getElementMetaData().getColumnMetaData();
         }
 
-        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+        try
+        {
+            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+        }
+        catch (NoTableManagedException ntme)
+        {
+            // Maybe this is a join table from an embedded object, so no table to link back to
+            throw new NucleusUserException("Table " + toString() + " for member=" + mmd.getFullFieldName() +
+                " needs a column to link back to its owner, yet the owner type (" + ownerType + ") has no table of its own (embedded?)");
+        }
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
