@@ -30,6 +30,7 @@ import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.DuplicateColumnException;
+import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
@@ -99,16 +100,17 @@ public final class ColumnCreator
      * @param nullable Whether this field is to be nullable
      * @param fieldRole The role of the mapping within this field
      * @param clr ClassLoader resolver
+     * @param ownerTable Table of the owner of this field (optional, for the case where the field is embedded so we can link back).
      * @return The java type mapping for this field
      */
     public static JavaTypeMapping createColumnsForJoinTables(Class javaType, AbstractMemberMetaData mmd, ColumnMetaData[] columnMetaData, RDBMSStoreManager storeMgr, Table table,
-            boolean primaryKey, boolean nullable, FieldRole fieldRole, ClassLoaderResolver clr)
+            boolean primaryKey, boolean nullable, FieldRole fieldRole, ClassLoaderResolver clr, Table ownerTable)
     {
         // Collection<PC>, Map<PC>, PC[]
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(javaType, false, false, mmd.getFullFieldName());
         mapping.setTable(table);
         // TODO Remove this when PCMapping creates its own columns
-        createColumnsForField(javaType, mapping, table, storeMgr, mmd, primaryKey, nullable, false, false, fieldRole, columnMetaData, clr, false);
+        createColumnsForField(javaType, mapping, table, storeMgr, mmd, primaryKey, nullable, false, false, fieldRole, columnMetaData, clr, false, ownerTable);
         return mapping;
     }
 
@@ -127,11 +129,12 @@ public final class ColumnCreator
      * @param columnMetaData MetaData for the column(s)
      * @param clr ClassLoader resolver
      * @param isReferenceField Whether this field is part of a reference field
+     * @param ownerTable Table of the owner of this member (optional, for when the member is embedded)
      * @return The JavaTypeMapping for the table
      */
     public static JavaTypeMapping createColumnsForField(Class javaType, JavaTypeMapping mapping, Table table, RDBMSStoreManager storeMgr, AbstractMemberMetaData mmd,
             boolean isPrimaryKey, boolean isNullable, boolean serialised, boolean embedded,
-            FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr, boolean isReferenceField)
+            FieldRole fieldRole, ColumnMetaData[] columnMetaData, ClassLoaderResolver clr, boolean isReferenceField, Table ownerTable)
     {
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         if (mapping instanceof ReferenceMapping || mapping instanceof PersistableMapping)
@@ -146,7 +149,22 @@ public final class ColumnCreator
             }
 
             // Get the table that we want our column to be a FK to. This could be the owner table, element table, key table, value table etc
-            DatastoreClass destinationTable = storeMgr.getDatastoreClass(javaType.getName(), clr);
+            DatastoreClass destinationTable = null;
+            try
+            {
+                destinationTable = storeMgr.getDatastoreClass(javaType.getName(), clr);
+            }
+            catch (NoTableManagedException ntme)
+            {
+                if (ownerTable != null && ownerTable instanceof DatastoreClass)
+                {
+                    destinationTable = (DatastoreClass)ownerTable;
+                }
+                else
+                {
+                    throw ntme;
+                }
+            }
             if (destinationTable == null)
             {
                 // Maybe the owner hasn't got its own table (e.g "subclass-table" inheritance strategy)
@@ -160,6 +178,7 @@ public final class ColumnCreator
                 // Use the first one since they should all have the same id column(s)
                 destinationTable = storeMgr.getDatastoreClass(ownerCmds[0].getFullClassName(), clr);
             }
+
             if (destinationTable != null)
             {
                 // Foreign-Key to the destination table
@@ -193,6 +212,7 @@ public final class ColumnCreator
                             {
                                 // Create join table identifier (FK using destination table identifier)
                                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
+                                // TODO If the mmd is an "embedded" type this can create invalid identifiers
                                 // TODO Cater for more than 1 related field
                                 identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
                                     m.getDatastoreMapping(i).getColumn().getIdentifier(), 

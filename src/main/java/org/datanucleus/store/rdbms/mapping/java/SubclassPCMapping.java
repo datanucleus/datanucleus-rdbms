@@ -109,8 +109,7 @@ public class SubclassPCMapping extends MultiPersistableMapping
                 {
                     if (mmd.getColumnMetaData().length < colPos+m.getNumberOfDatastoreMappings())
                     {
-                        throw new NucleusUserException(Localiser.msg("020186", 
-                            mmd.getFullFieldName(), "" + mmd.getColumnMetaData().length, 
+                        throw new NucleusUserException(Localiser.msg("020186", mmd.getFullFieldName(), "" + mmd.getColumnMetaData().length, 
                             "" + (colPos + m.getNumberOfDatastoreMappings())));
                     }
                     columnMetaDataForType = new ColumnMetaData[m.getNumberOfDatastoreMappings()];
@@ -120,9 +119,7 @@ public class SubclassPCMapping extends MultiPersistableMapping
 
                 // Create the FK columns for this subclass
                 // TODO Remove the link to an RDBMS class
-                ColumnCreator.createColumnsForField(type, this, table, storeMgr, mmd, pk, nullable, 
-                    false, false, FieldRole.ROLE_FIELD, columnMetaDataForType, clr, true);
-
+                ColumnCreator.createColumnsForField(type, this, table, storeMgr, mmd, pk, nullable, false, false, FieldRole.ROLE_FIELD, columnMetaDataForType, clr, true, null);
                 if (NucleusLogger.DATASTORE.isInfoEnabled())
                 {
                     NucleusLogger.DATASTORE.info(Localiser.msg("020187", type, mmd.getName()));

@@ -2658,11 +2658,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Called by (container) Mapping objects to request the creation of a join table.
      * If the specified field doesn't require a join table then this returns null.
      * If the join table already exists, then this returns it.
+     * @param ownerTable The table that owns this member.
      * @param mmd The metadata describing the field/property.
      * @param clr The ClassLoaderResolver
      * @return The table (SetTable/ListTable/MapTable/ArrayTable)
      */
-    public Table newJoinTable(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
+    public Table newJoinTable(Table ownerTable, AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         if (mmd.getJoinMetaData() == null)
         {
@@ -2741,22 +2742,22 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (mmd.getType().isArray())
         {
             // Use Array table for array types
-            return classAdder.addJoinTableForContainer(mmd, clr, ClassAdder.JOIN_TABLE_ARRAY);
+            return classAdder.addJoinTableForContainer(ownerTable, mmd, clr, ClassAdder.JOIN_TABLE_ARRAY);
         }
         else if (Map.class.isAssignableFrom(mmd.getType()))
         {
             // Use Map join table for supported map types
-            return classAdder.addJoinTableForContainer(mmd, clr, ClassAdder.JOIN_TABLE_MAP);
+            return classAdder.addJoinTableForContainer(ownerTable, mmd, clr, ClassAdder.JOIN_TABLE_MAP);
         }
         else if (Collection.class.isAssignableFrom(mmd.getType()))
         {
             // Use Collection join table for collection/set types
-            return classAdder.addJoinTableForContainer(mmd, clr, ClassAdder.JOIN_TABLE_COLLECTION);
+            return classAdder.addJoinTableForContainer(ownerTable, mmd, clr, ClassAdder.JOIN_TABLE_COLLECTION);
         }
         else
         {
             // N-1 uni join
-            return classAdder.addJoinTableForContainer(mmd, clr, ClassAdder.JOIN_TABLE_PERSISTABLE);
+            return classAdder.addJoinTableForContainer(ownerTable, mmd, clr, ClassAdder.JOIN_TABLE_PERSISTABLE);
         }
     }
 
@@ -3604,10 +3605,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         /**
          * Called by Mapping objects in the midst of RDBMSManager.addClasses()
          * to request the creation of a join table to hold a containers' contents.
-         * @param mmd The member metadata for this field/property.
+         * @param ownerTable Table of the owner of this member
+         * @param mmd The member metadata for this member
          * @param type The type of the join table
          */
-        private Table addJoinTableForContainer(AbstractMemberMetaData mmd, ClassLoaderResolver clr, int type)
+        private Table addJoinTableForContainer(Table ownerTable, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int type)
         {
             DatastoreIdentifier tableName = null;
             RDBMSStoreData sd = (RDBMSStoreData) storeDataMgr.get(mmd);
@@ -3623,19 +3625,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             Table join = null;
             if (type == JOIN_TABLE_COLLECTION)
             {
-                join = new CollectionTable(tableName, mmd, RDBMSStoreManager.this);
+                join = new CollectionTable(ownerTable, tableName, mmd, RDBMSStoreManager.this);
             }
             else if (type == JOIN_TABLE_MAP)
             {
-                join = new MapTable(tableName, mmd, RDBMSStoreManager.this);
+                join = new MapTable(ownerTable, tableName, mmd, RDBMSStoreManager.this);
             }
             else if (type == JOIN_TABLE_ARRAY)
             {
-                join = new ArrayTable(tableName, mmd, RDBMSStoreManager.this);
+                join = new ArrayTable(ownerTable, tableName, mmd, RDBMSStoreManager.this);
             }
             else if (type == JOIN_TABLE_PERSISTABLE)
             {
-                join = new PersistableJoinTable(tableName, mmd, RDBMSStoreManager.this);
+                join = new PersistableJoinTable(ownerTable, tableName, mmd, RDBMSStoreManager.this);
             }
 
             AutoStartMechanism starter = rdbmsMgr.getNucleusContext().getAutoStartMechanism();

@@ -79,6 +79,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class MapTable extends JoinTable implements DatastoreMap
 {
+    protected Table ownerTable;
+
     /** Mapping to the key object. */
     private JavaTypeMapping keyMapping;
 
@@ -99,13 +101,15 @@ public class MapTable extends JoinTable implements DatastoreMap
 
     /**
      * Constructor.
+     * @param ownerTable Table of the owner of this member
      * @param tableName Identifier name of the table
-     * @param mmd MetaData for the field/property of the owner
+     * @param mmd MetaData for the member of the owner
      * @param storeMgr The Store Manager managing these tables.
      */
-    public MapTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    public MapTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
         super(tableName, mmd, storeMgr);
+        this.ownerTable = ownerTable;
     }
 
     /**
@@ -136,8 +140,8 @@ public class MapTable extends JoinTable implements DatastoreMap
             // When specified at this side they use the <join> tag
             ownerColmd = mmd.getJoinMetaData().getColumnMetaData();
         }
-        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, ownerColmd,
-            storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+
+        ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, ownerColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, null);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
@@ -188,8 +192,8 @@ public class MapTable extends JoinTable implements DatastoreMap
                 // Column mappings defined at this side (1-N, M-N)
                 keyColmd = keymd.getColumnMetaData();
             }
-            keyMapping = ColumnCreator.createColumnsForJoinTables(keyCls, mmd, keyColmd, storeMgr, this,
-                false, false, FieldRole.ROLE_MAP_KEY, clr);
+
+            keyMapping = ColumnCreator.createColumnsForJoinTables(keyCls, mmd, keyColmd, storeMgr, this, false, false, FieldRole.ROLE_MAP_KEY, clr, null);
             if (mmd.getContainer().allowNulls() == Boolean.TRUE)
             {
                 // Make all key col(s) nullable so we can store null elements
@@ -247,8 +251,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                 // Column mappings defined at this side (1-N, M-N)
                 valueColmd = valuemd.getColumnMetaData();
             }
-            valueMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(mapmd.getValueType()), mmd,
-                valueColmd, storeMgr, this, false, true, FieldRole.ROLE_MAP_VALUE, clr);
+            valueMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(mapmd.getValueType()), mmd, valueColmd, storeMgr, this, false, true, FieldRole.ROLE_MAP_VALUE, clr, null);
             if (mmd.getContainer().allowNulls() == Boolean.TRUE)
             {
                 // Make all value col(s) nullable so we can store null elements

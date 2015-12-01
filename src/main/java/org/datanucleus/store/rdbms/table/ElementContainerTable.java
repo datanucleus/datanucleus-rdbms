@@ -60,6 +60,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class ElementContainerTable extends JoinTable
 {
+    /** Table of the owner of the member represented here. */
+    protected Table ownerTable;
+
     /**
      * Mapping of an element. This is either a PersistableMapping to the element table,
      * or an EmbeddedElementPCMapping (when PC elements are embedded), or a simple mapping (when
@@ -92,13 +95,15 @@ public abstract class ElementContainerTable extends JoinTable
 
     /**
      * Constructor.
-     * @param tableName Identifier name of the table
-     * @param mmd MetaData for the field/property owning this join table
+     * @param ownerTable Table of the owner of this member
+     * @param tableName Identifier name of this table
+     * @param mmd MetaData for the member owning this join table
      * @param storeMgr The Store Manager managing these tables.
      */
-    public ElementContainerTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    public ElementContainerTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
         super(tableName, mmd, storeMgr);
+        this.ownerTable = ownerTable;
     }
 
     /**
@@ -125,13 +130,14 @@ public abstract class ElementContainerTable extends JoinTable
         {
             // Column mappings defined at other side (M-N)
             // When specified at other side they use the <element> tag
-            // ** This is really only for Collections/Sets since M-N doesnt make sense for Lists/arrays **
+            // ** This is really only for Collections/Sets since M-N doesnt make sense for indexed Lists/arrays **
             columnMetaData = relatedMmds[0].getElementMetaData().getColumnMetaData();
         }
 
         try
         {
-            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+            // TODO Pass in ownerTable as the last argument if wanting to get the owner mapping table correct (note, more is needed to make that handling complete so disabled currently).
+            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, null);
         }
         catch (NoTableManagedException ntme)
         {

@@ -46,18 +46,23 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class PersistableJoinTable extends JoinTable
 {
+    /** Table of the owner of this member. */
+    protected Table ownerTable;
+
     /** Mapping from the join table to the "related". This will be a PersistableMapping. */
     protected JavaTypeMapping relatedMapping;
 
     /**
      * Constructor.
+     * @param ownerTable Table of the owner of this member.
      * @param tableName The Table SQL identifier
-     * @param mmd Member meta data for the "element" field/property
+     * @param mmd Member meta data for the "element" member.
      * @param storeMgr Manager for the datastore.
      */
-    public PersistableJoinTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    public PersistableJoinTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
         super(tableName, mmd, storeMgr);
+        this.ownerTable = ownerTable;
     }
 
     /* (non-Javadoc)
@@ -83,7 +88,7 @@ public class PersistableJoinTable extends JoinTable
             ownerColmd = mmd.getColumnMetaData();
         }
         ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(mmd.getClassName(true)), mmd, 
-            ownerColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr);
+            ownerColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, null);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             logMapping(mmd.getFullFieldName()+".[OWNER]", ownerMapping);
@@ -98,7 +103,7 @@ public class PersistableJoinTable extends JoinTable
             relatedColmd = mmd.getJoinMetaData().getColumnMetaData();
         }
         relatedMapping = ColumnCreator.createColumnsForJoinTables(mmd.getType(), mmd,
-            relatedColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_PERSISTABLE_RELATION, clr);
+            relatedColmd, storeMgr, this, pkRequired, false, FieldRole.ROLE_PERSISTABLE_RELATION, clr, null);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
             logMapping(mmd.getFullFieldName()+".[RELATED]", relatedMapping);

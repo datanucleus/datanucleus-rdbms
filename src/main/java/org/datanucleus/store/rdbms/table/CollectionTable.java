@@ -59,13 +59,14 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
 {
     /**
      * Constructor.
+     * @param ownerTable Table of the owner of this member
      * @param tableName Identifier name of the table
-     * @param mmd MetaData for the field of the owner
+     * @param mmd MetaData for the member of the owner
      * @param storeMgr The Store Manager managing these tables.
      */
-    public CollectionTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    public CollectionTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
-        super(tableName, mmd, storeMgr);
+        super(ownerTable, tableName, mmd, storeMgr);
     }
 
     /**
@@ -114,8 +115,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 elemColmd = relatedMmds[0].getJoinMetaData().getColumnMetaData();
             }
 
-            elementMapping = ColumnCreator.createColumnsForJoinTables(elementClass, mmd, 
-                elemColmd, storeMgr, this, false, false, FieldRole.ROLE_COLLECTION_ELEMENT, clr);
+            elementMapping = ColumnCreator.createColumnsForJoinTables(elementClass, mmd, elemColmd, storeMgr, this, false, false, FieldRole.ROLE_COLLECTION_ELEMENT, clr, null);
 
             RelationType relationType = mmd.getRelationType(clr);
             if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()) && relationType != RelationType.MANY_TO_MANY_BI)

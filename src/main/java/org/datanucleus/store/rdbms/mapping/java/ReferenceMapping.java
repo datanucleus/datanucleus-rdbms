@@ -484,7 +484,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 }
 
                 // Create the FK column(s) for this implementation
-                ColumnCreator.createColumnsForField(implClass, this, table, storeMgr, mmd, pk, nullable, serialised, embedded, fieldRole, columnMetaDataForType, clr, true);
+                ColumnCreator.createColumnsForField(implClass, this, table, storeMgr, mmd, pk, nullable, serialised, embedded, fieldRole, columnMetaDataForType, clr, true, null);
 
                 if (NucleusLogger.DATASTORE.isInfoEnabled())
                 {

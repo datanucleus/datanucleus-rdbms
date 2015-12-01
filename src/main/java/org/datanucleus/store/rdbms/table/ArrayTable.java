@@ -48,13 +48,14 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
 {
     /**
      * Constructor.
+     * @param ownerTable Table of the owner of this member
      * @param tableName Identifier name of the table
-     * @param mmd MetaData for the field of the owner
+     * @param mmd MetaData for the member of the owner
      * @param storeMgr The Store Manager managing these tables.
      */
-    public ArrayTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    public ArrayTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
-        super(tableName, mmd, storeMgr);
+        super(ownerTable, tableName, mmd, storeMgr);
     }
 
     /**
@@ -101,7 +102,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
                 elemColmd = elemmd.getColumnMetaData();
             }
             elementMapping = ColumnCreator.createColumnsForJoinTables(mmd.getType().getComponentType(), mmd,
-                elemColmd, storeMgr, this, false, true, FieldRole.ROLE_ARRAY_ELEMENT, clr);
+                elemColmd, storeMgr, this, false, true, FieldRole.ROLE_ARRAY_ELEMENT, clr, null);
             if (NucleusLogger.DATASTORE.isDebugEnabled())
             {
                 logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);

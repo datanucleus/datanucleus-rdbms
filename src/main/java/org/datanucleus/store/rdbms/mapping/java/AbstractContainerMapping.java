@@ -79,7 +79,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         if (!containerIsStoredInSingleColumn())
         {
             // Not serialised so we use JoinTable or ForeignKey
-            storeMgr.newJoinTable(mmd, clr);
+            storeMgr.newJoinTable(table, mmd, clr);
         }
     }
 
