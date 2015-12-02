@@ -106,9 +106,15 @@ public final class ColumnCreator
     public static JavaTypeMapping createColumnsForJoinTables(Class javaType, AbstractMemberMetaData mmd, ColumnMetaData[] columnMetaData, RDBMSStoreManager storeMgr, Table table,
             boolean primaryKey, boolean nullable, FieldRole fieldRole, ClassLoaderResolver clr, Table ownerTable)
     {
-        // Collection<PC>, Map<PC>, PC[]
-        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(javaType, false, false, mmd.getFullFieldName());
+        Class ownerType = javaType;
+        if (ownerTable != null && fieldRole == FieldRole.ROLE_OWNER)
+        {
+            // If the ownerTable is set, then use its id mapping in preference
+            ownerType = clr.classForName(ownerTable.getIdMapping().getType());
+        }
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(ownerType, false, false, mmd.getFullFieldName());
         mapping.setTable(table);
+
         // TODO Remove this when PCMapping creates its own columns
         createColumnsForField(javaType, mapping, table, storeMgr, mmd, primaryKey, nullable, false, false, fieldRole, columnMetaData, clr, false, ownerTable);
         return mapping;
