@@ -331,8 +331,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     }
 
     /**
-     * Convenience method to return if the container (collection or map) is stored
-     * in the owning table as a column. The container is stored in a single column in the following situations :-
+     * Convenience method to return if the container (collection or map) is stored in the owning table as a column. 
+     * The container is stored in a single column in the following situations :-
      * <UL>
      * <LI>The FieldMetaData has 'serialized="true"'</LI>
      * <LI>The collection has embedded-element="true" but no join table (and so serialised)</LI>
@@ -356,14 +356,12 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         {
             return true; // No join specified but serialised keys/values so serialise the field
         }
-        else if (mmd != null && mmd.hasArray() &&
-            SCOUtils.arrayIsStoredInSingleColumn(mmd, storeMgr.getMetaDataManager()))
+        else if (mmd != null && mmd.hasArray() && SCOUtils.arrayIsStoredInSingleColumn(mmd, storeMgr.getMetaDataManager()))
         {
             if (MetaDataUtils.getInstance().arrayStorableAsByteArrayInSingleColumn(mmd))
             {
                 return false; // Storable as byte array
             }
-
             return true; // No join specified but serialised elements so serialise the field
         }
         else
@@ -419,6 +417,13 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         else if (mmd.getOrderMetaData() != null && type.isAssignableFrom(java.util.List.class))
         {
             type = java.util.List.class;
+        }
+        
+        if (mmd.getAbsoluteFieldNumber() < 0)
+        {
+            // The metadata being used here is an embedded form, so swap for the real one
+            ExecutionContext ec = op.getExecutionContext();
+            mmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getClassName(true), ec.getClassLoaderResolver()).getMetaDataForMember(mmd.getName());
         }
 
         return SCOUtils.newSCOInstance(op, mmd, type, value, true);
