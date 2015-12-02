@@ -947,61 +947,74 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 return store;
             }
 
+            Class expectedMappingType = null;
             if (mmd.getMap() != null)
             {
-                assertCompatibleFieldType(mmd, clr, type, MapMapping.class);
+                expectedMappingType = MapMapping.class;
+            }
+            else if (mmd.getArray() != null)
+            {
+                expectedMappingType = ArrayMapping.class;
+            }
+            else if (mmd.getCollection() != null)
+            {
+                expectedMappingType = CollectionMapping.class;
+            }
+            else
+            {
+                expectedMappingType = PersistableMapping.class;
+            }
+
+            // Validate the mapping type matches the table
+            try
+            {
+                DatastoreClass ownerTable = getDatastoreClass(mmd.getClassName(), clr);
+
+                if (ownerTable == null)
+                {
+                    // Class doesn't manage its own table (uses subclass-table, or superclass-table?)
+                    AbstractClassMetaData fieldTypeCmd = getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
+                    AbstractClassMetaData[] tableOwnerCmds = getClassesManagingTableForClass(fieldTypeCmd, clr);
+                    if (tableOwnerCmds != null && tableOwnerCmds.length == 1)
+                    {
+                        ownerTable = getDatastoreClass(tableOwnerCmds[0].getFullClassName(), clr);
+                    }
+                }
+
+                if (ownerTable != null)
+                {
+                    JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
+                    if (!expectedMappingType.isAssignableFrom(m.getClass()))
+                    {
+                        String requiredType = (type != null ? type.getName() : mmd.getTypeName());
+                        NucleusLogger.PERSISTENCE.warn("Member " + mmd.getFullFieldName() + " in table=" + ownerTable + " has mapping=" + m + " but expected mapping type=" + expectedMappingType);
+                        throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), requiredType, m.getType());
+                    }
+                }
+            }
+            catch (NoTableManagedException ntme)
+            {
+                // Embedded, so just pass through
+            }
+
+            if (mmd.getMap() != null)
+            {
                 store = getBackingStoreForMap(mmd, clr);
             }
             else if (mmd.getArray() != null)
             {
-                assertCompatibleFieldType(mmd, clr, type, ArrayMapping.class);
                 store = getBackingStoreForArray(mmd, clr);
             }
             else if (mmd.getCollection() != null)
             {
-                assertCompatibleFieldType(mmd, clr, type, CollectionMapping.class);
                 store = getBackingStoreForCollection(mmd, clr, type);
             }
             else
             {
-                assertCompatibleFieldType(mmd, clr, type, PersistableMapping.class);
                 store = getBackingStoreForPersistableRelation(mmd, clr);
             }
             backingStoreByMemberName.put(mmd.getFullFieldName(), store);
             return store;
-        }
-    }
-
-    /**
-     * Asserts the current mapping for the member is the one expected.
-     * @param mmd MetaData for the member
-     * @param clr ClassLoader resolver
-     * @param preferredType Preferred type of object (if any, otherwise if null will use metadata)
-     * @param expectedMappingType Mapping type expected
-     */
-    private void assertCompatibleFieldType(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class preferredType, Class expectedMappingType)
-    {
-        DatastoreClass ownerTable = getDatastoreClass(mmd.getClassName(), clr);
-        if (ownerTable == null)
-        {
-            // Class doesn't manage its own table (uses subclass-table, or superclass-table?)
-            AbstractClassMetaData fieldTypeCmd = getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
-            AbstractClassMetaData[] tableOwnerCmds = getClassesManagingTableForClass(fieldTypeCmd, clr);
-            if (tableOwnerCmds != null && tableOwnerCmds.length == 1)
-            {
-                ownerTable = getDatastoreClass(tableOwnerCmds[0].getFullClassName(), clr);
-            }
-        }
-
-        if (ownerTable != null)
-        {
-            JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
-            if (!expectedMappingType.isAssignableFrom(m.getClass()))
-            {
-                String requiredType = (preferredType != null ? preferredType.getName() : mmd.getTypeName());
-                NucleusLogger.PERSISTENCE.warn("Member " + mmd.getFullFieldName() + " in table=" + ownerTable + " has mapping=" + m + " but expected mapping type=" + expectedMappingType);
-                throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), requiredType, m.getType());
-            }
         }
     }
 
