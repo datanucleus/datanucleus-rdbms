@@ -60,9 +60,6 @@ import org.datanucleus.util.NucleusLogger;
  */
 public abstract class ElementContainerTable extends JoinTable
 {
-    /** Table of the owner of the member represented here. */
-    protected Table ownerTable;
-
     /**
      * Mapping of an element. This is either a PersistableMapping to the element table,
      * or an EmbeddedElementPCMapping (when PC elements are embedded), or a simple mapping (when
@@ -102,8 +99,7 @@ public abstract class ElementContainerTable extends JoinTable
      */
     public ElementContainerTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
-        super(tableName, mmd, storeMgr);
-        this.ownerTable = ownerTable;
+        super(ownerTable, tableName, mmd, storeMgr);
     }
 
     /**

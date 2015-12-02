@@ -40,6 +40,9 @@ import org.datanucleus.util.Localiser;
  */
 public abstract class JoinTable extends TableImpl
 {
+    /** Table of the owner of the member represented here. */
+    protected final Table ownerTable;
+
     /** MetaData for the field/property in the owner class. */
     protected final AbstractMemberMetaData mmd;
 
@@ -51,14 +54,16 @@ public abstract class JoinTable extends TableImpl
 
     /**
      * Constructor.
+     * @param ownerTable Table of the owner member, for linking back
      * @param tableName The Table SQL identifier
      * @param mmd Member meta data for the owner field/property
      * @param storeMgr Manager for the datastore.
      */
-    protected JoinTable(DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
+    protected JoinTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
         super(tableName, storeMgr);
 
+        this.ownerTable = ownerTable;
         this.mmd = mmd;
         this.ownerType = mmd.getClassName(true);
 
@@ -66,6 +71,11 @@ public abstract class JoinTable extends TableImpl
         {
             throw new NucleusException(Localiser.msg("057006", mmd.getName())).setFatal();
         }
+    }
+
+    public Table getOwnerTable()
+    {
+        return ownerTable;
     }
 
     /**

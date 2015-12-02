@@ -108,8 +108,7 @@ public class MapTable extends JoinTable implements DatastoreMap
      */
     public MapTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
-        super(tableName, mmd, storeMgr);
-        this.ownerTable = ownerTable;
+        super(ownerTable, tableName, mmd, storeMgr);
     }
 
     /**

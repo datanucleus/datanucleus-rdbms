@@ -61,8 +61,7 @@ public class PersistableJoinTable extends JoinTable
      */
     public PersistableJoinTable(Table ownerTable, DatastoreIdentifier tableName, AbstractMemberMetaData mmd, RDBMSStoreManager storeMgr)
     {
-        super(tableName, mmd, storeMgr);
-        this.ownerTable = ownerTable;
+        super(ownerTable, tableName, mmd, storeMgr);
     }
 
     /* (non-Javadoc)
