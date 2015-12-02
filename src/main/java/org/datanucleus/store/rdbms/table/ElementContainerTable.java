@@ -132,8 +132,7 @@ public abstract class ElementContainerTable extends JoinTable
 
         try
         {
-            // TODO Pass in ownerTable as the last argument if wanting to get the owner mapping table correct (note, more is needed to make that handling complete so disabled currently).
-            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, null);
+            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, ownerTable);
         }
         catch (NoTableManagedException ntme)
         {

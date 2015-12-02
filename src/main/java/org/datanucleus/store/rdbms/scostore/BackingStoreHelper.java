@@ -39,6 +39,7 @@ import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.table.JoinTable;
+import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Series of helper methods for use with RDBMS backing stores.
@@ -54,9 +55,19 @@ public class BackingStoreHelper
      * @param bcs Base container backing store
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, 
-            int jdbcPosition, BaseContainerStore bcs)
+    public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
     {
+        Table ownerMappingTable = bcs.getOwnerMapping().getTable();
+        if (op.isEmbedded() && ownerMappingTable instanceof JoinTable && ((JoinTable)ownerMappingTable).getOwnerTable() != null)
+        {
+            // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
+            ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
+            if (ownerOPs != null && ownerOPs.length == 1)
+            {
+                op = ownerOPs[0];
+            }
+        }
+
         if (!bcs.getStoreManager().insertValuesOnInsert(bcs.getOwnerMapping().getDatastoreMapping(0)))
         {
             // Don't try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
