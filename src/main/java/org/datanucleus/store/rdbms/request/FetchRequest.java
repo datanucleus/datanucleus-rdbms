@@ -485,6 +485,7 @@ public class FetchRequest extends Request
                                 }
                             }
                         }
+                        // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
                         SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
                         number++;
                     }
