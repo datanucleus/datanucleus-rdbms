@@ -50,6 +50,8 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
+import org.datanucleus.metadata.VersionMetaData;
+import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.AppIdObjectIdFieldConsumer;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.StoreManager;
@@ -110,8 +112,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      */
-    public void initialize(AbstractMemberMetaData mmd, Table table, 
-            ClassLoaderResolver clr)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         super.initialize(mmd, table, clr);
 
@@ -690,6 +691,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     /**
      * Returns an instance of a persistable class.
      * Processes the FK field and generates the id of the object from the result values, and hence the object itself.
+     * TODO Pass in the discriminator/version columns also where available
      * @param ec execution context
      * @param rs The ResultSet
      * @param resultIndexes indexes in the ResultSet to retrieve
@@ -710,18 +712,33 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
 
         // Return the object represented by this mapping
+        Object pc = null;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            return MappingHelper.getObjectForDatastoreIdentity(ec, this, rs, resultIndexes, cmd);
+            pc = MappingHelper.getObjectForDatastoreIdentity(ec, this, rs, resultIndexes, cmd);
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            return MappingHelper.getObjectForApplicationIdentity(ec, this, rs, resultIndexes, cmd);
+            pc = MappingHelper.getObjectForApplicationIdentity(ec, this, rs, resultIndexes, cmd);
         }
         else
         {
             return null;
         }
+
+        // Sanity check that we have loaded the version also
+        ObjectProvider pcOP = ec.findObjectProvider(pc);
+        if (pcOP != null)
+        {
+            VersionMetaData vermd = cmd.getVersionMetaDataForTable();
+            if (vermd != null && vermd.getVersionStrategy() != VersionStrategy.NONE && ec.getTransaction().getOptimistic() && pcOP.getVersion() == null)
+            {
+                // For some reason the version was not loaded on this object, and wanting to delete it, so load the version now
+                // This can happen when we have 1-1 between A and B and we loaded the B field of A via FetchRequest but didn't pull in the version
+                pcOP.loadFieldFromDatastore(-1);
+            }
+        }
+        return pc;
     }
 
     // ----------------------- Implementation of MappingCallbacks --------------------------
