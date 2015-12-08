@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -469,6 +470,19 @@ public class FetchRequest extends Request
                                     {
                                         depth = 0;
                                     }
+                                }
+                            }
+                        }
+                        else if (mapping instanceof ReferenceMapping)
+                        {
+                            ReferenceMapping refMapping = (ReferenceMapping)mapping;
+                            if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
+                            {
+                                JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                                if (subMappings != null && subMappings.length == 1)
+                                {
+                                    // Support special case of reference mapping with single implementation possible
+                                    depth = 1;
                                 }
                             }
                         }
