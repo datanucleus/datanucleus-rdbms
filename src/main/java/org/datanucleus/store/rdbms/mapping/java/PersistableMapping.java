@@ -733,9 +733,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             VersionMetaData vermd = cmd.getVersionMetaDataForTable();
             if (vermd != null && vermd.getVersionStrategy() != VersionStrategy.NONE && ec.getTransaction().getOptimistic() && pcOP.getVersion() == null)
             {
-                // For some reason the version was not loaded on this object, and wanting to delete it, so load the version now
-                // This can happen when we have 1-1 between A and B and we loaded the B field of A via FetchRequest but didn't pull in the version
-                pcOP.loadFieldFromDatastore(-1);
+                // For some reason the version was not loaded on this object, and wanting to delete it, so load the version (+DFG) now.
+                // This can happen when we have 1-1 between A and B and we loaded the B field of A via FetchRequest but didn't pull in the version since the inheritance wasn't knowable
+                pcOP.loadUnloadedFieldsInFetchPlan();
             }
         }
         return pc;

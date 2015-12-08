@@ -930,8 +930,21 @@ public class SQLStatementHelper
         {
             RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
 
-            Class type = mmd.isSingleCollection() ? clr.classForName(mmd.getCollection().getElementType()) : mmd.getType(); 
-            
+            Class type = mmd.isSingleCollection() ? clr.classForName(mmd.getCollection().getElementType()) : mmd.getType();
+            if (m instanceof ReferenceMapping)
+            {
+                ReferenceMapping refMapping = (ReferenceMapping)m;
+                if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING && refMapping.getJavaTypeMapping().length == 1)
+                {
+                    JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                    if (subMappings != null && subMappings.length == 1)
+                    {
+                        // Special case of reference mapping with single FK implementation
+                        type = clr.classForName(refMapping.getJavaTypeMapping()[0].getType());
+                    }
+                }
+            }
+
             // select fetch plan fields of this object
             AbstractClassMetaData relatedCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
             if (relatedCmd != null)

@@ -32,6 +32,7 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.query.PersistentClassROF;
@@ -59,8 +60,7 @@ public class ResultSetGetter extends AbstractFieldManager
      * @param rs the ResultSet
      * @param resultMappings Mappings for the results for this class
      */
-    public ResultSetGetter(RDBMSStoreManager storeMgr, ObjectProvider op, ResultSet rs, 
-            StatementClassMapping resultMappings)
+    public ResultSetGetter(RDBMSStoreManager storeMgr, ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
     {
         this.storeMgr = storeMgr;
         this.op = op;
@@ -78,8 +78,7 @@ public class ResultSetGetter extends AbstractFieldManager
      * @param resultMappings Mappings for the results for this class
      * @param cmd Metadata for the class
      */
-    public ResultSetGetter(RDBMSStoreManager storeMgr, ExecutionContext ec, ResultSet rs,
-            StatementClassMapping resultMappings, AbstractClassMetaData cmd)
+    public ResultSetGetter(RDBMSStoreManager storeMgr, ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
     {
         this.storeMgr = storeMgr;
         this.op = null;
@@ -163,7 +162,7 @@ public class ResultSetGetter extends AbstractFieldManager
                 if (relationMappings != null)
                 {
                     Class type = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
-                    value = processSubObjectFields(type, relationMappings);
+                    value = processSubObjectFields(mapping, type, relationMappings);
                     
                     TypeManager typeManager = ec.getTypeManager();
                     ElementContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
@@ -180,8 +179,7 @@ public class ResultSetGetter extends AbstractFieldManager
                 StatementClassMapping relationMappings = resultMappings.getMappingDefinitionForMemberPosition(fieldNumber);
                 if (relationMappings != null)
                 {
-
-                    value = processSubObjectFields(mmd.getType(), relationMappings);
+                    value = processSubObjectFields(mapping, mmd.getType(), relationMappings);
                 }
                 else
                 {
@@ -211,13 +209,26 @@ public class ResultSetGetter extends AbstractFieldManager
         return value;
     }
 
-    private Object processSubObjectFields(Class fieldType, StatementClassMapping relationMappings)
+    private Object processSubObjectFields(JavaTypeMapping mapping, Class fieldType, StatementClassMapping relationMappings)
     {
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         AbstractClassMetaData relatedCmd = ec.getMetaDataManager().getMetaDataForClass(fieldType, clr);
-        
+        if (mapping instanceof ReferenceMapping)
+        {
+            // Special case where we have a ReferenceMapping and single implementation with FK
+            ReferenceMapping refMapping = (ReferenceMapping)mapping;
+            if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
+            {
+                JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                if (subMappings != null && subMappings.length == 1)
+                {
+                    relatedCmd = ec.getMetaDataManager().getMetaDataForClass(subMappings[0].getType(), clr);
+                    fieldType = clr.classForName(subMappings[0].getType());
+                }
+            }
+        }
+
         ResultObjectFactory relationROF = new PersistentClassROF(storeMgr, relatedCmd, relationMappings, false, ec.getFetchPlan(), fieldType);
-        
         return relationROF.getObject(ec, resultSet);
     }
 }

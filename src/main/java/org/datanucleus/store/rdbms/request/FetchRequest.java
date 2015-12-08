@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
@@ -468,6 +469,7 @@ public class FetchRequest extends Request
 
                         if (mappingToUse instanceof PersistableMapping)
                         {
+                            // Special case of 1-1/N-1 where we know the other side type so know what to join to, hence can load the related object
                             depth = 1;
                             if (Modifier.isAbstract(mmdToUse.getType().getModifiers()))
                             {
@@ -482,6 +484,19 @@ public class FetchRequest extends Request
                                     {
                                         depth = 0;
                                     }
+                                }
+                            }
+                        }
+                        else if (mappingToUse instanceof ReferenceMapping)
+                        {
+                            ReferenceMapping refMapping = (ReferenceMapping)mappingToUse;
+                            if (refMapping.getMappingStrategy() == ReferenceMapping.PER_IMPLEMENTATION_MAPPING)
+                            {
+                                JavaTypeMapping[] subMappings = refMapping.getJavaTypeMapping();
+                                if (subMappings != null && subMappings.length == 1)
+                                {
+                                    // Support special case of reference mapping with single implementation possible
+                                    depth = 1;
                                 }
                             }
                         }
