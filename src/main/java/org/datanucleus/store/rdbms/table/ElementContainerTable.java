@@ -50,6 +50,7 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a join table for a container of elements.
@@ -587,6 +588,12 @@ public abstract class ElementContainerTable extends JoinTable
             {
                 String[] columnNames = unimd.getColumnNames();
                 CandidateKey uniKey = new CandidateKey(this);
+                String unimdName = unimd.getName();
+                if (!StringUtils.isWhitespace(unimdName))
+                {
+                    uniKey.setName(unimd.getName());
+                }
+
                 IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
                 for (String columnName : columnNames)
                 {
