@@ -551,6 +551,16 @@ public class ObjectExpression extends SQLExpression
                     castTable, null, castTable.getIdMapping(), null, table.getGroupName());
             }
 
+            if (castSqlTbl == table)
+            {
+                AbstractClassMetaData castCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
+                if (castCmd.hasDiscriminatorStrategy())
+                {
+                    // TODO Generate BooleanExpression that needs to hang off this ObjectExpression so when we propagate up to ObjectExpr == val we can then append the discrim constraint also
+                    NucleusLogger.QUERY.warn(">> Currently do not support adding restriction on discriminator for table=" + table + " to " + type);
+                }
+            }
+
             // Return an expression based on the cast table
             return exprFactory.newExpression(stmt, castSqlTbl, castTable.getIdMapping());
         }
