@@ -62,6 +62,9 @@ public abstract class SQLExpression
     /** Parameter name that this represents (if this is a parameter, "?" in JDBC). */
     protected String parameterName = null;
 
+    /** Optional additional WHERE expression that is built whilst generating this expression, and will be utilised when forming a BooleanExpression from this expression. TODO Implement this */
+//    protected SQLExpression whereExpression;
+
     /**
      * Constructor for an SQL expression for a (field) mapping in a specified table.
      * @param stmt The statement
@@ -80,8 +83,7 @@ public abstract class SQLExpression
             {
                 for (int i=0; i<mapping.getNumberOfDatastoreMappings(); i++)
                 {
-                    ColumnExpression colExpr =
-                        new ColumnExpression(stmt, table, mapping.getDatastoreMapping(i).getColumn());
+                    ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getDatastoreMapping(i).getColumn());
                     subExprs.addExpression(colExpr);
                 }
             }
@@ -244,6 +246,11 @@ public abstract class SQLExpression
 
         st.append(')');
     }
+
+//    public SQLExpression getWhereExpression()
+//    {
+//        return whereExpression;
+//    }
 
     public Operator getLowestOperator()
     {

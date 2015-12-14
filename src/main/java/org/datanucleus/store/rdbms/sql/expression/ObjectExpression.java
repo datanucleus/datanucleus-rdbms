@@ -122,8 +122,7 @@ public class ObjectExpression extends SQLExpression
 
         // Replace the expressionList and SQL as if starting from scratch
         subExprs = new ColumnExpressionList();
-        ColumnExpression colExpr =
-            new ColumnExpression(stmt, table, mapping.getDatastoreMapping(0).getColumn());
+        ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getDatastoreMapping(0).getColumn());
         subExprs.addExpression(colExpr);
         st.clearStatement();
         st.append(subExprs.toString());
@@ -148,8 +147,7 @@ public class ObjectExpression extends SQLExpression
                 String oidString = (String)((StringLiteral)expr).getValue();
                 if (oidString != null)
                 {
-                    AbstractClassMetaData cmd =
-                        stmt.getRDBMSManager().getMetaDataManager().getMetaDataForClass(mapping.getType(),
+                    AbstractClassMetaData cmd = stmt.getRDBMSManager().getMetaDataManager().getMetaDataForClass(mapping.getType(),
                             stmt.getQueryGenerator().getClassLoaderResolver());
                     if (cmd.getIdentityType() == IdentityType.DATASTORE)
                     {
@@ -164,8 +162,7 @@ public class ObjectExpression extends SQLExpression
                         catch (IllegalArgumentException iae)
                         {
                             NucleusLogger.QUERY.info("Attempted comparison of " + this + " and " + expr +
-                                " where the former is a datastore-identity and the latter is of incorrect form (" +
-                                oidString + ")");
+                                " where the former is a datastore-identity and the latter is of incorrect form (" + oidString + ")");
                             SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
                             JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
                             return exprFactory.newLiteral(stmt, m, false).eq(exprFactory.newLiteral(stmt, m, true));
@@ -301,8 +298,7 @@ public class ObjectExpression extends SQLExpression
             {
                 for (int i=0;i<subExprs.size();i++)
                 {
-                    BooleanExpression subexpr =
-                        subExprs.getExpression(i).eq(((ObjectExpression)expr).subExprs.getExpression(i));
+                    BooleanExpression subexpr = subExprs.getExpression(i).eq(((ObjectExpression)expr).subExprs.getExpression(i));
                     bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
                 }
                 return new BooleanExpression(Expression.OP_NOT, bExpr != null ? bExpr.encloseInParentheses() : null);
@@ -363,8 +359,7 @@ public class ObjectExpression extends SQLExpression
                 for (int i=0;i<subExprs.size();i++)
                 {
                     // TODO Put value of subMapping in
-                    expr.subExprs.addExpression(new ColumnExpression(stmt, 
-                        expr.parameterName, expr.mapping, null, i));
+                    expr.subExprs.addExpression(new ColumnExpression(stmt, expr.parameterName, expr.mapping, null, i));
                 }
             }
         }
@@ -527,8 +522,7 @@ public class ObjectExpression extends SQLExpression
                 if (type.isAssignableFrom(implType))
                 {
                     DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                    SQLTable castSqlTbl = stmt.leftOuterJoin(table, implMappings[i], refMapping,
-                        castTable, null, castTable.getIdMapping(), null, null, null);
+                    SQLTable castSqlTbl = stmt.leftOuterJoin(table, implMappings[i], refMapping, castTable, null, castTable.getIdMapping(), null, null, null);
                     return exprFactory.newExpression(stmt, castSqlTbl, castTable.getIdMapping());
                 }
             }
@@ -543,6 +537,11 @@ public class ObjectExpression extends SQLExpression
         {
             // Check if there is already the cast table in the current table group
             DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
+            if (castTable == table)
+            {
+                // TODO Means that we are casting this object to a subclass
+            }
+
             SQLTable castSqlTbl = stmt.getTable(castTable, table.getGroupName());
             if (castSqlTbl == null)
             {
@@ -685,8 +684,7 @@ public class ObjectExpression extends SQLExpression
                     // TODO Allow for all possible tables. Can we do an OR of the tables ? How ?
                     if (cmds.length > 1)
                     {
-                        NucleusLogger.QUERY.warn(Localiser.msg("037006",
-                            mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
+                        NucleusLogger.QUERY.warn(Localiser.msg("037006", mapping.getMemberMetaData().getFullFieldName(), cmds[0].getFullClassName()));
                     }
                     memberTable = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr);
                 }
