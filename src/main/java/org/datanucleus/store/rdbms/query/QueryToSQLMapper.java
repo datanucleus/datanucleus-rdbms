@@ -105,7 +105,7 @@ import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
-import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
+import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
@@ -3939,18 +3939,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
-        if (right.getParameterName() != null)
+
+        if (right instanceof CollectionExpression)
+        {
+            // myElement IN myCollection
+            if (right.getParameterName() != null)
+            {
+                setNotPrecompilable();
+            }
+
+            // Use Collection.contains(element)
+            List<SQLExpression> sqlExprArgs = new ArrayList();
+            sqlExprArgs.add(left);
+            SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
+            stack.push(sqlExpr);
+            return sqlExpr;
+        }
+        else if (right.getParameterName() != null)
         {
             setNotPrecompilable();
-            if (right instanceof CollectionLiteral)
-            {
-                // Use Collection.contains(element)
-                List<SQLExpression> sqlExprArgs = new ArrayList();
-                sqlExprArgs.add(left);
-                SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
-                stack.push(sqlExpr);
-                return sqlExpr;
-            }
 
             // Single valued parameter, so use equality
             SQLExpression inExpr = new BooleanExpression(left, Expression.OP_EQ, right);
@@ -3971,20 +3978,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
-        if (right.getParameterName() != null)
+
+        if (right instanceof CollectionExpression)
         {
-            setNotPrecompilable();
-            if (right instanceof CollectionLiteral)
+            // myElement IN myCollection
+            if (right.getParameterName() != null)
             {
-                // Use !Collection.contains(element)
-                List<SQLExpression> sqlExprArgs = new ArrayList();
-                sqlExprArgs.add(left);
-                SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
-                sqlExpr.not();
-                stack.push(sqlExpr);
-                return sqlExpr;
+                setNotPrecompilable();
             }
 
+            // Use !Collection.contains(element)
+            List<SQLExpression> sqlExprArgs = new ArrayList();
+            sqlExprArgs.add(left);
+            SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
+            sqlExpr.not();
+            stack.push(sqlExpr);
+            return sqlExpr;
+        }
+        else if (right.getParameterName() != null)
+        {
             // Single valued parameter, so use equality
             SQLExpression inExpr = new BooleanExpression(left, Expression.OP_NOTEQ, right);
             stack.push(inExpr);
