@@ -24,6 +24,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
@@ -118,7 +119,28 @@ public class TypeConverterMapping extends SingleFieldMapping
     @Override
     public Class getJavaType()
     {
-        return mmd != null ? mmd.getType() : storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
+        if (mmd != null)
+        {
+            if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
+            {
+                return clr.classForName(mmd.getCollection().getElementType());
+            }
+            else if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
+            {
+                return clr.classForName(mmd.getArray().getElementType());
+            }
+            else if (roleForMember == FieldRole.ROLE_MAP_KEY)
+            {
+                return clr.classForName(mmd.getMap().getKeyType());
+            }
+            else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
+            {
+                return clr.classForName(mmd.getMap().getValueType());
+            }
+            return mmd.getType();
+        }
+        return clr.classForName(type);
     }
 
     /**
