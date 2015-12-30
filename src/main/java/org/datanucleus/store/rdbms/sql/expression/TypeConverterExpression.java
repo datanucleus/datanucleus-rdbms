@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.expression;
 
 import java.util.Date;
+import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -26,6 +27,8 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.store.types.converters.TypeConverterHelper;
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Wrapper expression handler for a TypeConverterMapping to avoid the need to have an explicit mapping for something using a TypeConverter.
@@ -37,7 +40,7 @@ public class TypeConverterExpression extends DelegatedExpression
         super(stmt, table, mapping);
         if (!(mapping instanceof TypeConverterMapping))
         {
-            throw new NucleusException("Attempt to create TypeConverterExpression for mapping of type " + mapping.getClass().getName());
+            throw new NucleusException(Localiser.msg("060019", mapping.getClass().getName()));
         }
 
         TypeConverterMapping convMapping = (TypeConverterMapping)mapping;
@@ -57,8 +60,32 @@ public class TypeConverterExpression extends DelegatedExpression
         }
         else
         {
-            throw new NucleusException("Could not create TypeConverterExpression for mapping of type " + mapping.getClass().getName() + " with datastoreType=" + datastoreType.getName() +
-                " - no available supported expression");
+            throw new NucleusException(Localiser.msg("060017", mapping.getClass().getName(), datastoreType.getName()));
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.sql.expression.DelegatedExpression#invoke(java.lang.String, java.util.List)
+     */
+    @Override
+    public SQLExpression invoke(String methodName, List args)
+    {
+        String typeName = mapping.getJavaType().getName();
+
+        try
+        {
+            return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, typeName, methodName, this, args);
+        }
+        catch (NucleusException ne)
+        {
+            if (delegate instanceof StringExpression)
+            {
+                // Special case of conversion to a String, so try to invoke the method on the String.
+                typeName = String.class.getName();
+                NucleusLogger.QUERY.info(Localiser.msg("060018", methodName, mapping.getJavaType().getName(), typeName));
+                return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, typeName, methodName, this, args);
+            }
+            throw ne;
         }
     }
 }
