@@ -103,16 +103,14 @@ public class FetchRequest extends Request
      * @param cmd ClassMetaData of objects being fetched
      * @param clr ClassLoader resolver
      */
-    public FetchRequest(DatastoreClass classTable, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, 
-        ClassLoaderResolver clr)
+    public FetchRequest(DatastoreClass classTable, AbstractMemberMetaData[] mmds, AbstractClassMetaData cmd, ClassLoaderResolver clr)
     {
         super(classTable);
 
         RDBMSStoreManager storeMgr = classTable.getStoreManager();
 
         // Work out the real candidate table.
-        // Instead of just taking the most derived table as the candidate we find the table closest to
-        // the root table necessary to retrieve the requested fields
+        // Instead of just taking the most derived table as the candidate we find the table closest to the root table necessary to retrieve the requested fields
         boolean found = false;
         DatastoreClass candidateTable = classTable;
         if (mmds != null)
@@ -254,6 +252,7 @@ public class FetchRequest extends Request
             }
             str.append("[VERSION]");
         }
+
         if (!fetchingSurrogateVersion && numberOfFieldsToFetch == 0)
         {
             fieldsToFetch = null;
@@ -282,10 +281,9 @@ public class FetchRequest extends Request
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", op.getObjectAsPrintable(), fieldsToFetch, table));
         }
 
-        if (isFetchingVersionOnly() && isVersionLoaded(op))
+        if (((fetchingSurrogateVersion || versionFieldName != null) && numberOfFieldsToFetch == 0) && op.isVersionLoaded())
         {
-            // Don't fetch if we have only the version to fetch and it is already loaded
-            // Debug comment until we're sure this is a valid thing to do
+            // Fetching only the version and it is already loaded, so do nothing
         }
         else if (statementLocked != null)
         {
@@ -405,25 +403,6 @@ public class FetchRequest extends Request
         {
             callbacks[i].postFetch(op);
         }
-    }
-
-    /**
-     * Convenience method to return if the version field of the managed object is loaded.
-     * @param op ObjectProvider of the object
-     * @return Whether the version is loaded
-     */
-    private boolean isVersionLoaded(ObjectProvider op)
-    {
-        return op.getObject() != null && op.getVersion() != null;
-    }
-
-    /**
-     * Convenience method to return if just the version field is being fetched.
-     * @return Whether we are just fetching the version field
-     */
-    private boolean isFetchingVersionOnly()
-    {
-        return ((fetchingSurrogateVersion || versionFieldName != null) && numberOfFieldsToFetch == 0);
     }
 
     /**
