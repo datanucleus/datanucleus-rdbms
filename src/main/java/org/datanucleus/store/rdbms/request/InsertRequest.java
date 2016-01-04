@@ -213,8 +213,7 @@ public class InsertRequest extends Request
             if (vermd != null && vermd.getFieldName() != null)
             {
                 // Version field - Update the version in the object
-                AbstractMemberMetaData verfmd = 
-                    ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
+                AbstractMemberMetaData verfmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
                 Object currentVersion = op.getVersion();
                 if (currentVersion instanceof Number)
                 {
