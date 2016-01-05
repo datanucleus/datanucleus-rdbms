@@ -56,7 +56,7 @@ public class MathCeilMethod extends AbstractSQLMethod
             if (expr instanceof ByteLiteral)
             {
                 int originalValue = ((BigInteger) ((ByteLiteral) expr).getValue()).intValue();
-                BigInteger absValue = new BigInteger(String.valueOf(Math.ceil(originalValue)));
+                BigInteger absValue = new BigInteger(String.valueOf(originalValue));
                 return new ByteLiteral(stmt, expr.getJavaTypeMapping(), absValue, null);
             }
             else if (expr instanceof IntegerLiteral)
