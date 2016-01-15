@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
@@ -1017,8 +1018,17 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             if (datastoreTable == null)
             {
                 // We need a "FK" relation.
-                if (mmd.getOrderMetaData() != null || List.class.isAssignableFrom(mmd.getType()))
+                if (Set.class.isAssignableFrom(mmd.getType()))
                 {
+                    return new FKSetStore(mmd, this, clr);
+                }
+                else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
+                {
+                    return new FKListStore(mmd, this, clr);
+                }
+                else if (mmd.getOrderMetaData() != null)
+                {
+                    // User has requested ordering
                     return new FKListStore(mmd, this, clr);
                 }
 
@@ -1026,8 +1036,17 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             // We need a "JoinTable" relation.
-            if (mmd.getOrderMetaData() != null || List.class.isAssignableFrom(mmd.getType()))
+            if (Set.class.isAssignableFrom(mmd.getType()))
             {
+                return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
+            }
+            else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
+            {
+                return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
+            }
+            else if (mmd.getOrderMetaData() != null)
+            {
+                // User has requested ordering
                 return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
             }
 
