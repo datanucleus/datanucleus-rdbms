@@ -575,7 +575,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * @param schemaName Database schema name
      * @param seqName Name of the sequence
      * @return The statement for getting the next id for the sequence
-     * @throws SQLException
+     * @throws SQLException If an error occurs
      */
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
     {
