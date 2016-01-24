@@ -1219,6 +1219,37 @@ Contributors:
         <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond4Method" datastore="sqlserver"/>
         <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond5Method" datastore="hsql"/>
         <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond6Method" datastore="sqlite"/>
+
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
+        <sql-method class="java.time.MonthDay" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
+        <sql-method class="java.time.MonthDay" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
+        <sql-method class="java.time.MonthDay" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
+        <sql-method class="java.time.MonthDay" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
+
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
+
+        <sql-method class="java.time.YearMonth" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
+        <sql-method class="java.time.YearMonth" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
+        <sql-method class="java.time.YearMonth" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
+        <sql-method class="java.time.YearMonth" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
     </extension>
 
     <!-- SQL OPERATIONS -->
