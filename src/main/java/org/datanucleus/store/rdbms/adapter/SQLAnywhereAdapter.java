@@ -438,7 +438,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
 
     /**
      * Method to define a foreign key definition
-     * @param pk An object describing the foreign key.
+     * @param fk An object describing the foreign key.
      * @param factory Identifier factory
      * @return The FK statement
      */
@@ -569,14 +569,14 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Determine if a sequence exists
+     * Determine if a sequence exists.
      * @param conn Connection to database
      * @param catalogName Database catalog name
      * @param schemaName Database schema name
-     * @param sequence_name Name of the sequence
+     * @param seqName Name of the sequence
      * @return The statement for getting the next id for the sequence
-     * @throws SQLException
-     **/
+     * @throws SQLException If an error occurs checking existence
+     */
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
     {
         try
