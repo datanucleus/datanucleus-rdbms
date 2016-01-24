@@ -78,90 +78,56 @@ Contributors:
 
     <!-- PERSISTENCE PROPERTIES -->
     <extension point="org.datanucleus.persistence_properties">
-        <persistence-property name="datanucleus.rdbms.useLegacyNativeValueStrategy" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.dynamicSchemaUpdates" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.useLegacyNativeValueStrategy" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.dynamicSchemaUpdates" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.tableColumnOrder" datastore="true" value="owner-first"/>
 
-        <persistence-property name="datanucleus.rdbms.query.fetchDirection" datastore="true" value="forward"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.query.resultSetType" datastore="true" value="forward-only"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.query.resultSetConcurrency" datastore="true" value="read-only"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.query.multivaluedFetch" datastore="true" value="exists"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.query.fetchDirection" datastore="true" value="forward" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.query.resultSetType" datastore="true" value="forward-only" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.query.resultSetConcurrency" datastore="true" value="read-only" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.query.multivaluedFetch" datastore="true" value="exists" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
 
-        <persistence-property name="datanucleus.rdbms.classAdditionMaxRetries" datastore="true" value="3"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.statementBatchLimit" datastore="true" value="50"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.classAdditionMaxRetries" datastore="true" value="3" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.statementBatchLimit" datastore="true" value="50" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.oracleNlsSortOrder" datastore="true" value="LATIN"/>
-        <persistence-property name="datanucleus.rdbms.discriminatorPerSubclassTable" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.constraintCreateMode" datastore="true" value="DataNucleus"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.uniqueConstraints.mapInverse" datastore="true" value="true"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.initializeColumnInfo" datastore="true" value="ALL"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.useDefaultSqlType" datastore="true" value="true"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.stringDefaultLength" datastore="true" value="255"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.stringLengthExceededAction" datastore="true" value="EXCEPTION"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.persistEmptyStringAsNull" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.checkExistTablesOrViews" datastore="true" value="true"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.discriminatorPerSubclassTable" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.constraintCreateMode" datastore="true" value="DataNucleus" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.uniqueConstraints.mapInverse" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.initializeColumnInfo" datastore="true" value="ALL" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.useDefaultSqlType" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.stringDefaultLength" datastore="true" value="255" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.stringLengthExceededAction" datastore="true" value="EXCEPTION" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.persistEmptyStringAsNull" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.checkExistTablesOrViews" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.schemaTable.tableName" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.connectionProviderName" datastore="true" value="PriorityList"/>
-        <persistence-property name="datanucleus.rdbms.connectionProviderFailOnError" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.connectionProviderFailOnError" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.datastoreAdapterClassName" datastore="true"/>
-        <persistence-property name="datanucleus.rdbms.omitDatabaseMetaDataGetColumns" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.omitDatabaseMetaDataGetColumns" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.sqlTableNamingStrategy" datastore="true" value="alpha-scheme"/>
         <persistence-property name="datanucleus.rdbms.allowColumnReuse" datastore="true" value="false"/>
 
-        <persistence-property name="datanucleus.rdbms.adapter.informixUseSerialForIdentity" datastore="true"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="values-in-brackets"
-            validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false"
-            validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.adapter.informixUseSerialForIdentity" datastore="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="values-in-brackets" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
 
         <persistence-property name="datanucleus.rdbms.mysql.engineType" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.mysql.collation" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.mysql.characterSet" datastore="true"/>
 
         <!-- TODO Rename these to "datanucleus.rdbms.connectionPool.*" or move to "core" -->
-        <persistence-property name="datanucleus.connectionPool.maxStatements" datastore="true" value="0"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.maxPoolSize" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.minPoolSize" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.initialPoolSize" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.maxIdle" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.minIdle" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.maxActive" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.maxWait" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.testSQL" datastore="true"
-            validator="org.datanucleus.properties.StringPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.timeBetweenEvictionRunsMillis" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.minEvictableIdleTimeMillis" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.connectionPool.maxConnections" datastore="true"
-            validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxStatements" datastore="true" value="0" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxPoolSize" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.minPoolSize" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.initialPoolSize" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxIdle" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.minIdle" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxActive" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxWait" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.testSQL" datastore="true" validator="org.datanucleus.properties.StringPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.timeBetweenEvictionRunsMillis" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.minEvictableIdleTimeMillis" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
+        <persistence-property name="datanucleus.connectionPool.maxConnections" datastore="true" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
         <persistence-property name="datanucleus.connectionPool.driverProps"/>
     </extension>
 
@@ -302,8 +268,7 @@ Contributors:
 
     <!-- RDBMS Datastore Mapping -->
     <extension point="org.datanucleus.store.rdbms.datastore_mapping">
-        <mapping java-type="java.lang.Boolean" jdbc-type="BIT" sql-type="BIT" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="BIT" sql-type="BIT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
             <excludes vendor-id="derby"/>
             <excludes vendor-id="firebird"/>
             <excludes vendor-id="h2"/>
@@ -311,249 +276,196 @@ Contributors:
             <excludes vendor-id="pointbase"/>
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="CHAR" sql-type="CHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
             <excludes vendor-id="h2"/>
             <excludes vendor-id="sqlanywhere"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BIT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BIT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping">
             <includes vendor-id="sqlanywhere"/>
-	</mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
+        </mapping>
+        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping">
             <includes vendor-id="h2"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="TINYINT" sql-type="TINYINT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="TINYINT" sql-type="TINYINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
-        <mapping java-type="java.lang.Boolean" jdbc-type="CHAR" sql-type="CHAR" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
+        <mapping java-type="java.lang.Boolean" jdbc-type="CHAR" sql-type="CHAR" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
             <includes vendor-id="db2"/>
             <includes vendor-id="derby"/>
             <includes vendor-id="firebird"/>
             <includes vendor-id="pointbase"/>
             <includes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="BOOLEAN" sql-type="BOOLEAN" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
             <includes vendor-id="hsql"/>
         </mapping>
-        <mapping java-type="java.lang.Boolean" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Boolean" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.lang.Byte" jdbc-type="TINYINT" sql-type="TINYINT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
+        <mapping java-type="java.lang.Byte" jdbc-type="TINYINT" sql-type="TINYINT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
         </mapping>
-        <mapping java-type="java.lang.Byte" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
-        <mapping java-type="java.lang.Byte" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Byte" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
+        <mapping java-type="java.lang.Byte" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.lang.Character" jdbc-type="CHAR" sql-type="CHAR" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.lang.Character" jdbc-type="INTEGER" sql-type="INTEGER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Character" jdbc-type="CHAR" sql-type="CHAR" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.lang.Character" jdbc-type="INTEGER" sql-type="INTEGER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Character" jdbc-type="INTEGER" sql-type="INT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Character" jdbc-type="INTEGER" sql-type="INT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="derby"/>
             <includes vendor-id="sapdb"/>
             <includes vendor-id="sqlserver"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Character" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Character" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.lang.Double" jdbc-type="DOUBLE" sql-type="DOUBLE" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
+        <mapping java-type="java.lang.Double" jdbc-type="DOUBLE" sql-type="DOUBLE" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
             <excludes vendor-id="informix"/>
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Double" jdbc-type="DOUBLE" sql-type="FLOAT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
+        <mapping java-type="java.lang.Double" jdbc-type="DOUBLE" sql-type="FLOAT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
             <includes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Double" jdbc-type="DECIMAL" sql-type="DECIMAL" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
+        <mapping java-type="java.lang.Double" jdbc-type="DECIMAL" sql-type="DECIMAL" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
             <excludes vendor-id="postgresql"/>
         </mapping>
-        <mapping java-type="java.lang.Double" jdbc-type="FLOAT" sql-type="FLOAT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.FloatRDBMSMapping">
+        <mapping java-type="java.lang.Double" jdbc-type="FLOAT" sql-type="FLOAT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.FloatRDBMSMapping">
             <includes vendor-id="informix"/>
             <includes vendor-id="oracle"/>
             <includes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Double" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Double" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.lang.Float" jdbc-type="FLOAT" sql-type="FLOAT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.FloatRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="FLOAT" sql-type="FLOAT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.FloatRDBMSMapping">
             <excludes vendor-id="postgresql"/>
             <excludes vendor-id="sybase"/>
             <excludes vendor-id="db2"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="DOUBLE" sql-type="DOUBLE" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="DOUBLE" sql-type="DOUBLE" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
             <excludes vendor-id="informix"/>
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="REAL" sql-type="REAL" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.RealRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="REAL" sql-type="REAL" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.RealRDBMSMapping">
             <excludes vendor-id="db2"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="REAL" sql-type="REAL" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.RealRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="REAL" sql-type="REAL" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.RealRDBMSMapping">
             <includes vendor-id="db2"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="DECIMAL" sql-type="DECIMAL" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="DECIMAL" sql-type="DECIMAL" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
             <excludes vendor-id="postgresql"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="DOUBLE" sql-type="DOUBLE" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="DOUBLE" sql-type="DOUBLE" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
             <includes vendor-id="postgresql"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Float" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Float" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.lang.Integer" jdbc-type="INTEGER" sql-type="INTEGER" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="INTEGER" sql-type="INTEGER" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="INTEGER" sql-type="INT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="INTEGER" sql-type="INT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="derby"/>
             <includes vendor-id="sapdb"/>
             <includes vendor-id="sqlserver"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="TINYINT" sql-type="TINYINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="TINYINT" sql-type="TINYINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
         </mapping>
-        <mapping java-type="java.lang.Integer" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
-        <mapping java-type="java.lang.Integer" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.lang.Integer" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
+        <mapping java-type="java.lang.Integer" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
 
-        <mapping java-type="java.lang.Long" jdbc-type="BIGINT" sql-type="BIGINT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="BIGINT" sql-type="BIGINT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="INTEGER" sql-type="INT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="INTEGER" sql-type="INT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="DOUBLE" sql-type="DOUBLE" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="DOUBLE" sql-type="DOUBLE" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DoubleRDBMSMapping">
             <includes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="DECIMAL" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="DECIMAL" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
             <includes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="INTEGER" sql-type="INT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="INTEGER" sql-type="INT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="TINYINT" sql-type="TINYINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
+        <mapping java-type="java.lang.Long" jdbc-type="TINYINT" sql-type="TINYINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sqlserver"/>
             <excludes vendor-id="nuodb"/>
         </mapping>
-        <mapping java-type="java.lang.Long" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
+        <mapping java-type="java.lang.Long" jdbc-type="SMALLINT" sql-type="SMALLINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
 
-        <mapping java-type="java.lang.Short" jdbc-type="SMALLINT" sql-type="SMALLINT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
-        <mapping java-type="java.lang.Short" jdbc-type="INTEGER" sql-type="INTEGER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Short" jdbc-type="SMALLINT" sql-type="SMALLINT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping"/>
+        <mapping java-type="java.lang.Short" jdbc-type="INTEGER" sql-type="INTEGER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.Short" jdbc-type="INTEGER" sql-type="INT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="java.lang.Short" jdbc-type="INTEGER" sql-type="INT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="derby"/>
             <includes vendor-id="sapdb"/>
             <includes vendor-id="sqlserver"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.lang.Short" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Short" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Short" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.lang.Short" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.Short" jdbc-type="TINYINT" sql-type="TINYINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
+        <mapping java-type="java.lang.Short" jdbc-type="TINYINT" sql-type="TINYINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping">
             <excludes vendor-id="db2"/>
             <excludes vendor-id="derby"/>
             <excludes vendor-id="sapdb"/>
@@ -561,223 +473,158 @@ Contributors:
             <excludes vendor-id="nuodb"/>
         </mapping>
 
-        <mapping java-type="java.lang.String" jdbc-type="VARCHAR" sql-type="VARCHAR" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="java.lang.String" jdbc-type="CHAR" sql-type="CHAR" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.lang.String" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping"/>
-        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="LONGVARCHAR" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping"/>
-        <mapping java-type="java.lang.String" jdbc-type="CLOB" sql-type="CLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ClobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="VARCHAR" sql-type="VARCHAR" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="LONGVARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="CLOB" sql-type="CLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ClobRDBMSMapping">
             <excludes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="CLOB" sql-type="CLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleClobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="CLOB" sql-type="CLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleClobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
             <excludes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="BLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="DATALINK" sql-type="DATALINK" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DB2DatalinkRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="DATALINK" sql-type="DATALINK" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DB2DatalinkRDBMSMapping">
             <includes vendor-id="db2"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="CHAR" sql-type="UNIQUEIDENTIFIER" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="CHAR" sql-type="UNIQUEIDENTIFIER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping">
             <includes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="SQLXML" sql-type="SQLXML" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SqlXmlRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="SQLXML" sql-type="SQLXML" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.SqlXmlRDBMSMapping">
             <includes vendor-id="db2"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="LONGTEXT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="LONGTEXT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
             <includes vendor-id="mysql"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="MEDIUMTEXT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="MEDIUMTEXT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
             <includes vendor-id="mysql"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="TEXT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="LONGVARCHAR" sql-type="TEXT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarcharRDBMSMapping">
             <includes vendor-id="mysql"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="LONGBLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="LONGBLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
             <includes vendor-id="mysql"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="MEDIUMBLOB" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="BLOB" sql-type="MEDIUMBLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
             <includes vendor-id="mysql"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="XMLTYPE" sql-type="XMLTYPE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleXMLTypeRDBMSMapping">
+        <mapping java-type="java.lang.String" jdbc-type="XMLTYPE" sql-type="XMLTYPE" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleXMLTypeRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NVarcharRDBMSMapping"/>
-        <mapping java-type="java.lang.String" jdbc-type="NCHAR" sql-type="NCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NCharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NVarcharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="NCHAR" sql-type="NCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NCharRDBMSMapping"/>
 
-        <mapping java-type="java.math.BigDecimal" jdbc-type="DECIMAL" sql-type="DECIMAL" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
+        <mapping java-type="java.math.BigDecimal" jdbc-type="DECIMAL" sql-type="DECIMAL" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
             <excludes vendor-id="postgresql"/>
         </mapping>
-        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="postgresql"/>
         </mapping>
-        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigDecimal" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.math.BigInteger" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigInteger" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.math.BigInteger" jdbc-type="DECIMAL" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
+        <mapping java-type="java.math.BigInteger" jdbc-type="DECIMAL" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">
             <includes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="java.math.BigInteger" jdbc-type="NUMERIC" sql-type="NUMBER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="java.math.BigInteger" jdbc-type="NUMERIC" sql-type="NUMBER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
 
-        <mapping java-type="java.sql.Date" jdbc-type="DATE" sql-type="DATE" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
-        <mapping java-type="java.sql.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
-        <mapping java-type="java.sql.Date" jdbc-type="CHAR" sql-type="CHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.sql.Date" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="java.sql.Date" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.sql.Date" jdbc-type="DATE" sql-type="DATE" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
+        <mapping java-type="java.sql.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
+        <mapping java-type="java.sql.Date" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.sql.Date" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="java.sql.Date" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
 
-        <mapping java-type="java.sql.Time" jdbc-type="TIME" sql-type="TIME" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
-        <mapping java-type="java.sql.Time" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
-        <mapping java-type="java.sql.Time" jdbc-type="CHAR" sql-type="CHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.sql.Time" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="java.sql.Time" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.sql.Time" jdbc-type="TIME" sql-type="TIME" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
+        <mapping java-type="java.sql.Time" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
+        <mapping java-type="java.sql.Time" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.sql.Time" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="java.sql.Time" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
 
-        <mapping java-type="java.sql.Timestamp" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
-        <mapping java-type="java.sql.Timestamp" jdbc-type="CHAR" sql-type="CHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.sql.Timestamp" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="java.sql.Timestamp" jdbc-type="DATE" sql-type="DATE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
-        <mapping java-type="java.sql.Timestamp" jdbc-type="TIME" sql-type="TIME" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="DATE" sql-type="DATE" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
+        <mapping java-type="java.sql.Timestamp" jdbc-type="TIME" sql-type="TIME" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
 
-        <mapping java-type="java.util.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
-        <mapping java-type="java.util.Date" jdbc-type="DATE" sql-type="DATE" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
-        <mapping java-type="java.util.Date" jdbc-type="CHAR" sql-type="CHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="java.util.Date" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="java.util.Date" jdbc-type="BIGINT" sql-type="BIGINT" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="java.util.Date" jdbc-type="TIMESTAMP" sql-type="TIMESTAMP" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimestampRDBMSMapping"/>
+        <mapping java-type="java.util.Date" jdbc-type="DATE" sql-type="DATE" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DateRDBMSMapping"/>
+        <mapping java-type="java.util.Date" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="java.util.Date" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="java.util.Date" jdbc-type="BIGINT" sql-type="BIGINT" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="java.util.Date" jdbc-type="TIME" sql-type="TIME" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
+        <mapping java-type="java.util.Date" jdbc-type="TIME" sql-type="TIME" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping"/>
 
-        <mapping java-type="java.util.UUID" jdbc-type="OTHER" sql-type="UUID" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OtherRDBMSMapping">
+        <mapping java-type="java.util.UUID" jdbc-type="OTHER" sql-type="UUID" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OtherRDBMSMapping">
             <includes vendor-id="postgresql"/>
         </mapping>
 
         <!-- Use Collection as the way to signal that we want an ARRAY type. -->
-        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="TEXT ARRAY" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
+        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="TEXT ARRAY" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
             <includes vendor-id="postgresql"/>
         </mapping>
-        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="INT ARRAY" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
+        <mapping java-type="java.util.Collection" jdbc-type="ARRAY" sql-type="INT ARRAY" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.ArrayRDBMSMapping">
             <includes vendor-id="postgresql"/>
         </mapping>
 
-        <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping">
-        </mapping>
-        <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="false"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
+        <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping"/>
+        <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
             <excludes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
+        <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
-        <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="false"
-                 rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarBinaryRDBMSMapping">
+        <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarBinaryRDBMSMapping">
             <excludes vendor-id="timesten"/>
         </mapping>
-        <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="true"
-                 rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping">
+        <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping">
             <includes vendor-id="timesten"/>
         </mapping>
-        <mapping java-type="java.io.File" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true"
-            rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BinaryStreamRDBMSMapping">
+        <mapping java-type="java.io.File" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BinaryStreamRDBMSMapping">
         </mapping>
 
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="BIGINT" sql-type="BIGINT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="BIGINT" sql-type="BIGINT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping">
             <excludes vendor-id="sapdb"/>
             <excludes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INTEGER" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INTEGER" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <excludes vendor-id="sqlserver"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <excludes vendor-id="sapdb"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="CHAR" sql-type="CHAR" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INT" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="CHAR" sql-type="CHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping"/>
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="VARCHAR" sql-type="VARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping"/>
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="INTEGER" sql-type="INT" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping">
             <includes vendor-id="sapdb"/>
             <includes vendor-id="sqlserver"/>
             <includes vendor-id="sybase"/>
         </mapping>
-        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true"
-             rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
+        <mapping java-type="org.datanucleus.identity.DatastoreId" jdbc-type="NUMERIC" sql-type="NUMERIC" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping">
             <includes vendor-id="oracle"/>
         </mapping>
     </extension>
@@ -1254,32 +1101,20 @@ Contributors:
 
     <!-- SQL OPERATIONS -->
     <extension point="org.datanucleus.store.rdbms.sql_operation">
-        <sql-operation name="mod" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="h2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="hsql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="informix"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="oracle"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="db2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod3Operation"/>
+        <sql-operation name="mod" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="h2" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="hsql" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="informix" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod3Operation"/>
 
-        <sql-operation name="concat" datastore="mysql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
-        <sql-operation name="concat" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
-        <sql-operation name="concat" datastore="db2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
+        <sql-operation name="concat" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
+        <sql-operation name="concat" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
+        <sql-operation name="concat" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
 
-        <sql-operation name="numericToString"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation"/>
-        <sql-operation name="numericToString" datastore="mysql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation"/>
-        <sql-operation name="numericToString" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation"/>
+        <sql-operation name="numericToString" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation"/>
+        <sql-operation name="numericToString" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation"/>
+        <sql-operation name="numericToString" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation"/>
     </extension>
 
     <!-- SQL TABLE NAMING -->
@@ -1312,10 +1147,10 @@ Contributors:
         <datastore-adapter vendor-id="postgresql" class-name="org.datanucleus.store.rdbms.adapter.PostgreSQLAdapter" priority="0"/>
         <datastore-adapter vendor-id="sap db" class-name="org.datanucleus.store.rdbms.adapter.SAPDBAdapter" priority="0"/>
         <datastore-adapter vendor-id="sapdb" class-name="org.datanucleus.store.rdbms.adapter.SAPDBAdapter" priority="0"/>
+        <datastore-adapter vendor-id="sqlanywhere" class-name="org.datanucleus.store.rdbms.adapter.SQLAnywhereAdapter" priority="0"/>
+        <datastore-adapter vendor-id="sqlite" class-name="org.datanucleus.store.rdbms.adapter.SQLiteAdapter" priority="0"/>
         <datastore-adapter vendor-id="sybase" class-name="org.datanucleus.store.rdbms.adapter.SybaseAdapter" priority="0"/>
         <datastore-adapter vendor-id="timesten" class-name="org.datanucleus.store.rdbms.adapter.TimesTenAdapter" priority="0"/>
-        <datastore-adapter vendor-id="sqlite" class-name="org.datanucleus.store.rdbms.adapter.SQLiteAdapter" priority="0"/>
         <datastore-adapter vendor-id="virtuoso" class-name="org.datanucleus.store.rdbms.adapter.VirtuosoAdapter" priority="0"/>
-	<datastore-adapter vendor-id="sqlanywhere" class-name="org.datanucleus.store.rdbms.adapter.SQLAnywhereAdapter" priority="0"/>
     </extension>
 </plugin>
