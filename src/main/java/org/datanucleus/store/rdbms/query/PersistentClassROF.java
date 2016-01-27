@@ -98,7 +98,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
     {
         if (mappingDefinition == null)
         {
-            throw new NucleusException("Attempt to create PersistentIDROF with null mappingDefinition");
+            throw new NucleusException("Attempt to create PersistentClassROF with null mappingDefinition");
         }
 
         this.storeMgr = storeMgr;
@@ -354,7 +354,15 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 {
                     NucleusLogger.DATASTORE_RETRIEVE.warn(warnMsg);
                 }
-                obj = getObjectForApplicationId(ec, rs, mappingDefinition, mappedFieldNumbers, pcClassForObject, cmd, requiresInheritanceCheck, surrogateVersion);
+
+                Object id = getIdentityForResultSetRow(storeMgr, rs, mappingDefinition, ec, cmd, pcClassForObject, requiresInheritanceCheck);
+                if (IdentityUtils.isSingleFieldIdentity(id))
+                {
+                    // Any single-field identity will have the precise target class determined above, so use it
+                    pcClassForObject = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentitySimple(id));
+                }
+
+                obj = findObjectWithIdAndLoadFields(id, ec, rs, mappingDefinition, mappedFieldNumbers, pcClassForObject, cmd, surrogateVersion);
             }
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -382,7 +390,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 }
                 else
                 {
-                    obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, id, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
+                    obj = findObjectWithIdAndLoadFields(id, ec, rs, mappingDefinition, mappedFieldNumbers, requiresInheritanceCheck ? null : pcClassForObject, cmd, surrogateVersion);
                 }
             }
         }
@@ -402,7 +410,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             }
             else
             {
-                obj = getObjectForDatastoreId(ec, rs, mappingDefinition, mappedFieldNumbers, id, pcClassForObject, cmd, surrogateVersion);
+                obj = findObjectWithIdAndLoadFields(id, ec, rs, mappingDefinition, fieldNumbers, pcClassForObject, cmd, surrogateVersion);
             }
         }
 
@@ -437,88 +445,20 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
     }
 
     /**
-     * Returns a PC instance from a ResultSet row with a datastore identity.
-     * @param ec execution context
-     * @param resultSet The ResultSet
-     * @param mappingDefinition The mapping info for the result class
-     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param cmd MetaData for the class
-     * @param oid The object id
-     * @param pcClass The persistable class (where we know the instance type required, null if not)
-     * @param cmd Metadata for the class
-     * @param surrogateVersion Surrogate version (if applicable)
-     * @return The Object
+     * Method to lookup an object for an id, and specify its FieldValues using the ResultSet. Works for all identity types.
+     * @param id The identity (DatastoreId, application id, or SCOID when nondurable)
+     * @param ec ExecutionContext
+     * @param resultSet ResultSet
+     * @param mappingDefinition Mapping Definition
+     * @param fieldNumbers Field numbers that we have results for
+     * @param pcClass The class of the required object if known
+     * @param cmd Metadata for the type
+     * @param surrogateVersion Whether there is a surrogate version
+     * @return The persistable object for this id
      */
-    private T getObjectForDatastoreId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
-            final int[] fieldNumbers, Object oid, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
+    private T findObjectWithIdAndLoadFields(final Object id, final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
+            final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, final Object surrogateVersion)
     {
-        if (oid == null)
-        {
-            return null;
-        }
-
-        return (T) ec.findObject(oid, new FieldValues()
-        {
-            public void fetchFields(ObjectProvider op)
-            {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
-                op.replaceFields(fieldNumbers, fm, false);
-
-                // Set version
-                if (surrogateVersion != null)
-                {
-                    // Surrogate version field
-                    op.setVersion(surrogateVersion);
-                }
-                else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
-                {
-                    // Version stored in a normal field
-                    VersionMetaData vermd = cmd.getVersionMetaData();
-                    int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
-                    if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
-                    {
-                        Object verFieldValue = op.provideField(versionFieldNumber);
-                        if (verFieldValue != null)
-                        {
-                            op.setVersion(verFieldValue);
-                        }
-                    }
-                }
-            }
-            public void fetchNonLoadedFields(ObjectProvider sm)
-            {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, resultSet, mappingDefinition);
-                sm.replaceNonLoadedFields(fieldNumbers, fm);
-            }
-            public FetchPlan getFetchPlanForLoading()
-            {
-                return fetchPlan;
-            }
-        }, pcClass, ignoreCache, false);
-    }
-
-    /**
-     * Returns a PC instance from a ResultSet row with an application identity.
-     * @param ec execution context
-     * @param resultSet The ResultSet
-     * @param mappingDefinition The mapping info for the result class
-     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param pcClass persistable class
-     * @param cmd Metadata for the class
-     * @param requiresInheritanceCheck Whether we need to check the inheritance level of the returned object
-     * @param surrogateVersion Surrogate version if available
-     * @return The object with this application identity
-     */
-    private T getObjectForApplicationId(final ExecutionContext ec, final ResultSet resultSet, final StatementClassMapping mappingDefinition, 
-            final int[] fieldNumbers, Class pcClass, final AbstractClassMetaData cmd, boolean requiresInheritanceCheck, final Object surrogateVersion)
-    {
-        Object id = getIdentityForResultSetRow(storeMgr, resultSet, mappingDefinition, ec, cmd, pcClass, requiresInheritanceCheck);
-        if (IdentityUtils.isSingleFieldIdentity(id))
-        {
-            // Any single-field identity will have the precise target class determined above, so use it
-            pcClass = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentitySimple(id));
-        }
-
         return (T) ec.findObject(id, new FieldValues()
         {
             public void fetchFields(ObjectProvider op)
@@ -556,7 +496,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             {
                 return fetchPlan;
             }
-        }, pcClass, ignoreCache, false);
+        }, pcClass, ignoreCache, false);        
     }
 
     /**
