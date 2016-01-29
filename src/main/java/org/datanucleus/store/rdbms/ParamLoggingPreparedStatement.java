@@ -1011,6 +1011,7 @@ class ParamLoggingPreparedStatement implements PreparedStatement
 
     public void setNString(int parameterIndex, String value) throws SQLException
     {
+        setParameter(parameterIndex, value);
         ps.setNString(parameterIndex, value);
     }
 
