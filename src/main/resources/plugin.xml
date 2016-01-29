@@ -517,6 +517,9 @@ Contributors:
             <includes vendor-id="oracle"/>
         </mapping>
         <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NVarcharRDBMSMapping"/>
+        <mapping java-type="java.lang.String" jdbc-type="NVARCHAR" sql-type="NVARCHAR2" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NVarcharRDBMSMapping">
+            <includes vendor-id="oracle"/>
+        </mapping>
         <mapping java-type="java.lang.String" jdbc-type="NCHAR" sql-type="NCHAR" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.NCharRDBMSMapping"/>
 
         <mapping java-type="java.math.BigDecimal" jdbc-type="DECIMAL" sql-type="DECIMAL" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.DecimalRDBMSMapping">

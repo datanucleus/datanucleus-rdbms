@@ -209,6 +209,11 @@ public class OracleAdapter extends BaseDatastoreAdapter
             false, false, false, OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE, sqlType, true);
 
+        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+            "NVARCHAR2", (short)Types.NVARCHAR, 4000, "'", "'", null, 1, true, (short)3,
+            false, false, false, "NVARCHAR2", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.NVARCHAR, sqlType, true);
+
         // Update any types that need extra info relative to the JDBC info
         Collection<SQLTypeInfo> sqlTypes = getSQLTypeInfoForJdbcType(handler, mconn, (short)Types.BLOB);
         if (sqlTypes != null)
