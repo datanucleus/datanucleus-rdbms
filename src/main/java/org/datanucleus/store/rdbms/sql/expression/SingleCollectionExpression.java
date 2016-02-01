@@ -22,6 +22,11 @@ import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 
+/**
+ * Cover-all expression to represent "single collection" mapped types.
+ * Note that we should split this up if we ever want to have methods on particular types.
+ * For example we could have OptionalExpression and provide methods "isPresent" and "get".
+ */
 public class SingleCollectionExpression extends DelegatedExpression
 {
     protected SQLExpression[] wrappedExpressions;
