@@ -20,7 +20,6 @@ package org.datanucleus.store.rdbms.adapter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
@@ -575,7 +574,6 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * @param schemaName Database schema name
      * @param seqName Name of the sequence
      * @return The statement for getting the next id for the sequence
-     * @throws SQLException If an error occurs checking existence
      */
     public boolean sequenceExists(Connection conn, String catalogName, String schemaName, String seqName)
     {
