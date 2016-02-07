@@ -1948,6 +1948,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      * Convenience method to convert a NewObjectExpression into a StatementNewObjectMapping.
      * Handles recursive new object calls (where a new object is an arg to a new object construction).
      * @param expr The NewObjectExpression
+     * @param stmt SelectStatement
      * @return The mapping for the new object
      */
     protected StatementNewObjectMapping getStatementMappingForNewObjectExpression(NewObjectExpression expr, SelectStatement stmt)
