@@ -941,45 +941,45 @@ Contributors:
         <sql-method class="java.util.Collection" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.CollectionSizeMethod"/>
         <sql-method class="java.util.Collection" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.ListGetMethod"/>
 
-        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDayMethod"/>
-        <sql-method class="java.util.Date" method="getDay" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay2Method"/>
-        <sql-method class="java.util.Date" method="getDay" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay3Method"/>
-        <sql-method class="java.util.Date" method="getDay" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay4Method"/>
-        <sql-method class="java.util.Date" method="getDay" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay5Method"/>
-        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDayMethod"/>
-        <sql-method class="java.util.Date" method="getDate" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay2Method"/>
-        <sql-method class="java.util.Date" method="getDate" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay3Method"/>
-        <sql-method class="java.util.Date" method="getDate" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay4Method"/>
-        <sql-method class="java.util.Date" method="getDate" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetDay5Method"/>
-        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonthMethod"/>
-        <sql-method class="java.util.Date" method="getMonth" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth2Method"/>
-        <sql-method class="java.util.Date" method="getMonth" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth3Method"/>
-        <sql-method class="java.util.Date" method="getMonth" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth4Method"/>
-        <sql-method class="java.util.Date" method="getMonth" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMonth5Method"/>
-        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYearMethod"/>
-        <sql-method class="java.util.Date" method="getYear" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear2Method"/>
-        <sql-method class="java.util.Date" method="getYear" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear3Method"/>
-        <sql-method class="java.util.Date" method="getYear" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear4Method"/>
-        <sql-method class="java.util.Date" method="getYear" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetYear5Method"/>
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHourMethod"/>
-        <sql-method class="java.util.Date" method="getHour" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour2Method"/>
-        <sql-method class="java.util.Date" method="getHour" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour3Method"/>
-        <sql-method class="java.util.Date" method="getHour" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour4Method"/>
-        <sql-method class="java.util.Date" method="getHour" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour5Method"/>
-        <sql-method class="java.util.Date" method="getHour" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetHour6Method"/>
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinuteMethod"/>
-        <sql-method class="java.util.Date" method="getMinute" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute2Method"/>
-        <sql-method class="java.util.Date" method="getMinute" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute3Method"/>
-        <sql-method class="java.util.Date" method="getMinute" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute4Method"/>
-        <sql-method class="java.util.Date" method="getMinute" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute5Method"/>
-        <sql-method class="java.util.Date" method="getMinute" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetMinute6Method"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecondMethod"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond2Method"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond3Method"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond4Method"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="hsql" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond5Method"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond6Method"/>
-        <sql-method class="java.util.Date" method="getSecond" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.DateGetSecond7Method"/>
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod4" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod5" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod7" datastore="firebird"/>
 
         <sql-method class="java.util.Map" method="mapKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapKeyMethod"/>
         <sql-method class="java.util.Map" method="mapValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapValueMethod"/>
@@ -995,111 +995,154 @@ Contributors:
         <sql-method class="ARRAY" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
         <sql-method class="ARRAY" method="length" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
 
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHourMethod"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour5Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinuteMethod"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute5Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecondMethod"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond5Method" datastore="hsql"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond6Method" datastore="sqlite"/>
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2" datastore="oracle"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod3" datastore="postgresql"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod4" datastore="sqlite"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod5" datastore="firebird"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod7" datastore="firebird"/>
 
-        <sql-method class="java.time.LocalDate" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
-        <sql-method class="java.time.LocalDate" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.LocalDate" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="firebird"/>
 
-        <sql-method class="java.time.LocalDateTime" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHourMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetHour5Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinuteMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetMinute5Method" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecondMethod"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond2Method" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond3Method" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond4Method" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond5Method" datastore="hsql"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.LocalTimeGetSecond6Method" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
 
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonthMethod"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth2Method" datastore="oracle"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth3Method" datastore="postgresql"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetDayOfMonth4Method" datastore="sqlite"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="firebird"/>
 
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
 
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValueMethod"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue2Method" datastore="oracle"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue3Method" datastore="postgresql"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetMonthValue4Method" datastore="sqlite"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYearMethod"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear2Method" datastore="oracle"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear3Method" datastore="postgresql"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.LocalDateGetYear4Method" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
+
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
     </extension>
 
     <!-- SQL OPERATIONS -->
