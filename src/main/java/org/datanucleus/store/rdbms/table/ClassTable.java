@@ -102,8 +102,7 @@ import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
-import org.datanucleus.store.rdbms.mapping.java.VersionLongMapping;
-import org.datanucleus.store.rdbms.mapping.java.VersionTimestampMapping;
+import org.datanucleus.store.rdbms.mapping.java.VersionMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
@@ -282,14 +281,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         versionMetaData = cmd.getVersionMetaDataForTable();
         if (versionMetaData != null && versionMetaData.getFieldName() == null)
         {
-            if (versionMetaData.getVersionStrategy() == VersionStrategy.NONE)
+            if (versionMetaData.getVersionStrategy() == VersionStrategy.NONE || versionMetaData.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
             {
                 // No optimistic locking but the idiot wants a column for that :-)
-                versionMapping = new VersionLongMapping(this, mapMgr.getMapping(Long.class));
-            }
-            else if (versionMetaData.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
-            {
-                versionMapping = new VersionLongMapping(this, mapMgr.getMapping(Long.class));
+                versionMapping = new VersionMapping.VersionLongMapping(this, mapMgr.getMapping(Long.class));
             }
             else if (versionMetaData.getVersionStrategy() == VersionStrategy.DATE_TIME)
             {
@@ -300,7 +295,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         "to use date-time versioning, yet this datastore doesnt support storing " +
                         "milliseconds in DATETIME/TIMESTAMP columns. Use version-number");
                 }
-                versionMapping = new VersionTimestampMapping(this, mapMgr.getMapping(Timestamp.class));
+                versionMapping = new VersionMapping.VersionTimestampMapping(this, mapMgr.getMapping(Timestamp.class));
             }
             if (versionMapping != null)
             {

@@ -209,4 +209,40 @@ public class DiscriminatorMapping extends SingleFieldMapping
         }
         return null;
     }
+
+    // These extend DiscriminatorMapping so that we can have different expression/literal for string/numeric discriminators.
+
+    /**
+     * Discriminator using a String delegate.
+     */
+    public static final class DiscriminatorStringMapping extends DiscriminatorMapping
+    {
+        /**
+         * Constructor.
+         * @param table Datastore table
+         * @param delegate The JavaTypeMapping to delegate storage
+         * @param dismd Metadata for the discriminator
+         */
+        public DiscriminatorStringMapping(Table table, JavaTypeMapping delegate, DiscriminatorMetaData dismd)
+        {
+            super(table, delegate, dismd);
+        }
+    }
+
+    /**
+     * Discriminator using a Long delegate.
+     */
+    public static final class DiscriminatorLongMapping extends DiscriminatorMapping
+    {
+        /**
+         * Constructor.
+         * @param table Datastore table
+         * @param delegate The JavaTypeMapping to delegate storage
+         * @param dismd Discriminator metadata
+         */
+        public DiscriminatorLongMapping(Table table, JavaTypeMapping delegate, DiscriminatorMetaData dismd)
+        {
+            super(table, delegate, dismd);
+        }
+    }
 }

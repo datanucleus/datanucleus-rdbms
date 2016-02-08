@@ -675,10 +675,10 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DiscriminatorLongMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping$DiscriminatorLongMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.IntegerLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DiscriminatorStringMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping$DiscriminatorStringMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DoubleMapping"
@@ -762,10 +762,10 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionLongMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionMapping$VersionLongMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.IntegerLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.NumericExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionTimestampMapping" 
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionMapping$VersionTimestampMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.ClassMapping" 

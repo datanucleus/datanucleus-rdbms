@@ -47,7 +47,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-import org.datanucleus.store.rdbms.mapping.java.DiscriminatorLongMapping;
+import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
@@ -1134,7 +1134,7 @@ public class SQLStatementHelper
                 // No value defined for this clause of the map
                 strValue = className;
             }
-            if (discriminatorMapping instanceof DiscriminatorLongMapping)
+            if (discriminatorMapping instanceof DiscriminatorMapping.DiscriminatorLongMapping)
             {
                 try
                 {

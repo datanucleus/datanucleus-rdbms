@@ -165,4 +165,28 @@ public class VersionMapping extends SingleFieldMapping
     {
         return delegate.getObject(ec, resultSet, exprIndex);
     }
+
+    // These implementations extend VersionMapping so that we can have different query expression/literal for numeric and timestamp versions.
+
+    /**
+     * Version using a Timestamp delegate.
+     */
+    public final static class VersionTimestampMapping extends VersionMapping
+    {
+        public VersionTimestampMapping(Table table, JavaTypeMapping delegate)
+        {
+            super(table, delegate);
+        }
+    }
+
+    /**
+     * Version using a Long delegate.
+     */
+    public final static class VersionLongMapping extends VersionMapping
+    {
+        public VersionLongMapping(Table datastoreContainer, JavaTypeMapping delegate)
+        {
+            super(datastoreContainer, delegate);
+        }
+    }
 }
