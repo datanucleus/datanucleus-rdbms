@@ -65,19 +65,16 @@ import org.datanucleus.util.StringUtils;
 public class RDBMSQueryUtils extends QueryUtils
 {
     /**
-     * Convenience method that takes a result set that contains a discriminator column and returns
-     * the class name that it represents.
+     * Convenience method that takes a result set that contains a discriminator column and returns the class name that it represents.
      * @param discrimMapping Mapping for the discriminator column
      * @param dismd Metadata for the discriminator
      * @param rs The result set
      * @param ec execution context
      * @return The class name for the object represented in the current row
      */
-    public static String getClassNameFromDiscriminatorResultSetRow(JavaTypeMapping discrimMapping,
-            DiscriminatorMetaData dismd, ResultSet rs, ExecutionContext ec)
+    public static String getClassNameFromDiscriminatorResultSetRow(JavaTypeMapping discrimMapping, DiscriminatorMetaData dismd, ResultSet rs, ExecutionContext ec)
     {
         String rowClassName = null;
-        
         if (discrimMapping != null && dismd.getStrategy() != DiscriminatorStrategy.NONE)
         {
             try
@@ -96,16 +93,14 @@ public class RDBMSQueryUtils extends QueryUtils
 
     /**
      * Accessor for the result set type for the specified query.
-     * Uses the persistence property "datanucleus.rdbms.query.resultSetType" and allows it to be
-     * overridden by the query extension of the same name.
-     * Checks both the PMF, and also the query extensions.
+     * Uses the persistence property "datanucleus.rdbms.query.resultSetType" and allows it to be overridden by the query extension of the same name.
+     * Checks both the NucleusContext and also the query extensions.
      * @param query The query
      * @return The result set type string
      */
     public static String getResultSetTypeForQuery(Query query)
     {
-        String rsTypeString = 
-            query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
+        String rsTypeString = query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
         Object rsTypeExt = query.getExtension(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_TYPE);
         if (rsTypeExt != null)
         {
@@ -116,16 +111,14 @@ public class RDBMSQueryUtils extends QueryUtils
 
     /**
      * Accessor for the result set concurrency for the specified query.
-     * Uses the persistence property "datanucleus.rdbms.query.resultSetConcurrency" and allows it to be
-     * overridden by the query extension of the same name.
-     * Checks both the PMF, and also the query extensions.
+     * Uses the persistence property "datanucleus.rdbms.query.resultSetConcurrency" and allows it to be overridden by the query extension of the same name.
+     * Checks both the NucleusContext and also the query extensions.
      * @param query The query
      * @return The result set concurrency string
      */
     public static String getResultSetConcurrencyForQuery(Query query)
     {
-        String rsConcurrencyString = 
-            query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
+        String rsConcurrencyString = query.getExecutionContext().getNucleusContext().getConfiguration().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
         Object rsConcurrencyExt = query.getExtension(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_RESULT_SET_CONCURRENCY);
         if (rsConcurrencyExt != null)
         {
@@ -136,8 +129,7 @@ public class RDBMSQueryUtils extends QueryUtils
 
     /**
      * Convenience method to return if the specified query should use an "UPDATE" lock on returned objects.
-     * First checks whether serializeRead is set on the query and, if not, falls back to the setting
-     * for the class.
+     * First checks whether serializeRead is set on the query and, if not, falls back to the setting for the class.
      * @param query The query
      * @return Whether to use an "UPDATE" lock
      */
@@ -167,15 +159,12 @@ public class RDBMSQueryUtils extends QueryUtils
      * @return the PreparedStatement
      * @throws SQLException Thrown if an error occurs creating the statement
      */
-    public static PreparedStatement getPreparedStatementForQuery(ManagedConnection conn, String queryStmt, 
-            Query query)
+    public static PreparedStatement getPreparedStatementForQuery(ManagedConnection conn, String queryStmt, Query query)
     throws SQLException
     {
         // Apply any non-standard result set definition if required (either from the PMF, or via query extensions)
         String rsTypeString = RDBMSQueryUtils.getResultSetTypeForQuery(query);
-        if (rsTypeString != null &&
-            (!rsTypeString.equals("scroll-sensitive") && !rsTypeString.equals("forward-only") &&
-             !rsTypeString.equals("scroll-insensitive")))
+        if (rsTypeString != null && (!rsTypeString.equals("scroll-sensitive") && !rsTypeString.equals("forward-only") && !rsTypeString.equals("scroll-insensitive")))
         {
             throw new NucleusUserException(Localiser.msg("052510"));
         }
@@ -202,8 +191,7 @@ public class RDBMSQueryUtils extends QueryUtils
         }
 
         String rsConcurrencyString = RDBMSQueryUtils.getResultSetConcurrencyForQuery(query);
-        if (rsConcurrencyString != null &&
-            (!rsConcurrencyString.equals("read-only") && !rsConcurrencyString.equals("updateable")))
+        if (rsConcurrencyString != null && (!rsConcurrencyString.equals("read-only") && !rsConcurrencyString.equals("updateable")))
         {
             throw new NucleusUserException(Localiser.msg("052511"));
         }
@@ -287,8 +275,7 @@ public class RDBMSQueryUtils extends QueryUtils
     }
 
     /**
-     * Method to return a statement selecting the candidate table(s) required to cover all possible
-     * types for this candidates inheritance strategy.
+     * Method to return a statement selecting the candidate table(s) required to cover all possible types for this candidates inheritance strategy.
      * @param storeMgr RDBMS StoreManager
      * @param parentStmt Parent statement (if there is one)
      * @param cmd Metadata for the class
@@ -325,8 +312,7 @@ public class RDBMSQueryUtils extends QueryUtils
             }
             if (subclasses)
             {
-                Collection<String> subclassNames = 
-                    storeMgr.getSubClassesForClass(cmd.getFullClassName(), subclasses, clr);
+                Collection<String> subclassNames = storeMgr.getSubClassesForClass(cmd.getFullClassName(), subclasses, clr);
                 if (subclassNames != null)
                 {
                     Iterator<String> subclassIter = subclassNames.iterator();
@@ -394,8 +380,7 @@ public class RDBMSQueryUtils extends QueryUtils
             if (ClassUtils.isReferenceType(candidateCls))
             {
                 // Persistent interface, so find all persistent implementations
-                String[] clsNames =
-                    storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(candidateCls.getName(), clr);
+                String[] clsNames = storeMgr.getNucleusContext().getMetaDataManager().getClassesImplementingInterface(candidateCls.getName(), clr);
                 for (int i=0;i<clsNames.length;i++)
                 {
                     Class cls = clr.classForName(clsNames[i]);
@@ -406,16 +391,14 @@ public class RDBMSQueryUtils extends QueryUtils
                     if (implCmd.getIdentityType() != cmd.getIdentityType())
                     {
                         throw new NucleusUserException("You are querying an interface (" + cmd.getFullClassName() + ") " +
-                            "yet one of its implementations (" + implCmd.getFullClassName() + ") " +
-                            " uses a different identity type!");
+                            "yet one of its implementations (" + implCmd.getFullClassName() + ") uses a different identity type!");
                     }
                     else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                     {
                         if (cmd.getPKMemberPositions().length != implCmd.getPKMemberPositions().length)
                         {
                             throw new NucleusUserException("You are querying an interface (" + cmd.getFullClassName() + ") " +
-                                "yet one of its implementations (" + implCmd.getFullClassName() + ") " +
-                                " has a different number of PK members!");
+                                "yet one of its implementations (" + implCmd.getFullClassName() + ") has a different number of PK members!");
                         }
                     }
                 }
@@ -458,14 +441,13 @@ public class RDBMSQueryUtils extends QueryUtils
                 if (tbl.getDiscriminatorMapping(true) != null || QueryUtils.resultHasOnlyAggregates(result))
                 {
                     // Either has a discriminator, or only selecting aggregates so need single select
-                    stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, 
-                        candidateAliasId, candidateTableGroupName);
+                    stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
                 }
                 else
                 {
-                    stmtGen = new UnionStatementGenerator(storeMgr, clr, cls, subclasses, 
-                        candidateAliasId, candidateTableGroupName);
+                    // No discriminator, so try to identify using UNIONs (hopefully one per class)
+                    stmtGen = new UnionStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
                     if (result == null)
                     {
                         // Returning one row per candidate so include distinguisher column
@@ -499,8 +481,7 @@ public class RDBMSQueryUtils extends QueryUtils
      * @param resultClass Result class if required (or null)
      * @return The query ResultObjectFactory
      */
-    public static ResultObjectFactory getResultObjectFactoryForNoCandidateClass(RDBMSStoreManager storeMgr, ResultSet rs,
-            Class resultClass)
+    public static ResultObjectFactory getResultObjectFactoryForNoCandidateClass(RDBMSStoreManager storeMgr, ResultSet rs, Class resultClass)
     {
         // No candidate class, so use resultClass or Object/Object[]
         Class requiredResultClass = resultClass;
@@ -512,14 +493,7 @@ public class RDBMSQueryUtils extends QueryUtils
             numberOfColumns = rsmd.getColumnCount();
             if (requiredResultClass == null)
             {
-                if (numberOfColumns == 1)
-                {
-                    requiredResultClass = Object.class;
-                }
-                else
-                {
-                    requiredResultClass = Object[].class;
-                }
+                requiredResultClass = (numberOfColumns == 1) ? Object.class : Object[].class;
             }
 
             // Generate names to use for the fields based on the column names
