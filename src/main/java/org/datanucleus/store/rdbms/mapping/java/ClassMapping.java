@@ -29,6 +29,7 @@ import org.datanucleus.store.types.converters.ClassStringConverter;
 
 /**
  * Mapping for a Class type. Converts it to a String for persisting in the datastore.
+ * TODO Drop this and use the TypeConverter
  */
 public class ClassMapping extends SingleFieldMapping
 {
