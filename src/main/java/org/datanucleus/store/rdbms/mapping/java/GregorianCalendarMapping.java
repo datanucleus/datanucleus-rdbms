@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.table.Table;
  * Maps the class fields of a GregorianCalendar to column(s).
  * We default to a single column (timestamp), but allow the option of persisting to 2 columns (timestamp millisecs and timezone).
  * JPOX traditionally supported persistence to 2 columns.
+ * TODO Remove this and use converters for the different options : (Long, String), (Timestamp).
  */
 public class GregorianCalendarMapping extends SingleFieldMultiMapping
 {
