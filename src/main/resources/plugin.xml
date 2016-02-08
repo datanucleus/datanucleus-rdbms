@@ -162,7 +162,6 @@ Contributors:
         <mapping java-type="java.lang.Long" mapping-class="org.datanucleus.store.rdbms.mapping.java.LongMapping"/>
         <mapping java-type="java.lang.Short" mapping-class="org.datanucleus.store.rdbms.mapping.java.ShortMapping"/>
 
-        <mapping java-type="java.lang.Class" mapping-class="org.datanucleus.store.rdbms.mapping.java.ClassMapping"/>
         <mapping java-type="java.lang.Number" mapping-class="org.datanucleus.store.rdbms.mapping.java.NumberMapping"/>
         <mapping java-type="java.lang.Object" mapping-class="org.datanucleus.store.rdbms.mapping.java.SerialisedMapping"/>
         <mapping java-type="java.lang.String" mapping-class="org.datanucleus.store.rdbms.mapping.java.StringMapping"/>
@@ -768,9 +767,6 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.VersionMapping$VersionTimestampMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
-        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.ClassMapping" 
-            literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
-            expression-class="org.datanucleus.store.rdbms.sql.expression.StringExpression"/>
 
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.UUIDMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.StringLiteral"
