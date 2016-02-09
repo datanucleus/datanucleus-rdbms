@@ -238,7 +238,7 @@ Contributors:
         <mapping java-type="java.util.TreeMap" mapping-class="org.datanucleus.store.rdbms.mapping.java.MapMapping"/>
         <mapping java-type="java.util.TreeSet" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
         <mapping java-type="java.util.Vector" mapping-class="org.datanucleus.store.rdbms.mapping.java.CollectionMapping"/>
-        <mapping java-type="java.util.Optional" mapping-class="org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping"/>
+        <mapping java-type="java.util.Optional" mapping-class="org.datanucleus.store.rdbms.mapping.java.OptionalMapping"/>
 
         <!-- DataNucleus types -->
         <mapping java-type="org.datanucleus.identity.DatastoreId" mapping-class="org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping"/>
@@ -671,6 +671,9 @@ Contributors:
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.SingleCollectionLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.SingleCollectionExpression"/>
+        <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.OptionalMapping" 
+            literal-class="org.datanucleus.store.rdbms.sql.expression.OptionalLiteral"
+            expression-class="org.datanucleus.store.rdbms.sql.expression.OptionalExpression"/>
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.DateMapping" 
             literal-class="org.datanucleus.store.rdbms.sql.expression.TemporalLiteral"
             expression-class="org.datanucleus.store.rdbms.sql.expression.TemporalExpression"/>
@@ -1139,6 +1142,9 @@ Contributors:
         <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
         <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
         <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
+
+        <sql-method class="java.util.Optional" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalGetMethod"/>
+        <sql-method class="java.util.Optional" method="isPresent" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalIsPresentMethod"/>
     </extension>
 
     <!-- SQL OPERATIONS -->
