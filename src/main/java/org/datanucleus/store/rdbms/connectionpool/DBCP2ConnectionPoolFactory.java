@@ -72,6 +72,7 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
 
             // Create the actual pool of connections, and apply any properties
             connectionPool = new org.apache.commons.pool2.impl.GenericObjectPool(poolableCF);
+            poolableCF.setPool(connectionPool);
             if (testSQL != null)
             {
                 connectionPool.setTestOnBorrow(true);
