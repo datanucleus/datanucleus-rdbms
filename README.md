@@ -28,8 +28,9 @@ so if planning on supporting or improving support for an RDBMS database this is 
 
 DataNucleus RDBMS maps fields to columns using a _mapping_. Each Java type has a JavaTypeMapping variant, under
 [org.datanucleus.store.rdbms.mapping.java](https://github.com/datanucleus/datanucleus-rdbms/tree/master/src/main/java/org/datanucleus/store/rdbms/mapping/java)
-and each of these has 1+ DatastoreMapping, under
+and each of these has 1+ DatastoreMapping (which map approximately onto JDBC types), under
 [org.datanucleus.store.rdbms.mapping.datastore](https://github.com/datanucleus/datanucleus-rdbms/tree/master/src/main/java/org/datanucleus/store/rdbms/mapping/datastore).
+
 Later DataNucleus releases are making less use of these mappings and more use of the internal _TypeConverter_ mechanism, so that we now only have mappings for
 some of the more basic types or where complicated handling is required, with remaining types using TypeConverterMapping.
 
