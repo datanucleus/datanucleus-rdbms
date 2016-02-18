@@ -1687,15 +1687,25 @@ public class SQLStatement
         // GROUP BY ...
         if (groupingExpressions != null)
         {
-            List groupBy = new ArrayList();
+            List<SQLText> groupBy = new ArrayList();
             Iterator<SQLExpression> groupIter = groupingExpressions.iterator();
             while (groupIter.hasNext())
             {
                 SQLExpression expr = groupIter.next();
-                String exprText = expr.toSQLText().toSQL();
-                if (!groupBy.contains(exprText))
+                boolean exists = false;
+                String exprSQL = expr.toSQLText().toSQL();
+                for (SQLText st : groupBy)
                 {
-                    groupBy.add(exprText);
+                    String sql = st.toSQL();
+                    if (sql.equals(exprSQL))
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                {
+                    groupBy.add(expr.toSQLText());
                 }
             }
 
@@ -1706,20 +1716,20 @@ public class SQLStatement
                 {
                     if (selItem.isPrimary())
                     {
-                        String selSQL = selItem.getSQLText().toSQL();
-                        boolean selExists = false;
-                        for (SQLExpression grpExpr : groupingExpressions)
+                        boolean exists = false;
+                        String selItemSQL = selItem.getSQLText().toSQL();
+                        for (SQLText st : groupBy)
                         {
-                            String grpExprSQL = grpExpr.toSQLText().toSQL();
-                            if (grpExprSQL.equals(selSQL))
+                            String sql = st.toSQL();
+                            if (sql.equals(selItemSQL))
                             {
-                                selExists = true;
+                                exists = true;
                                 break;
                             }
                         }
-                        if (!selExists)
+                        if (!exists)
                         {
-                            groupBy.add(selSQL);
+                            groupBy.add(selItem.getSQLText());
                         }
                     }
                 }
@@ -1734,7 +1744,7 @@ public class SQLStatement
                     {
                         sql.append(',');
                     }
-                    sql.append((String)groupBy.get(i));
+                    sql.append(groupBy.get(i));
                 }
             }
         }
