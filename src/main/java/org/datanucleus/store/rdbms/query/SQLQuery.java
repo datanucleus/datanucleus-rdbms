@@ -991,7 +991,7 @@ public final class SQLQuery extends Query
             if (!params.containsKey(key))
             {
                 // Expected parameter is not provided
-                throw new NucleusUserException(Localiser.msg("059030", inputSQL, "" + key));
+                throw new NucleusUserException(Localiser.msg("059031", "" + key, inputSQL));
             }
 
             executeMap.put(Integer.valueOf(paramPos), params.get(key));
