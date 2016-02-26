@@ -60,7 +60,6 @@ import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.query.AbstractJDOQLQuery;
 import org.datanucleus.store.query.CandidateIdsQueryResult;
-import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryInterruptedException;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryResult;
@@ -323,12 +322,12 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         // Compile the query for the datastore since not cached
         AbstractClassMetaData acmd = getCandidateClassMetaData();
-        if (type == Query.BULK_UPDATE)
+        if (type == QueryType.BULK_UPDATE)
         {
             datastoreCompilation = new RDBMSQueryCompilation();
             compileQueryUpdate(parameterValues, acmd);
         }
-        else if (type == Query.BULK_DELETE)
+        else if (type == QueryType.BULK_DELETE)
         {
             datastoreCompilation = new RDBMSQueryCompilation();
             compileQueryDelete(parameterValues, acmd);
@@ -578,7 +577,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 return new JDOQLEvaluator(this, new ArrayList(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
             }
         }
-        else if (type == Query.SELECT)
+        else if (type == QueryType.SELECT)
         {
             // Query results are cached, so return those
             List<Object> cachedResults = getQueryManager().getQueryResult(this, parameters);
@@ -605,7 +604,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             PreparedStatement ps = null;
             try
             {
-                if (type == Query.SELECT)
+                if (type == QueryType.SELECT)
                 {
                     // Create PreparedStatement and apply parameters, result settings etc
                     ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, datastoreCompilation.getSQL(), this);
@@ -742,7 +741,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         }
                     }
                 }
-                else if (type == Query.BULK_UPDATE || type == Query.BULK_DELETE)
+                else if (type == QueryType.BULK_UPDATE || type == QueryType.BULK_DELETE)
                 {
                     long bulkResult = 0;
                     List<StatementCompilation> stmtCompilations = datastoreCompilation.getStatementCompilations();
@@ -839,7 +838,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
      */
     private void compileQueryFull(Map parameters, AbstractClassMetaData candidateCmd)
     {
-        if (type != Query.SELECT)
+        if (type != QueryType.SELECT)
         {
             return;
         }
@@ -1034,7 +1033,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
      */
     private void compileQueryToRetrieveCandidates(Map parameters, AbstractClassMetaData candidateCmd)
     {
-        if (type != Query.SELECT)
+        if (type != QueryType.SELECT)
         {
             return;
         }

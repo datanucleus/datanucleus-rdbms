@@ -157,22 +157,22 @@ public final class SQLQuery extends Query
         String firstToken = inputSQL.trim().substring(0,6).toUpperCase(); 
         if (firstToken.equals("SELECT"))
         {
-            type = SELECT;
+            type = QueryType.SELECT;
         }
         else if (firstToken.equals("DELETE"))
         {
-            type = BULK_DELETE;
+            type = QueryType.BULK_DELETE;
             unique = true;
         }
         else if (firstToken.equals("UPDATE") || firstToken.equals("INSERT") || firstToken.startsWith("MERGE"))
         {
-            type = BULK_UPDATE;
+            type = QueryType.BULK_UPDATE;
             unique = true;
         }
         else
         {
             // Stored procedures, others
-            type = OTHER;
+            type = QueryType.OTHER;
             unique = true;
         }
 
@@ -434,7 +434,7 @@ public final class SQLQuery extends Query
         // Default to using the users SQL direct with no substitution of params etc
         compiledSQL = inputSQL;
 
-        if (candidateClass != null && getType() == Query.SELECT)
+        if (candidateClass != null && getType() == QueryType.SELECT)
         {
             // Perform any sanity checking of input for SELECT queries
             RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
@@ -579,7 +579,7 @@ public final class SQLQuery extends Query
             throw new NucleusUserException(Localiser.msg("059019", "" + parameterNames.length,"" + parameters.size()));
         }
 
-        if (type == BULK_DELETE || type == BULK_UPDATE)
+        if (type == QueryType.BULK_DELETE || type == QueryType.BULK_UPDATE)
         {
             // Update/Delete statement (INSERT/UPDATE/DELETE/MERGE)
             try
@@ -618,7 +618,7 @@ public final class SQLQuery extends Query
                 throw new NucleusDataStoreException(Localiser.msg("059025", compiledSQL), e);
             }
         }
-        else if (type == SELECT)
+        else if (type == QueryType.SELECT)
         {
             // Query statement (SELECT, stored-procedure)
             AbstractRDBMSQueryResult qr = null;
