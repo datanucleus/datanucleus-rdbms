@@ -78,10 +78,6 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
     {
         super.initialize(clr);
 
-        PrimaryKeyMetaData pkmd = (mmd.getJoinMetaData() != null ? mmd.getJoinMetaData().getPrimaryKeyMetaData() : null);
-        boolean pkColsSpecified = (pkmd != null ? pkmd.getColumnMetaData() != null : false);
-        boolean pkRequired = requiresPrimaryKey();
-
         // Add column(s) for element
         boolean elementPC = (mmd.hasCollection() && mmd.getCollection().elementIsPersistent());
         Class elementClass = clr.classForName(getElementType());
@@ -133,6 +129,10 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
                 logMapping(mmd.getFullFieldName()+".[ELEMENT]", elementMapping);
             }
         }
+
+        PrimaryKeyMetaData pkmd = (mmd.getJoinMetaData() != null ? mmd.getJoinMetaData().getPrimaryKeyMetaData() : null);
+        boolean pkColsSpecified = (pkmd != null ? pkmd.getColumnMetaData() != null : false);
+        boolean pkRequired = requiresPrimaryKey();
 
         // Add order mapping if required
         boolean orderRequired = false;
@@ -345,9 +345,19 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
      */
     protected boolean requiresPrimaryKey()
     {
-        if (!Set.class.isAssignableFrom(mmd.getType()) && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+        if (elementMapping != null && elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
         {
-            // "Ordered Collection/List" so no PK applied, meaning that we can have duplicate elements in the List
+            // Cannot apply PK when we have multiple interface implementations
+            return false;
+        }
+
+        if (Set.class.isAssignableFrom(mmd.getType()))
+        {
+            // No dups
+        }
+        else if (mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+        {
+            // Dups allowed in a List, but if we have an indexed list then we can have a PK
             return false;
         }
         return super.requiresPrimaryKey();
