@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.store.rdbms.table;
 
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -344,7 +345,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
      */
     protected boolean requiresPrimaryKey()
     {
-        if (mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
+        if (!Set.class.isAssignableFrom(mmd.getType()) && mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
         {
             // "Ordered Collection/List" so no PK applied, meaning that we can have duplicate elements in the List
             return false;
