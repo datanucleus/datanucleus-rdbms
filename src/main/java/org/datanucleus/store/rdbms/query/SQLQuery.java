@@ -640,7 +640,7 @@ public final class SQLQuery extends Query
                         }
 
                         // Apply any user-specified constraints over timeouts and ResultSet
-                        RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
+                        RDBMSQueryUtils.prepareStatementForExecution(ps, this, true);
 
                         ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, compiledSQL, ps);
                         try
