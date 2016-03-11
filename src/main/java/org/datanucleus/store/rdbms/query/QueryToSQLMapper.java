@@ -1333,7 +1333,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         // Process all join expressions
         Expression rightExpr = clsExpr.getRight();
         SQLTable sqlTbl = candSqlTbl;
-
+        JavaTypeMapping previousMapping = null;
         while (rightExpr != null)
         {
             if (rightExpr instanceof JoinExpression)
@@ -1465,11 +1465,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                         if (relationType == RelationType.ONE_TO_ONE_UNI)
                         {
+                            JavaTypeMapping otherMapping = null;
                             cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
-                            if (!mmd.isEmbedded())
+                            if (mmd.isEmbedded())
+                            {
+                                otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                            }
+                            else
                             {
                                 relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
-                                JavaTypeMapping otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                if (otherMapping == null && previousMapping != null)
+                                {
+                                    if (previousMapping instanceof EmbeddedMapping)
+                                    {
+                                        // Part of an embedded 1-1 object, so find the relevant member mapping
+                                        EmbeddedMapping embMapping = (EmbeddedMapping)previousMapping;
+                                        otherMapping = embMapping.getJavaTypeMapping(mmd.getName());
+                                    }
+                                }
+
                                 if (otherMapping == null)
                                 {
                                     // Polymorphic join? : cannot find this member in the candidate of the main statement, so need to pick which UNION
@@ -1525,13 +1540,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
                                 }
                             }
+
+                            previousMapping = otherMapping;
                             tblIdMapping = sqlTbl.getTable().getIdMapping();
                             tblMappingSqlTbl = sqlTbl;
                         }
                         else if (relationType == RelationType.ONE_TO_ONE_BI)
                         {
+                            JavaTypeMapping otherMapping = null;
                             cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                            if (!mmd.isEmbedded())
+                            if (mmd.isEmbedded())
+                            {
+                                otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                            }
+                            else
                             {
                                 relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                                 if (mmd.getMappedBy() != null)
@@ -1542,15 +1564,27 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 }
                                 else
                                 {
-                                    JavaTypeMapping otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                    otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                    if (otherMapping == null && previousMapping != null)
+                                    {
+                                        if (previousMapping instanceof EmbeddedMapping)
+                                        {
+                                            // Part of an embedded 1-1 object, so find the relevant member mapping
+                                            EmbeddedMapping embMapping = (EmbeddedMapping)previousMapping;
+                                            otherMapping = embMapping.getJavaTypeMapping(mmd.getName());
+                                        }
+                                    }
                                     sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
                                 }
                             }
+
+                            previousMapping = otherMapping;
                             tblIdMapping = sqlTbl.getTable().getIdMapping();
                             tblMappingSqlTbl = sqlTbl;
                         }
                         else if (relationType == RelationType.ONE_TO_MANY_BI)
                         {
+                            previousMapping = null;
                             if (mmd.hasCollection())
                             {
                                 // TODO Cater for embedded element
@@ -1628,6 +1662,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else if (relationType == RelationType.ONE_TO_MANY_UNI)
                         {
+                            previousMapping = null;
                             if (mmd.hasCollection())
                             {
                                 // TODO Cater for embedded element
@@ -1707,6 +1742,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else if (relationType == RelationType.MANY_TO_MANY_BI)
                         {
+                            previousMapping = null;
                             relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
                             cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
@@ -1721,6 +1757,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else if (relationType == RelationType.MANY_TO_ONE_BI)
                         {
+                            previousMapping = null;
                             relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                             cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
@@ -1743,6 +1780,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else
                         {
+                            previousMapping = null;
                             if (mmd.hasCollection())
                             {
                                 cmd = null;
@@ -1843,6 +1881,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     SQLJoin join = stmt.getJoinForTable(sqlTbl);
                     join.addAndCondition(joinOnSqlExpr);
                 }
+            }
+            else
+            {
+                previousMapping = null;
             }
 
             // Move on to next join in the chain
