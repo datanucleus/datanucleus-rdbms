@@ -66,10 +66,6 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
     {
         super.initialize(clr);
 
-        PrimaryKeyMetaData pkmd = (mmd.getJoinMetaData() != null ? mmd.getJoinMetaData().getPrimaryKeyMetaData() : null);
-        boolean pkColsSpecified = (pkmd != null ? pkmd.getColumnMetaData() != null : false);
-        boolean pkRequired = requiresPrimaryKey();
-
         // Add field(s) for element
         boolean elementPC = (mmd.hasArray() && mmd.getArray().elementIsPersistent());
         if (isSerialisedElementPC() || isEmbeddedElementPC() || (isEmbeddedElement() && !elementPC) ||
@@ -109,6 +105,10 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             }
         }
 
+        boolean pkRequired = requiresPrimaryKey();
+        PrimaryKeyMetaData pkmd = (mmd.getJoinMetaData() != null ? mmd.getJoinMetaData().getPrimaryKeyMetaData() : null);
+        boolean pkColsSpecified = (pkmd != null ? pkmd.getColumnMetaData() != null : false);
+
         // Add order mapping
         ColumnMetaData colmd = null;
         if (mmd.getOrderMetaData() != null && mmd.getOrderMetaData().getColumnMetaData() != null &&
@@ -124,6 +124,7 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             colmd = new ColumnMetaData();
             colmd.setName(id.getName());
         }
+
         orderMapping = storeMgr.getMappingManager().getMapping(int.class); // JDO2 spec [18.5] order column is assumed to be "int"
         ColumnCreator.createIndexColumn(orderMapping, storeMgr, clr, this, colmd, pkRequired && !pkColsSpecified);
         if (NucleusLogger.DATASTORE.isDebugEnabled())
@@ -132,10 +133,21 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
         }
 
         // Define primary key of the join table (if any)
-        if (pkRequired && pkColsSpecified)
+        if (pkRequired)
         {
-            // Apply the users PK specification
-            applyUserPrimaryKeySpecification(pkmd);
+            if (pkColsSpecified)
+            {
+                // Apply the users PK specification
+                applyUserPrimaryKeySpecification(pkmd);
+            }
+            else
+            {
+                // Define PK
+                for (int i=0;i<ownerMapping.getNumberOfDatastoreMappings();i++)
+                {
+                    ownerMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                }
+            }
         }
 
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())

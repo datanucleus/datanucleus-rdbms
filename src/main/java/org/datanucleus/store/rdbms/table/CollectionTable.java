@@ -156,7 +156,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             // Indexed List with no <order>, so has index mapping
             orderRequired = true;
         }
-        else if (requiresPrimaryKey() && !pkColsSpecified)
+        else if (pkRequired && !pkColsSpecified)
         {
             // PK is required so maybe need to add an index to form the PK
             if (isEmbeddedElementPC())
@@ -238,6 +238,11 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             else
             {
                 // Define PK
+                for (int i=0;i<ownerMapping.getNumberOfDatastoreMappings();i++)
+                {
+                    ownerMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                }
+
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK

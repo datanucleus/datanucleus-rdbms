@@ -111,8 +111,6 @@ public abstract class ElementContainerTable extends JoinTable
     {
         assertIsUninitialized();
 
-        boolean pkRequired = requiresPrimaryKey();
-
         // Add owner mapping
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
         ColumnMetaData[] columnMetaData = null;
@@ -133,7 +131,7 @@ public abstract class ElementContainerTable extends JoinTable
 
         try
         {
-            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, pkRequired, false, FieldRole.ROLE_OWNER, clr, ownerTable);
+            ownerMapping = ColumnCreator.createColumnsForJoinTables(clr.classForName(ownerType), mmd, columnMetaData, storeMgr, this, false, false, FieldRole.ROLE_OWNER, clr, ownerTable);
         }
         catch (NoTableManagedException ntme)
         {
