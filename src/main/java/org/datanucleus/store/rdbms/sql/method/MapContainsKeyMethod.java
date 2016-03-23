@@ -158,15 +158,32 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            boolean needsSubquery = getNeedsSubquery();
+            boolean useSubquery = getNeedsSubquery();
+            if (keyExpr instanceof UnboundExpression)
+            {
+                // See if the user has defined what should be used
+                String varName = ((UnboundExpression)keyExpr).getVariableName();
+                String extensionName = "datanucleus.query.jdoql." + varName + ".join";
+                String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
+                if (extensionValue != null)
+                {
+                    if (extensionValue.equalsIgnoreCase("SUBQUERY"))
+                    {
+                        useSubquery = true;
+                    }
+                    else if (extensionValue.equalsIgnoreCase("INNERJOIN"))
+                    {
+                        useSubquery = false;
+                    }
+                }
+            }
 
             // TODO Check if *this* "containsKey" is negated, not any of them (and remove above check)
-            if (needsSubquery)
+            if (useSubquery)
             {
-                NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using SUBQUERY");
                 return containsAsSubquery(mapExpr, keyExpr);
             }
-            NucleusLogger.QUERY.debug("map.containsKey on " + mapExpr + "(" + keyExpr + ") using INNERJOIN");
+
             return containsAsInnerJoin(mapExpr, keyExpr);
         }
         return containsAsSubquery(mapExpr, keyExpr);

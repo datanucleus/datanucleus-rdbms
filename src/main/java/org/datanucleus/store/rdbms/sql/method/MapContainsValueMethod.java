@@ -157,15 +157,32 @@ public class MapContainsValueMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            boolean needsSubquery = getNeedsSubquery();
+            boolean useSubquery = getNeedsSubquery();
+            if (valExpr instanceof UnboundExpression)
+            {
+                // See if the user has defined what should be used
+                String varName = ((UnboundExpression)valExpr).getVariableName();
+                String extensionName = "datanucleus.query.jdoql." + varName + ".join";
+                String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
+                if (extensionValue != null)
+                {
+                    if (extensionValue.equalsIgnoreCase("SUBQUERY"))
+                    {
+                        useSubquery = true;
+                    }
+                    else if (extensionValue.equalsIgnoreCase("INNERJOIN"))
+                    {
+                        useSubquery = false;
+                    }
+                }
+            }
 
             // TODO Check if *this* "containsValue" is negated, not any of them (and remove above check)
-            if (needsSubquery)
+            if (useSubquery)
             {
-                NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using SUBQUERY");
                 return containsAsSubquery(mapExpr, valExpr);
             }
-            NucleusLogger.QUERY.debug("map.containsValue on " + mapExpr + "(" + valExpr + ") using INNERJOIN");
+
             return containsAsInnerJoin(mapExpr, valExpr);
         }
         return containsAsSubquery(mapExpr, valExpr);
