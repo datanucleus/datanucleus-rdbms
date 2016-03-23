@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SQLJoin;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
@@ -182,19 +183,27 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
             boolean useSubquery = getNeedsSubquery(collExpr, elemExpr);
+            JoinType joinType = JoinType.INNER_JOIN;
             if (elemExpr instanceof UnboundExpression)
             {
                 // See if the user has defined what should be used
                 String varName = ((UnboundExpression)elemExpr).getVariableName();
                 String extensionName = "datanucleus.query.jdoql." + varName + ".join";
                 String extensionValue = (String) stmt.getQueryGenerator().getValueForExtension(extensionName);
-                if (extensionValue != null && extensionValue.equalsIgnoreCase("SUBQUERY"))
+                if (extensionValue != null)
                 {
-                    useSubquery = true;
-                }
-                else if (extensionValue != null && extensionValue.equalsIgnoreCase("INNERJOIN"))
-                {
-                    useSubquery = false;
+                    if (extensionValue.equalsIgnoreCase("SUBQUERY"))
+                    {
+                        useSubquery = true;
+                    }
+                    else if (extensionValue.equalsIgnoreCase("INNERJOIN"))
+                    {
+                        useSubquery = false;
+                    }
+                    else if (extensionValue.equalsIgnoreCase("LEFTOUTERJOIN"))
+                    {
+                        joinType = JoinType.LEFT_OUTER_JOIN;
+                    }
                 }
             }
 
@@ -203,7 +212,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 return containsAsSubquery(collExpr, elemExpr);
             }
 
-            return containsAsInnerJoin(collExpr, elemExpr);
+            return containsAsJoin(collExpr, elemExpr, joinType);
         }
 
         return containsAsSubquery(collExpr, elemExpr);
@@ -250,9 +259,10 @@ public class CollectionContainsMethod extends AbstractSQLMethod
      * contained of not).
      * @param collExpr Collection expression
      * @param elemExpr Expression for the element
+     * @param joinType Join type
      * @return Contains expression
      */
-    protected SQLExpression containsAsInnerJoin(CollectionExpression collExpr, SQLExpression elemExpr)
+    protected SQLExpression containsAsJoin(CollectionExpression collExpr, SQLExpression elemExpr, SQLJoin.JoinType joinType)
     {
         boolean elemIsUnbound = (elemExpr instanceof UnboundExpression);
         String varName = null;
@@ -265,8 +275,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         }
         else if (!stmt.getQueryGenerator().hasExplicitJoins())
         {
-            JoinType joinType = stmt.getJoinTypeForTable(elemExpr.getSQLTable());
-            if (joinType == JoinType.CROSS_JOIN)
+            if (stmt.getJoinTypeForTable(elemExpr.getSQLTable()) == JoinType.CROSS_JOIN)
             {
                 elemAlias = stmt.removeCrossJoin(elemExpr.getSQLTable());
                 elemIsUnbound = true;
@@ -277,8 +286,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData elemCmd =
-            mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
+        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
         if (elemIsUnbound)
         {
@@ -293,14 +301,14 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         {
             elemType = mmd.getCollection().getElementType();
         }
+
         if (joinTbl != null)
         {
             // JoinTable Collection - join from owner to join, then from join to element
             if (elemCmd == null)
             {
                 // Collection<Non-PC>
-                SQLTable joinSqlTbl = stmt.innerJoin(collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(),
-                    joinTbl, elemAlias, joinTbl.getOwnerMapping(), null, null);
+                SQLTable joinSqlTbl = stmt.join(joinType, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), joinTbl, elemAlias, joinTbl.getOwnerMapping(), null, null);
 
                 SQLExpression elemIdExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getElementMapping());
                 if (elemIsUnbound)
@@ -317,8 +325,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             else
             {
                 // Collection<PC>
-                SQLTable joinSqlTbl = stmt.innerJoin(collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(),
-                    joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                SQLTable joinSqlTbl = stmt.join(joinType, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
                 if (!mmd.getCollection().isEmbeddedElement())
                 {
@@ -337,12 +344,13 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                                 break;
                             }
                         }
-                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, elemMapping, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null);
+                        elemSqlTbl = stmt.join(joinType, joinSqlTbl, elemMapping, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null, true);
                     }
                     else
                     {
-                        elemSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null);
+                        elemSqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null);
                     }
+
                     SQLExpression elemIdExpr = exprFactory.newExpression(stmt, elemSqlTbl, elemTbl.getIdMapping());
                     if (elemIsUnbound)
                     {
@@ -384,7 +392,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             {
                 ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable elemSqlTbl = stmt.innerJoin(collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), elemTbl, elemAlias, ownerMapping, null, null);
+
+            SQLTable elemSqlTbl = stmt.join(joinType, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), elemTbl, elemAlias, ownerMapping, null, null);
 
             if (elemIsUnbound)
             {
@@ -393,7 +402,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 {
                     // Variable is defined as a subclass of the declared type so add extra join to variable type
                     DatastoreClass varTbl = storeMgr.getDatastoreClass(elemType, clr);
-                    SQLTable varSqlTbl = stmt.innerJoin(elemSqlTbl, elemTbl.getIdMapping(), varTbl, null, varTbl.getIdMapping(), null, null);
+                    SQLTable varSqlTbl = stmt.join(joinType, elemSqlTbl, elemTbl.getIdMapping(), varTbl, null, varTbl.getIdMapping(), null, null);
                     elemIdExpr = exprFactory.newExpression(stmt, varSqlTbl, varTbl.getIdMapping());
                 }
                 else

@@ -159,6 +159,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
             boolean useSubquery = getNeedsSubquery();
+            JoinType joinType = JoinType.INNER_JOIN;
             if (keyExpr instanceof UnboundExpression)
             {
                 // See if the user has defined what should be used
@@ -175,6 +176,10 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                     {
                         useSubquery = false;
                     }
+                    else if (extensionValue.equalsIgnoreCase("LEFTOUTERJOIN"))
+                    {
+                        joinType = JoinType.LEFT_OUTER_JOIN;
+                    }
                 }
             }
 
@@ -184,7 +189,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 return containsAsSubquery(mapExpr, keyExpr);
             }
 
-            return containsAsInnerJoin(mapExpr, keyExpr);
+            return containsAsJoin(mapExpr, keyExpr, joinType);
         }
         return containsAsSubquery(mapExpr, keyExpr);
     }
@@ -216,13 +221,13 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
      * This is only for use when there are no "!containsKey" and no "OR" operations.
      * Creates SQL by adding INNER JOIN to the join table (where it exists), and also to the key table
      * adding an AND condition on the element (with value of the keyExpr).
-     * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the key is
-     * contained of not).
+     * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the key is contained of not).
      * @param mapExpr Map expression
      * @param keyExpr Expression for the key
+     * @param joinType Type of join
      * @return Contains expression
      */
-    protected SQLExpression containsAsInnerJoin(MapExpression mapExpr, SQLExpression keyExpr)
+    protected SQLExpression containsAsJoin(MapExpression mapExpr, SQLExpression keyExpr, JoinType joinType)
     {
         boolean keyIsUnbound = (keyExpr instanceof UnboundExpression);
         String varName = null;
@@ -235,8 +240,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         }
         else if (!stmt.getQueryGenerator().hasExplicitJoins())
         {
-            JoinType joinType = stmt.getJoinTypeForTable(keyExpr.getSQLTable());
-            if (joinType == JoinType.CROSS_JOIN)
+            if (stmt.getJoinTypeForTable(keyExpr.getSQLTable()) == JoinType.CROSS_JOIN)
             {
                 keyAlias = stmt.removeCrossJoin(keyExpr.getSQLTable());
                 keyIsUnbound = true;
@@ -252,13 +256,13 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         {
             // Map formed in join table - add join to join table, then to key table (if present)
             MapTable mapTbl = (MapTable)storeMgr.getTable(mmd);
-            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
+            SQLTable joinSqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
             if (keyCmd != null)
             {
                 if (keyIsUnbound)
                 {
                     DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                    SQLTable keySqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getKeyMapping(), keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
+                    SQLTable keySqlTbl = stmt.join(joinType, joinSqlTbl, mapTbl.getKeyMapping(), keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
 
                     // Bind the variable in the QueryGenerator
                     keyExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
@@ -303,12 +307,12 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
 
-            SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
+            SQLTable valSqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
 
             if (keyCmd != null)
             {
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                SQLTable keySqlTbl = stmt.innerJoin(valSqlTbl, valTbl.getMemberMapping(valKeyMmd), keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
+                SQLTable keySqlTbl = stmt.join(joinType, valSqlTbl, valTbl.getMemberMapping(valKeyMmd), keyTbl, keyAlias, keyTbl.getIdMapping(), null, null);
 
                 if (keyIsUnbound)
                 {
@@ -352,7 +356,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             {
                 ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, keyAlias, ownerMapping, null, null);
+            SQLTable keySqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, keyAlias, ownerMapping, null, null);
 
             if (keyIsUnbound)
             {

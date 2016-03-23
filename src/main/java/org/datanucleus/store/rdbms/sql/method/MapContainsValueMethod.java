@@ -158,6 +158,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
             boolean useSubquery = getNeedsSubquery();
+            JoinType joinType = JoinType.INNER_JOIN;
             if (valExpr instanceof UnboundExpression)
             {
                 // See if the user has defined what should be used
@@ -174,6 +175,10 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                     {
                         useSubquery = false;
                     }
+                    else if (extensionValue.equalsIgnoreCase("LEFTOUTERJOIN"))
+                    {
+                        joinType = JoinType.LEFT_OUTER_JOIN;
+                    }
                 }
             }
 
@@ -183,7 +188,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                 return containsAsSubquery(mapExpr, valExpr);
             }
 
-            return containsAsInnerJoin(mapExpr, valExpr);
+            return containsAsJoin(mapExpr, valExpr, joinType);
         }
         return containsAsSubquery(mapExpr, valExpr);
     }
@@ -215,13 +220,13 @@ public class MapContainsValueMethod extends AbstractSQLMethod
      * This is only for use when there are no "!containsValue" and no "OR" operations.
      * Creates SQL by adding INNER JOIN to the join table (where it exists), and also to the value table
      * adding an AND condition on the value (with value of the valueExpr).
-     * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the value is
-     * contained of not).
+     * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the value is contained of not).
      * @param mapExpr Map expression
      * @param valExpr Expression for the value
+     * @param joinType Type of join
      * @return Contains expression
      */
-    protected SQLExpression containsAsInnerJoin(MapExpression mapExpr, SQLExpression valExpr)
+    protected SQLExpression containsAsJoin(MapExpression mapExpr, SQLExpression valExpr, JoinType joinType)
     {
         boolean valIsUnbound = (valExpr instanceof UnboundExpression);
         String varName = null;
@@ -234,8 +239,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         }
         else if (!stmt.getQueryGenerator().hasExplicitJoins())
         {
-            JoinType joinType = stmt.getJoinTypeForTable(valExpr.getSQLTable());
-            if (joinType == JoinType.CROSS_JOIN)
+            if (stmt.getJoinTypeForTable(valExpr.getSQLTable()) == JoinType.CROSS_JOIN)
             {
                 // Value is currently joined via CROSS JOIN, so remove it (and use INNER JOIN below)
                 valAlias = stmt.removeCrossJoin(valExpr.getSQLTable());
@@ -255,13 +259,13 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         {
             // Map formed in join table - add join to join table, then to value table (if present)
             MapTable mapTbl = (MapTable)storeMgr.getTable(mmd);
-            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
+            SQLTable joinSqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), mapTbl, null, mapTbl.getOwnerMapping(), null, null);
             if (valCmd != null)
             {
                 if (valIsUnbound)
                 {
                     DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                    SQLTable valSqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getValueMapping(), valTbl, valAlias, valTbl.getIdMapping(), null, null);
+                    SQLTable valSqlTbl = stmt.join(joinType, joinSqlTbl, mapTbl.getValueMapping(), valTbl, valAlias, valTbl.getIdMapping(), null, null);
 
                     // Bind the variable in the QueryGenerator
                     valExpr = exprFactory.newExpression(stmt, valSqlTbl, valSqlTbl.getTable().getIdMapping());
@@ -303,7 +307,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
             {
                 ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, valAlias, ownerMapping, null, null);
+            SQLTable valSqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, valAlias, ownerMapping, null, null);
 
             if (valIsUnbound)
             {
@@ -333,12 +337,12 @@ public class MapContainsValueMethod extends AbstractSQLMethod
             {
                 ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             }
-            SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
+            SQLTable keySqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
 
             if (valCmd != null)
             {
                 DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                SQLTable valSqlTbl = stmt.innerJoin(keySqlTbl, keyTbl.getMemberMapping(keyValMmd), valTbl, valAlias, valTbl.getIdMapping(), null, null);
+                SQLTable valSqlTbl = stmt.join(joinType, keySqlTbl, keyTbl.getMemberMapping(keyValMmd), valTbl, valAlias, valTbl.getIdMapping(), null, null);
 
                 if (valIsUnbound)
                 {
