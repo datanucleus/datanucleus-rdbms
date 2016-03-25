@@ -89,7 +89,11 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
             Iterator iter = iterator(op);
             while (iter.hasNext())
             {
-                dependentElements.add(iter.next());
+                Object elem = iter.next();
+                if (op.getExecutionContext().getApiAdapter().isPersistable(elem))
+                {
+                    dependentElements.add(elem);
+                }
             }
         }
         clearInternal(op);
