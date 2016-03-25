@@ -23,10 +23,13 @@ import java.util.List;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.scostore.ArrayStore;
+import org.datanucleus.store.types.SCO;
+import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -107,19 +110,21 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             return;
         }
 
-        if (!mmd.isCascadePersist())
+        int arrayLength = Array.getLength(value);
+        boolean persistentElements = (mmd.getRelationType(ec.getClassLoaderResolver()) != RelationType.NONE);
+        boolean needsAttaching = false;
+        if (persistentElements)
         {
-            // Field doesnt support cascade-persist so no reachability
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            Object[] array = (Object[])value;
+            if (!mmd.isCascadePersist())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
-            }
+                // Check that all elements are persistent before continuing and throw exception if necessary
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
+                }
 
-            // Check for any persistable keys/values that arent persistent
-            if (!mmd.getType().getComponentType().isPrimitive())
-            {
-                Object[] array = (Object[])value;
-                for (int i=0;i<array.length;i++)
+                for (int i=0;i<arrayLength;i++)
                 {
                     if (!ec.getApiAdapter().isDetached(array[i]) && !ec.getApiAdapter().isPersistent(array[i]))
                     {
@@ -128,17 +133,44 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                     }
                 }
             }
+            else
+            {
+                // Reachability
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                {
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
+                }
+            }
+
+            for (int i=0;i<arrayLength;i++)
+            {
+                if (ownerOP.getExecutionContext().getApiAdapter().isDetached(array[i]))
+                {
+                    needsAttaching = true;
+                    break;
+                }
+            }
+        }
+
+        if (needsAttaching)
+        {
+            // Create a wrapper and attach the elements (and add the others)
+            SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
+            if (arrayLength > 0)
+            {
+                collWrapper.attachCopy(value);
+
+                // The attach will have put entries in the operationQueue if using optimistic, so flush them
+                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
+            }
         }
         else
         {
-            // Reachability
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            if (arrayLength > 0)
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
+                // Add the elements direct to the datastore
+                ((ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, null)).set(ownerOP, value);
             }
-
-            // Insert the array
-            ((ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, null)).set(ownerOP, value);
         }
     }
 
