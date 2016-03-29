@@ -1317,7 +1317,10 @@ public class SelectStatement extends SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, joinType);
 
-        addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+        // Generate the join condition to use
+        BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+
+        addJoin(joinType, sourceTable, targetTbl, joinCondition);
 
         if (unions != null && applyToUnions)
         {
@@ -1327,6 +1330,48 @@ public class SelectStatement extends SQLStatement
             {
                 SelectStatement stmt = unionIter.next();
                 stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
+            }
+        }
+
+        return targetTbl;
+    }
+
+    @Override
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, Table target, String targetAlias, String tableGrpName, BooleanExpression joinCondition, boolean applyToUnions)
+    {
+        invalidateStatement();
+
+        // Create the SQLTable to join to.
+        if (tables == null)
+        {
+            tables = new HashMap();
+        }
+        if (tableGrpName == null)
+        {
+            tableGrpName = "Group" + tableGroups.size();
+        }
+        if (targetAlias == null)
+        {
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
+        }
+        if (sourceTable == null)
+        {
+            sourceTable = primaryTable;
+        }
+        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
+        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
+        putSQLTableInGroup(targetTbl, tableGrpName, joinType);
+
+        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the join to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.join(joinType, sourceTable, target, targetAlias, tableGrpName, joinCondition, true);
             }
         }
 
@@ -1355,7 +1400,10 @@ public class SelectStatement extends SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
 
-        addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
+        // Generate the join condition to use
+        BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
+
+        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition);
 
         if (unions != null)
         {

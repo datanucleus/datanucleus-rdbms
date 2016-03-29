@@ -455,7 +455,51 @@ public abstract class SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, joinType);
 
-        addJoin(joinType, sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+        // Generate the join condition to use
+        BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
+
+        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+
+        return targetTbl;
+    }
+
+    /**
+     * Method to form a join to the specified table using the provided mappings.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @param joinCondition On clause for the join
+     * @param applyToUnions Whether to apply to any unioned statements (only applies to SELECT statements)
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, Table target, String targetAlias, String tableGrpName, BooleanExpression joinCondition, boolean applyToUnions)
+    {
+        invalidateStatement();
+
+        // Create the SQLTable to join to.
+        if (tables == null)
+        {
+            tables = new HashMap();
+        }
+        if (tableGrpName == null)
+        {
+            tableGrpName = "Group" + tableGroups.size();
+        }
+        if (targetAlias == null)
+        {
+            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
+        }
+        if (sourceTable == null)
+        {
+            sourceTable = primaryTable;
+        }
+        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
+        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
+        putSQLTableInGroup(targetTbl, tableGrpName, joinType);
+
+        addJoin(joinType, sourceTable, targetTbl, joinCondition);
 
         return targetTbl;
     }
@@ -603,7 +647,10 @@ public abstract class SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
 
-        addJoin(JoinType.CROSS_JOIN, primaryTable, null, null, targetTbl, null, null, null);
+        // Generate the join condition to use
+        BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
+
+        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition);
 
         return targetTbl;
     }
@@ -717,10 +764,7 @@ public abstract class SQLStatement
      * @param targetParentMapping Optional parent of this target mapping (when joining an impl of an interface)
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      */
-    protected void addJoin(SQLJoin.JoinType joinType, 
-            SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            SQLTable targetTable, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping,
-            Object[] discrimValues)
+    protected void addJoin(SQLJoin.JoinType joinType, SQLTable sourceTable, SQLTable targetTable, BooleanExpression joinCondition)
     {
         if (tables == null)
         {
@@ -740,10 +784,6 @@ public abstract class SQLStatement
 
         // Add the table to the referenced tables for this statement
         tables.put(targetTable.alias.getName(), targetTable);
-
-        // Generate the join condition to use
-        BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping,
-            targetTable, targetMapping, targetParentMapping, discrimValues);
 
         if (rdbmsMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.ANSI_JOIN_SYNTAX))
         {

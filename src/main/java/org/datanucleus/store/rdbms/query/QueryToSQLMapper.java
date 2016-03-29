@@ -1431,10 +1431,40 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 String joinAlias = joinExpr.getAlias();
                 PrimaryExpression joinPrimExpr = joinExpr.getPrimaryExpression();
 
+                if (joinPrimExpr.getTuples().size() == 1)
+                {
+                    // Join to (new) root element?
+                    baseCls = resolveClass(joinPrimExpr.getId());
+                    DatastoreClass baseTbl = storeMgr.getDatastoreClass(baseCls.getName(), clr);
+                    Expression joinOnExpr = joinExpr.getOnExpression();
+                    if (joinOnExpr == null)
+                    {
+                        throw new NucleusUserException("Query has join to " + joinPrimExpr.getId() + " yet this is a root component and there is no ON expression");
+                    }
+
+                    // Add the basic join first with no condition since this root will be referenced in the "on" condition
+                    sqlTbl = stmt.join(joinType, candSqlTbl, baseTbl, joinAlias, null, null, true);
+                    cmd = mmgr.getMetaDataForClass(baseCls, clr);
+                    SQLTableMapping tblMapping = new SQLTableMapping(sqlTbl, cmd, baseTbl.getIdMapping());
+                    setSQLTableMappingForAlias(joinAlias, tblMapping);
+
+                    // Convert the ON expression to a BooleanExpression and add to the join
+                    processingOnClause = true;
+                    joinOnExpr.evaluate(this);
+                    BooleanExpression joinOnSqlExpr = (BooleanExpression) stack.pop();
+                    processingOnClause = false;
+                    SQLJoin join = stmt.getJoinForTable(sqlTbl);
+                    join.addAndCondition(joinOnSqlExpr);
+
+                    // Move on to next join in the chain
+                    rightExpr = rightExpr.getRight();
+
+                    continue;
+                }
+
                 Iterator<String> iter = joinPrimExpr.getTuples().iterator();
                 String rootId = iter.next();
                 String joinTableGroupName = null;
-
                 if (rootId.equalsIgnoreCase(candidateAlias))
                 {
                     // Join relative to the candidate
