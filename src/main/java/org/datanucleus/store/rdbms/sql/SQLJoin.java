@@ -116,7 +116,7 @@ public class SQLJoin
      */
     public void addAndCondition(BooleanExpression expr)
     {
-        condition = condition.and(expr);
+        condition = (condition != null) ? condition.and(expr) : expr;
     }
 
     public String toString()
