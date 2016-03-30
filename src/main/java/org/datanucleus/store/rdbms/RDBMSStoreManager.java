@@ -3713,6 +3713,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         set.add(StoreManager.OPTION_ORM_EMBEDDED_MAP);
         set.add(StoreManager.OPTION_ORM_EMBEDDED_ARRAY);
         set.add(StoreManager.OPTION_ORM_FOREIGN_KEYS);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_COLLECTION_ELEMENT);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_ARRAY_ELEMENT);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_KEY);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_VALUE);
 
         // Add isolation levels for this database adapter
         if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_COMMITTED))
