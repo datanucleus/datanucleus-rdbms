@@ -3740,6 +3740,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Query Cancel and Datastore Timeout is supported on JDOQL for RDBMS (unless turned off by user)
         set.add(StoreManager.OPTION_QUERY_CANCEL);
         set.add(StoreManager.OPTION_DATASTORE_TIMEOUT);
+        if (dba.supportsOption(DatastoreAdapter.DATETIME_STORES_MILLISECS))
+        {
+            set.add(StoreManager.OPTION_DATASTORE_TIME_STORES_MILLISECS);
+            // TODO What about nanosecs
+        }
 
         // JDOQL Bitwise are only supported if supported by the datastore
         if (dba.supportsOption(DatastoreAdapter.OPERATOR_BITWISE_AND))
