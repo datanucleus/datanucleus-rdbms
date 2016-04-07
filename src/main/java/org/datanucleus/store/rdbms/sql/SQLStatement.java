@@ -757,12 +757,8 @@ public abstract class SQLStatement
      * Internal method to form a join to the specified table using the provided mappings.
      * @param joinType Type of join (INNER, LEFT OUTER, RIGHT OUTER, CROSS, NON-ANSI)
      * @param sourceTable SQLTable to join from
-     * @param sourceMapping Mapping in this table to join from
-     * @param sourceParentMapping Optional parent of this source mapping (when joining an impl of an interface)
      * @param targetTable SQLTable to join to
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param targetParentMapping Optional parent of this target mapping (when joining an impl of an interface)
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param joinCondition Condition for the join
      */
     protected void addJoin(SQLJoin.JoinType joinType, SQLTable sourceTable, SQLTable targetTable, BooleanExpression joinCondition)
     {
