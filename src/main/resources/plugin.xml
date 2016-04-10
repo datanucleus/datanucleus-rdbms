@@ -1145,6 +1145,7 @@ Contributors:
 
         <sql-method class="java.util.Optional" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalGetMethod"/>
         <sql-method class="java.util.Optional" method="isPresent" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalIsPresentMethod"/>
+        <sql-method class="java.util.Optional" method="orElse" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalOrElseMethod"/>
     </extension>
 
     <!-- SQL OPERATIONS -->
