@@ -543,7 +543,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                     // Create PreparedStatement and apply parameters, result settings etc
                     ps = RDBMSQueryUtils.getPreparedStatementForQuery(mconn, datastoreCompilation.getSQL(), this);
                     SQLStatementHelper.applyParametersToStatement(ps, ec, datastoreCompilation.getStatementParameters(), null, parameters);
-                    RDBMSQueryUtils.prepareStatementForExecution(ps, this, false);
+                    RDBMSQueryUtils.prepareStatementForExecution(ps, this, true);
 
                     registerTask(ps);
                     ResultSet rs = null;
