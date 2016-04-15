@@ -1012,6 +1012,11 @@ public final class SQLQuery extends Query
         // We support cancel via JDBC PreparedStatement.cancel();
     }
 
+    protected boolean supportsTimeout()
+    {
+        return true;
+    }
+
     /**
      * Method to generate a ResultObjectFactory for converting rows of the provided ResultSet into
      * instances of the candidate class. Populates stmtMappings.
