@@ -43,6 +43,8 @@ import org.datanucleus.store.rdbms.mapping.OracleRDBMSMappingManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
+import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.OracleTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -151,6 +153,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(GROUP_BY_REQUIRES_ALL_SELECT_PRIMARIES);
+        supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         if (datastoreMajorVersion < 9)
@@ -317,6 +320,12 @@ public class OracleAdapter extends BaseDatastoreAdapter
     public String getDropDatabaseStatement(String catalogName, String schemaName)
     {
         throw new UnsupportedOperationException("Oracle does not support DROP SCHEMA; you need to delete a USER (manually)");
+    }
+
+    public String getAddPrimaryKeyStatement(PrimaryKey pk, IdentifierFactory factory)
+    {
+        // We are using PRIMARYKEY_IN_CREATE_STATEMENTS so return null
+        return null;
     }
 
     /**
