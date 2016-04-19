@@ -132,12 +132,12 @@ public class JoinListStore<E> extends AbstractListStore<E>
             {
                 // Collection of PC or non-PC
                 // Generate the information for the possible elements
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
-                if (emd != null)
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+                if (elementCmd != null)
                 {
                     if (!elementsAreEmbedded)
                     {
-                        elementInfo = getComponentInformationForClass(elementType, emd);
+                        elementInfo = getComponentInformationForClass(elementType, elementCmd);
                         /*if (elementInfo != null && elementInfo.length > 1)
                         {
                             throw new NucleusUserException(Localiser.msg("056031", 
@@ -783,7 +783,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, emd, resultMapping, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, elementCmd, resultMapping, false, null, clr.classForName(elementType));
                             return new ListStoreIterator(op, rs, rof, this);
                         }
                     }
@@ -994,7 +994,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
             // Select the required fields
             SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, elementCmd, 0);
         }
 
         if (addRestrictionOnOwner)

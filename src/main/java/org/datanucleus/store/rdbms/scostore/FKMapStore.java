@@ -155,8 +155,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         if (keyStoredInValue)
         {
             // Key = field in value, Value = PC
-            vmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(valueClass, clr);
-            if (vmd == null)
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(valueClass, clr);
+            if (valueCmd == null)
             {
                 // Value has no MetaData!
                 throw new NucleusUserException(Localiser.msg("056070", valueType, mmd.getFullFieldName()));
@@ -170,7 +170,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (mmd.getMappedBy() != null)
             {
                 // 1-N bidirectional : The value class has a field for the owner.
-                AbstractMemberMetaData vofmd = vmd.getMetaDataForMember(ownerFieldName);
+                AbstractMemberMetaData vofmd = valueCmd.getMetaDataForMember(ownerFieldName);
                 if (vofmd == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
@@ -184,7 +184,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         vofmd.getFullFieldName(), vofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
                 }
 
-                ownerFieldNumber = vmd.getAbsolutePositionOfMember(ownerFieldName);
+                ownerFieldNumber = valueCmd.getAbsolutePositionOfMember(ownerFieldName);
                 ownerMapping = valueTable.getMemberMapping(vofmd);
                 if (ownerMapping == null)
                 {
@@ -240,8 +240,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
             // Set up key field
             String keyFieldName = vkfmd.getName();
-            keyFieldNumber = vmd.getAbsolutePositionOfMember(keyFieldName);
-            keyMapping = valueTable.getMemberMapping(vmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
+            keyFieldNumber = valueCmd.getAbsolutePositionOfMember(keyFieldName);
+            keyMapping = valueTable.getMemberMapping(valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
             if (keyMapping == null)
             {
                 throw new NucleusUserException(Localiser.msg("056053", 
@@ -267,8 +267,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         else
         {
             // Key = PC, Value = field in key
-            kmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(keyClass, clr);
-            if (kmd == null)
+            keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(keyClass, clr);
+            if (keyCmd == null)
             {
                 // Key has no MetaData!
                 throw new NucleusUserException(Localiser.msg("056069", keyType, mmd.getFullFieldName()));
@@ -283,7 +283,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (mmd.getMappedBy() != null)
             {
                 // 1-N bidirectional : The key class has a field for the owner.
-                AbstractMemberMetaData kofmd = kmd.getMetaDataForMember(ownerFieldName);
+                AbstractMemberMetaData kofmd = keyCmd.getMetaDataForMember(ownerFieldName);
                 if (kofmd == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
@@ -297,7 +297,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         kofmd.getFullFieldName(), kofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
                 }
 
-                ownerFieldNumber = kmd.getAbsolutePositionOfMember(ownerFieldName);
+                ownerFieldNumber = keyCmd.getAbsolutePositionOfMember(ownerFieldName);
                 ownerMapping = valueTable.getMemberMapping(kofmd);
                 if (ownerMapping == null)
                 {
@@ -353,8 +353,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
             // Set up value field
             String valueFieldName = vkfmd.getName();
-            valueFieldNumber = kmd.getAbsolutePositionOfMember(valueFieldName);
-            valueMapping = valueTable.getMemberMapping(kmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
+            valueFieldNumber = keyCmd.getAbsolutePositionOfMember(valueFieldName);
+            valueMapping = valueTable.getMemberMapping(keyCmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
             if (valueMapping == null)
             {
                 throw new NucleusUserException(Localiser.msg("056054", 
@@ -462,7 +462,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         V oldValue = get(op, newKey);
         if (oldValue != newValue)
         {
-            if (vmd != null)
+            if (valueCmd != null)
             {
                 if (oldValue != null && !oldValue.equals(newValue))
                 {
@@ -1194,7 +1194,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, vmd, getMappingDef, false, null, clr.classForName(valueType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, valueCmd, getMappingDef, false, null, clr.classForName(valueType));
                             value = rof.getObject(ec, rs);
                         }
 
@@ -1268,7 +1268,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
             // Select the value field(s)
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), vmd, 0);
+                ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), valueCmd, 0);
         }
         else
         {
@@ -1276,7 +1276,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
             sqlStmt.setClassLoaderResolver(clr);
 
-            if (vmd != null)
+            if (valueCmd != null)
             {
                 // Left outer join to value table (so we allow for null values)
                 SQLTable valueSqlTbl = sqlStmt.leftOuterJoin(sqlStmt.getPrimaryTable(), valueMapping,
@@ -1284,7 +1284,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
                 // Select the value field(s)
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, vmd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, valueCmd, 0);
             }
             else
             {

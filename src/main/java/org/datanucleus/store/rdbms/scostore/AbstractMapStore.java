@@ -68,10 +68,10 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
     protected DatastoreClass valueTable;
 
     /** Metadata for the keys (if persistable). */
-    protected AbstractClassMetaData kmd;
+    protected AbstractClassMetaData keyCmd;
 
     /** Metadata for the values (if persistable). */
-    protected AbstractClassMetaData vmd;
+    protected AbstractClassMetaData valueCmd;
 
     /** Mapping to the key from the mapTable. */
     protected JavaTypeMapping keyMapping;
@@ -420,7 +420,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         boolean modified = false;
         if (keyMapping != null && keyMapping instanceof EmbeddedKeyPCMapping)
         {
-            String fieldName = vmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            String fieldName = valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
             if (fieldName == null)
             {
                 // We have no mapping for this field so presumably is the owner field or a PK field
@@ -450,7 +450,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         boolean modified = false;
         if (valueMapping != null && valueMapping instanceof EmbeddedValuePCMapping)
         {
-            String fieldName = vmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            String fieldName = valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
             if (fieldName == null)
             {
                 // We have no mapping for this field so presumably is the owner field or a PK field
@@ -493,14 +493,14 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         return mapTable;
     }
 
-    public AbstractClassMetaData getKmd()
+    public AbstractClassMetaData getKeyClassMetaData()
     {
-        return kmd;
+        return keyCmd;
     }
 
-    public AbstractClassMetaData getVmd()
+    public AbstractClassMetaData getValueClassMetaData()
     {
-        return vmd;
+        return valueCmd;
     }
 
     /**

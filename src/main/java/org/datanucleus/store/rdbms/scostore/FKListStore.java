@@ -112,25 +112,25 @@ public class FKListStore<E> extends AbstractListStore<E>
             elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
             if (elementIsPersistentInterface)
             {
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
             }
             else
             {
                 // Take the metadata for the first implementation of the reference type
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
             }
         }
         else
         {
             // Check that the element class has MetaData
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
         }
-        if (emd == null)
+        if (elementCmd == null)
         {
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getComponentInformationForClass(elementType, emd);
+        elementInfo = getComponentInformationForClass(elementType, elementCmd);
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
@@ -138,7 +138,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         else if (elementInfo.length == 1 && ClassUtils.isReferenceType(element_class))
         {
             // Special case : reference element type (interface/object) and single "implementation"
-            elementType = emd.getFullClassName();
+            elementType = elementCmd.getFullClassName();
         }
 
         elementMapping = elementInfo[0].getDatastoreClass().getIdMapping(); // Just use the first element type as the guide for the element mapping
@@ -1041,7 +1041,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(storeMgr, emd, resultMapping, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, elementCmd, resultMapping, false, null, clr.classForName(elementType));
                         return new ListStoreIterator(op, rs, rof, this);
                     }
                     finally
@@ -1494,7 +1494,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
         }
         else
         {

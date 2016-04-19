@@ -132,16 +132,16 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         Class valueCls = clr.classForName(elementType);
         if (ClassUtils.isReferenceType(valueCls))
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(valueCls,null,clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(valueCls,null,clr);
         }
         else
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(valueCls, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(valueCls, clr);
         }
-        if (emd != null)
+        if (elementCmd != null)
         {
-            elementType = emd.getFullClassName();
-            elementInfo = getComponentInformationForClass(elementType, emd);
+            elementType = elementCmd.getFullClassName();
+            elementInfo = getComponentInformationForClass(elementType, elementCmd);
         }
 
         if (keyMapping != null)
@@ -328,7 +328,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                             return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
 
-                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally
@@ -373,7 +373,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         final Class valueCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
-        if (emd != null && emd.getDiscriminatorStrategyForTable() != null && emd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
+        if (elementCmd != null && elementCmd.getDiscriminatorStrategyForTable() != null && elementCmd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
         {
             // Map<?, PC> where value has discriminator
             if (ClassUtils.isReferenceType(valueCls))
@@ -403,7 +403,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else if (mapType == MapType.MAP_TYPE_KEY_IN_VALUE)
             {
@@ -412,7 +412,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
@@ -422,14 +422,14 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
         }
         else
         {
             if (mapType == MapType.MAP_TYPE_VALUE_IN_KEY)
             {
-                if (emd != null)
+                if (elementCmd != null)
                 {
                     // TODO Allow for null value [change to select the key table and left outer join to the key]
                     // Select of value table, joining to key table
@@ -443,7 +443,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }
                 else
                 {
@@ -476,11 +476,11 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
-                if (emd != null)
+                if (elementCmd != null)
                 {
                     // TODO Allow for null value [change to select the join table and left outer join to the key]
                     // Select of value table, joining to key table
@@ -494,7 +494,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }
                 else
                 {

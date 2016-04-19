@@ -106,25 +106,25 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
             if (elementIsPersistentInterface)
             {
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
             }
             else
             {
                 // Take the metadata for the first implementation of the reference type
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
             }
         }
         else
         {
             // Check that the element class has MetaData
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
         }
-        if (emd == null)
+        if (elementCmd == null)
         {
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getComponentInformationForClass(elementType, emd);
+        elementInfo = getComponentInformationForClass(elementType, elementCmd);
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
@@ -138,7 +138,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         {
             // 1-N FK bidirectional
             // The element class has a field for the owner.
-            AbstractMemberMetaData eofmd = emd.getMetaDataForMember(mmd.getMappedBy());
+            AbstractMemberMetaData eofmd = elementCmd.getMetaDataForMember(mmd.getMappedBy());
             if (eofmd == null)
             {
                 throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
@@ -157,7 +157,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             }
             */
             String ownerFieldName = eofmd.getName();
-            ownerFieldNumber = emd.getAbsolutePositionOfMember(ownerFieldName);
+            ownerFieldNumber = elementCmd.getAbsolutePositionOfMember(ownerFieldName);
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null && elementInfo.length > 1)
             {
@@ -392,7 +392,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         if (elementTable == null)
         {
             // "subclass-table", persisted into table of other class
-            AbstractClassMetaData[] managingCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
+            AbstractClassMetaData[] managingCmds = storeMgr.getClassesManagingTableForClass(elementCmd, clr);
             if (managingCmds != null && managingCmds.length > 0)
             {
                 // Find which of these subclasses is appropriate for this element
@@ -1076,7 +1076,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         {
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
-                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingClass, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingClass, false, null, clr.classForName(elementType));
 
                         return new CollectionStoreIterator(op, rs, rof, this);
                     }
@@ -1143,7 +1143,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 //            NucleusLogger.GENERAL.info(">> FKSetStore.iter iterMapDef=" + iteratorMappingDef + " table=" + sqlStmt.getPrimaryTable() +
 //                " emd=" + emd.getFullClassName() + " elem.subclasses=" + StringUtils.objectArrayToString(elemSubclasses));
             // Select the required fields (of the element class)
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
         }
         else
         {

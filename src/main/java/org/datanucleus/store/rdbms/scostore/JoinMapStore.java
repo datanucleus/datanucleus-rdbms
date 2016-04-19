@@ -121,29 +121,29 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         this.valuesAreEmbedded = mapTable.isEmbeddedValue();
         this.valuesAreSerialised = mapTable.isSerialisedValue();
 
-        kmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
+        keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
 
         Class value_class=clr.classForName(valueType);
         if (ClassUtils.isReferenceType(value_class))
         {
             // Map of reference value types (interfaces/Objects)
             NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", ownerMemberMetaData.getFullFieldName(), value_class.getName()));
-            vmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class,null,clr);
-            if (vmd != null)
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class,null,clr);
+            if (valueCmd != null)
             {
                 this.valueType = value_class.getName();
                 // TODO This currently just grabs the cmd of the first implementation. It needs to
                 // get the cmds for all implementations, so we can have a handle to all possible elements.
                 // This would mean changing the SCO classes to have multiple valueTable/valueMapping etc.
-                valueTable = storeMgr.getDatastoreClass(vmd.getFullClassName(), clr);
+                valueTable = storeMgr.getDatastoreClass(valueCmd.getFullClassName(), clr);
             }
         }
         else
         {
-            vmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(value_class, clr);
-            if (vmd != null)
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(value_class, clr);
+            if (valueCmd != null)
             {
-                this.valueType = vmd.getFullClassName();
+                this.valueType = valueCmd.getFullClassName();
                 if (valuesAreEmbedded)
                 {
                     valueTable = null;
@@ -750,7 +750,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, vmd, getMappingDef, false, null, clr.classForName(valueType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, valueCmd, getMappingDef, false, null, clr.classForName(valueType));
                             value = rof.getObject(ec, rs);
                         }
 
@@ -801,9 +801,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             // Value is stored in own table
             getMappingDef = new StatementClassMapping();
-            if (!vmd.getFullClassName().equals(valueCls.getName()))
+            if (!valueCmd.getFullClassName().equals(valueCls.getName()))
             {
-                valueCls = clr.classForName(vmd.getFullClassName());
+                valueCls = clr.classForName(valueCmd.getFullClassName());
             }
             UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
             stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
@@ -813,7 +813,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             // Select the value field(s)
             SQLTable valueSqlTbl = sqlStmt.getTable(valueTable, sqlStmt.getPrimaryTable().getGroupName());
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, vmd, 0);
+                ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, valueCmd, 0);
         }
 
         // Apply condition on owner field to filter by owner

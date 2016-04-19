@@ -107,13 +107,13 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
             else
             {
                 // Collection of PC or non-PC
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
-                if (emd != null)
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+                if (elementCmd != null)
                 {
-                    this.elementType  = emd.getFullClassName();
+                    this.elementType  = elementCmd.getFullClassName();
                     if (!elementsAreEmbedded && !elementsAreSerialised)
                     {
-                        elementInfo = getComponentInformationForClass(elementType, emd);
+                        elementInfo = getComponentInformationForClass(elementType, elementCmd);
                         if (elementInfo != null && elementInfo.length > 1)
                         {
                             throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));
@@ -212,7 +212,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, emd, iteratorMappingClass, false, null, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingClass, false, null, clr.classForName(elementType));
                             return new ArrayStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
@@ -344,7 +344,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
 
             // Select the required fields
             SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, 0);
         }
 
         if (addRestrictionOnOwner)

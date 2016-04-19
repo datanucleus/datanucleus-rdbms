@@ -84,7 +84,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
     protected ComponentInfo[] elementInfo;
 
     /** MetaData for the "element-type" class. Not used for reference types since no metadata is present for the declared type. */
-    protected AbstractClassMetaData emd;
+    protected AbstractClassMetaData elementCmd;
 
     /** Table containing the link between owner and element. */
     protected Table containerTable;
@@ -147,9 +147,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
         return containerTable;
     }
 
-    public AbstractClassMetaData getEmd()
+    public AbstractClassMetaData getElementClassMetaData()
     {
-        return emd;
+        return elementCmd;
     }
 
     public boolean isElementsAreSerialised()

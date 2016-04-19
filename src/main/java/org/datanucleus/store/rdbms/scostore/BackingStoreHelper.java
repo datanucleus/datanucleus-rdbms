@@ -367,7 +367,7 @@ public class BackingStoreHelper
     public static int populateEmbeddedKeyFieldsInStatement(ObjectProvider op, Object key,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
-        AbstractClassMetaData kmd = mapStore.getKmd();
+        AbstractClassMetaData kmd = mapStore.getKeyClassMetaData();
         EmbeddedKeyPCMapping embeddedMapping = (EmbeddedKeyPCMapping)mapStore.getKeyMapping();
         StatementClassMapping mappingDefinition = new StatementClassMapping();  
         int[] elementFieldNumbers = new int[embeddedMapping.getNumberOfJavaTypeMappings()];
@@ -408,7 +408,7 @@ public class BackingStoreHelper
     public static int populateEmbeddedValueFieldsInStatement(ObjectProvider op, Object value,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
-        AbstractClassMetaData vmd = mapStore.getVmd();
+        AbstractClassMetaData vmd = mapStore.getValueClassMetaData();
         EmbeddedValuePCMapping embeddedMapping = (EmbeddedValuePCMapping)mapStore.getValueMapping();
         StatementClassMapping mappingDefinition = new StatementClassMapping();
         int[] elementFieldNumbers = new int[embeddedMapping.getNumberOfJavaTypeMappings()];

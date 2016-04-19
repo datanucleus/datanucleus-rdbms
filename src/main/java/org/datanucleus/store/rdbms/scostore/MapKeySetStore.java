@@ -123,16 +123,16 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
 
         if (ClassUtils.isReferenceType(elementCls))
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(elementCls, null, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(elementCls, null, clr);
         }
         else
         {
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(elementCls, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(elementCls, clr);
         }
-        if (emd != null)
+        if (elementCmd != null)
         {
-            elementType = emd.getFullClassName();
-            elementInfo = getComponentInformationForClass(elementType, emd);
+            elementType = elementCmd.getFullClassName();
+            elementInfo = getComponentInformationForClass(elementType, elementCmd);
         } 
     }
 
@@ -211,7 +211,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                             return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
 
-                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally
@@ -256,8 +256,8 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         final Class keyCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
-        if (emd != null && emd.getDiscriminatorStrategyForTable() != null &&
-            emd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
+        if (elementCmd != null && elementCmd.getDiscriminatorStrategyForTable() != null &&
+            elementCmd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
         {
             // Map<PC, ?> where key has discriminator
             if (ClassUtils.isReferenceType(keyCls))
@@ -286,7 +286,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
@@ -297,7 +297,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
         }
         else
@@ -313,12 +313,12 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
                 // MAP_TYPE_KEY_IN_VALUE, MAP_TYPE_JOIN
-                if (emd != null)
+                if (elementCmd != null)
                 {
                     // Select of key table, joining to join table
                     iteratorMappingDef = new StatementClassMapping();
@@ -331,7 +331,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), emd, 0);
+                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }
                 else
                 {

@@ -75,7 +75,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         boolean modified = false;
         if (elementMapping != null && elementMapping instanceof EmbeddedElementPCMapping)
         {
-            String fieldName = emd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            String fieldName = elementCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
             if (fieldName == null)
             {
                 // We have no mapping for this field so presumably is the owner field or a PK field
@@ -358,7 +358,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
-                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, emd, this);
+                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, elementCmd, this);
 
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                     modified = true;

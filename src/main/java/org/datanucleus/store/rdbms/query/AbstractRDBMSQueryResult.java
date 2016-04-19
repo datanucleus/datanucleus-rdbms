@@ -143,7 +143,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 }
                 else
                 {
-                    ResultObjectFactory<E> scoROF = new PersistentClassROF((RDBMSStoreManager)query.getStoreManager(), backingStore.getEmd(),
+                    ResultObjectFactory<E> scoROF = new PersistentClassROF((RDBMSStoreManager)query.getStoreManager(), backingStore.getElementClassMetaData(),
                         iterStmt.getStatementClassMapping(), false, null, 
                         ec.getClassLoaderResolver().classForName(backingStore.getOwnerMemberMetaData().getCollection().getElementType()));
                     while (rs.next())

@@ -96,25 +96,25 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             elementIsPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(element_class.getName());
             if (elementIsPersistentInterface)
             {
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForInterface(element_class,clr);
             }
             else
             {
                 // Take the metadata for the first implementation of the reference type
-                emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
+                elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(element_class,null,clr);
             }
         }
         else
         {
             // Check that the element class has MetaData
-            emd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
+            elementCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(element_class, clr);
         }
-        if (emd == null)
+        if (elementCmd == null)
         {
             throw new NucleusUserException(Localiser.msg("056003", element_class.getName(), mmd.getFullFieldName()));
         }
 
-        elementInfo = getComponentInformationForClass(elementType, emd);
+        elementInfo = getComponentInformationForClass(elementType, elementCmd);
         if (elementInfo == null || elementInfo.length == 0)
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
@@ -597,7 +597,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                             throw new NucleusException("Cannot have FK array with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(storeMgr, emd, iteratorMappingDef, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingDef, false, null, clr.classForName(elementType));
                         return new ArrayStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally
@@ -659,7 +659,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), emd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
         }
         else
         {
