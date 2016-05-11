@@ -3751,6 +3751,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             set.add(StoreManager.OPTION_QUERY_JDOQL_BITWISE_OPS);
         }
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_INSERT);
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_UPDATE);
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_DELETE);
+        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_UPDATE);
+        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_DELETE);
 
         return set;
     }
