@@ -1016,7 +1016,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext().getClassLoaderResolver(), op.getExecutionContext().getFetchPlan(), true);
+        IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext(), op.getExecutionContext().getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping iteratorMappingClass = iterStmt.getStatementClassMapping();
 
@@ -1107,12 +1107,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to return the SQLStatement and mapping for an iterator for this backing store.
-     * @param clr ClassLoader resolver
+     * @param ec ExecutionContext
      * @param fp FetchPlan to use in determing which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
+    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -1130,11 +1130,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 {
                     cls[i] = clr.classForName(clsNames[i]);
                 }
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement(ec);
             }
             else
             {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement(ec);
             }
             iterateUsingDiscriminator = true;
 
@@ -1162,7 +1162,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
                 stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                SelectStatement subStmt = stmtGen.getStatement();
+                SelectStatement subStmt = stmtGen.getStatement(ec);
 
                 if (selectFetchPlan)
                 {

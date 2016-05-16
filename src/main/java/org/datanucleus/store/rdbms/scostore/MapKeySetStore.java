@@ -251,8 +251,9 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
     protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP)
     {
         SelectStatement sqlStmt = null;
+        ExecutionContext ec = ownerOP.getExecutionContext();
 
-        final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
+        final ClassLoaderResolver clr = ec.getClassLoaderResolver();
         final Class keyCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
@@ -269,12 +270,11 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 {
                     cls[j] = clr.classForName(clsNames[j]);
                 }
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement(ec);
             }
             else
             {
-                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr,
-                    clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement();
+                sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(elementInfo[0].getClassName()), true, null, null).getStatement(ec);
             }
             containerSqlTbl = sqlStmt.getPrimaryTable();
             iterateUsingDiscriminator = true;
@@ -285,8 +285,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
@@ -296,8 +295,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
         }
         else
@@ -309,11 +307,10 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
                 stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                sqlStmt = stmtGen.getStatement();
+                sqlStmt = stmtGen.getStatement(ec);
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
             }
             else
             {
@@ -325,13 +322,12 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                    sqlStmt = stmtGen.getStatement();
+                    sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
                     containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                        ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }
                 else
                 {

@@ -1231,6 +1231,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     protected SelectStatement getSQLStatementForGet(ObjectProvider ownerOP)
     {
         SelectStatement sqlStmt = null;
+        ExecutionContext ec = ownerOP.getExecutionContext();
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         final Class valueCls = clr.classForName(this.valueType);
@@ -1249,11 +1250,11 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         cls[i] = clr.classForName(clsNames[i]);
                     }
-                    sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement();
+                    sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null).getStatement(ec);
                 }
                 else
                 {
-                    sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, valueCls, true, null, null).getStatement();
+                    sqlStmt = new DiscriminatorStatementGenerator(storeMgr, clr, valueCls, true, null, null).getStatement(ec);
                 }
                 iterateUsingDiscriminator = true;
             }
@@ -1263,12 +1264,11 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
                 stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                 getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                sqlStmt = stmtGen.getStatement();
+                sqlStmt = stmtGen.getStatement(ec);
             }
 
             // Select the value field(s)
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                ownerOP.getExecutionContext().getFetchPlan(), sqlStmt.getPrimaryTable(), valueCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), valueCmd, 0);
         }
         else
         {
@@ -1279,12 +1279,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (valueCmd != null)
             {
                 // Left outer join to value table (so we allow for null values)
-                SQLTable valueSqlTbl = sqlStmt.leftOuterJoin(sqlStmt.getPrimaryTable(), valueMapping,
-                    valueTable, null, valueTable.getIdMapping(), null, null);
+                SQLTable valueSqlTbl = sqlStmt.leftOuterJoin(sqlStmt.getPrimaryTable(), valueMapping, valueTable, null, valueTable.getIdMapping(), null, null);
 
                 // Select the value field(s)
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                    ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, valueCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
             }
             else
             {
@@ -1310,8 +1308,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // if object mapping (BLOB) use like
             SQLExpression keyExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), keyMapping);
             SQLExpression keyVal = exprFactory.newLiteralParameter(sqlStmt, keyMapping, null, "KEY");
-            sqlStmt.whereAnd(new org.datanucleus.store.rdbms.sql.expression.BooleanExpression(keyExpr,
-                Expression.OP_LIKE, keyVal), true);
+            sqlStmt.whereAnd(new org.datanucleus.store.rdbms.sql.expression.BooleanExpression(keyExpr, Expression.OP_LIKE, keyVal), true);
         }
         else
         {

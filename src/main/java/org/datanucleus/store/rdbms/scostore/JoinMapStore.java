@@ -787,6 +787,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     protected SelectStatement getSQLStatementForGet(ObjectProvider ownerOP)
     {
         SelectStatement sqlStmt = null;
+        ExecutionContext ec = ownerOP.getExecutionContext();
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         Class valueCls = clr.classForName(this.valueType);
@@ -808,12 +809,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
             stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
             getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-            sqlStmt = stmtGen.getStatement();
+            sqlStmt = stmtGen.getStatement(ec);
 
             // Select the value field(s)
             SQLTable valueSqlTbl = sqlStmt.getTable(valueTable, sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
-                ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, valueCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
         }
 
         // Apply condition on owner field to filter by owner

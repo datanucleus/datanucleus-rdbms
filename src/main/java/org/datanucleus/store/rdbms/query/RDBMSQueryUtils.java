@@ -456,7 +456,7 @@ public class RDBMSQueryUtils extends QueryUtils
                     }
                 }
                 stmtGen.setParentStatement(parentStmt);
-                SelectStatement tblStmt = stmtGen.getStatement();
+                SelectStatement tblStmt = stmtGen.getStatement(ec);
 
                 if (stmt == null)
                 {

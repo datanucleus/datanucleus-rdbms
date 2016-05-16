@@ -855,7 +855,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         ExecutionContext ec = ownerOP.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(ec.getClassLoaderResolver(), ec.getFetchPlan(), true);
+        IteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.sqlStmt;
         StatementClassMapping iteratorMappingClass = iterStmt.stmtClassMapping;
 
@@ -953,12 +953,12 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to return the SQLStatement and mapping for an iterator for this backing store.
-     * @param clr ClassLoader resolver
+     * @param ec ExecutionContext
      * @param fp FetchPlan to use in determining which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
+    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -1011,7 +1011,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
-                        elementStmt = stmtGen.getStatement();
+                        elementStmt = stmtGen.getStatement(ec);
                     }
                     else
                     {
@@ -1020,7 +1020,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
-                        elementStmt = stmtGen.getStatement();
+                        elementStmt = stmtGen.getStatement(ec);
                     }
                     iterateUsingDiscriminator = true;
                 }
@@ -1030,7 +1030,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
                     iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                    elementStmt = stmtGen.getStatement();
+                    elementStmt = stmtGen.getStatement(ec);
                 }
 
                 // TODO What if the first elementInfo has fields selected in one order and then the second in a different order?

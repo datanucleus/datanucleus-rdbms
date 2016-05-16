@@ -74,7 +74,7 @@ public class RDBMSStoreHelper
         // Form the query to find which one of these classes has the instance with this id
         DiscriminatorStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, clr.classForName(cmd.getFullClassName()), true, null, null);
         stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
-        SelectStatement sqlStmt = stmtGen.getStatement();
+        SelectStatement sqlStmt = stmtGen.getStatement(ec);
 
         // Select the discriminator
         JavaTypeMapping discrimMapping = primaryTable.getDiscriminatorMapping(true);
@@ -186,7 +186,7 @@ public class RDBMSStoreHelper
                         if (sqlStmtMain == null)
                         {
                             sampleCmd = subcmds[i];
-                            sqlStmtMain = stmtGen.getStatement();
+                            sqlStmtMain = stmtGen.getStatement(ec);
 
                             // WHERE (object id) = ?
                             JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
@@ -197,7 +197,7 @@ public class RDBMSStoreHelper
                         }
                         else
                         {
-                            SelectStatement sqlStmt = stmtGen.getStatement();
+                            SelectStatement sqlStmt = stmtGen.getStatement(ec);
 
                             // WHERE (object id) = ?
                             JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
@@ -218,7 +218,7 @@ public class RDBMSStoreHelper
                 if (sqlStmtMain == null)
                 {
                     sampleCmd = rootCmd;
-                    sqlStmtMain = stmtGen.getStatement();
+                    sqlStmtMain = stmtGen.getStatement(ec);
 
                     // WHERE (object id) = ?
                     JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
@@ -229,7 +229,7 @@ public class RDBMSStoreHelper
                 }
                 else
                 {
-                    SelectStatement sqlStmt = stmtGen.getStatement();
+                    SelectStatement sqlStmt = stmtGen.getStatement(ec);
 
                     // WHERE (object id) = ?
                     JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();

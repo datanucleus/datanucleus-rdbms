@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql;
 
+import org.datanucleus.ExecutionContext;
+
 /**
  * Generator of SQL SELECT Statements.
  */
@@ -33,9 +35,10 @@ public interface SelectStatementGenerator
 
     /**
      * Accessor for the statement.
+     * @param ec ExecutionContext
      * @return The SQLStatement
      */
-    SelectStatement getStatement();
+    SelectStatement getStatement(ExecutionContext ec);
 
     /**
      * Method to set the parent statement.

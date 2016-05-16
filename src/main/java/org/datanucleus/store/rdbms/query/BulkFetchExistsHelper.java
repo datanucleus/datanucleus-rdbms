@@ -94,27 +94,27 @@ public class BulkFetchExistsHelper
         Store backingStore = storeMgr.getBackingStoreForField(clr, mmd, null);
         if (backingStore instanceof JoinSetStore)
         {
-            iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+            iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
         }
         else if (backingStore instanceof FKSetStore)
         {
-            iterStmt = ((FKSetStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+            iterStmt = ((FKSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
         }
         else if (backingStore instanceof JoinListStore)
         {
-            iterStmt = ((JoinListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
+            iterStmt = ((JoinListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
         }
         else if (backingStore instanceof FKListStore)
         {
-            iterStmt = ((FKListStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false, -1, -1);
+            iterStmt = ((FKListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
         }
         else if (backingStore instanceof JoinArrayStore)
         {
-            iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+            iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
         }
         else if (backingStore instanceof FKArrayStore)
         {
-            iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(clr, ec.getFetchPlan(), false);
+            iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
         }
         else if (backingStore instanceof JoinMapStore)
         {

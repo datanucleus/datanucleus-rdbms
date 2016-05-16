@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.PropertyNames;
+import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
@@ -160,9 +160,10 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
 
     /**
      * Accessor for the SelectStatement for the candidate [+ subclasses].
+     * @param ec ExecutionContext
      * @return The SelectStatement returning objects with a UNION statement.
      */
-    public SelectStatement getStatement()
+    public SelectStatement getStatement(ExecutionContext ec)
     {
         // Find set of possible candidates (including subclasses of subclasses)
         Collection<String> candidateClassNames = new ArrayList<String>();
@@ -225,7 +226,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             if (joinTable == null)
             {
                 // Select of candidate table
-                candidateStmt = getSelectStatementForCandidate(candidateClassName);
+                candidateStmt = getSelectStatementForCandidate(candidateClassName, ec);
             }
             else
             {
@@ -252,9 +253,10 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
      * Convenience method to return the SelectStatement for a particular class.
      * Returns a SelectStatement with primaryTable of the "candidateTable", and which joins to the table of the class (if different).
      * @param className The class name to generate the statement for
+     * @param ec ExecutionContext
      * @return The SelectStatement
      */
-    protected SelectStatement getSelectStatementForCandidate(String className)
+    protected SelectStatement getSelectStatementForCandidate(String className, ExecutionContext ec)
     {
         DatastoreClass table = storeMgr.getDatastoreClass(className, clr);
         if (table == null)
@@ -305,11 +307,11 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         if (table.getMultitenancyMapping() != null)
         {
             // Multi-tenancy restriction
+            AbstractClassMetaData cmd = table.getClassMetaData();
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), tblGroupName);
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            // TODO set as parameter here and set value when executing
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 

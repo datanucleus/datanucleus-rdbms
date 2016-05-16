@@ -141,7 +141,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
         ExecutionContext ec = ownerOP.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(ec.getClassLoaderResolver(), ec.getFetchPlan(), true);
+        IteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.sqlStmt;
         StatementClassMapping iteratorMappingClass = iterStmt.stmtClassMapping;
 
@@ -243,12 +243,12 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Method to return the SQLStatement and mapping for an iterator for this backing store.
-     * @param clr ClassLoader resolver
+     * @param ec ExecutionContext
      * @param fp FetchPlan to use in determing which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ClassLoaderResolver clr, FetchPlan fp, boolean addRestrictionOnOwner)
+    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -305,7 +305,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
-                        elementStmt = stmtGen.getStatement();
+                        elementStmt = stmtGen.getStatement(ec);
                     }
                     else
                     {
@@ -315,7 +315,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                         }
-                        elementStmt = stmtGen.getStatement();
+                        elementStmt = stmtGen.getStatement(ec);
                     }
                     iterateUsingDiscriminator = true;
                 }
@@ -329,7 +329,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                     }
                     iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
-                    elementStmt = stmtGen.getStatement();
+                    elementStmt = stmtGen.getStatement(ec);
                 }
 
                 if (sqlStmt == null)

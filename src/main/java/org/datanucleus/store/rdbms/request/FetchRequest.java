@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -189,7 +188,7 @@ public class FetchRequest extends Request
                 datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
                 mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
             }
-            datastoreIdx.addParameterOccurrence(new int[] {inputParamNum});
+            datastoreIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
@@ -223,9 +222,16 @@ public class FetchRequest extends Request
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
-            // TODO set this to a parameter and set in execute
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, tenantMapping, null, "TENANT");
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
+
+            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+            if (multitenancyIdx == null)
+            {
+                multitenancyIdx = new StatementMappingIndex(tenantMapping);
+                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_MULTITENANCY, multitenancyIdx);
+            }
+            multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
 
         // Generate convenience string for logging
@@ -332,6 +338,17 @@ public class FetchRequest extends Request
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
                             op.provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDef));
+                        }
+
+                        if (table.getMultitenancyMapping() != null)
+                        {
+                            // Provide the tenant id to the JDBC statement
+                            StatementMappingIndex multitenancyIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+                            String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
+                            for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
+                            {
+                                table.getMultitenancyMapping().setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                            }
                         }
 
                         // Execute the statement

@@ -65,6 +65,7 @@ public class StatementClassMapping
     public static final int MEMBER_DATASTORE_ID = -1;
     public static final int MEMBER_VERSION = -2;
     public static final int MEMBER_DISCRIMINATOR = -3;
+    public static final int MEMBER_MULTITENANCY = -4;
 
     /** Name of the class. */
     String className;
@@ -136,6 +137,7 @@ public class StatementClassMapping
      * Member position of -1 means datastore-identity.
      * Member position of -2 means version.
      * Member position of -3 means discriminator.
+     * Member position of -4 means multitenancy.
      * @param position The position of the member in this class
      * @return The mapping definition for the object at this member position
      */
@@ -183,6 +185,11 @@ public class StatementClassMapping
         {
             length--; // Ignore discriminator
         }
+        if (mappings.containsKey(MEMBER_MULTITENANCY))
+        {
+            length--; // Ignore multitenancy
+        }
+
         int[] positions = new int[length];
         Iterator<Integer> iter = mappings.keySet().iterator();
         int i = 0;

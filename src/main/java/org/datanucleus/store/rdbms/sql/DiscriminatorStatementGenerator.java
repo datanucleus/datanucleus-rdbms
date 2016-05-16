@@ -22,7 +22,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.PropertyNames;
+import org.datanucleus.ExecutionContext;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
@@ -180,9 +181,10 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
 
     /**
      * Accessor for the SelectStatement.
+     * @param ec ExecutionContext
      * @return The SelectStatement for iterating through objects with a discriminator column
      */
-    public SelectStatement getStatement()
+    public SelectStatement getStatement(ExecutionContext ec)
     {
         SelectStatement stmt = null;
         SQLTable discrimSqlTbl = null;
@@ -348,10 +350,11 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
         if (candidateTable.getMultitenancyMapping() != null)
         {
             // Multi-tenancy restriction
+            AbstractClassMetaData cmd = candidateTable.getClassMetaData();
             JavaTypeMapping tenantMapping = candidateTable.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), discrimSqlTbl.getGroupName());
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
