@@ -288,15 +288,12 @@ public class DeleteRequest extends Request
                                 mappingDefinition.addMappingForMember(i, idxs[i]);
                             }
                         }
-                        op.provideFields(whereFieldNumbers,
-                            storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(whereFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                     }
 
                     if (multitenancyStatementMapping != null)
                     {
-                        table.getMultitenancyMapping().setObject(ec, ps,
-                            multitenancyStatementMapping.getParameterPositionsForOccurrence(0), 
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                        table.getMultitenancyMapping().setObject(ec, ps, multitenancyStatementMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getMultiTenancyId(ec, cmd));
                     }
 
                     if (optimisticChecks)
@@ -314,8 +311,7 @@ public class DeleteRequest extends Request
                         StatementMappingIndex mapIdx = mappingStatementIndex.getWhereVersion();
                         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            verMapping.setObject(ec, ps,
-                                mapIdx.getParameterPositionsForOccurrence(i), currentVersion);
+                            verMapping.setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), currentVersion);
                         }
                     }
 

@@ -37,7 +37,6 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -199,6 +198,7 @@ public class InsertRequest extends Request
      */
     public void execute(ObjectProvider op)
     {
+        ExecutionContext ec = op.getExecutionContext();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are inserting
@@ -208,7 +208,6 @@ public class InsertRequest extends Request
         try
         {
             VersionMetaData vermd = table.getVersionMetaData();
-            ExecutionContext ec = op.getExecutionContext();
             RDBMSStoreManager storeMgr = table.getStoreManager();
             if (vermd != null && vermd.getFieldName() != null)
             {
@@ -298,8 +297,7 @@ public class InsertRequest extends Request
                         Object nextOptimisticVersion = VersionHelper.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
                         for (int k=0;k<versionStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
-                            table.getVersionMapping(false).setObject(ec, ps, 
-                                versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
+                            table.getVersionMapping(false).setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
                         }
                         op.setTransactionalVersion(nextOptimisticVersion);
                     }
@@ -314,9 +312,8 @@ public class InsertRequest extends Request
                     // Multitenancy mapping (optional)
                     if (multitenancyStmtMapping != null)
                     {
-                        table.getMultitenancyMapping().setObject(ec, ps,
-                            multitenancyStmtMapping.getParameterPositionsForOccurrence(0), 
-                            storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                        table.getMultitenancyMapping().setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
+                            ec.getNucleusContext().getMultiTenancyId(ec, op.getClassMetaData()));
                     }
 
                     // Discriminator mapping (optional)

@@ -89,13 +89,11 @@ public class LocateRequest extends Request
         {
             // Datastore identity value for input
             JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
-            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                datastoreIdMapping);
+            SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
             sqlStatement.whereAnd(expr.eq(val), true);
 
-            StatementMappingIndex datastoreIdx =
-                mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
             if (datastoreIdx == null)
             {
                 datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
@@ -115,8 +113,7 @@ public class LocateRequest extends Request
                 {
                     pkMapping = table.getMemberMapping(mmd);
                 }
-                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(),
-                    pkMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
                 sqlStatement.whereAnd(expr.eq(val), true);
 
@@ -139,10 +136,9 @@ public class LocateRequest extends Request
         {
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), 
-                tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping,
-                storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
+            // TODO set this to a parameter and set in execute
+            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -167,8 +163,7 @@ public class LocateRequest extends Request
             short lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
             if (lockType != LockManager.LOCK_MODE_NONE)
             {
-                if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ ||
-                    lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
+                if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ || lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
                 {
                     // Override with pessimistic lock
                     locked = true;
@@ -191,18 +186,15 @@ public class LocateRequest extends Request
                         // Provide the primary key field(s)
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(
-                                StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps,
-                                    datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getDatastoreIdMapping().setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(),
-                                storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                            op.provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                         }
 
                         // Execute the statement
@@ -240,8 +232,7 @@ public class LocateRequest extends Request
                 {
                     exceptions.add(sqle);
                 }
-                throw new NucleusDataStoreException(msg, 
-                    (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
             }
         }
     }

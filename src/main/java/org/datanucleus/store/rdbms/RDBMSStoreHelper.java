@@ -59,8 +59,7 @@ public class RDBMSStoreHelper
      * @param cmd Metadata for the root candidate class
      * @return Name of the class with this identity (or null if none found)
      */
-    public static String getClassNameForIdUsingDiscriminator(RDBMSStoreManager storeMgr, ExecutionContext ec, Object id,
-            AbstractClassMetaData cmd)
+    public static String getClassNameForIdUsingDiscriminator(RDBMSStoreManager storeMgr, ExecutionContext ec, Object id, AbstractClassMetaData cmd)
     {
         // Check for input error
         if (cmd == null || id == null)

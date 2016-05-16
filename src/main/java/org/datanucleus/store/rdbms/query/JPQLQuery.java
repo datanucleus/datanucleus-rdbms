@@ -40,7 +40,6 @@ import java.util.StringTokenizer;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlanForClass;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -1133,7 +1132,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1253,7 +1252,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?

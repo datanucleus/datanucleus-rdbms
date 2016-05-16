@@ -308,6 +308,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), tblGroupName);
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
+            // TODO set as parameter here and set value when executing
             SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }

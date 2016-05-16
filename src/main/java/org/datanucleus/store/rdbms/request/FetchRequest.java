@@ -223,6 +223,7 @@ public class FetchRequest extends Request
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
+            // TODO set this to a parameter and set in execute
             SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
@@ -307,7 +308,6 @@ public class FetchRequest extends Request
                 // Don't fetch any children since the object is being deleted
                 mappingDef = mappingDefinition.cloneStatementMappingWithoutChildren();
             }*/
-
             try
             {
                 ManagedConnection mconn = storeMgr.getConnection(ec);

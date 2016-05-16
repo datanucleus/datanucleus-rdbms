@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -332,29 +331,22 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         // Add Multi-tenancy discriminator if applicable
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
-        if (storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID) != null)
+        if (storeMgr.getNucleusContext().isClassMultiTenant(cmd))
         {
-            if ("true".equalsIgnoreCase(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_DISABLE)))
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
             {
-                // Don't bother with multitenancy for this class
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME));
             }
-            else
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
             {
-                ColumnMetaData colmd = new ColumnMetaData();
-                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
-                {
-                    colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME));
-                }
-                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
-                {
-                    colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
-                }
-                if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH))
-                {
-                    colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
-                }
-                addMultitenancyMapping(colmd);
+                colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
             }
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH))
+            {
+                colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
+            }
+            addMultitenancyMapping(colmd);
         }
 
         // Initialise any SecondaryTables

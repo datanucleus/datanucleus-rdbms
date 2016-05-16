@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -87,6 +86,7 @@ public class LocateBulkRequest extends BulkRequest
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
+        ExecutionContext ec = ops[0].getExecutionContext();
 
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
 
@@ -171,7 +171,7 @@ public class LocateBulkRequest extends BulkRequest
             // Add restriction on multi-tenancy
             JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, storeMgr.getStringProperty(PropertyNames.PROPERTY_MAPPING_TENANT_ID));
+            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
