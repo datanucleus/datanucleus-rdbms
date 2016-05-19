@@ -27,8 +27,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.NucleusLogger;
@@ -56,14 +54,9 @@ public class EnumMapping extends SingleFieldMapping
         }
         else if (mmd != null)
         {
-            ColumnMetaData[] colmds = getColumnMetaDataForMember(mmd, roleForMember);
-            if (colmds != null && colmds.length > 0)
+            if (MetaDataUtils.isJdbcTypeNumeric(TypeConversionHelper.getJdbcTypeForEnum(mmd, roleForMember, clr)))
             {
-                // Check if the user requested an INTEGER based datastore type
-                if (MetaDataUtils.isJdbcTypeNumeric(colmds[0].getJdbcType()))
-                {
-                    datastoreJavaType = ClassNameConstants.JAVA_LANG_INTEGER;
-                }
+                datastoreJavaType = ClassNameConstants.JAVA_LANG_INTEGER;
             }
         }
 
@@ -92,7 +85,7 @@ public class EnumMapping extends SingleFieldMapping
                         String[] valueStrings = new String[values.length];
                         for (int i=0;i<values.length;i++)
                         {
-                            valueStrings[i] = values[i].toString();
+                            valueStrings[i] = (String)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
                         }
                         return valueStrings;
                     }
@@ -100,7 +93,8 @@ public class EnumMapping extends SingleFieldMapping
                     Integer[] valueInts = new Integer[values.length];
                     for (int i=0;i<values.length;i++)
                     {
-                        valueInts[i] = (int)TypeConversionHelper.getValueFromEnum(mmd, roleForMember, values[i]);
+                        Number val = (Number)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
+                        valueInts[i] = val.intValue();
                     }
                     return valueInts;
                 }
@@ -147,28 +141,29 @@ public class EnumMapping extends SingleFieldMapping
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
+            int intVal = 0;
             if (value instanceof Enum)
             {
-                int intVal = (int)TypeConversionHelper.getValueFromEnum(mmd, roleForMember, (Enum)value);
-                getDatastoreMapping(0).setInt(ps, exprIndex[0], intVal);
+                intVal = ((Number)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value)).intValue();
             }
             else if (value instanceof BigInteger)
             {
                 // ordinal value passed in directly (e.g ENUM_FIELD == ? in query)
-                getDatastoreMapping(0).setInt(ps, exprIndex[0], ((BigInteger)value).intValue());
+                intVal = ((BigInteger)value).intValue();
             }
+            getDatastoreMapping(0).setInt(ps, exprIndex[0], intVal);
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            String stringVal;
-            if (value instanceof String)
+            String stringVal = null;
+            if (value instanceof Enum)
+            {
+                stringVal = (String)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value);
+            }
+            else if (value instanceof String)
             {
                 //it may be String when there is a compare between Enums values and Strings in the JDOQL query (for example)
                 stringVal = (String)value;
-            }
-            else
-            {
-                stringVal = ((Enum)value).name();
             }
             getDatastoreMapping(0).setString(ps, exprIndex[0], stringVal);
         }
@@ -198,45 +193,24 @@ public class EnumMapping extends SingleFieldMapping
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
-            long longVal = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+            int intVal = getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
             Class enumType = null;
             if (mmd == null)
             {
                 enumType = ec.getClassLoaderResolver().classForName(type);
-                return enumType.getEnumConstants()[(int)longVal];
+                return enumType.getEnumConstants()[intVal];
             }
-
-            return TypeConversionHelper.getEnumFromValue(mmd, roleForMember, ec, longVal);
+            return TypeConversionHelper.getEnumForStoredValue(mmd, roleForMember, intVal, ec.getClassLoaderResolver());
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             String stringVal = getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
-            Class enumType = null;
             if (mmd == null)
             {
-                enumType = ec.getClassLoaderResolver().classForName(type);
+                Class enumType = ec.getClassLoaderResolver().classForName(type);
+                return Enum.valueOf(enumType, stringVal);
             }
-            else
-            {
-                enumType = mmd.getType();
-                if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
-                }
-                else if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getArray().getElementType());
-                }
-                else if (roleForMember == FieldRole.ROLE_MAP_KEY)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getKeyType());
-                }
-                else if (roleForMember == FieldRole.ROLE_MAP_VALUE)
-                {
-                    enumType = ec.getClassLoaderResolver().classForName(mmd.getMap().getValueType());
-                }
-            }
-            return Enum.valueOf(enumType, stringVal);
+            return TypeConversionHelper.getEnumForStoredValue(mmd, roleForMember, stringVal, ec.getClassLoaderResolver());
         }
         else
         {

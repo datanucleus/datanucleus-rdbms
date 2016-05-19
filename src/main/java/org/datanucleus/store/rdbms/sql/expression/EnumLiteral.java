@@ -58,11 +58,11 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
 
         if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            delegate = new StringLiteral(stmt, mapping, (this.value != null ? this.value.name() : null), parameterName);
+            delegate = new StringLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
         else
         {
-            delegate = new IntegerLiteral(stmt, mapping, getValueAsInt(mapping), parameterName);
+            delegate = new IntegerLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
     }
 
@@ -74,11 +74,11 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         // Reset the delegate in case it has changed
         if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            delegate = new StringLiteral(stmt, mapping, (this.value != null ? this.value.name() : null), parameterName);
+            delegate = new StringLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
         else
         {
-            delegate = new IntegerLiteral(stmt, mapping, getValueAsInt(mapping), parameterName);
+            delegate = new IntegerLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
     }
 
@@ -107,17 +107,23 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         ((SQLLiteral)delegate).setNotParameter();
     }
 
-    private Integer getValueAsInt(JavaTypeMapping mapping)
+    private Object getStoredValueForEnum(JavaTypeMapping mapping)
     {
-        Integer val = null;
-        if(this.value != null)
+        Object val = null;
+        if (this.value != null)
         {
             val = this.value.ordinal();
-
-            if(mapping instanceof EnumMapping)
+            if (mapping instanceof EnumMapping)
             {
                 EnumMapping m = (EnumMapping)mapping;
-                val = (int)TypeConversionHelper.getValueFromEnum(m.getMemberMetaData(), m.getRoleForMember(), this.value);
+                if (m.getMemberMetaData() != null)
+                {
+                    val = TypeConversionHelper.getStoredValueFromEnum(m.getMemberMetaData(), m.getRoleForMember(), this.value);
+                }
+                else
+                {
+                    return (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING)) ? this.value.name() : this.value.ordinal();
+                }
             }
         }
         return val;
