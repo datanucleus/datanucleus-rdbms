@@ -35,8 +35,7 @@ import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
 
 /**
- * Maps single collection elements as 1-1 instead of 1-N, by wrapping and reusing the JavaTypeMappings and
- * member metadata of the element types.
+ * Maps single collection elements as 1-1 instead of 1-N, by wrapping and reusing the JavaTypeMappings and member metadata of the element types.
  */
 public class SingleCollectionMapping extends JavaTypeMapping implements MappingCallbacks
 {
@@ -197,13 +196,10 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
             this.singleCollectionMetadata = fmd;
             this.type = type;
             this.columnMetaData = fmd.getColumnMetaData();
-
             this.relationType = fmd.getRelationType(clr);
             this.relatedMemberMetaData = fmd.getRelatedMemberMetaData(clr);
 
-            // Copy the Element embedded definition to the field embedded
-            // metaData because EmbeddedPCMapping reads it from there.
-            // (Maybe it should use EmbeddedElementPCMapping?)
+            // Copy the Element embedded definition to the field embedded metaData because EmbeddedPCMapping reads it from there. (Maybe it should use EmbeddedElementPCMapping?)
             ElementMetaData fmdElementMetaData = fmd.getElementMetaData();
             if (fmdElementMetaData != null && fmdElementMetaData.getEmbeddedMetaData() != null)
             {
@@ -226,6 +222,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         @Override
         public String toString()
         {
+            // TODO This is a bastardisation of what the AbstractMemberMetaData contract is supposed to provide, namely the XML form of the metadata! Fix this
             return "Wrapped[" + getName() + "]\n" + super.toString();
         }
     }
