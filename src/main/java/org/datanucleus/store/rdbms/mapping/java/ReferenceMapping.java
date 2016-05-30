@@ -226,7 +226,8 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 if (mmd.getMappedBy() == null)
                 {
                     // Unidirectional 1-1
-                    createPerImplementationColumnsForReferenceField(false, true, false, mmd.isEmbedded() || mmd.getElementMetaData() != null, roleForMember, mmd.getColumnMetaData(), clr);
+                    boolean embedded = (mmd.isEmbedded() || mmd.getEmbeddedMetaData() != null);
+                    createPerImplementationColumnsForReferenceField(false, true, false, embedded, roleForMember, mmd.getColumnMetaData(), clr);
                 }
                 else
                 {
