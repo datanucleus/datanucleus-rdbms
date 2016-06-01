@@ -22,12 +22,12 @@ package org.datanucleus.store.rdbms.fieldmanager;
 import java.sql.PreparedStatement;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;

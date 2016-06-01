@@ -18,7 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.exceptions;
 
-import org.datanucleus.store.exceptions.DatastoreValidationException;
+import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**

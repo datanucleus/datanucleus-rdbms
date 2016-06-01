@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -53,7 +54,6 @@ import org.datanucleus.state.ActivityState;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.VersionHelper;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;

@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.datanucleus.store.exceptions.DatastoreValidationException;
+import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;

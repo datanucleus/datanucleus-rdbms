@@ -24,13 +24,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.DatastoreInitialisationException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AbstractAutoStartMechanism;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.exceptions.DatastoreInitialisationException;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;

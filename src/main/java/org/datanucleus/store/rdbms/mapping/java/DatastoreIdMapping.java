@@ -27,10 +27,10 @@ import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
+import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

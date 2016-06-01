@@ -26,10 +26,10 @@ import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
+import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
