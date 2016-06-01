@@ -53,8 +53,8 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.scostore.MapStore;
-import org.datanucleus.store.scostore.SetStore;
+import org.datanucleus.store.types.scostore.MapStore;
+import org.datanucleus.store.types.scostore.SetStore;
 
 /**
  * RDBMS-specific implementation of a SetStore for map entries.

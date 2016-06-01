@@ -67,9 +67,9 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.scostore.CollectionStore;
-import org.datanucleus.store.scostore.MapStore;
-import org.datanucleus.store.scostore.SetStore;
+import org.datanucleus.store.types.scostore.CollectionStore;
+import org.datanucleus.store.types.scostore.MapStore;
+import org.datanucleus.store.types.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 

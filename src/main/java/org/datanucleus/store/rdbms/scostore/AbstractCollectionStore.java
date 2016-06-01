@@ -40,7 +40,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.scostore.CollectionStore;
+import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

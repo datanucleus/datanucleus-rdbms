@@ -52,7 +52,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.scostore.Store;
 
 /**
  * Helper class to generate the necessary statement for multi-valued field bulk-fetch.

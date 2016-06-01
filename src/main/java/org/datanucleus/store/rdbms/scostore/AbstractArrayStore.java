@@ -34,9 +34,9 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.exceptions.NotYetFlushedException;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
+import org.datanucleus.store.types.scostore.ArrayStore;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
-import org.datanucleus.store.scostore.ArrayStore;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 

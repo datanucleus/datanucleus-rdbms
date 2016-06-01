@@ -42,10 +42,10 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
+import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
-import org.datanucleus.store.scostore.ListStore;
 import org.datanucleus.util.Localiser;
 
 /**

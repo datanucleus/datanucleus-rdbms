@@ -30,8 +30,8 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.scostore.Store;
 
 /**
  * Base class for all mapped container stores (collections, maps, arrays).

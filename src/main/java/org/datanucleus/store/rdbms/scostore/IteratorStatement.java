@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.scostore;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.scostore.Store;
+import org.datanucleus.store.types.scostore.Store;
 
 /**
  * Representation of the SQLStatement for an iterator of a container, together with the class mapping for the element.

@@ -34,7 +34,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.table.PersistableJoinTable;
-import org.datanucleus.store.scostore.PersistableRelationStore;
+import org.datanucleus.store.types.scostore.PersistableRelationStore;
 
 /**
  * RDBMS implementation of a persistable relation backing store.

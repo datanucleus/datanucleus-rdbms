@@ -63,7 +63,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.scostore.ListStore;
+import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
