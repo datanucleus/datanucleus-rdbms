@@ -100,7 +100,7 @@ public abstract class SQLExpression
     {
         st.append(op.toString());
 
-        if (op.isHigherThan(expr1.lowestOperator))
+        if (op.isHigherThan(expr1.lowestOperator) || (op == Expression.OP_NOT && expr1.lowestOperator == Expression.OP_NOT))
         {
             st.append('(').append(expr1).append(')');
         }
