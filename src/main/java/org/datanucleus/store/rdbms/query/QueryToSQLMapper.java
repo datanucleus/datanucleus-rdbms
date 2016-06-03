@@ -87,6 +87,7 @@ import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
+import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -2790,13 +2791,33 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             else if (expr.getLeft() instanceof InvokeExpression)
             {
-                processInvokeExpression((InvokeExpression)expr.getLeft());
+                InvokeExpression invokeExpr = (InvokeExpression)expr.getLeft();
+                SQLExpression invokedSqlExpr = getInvokedSqlExpressionForInvokeExpression(invokeExpr);
+
+                processInvokeExpression(invokeExpr, invokedSqlExpr);
                 SQLExpression invokeSqlExpr = stack.pop();
                 Table tbl = invokeSqlExpr.getSQLTable().getTable();
                 if (expr.getTuples().size() > 1)
                 {
                     throw new NucleusUserException("Dont currently support evaluating " + expr.getId() + " on " + invokeSqlExpr);
                 }
+                SQLTable invokeSqlTbl = invokeSqlExpr.getSQLTable();
+
+                if (invokedSqlExpr.getJavaTypeMapping() instanceof OptionalMapping && invokeExpr.getOperation().equals("get") && expr.getTuples().size() == 1)
+                {
+                    OptionalMapping opMapping = (OptionalMapping)invokedSqlExpr.getJavaTypeMapping();
+                    if (opMapping.getWrappedMapping() instanceof PersistableMapping)
+                    {
+                        // Special case of Optional.get().{field}, so we need to join to the related table
+                        AbstractMemberMetaData mmd = invokedSqlExpr.getJavaTypeMapping().getMemberMetaData();
+                        AbstractClassMetaData otherCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getCollection().getElementType(), clr);
+                        Table otherTbl = storeMgr.getDatastoreClass(otherCmd.getFullClassName(), clr);
+                        
+                        invokeSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, invokeSqlExpr.getSQLTable(), opMapping.getWrappedMapping(), otherTbl, null, otherTbl.getIdMapping(), null, null, true);
+                        tbl = invokeSqlTbl.getTable();
+                    }
+                }
+
                 if (tbl instanceof DatastoreClass)
                 {
                     // Table of a class, so assume to have field in the table of the class
@@ -2808,7 +2829,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             " on " + invokeSqlExpr + ". The field " + expr.getId() + " doesnt exist in table " + tbl);
                     }
 
-                    sqlExpr = exprFactory.newExpression(stmt, invokeSqlExpr.getSQLTable(), mapping);
+                    sqlExpr = exprFactory.newExpression(stmt, invokeSqlTbl, mapping);
                     stack.push(sqlExpr);
                     return sqlExpr;
                 }
@@ -2824,7 +2845,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             throw new NucleusUserException("Dont currently support evaluating " + expr.getId() +
                                 " on " + invokeSqlExpr + ". The field " + expr.getId() + " doesnt exist in table " + tbl);
                         }
-                        sqlExpr = exprFactory.newExpression(stmt, invokeSqlExpr.getSQLTable(), mapping);
+                        sqlExpr = exprFactory.newExpression(stmt, invokeSqlTbl, mapping);
                         stack.push(sqlExpr);
                         return sqlExpr;
                     }
@@ -3491,12 +3512,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         return sqlExpr;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processInvokeExpression(org.datanucleus.query.expression.InvokeExpression)
-     */
-    protected Object processInvokeExpression(InvokeExpression expr)
+    protected SQLExpression getInvokedSqlExpressionForInvokeExpression(InvokeExpression expr)
     {
-        // Find object that we invoke on
         Expression invokedExpr = expr.getLeft();
         SQLExpression invokedSqlExpr = null;
         if (invokedExpr == null)
@@ -3554,6 +3571,28 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             throw new NucleusException("Dont currently support invoke expression " + invokedExpr);
         }
 
+        return invokedSqlExpr;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.query.evaluator.AbstractExpressionEvaluator#processInvokeExpression(org.datanucleus.query.expression.InvokeExpression)
+     */
+    protected Object processInvokeExpression(InvokeExpression expr)
+    {
+        // Find object that we invoke on
+        SQLExpression invokedSqlExpr = getInvokedSqlExpressionForInvokeExpression(expr);
+
+        return processInvokeExpression(expr, invokedSqlExpr);
+    }
+
+    /**
+     * Internal method to handle the processing of an InvokeExpression.
+     * @param expr The InvokeExpression
+     * @param invokedSqlExpr The SQLExpression that we are invoking the method on.
+     * @return The resultant SQLExpression
+     */
+    protected SQLExpression processInvokeExpression(InvokeExpression expr, SQLExpression invokedSqlExpr)
+    {
         if (invokedSqlExpr instanceof NullLiteral)
         {
             // We cannot invoke anything on a null TODO Handle this "NPE"
