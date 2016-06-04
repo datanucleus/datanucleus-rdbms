@@ -20,9 +20,16 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.mapping.java.BigDecimalMapping;
+import org.datanucleus.store.rdbms.mapping.java.BigIntegerMapping;
 import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
+import org.datanucleus.store.rdbms.mapping.java.DoubleMapping;
+import org.datanucleus.store.rdbms.mapping.java.FloatMapping;
+import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
+import org.datanucleus.store.rdbms.mapping.java.ShortMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CaseExpression;
@@ -58,7 +65,9 @@ public class OptionalOrElseMethod extends AbstractSQLMethod
         {
             return new CaseStringExpression(new SQLExpression[] {isNotNullExpr}, new SQLExpression[] {getExpr}, elseExpr);
         }
-        else if (Number.class.isAssignableFrom(javaMapping.getJavaType()))
+        else if (javaMapping instanceof IntegerMapping || javaMapping instanceof LongMapping || javaMapping instanceof ShortMapping ||
+                javaMapping instanceof FloatMapping || javaMapping instanceof DoubleMapping || javaMapping instanceof BigIntegerMapping || javaMapping instanceof BigDecimalMapping)
+        // TODO Maybe use javaMapping.getJavaType compared to Number to avoid the check above
         {
             return new CaseNumericExpression(new SQLExpression[] {isNotNullExpr}, new SQLExpression[] {getExpr}, elseExpr);
         }
