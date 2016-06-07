@@ -91,6 +91,11 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                 return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, false));
             }
 
+            if (arrExpr.isParameter())
+            {
+                stmt.getQueryGenerator().useParameterExpressionAsLiteral((ArrayLiteral)arrExpr);
+            }
+
             boolean useInExpression = false;
             List<SQLExpression> collElementExprs = lit.getElementExpressions();
             if (collElementExprs != null && !collElementExprs.isEmpty())

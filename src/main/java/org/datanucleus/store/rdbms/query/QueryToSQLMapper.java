@@ -4053,7 +4053,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression right = stack.pop();
         SQLExpression left = stack.pop();
 
-        if (right instanceof CollectionExpression)
+        if (right instanceof CollectionExpression || right instanceof org.datanucleus.store.rdbms.sql.expression.ArrayExpression)
         {
             // myElement IN myCollection
             if (right.getParameterName() != null)
@@ -4061,7 +4061,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 setNotPrecompilable();
             }
 
-            // Use Collection.contains(element)
+            // Use Collection.contains(element)/Array.contains(element)
             List<SQLExpression> sqlExprArgs = new ArrayList();
             sqlExprArgs.add(left);
             SQLExpression sqlExpr = right.invoke("contains", sqlExprArgs);
