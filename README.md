@@ -13,6 +13,7 @@ __Javadocs__ : [5.0](http://www.datanucleus.org/javadocs/store.rdbms/5.0/), [4.1
 __Download(Releases)__ : [Maven Central](http://central.maven.org/maven2/org/datanucleus/datanucleus-rdbms)  
 __Download(Nightly)__ : [Nightly Builds](http://www.datanucleus.org/downloads/maven2-nightly/org/datanucleus/datanucleus-rdbms)  
 __Dependencies__ : See file [pom.xml](pom.xml)  
+__Support__ : [DataNucleus Support Page](http://www.datanucleus.org/support.html)  
 
 
 ## Datastore Adapters
