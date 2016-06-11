@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>datanucleus-rdbms</artifactId>
-    <version>5.0.0-m5-SNAPSHOT</version>
+    <version>5.0.0-m5</version>
 
     <name>DataNucleus RDBMS plugin</name>
     <description>
