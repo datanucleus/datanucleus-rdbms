@@ -17,6 +17,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Expression representing the SQL construct "IN (expr1, expr2, ...)".
  */
@@ -33,11 +36,30 @@ public class InExpression extends BooleanExpression
      */
     public InExpression(SQLExpression expr, SQLExpression[] exprs)
     {
-        super(expr.getSQLStatement(),
-            expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(boolean.class, false));
+        super(expr.getSQLStatement(), expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(boolean.class, false));
 
         this.expr = expr;
         this.exprs = exprs;
+        setStatement();
+    }
+
+    /**
+     * Constructor for an IN expression.
+     * @param expr The expression that is contained.
+     * @param exprList List of expressions that it is contained in
+     */
+    public InExpression(SQLExpression expr, List<SQLExpression> exprList)
+    {
+        super(expr.getSQLStatement(), expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(boolean.class, false));
+
+        this.expr = expr;
+        this.exprs = new SQLExpression[exprList.size()];
+        Iterator<SQLExpression> exprListIter = exprList.iterator();
+        int i = 0;
+        while (exprListIter.hasNext())
+        {
+            this.exprs[i++] = exprListIter.next();
+        }
         setStatement();
     }
 
