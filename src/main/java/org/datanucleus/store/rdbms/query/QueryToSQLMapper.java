@@ -2812,7 +2812,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         AbstractMemberMetaData mmd = invokedSqlExpr.getJavaTypeMapping().getMemberMetaData();
                         AbstractClassMetaData otherCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getCollection().getElementType(), clr);
                         Table otherTbl = storeMgr.getDatastoreClass(otherCmd.getFullClassName(), clr);
-                        
+
+                        // Optional type so do LEFT OUTER JOIN since if it is null then we would eliminate all other results
                         invokeSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, invokeSqlExpr.getSQLTable(), opMapping.getWrappedMapping(), otherTbl, null, otherTbl.getIdMapping(), null, null, true);
                         tbl = invokeSqlTbl.getTable();
                     }
@@ -3116,9 +3117,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     else
                     {
-                        // FK is at this side, so only join if further component provided, or if forcing
+                        // FK is at this side
                         if (forceJoin == null && !iter.hasNext())
                         {
+                            // Further component provided, so check if we should force a join to the other side
                             if (primExpr.getParent() != null && primExpr.getParent().getOperator() == Expression.OP_CAST)
                             {
                                 // Cast and not an interface field, so do a join to the table of the persistable object
