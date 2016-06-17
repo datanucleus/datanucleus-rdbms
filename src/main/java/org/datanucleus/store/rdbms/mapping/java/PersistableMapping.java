@@ -84,8 +84,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class PersistableMapping extends MultiMapping implements MappingCallbacks
 {
-    //----------------------- convenience fields to improve performance ----------------------// 
-    /** ClassMetaData for the represented class. Create a new one on each getObject invoke is expensive **/
+    /** ClassMetaData for the represented class; creating a new one on each getObject invoke is expensive **/
     protected AbstractClassMetaData cmd;
 
     /**
@@ -241,8 +240,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
-     * Method to return the value to be stored in the specified datastore index given the overall
-     * value for this java type.
+     * Method to return the value to be stored in the specified datastore index given the overall value for this java type.
      * @param nucleusCtx Context
      * @param index The datastore index
      * @param value The overall value for this java type
@@ -858,8 +856,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     }
 
     /**
-     * Method executed just afer any update of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
+     * Method executed just afer any update of the owning object, allowing any necessary action to this field and the object stored in it.
      * @param op ObjectProvider for the owner
      */
     public void postUpdate(ObjectProvider op)
@@ -966,7 +963,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             }
             if (ec.getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
             {
-                // JDO2 doesnt currently (2.0 spec) take note of foreign-key
+                // JDO doesn't currently take note of foreign-key
                 hasFK = false;
             }
         }
@@ -976,8 +973,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         // 2. If it is not dependent and they have defined no FK then null it, else delete it
         // 3. If it is not dependent and they have a FK, let the datastore handle the delete
         // There may be some corner cases that this code doesn't yet cater for
-        if (relationType == RelationType.ONE_TO_ONE_UNI ||
-            (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null))
+        if (relationType == RelationType.ONE_TO_ONE_UNI || (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null))
         {
             // 1-1 with FK at this side (owner of the relation)
             if (dependent)
@@ -985,7 +981,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 boolean relatedObjectDeleted = ec.getApiAdapter().isDeleted(pc);
                 if (isNullable() && !relatedObjectDeleted)
                 {
-                    // Other object not yet deleted - just null out the FK
+                    // Other object not yet deleted, but the field is nullable so just null out the FK
                     // TODO Not doing this would cause errors in 1-1 uni relations (e.g AttachDetachTest)
                     // TODO Log this since it affects the resultant objects
                     op.replaceFieldMakeDirty(fieldNumber, null);
@@ -998,15 +994,16 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 }
                 else
                 {
-                    // Can't just delete the other object since that would cause a FK constraint violation
-                    // Do nothing - handled by DeleteRequest
-                    NucleusLogger.DATASTORE_PERSIST.warn("Delete of " + StringUtils.toJVMIDString(op.getObject()) +
-                        " needs delete of related object at " + mmd.getFullFieldName() + " but cannot delete it direct since FK is here");
+                    // Can't just delete the other object since that would cause a FK constraint violation. Do nothing - handled by DeleteRequest on other object
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("041017", StringUtils.toJVMIDString(op.getObject()), mmd.getFullFieldName()));
+                    }
                 }
             }
             else
             {
-                // We're deleting the FK at this side so shouldnt be an issue
+                // We're deleting the FK at this side so shouldn't be an issue
                 AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, op.getObject(), pc);
                 if (relatedMmd != null)
                 {
