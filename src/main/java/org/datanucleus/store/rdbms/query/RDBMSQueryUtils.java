@@ -441,6 +441,7 @@ public class RDBMSQueryUtils extends QueryUtils
                 if (tbl.getDiscriminatorMapping(true) != null || QueryUtils.resultHasOnlyAggregates(result))
                 {
                     // Either has a discriminator, or only selecting aggregates so need single select
+                    // TODO Add option to omit discriminator restriction
                     stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
                 }
