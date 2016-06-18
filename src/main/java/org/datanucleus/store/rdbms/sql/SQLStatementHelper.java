@@ -224,9 +224,67 @@ public class SQLStatementHelper
                     {
                         if (!ec.getApiAdapter().isPersistent(value) && !ec.getApiAdapter().isDetached(value))
                         {
-                            NucleusLogger.QUERY.warn("Attempt to use transient object as parameter in query. Not supported, so using NULL for parameter value");
-                            // Transient persistable object, so don't use since would cause its persistence TODO Support this, use reflection to get "id" field value(s)
-                            mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), null);
+                            // Transient persistable object passed in as query parameter! We cannot simply use mapping.setObject since it will PERSIST the object
+                            // See also JDO TCK Assertion ID: A14.6.2-44 "Comparisons between persistent and non-persistent instances return not equal"
+                            boolean supported = false;
+                            /*if (cmd.getIdentityType() == IdentityType.APPLICATION)
+                            {
+                                // Try to use reflection to get the PK field(s) from the supplied object
+                                String[] pkFieldNames = cmd.getPrimaryKeyMemberNames();
+
+                                supported = true;
+                                PersistableMapping pcMapping = (PersistableMapping)mapping;
+                                JavaTypeMapping[] pkMappings = pcMapping.getJavaTypeMapping();
+                                for (int j=0;j<pkMappings.length;j++)
+                                {
+                                    if (pkMappings[j] instanceof PersistableMapping)
+                                    {
+                                        supported = false;
+                                        break;
+                                    }
+                                }
+                                if (pkFieldNames.length != pkMappings.length)
+                                {
+                                    supported = false;
+                                }
+
+                                if (supported)
+                                {
+                                    // Extract the field values using reflection
+                                    Object[] pkVals = new Object[pkFieldNames.length];
+                                    for (int j=0;j<pkFieldNames.length;j++)
+                                    {
+                                        Field f = ClassUtils.getFieldForClass(value.getClass(), pkFieldNames[j]);
+                                        if (f != null)
+                                        {
+                                            try
+                                            {
+                                                f.setAccessible(true);
+                                                pkVals[j] = f.get(value);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                        }
+                                    }
+
+                                    int position = num;
+                                    for (int j=0;j<pkMappings.length;j++)
+                                    {
+                                        // Apply the field values one-by-one
+                                        int[] posns = MappingHelper.getMappingIndices(position, pkMappings[j]);
+                                        pkMappings[j].setObject(ec, ps, posns, pkVals[j]);
+                                        position += pkMappings[j].getNumberOfDatastoreMappings();
+                                    }
+                                }
+                            }*/
+
+                            if (!supported)
+                            {
+                                // Transient persistable object, so don't use (use null instead) since would cause its persistence
+                                NucleusLogger.QUERY.warn("Attempt to use transient object as parameter in query. Not supported, so using NULL for parameter value");
+                                mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), null);
+                            }
                         }
                         else if (ec.getApiAdapter().isDetached(value))
                         {
