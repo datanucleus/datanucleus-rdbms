@@ -224,6 +224,7 @@ public class SQLStatementHelper
                     {
                         if (!ec.getApiAdapter().isPersistent(value) && !ec.getApiAdapter().isDetached(value))
                         {
+                            NucleusLogger.QUERY.warn("Attempt to use transient object as parameter in query. Not supported, so using NULL for parameter value");
                             // Transient persistable object, so don't use since would cause its persistence
                             mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), null);
                         }
@@ -1118,11 +1119,30 @@ public class SQLStatementHelper
     public static BooleanExpression getExpressionForDiscriminatorForClass(SQLStatement stmt, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
             SQLTable discrimSqlTbl, ClassLoaderResolver clr)
     {
+        Object discriminatorValue = getDiscriminatorValueForClass(stmt.getRDBMSManager().getNucleusContext(), className, dismd, discriminatorMapping, clr);
+
+        SQLExpression discrExpr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
+        SQLExpression discrVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discriminatorMapping, discriminatorValue);
+        return discrExpr.eq(discrVal);
+    }
+
+    /**
+     * Convenience method to generate a BooleanExpression for the associated discriminator value for
+     * the specified class.
+     * @param nucleusCtx NucleusContext
+     * @param className The class name
+     * @param dismd MetaData for the discriminator
+     * @param discriminatorMapping Mapping for the discriminator
+     * @param clr ClassLoader resolver
+     * @return The discriminator value for this class
+     */
+    public static Object getDiscriminatorValueForClass(NucleusContext nucleusCtx, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
+            ClassLoaderResolver clr)
+    {
         Object discriminatorValue = className; // Default to the "class-name" discriminator strategy
         if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
         {
             // Get the MetaData for the target class since that holds the "value"
-            NucleusContext nucleusCtx = stmt.getRDBMSManager().getNucleusContext();
             AbstractClassMetaData targetCmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, clr);
             String strValue = null;
             if (targetCmd.getInheritanceMetaData() != null && targetCmd.getInheritanceMetaData().getDiscriminatorMetaData() != null)
@@ -1150,10 +1170,7 @@ public class SQLStatementHelper
                 discriminatorValue = strValue;
             }
         }
-
-        SQLExpression discrExpr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discriminatorMapping);
-        SQLExpression discrVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discriminatorMapping, discriminatorValue);
-        return discrExpr.eq(discrVal);
+        return discriminatorValue;
     }
 
     /**
