@@ -225,7 +225,7 @@ public class SQLStatementHelper
                         if (!ec.getApiAdapter().isPersistent(value) && !ec.getApiAdapter().isDetached(value))
                         {
                             NucleusLogger.QUERY.warn("Attempt to use transient object as parameter in query. Not supported, so using NULL for parameter value");
-                            // Transient persistable object, so don't use since would cause its persistence
+                            // Transient persistable object, so don't use since would cause its persistence TODO Support this, use reflection to get "id" field value(s)
                             mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), null);
                         }
                         else if (ec.getApiAdapter().isDetached(value))
