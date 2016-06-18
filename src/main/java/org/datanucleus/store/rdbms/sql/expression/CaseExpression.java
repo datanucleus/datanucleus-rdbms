@@ -56,6 +56,11 @@ public class CaseExpression extends SQLExpression
     @Override
     public BooleanExpression eq(SQLExpression expr)
     {
+        if (expr instanceof NullLiteral)
+        {
+            // Cater for using "IS NULL" rather than "= NULL"
+            return expr.eq(this);
+        }
         return new BooleanExpression(this, Expression.OP_EQ, expr);
     }
 
@@ -65,6 +70,11 @@ public class CaseExpression extends SQLExpression
     @Override
     public BooleanExpression ne(SQLExpression expr)
     {
+        if (expr instanceof NullLiteral)
+        {
+            // Cater for using "IS NOT NULL" rather than "!= NULL"
+            return expr.ne(this);
+        }
         return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
     }
 
