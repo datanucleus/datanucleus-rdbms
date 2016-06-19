@@ -58,7 +58,7 @@ import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.query.compiler.QueryCompilation;
 import org.datanucleus.query.compiler.Symbol;
-import org.datanucleus.query.evaluator.AbstractExpressionEvaluator;
+import org.datanucleus.query.expression.AbstractExpressionEvaluator;
 import org.datanucleus.query.expression.ArrayExpression;
 import org.datanucleus.query.expression.CaseExpression;
 import org.datanucleus.query.expression.CaseExpression.ExpressionPair;

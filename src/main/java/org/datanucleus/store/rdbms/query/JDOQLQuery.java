@@ -48,8 +48,8 @@ import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.compiler.Symbol;
-import org.datanucleus.query.evaluator.JDOQLEvaluator;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.query.inmemory.JDOQLInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
@@ -573,7 +573,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
             else if (inMemory)
             {
-                return new JDOQLEvaluator(this, new ArrayList(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
+                return new JDOQLInMemoryEvaluator(this, new ArrayList(candidateCollection), compilation, parameters, clr).execute(true, true, true, true, true);
             }
         }
         else if (type == QueryType.SELECT)
@@ -638,7 +638,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             }
 
                             // Perform in-memory filter/result/order etc
-                            results = new JDOQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
+                            results = new JDOQLInMemoryEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
                         }
                         else
                         {

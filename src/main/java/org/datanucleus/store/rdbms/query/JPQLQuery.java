@@ -48,8 +48,8 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.query.QueryUtils;
-import org.datanucleus.query.evaluator.JPQLEvaluator;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.query.inmemory.JPQLInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
@@ -519,7 +519,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
 
             List candidates = new ArrayList(candidateCollection);
-            return new JPQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
+            return new JPQLInMemoryEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
         }
         else if (type == QueryType.SELECT)
         {
@@ -583,7 +583,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             }
 
                             // Perform in-memory filter/result/order etc
-                            results = new JPQLEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
+                            results = new JPQLInMemoryEvaluator(this, candidates, compilation, parameters, clr).execute(true, true, true, true, true);
                         }
                         else
                         {
