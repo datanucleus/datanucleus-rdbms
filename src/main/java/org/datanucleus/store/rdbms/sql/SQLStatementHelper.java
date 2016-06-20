@@ -1112,6 +1112,14 @@ public class SQLStatementHelper
         {
             // Fallback to nullability logic since no type specified
             joinType = getJoinTypeForOneToOneRelationJoin(sourceMapping, sourceSqlTbl, joinType);
+
+            // TODO Cater for JDOQL where user hasn't checked for null on the relation and this is an OUTER join (i.e add WHERE check for null).
+            //if (joinType == JoinType.LEFT_OUTER_JOIN)
+            //{
+            //SQLExpression fkExpr = stmt.getSQLExpressionFactory().newExpression(stmt, sourceSqlTbl, sourceMapping);
+            //SQLExpression nullLit = stmt.getSQLExpressionFactory().newLiteral(stmt, null, null);
+            //stmt.whereAnd(fkExpr.ne(nullLit), true);
+            //}
         }
 
         SQLTable targetSqlTbl = null;
