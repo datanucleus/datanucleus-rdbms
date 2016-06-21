@@ -42,15 +42,14 @@ public class RDBMSStoreData extends StoreData
     protected boolean tableOwner = true;
 
     /**
-     * Constructor. To be used when creating for the start mechanism.
+     * Constructor. To be used when creating for the auto-start mechanism.
      * @param name Name of the class/field
      * @param tableName Name of the table associated
      * @param tableOwner Whether this is the owner
      * @param type The type (FCO/SCO)
-     * @param interfaceName if this class is an implementation of a persistent interface (multiple persistent interface names 
-     *    are comma separated), otherwise is null.
+     * @param interfaceName if this class is an implementation of a persistent interface (multiple persistent interface names are comma separated), otherwise is null.
      */
-    public RDBMSStoreData(String name, String tableName, boolean tableOwner, int type, String interfaceName)
+    public RDBMSStoreData(String name, String tableName, boolean tableOwner, Type type, String interfaceName)
     {
         super(name, null, type, interfaceName);
         this.tableName = tableName;
@@ -65,7 +64,7 @@ public class RDBMSStoreData extends StoreData
      */
     public RDBMSStoreData(ClassMetaData cmd, Table table, boolean tableOwner)
     {
-        super(cmd.getFullClassName(), cmd, FCO_TYPE, null);
+        super(cmd.getFullClassName(), cmd, Type.FCO, null);
 
         this.tableOwner = tableOwner;
         if (table != null)
@@ -96,13 +95,13 @@ public class RDBMSStoreData extends StoreData
     }
 
     /**
-     * Constructor, taking the meta data for the field, and the table it is mapped to.
+     * Constructor for SCO data. Takes in the meta data for the field, and the table it is mapped to.
      * @param mmd MetaData for the field.
      * @param table Table definition
      */
     public RDBMSStoreData(AbstractMemberMetaData mmd, Table table)
     {
-        super(mmd.getFullFieldName(), mmd, SCO_TYPE, null);
+        super(mmd.getFullFieldName(), mmd, Type.SCO, null);
 
         if (table == null)
         {
@@ -113,8 +112,7 @@ public class RDBMSStoreData extends StoreData
         this.tableOwner = true;
         this.tableIdentifier = table.getIdentifier();
 
-        String interfaceName = 
-            (table.getStoreManager().getMetaDataManager().isPersistentInterface(mmd.getType().getName()) ? mmd.getType().getName() : null);
+        String interfaceName = (table.getStoreManager().getMetaDataManager().isPersistentInterface(mmd.getType().getName()) ? mmd.getType().getName() : null);
         if (interfaceName != null)
         {
             this.interfaceName = interfaceName;

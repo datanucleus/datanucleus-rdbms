@@ -47,15 +47,13 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.TableImpl;
 
 /**
- * Class defining DataNucleus schema definition tables. Represents a table in the
- * datastore storing the class and table mappings. This table is used when
- * restarting a DataNucleus system so that it is 'aware' of what classes were
- * supported the previous time this datastore was used. It uses this
- * information to pre-populate the RDBMSManager with the classes stored in this
- * table. The table names are not used as such, other than as a record of what
- * table a class maps to - because it goes off and finds the MetaData for the
+ * Class defining DataNucleus schema definition tables. 
+ * Represents a table in the datastore storing the class and table mappings. 
+ * This table is used when restarting a DataNucleus system so that it is 'aware' of what classes were supported the previous time this datastore was used. 
+ * It uses this information to pre-populate the RDBMSManager with the classes stored in this table. 
+ * The table names are not used as such, other than as a record of what table a class maps to - because it goes off and finds the MetaData for the
  * class which, with the DataNucleus naming scheme, defines the table name anyway.
- **/ 
+ */
 public class SchemaTable extends TableImpl
 {
     private JavaTypeMapping classMapping=null;
@@ -75,23 +73,23 @@ public class SchemaTable extends TableImpl
      * Constructor.
      * @param storeMgr The RDBMSManager for this datastore
      * @param tableName Name of the starter table (optional, uses NUCLEUS_TABLES when this is null)
-     **/
+     */
     public SchemaTable(RDBMSStoreManager storeMgr, String tableName)
     {
-        super(storeMgr.getIdentifierFactory().newTableIdentifier(
-            (tableName != null ? tableName : "NUCLEUS_TABLES")), storeMgr);
+        super(storeMgr.getIdentifierFactory().newTableIdentifier((tableName != null ? tableName : "NUCLEUS_TABLES")), storeMgr);
     }
 
     /**
      * Method to initialise the table.
      * @param clr The ClassLoaderResolver
-     **/
+     */
     public void initialize(ClassLoaderResolver clr)
     {
         assertIsUninitialized();
 
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         MappingManager mapMgr = getStoreManager().getMappingManager();
+
         classMapping = mapMgr.getMapping(String.class);
         Column class_column= addColumn(String.class.getName(), idFactory.newColumnIdentifier("CLASS_NAME"), classMapping, null);
         mapMgr.createDatastoreMapping(classMapping, class_column, String.class.getName());
@@ -146,7 +144,7 @@ public class SchemaTable extends TableImpl
     /**
      * Accessor for a mapping for the ID (persistable) for this table.
      * @return The (persistable) ID mapping.
-     **/
+     */
     public JavaTypeMapping getIdMapping()
     {
         throw new NucleusException("Attempt to get ID mapping of SchemaTable!").setFatal();
@@ -157,7 +155,7 @@ public class SchemaTable extends TableImpl
      * @param conn Connection for this datastore.
      * @return The HashSet of class names (StoreData)
      * @throws SQLException Thrown when an error occurs in the process.
-     **/
+     */
     public HashSet getAllClasses(ManagedConnection conn)
     throws SQLException
     {
@@ -179,7 +177,7 @@ public class SchemaTable extends TableImpl
                 while (rs.next())
                 {
                     StoreData data = new RDBMSStoreData(rs.getString(1), rs.getString(2), rs.getString(4).equals("1") ? true : false, 
-                            rs.getString(3).equals("FCO") ? StoreData.FCO_TYPE : StoreData.SCO_TYPE, rs.getString(6));
+                            rs.getString(3).equals("FCO") ? StoreData.Type.FCO : StoreData.Type.SCO, rs.getString(6));
                     schema_data.add(data);
                 }
             }
@@ -258,7 +256,7 @@ public class SchemaTable extends TableImpl
      * @param conn Connection to the datastore
      * @return if the SchemaTable already has the class
      * @throws SQLException Thrown when an error occurs inserting the schema. 
-     **/
+     */
     private boolean hasClass(StoreData data, ManagedConnection conn)
     throws SQLException
     {
