@@ -423,7 +423,7 @@ public class RDBMSMappingManager implements MappingManager
                 typeCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
             }
 
-            if (mmd.hasExtension(SerialisedLocalFileMapping.SERIALIZE_TO_FOLDER_EXTENSION) && Serializable.class.isAssignableFrom(mmd.getType()))
+            if (mmd.hasExtension(SerialisedLocalFileMapping.EXTENSION_SERIALIZE_TO_FOLDER) && Serializable.class.isAssignableFrom(mmd.getType()))
             {
                 // Special case : use file serialization mapping
                 mc = SerialisedLocalFileMapping.class;

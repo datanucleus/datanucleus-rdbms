@@ -44,14 +44,14 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SerialisedLocalFileMapping extends JavaTypeMapping implements MappingCallbacks
 {
-    public static final String SERIALIZE_TO_FOLDER_EXTENSION = "serializeToFileLocation";
+    public static final String EXTENSION_SERIALIZE_TO_FOLDER = "serializeToFileLocation";
 
     String folderName = null;
 
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         super.initialize(mmd, table, clr);
-        folderName = mmd.getValueForExtension(SERIALIZE_TO_FOLDER_EXTENSION);
+        folderName = mmd.getValueForExtension(EXTENSION_SERIALIZE_TO_FOLDER);
         File folder = new File(folderName);
         if (!folder.exists())
         {
