@@ -1502,8 +1502,8 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 SelectStatement subStmt = stmtGen.getStatement(ec);
 
                 // Select the required fields (of the element class)

@@ -667,8 +667,8 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             {
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 SelectStatement subStmt = stmtGen.getStatement(ec);
 
                 // Select the required fields (of the element class)

@@ -349,7 +349,7 @@ public class RDBMSQueryUtils extends QueryUtils
                 tblStmt.setClassLoaderResolver(clr);
                 tblStmt.setCandidateClassName(cls.getType());
 
-                // Add SELECT of dummy column accessible as "NUCLEUS_TYPE" containing the classname
+                // Add SELECT of dummy column accessible as "DN_TYPE" containing the classname
                 JavaTypeMapping m = storeMgr.getMappingManager().getMapping(String.class);
                 String nuctypeName = cls.getType();
                 if (maxClassNameLength > nuctypeName.length())
@@ -357,7 +357,7 @@ public class RDBMSQueryUtils extends QueryUtils
                     nuctypeName = StringUtils.leftAlignedPaddedString(nuctypeName, maxClassNameLength);
                 }
                 StringLiteral lit = new StringLiteral(tblStmt, m, nuctypeName, null);
-                tblStmt.select(lit, UnionStatementGenerator.NUC_TYPE_COLUMN);
+                tblStmt.select(lit, UnionStatementGenerator.DN_TYPE_COLUMN);
 
                 if (stmt == null)
                 {
@@ -370,7 +370,7 @@ public class RDBMSQueryUtils extends QueryUtils
             }
             if (clsMapping != null)
             {
-                clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
             }
         }
         else
@@ -452,8 +452,8 @@ public class RDBMSQueryUtils extends QueryUtils
                     if (result == null)
                     {
                         // Returning one row per candidate so include distinguisher column
-                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                        clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                        clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     }
                 }
                 stmtGen.setParentStatement(parentStmt);

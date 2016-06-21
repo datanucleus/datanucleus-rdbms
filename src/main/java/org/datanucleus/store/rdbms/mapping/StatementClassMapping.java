@@ -73,8 +73,8 @@ public class StatementClassMapping
     /** Name of the field/property in the parent class (null implies parent class). */
     String memberName;
 
-    /** Name of a NUCLEUS_TYPE column if used in this query for determining this class. Null otherwise. */
-    String nucleusTypeColumn;
+    /** Name of a DN_TYPE column if used in this query for determining this class. Null otherwise. */
+    String dnTypeColumn;
 
     /** Numbers of fields/properties defined in the statement. */
     int[] memberNumbers;
@@ -108,12 +108,12 @@ public class StatementClassMapping
 
     public void setNucleusTypeColumnName(String colName)
     {
-        this.nucleusTypeColumn = colName;
+        this.dnTypeColumn = colName;
     }
 
     public String getNucleusTypeColumnName()
     {
-        return nucleusTypeColumn;
+        return dnTypeColumn;
     }
 
     /**
@@ -224,7 +224,7 @@ public class StatementClassMapping
     public StatementClassMapping cloneStatementMappingWithoutChildren()
     {
         StatementClassMapping mapping = new StatementClassMapping(className, memberName);
-        mapping.nucleusTypeColumn = nucleusTypeColumn;
+        mapping.dnTypeColumn = dnTypeColumn;
         Iterator iter = mappings.entrySet().iterator();
         while (iter.hasNext())
         {
@@ -274,9 +274,9 @@ public class StatementClassMapping
             str.append("]");
         }
 
-        if (nucleusTypeColumn != null)
+        if (dnTypeColumn != null)
         {
-            str.append(",nucleusTypeColumn=" + nucleusTypeColumn);
+            str.append(",nucleusTypeColumn=" + dnTypeColumn);
         }
         return str.toString();
     }

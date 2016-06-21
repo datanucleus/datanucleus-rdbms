@@ -182,7 +182,7 @@ public class RDBMSStoreHelper
                     for (int i=0;i<subcmds.length;i++)
                     {
                         UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(subcmds[i].getFullClassName()), true, null, null);
-                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                        stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
                         if (sqlStmtMain == null)
                         {
                             sampleCmd = subcmds[i];
@@ -214,7 +214,7 @@ public class RDBMSStoreHelper
             else
             {
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootCmd.getFullClassName()), true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
                 if (sqlStmtMain == null)
                 {
                     sampleCmd = rootCmd;
@@ -268,7 +268,7 @@ public class RDBMSStoreHelper
                             {
                                 try
                                 {
-                                    return rs.getString(UnionStatementGenerator.NUC_TYPE_COLUMN).trim();
+                                    return rs.getString(UnionStatementGenerator.DN_TYPE_COLUMN).trim();
                                 }
                                 catch (SQLException sqle)
                                 {

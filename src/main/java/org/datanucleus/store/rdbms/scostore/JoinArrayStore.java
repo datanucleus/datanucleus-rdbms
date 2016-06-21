@@ -323,12 +323,12 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                 {
                     // No discriminator, but subclasses so use UNIONs
                     SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
-                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
                     if (allowNulls) 
                     {
                         stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                     }
-                    iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                    iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement(ec);
                 }
 

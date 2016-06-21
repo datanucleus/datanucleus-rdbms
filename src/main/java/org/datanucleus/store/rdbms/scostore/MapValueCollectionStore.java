@@ -433,8 +433,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     // Select of value table, joining to key table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
@@ -468,8 +468,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 // Select of value in value table (allow union of possible value types)
                 iteratorMappingDef = new StatementClassMapping();
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 sqlStmt = stmtGen.getStatement(ec);
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
@@ -483,8 +483,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     // Select of value table, joining to key table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();

@@ -27,8 +27,8 @@ public interface SelectStatementGenerator
     /** Option to allow null values as elements of an array or collection. */
     static final String OPTION_ALLOW_NULLS = "allowNulls";
 
-    /** Option to add "NUCLEUS_TYPE" to the SELECT clause as kind of discriminator. */
-    static final String OPTION_SELECT_NUCLEUS_TYPE = "selectNucleusType";
+    /** Option to add "DN_TYPE" to the SELECT clause as kind of discriminator. */
+    static final String OPTION_SELECT_DN_TYPE = "selectDnType";
 
     /** Option to add a WHERE clause to restrict to the discriminator value. */
     static final String OPTION_RESTRICT_DISCRIM = "restrictDiscriminator";

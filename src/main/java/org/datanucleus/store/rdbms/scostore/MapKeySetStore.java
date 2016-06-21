@@ -305,8 +305,8 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 // Select of key in key table (allow union of possible key types)
                 iteratorMappingDef = new StatementClassMapping();
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 sqlStmt = stmtGen.getStatement(ec);
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
@@ -320,8 +320,8 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     // Select of key table, joining to join table
                     iteratorMappingDef = new StatementClassMapping();
                     UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, keyCls, true, null, null);
-                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                    stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                    iteratorMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();

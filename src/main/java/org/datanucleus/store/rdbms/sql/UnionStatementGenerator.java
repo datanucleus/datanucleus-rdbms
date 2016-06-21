@@ -50,20 +50,20 @@ import org.datanucleus.util.StringUtils;
  * <h3>Supported options</h3>
  * This generator supports
  * <ul>
- * <li><b>selectNucleusType</b> : adds a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the class name.</li>
+ * <li><b>selectDnType</b> : adds a SELECT of a dummy column accessible as "DN_TYPE" storing the class name.</li>
  * <li><b>allowNulls</b> : whether we allow for null objects (only happens when we have a join table collection.</li>
  * </ul>
  */
 public class UnionStatementGenerator extends AbstractSelectStatementGenerator
 {
-    /** Name of column added when using "selectNucleusType" */
-    public static final String NUC_TYPE_COLUMN = "NUCLEUS_TYPE";
+    /** Name of column added when using "selectDnType" */
+    public static final String DN_TYPE_COLUMN = "DN_TYPE";
 
     /**
      * Constructor using the candidateTable as the primary table.
      * If we are querying objects of type A with subclasses A1, A2 the query will be of the form :-
      * <PRE>
-     * SELECT ['mydomain.A' AS NUCLEUS_TYPE]
+     * SELECT ['mydomain.A' AS DN_TYPE]
      * FROM A THIS
      *   LEFT OUTER JOIN A1 SUBELEMENT0 ON SUBELEMENT0.A1_ID = THIS.A_ID
      *   LEFT OUTER JOIN A1 SUBELEMENT1 ON SUBELEMENT0.A2_ID = THIS.A_ID
@@ -72,13 +72,13 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
      *
      * UNION 
      *
-     * SELECT ['mydomain.A1' AS NUCLEUS_TYPE] 
+     * SELECT ['mydomain.A1' AS DN_TYPE] 
      * FROM A THIS
      *   INNER JOIN A1 'ELEMENT' ON 'ELEMENT'.A1_ID = THIS.A_ID
      *
      * UNION
      *
-     * SELECT ['mydomain.A2' AS NUCLEUS_TYPE] 
+     * SELECT ['mydomain.A2' AS DN_TYPE] 
      * FROM A THIS
      *   INNER JOIN A2 'ELEMENT' ON 'ELEMENT'.A2_ID = THIS.A_ID
      * </PRE>
@@ -103,7 +103,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
      * If we are querying elements (B) of a collection in class A and B has subclasses B1, B2 
      * stored via a join table (A_B) the query will be of the form :-
      * <PRE>
-     * SELECT ['mydomain.B' AS NUCLEUS_TYPE]
+     * SELECT ['mydomain.B' AS DN_TYPE]
      * FROM A_B T0
      *   INNER JOIN B T1 ON T0.B_ID_EID = T1.B_ID
      *   LEFT OUTER JOIN B1 T2 ON T2.B1_ID = T0.B_ID_EID
@@ -113,14 +113,14 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
      *
      * UNION 
      *
-     * SELECT ['mydomain.B1' AS NUCLEUS_TYPE] 
+     * SELECT ['mydomain.B1' AS DN_TYPE] 
      * FROM A_B THIS
      *   INNER JOIN B T1 ON T1.B_ID = T0.B_ID_EID
      *   INNER JOIN B1 T2 ON T2.B1_ID = T1.B_ID
      *
      * UNION
      *
-     * SELECT ['mydomain.A2' AS NUCLEUS_TYPE] 
+     * SELECT ['mydomain.A2' AS DN_TYPE] 
      * FROM A_B THIS
      *   INNER JOIN B T1 ON T1.B_ID = T0.B_ID_EID
      *   INNER JOIN B2 T2 ON T2.B2_ID = T1.B_ID
@@ -196,7 +196,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             }
         }
 
-        if (hasOption(OPTION_SELECT_NUCLEUS_TYPE))
+        if (hasOption(OPTION_SELECT_DN_TYPE))
         {
             // Get the length of the longest class name
             iter = candidateClassNames.iterator();
@@ -356,9 +356,9 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             }
         }
 
-        if (hasOption(OPTION_SELECT_NUCLEUS_TYPE))
+        if (hasOption(OPTION_SELECT_DN_TYPE))
         {
-            // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
+            // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS DN_TYPE")
             addTypeSelectForClass(stmt, className);
         }
 
@@ -461,9 +461,9 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             }
         }
 
-        if (hasOption(OPTION_SELECT_NUCLEUS_TYPE))
+        if (hasOption(OPTION_SELECT_DN_TYPE))
         {
-            // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
+            // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS DN_TYPE")
             addTypeSelectForClass(stmt, className);
         }
 
@@ -471,13 +471,13 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
     }
 
     /**
-     * Convenience method to add a SELECT of a dummy column accessible as "NUCLEUS_TYPE" storing the class name.
+     * Convenience method to add a SELECT of a dummy column accessible as "DN_TYPE" storing the class name.
      * @param stmt SQLStatement
      * @param className Name of the class
      */
     private void addTypeSelectForClass(SelectStatement stmt, String className)
     {
-        // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS NUCLEUS_TYPE")
+        // Add SELECT of dummy metadata for this class ("'mydomain.MyClass' AS DN_TYPE")
         /*if (hasOption(OPTION_ALLOW_NULLS))
         {
             NullLiteral nullLtl = new NullLiteral(stmt, null, null, null);
@@ -485,7 +485,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         }
         else
         {*/
-        // Add SELECT of dummy column accessible as "NUCLEUS_TYPE" containing the classname
+        // Add SELECT of dummy column accessible as "DN_TYPE" containing the classname
         JavaTypeMapping m = storeMgr.getMappingManager().getMapping(String.class);
         String nuctypeName = className;
         if (maxClassNameLength > nuctypeName.length())
@@ -493,7 +493,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             nuctypeName = StringUtils.leftAlignedPaddedString(nuctypeName, maxClassNameLength);
         }
         StringLiteral lit = new StringLiteral(stmt, m, nuctypeName, null);
-        stmt.select(lit, NUC_TYPE_COLUMN);
+        stmt.select(lit, DN_TYPE_COLUMN);
         /*}*/
     }
 }

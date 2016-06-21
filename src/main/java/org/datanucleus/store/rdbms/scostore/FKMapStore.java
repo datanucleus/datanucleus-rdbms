@@ -1262,8 +1262,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Use union to resolve any subclasses of value
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null);
-                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-                getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+                stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+                getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 sqlStmt = stmtGen.getStatement(ec);
             }
 

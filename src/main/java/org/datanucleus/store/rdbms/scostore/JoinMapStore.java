@@ -807,8 +807,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 valueCls = clr.classForName(valueCmd.getFullClassName());
             }
             UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, valueCls, true, null, null, mapTable, null, valueMapping);
-            stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
-            getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.NUC_TYPE_COLUMN);
+            stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
+            getMappingDef.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
             sqlStmt = stmtGen.getStatement(ec);
 
             // Select the value field(s)
