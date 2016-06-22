@@ -39,6 +39,7 @@ import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
@@ -282,6 +283,14 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 // User hasn't provided a field definition so map with the classes own definition
                 embMmdMapping = mapMgr.getMapping(table, embMmd, clr, FieldRole.ROLE_FIELD);
             }
+
+            if (embMmd.getRelationType(clr) != RelationType.NONE && embMmdMapping instanceof AbstractContainerMapping)
+            {
+                // TODO Support 1-N (unidirectional) relationships and use owner object as the key in the join table
+                throw new NucleusException("Embedded object at " + getMemberMetaData().getFullFieldName() + " has a member " + embMmd.getFullFieldName() + 
+                    " that is a container. Not supported as part of an embedded object!");
+            }
+
             // Use field number from embMmd, since the embedded mapping info doesn't have reliable field number infos
             embMmdMapping.setAbsFieldNumber(embMmd.getAbsoluteFieldNumber());
             this.addJavaTypeMapping(embMmdMapping);
@@ -319,13 +328,14 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      */
     public void addJavaTypeMapping(JavaTypeMapping mapping)
     {
-        if (javaTypeMappings == null)
-        {
-            javaTypeMappings = new ArrayList();
-        }
         if (mapping == null)
         {
             throw new NucleusException("mapping argument in EmbeddedMapping.addJavaTypeMapping is null").setFatal();
+        }
+
+        if (javaTypeMappings == null)
+        {
+            javaTypeMappings = new ArrayList();
         }
         javaTypeMappings.add(mapping);
     }
@@ -481,16 +491,15 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             }
 
             AbstractClassMetaData embCmd = ec.getMetaDataManager().getMetaDataForClass(value.getClass(), ec.getClassLoaderResolver());
-            ObjectProvider embSM = ec.findObjectProvider(value);
-            if (embSM == null || api.getExecutionContext(value) == null)
+            ObjectProvider embOP = ec.findObjectProvider(value);
+            if (embOP == null || api.getExecutionContext(value) == null)
             {
                 // Assign a StateManager to manage our embedded object
-                embSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerFieldNumber);
-                embSM.setPcObjectType(objectType);
+                embOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, ownerFieldNumber);
+                embOP.setPcObjectType(objectType);
             }
 
             int n = 0;
-
             if (discrimMapping != null)
             {
                 if (discrimMetaData.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
@@ -519,10 +528,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 if (embAbsFieldNum >= 0)
                 {
                     // Member is present in this embedded type
-                    Object fieldValue = embSM.provideField(embAbsFieldNum);
+                    Object fieldValue = embOP.provideField(embAbsFieldNum);
                     if (mapping instanceof EmbeddedPCMapping)
                     {
-                        mapping.setObject(ec, ps, posMapping, fieldValue, embSM, embAbsFieldNum);
+                        mapping.setObject(ec, ps, posMapping, fieldValue, embOP, embAbsFieldNum);
                     }
                     else
                     {
@@ -627,36 +636,39 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 }
                 else
                 {
-                    // Extract the value(s) for this field and update the PC if it is not null
-                    int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
-                    for (int j=0; j<posMapping.length; j++)
+                    if (mapping.getNumberOfDatastoreMappings() > 0)
                     {
-                        posMapping[j] = param[n++];
-                    }
-                    Object fieldValue = mapping.getObject(ec, rs, posMapping);
-
-                    // Check for the null column and its value and break if this matches the null check
-                    if (nullColumn != null && mapping.getMemberMetaData().getColumnMetaData()[0].getName().equals(nullColumn))
-                    {
-                        if ((nullValue == null && fieldValue == null) || (nullValue != null && fieldValue.toString().equals(nullValue)))
+                        // Extract the value(s) for this field and update the PC if it is not null
+                        int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                        for (int j=0; j<posMapping.length; j++)
                         {
-                            value = null;
-                            break;
+                            posMapping[j] = param[n++];
                         }
-                    }
+                        Object fieldValue = mapping.getObject(ec, rs, posMapping);
 
-                    // Set the field value
-                    if (fieldValue != null)
-                    {
-                        embOP.replaceField(embAbsFieldNum, fieldValue);
-                    }
-                    else
-                    {
-                        // If the value is null, but the field is not a primitive update it
-                        AbstractMemberMetaData embFmd = embCmd.getMetaDataForManagedMemberAtAbsolutePosition(embAbsFieldNum);
-                        if (!embFmd.getType().isPrimitive())
+                        // Check for the null column and its value and break if this matches the null check
+                        if (nullColumn != null && mapping.getMemberMetaData().getColumnMetaData()[0].getName().equals(nullColumn))
+                        {
+                            if ((nullValue == null && fieldValue == null) || (nullValue != null && fieldValue.toString().equals(nullValue)))
+                            {
+                                value = null;
+                                break;
+                            }
+                        }
+
+                        // Set the field value
+                        if (fieldValue != null)
                         {
                             embOP.replaceField(embAbsFieldNum, fieldValue);
+                        }
+                        else
+                        {
+                            // If the value is null, but the field is not a primitive update it
+                            AbstractMemberMetaData embFmd = embCmd.getMetaDataForManagedMemberAtAbsolutePosition(embAbsFieldNum);
+                            if (!embFmd.getType().isPrimitive())
+                            {
+                                embOP.replaceField(embAbsFieldNum, fieldValue);
+                            }
                         }
                     }
                 }
