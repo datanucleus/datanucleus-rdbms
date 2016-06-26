@@ -32,6 +32,7 @@ import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.ForeignKeyMetaData;
 import org.datanucleus.metadata.IndexMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.PrimaryKeyMetaData;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
@@ -145,10 +146,10 @@ public abstract class ElementContainerTable extends JoinTable
         }
 
         // Add any distinguisher column
-        if (mmd.hasExtension("relation-discriminator-column") || mmd.hasExtension("relation-discriminator-value"))
+        if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN) || mmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_VALUE))
         {
             // Generate some columnMetaData for our new column
-            String colName = mmd.getValueForExtension("relation-discriminator-column");
+            String colName = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN);
             if (colName == null)
             {
                 // No column defined so use a fallback name
@@ -158,7 +159,7 @@ public abstract class ElementContainerTable extends JoinTable
             colmd.setName(colName);
 
             boolean relationDiscriminatorPk = false;
-            if (mmd.hasExtension("relation-discriminator-pk") && mmd.getValueForExtension("relation-discriminator-pk").equalsIgnoreCase("true"))
+            if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_PK) && mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_PK).equalsIgnoreCase("true"))
             {
                 // Default this to not be part of the PK of the join table, but allow the user to override it
                 relationDiscriminatorPk = true;
@@ -172,7 +173,7 @@ public abstract class ElementContainerTable extends JoinTable
             relationDiscriminatorMapping = storeMgr.getMappingManager().getMapping(String.class);
             ColumnCreator.createIndexColumn(relationDiscriminatorMapping, storeMgr, clr, this, colmd, relationDiscriminatorPk);
 
-            relationDiscriminatorValue = mmd.getValueForExtension("relation-discriminator-value");
+            relationDiscriminatorValue = mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_VALUE);
             if (relationDiscriminatorValue == null)
             {
                 // No value defined so just use the field name

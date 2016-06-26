@@ -114,27 +114,26 @@ import org.datanucleus.util.StringUtils;
  * Table representing a Java class (or classes) as a first class object (FCO).
  * Uses the inheritance strategy to control whether this represents multiple classes
  * or just the one class.
- * <H3>Mappings</H3>
+ * <h3>Mappings</h3>
  * This class adds some additional mappings over what the superclass provides. Here we add
- * <UL>
- * <LI><B>externalFkMappings</B> - any mappings for Collections that have no associated
- * field in this class, providing the foreign key column(s)</LI>
- * <LI><B>externalOrderMappings</B> - mappings for any ordering column used by Lists for ordering
- * elements of this class</LI>
- * <LI><B>externalFkDiscriminatorMappings</B> - mappings for any discriminator column used when sharing
- * external foreign keys to distinguish the element owner field</LI>
- * </UL>
- * <H3>Classes</H3>
+ * <ul>
+ * <li><b>externalFkMappings</b> - any mappings for Collections that have no associated field in this class, providing the foreign key column(s)</li>
+ * <li><b>externalOrderMappings</b> - mappings for any ordering column used by Lists for ordering elements of this class</li>
+ * <li><b>externalFkDiscriminatorMappings</b> - mappings for any discriminator column used when sharing external foreign keys to distinguish the element owner field</li>
+ * </ul>
+ * <h3>Classes</h3>
  * A table can represent multiple classes. It has a nominal owner which is the class
  * that has an inheritance strategy of "new-table". All classes that utilise this table
  * have their MetaData stored in this object.
- * <H3>Secondary Tables</H3>
- * This class represents a "primary" table. That is, the main table where objects of a
- * class are persisted. It can have several "secondary" tables where some of the classes
- * fields are stored at persistence.
+ * <h3>Secondary Tables</h3>
+ * This class represents a "primary" table. That is, the main table where objects of a class are persisted. 
+ * It can have several "secondary" tables where some of the classes fields are stored at persistence.
  */
 public class ClassTable extends AbstractClassTable implements DatastoreClass 
 {
+    /** Extension for Index for specifying extended RDBMS DDL settings. */
+    public static final String EXTENSION_INDEX_EXTENDED_SETTING = "extended-setting";
+
     /**
      * MetaData for the principal class being stored here.
      * In inheritance situations where multiple classes share the same table, this will
@@ -672,13 +671,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     // Elements that are reference types or non-PC will come through here
                                     if (mmd.hasCollection())
                                     {
-                                        NucleusLogger.METADATA.warn(Localiser.msg("057016", 
-                                            theCmd.getFullClassName(), mmd.getCollection().getElementType()));
+                                        NucleusLogger.METADATA.warn(Localiser.msg("057016", theCmd.getFullClassName(), mmd.getCollection().getElementType()));
                                     }
                                     else
                                     {
-                                        NucleusLogger.METADATA.warn(Localiser.msg("057014", 
-                                            theCmd.getFullClassName(), mmd.getType().getComponentType().getName()));
+                                        NucleusLogger.METADATA.warn(Localiser.msg("057014", theCmd.getFullClassName(), mmd.getType().getComponentType().getName()));
                                     }
                                 }
                             }
@@ -739,8 +736,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     DatastoreClass dc = storeMgr.getDatastoreClass(elementCmds[i].getFullClassName(), clr);
                                     if (dc == null)
                                     {
-                                        throw new NucleusException("Unable to add foreign-key to " + 
-                                            elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
+                                        throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
                                     }
                                     ClassTable ct = (ClassTable) dc;
                                     if (ct.isInitialized())
@@ -761,8 +757,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 if (valueCmd == null)
                                 {
                                     // Interface elements will come through here and java.lang.String and others as well
-                                    NucleusLogger.METADATA.warn(Localiser.msg("057018", 
-                                        theCmd.getFullClassName(), mmd.getMap().getValueType()));
+                                    NucleusLogger.METADATA.warn(Localiser.msg("057018", theCmd.getFullClassName(), mmd.getMap().getValueType()));
                                 }
                                 else
                                 {
@@ -799,8 +794,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 if (keyCmd == null)
                                 {
                                     // Interface elements will come through here and java.lang.String and others as well
-                                    NucleusLogger.METADATA.warn(Localiser.msg("057019", 
-                                        theCmd.getFullClassName(), mmd.getMap().getKeyType()));
+                                    NucleusLogger.METADATA.warn(Localiser.msg("057019", theCmd.getFullClassName(), mmd.getMap().getKeyType()));
                                 }
                                 else
                                 {
@@ -972,8 +966,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
-                        if ((fmd.getValueStrategy() == IdentityStrategy.IDENTITY) && 
-                            !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
+                        if ((fmd.getValueStrategy() == IdentityStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
                             throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), fmd.getName())).setFatal();
                         }
@@ -1128,9 +1121,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     }
 
     /**
-     * Utility to navigate the inheritance hierarchy to find the base class that defines the primary keys
-     * for this tree. This has the assumption that there is no supertable, and will go up until it finds the superclass
-     * which has PK fields but no classes above.
+     * Utility to navigate the inheritance hierarchy to find the base class that defines the primary keys for this tree. 
+     * This has the assumption that there is no supertable, and will go up until it finds the superclass which has PK fields but no classes above.
      * @param cmd AbstractClassMetaData for this class
      * @param clr The ClassLoaderResolver
      * @return The AbstractClassMetaData for the class defining the primary keys
@@ -1262,8 +1254,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             AbstractMemberMetaData fmd = managedCmd.getMetaDataForMember(ownerFmd.getMappedBy());
                             if (fmd == null)
                             {
-                                throw new NucleusUserException(Localiser.msg("057036",
-                                    ownerFmd.getMappedBy(), managedCmd.getFullClassName(), ownerFmd.getFullFieldName()));
+                                throw new NucleusUserException(Localiser.msg("057036", ownerFmd.getMappedBy(), managedCmd.getFullClassName(), ownerFmd.getFullFieldName()));
                             }
 
                             if (ownerFmd.getMap() != null && storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_UNIQUE_CONSTRAINTS_MAP_INVERSE))
@@ -1274,10 +1265,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             boolean duplicate = false;
                             JavaTypeMapping fkDiscrimMapping = null;
                             JavaTypeMapping orderMapping = null;
-                            if (ownerFmd.hasExtension("relation-discriminator-column"))
+                            if (ownerFmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN))
                             {
                                 // Collection has a relation discriminator so we need to share the FK. Check for the required discriminator
-                                String colName = ownerFmd.getValueForExtension("relation-discriminator-column");
+                                String colName = ownerFmd.getValueForExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN);
                                 if (colName == null)
                                 {
                                     // No column defined so use a fallback name
@@ -1342,7 +1333,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     if (ownerParentCmds.length > 1)
                                     {
                                         throw new NucleusUserException("Relation (" + ownerFmd.getFullFieldName() +
-                                        ") with multiple related tables (using subclass-table). Not supported");
+                                            ") with multiple related tables (using subclass-table). Not supported");
                                     }
                                     ownerClassName = ownerParentCmds[0].getFullClassName();
                                     ownerTbl = storeMgr.getDatastoreClass(ownerClassName, clr);
@@ -1369,8 +1360,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     // 1-N Map with value stored in the key
                                     colmdContainer = ownerFmd.getKeyMetaData();
                                 }
-                                CorrespondentColumnsMapper correspondentColumnsMapping = 
-                                    new CorrespondentColumnsMapper(colmdContainer, ownerIdMapping, true);
+                                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(colmdContainer, ownerIdMapping, true);
                                 int countIdFields = ownerIdMapping.getNumberOfDatastoreMappings();
                                 for (int i=0; i<countIdFields; i++)
                                 {
@@ -1379,8 +1369,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refDatastoreMapping.getColumn().getIdentifier());
                                     if (colmd == null)
                                     {
-                                        throw new NucleusUserException(Localiser.msg("057035",
-                                            refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
+                                        throw new NucleusUserException(Localiser.msg("057035", refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
                                     }
 
                                     DatastoreIdentifier identifier = null;
@@ -1388,10 +1377,8 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     if (colmd.getName() == null || colmd.getName().length() < 1)
                                     {
                                         // No user provided name so generate one
-                                        identifier = idFactory.newForeignKeyFieldIdentifier(ownerFmd, 
-                                            null, refDatastoreMapping.getColumn().getIdentifier(), 
-                                            storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mapping.getJavaType()),
-                                            FieldRole.ROLE_OWNER);
+                                        identifier = idFactory.newForeignKeyFieldIdentifier(ownerFmd, null, refDatastoreMapping.getColumn().getIdentifier(), 
+                                            storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mapping.getJavaType()), FieldRole.ROLE_OWNER);
                                     }
                                     else
                                     {
@@ -1401,8 +1388,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     Column refColumn = addColumn(mapping.getJavaType().getName(), identifier, mapping, colmd);
                                     refDatastoreMapping.getColumn().copyConfigurationTo(refColumn);
 
-                                    if ((colmd.getAllowsNull() == null) ||
-                                        (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
+                                    if ((colmd.getAllowsNull() == null) || (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
                                     {
                                         // User either wants it nullable, or haven't specified anything, so make it nullable
                                         refColumn.setNullable(true);
@@ -1415,7 +1401,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             catch (DuplicateColumnException dce)
                             {
                                 // If the user hasnt specified "relation-discriminator-column" here we dont allow the sharing of columns
-                                if (!ownerFmd.hasExtension("relation-discriminator-column"))
+                                if (!ownerFmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN))
                                 {
                                     throw dce;
                                 }
@@ -1447,10 +1433,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 duplicate = true;
                             }
 
-                            if (!duplicate && ownerFmd.hasExtension("relation-discriminator-column"))
+                            if (!duplicate && ownerFmd.hasExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN))
                             {
                                 // Create the relation discriminator column
-                                String colName = ownerFmd.getValueForExtension("relation-discriminator-column");
+                                String colName = ownerFmd.getValueForExtension(MetaData.EXTENSION_MEMBER_RELATION_DISCRIM_COLUMN);
                                 if (colName == null)
                                 {
                                     // No column defined so use a fallback name
@@ -1971,8 +1957,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             IndexMetaData idxmd = getVersionMetaData().getIndexMetaData();
             if (idxmd != null)
             {
-                Index index = new Index(this, idxmd.isUnique(),
-                    idxmd.getValueForExtension("extended-setting"));
+                Index index = new Index(this, idxmd.isUnique(), idxmd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
                 if (idxmd.getName() != null)
                 {
                     index.setName(idxmd.getName());
@@ -1993,8 +1978,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             IndexMetaData idxmd = dismd.getIndexMetaData();
             if (idxmd != null)
             {
-                Index index = new Index(this, idxmd.isUnique(), 
-                    idxmd.getValueForExtension("extended-setting"));
+                Index index = new Index(this, idxmd.isUnique(), idxmd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
                 if (idxmd.getName() != null)
                 {
                     index.setName(idxmd.getName());
@@ -2076,7 +2060,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Verify if a unique index is needed
         boolean unique = imd.isUnique();
 
-        Index index = new Index(this, unique, imd.getValueForExtension("extended-setting"));
+        Index index = new Index(this, unique, imd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
 
         // Set the index name if required
         if (imd.getName() != null)
@@ -2103,7 +2087,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Verify if a unique index is needed
         boolean unique = imd.isUnique();
 
-        Index index = new Index(this, unique, imd.getValueForExtension("extended-setting"));
+        Index index = new Index(this, unique, imd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
 
         // Set the index name if required
         if (imd.getName() != null)
@@ -2826,8 +2810,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 }
                                 else
                                 {
-                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057041", 
-                                        ownerMmd.getName()));
+                                    NucleusLogger.DATASTORE_SCHEMA.warn(Localiser.msg("057041", ownerMmd.getName()));
                                 }
                             }
 
