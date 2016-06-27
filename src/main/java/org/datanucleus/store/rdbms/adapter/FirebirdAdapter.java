@@ -164,6 +164,6 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
     public boolean supportsCharLengthFunction()
     {
         // CHAR_LENGTH supported in v2+
-        return (datastoreMajorVersion > 1);
+        return datastoreMajorVersion > 1;
     }
 }

@@ -551,7 +551,7 @@ public class DriverAdapterCPDS
     }
 
     public int getMaxActive() {
-        return (this.maxActive);
+        return this.maxActive;
     }
 
     public void setMaxActive(int maxActive) {
@@ -560,7 +560,7 @@ public class DriverAdapterCPDS
     }
 
     public int getMaxIdle() {
-        return (this.maxIdle);
+        return this.maxIdle;
     }
 
     public void setMaxIdle(int maxIdle) {

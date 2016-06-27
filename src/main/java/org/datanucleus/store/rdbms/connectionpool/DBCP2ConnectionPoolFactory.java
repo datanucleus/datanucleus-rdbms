@@ -119,7 +119,7 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
 
                     // in each eviction run, evict at least a quarter of "maxIdle" connections
                     int maxIdle = connectionPool.getMaxIdle();
-                    int numTestsPerEvictionRun = (int) Math.ceil(((double) maxIdle / 4));
+                    int numTestsPerEvictionRun = (int) Math.ceil((double) maxIdle / 4);
                     connectionPool.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
                 }
             }

@@ -1085,7 +1085,7 @@ public class BasicDataSource implements DataSource {
 
         // Return the pool if we have already created it
         if (dataSource != null) {
-            return (dataSource);
+            return dataSource;
         }
 
         // create factory which returns raw physical connections

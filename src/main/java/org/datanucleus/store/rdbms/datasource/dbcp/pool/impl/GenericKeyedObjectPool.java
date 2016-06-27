@@ -1138,7 +1138,7 @@ public class GenericKeyedObjectPool extends BaseKeyedObjectPool implements Keyed
                                         } else {
                                             // this code may be executed again after a notify then continue cycle
                                             // so, need to calculate the amount of time to wait
-                                            final long elapsed = (System.currentTimeMillis() - starttime);
+                                            final long elapsed = System.currentTimeMillis() - starttime;
                                             final long waitTime = maxWait - elapsed;
                                             if (waitTime > 0)
                                             {

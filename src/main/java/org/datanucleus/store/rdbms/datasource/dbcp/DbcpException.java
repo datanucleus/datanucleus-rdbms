@@ -106,7 +106,7 @@ public class DbcpException extends RuntimeException {
      */
     public synchronized Throwable getCause() {
 
-        return (this.cause);
+        return this.cause;
 
     }
 

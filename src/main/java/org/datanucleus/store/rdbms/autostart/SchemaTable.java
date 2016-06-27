@@ -76,7 +76,7 @@ public class SchemaTable extends TableImpl
      */
     public SchemaTable(RDBMSStoreManager storeMgr, String tableName)
     {
-        super(storeMgr.getIdentifierFactory().newTableIdentifier((tableName != null ? tableName : "NUCLEUS_TABLES")), storeMgr);
+        super(storeMgr.getIdentifierFactory().newTableIdentifier(tableName != null ? tableName : "NUCLEUS_TABLES"), storeMgr);
     }
 
     /**

@@ -139,7 +139,7 @@ public class JOCLContentHandler extends DefaultHandler {
                 if(ELT_OBJECT.equals(localName)) {
                     String cname = getAttributeValue(ATT_CLASS,attr);
                     String isnullstr = getAttributeValue(ATT_ISNULL,attr,"false");
-                    boolean isnull = ("true".equalsIgnoreCase(isnullstr) || "yes".equalsIgnoreCase(isnullstr));
+                    boolean isnull = "true".equalsIgnoreCase(isnullstr) || "yes".equalsIgnoreCase(isnullstr);
                     _cur = new ConstructorDetails(cname,_cur,isnull);
                 } else if(ELT_ARRAY.equals(localName)) {
                     _cur = new ConstructorDetails(Object[].class,_cur,false,true);
@@ -149,7 +149,7 @@ public class JOCLContentHandler extends DefaultHandler {
                     _cur = new ConstructorDetails(List.class,_cur,false,true);
                 } else if(ELT_BOOLEAN.equals(localName)) {
                     String valstr = getAttributeValue(ATT_VALUE,attr,"false");
-                    boolean val = ("true".equalsIgnoreCase(valstr) || "yes".equalsIgnoreCase(valstr));
+                    boolean val = "true".equalsIgnoreCase(valstr) || "yes".equalsIgnoreCase(valstr);
                     addObject(Boolean.TYPE,Boolean.valueOf(val));
                 } else if(ELT_BYTE.equals(localName)) {
                     byte val = Byte.parseByte(getAttributeValue(ATT_VALUE,attr,"0"));
@@ -267,7 +267,7 @@ public class JOCLContentHandler extends DefaultHandler {
         if(null == val && _acceptJoclPrefixForAttributes) {
             val = attr.getValue("",JOCL_PREFIX + localname);
         }
-        return(null == val ? implied : val);
+        return null == val ? implied : val;
     }
 
     protected void addObject(Class type, Object val) {

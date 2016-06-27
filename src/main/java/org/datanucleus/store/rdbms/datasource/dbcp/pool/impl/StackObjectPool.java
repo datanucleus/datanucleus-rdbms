@@ -128,8 +128,8 @@ public class StackObjectPool extends BaseObjectPool implements ObjectPool {
      */
     public StackObjectPool(PoolableObjectFactory factory, int maxIdle, int initIdleCapacity) {
         _factory = factory;
-        _maxSleeping = (maxIdle < 0 ? DEFAULT_MAX_SLEEPING : maxIdle);
-        int initcapacity = (initIdleCapacity < 1 ? DEFAULT_INIT_SLEEPING_CAPACITY : initIdleCapacity);
+        _maxSleeping = maxIdle < 0 ? DEFAULT_MAX_SLEEPING : maxIdle;
+        int initcapacity = initIdleCapacity < 1 ? DEFAULT_INIT_SLEEPING_CAPACITY : initIdleCapacity;
         _pool = new Stack();
         _pool.ensureCapacity( initcapacity > _maxSleeping ? _maxSleeping : initcapacity);
     }

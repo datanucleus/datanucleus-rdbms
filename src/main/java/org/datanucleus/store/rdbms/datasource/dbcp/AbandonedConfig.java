@@ -46,7 +46,7 @@ public class AbandonedConfig {
      * @return true if abandoned connections are to be removed
      */
     public boolean getRemoveAbandoned() {
-        return (this.removeAbandoned);
+        return this.removeAbandoned;
     }
 
     /**
@@ -79,7 +79,7 @@ public class AbandonedConfig {
      * @return abandoned timeout in seconds
      */
     public int getRemoveAbandonedTimeout() {
-        return (this.removeAbandonedTimeout);
+        return this.removeAbandonedTimeout;
     }
 
     /**
@@ -113,7 +113,7 @@ public class AbandonedConfig {
      *
      */
     public boolean getLogAbandoned() {
-        return (this.logAbandoned);
+        return this.logAbandoned;
     }
 
     /**

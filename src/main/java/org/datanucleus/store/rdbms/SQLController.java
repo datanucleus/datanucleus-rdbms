@@ -250,9 +250,9 @@ public class SQLController
             }
         }
 
-        PreparedStatement ps = (getGeneratedKeysFlag ? 
+        PreparedStatement ps = getGeneratedKeysFlag ?
                 c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : 
-                    c.prepareStatement(stmtText));
+                    c.prepareStatement(stmtText);
         ps.clearBatch(); // In case using statement caching and given one with batched statements left hanging (C3P0)
         if (!jdbcStatements)
         {
@@ -559,7 +559,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_RETRIEVE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("045000", (System.currentTimeMillis() - startTime)));
+            NucleusLogger.DATASTORE_RETRIEVE.debug(Localiser.msg("045000", System.currentTimeMillis() - startTime));
         }
 
         return rs;

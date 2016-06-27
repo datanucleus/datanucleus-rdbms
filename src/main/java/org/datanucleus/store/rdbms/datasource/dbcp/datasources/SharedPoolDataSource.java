@@ -80,7 +80,7 @@ public class SharedPoolDataSource
     }
 
     public int getMaxActive() {
-        return (this.maxActive);
+        return this.maxActive;
     }
 
     public void setMaxActive(int maxActive) {
@@ -89,7 +89,7 @@ public class SharedPoolDataSource
     }
 
     public int getMaxIdle() {
-        return (this.maxIdle);
+        return this.maxIdle;
     }
 
     public void setMaxIdle(int maxIdle) {
@@ -98,7 +98,7 @@ public class SharedPoolDataSource
     }
 
     public int getMaxWait() {
-        return (this.maxWait);
+        return this.maxWait;
     }
 
     public void setMaxWait(int maxWait) {

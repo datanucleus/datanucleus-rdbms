@@ -87,8 +87,8 @@ class UserPassKey implements Serializable {
      * Returns the hash of the username. 
      */
     public int hashCode() {
-        return (this.username != null ?
-                (this.username).hashCode() : 0);
+        return this.username != null ?
+                (this.username).hashCode() : 0;
     }
 
     public String toString() {

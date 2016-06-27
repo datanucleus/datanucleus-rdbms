@@ -554,7 +554,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public Object getValueForProperty(String name)
     {
-        return (properties != null ? properties.get(name) : null);
+        return properties != null ? properties.get(name) : null;
     }
 
     /**
@@ -713,7 +713,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     {
         if (nanos < 0)
         {
-            return (((time / 1000) - 1) * 1000);
+            return ((time / 1000) - 1) * 1000;
         }
         return (time / 1000) * 1000;
     }
