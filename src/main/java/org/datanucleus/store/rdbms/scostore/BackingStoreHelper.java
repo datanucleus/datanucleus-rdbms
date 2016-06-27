@@ -46,6 +46,8 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public class BackingStoreHelper
 {
+    private BackingStoreHelper(){}
+
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
      * @param op ObjectProvider

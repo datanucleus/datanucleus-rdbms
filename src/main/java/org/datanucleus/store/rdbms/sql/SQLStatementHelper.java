@@ -72,6 +72,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SQLStatementHelper
 {
+    private SQLStatementHelper(){}
+
     /**
      * Convenience method to return a PreparedStatement for an SQLStatement.
      * @param sqlStmt The query expression

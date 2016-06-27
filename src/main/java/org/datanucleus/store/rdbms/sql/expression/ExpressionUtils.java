@@ -51,6 +51,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class ExpressionUtils
 {
+    private ExpressionUtils(){}
+
     /**
      * Method to return a numeric expression for the supplied SQL expression.
      * Makes use of the RDBMS function to convert to a numeric.

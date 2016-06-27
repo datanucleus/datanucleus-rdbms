@@ -44,6 +44,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class MappingHelper
 {
+    private MappingHelper(){}
     /**
      * Convenience method to return an array of positions for datastore columns for the supplied
      * mapping and the initial position value. For example if the mapping has a single datastore

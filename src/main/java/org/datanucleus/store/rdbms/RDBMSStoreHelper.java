@@ -50,6 +50,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class RDBMSStoreHelper
 {
+    private RDBMSStoreHelper(){}
     /**
      * Utility that does a discriminator candidate query for the specified candidate and subclasses
      * and returns the class name of the instance that has the specified identity (if any).

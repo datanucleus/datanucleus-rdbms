@@ -23,6 +23,7 @@ package org.datanucleus.store.rdbms.adapter;
  */
 public class DerbySQLFunction
 {
+    private DerbySQLFunction(){}
     /**
      * ASCII code.
      * @param code The code
