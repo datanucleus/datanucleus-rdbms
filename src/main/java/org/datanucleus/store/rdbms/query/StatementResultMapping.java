@@ -59,7 +59,7 @@ public class StatementResultMapping
     {
         if (mappings == null)
         {
-            mappings = new HashMap<Integer, Object>();
+            mappings = new HashMap<>();
         }
         mappings.put(position, mapping);
     }
@@ -68,7 +68,7 @@ public class StatementResultMapping
     {
         if (mappings == null)
         {
-            mappings = new HashMap<Integer, Object>();
+            mappings = new HashMap<>();
         }
         mappings.put(position, mapping);
     }
@@ -77,7 +77,7 @@ public class StatementResultMapping
     {
         if (mappings == null)
         {
-            mappings = new HashMap<Integer, Object>();
+            mappings = new HashMap<>();
         }
         mappings.put(position, mapping);
     }

@@ -149,7 +149,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             {
                 NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
             }
-            return new ValueGenerationBlock<Long>(oid);
+            return new ValueGenerationBlock<>(oid);
         }
         catch (SQLException e)
         {

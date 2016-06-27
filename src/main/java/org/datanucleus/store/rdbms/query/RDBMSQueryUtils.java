@@ -302,7 +302,7 @@ public class RDBMSQueryUtils extends QueryUtils
         }
 
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
-        List<DatastoreClass> candidateTables = new ArrayList<DatastoreClass>();
+        List<DatastoreClass> candidateTables = new ArrayList<>();
         if (cmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
         {
             DatastoreClass candidateTable = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
@@ -376,7 +376,7 @@ public class RDBMSQueryUtils extends QueryUtils
         else
         {
             // "new-table", "superclass-table", "subclass-table"
-            List<Class> candidateClasses = new ArrayList<Class>();
+            List<Class> candidateClasses = new ArrayList<>();
             if (ClassUtils.isReferenceType(candidateCls))
             {
                 // Persistent interface, so find all persistent implementations

@@ -173,7 +173,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         }
 
         // search for an ID in the database
-        List<Long> oid = new ArrayList<Long>();
+        List<Long> oid = new ArrayList<>();
         try
         {
             if (sequenceTable == null)
@@ -198,7 +198,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
             {
                 NucleusLogger.VALUEGENERATION.debug(Localiser.msg("040004", "" + size));
             }
-            return new ValueGenerationBlock<Long>(oid);
+            return new ValueGenerationBlock<>(oid);
         }
         catch (SQLException e)
         {

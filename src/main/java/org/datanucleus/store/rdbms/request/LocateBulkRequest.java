@@ -357,7 +357,7 @@ public class LocateBulkRequest extends BulkRequest
     private ObjectProvider[] processResults(ResultSet rs, ObjectProvider[] ops)
     throws SQLException
     {
-        List<ObjectProvider> missingOps = new ArrayList<ObjectProvider>();
+        List<ObjectProvider> missingOps = new ArrayList<>();
         for (int i=0;i<ops.length;i++)
         {
             missingOps.add(ops[i]);

@@ -80,7 +80,7 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
     {
         PreparedStatement ps = null;
         ResultSet rs = null;
-        List<String> oid = new ArrayList<String>();
+        List<String> oid = new ArrayList<>();
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
         SQLController sqlControl = srm.getSQLController();
         try
@@ -99,7 +99,7 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
                     oid.add(rs.getString(1));
                 }
             }
-            return new ValueGenerationBlock<String>(oid);
+            return new ValueGenerationBlock<>(oid);
         }
         catch (SQLException e)
         {

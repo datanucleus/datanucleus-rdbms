@@ -628,7 +628,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 Savepoint sp = ((Connection)conn).setSavepoint(name);
                 if (savepoints == null)
                 {
-                    savepoints = new HashMap<String, Savepoint>();
+                    savepoints = new HashMap<>();
                 }
                 savepoints.put(name, sp);
             }

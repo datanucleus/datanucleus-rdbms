@@ -242,7 +242,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                     {
                         // Definitely does a SELECT, so try to identify any additional non-relation or 1-1, N-1
                         // members that aren't loaded that could be fetched right now in this call.
-                        List<Integer> memberNumberList = new ArrayList<Integer>();
+                        List<Integer> memberNumberList = new ArrayList<>();
                         for (int i=0;i<memberNumbers.length;i++)
                         {
                             memberNumberList.add(memberNumbers[i]);
@@ -536,7 +536,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         }
 
         ClassLoaderResolver clr = ops[0].getExecutionContext().getClassLoaderResolver();
-        Map<DatastoreClass, List<ObjectProvider>> opsByTable = new HashMap<DatastoreClass, List<ObjectProvider>>();
+        Map<DatastoreClass, List<ObjectProvider>> opsByTable = new HashMap<>();
         for (int i=0;i<ops.length;i++)
         {
             AbstractClassMetaData cmd = ops[i].getClassMetaData();
@@ -545,7 +545,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             List<ObjectProvider> opList = opsByTable.get(table);
             if (opList == null)
             {
-                opList = new ArrayList<ObjectProvider>();
+                opList = new ArrayList<>();
             }
             opList.add(ops[i]);
             opsByTable.put(table, opList);

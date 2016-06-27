@@ -45,7 +45,7 @@ public class NewObjectExpression extends SQLExpression
         this.newClass = cls;
         if (args != null)
         {
-            ctrArgExprs = new ArrayList<SQLExpression>();
+            ctrArgExprs = new ArrayList<>();
             ctrArgExprs.addAll(args);
         }
     }

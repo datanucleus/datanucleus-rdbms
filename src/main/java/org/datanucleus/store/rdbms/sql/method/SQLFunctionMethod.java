@@ -52,7 +52,7 @@ public class SQLFunctionMethod extends AbstractSQLMethod
         }
         String sql = (String)((StringLiteral)expr).getValue();
 
-        List<SQLExpression> funcArgs = new ArrayList<SQLExpression>();
+        List<SQLExpression> funcArgs = new ArrayList<>();
         if (args.size() > 1)
         {
             funcArgs.addAll(args.subList(1, args.size()));

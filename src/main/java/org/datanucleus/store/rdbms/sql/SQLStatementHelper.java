@@ -164,7 +164,7 @@ public class SQLStatementHelper
                         if (paramNameByPosition != null)
                         {
                             int paramPosition = -1;
-                            Set<String> paramNamesEncountered = new HashSet<String>();
+                            Set<String> paramNamesEncountered = new HashSet<>();
                             for (Map.Entry<Integer, String> entry : paramNameByPosition.entrySet())
                             {
                                 String paramName = entry.getValue();
@@ -191,7 +191,7 @@ public class SQLStatementHelper
                             catch (NumberFormatException nfe)
                             {
                                 value = paramValuesByName.get(Integer.valueOf(nextParamNumber));
-                                paramNumberByName = new HashMap<String, Integer>();
+                                paramNumberByName = new HashMap<>();
                                 paramNumberByName.put(param.getName(), Integer.valueOf(nextParamNumber));
                                 nextParamNumber++;
                             }

@@ -73,7 +73,7 @@ public abstract class AbstractSelectStatementGenerator implements SelectStatemen
     JavaTypeMapping joinElementMapping = null;
 
     /** Selected options controlling the generation of the SQL statement. */
-    Set<String> options = new HashSet<String>();
+    Set<String> options = new HashSet<>();
 
     /**
      * Constructor for the case where we select the candidate table.

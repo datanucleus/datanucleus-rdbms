@@ -184,7 +184,7 @@ public class RDBMSQueryCompilation
     {
         if (scoIteratorStatementByMemberName == null)
         {
-            scoIteratorStatementByMemberName = new HashMap<String, IteratorStatement>();
+            scoIteratorStatementByMemberName = new HashMap<>();
         }
         scoIteratorStatementByMemberName.put(memberName, iterStmt);
     }

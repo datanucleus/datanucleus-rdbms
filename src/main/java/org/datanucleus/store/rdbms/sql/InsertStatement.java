@@ -38,7 +38,7 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public class InsertStatement extends SQLStatement
 {
-    List<SQLExpression> columnList = new ArrayList<SQLExpression>();
+    List<SQLExpression> columnList = new ArrayList<>();
 
     SelectStatement selectStmt;
 

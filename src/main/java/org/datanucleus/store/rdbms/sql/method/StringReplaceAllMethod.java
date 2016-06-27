@@ -62,7 +62,7 @@ public class StringReplaceAllMethod extends AbstractSQLMethod
         }
 
         // Invoke substring(startExpr, endExpr)
-        List<SQLExpression> newArgs = new ArrayList<SQLExpression>(3);
+        List<SQLExpression> newArgs = new ArrayList<>(3);
         newArgs.add(expr);
         newArgs.add(strExpr1);
         newArgs.add(strExpr2);

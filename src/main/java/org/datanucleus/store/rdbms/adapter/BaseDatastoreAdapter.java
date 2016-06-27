@@ -542,7 +542,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     {
         if (props != null)
         {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         properties.putAll(props);
     }

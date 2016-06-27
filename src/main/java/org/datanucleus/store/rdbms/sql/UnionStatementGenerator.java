@@ -166,7 +166,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
     public SelectStatement getStatement(ExecutionContext ec)
     {
         // Find set of possible candidates (including subclasses of subclasses)
-        Collection<String> candidateClassNames = new ArrayList<String>();
+        Collection<String> candidateClassNames = new ArrayList<>();
         AbstractClassMetaData acmd = storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
         candidateClassNames.add(acmd.getFullClassName());
         if (includeSubclasses)

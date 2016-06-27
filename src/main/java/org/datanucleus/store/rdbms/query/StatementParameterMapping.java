@@ -88,7 +88,7 @@ public class StatementParameterMapping
     {
         if (mappings == null)
         {
-            mappings = new HashMap<String, StatementMappingIndex>();
+            mappings = new HashMap<>();
         }
         mappings.put(name, mapping);
     }

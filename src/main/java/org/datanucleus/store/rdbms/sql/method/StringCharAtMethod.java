@@ -58,7 +58,7 @@ public class StringCharAtMethod extends AbstractSQLMethod
         SQLExpression endExpr = startExpr.add(ExpressionUtils.getLiteralForOne(stmt));
 
         // Invoke substring(startExpr, endExpr)
-        List<SQLExpression> newArgs = new ArrayList<SQLExpression>(2);
+        List<SQLExpression> newArgs = new ArrayList<>(2);
         newArgs.add(startExpr);
         newArgs.add(endExpr);
         return exprFactory.invokeMethod(stmt, String.class.getName(), "substring", expr, newArgs);

@@ -219,10 +219,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     CompilationComponent compileComponent;
 
     /** Stack of expressions, used for compilation of the query into SQL. */
-    Deque<SQLExpression> stack = new ArrayDeque<SQLExpression>();
+    Deque<SQLExpression> stack;
 
     /** Map of SQLTable/mapping keyed by the name of the primary that it relates to. */
-    Map<String, SQLTableMapping> sqlTableByPrimary = new HashMap<String, SQLTableMapping>();
+    Map<String, SQLTableMapping> sqlTableByPrimary = new HashMap<>();
 
     /** Aliases defined in the result, populated during compileResult. */
     Set<String> resultAliases = null;
@@ -233,7 +233,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     Map<String, JavaTypeMapping> paramMappingForName = new HashMap();
 
     /** Options for the SQL generation process. See OPTION_xxx above. */
-    Set<String> options = new HashSet<String>();
+    Set<String> options = new HashSet<>();
 
     /** Parent mapper if we are processing a subquery. */
     public QueryToSQLMapper parentMapper = null;
@@ -328,6 +328,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         // Register the candidate
         SQLTableMapping tblMapping = new SQLTableMapping(stmt.getPrimaryTable(), candidateCmd, stmt.getPrimaryTable().getTable().getIdMapping());
         setSQLTableMappingForAlias(candidateAlias, tblMapping);
+        stack = new ArrayDeque<SQLExpression>();
     }
 
     /**
@@ -585,7 +586,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 String alias = resultExprs[i].getAlias();
                 if (alias != null && resultAliases == null)
                 {
-                    resultAliases = new HashSet<String>();
+                    resultAliases = new HashSet<>();
                 }
 
                 if (resultExprs[i] instanceof InvokeExpression)
@@ -1971,7 +1972,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     if (explicitJoinPrimaryByAlias == null)
                     {
-                        explicitJoinPrimaryByAlias = new HashMap<String, String>();
+                        explicitJoinPrimaryByAlias = new HashMap<>();
                     }
                     explicitJoinPrimaryByAlias.put(joinAlias, joinPrimExpr.getId());
 
@@ -3340,7 +3341,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             if (paramNameByPosition == null)
             {
-                paramNameByPosition = new HashMap<Integer, String>();
+                paramNameByPosition = new HashMap<>();
             }
             paramNameByPosition.put(Integer.valueOf(expr.getPosition()), expr.getId());
         }
@@ -3378,7 +3379,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     positionalParamNumber = position+1;
                     if (parameterValueByName == null)
                     {
-                        parameterValueByName = new HashMap<String, Object>();
+                        parameterValueByName = new HashMap<>();
                     }
                     parameterValueByName.put(expr.getId(), paramValue);
                 }
@@ -3503,7 +3504,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
             if (expressionForParameter == null)
             {
-                expressionForParameter = new HashMap<Object, SQLExpression>();
+                expressionForParameter = new HashMap<>();
             }
             expressionForParameter.put(expr.getId(), sqlExpr);
 
@@ -3692,7 +3693,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
 
                 // Find an expression for the collection field
-                List<String> tuples = new ArrayList<String>();
+                List<String> tuples = new ArrayList<>();
                 StringTokenizer primTokenizer = new StringTokenizer(collExprName, ".");
                 while (primTokenizer.hasMoreTokens())
                 {
@@ -4148,7 +4149,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (args != null)
         {
             Class[] ctrArgTypes = new Class[args.size()];
-            ctrArgExprs = new ArrayList<SQLExpression>(args.size());
+            ctrArgExprs = new ArrayList<>(args.size());
             Iterator iter = args.iterator();
             int i = 0;
             while (iter.hasNext())

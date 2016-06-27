@@ -139,7 +139,7 @@ public class BulkFetchExistsHelper
             // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SelectStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
-            Set<String> options = new HashSet<String>();
+            Set<String> options = new HashSet<>();
             if (mapperOptions != null)
             {
                 options.addAll(mapperOptions);
@@ -176,7 +176,7 @@ public class BulkFetchExistsHelper
             // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SelectStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
-            Set<String> options = new HashSet<String>();
+            Set<String> options = new HashSet<>();
             if (mapperOptions != null)
             {
                 options.addAll(mapperOptions);
@@ -229,7 +229,7 @@ public class BulkFetchExistsHelper
         List<SQLStatementParameter> stmtParams = null;
         if (datastoreCompilation.getStatementParameters() != null)
         {
-            stmtParams = new ArrayList<SQLStatementParameter>();
+            stmtParams = new ArrayList<>();
             stmtParams.addAll(datastoreCompilation.getStatementParameters());
 
             if (sqlStmt instanceof SelectStatement)
@@ -244,7 +244,7 @@ public class BulkFetchExistsHelper
                 if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
                 {
                     // ParameterNameByPosition is only populated with implicit parameters
-                    stmtParamNameByPosition = new HashMap<Integer, String>();
+                    stmtParamNameByPosition = new HashMap<>();
                     stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
 
                     int numParams = stmtParamNameByPosition.size();
@@ -264,7 +264,7 @@ public class BulkFetchExistsHelper
                 if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
                 {
                     // ParameterNameByPosition is only populated with implicit parameters
-                    stmtParamNameByPosition = new HashMap<Integer, String>();
+                    stmtParamNameByPosition = new HashMap<>();
                     stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
                 }
             }
