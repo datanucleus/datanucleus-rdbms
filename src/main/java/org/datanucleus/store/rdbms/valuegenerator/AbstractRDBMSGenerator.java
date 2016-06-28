@@ -29,8 +29,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of a ValueGenerator for RDBMS datastores.
- * Builds on the base AbstractValueGenerator, and providing datastore connection 
- * and StoreManager information.
+ * Builds on the base AbstractValueGenerator, and providing datastore connection and StoreManager information.
  */
 public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerator<T>
 {
@@ -97,12 +96,12 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
                     block = reserveBlock(number);
                 }
             }
-            catch (ValueGenerationException poidex)
+            catch (ValueGenerationException vge)
             {
-                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", poidex.getMessage()));
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", vge.getMessage()));
                 if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
                 {
-                    NucleusLogger.VALUEGENERATION.debug("Caught exception", poidex);
+                    NucleusLogger.VALUEGENERATION.debug("Caught exception", vge);
                 }
 
                 // attempt to obtain the block of unique identifiers is invalid
@@ -112,7 +111,7 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerat
                 }
                 else
                 {
-                    throw poidex;
+                    throw vge;
                 }
             }
             catch (RuntimeException ex)
