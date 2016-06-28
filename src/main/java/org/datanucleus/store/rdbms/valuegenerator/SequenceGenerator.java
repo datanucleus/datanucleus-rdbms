@@ -75,21 +75,8 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         allocationSize = 1;
         if (properties != null)
         {
-            if (properties.get("key-increment-by") != null)
+            if (properties.get("key-cache-size") != null)
             {
-                // Cache the same number as the datastore is incremented by
-                try
-                {
-                    allocationSize = Integer.parseInt((String)properties.get("key-increment-by"));
-                }
-                catch (Exception e)
-                {
-                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-increment-by")));
-                }
-            }
-            else if (properties.get("key-cache-size") != null)
-            {
-                // Not provided "key-increment-by" so use previous name of "key-cache-size"
                 try
                 {
                     allocationSize = Integer.parseInt((String)properties.get("key-cache-size"));
