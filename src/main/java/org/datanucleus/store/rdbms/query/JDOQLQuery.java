@@ -875,7 +875,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         }
 
         // Update the SQLStatement with filter, ordering, result etc
-        Set<String> options = new HashSet<String>();
+        Set<String> options = new HashSet<>();
         options.add(QueryToSQLMapper.OPTION_BULK_UPDATE_VERSION);
         if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
         {
@@ -1093,7 +1093,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             throw new NucleusDataStoreException("Bulk update of " + candidateCmd.getFullClassName() + " not supported since candidate has no table of its own");
         }
 
-        List<BulkTable> tables = new ArrayList<BulkTable>();
+        List<BulkTable> tables = new ArrayList<>();
         tables.add(new BulkTable(candidateTbl, true));
         if (candidateTbl.getSuperDatastoreClass() != null)
         {
@@ -1105,8 +1105,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
         }
 
-        List<SQLStatement> stmts = new ArrayList<SQLStatement>();
-        List<Boolean> stmtCountFlags = new ArrayList<Boolean>();
+        List<SQLStatement> stmts = new ArrayList<>();
+        List<Boolean> stmtCountFlags = new ArrayList<>();
         for (BulkTable bulkTable : tables)
         {
             // Generate statement for candidate
@@ -1115,7 +1115,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             Map<String, Object> extensions = null;
             if (!storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE))
             {
-                extensions = new HashMap<String, Object>();
+                extensions = new HashMap<>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
             UpdateStatement stmt = new UpdateStatement(storeMgr, table, null, null, extensions);
@@ -1133,7 +1133,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
             // TODO Discriminator restriction?
 
-            Set<String> options = new HashSet<String>();
+            Set<String> options = new HashSet<>();
             if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
             {
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
@@ -1194,7 +1194,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         InheritanceStrategy inhStr = candidateCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy();
 
-        List<BulkTable> tables = new ArrayList<BulkTable>();
+        List<BulkTable> tables = new ArrayList<>();
         tables.add(new BulkTable(candidateTbl, true));
         if (inhStr != InheritanceStrategy.COMPLETE_TABLE)
         {
@@ -1223,8 +1223,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
         }
 
-        List<SQLStatement> stmts = new ArrayList<SQLStatement>();
-        List<Boolean> stmtCountFlags = new ArrayList<Boolean>();
+        List<SQLStatement> stmts = new ArrayList<>();
+        List<Boolean> stmtCountFlags = new ArrayList<>();
         for (BulkTable bulkTable : tables)
         {
             // Generate statement for candidate
@@ -1232,7 +1232,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             Map<String, Object> extensions = null;
             if (!storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE))
             {
-                extensions = new HashMap<String, Object>();
+                extensions = new HashMap<>();
                 extensions.put(SQLStatement.EXTENSION_SQL_TABLE_NAMING_STRATEGY, "table-name");
             }
             SQLStatement stmt = new DeleteStatement(storeMgr, table, null, null, extensions);
@@ -1250,7 +1250,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             }
             // TODO Discriminator restriction?
 
-            Set<String> options = new HashSet<String>();
+            Set<String> options = new HashSet<>();
             if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
             {
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);

@@ -38,7 +38,7 @@ public class SQLTableGroup
     JoinType joinType = null;
 
     /** Map of tables in this group, keyed by their alias. */
-    Map<String, SQLTable> tablesByAlias = new HashMap<String, SQLTable>();
+    Map<String, SQLTable> tablesByAlias = new HashMap<>();
 
     /**
      * Constructor for a group with this name.

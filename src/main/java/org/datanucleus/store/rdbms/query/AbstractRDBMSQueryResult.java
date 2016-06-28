@@ -84,7 +84,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     {
         if (bulkLoadedValueByMemberNumber == null)
         {
-            bulkLoadedValueByMemberNumber = new HashMap<Object, Map<Integer, Object>>();
+            bulkLoadedValueByMemberNumber = new HashMap<>();
         }
 
         try
@@ -213,7 +213,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
         Map<Integer, Object> fieldValuesForOwner = bulkLoadedValueByMemberNumber.get(ownerId);
         if (fieldValuesForOwner == null)
         {
-            fieldValuesForOwner = new HashMap<Integer, Object>();
+            fieldValuesForOwner = new HashMap<>();
             bulkLoadedValueByMemberNumber.put(ownerId, fieldValuesForOwner);
         }
         Collection coll = (Collection) fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());

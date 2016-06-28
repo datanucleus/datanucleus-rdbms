@@ -131,7 +131,7 @@ public class StatementMappingIndex
     {
         if (paramPositions == null)
         {
-            paramPositions = new ArrayList<int[]>();
+            paramPositions = new ArrayList<>();
         }
         if (mapping != null && positions.length != mapping.getNumberOfDatastoreMappings())
         {

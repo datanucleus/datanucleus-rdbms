@@ -65,19 +65,19 @@ public class SQLExpressionFactory
     Map<String, Class> literalClassByMappingName = new HashMap();
 
     /** Names of methods that are supported. */
-    Set<MethodKey> methodNamesSupported = new HashSet<MethodKey>();
+    Set<MethodKey> methodNamesSupported = new HashSet<>();
 
     /** Cache of already created SQLMethod instances, keyed by their class+method[+datastore] name. */
-    Map<MethodKey, SQLMethod> methodByClassMethodName = new HashMap<MethodKey, SQLMethod>();
+    Map<MethodKey, SQLMethod> methodByClassMethodName = new HashMap<>();
 
     /** Names of operations that are supported. */
-    Set<String> operationNamesSupported = new HashSet<String>();
+    Set<String> operationNamesSupported = new HashSet<>();
 
     /** Cache of already created SQLOperation instances, keyed by their name. */
-    Map<String, SQLOperation> operationByOperationName = new HashMap<String, SQLOperation>();
+    Map<String, SQLOperation> operationByOperationName = new HashMap<>();
 
     /** Map of JavaTypeMapping for use in query expressions, keyed by the type being represented. */
-    Map<Class, JavaTypeMapping> mappingByClass = new HashMap<Class, JavaTypeMapping>();
+    Map<Class, JavaTypeMapping> mappingByClass = new HashMap<>();
 
     private class MethodKey
     {

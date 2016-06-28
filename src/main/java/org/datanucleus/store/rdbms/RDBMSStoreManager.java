@@ -267,7 +267,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     /** State variable for schema generation of the callback information to be processed. TODO Move to ClassTable. */
     private MultiMap schemaCallbacks = new MultiMap();
 
-    private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<String, Store>();
+    private Map<String, Store> backingStoreByMemberName = new ConcurrentHashMap<>();
 
     /**
      * Constructs a new RDBMSManager. 
@@ -1758,7 +1758,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Generate a list of metadata for the roots of inheritance tree(s) that this identity can represent
         // Really ought to be for a single inheritance tree (hence one element in the List) but we allow for
         // a user reusing their PK class in multiple trees
-        List<AbstractClassMetaData> rootCmds = new ArrayList<AbstractClassMetaData>();
+        List<AbstractClassMetaData> rootCmds = new ArrayList<>();
         if (IdentityUtils.isDatastoreIdentity(id))
         {
             // Datastore Identity, so identity is an OID, and the object is of the target class or a subclass
@@ -4365,7 +4365,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     protected static Set<String> cleanInputClassNames(NucleusContext ctx, Set<String> inputClassNames) 
     {
-        Set<String> classNames = new TreeSet<String>();
+        Set<String> classNames = new TreeSet<>();
         if (inputClassNames == null || inputClassNames.size() == 0)
         {
             // Use all "known" persistable classes

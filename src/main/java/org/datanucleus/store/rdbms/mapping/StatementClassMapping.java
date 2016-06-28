@@ -80,7 +80,7 @@ public class StatementClassMapping
     int[] memberNumbers;
 
     /** Mappings for the members of this object defined in the statement, keyed by the member number. */
-    Map<Integer, StatementMappingIndex> mappings = new HashMap<Integer, StatementMappingIndex>();
+    Map<Integer, StatementMappingIndex> mappings = new HashMap<>();
 
     /** Mapping definition for a member that is a relation in this statement, keyed by the member number. */
     Map<Integer, StatementClassMapping> children;

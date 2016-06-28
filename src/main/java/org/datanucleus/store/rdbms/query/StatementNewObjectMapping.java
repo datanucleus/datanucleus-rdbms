@@ -67,7 +67,7 @@ public class StatementNewObjectMapping
     {
         if (ctrArgMappings == null)
         {
-            ctrArgMappings = new HashMap<Integer, Object>();
+            ctrArgMappings = new HashMap<>();
         }
         ctrArgMappings.put(ctrPos, argMapping);
     }

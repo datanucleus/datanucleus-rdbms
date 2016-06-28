@@ -145,7 +145,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     private final Collection<AbstractClassMetaData> managedClassMetaData = new HashSet();
 
     /** Callbacks that have been applied keyed by the managed class. */
-    private final Map<String, Collection<AbstractMemberMetaData>> callbacksAppliedForManagedClass = new HashMap<String, Collection<AbstractMemberMetaData>>();
+    private final Map<String, Collection<AbstractMemberMetaData>> callbacksAppliedForManagedClass = new HashMap<>();
 
     /** Table above this table storing superclass information (if any). */
     private ClassTable supertable;

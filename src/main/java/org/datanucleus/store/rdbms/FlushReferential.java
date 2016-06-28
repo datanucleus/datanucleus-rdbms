@@ -58,7 +58,7 @@ public class FlushReferential extends FlushOrdered
                 {
                     if (unrelatedOPs == null)
                     {
-                        unrelatedOPs = new HashSet<ObjectProvider>();
+                        unrelatedOPs = new HashSet<>();
                     }
                     unrelatedOPs.add(op);
                     opIter.remove();
@@ -75,7 +75,7 @@ public class FlushReferential extends FlushOrdered
                 {
                     if (unrelatedOPs == null)
                     {
-                        unrelatedOPs = new HashSet<ObjectProvider>();
+                        unrelatedOPs = new HashSet<>();
                     }
                     unrelatedOPs.add(op);
                     opIter.remove();

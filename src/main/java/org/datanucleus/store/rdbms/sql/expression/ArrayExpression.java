@@ -52,7 +52,7 @@ public class ArrayExpression extends SQLExpression
     public ArrayExpression(SQLStatement stmt, JavaTypeMapping mapping, SQLExpression[] exprs)
     {
         super(stmt, null, mapping);
-        elementExpressions = new ArrayList<SQLExpression>();
+        elementExpressions = new ArrayList<>();
         for (int i=0;i<exprs.length;i++)
         {
             elementExpressions.add(exprs[i]);

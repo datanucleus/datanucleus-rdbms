@@ -959,7 +959,7 @@ public class SelectStatement extends SQLStatement
         DatastoreAdapter dba = getDatastoreAdapter();
         if (requiresJoinReorder)
         {
-            List<SQLJoin> theJoins = new ArrayList<SQLJoin>(joins.size());
+            List<SQLJoin> theJoins = new ArrayList<>(joins.size());
             reorderJoins(theJoins, joins);
             joins = theJoins;
         }
@@ -1264,7 +1264,7 @@ public class SelectStatement extends SQLStatement
         invalidateStatement();
         if (unions == null)
         {
-            unions = new ArrayList<SelectStatement>();
+            unions = new ArrayList<>();
         }
         unions.add(stmt);
     }

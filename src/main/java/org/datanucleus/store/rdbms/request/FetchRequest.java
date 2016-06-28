@@ -166,7 +166,7 @@ public class FetchRequest extends Request
         // Generate the statement for the requested members
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
-        Collection<MappingCallbacks> fetchCallbacks = new HashSet<MappingCallbacks>();
+        Collection<MappingCallbacks> fetchCallbacks = new HashSet<>();
         numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
         callbacks = fetchCallbacks.toArray(new MappingCallbacks[fetchCallbacks.size()]);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
