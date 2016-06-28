@@ -47,7 +47,7 @@ public final class PoolUtils {
      * Instead, the class should be used procedurally: PoolUtils.adapt(aPool);.
      * This constructor is public to permit tools that require a JavaBean instance to operate.
      */
-    public PoolUtils() {
+    private PoolUtils() {
     }
 
     /**

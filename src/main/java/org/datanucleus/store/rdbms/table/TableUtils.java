@@ -44,6 +44,7 @@ import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
  */
 public class TableUtils
 {
+    private TableUtils(){}
     /**
      * Convenience method to add foreign-keys for the specified reference field.
      * Adds FKs from the column(s) in this table to the ID column(s) of the PC table of the implementation type.

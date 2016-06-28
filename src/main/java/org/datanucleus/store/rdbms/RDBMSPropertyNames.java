@@ -22,6 +22,8 @@ package org.datanucleus.store.rdbms;
  */
 public class RDBMSPropertyNames
 {
+    private RDBMSPropertyNames(){}
+
     public static final String PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY = "datanucleus.rdbms.useLegacyNativeValueStrategy";
     public static final String PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES = "datanucleus.rdbms.dynamicSchemaUpdates";
     public static final String PROPERTY_RDBMS_TABLE_COLUMN_ORDER = "datanucleus.rdbms.tableColumnOrder";

@@ -34,6 +34,8 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JDBCUtils
 {
+    private JDBCUtils(){}
+
     /**
      * Method to return the "subprotocol" for a JDBC URL.
      * A JDBC URL is made up of
