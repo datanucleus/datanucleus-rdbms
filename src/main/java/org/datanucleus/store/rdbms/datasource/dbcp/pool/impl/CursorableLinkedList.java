@@ -99,8 +99,8 @@ class CursorableLinkedList implements List, Serializable {
             if(index < 0 || index > _size) {
                 throw new IndexOutOfBoundsException(String.valueOf(index) + " < 0 or " + String.valueOf(index) + " > " + _size);
             }
-            Listable succ = (isEmpty() ? null : getListableAt(index));
-            Listable pred = (null == succ ? null : succ.prev());
+            Listable succ = isEmpty() ? null : getListableAt(index);
+            Listable pred = null == succ ? null : succ.prev();
             insertListable(pred,succ,element);
         }
     }
@@ -438,7 +438,7 @@ class CursorableLinkedList implements List, Serializable {
      * @return <tt>true</tt> if this list contains no elements.
      */
     public boolean isEmpty() {
-        return(0 == _size);
+        return 0 == _size;
     }
 
     /**
@@ -790,7 +790,7 @@ class CursorableLinkedList implements List, Serializable {
         }
 
         Listable elt = _head.prev();
-        for(int i = (_size-1); i > index; i--) {
+        for(int i = _size-1; i > index; i--) {
             elt = elt.prev();
         }
         return elt;
@@ -1030,7 +1030,7 @@ class CursorableLinkedList implements List, Serializable {
 
         public boolean hasNext() {
             checkForComod();
-            return(null != _cur.next() && _cur.prev() != _head.prev());
+            return null != _cur.next() && _cur.prev() != _head.prev();
         }
 
         public Object next() {
@@ -1057,7 +1057,7 @@ class CursorableLinkedList implements List, Serializable {
 
         public boolean hasPrevious() {
             checkForComod();
-            return(null != _cur.prev() && _cur.next() != _head.next());
+            return null != _cur.prev() && _cur.next() != _head.next();
         }
 
         public void set(Object o) {
@@ -1405,7 +1405,7 @@ class CursorableSubList extends CursorableLinkedList implements List {
     protected Listable insertListable(Listable before, Listable after, Object value) {
         _modCount++;
         _size++;
-        Listable elt = _list.insertListable((null == before ? _pre : before), (null == after ? _post : after),value);
+        Listable elt = _list.insertListable(null == before ? _pre : before, null == after ? _post : after,value);
         if(null == _head.next()) {
             _head.setNext(elt);
             _head.setPrev(elt);

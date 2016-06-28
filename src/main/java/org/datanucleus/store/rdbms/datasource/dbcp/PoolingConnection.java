@@ -311,12 +311,12 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
         public boolean equals(Object that) {
             try {
                 PStmtKey key = (PStmtKey)that;
-                return( ((null == _sql && null == key._sql) || _sql.equals(key._sql)) &&  
+                return ((null == _sql && null == key._sql) || _sql.equals(key._sql)) &&
                         ((null == _catalog && null == key._catalog) || _catalog.equals(key._catalog)) &&
                         ((null == _resultSetType && null == key._resultSetType) || _resultSetType.equals(key._resultSetType)) &&
                         ((null == _resultSetConcurrency && null == key._resultSetConcurrency) || _resultSetConcurrency.equals(key._resultSetConcurrency)) &&
                         (_stmtType == key._stmtType)
-                      );
+                      ;
             } catch(ClassCastException e) {
                 return false;
             } catch(NullPointerException e) {
@@ -326,9 +326,9 @@ public class PoolingConnection extends DelegatingConnection implements Connectio
 
         public int hashCode() {
             if (_catalog==null)
-                return(null == _sql ? 0 : _sql.hashCode());
+                return null == _sql ? 0 : _sql.hashCode();
 
-            return(null == _sql ? _catalog.hashCode() : (_catalog + _sql).hashCode());
+            return null == _sql ? _catalog.hashCode() : (_catalog + _sql).hashCode();
         }
 
         public String toString() {

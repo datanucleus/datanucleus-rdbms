@@ -316,7 +316,7 @@ public abstract class InstanceKeyDataSource
     }
 
     public String getValidationQuery() {
-        return (this.validationQuery);
+        return this.validationQuery;
     }
 
     public void setValidationQuery(String validationQuery) {
@@ -328,7 +328,7 @@ public abstract class InstanceKeyDataSource
     }
 
     public boolean isRollbackAfterValidation() {
-        return (this.rollbackAfterValidation);
+        return this.rollbackAfterValidation;
     }
 
     public void setRollbackAfterValidation(boolean rollbackAfterValidation) {

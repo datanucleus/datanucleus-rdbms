@@ -1104,7 +1104,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
                                         } else {
                                             // this code may be executed again after a notify then continue cycle
                                             // so, need to calculate the amount of time to wait
-                                            final long elapsed = (System.currentTimeMillis() - starttime);
+                                            final long elapsed = System.currentTimeMillis() - starttime;
                                             final long waitTime = maxWait - elapsed;
                                             if (waitTime > 0)
                                             {
@@ -1499,7 +1499,7 @@ public class GenericObjectPool extends BaseObjectPool implements ObjectPool {
                 return;
             }
             if (null == _evictionCursor) {
-                _evictionCursor = (_pool.cursor(_lifo ? _pool.size() : 0));
+                _evictionCursor = _pool.cursor(_lifo ? _pool.size() : 0);
             }
         }
 

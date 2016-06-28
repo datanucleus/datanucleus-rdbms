@@ -987,7 +987,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     JavaTypeMapping m = ownerTable.getMemberMapping(mmd);
                     if (!expectedMappingType.isAssignableFrom(m.getClass()))
                     {
-                        String requiredType = (type != null ? type.getName() : mmd.getTypeName());
+                        String requiredType = type != null ? type.getName() : mmd.getTypeName();
                         NucleusLogger.PERSISTENCE.warn("Member " + mmd.getFullFieldName() + " in table=" + ownerTable + " has mapping=" + m + " but expected mapping type=" + expectedMappingType);
                         throw new IncompatibleFieldTypeException(mmd.getFullFieldName(), requiredType, m.getType());
                     }
@@ -1702,7 +1702,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public boolean hasWrittenDdlStatement(String stmt)
     {
-        return (writtenDdlStatements != null && writtenDdlStatements.contains(stmt));
+        return writtenDdlStatements != null && writtenDdlStatements.contains(stmt);
     }
 
     /**
@@ -2024,7 +2024,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 else
                 {
-                    newConnection = (connPref == ConnectionPreference.NEW);
+                    newConnection = connPref == ConnectionPreference.NEW;
                 }
 
                 // RDBMS-based generator so set the connection provider
@@ -3776,7 +3776,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public boolean allowsBatching()
     {
-        return (dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0);
+        return dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0;
     }
 
     public boolean usesBackedSCOWrappers()
@@ -3844,9 +3844,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         String ddlFilename = props != null ? props.getProperty("ddlFilename") : null;
         String completeDdlProp = props != null ? props.getProperty("completeDdl") : null;
-        boolean completeDdl = (completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true"));
+        boolean completeDdl = completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true");
         String autoStartProp = props != null ? props.getProperty("autoStartTable") : null;
-        boolean autoStart = (autoStartProp != null && autoStartProp.equalsIgnoreCase("true"));
+        boolean autoStart = autoStartProp != null && autoStartProp.equalsIgnoreCase("true");
 
         if (classNames.size() > 0)
         {
@@ -4180,9 +4180,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // Delete the tables
             String ddlFilename = props != null ? props.getProperty("ddlFilename") : null;
             String completeDdlProp = props != null ? props.getProperty("completeDdl") : null;
-            boolean completeDdl = (completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true"));
+            boolean completeDdl = completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true");
             String autoStartProp = props != null ? props.getProperty("autoStartTable") : null;
-            boolean autoStart = (autoStartProp != null && autoStartProp.equalsIgnoreCase("true"));
+            boolean autoStart = autoStartProp != null && autoStartProp.equalsIgnoreCase("true");
 
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
             FileWriter ddlFileWriter = null;

@@ -76,7 +76,7 @@ public class MappedTypeManager
             {
                 Class cls = clr.classForName(className);
                 type = findMappedTypeForClass(cls);
-                return (type != null && type.javaMappingType != null);
+                return type != null && type.javaMappingType != null;
             }
             catch (Exception e)
             {
@@ -84,7 +84,7 @@ public class MappedTypeManager
             return false;
         }
 
-        return (type.javaMappingType != null);
+        return type.javaMappingType != null;
     }
 
     /**
@@ -240,7 +240,7 @@ public class MappedTypeManager
         }
 
         // Not supported so try to find one that is supported that this class derives from
-        Class componentCls = (cls.isArray() ? cls.getComponentType() : null);
+        Class componentCls = cls.isArray() ? cls.getComponentType() : null;
         Collection supportedTypes = new HashSet(mappedTypes.values());
         Iterator<MappedType> iter = supportedTypes.iterator();
         while (iter.hasNext())

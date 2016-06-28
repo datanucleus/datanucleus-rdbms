@@ -112,7 +112,7 @@ public class RDBMSStoreData extends StoreData
         this.tableOwner = true;
         this.tableIdentifier = table.getIdentifier();
 
-        String interfaceName = (table.getStoreManager().getMetaDataManager().isPersistentInterface(mmd.getType().getName()) ? mmd.getType().getName() : null);
+        String interfaceName = table.getStoreManager().getMetaDataManager().isPersistentInterface(mmd.getType().getName()) ? mmd.getType().getName() : null;
         if (interfaceName != null)
         {
             this.interfaceName = interfaceName;

@@ -127,8 +127,8 @@ public class StackKeyedObjectPool extends BaseKeyedObjectPool implements KeyedOb
      */
     public StackKeyedObjectPool(KeyedPoolableObjectFactory factory, int max, int init) {
         _factory = factory;
-        _maxSleeping = (max < 0 ? DEFAULT_MAX_SLEEPING : max);
-        _initSleepingCapacity = (init < 1 ? DEFAULT_INIT_SLEEPING_CAPACITY : init);
+        _maxSleeping = max < 0 ? DEFAULT_MAX_SLEEPING : max;
+        _initSleepingCapacity = init < 1 ? DEFAULT_INIT_SLEEPING_CAPACITY : init;
         _pools = new HashMap();
         _activeCount = new HashMap();
     }

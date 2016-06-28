@@ -76,7 +76,7 @@ public class PerUserPoolDataSource
     }
 
     public int getDefaultMaxActive() {
-        return (this.defaultMaxActive);
+        return this.defaultMaxActive;
     }
 
     public void setDefaultMaxActive(int maxActive) {
@@ -85,7 +85,7 @@ public class PerUserPoolDataSource
     }
 
     public int getDefaultMaxIdle() {
-        return (this.defaultMaxIdle);
+        return this.defaultMaxIdle;
     }
 
     public void setDefaultMaxIdle(int defaultMaxIdle) {
@@ -94,7 +94,7 @@ public class PerUserPoolDataSource
     }
 
     public int getDefaultMaxWait() {
-        return (this.defaultMaxWait);
+        return this.defaultMaxWait;
     }
 
     public void setDefaultMaxWait(int defaultMaxWait) {
