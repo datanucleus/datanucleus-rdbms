@@ -31,6 +31,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerationManager;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -80,14 +81,14 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                 props.put(seqExtensions[i].getKey(), seqExtensions[i].getValue());
             }
         }
-        props.put("sequence-name", seqMetaData.getDatastoreSequence());
+        props.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqMetaData.getDatastoreSequence());
         if (seqMetaData.getAllocationSize() > 0)
         {
-            props.put("key-cache-size", "" + seqMetaData.getAllocationSize());
+            props.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqMetaData.getAllocationSize());
         }
         if (seqMetaData.getInitialValue() > 0)
         {
-            props.put("key-initial-value", "" + seqMetaData.getInitialValue());
+            props.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqMetaData.getInitialValue());
         }
 
         // Get a ValueGenerationManager to create the generator
@@ -123,15 +124,12 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                 }
             };
         Class cls = null;
-        ConfigurationElement elem =
-            ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension(
-                "org.datanucleus.store_valuegenerator", 
+        ConfigurationElement elem = ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
                 new String[]{"name", "datastore"}, 
                 new String[] {valueGeneratorName, storeManager.getStoreManagerKey()});
         if (elem != null)
         {
-            cls = ec.getNucleusContext().getPluginManager().loadClass(
-                elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
+            cls = ec.getNucleusContext().getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
         }
         if (cls == null)
         {

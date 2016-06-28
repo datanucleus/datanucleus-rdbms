@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -110,9 +111,9 @@ public class MaxGenerator extends AbstractRDBMSGenerator<Long>
         RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
         StringBuilder stmt = new StringBuilder();
         stmt.append("SELECT max(");
-        stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get("column-name")));
+        stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get(ValueGenerator.PROPERTY_COLUMN_NAME)));
         stmt.append(") FROM ");
-        stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get("table-name")));  
+        stmt.append(srm.getIdentifierFactory().getIdentifierInAdapterCase((String)properties.get(ValueGenerator.PROPERTY_TABLE_NAME)));  
         return stmt.toString();
     }
 

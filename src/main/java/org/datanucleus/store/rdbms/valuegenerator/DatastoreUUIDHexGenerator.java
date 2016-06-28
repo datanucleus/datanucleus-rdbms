@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -48,15 +49,15 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
         allocationSize = 10;
         if (properties != null)
         {
-            if (properties.get("key-cache-size") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
                 try
                 {
-                    allocationSize = Integer.parseInt((String)properties.get("key-cache-size"));
+                    allocationSize = Integer.parseInt((String)properties.get(ValueGenerator.PROPERTY_KEY_CACHE_SIZE));
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("040006",properties.get(ValueGenerator.PROPERTY_KEY_CACHE_SIZE)));
                 }
             }
         }

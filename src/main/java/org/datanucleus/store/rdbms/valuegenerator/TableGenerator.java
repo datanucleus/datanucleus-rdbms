@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -46,8 +47,7 @@ import org.datanucleus.util.NucleusLogger;
  * generating the ids).
  * <UL>
  * <LI><U>sequence-name</U> - Name for the sequence</LI>
- * <LI><U>sequence-table-basis</U> - Basic for the sequence name (if "sequence-name" not provided). This can be
- * "table" or "class".</LI>
+ * <LI><U>sequence-table-basis</U> - Basic for the sequence name (if "sequence-name" not provided). This can be "table" or "class".</LI>
  * </UL>
  * 
  * <p>
@@ -104,22 +104,22 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         initialValue = -1; // So we know if being set
         if (properties != null)
         {
-            if (properties.get("key-cache-size") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
                 try
                 {
-                    allocationSize = Integer.parseInt(properties.getProperty("key-cache-size"));
+                    allocationSize = Integer.parseInt(properties.getProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE));
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(Localiser.msg("Sequence040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("Sequence040006",properties.get(ValueGenerator.PROPERTY_KEY_CACHE_SIZE)));
                 }
             }
-            if (properties.get("key-initial-value") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE))
             {
                 try
                 {
-                    initialValue = Integer.parseInt(properties.getProperty("key-initial-value"));
+                    initialValue = Integer.parseInt(properties.getProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE));
                 }
                 catch (NumberFormatException nfe)
                 {
@@ -127,21 +127,20 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
                 }
             }
 
-            if (properties.getProperty("sequence-name") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_SEQUENCE_NAME))
             {
                 // Specified sequence-name so use that
-                sequenceName = properties.getProperty("sequence-name");
+                sequenceName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
             }
-            else if (properties.getProperty("sequence-table-basis") != null && 
-                properties.getProperty("sequence-table-basis").equalsIgnoreCase("table"))
+            else if (properties.containsKey("sequence-table-basis") && properties.getProperty("sequence-table-basis").equalsIgnoreCase("table"))
             {
                 // Use table name in the sequence table as the sequence name
-                sequenceName = properties.getProperty("table-name");
+                sequenceName = properties.getProperty(ValueGenerator.PROPERTY_TABLE_NAME);
             }
             else
             {
                 // Use root class name (for this inheritance tree) in the sequence table as the sequence name
-                sequenceName = properties.getProperty("root-class-name");
+                sequenceName = properties.getProperty(ValueGenerator.PROPERTY_ROOT_CLASS_NAME);
             }
         }
         else
@@ -182,13 +181,12 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
             }
 
             DatastoreIdentifier sourceTableIdentifier = null;
-            if (properties.getProperty("table-name") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_TABLE_NAME))
             {
-                sourceTableIdentifier = ((RDBMSStoreManager)storeMgr).getIdentifierFactory().newTableIdentifier(properties.getProperty("table-name"));
+                sourceTableIdentifier = ((RDBMSStoreManager)storeMgr).getIdentifierFactory().newTableIdentifier(properties.getProperty(ValueGenerator.PROPERTY_TABLE_NAME));
                 // TODO Apply passed in catalog/schema to this identifier rather than the default for the factory
             }
-            Long nextId = sequenceTable.getNextVal(sequenceName, connection, (int)size,
-                sourceTableIdentifier, properties.getProperty("column-name"), initialValue);
+            Long nextId = sequenceTable.getNextVal(sequenceName, connection, (int)size, sourceTableIdentifier, properties.getProperty(ValueGenerator.PROPERTY_COLUMN_NAME), initialValue);
             for (int i=0; i<size; i++)
             {
                 oid.add(nextId);
@@ -283,18 +281,19 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
     protected void initialiseSequenceTable()
     {
         // Set catalog/schema name (using properties, and if not specified using the values for the table)
-        String catalogName = properties.getProperty("sequence-catalog-name");
+        String catalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
         if (catalogName == null)
         {
-            catalogName = properties.getProperty("catalog-name");
+            catalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
         }
-        String schemaName = properties.getProperty("sequence-schema-name");
+
+        String schemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
         if (schemaName == null)
         {
-            schemaName = properties.getProperty("schema-name");
+            schemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
         }
-        String tableName = (properties.getProperty("sequence-table-name") == null ? 
-                DEFAULT_TABLE_NAME : properties.getProperty("sequence-table-name"));
+
+        String tableName = (properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE) == null ? DEFAULT_TABLE_NAME : properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE));
 
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)this.storeMgr;
         DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
@@ -316,15 +315,17 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         else
         {
             String sequenceNameColumnName = DEFAULT_SEQUENCE_COLUMN_NAME;
+            if (properties.containsKey(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN))
+            {
+                sequenceNameColumnName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN);
+            }
+
             String nextValColumnName = DEFAULT_NEXTVALUE_COLUMN_NAME;
-            if (properties.getProperty("sequence-name-column-name") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN))
             {
-                sequenceNameColumnName = properties.getProperty("sequence-name-column-name");
+                nextValColumnName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN);
             }
-            if (properties.getProperty("sequence-nextval-column-name") != null)
-            {
-                nextValColumnName = properties.getProperty("sequence-nextval-column-name");
-            }
+
             sequenceTable = new SequenceTable(identifier, storeMgr, sequenceNameColumnName, nextValColumnName);
             sequenceTable.initialize(storeMgr.getNucleusContext().getClassLoaderResolver(null));
         }

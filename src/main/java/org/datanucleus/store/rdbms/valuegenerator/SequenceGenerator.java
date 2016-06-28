@@ -37,6 +37,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -75,20 +76,20 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         allocationSize = 1;
         if (properties != null)
         {
-            if (properties.get("key-cache-size") != null)
+            if (properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
                 try
                 {
-                    allocationSize = Integer.parseInt((String)properties.get("key-cache-size"));
+                    allocationSize = Integer.parseInt((String)properties.get(ValueGenerator.PROPERTY_KEY_CACHE_SIZE));
                 }
                 catch (Exception e)
                 {
-                    throw new ValueGenerationException(Localiser.msg("040006",properties.get("key-cache-size")));
+                    throw new ValueGenerationException(Localiser.msg("040006", properties.get(ValueGenerator.PROPERTY_KEY_CACHE_SIZE)));
                 }
             }
-            if (properties.get("sequence-name") == null)
+            if (!properties.containsKey(ValueGenerator.PROPERTY_SEQUENCE_NAME))
             {
-                throw new ValueGenerationException(Localiser.msg("040007",properties.get("sequence-name")));
+                throw new ValueGenerationException(Localiser.msg("040007", properties.get(ValueGenerator.PROPERTY_SEQUENCE_NAME)));
             }
         }
     }
@@ -171,17 +172,18 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         if (sequenceName == null)
         {
             // Set the name of the sequence (including catalog/schema as required)
-            String sequenceCatalogName = properties.getProperty("sequence-catalog-name");
+            String sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
             if (sequenceCatalogName == null)
             {
-                sequenceCatalogName = properties.getProperty("catalog-name");
+                sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
             }
-            String sequenceSchemaName = properties.getProperty("sequence-schema-name");
+            String sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
             if (sequenceSchemaName == null)
             {
-                sequenceSchemaName = properties.getProperty("schema-name");
+                sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
             }
-            String sequenceName = properties.getProperty("sequence-name");
+            String sequenceName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
+
             RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
             DatastoreAdapter dba = srm.getDatastoreAdapter();
             DatastoreIdentifier identifier = srm.getIdentifierFactory().newSequenceIdentifier(sequenceName);
@@ -214,10 +216,10 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
      */
     protected boolean repositoryExists()
     {
-        String sequenceCatalogName = properties.getProperty("sequence-catalog-name");
+        String sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
         if (sequenceCatalogName == null)
         {
-            sequenceCatalogName = properties.getProperty("catalog-name");
+            sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
         }
         if (!StringUtils.isWhitespace(sequenceCatalogName))
         {
@@ -225,10 +227,10 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             sequenceCatalogName = idFactory.getIdentifierInAdapterCase(sequenceCatalogName);
         }
 
-        String sequenceSchemaName = properties.getProperty("sequence-schema-name");
+        String sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
         if (sequenceSchemaName == null)
         {
-            sequenceSchemaName = properties.getProperty("schema-name");
+            sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
         }
         if (!StringUtils.isWhitespace(sequenceSchemaName))
         {
@@ -236,11 +238,10 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             sequenceSchemaName = idFactory.getIdentifierInAdapterCase(sequenceSchemaName);
         }
 
-        String seqName = properties.getProperty("sequence-name");
+        String seqName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
         IdentifierFactory idFactory = ((RDBMSStoreManager)storeMgr).getIdentifierFactory();
         seqName = idFactory.getIdentifierInAdapterCase(seqName);
-        return ((RDBMSStoreManager)storeMgr).getDatastoreAdapter().sequenceExists((Connection) connection.getConnection(), 
-            sequenceCatalogName, sequenceSchemaName, seqName);
+        return ((RDBMSStoreManager)storeMgr).getDatastoreAdapter().sequenceExists((Connection) connection.getConnection(), sequenceCatalogName, sequenceSchemaName, seqName);
     }
 
     /**
@@ -259,16 +260,11 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             throw new NucleusUserException(Localiser.msg("040010", getSequenceName()));
         }
 
-        Integer min = properties.containsKey("key-min-value") ? 
-                Integer.valueOf(properties.getProperty("key-min-value")) : null;
-        Integer max = properties.containsKey("key-max-value") ? 
-                Integer.valueOf(properties.getProperty("key-max-value")) : null;
-        Integer start = properties.containsKey("key-initial-value") ? 
-                Integer.valueOf(properties.getProperty("key-initial-value")) : null;
-        Integer incr = properties.containsKey("key-cache-size") ? 
-                Integer.valueOf(properties.getProperty("key-cache-size")) : null;
-        Integer cacheSize = properties.containsKey("key-database-cache-size") ? 
-                Integer.valueOf(properties.getProperty("key-database-cache-size")) : null;
+        Integer min = properties.containsKey(ValueGenerator.PROPERTY_KEY_MIN_VALUE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_MIN_VALUE)) : null;
+        Integer max = properties.containsKey(ValueGenerator.PROPERTY_KEY_MAX_VALUE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_MAX_VALUE)) : null;
+        Integer start = properties.containsKey(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE)) : null;
+        Integer incr = properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE)) : null;
+        Integer cacheSize = properties.containsKey(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE)) : null;
         String stmt = dba.getSequenceCreateStmt(getSequenceName(), min, max, start, incr, cacheSize);
         try
         {

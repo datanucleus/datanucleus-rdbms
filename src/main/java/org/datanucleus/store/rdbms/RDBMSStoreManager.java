@@ -2133,34 +2133,37 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         Properties properties = new Properties();
-        properties.setProperty("class-name", cmd.getFullClassName());
-        properties.put("root-class-name", cmd.getBaseAbstractClassMetaData().getFullClassName());
+        properties.setProperty(ValueGenerator.PROPERTY_CLASS_NAME, cmd.getFullClassName());
+        properties.put(ValueGenerator.PROPERTY_ROOT_CLASS_NAME, cmd.getBaseAbstractClassMetaData().getFullClassName());
         if (mmd != null)
         {
-            properties.setProperty("field-name", mmd.getFullFieldName());
+            properties.setProperty(ValueGenerator.PROPERTY_FIELD_NAME, mmd.getFullFieldName());
         }
+
         if (cmd.getCatalog() != null)
         {
-            properties.setProperty("catalog-name", cmd.getCatalog());
+            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, cmd.getCatalog());
         }
         else if (!StringUtils.isWhitespace(catalogName))
         {
-            properties.setProperty("catalog-name", catalogName);
+            properties.setProperty(ValueGenerator.PROPERTY_CATALOG_NAME, catalogName);
         }
+
         if (cmd.getSchema() != null)
         {
-            properties.setProperty("schema-name", cmd.getSchema());
+            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, cmd.getSchema());
         }
         else if (!StringUtils.isWhitespace(schemaName))
         {
-            properties.setProperty("schema-name", schemaName);
+            properties.setProperty(ValueGenerator.PROPERTY_SCHEMA_NAME, schemaName);
         }
-        properties.setProperty("table-name", tbl.getIdentifier().toString());
-        properties.setProperty("column-name", columnsName.toString());
+
+        properties.setProperty(ValueGenerator.PROPERTY_TABLE_NAME, tbl.getIdentifier().toString());
+        properties.setProperty(ValueGenerator.PROPERTY_COLUMN_NAME, columnsName.toString());
 
         if (sequence != null)
         {
-            properties.setProperty("sequence-name", sequence);
+            properties.setProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME, sequence);
         }
 
         // Add any extension properties
@@ -2181,44 +2184,44 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (strategy == IdentityStrategy.INCREMENT && tablegenmd != null)
         {
             // User has specified a TableGenerator (JPA)
-            properties.put("key-initial-value", "" + tablegenmd.getInitialValue());
-            properties.put("key-cache-size", "" + tablegenmd.getAllocationSize());
+            properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
+            properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + tablegenmd.getAllocationSize());
             if (tablegenmd.getTableName() != null)
             {
-                properties.put("sequence-table-name", tablegenmd.getTableName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE, tablegenmd.getTableName());
             }
             if (tablegenmd.getCatalogName() != null)
             {
-                properties.put("sequence-catalog-name", tablegenmd.getCatalogName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, tablegenmd.getCatalogName());
             }
             if (tablegenmd.getSchemaName() != null)
             {
-                properties.put("sequence-schema-name", tablegenmd.getSchemaName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, tablegenmd.getSchemaName());
             }
             if (tablegenmd.getPKColumnName() != null)
             {
-                properties.put("sequence-name-column-name", tablegenmd.getPKColumnName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN, tablegenmd.getPKColumnName());
             }
             if (tablegenmd.getPKColumnName() != null)
             {
-                properties.put("sequence-nextval-column-name", tablegenmd.getValueColumnName());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN, tablegenmd.getValueColumnName());
             }
             if (tablegenmd.getPKColumnValue() != null)
             {
-                properties.put("sequence-name", tablegenmd.getPKColumnValue());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, tablegenmd.getPKColumnValue());
             }
 
             // Using JPA generator so don't enable initial value detection
-            properties.remove("table-name");
-            properties.remove("column-name");
+            properties.remove(ValueGenerator.PROPERTY_TABLE_NAME);
+            properties.remove(ValueGenerator.PROPERTY_COLUMN_NAME);
         }
         else if (strategy == IdentityStrategy.INCREMENT && tablegenmd == null)
         {
-            if (!properties.containsKey("key-cache-size"))
+            if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
                 // Use default allocation size
                 int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_INCREMENT_ALLOCSIZE);
-                properties.put("key-cache-size", "" + allocSize);
+                properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
             }
         }
         else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
@@ -2229,26 +2232,26 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 // Apply default to sequence name, as name of sequence metadata
                 if (seqmd.getName() != null)
                 {
-                    properties.put("sequence-name", seqmd.getName());
+                    properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqmd.getName());
                 }
             }
             if (seqmd.getDatastoreSequence() != null)
             {
                 if (seqmd.getInitialValue() >= 0)
                 {
-                    properties.put("key-initial-value", "" + seqmd.getInitialValue());
+                    properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + seqmd.getInitialValue());
                 }
                 if (seqmd.getAllocationSize() > 0)
                 {
-                    properties.put("key-cache-size", "" + seqmd.getAllocationSize());
+                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + seqmd.getAllocationSize());
                 }
                 else
                 {
                     // Use default allocation size
                     int allocSize = getIntProperty(PropertyNames.PROPERTY_VALUEGEN_SEQUENCE_ALLOCSIZE);
-                    properties.put("key-cache-size", "" + allocSize);
+                    properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
                 }
-                properties.put("sequence-name", "" + seqmd.getDatastoreSequence());
+                properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
                 ExtensionMetaData[] seqExtensions = seqmd.getExtensions();
@@ -4031,25 +4034,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         String tableName = TableGenerator.DEFAULT_TABLE_NAME;
         String seqColName = TableGenerator.DEFAULT_SEQUENCE_COLUMN_NAME;
         String nextValColName = TableGenerator.DEFAULT_NEXTVALUE_COLUMN_NAME;
-        if (md.hasExtension("sequence-catalog-name"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG))
         {
-            catName = md.getValueForExtension("sequence-catalog-name");
+            catName = md.getValueForExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
         }
-        if (md.hasExtension("sequence-schema-name"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA))
         {
-            schName = md.getValueForExtension("sequence-schema-name");
+            schName = md.getValueForExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
         }
-        if (md.hasExtension("sequence-table-name"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE))
         {
-            tableName = md.getValueForExtension("sequence-table-name");
+            tableName = md.getValueForExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_TABLE);
         }
-        if (md.hasExtension("sequence-name-column-name"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN))
         {
-            seqColName = md.getValueForExtension("sequence-name-column-name");
+            seqColName = md.getValueForExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_NAME_COLUMN);
         }
-        if (md.hasExtension("sequence-nextval-column-name"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN))
         {
-            nextValColName = md.getValueForExtension("sequence-nextval-column-name");
+            nextValColName = md.getValueForExtension(ValueGenerator.PROPERTY_SEQUENCETABLE_NEXTVAL_COLUMN);
         }
 
         if (!seqTablesGenerated.contains(tableName))
@@ -4105,25 +4108,25 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             md = seqmd;
         }
-        if (md.hasExtension("key-min-value"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_KEY_MIN_VALUE))
         {
-            min = Integer.valueOf(md.getValueForExtension("key-min-value"));
+            min = Integer.valueOf(md.getValueForExtension(ValueGenerator.PROPERTY_KEY_MIN_VALUE));
         }
-        if (md.hasExtension("key-max-value"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_KEY_MAX_VALUE))
         {
-            max = Integer.valueOf(md.getValueForExtension("key-max-value"));
+            max = Integer.valueOf(md.getValueForExtension(ValueGenerator.PROPERTY_KEY_MAX_VALUE));
         }
-        if (md.hasExtension("key-cache-size"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
         {
-            increment = Integer.valueOf(md.getValueForExtension("key-cache-size"));
+            increment = Integer.valueOf(md.getValueForExtension(ValueGenerator.PROPERTY_KEY_CACHE_SIZE));
         }
-        if (md.hasExtension("key-initial-value"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE))
         {
-            start = Integer.valueOf(md.getValueForExtension("key-initial-value"));
+            start = Integer.valueOf(md.getValueForExtension(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE));
         }
-        if (md.hasExtension("key-database-cache-size"))
+        if (md.hasExtension(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE))
         {
-            cacheSize = Integer.valueOf(md.getValueForExtension("key-database-cache-size"));
+            cacheSize = Integer.valueOf(md.getValueForExtension(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE));
         }
         if (!sequencesGenerated.contains(seqName))
         {
