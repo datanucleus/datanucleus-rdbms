@@ -232,13 +232,11 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
     }
 
     public String getCreateDatabaseStatement(String catalogName, String schemaName)
-        throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException("SQL Anywhere does not support CREATE DATABASE via a schema name");
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)
-        throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException("SQL Anywhere does not support DROP DATABASE via a schema name");
     }
@@ -629,8 +627,6 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * @return The SQL to append to allow for ranges using LIMIT.
      */
     public String getRangeByLimitEndOfStatementClause(long offset, long count)
-        throws UnsupportedOperationException
-
     {
         if (offset >= 0 && count > 0)
         {
