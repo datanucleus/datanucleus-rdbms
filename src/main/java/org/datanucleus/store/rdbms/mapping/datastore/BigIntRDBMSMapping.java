@@ -184,7 +184,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue().toString()))
                 {
-                    ps.setLong(param, Long.valueOf(column.getDefaultValue().toString().trim()).longValue());
+                    ps.setLong(param, Long.parseLong(column.getDefaultValue().toString().trim()));
                 }
                 else
                 {
@@ -200,7 +200,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                 else if (value instanceof String)
                 {
                     // User requested to store a String as an INTEGER! Why would anyone do that?
-                    ps.setLong(param, Long.valueOf((String)value).longValue());
+                    ps.setLong(param, Long.parseLong((String) value));
                 }
                 else if (value instanceof java.util.Date)
                 {

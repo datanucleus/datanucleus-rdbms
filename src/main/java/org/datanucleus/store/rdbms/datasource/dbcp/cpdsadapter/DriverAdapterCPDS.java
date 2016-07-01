@@ -307,8 +307,8 @@ public class DriverAdapterCPDS
 
                 ra = ref.get("poolPreparedStatements");
                 if (ra != null && ra.getContent() != null) {
-                    setPoolPreparedStatements(Boolean.valueOf(
-                        ra.getContent().toString()).booleanValue());
+                    setPoolPreparedStatements(Boolean.parseBoolean(
+                        ra.getContent().toString()));
                 }
                 ra = ref.get("maxActive");
                 if (ra != null && ra.getContent() != null) {
