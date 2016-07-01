@@ -197,8 +197,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         if (cmd.getInheritanceMetaData().getStrategy() != InheritanceStrategy.NEW_TABLE &&
             cmd.getInheritanceMetaData().getStrategy() != InheritanceStrategy.COMPLETE_TABLE)
         {
-            throw new NucleusUserException(Localiser.msg("057003", cmd.getFullClassName(),
-                cmd.getInheritanceMetaData().getStrategy().toString())).setFatal();
+            throw new NucleusUserException(Localiser.msg("057003", cmd.getFullClassName(), cmd.getInheritanceMetaData().getStrategy().toString())).setFatal();
         }
 
         highestMemberNumber = cmd.getNoOfManagedMembers() + cmd.getNoOfInheritedManagedMembers();
@@ -1937,12 +1936,21 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 AbstractMemberMetaData relMmd = fmd.getRelatedMemberMetaData(clr)[0];
                                 if (relMmd.getJoinMetaData() == null && fmd.getJoinMetaData() == null)
                                 {
-                                    Index index = new Index(this, false, null);
-                                    for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                                    if (fieldMapping.getNumberOfDatastoreMappings() > 0)
                                     {
-                                        index.setColumn(i, fieldMapping.getDatastoreMapping(i).getColumn());
+                                        Index index = new Index(this, false, null);
+                                        for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                                        {
+                                            index.setColumn(i, fieldMapping.getDatastoreMapping(i).getColumn());
+                                        }
+                                        indices.add(index);
                                     }
-                                    indices.add(index);
+                                    else
+                                    {
+                                        // TODO How do we get this?
+                                        NucleusLogger.DATASTORE_SCHEMA.warn("Table " + this + " manages member " + fmd.getFullFieldName() + 
+                                            " which is a N-1 but there is no column for this mapping so not adding index!");
+                                    }
                                 }
                             }
                         }
