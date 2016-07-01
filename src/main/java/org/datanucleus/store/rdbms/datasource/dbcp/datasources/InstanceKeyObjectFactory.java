@@ -52,7 +52,7 @@ abstract class InstanceKeyObjectFactory
             if (obj instanceof String)
             {
                 try {
-                    max = Math.max(max, Integer.valueOf((String)obj).intValue());
+                    max = Math.max(max, Integer.parseInt((String) obj));
                 }
                 catch (NumberFormatException e) {
                     // no sweat, ignore those keys
@@ -134,14 +134,14 @@ abstract class InstanceKeyObjectFactory
 
         ra = ref.get("defaultAutoCommit");
         if (ra != null && ra.getContent() != null) {
-            ikds.setDefaultAutoCommit(Boolean.valueOf(
-                ra.getContent().toString()).booleanValue());
+            ikds.setDefaultAutoCommit(Boolean.parseBoolean(
+                    ra.getContent().toString()));
         }
 
         ra = ref.get("defaultReadOnly");
         if (ra != null && ra.getContent() != null) {
-            ikds.setDefaultReadOnly(Boolean.valueOf(
-                ra.getContent().toString()).booleanValue());
+            ikds.setDefaultReadOnly(Boolean.parseBoolean(
+                    ra.getContent().toString()));
         }
 
         ra = ref.get("description");
@@ -164,14 +164,14 @@ abstract class InstanceKeyObjectFactory
 
         ra = ref.get("testOnBorrow");
         if (ra != null && ra.getContent() != null) {
-            ikds.setTestOnBorrow(Boolean.valueOf(
-                ra.getContent().toString()).booleanValue());
+            ikds.setTestOnBorrow(Boolean.parseBoolean(
+                    ra.getContent().toString()));
         }
 
         ra = ref.get("testOnReturn");
         if (ra != null && ra.getContent() != null) {
-            ikds.setTestOnReturn(Boolean.valueOf(
-                ra.getContent().toString()).booleanValue());
+            ikds.setTestOnReturn(Boolean.parseBoolean(
+                    ra.getContent().toString()));
         }
 
         ra = ref.get("timeBetweenEvictionRunsMillis");
@@ -194,8 +194,8 @@ abstract class InstanceKeyObjectFactory
 
         ra = ref.get("testWhileIdle");
         if (ra != null && ra.getContent() != null) {
-            ikds.setTestWhileIdle(Boolean.valueOf(
-                ra.getContent().toString()).booleanValue());
+            ikds.setTestWhileIdle(Boolean.parseBoolean(
+                    ra.getContent().toString()));
         }
 
         ra = ref.get("validationQuery");

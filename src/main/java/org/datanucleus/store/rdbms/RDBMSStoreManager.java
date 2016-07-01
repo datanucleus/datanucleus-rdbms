@@ -1294,7 +1294,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     int jdbcTypeNumber = 0;
                     try
                     {
-                        jdbcTypeNumber = Short.valueOf(jdbcTypeStr).shortValue();
+                        jdbcTypeNumber = Short.parseShort(jdbcTypeStr);
                     }
                     catch (NumberFormatException nfe) { }
 
@@ -2616,7 +2616,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     short jdbcTypeNumber = 0;
                     try
                     {
-                        jdbcTypeNumber = Short.valueOf(jdbcTypeStr).shortValue();
+                        jdbcTypeNumber = Short.parseShort(jdbcTypeStr);
                     }
                     catch (NumberFormatException nfe) { }
                     JDBCTypeInfo jdbcType = (JDBCTypeInfo)typesInfo.getChild(jdbcTypeStr);
