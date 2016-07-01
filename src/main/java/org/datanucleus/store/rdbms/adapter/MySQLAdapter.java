@@ -264,7 +264,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         // Check for specification of the "collation"
         String collation = null;
-        if (props != null && props.contains("collation"))
+        if (props != null && props.contains("mysql-collation"))
         {
             collation = props.getProperty("mysql-collation");
         }
@@ -275,7 +275,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         // Check for specification of the "charset"
         String charset = null;
-        if (props != null && props.contains("characterSet"))
+        if (props != null && props.contains("mysql-character-set"))
         {
             charset = props.getProperty("mysql-character-set");
         }
