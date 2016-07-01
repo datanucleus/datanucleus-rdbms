@@ -29,7 +29,6 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_TABLE_COLUMN_ORDER = "datanucleus.rdbms.tableColumnOrder";
 
     public static final String PROPERTY_RDBMS_CLASS_ADDER_MAX_RETRIES = "datanucleus.rdbms.classAdditionMaxRetries";
-    public static final String PROPERTY_RDBMS_ORACLE_NLS_SORT_ORDER = "datanucleus.rdbms.oracleNlsSortOrder";
     public static final String PROPERTY_RDBMS_DISCRIM_PER_SUBCLASS_TABLE = "datanucleus.rdbms.discriminatorPerSubclassTable";
     public static final String PROPERTY_RDBMS_CONSTRAINT_CREATE_MODE = "datanucleus.rdbms.constraintCreateMode";
     public static final String PROPERTY_RDBMS_UNIQUE_CONSTRAINTS_MAP_INVERSE = "datanucleus.rdbms.uniqueConstraints.mapInverse";
@@ -45,8 +44,6 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS = "datanucleus.rdbms.omitDatabaseMetaDataGetColumns";
     public static final String PROPERTY_RDBMS_ALLOW_COLUMN_REUSE = "datanucleus.rdbms.allowColumnReuse";
     public static final String PROPERTY_RDBMS_DEFAULT_SQL_TYPE = "datanucleus.rdbms.useDefaultSqlType";
-
-    public static final String PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY = "datanucleus.rdbms.adapter.informixUseSerialForIdentity";
 
     public static final String PROPERTY_RDBMS_QUERY_MULTIVALUED_FETCH = "datanucleus.rdbms.query.multivaluedFetch";
     public static final String PROPERTY_RDBMS_QUERY_FETCH_DIRECTION = "datanucleus.rdbms.query.fetchDirection";
@@ -84,4 +81,15 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_CONNECTION_POOL_VALIDATION_TIMEOUT = "datanucleus.connectionPool.validationTimeout";
     public static final String PROPERTY_CONNECTION_POOL_TRANSACTION_ISOLATION = "datanucleus.connectionPool.transactionIsolation";
     public static final String PROPERTY_CONNECTION_POOL_CATALOG = "datanucleus.connectionPool.catalog";
+
+    // Oracle specific
+    public static final String PROPERTY_RDBMS_ORACLE_NLS_SORT_ORDER = "datanucleus.rdbms.oracle.nlsSortOrder";
+
+    // Informix specific
+    public static final String PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY = "datanucleus.rdbms.informix.useSerialForIdentity";
+
+    // MySQL specific
+    public static final String PROPERTY_RDBMS_MYSQL_ENGINETYPE = "datanucleus.rdbms.mysql.engineType";
+    public static final String PROPERTY_RDBMS_MYSQL_COLLATION = "datanucleus.rdbms.mysql.collation";
+    public static final String PROPERTY_RDBMS_MYSQL_CHARACTERSET = "datanucleus.rdbms.mysql.characterSet";
 }

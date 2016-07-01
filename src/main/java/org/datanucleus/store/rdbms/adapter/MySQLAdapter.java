@@ -26,6 +26,7 @@ import java.sql.Types;
 import java.util.Properties;
 
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -256,9 +257,9 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         {
             engineType = props.getProperty("mysql-engine-type");
         }
-        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.engineType"))
+        else if (table.getStoreManager().hasProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_ENGINETYPE))
         {
-            engineType = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.engineType");
+            engineType = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_ENGINETYPE);
         }
 
         // Check for specification of the "collation"
@@ -267,9 +268,9 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         {
             collation = props.getProperty("mysql-collation");
         }
-        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.collation"))
+        else if (table.getStoreManager().hasProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_COLLATION))
         {
-            collation = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.collation");
+            collation = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_COLLATION);
         }
 
         // Check for specification of the "charset"
@@ -278,9 +279,9 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         {
             charset = props.getProperty("mysql-character-set");
         }
-        else if (table.getStoreManager().hasProperty("datanucleus.rdbms.mysql.characterSet"))
+        else if (table.getStoreManager().hasProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_CHARACTERSET))
         {
-            charset = table.getStoreManager().getStringProperty("datanucleus.rdbms.mysql.characterSet");
+            charset = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_CHARACTERSET);
         }
 
         boolean engineKeywordPresent = false;
