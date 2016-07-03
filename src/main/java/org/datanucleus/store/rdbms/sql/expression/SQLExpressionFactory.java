@@ -52,10 +52,10 @@ public class SQLExpressionFactory
 
     ClassLoaderResolver clr;
 
-    private final Class[] EXPR_CREATION_ARG_TYPES = 
+    private static final Class[] EXPR_CREATION_ARG_TYPES = 
         new Class[] {SQLStatement.class, SQLTable.class, JavaTypeMapping.class};
 
-    private final Class[] LIT_CREATION_ARG_TYPES = 
+    private static final Class[] LIT_CREATION_ARG_TYPES = 
         new Class[] {SQLStatement.class, JavaTypeMapping.class, Object.class, String.class};
 
     /** Cache of expression class, keyed by the mapping class name. */

@@ -64,7 +64,7 @@ import org.datanucleus.util.StringUtils;
 public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
 {
     /** Time within which column info is valid (millisecs). Set to 5 mins. */
-    protected final long COLUMN_INFO_EXPIRATION_MS = 5*60*1000;
+    protected static final long COLUMN_INFO_EXPIRATION_MS = 5*60*1000;
 
     protected final RDBMSStoreManager rdbmsStoreMgr;
 
