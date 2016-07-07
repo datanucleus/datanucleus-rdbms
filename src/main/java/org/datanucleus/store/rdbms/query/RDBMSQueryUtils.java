@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.NucleusContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -64,6 +63,13 @@ import org.datanucleus.util.StringUtils;
  */
 public class RDBMSQueryUtils extends QueryUtils
 {
+    public static final String QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE = "scroll-sensitive";
+    public static final String QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE = "scroll-insensitive";
+    public static final String QUERY_RESULTSET_TYPE_FORWARD_ONLY = "forward-only";
+
+    public static final String QUERY_RESULTSET_CONCURRENCY_READONLY = "read-only";
+    public static final String QUERY_RESULTSET_CONCURRENCY_UPDATEABLE = "updateable";
+
     /**
      * Convenience method that takes a result set that contains a discriminator column and returns the class name that it represents.
      * @param discrimMapping Mapping for the discriminator column
@@ -164,34 +170,36 @@ public class RDBMSQueryUtils extends QueryUtils
     {
         // Apply any non-standard result set definition if required (either from the PMF, or via query extensions)
         String rsTypeString = RDBMSQueryUtils.getResultSetTypeForQuery(query);
-        if (rsTypeString != null && (!rsTypeString.equals("scroll-sensitive") && !rsTypeString.equals("forward-only") && !rsTypeString.equals("scroll-insensitive")))
+        if (rsTypeString != null && (!rsTypeString.equals(QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE) && !rsTypeString.equals(QUERY_RESULTSET_TYPE_FORWARD_ONLY) && 
+                !rsTypeString.equals(QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE)))
         {
             throw new NucleusUserException(Localiser.msg("052510"));
         }
+
         if (rsTypeString != null)
         {
             DatastoreAdapter dba = ((RDBMSStoreManager)query.getStoreManager()).getDatastoreAdapter();
 
             // Add checks on what the DatastoreAdapter supports
-            if (rsTypeString.equals("scroll-sensitive") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_SENSITIVE))
+            if (rsTypeString.equals(QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE) && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_SENSITIVE))
             {
-                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using forward-only");
-                rsTypeString = "forward-only";
+                rsTypeString = QUERY_RESULTSET_TYPE_FORWARD_ONLY;
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using " + rsTypeString);
             }
-            else if (rsTypeString.equals("scroll-insensitive") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_INSENSITIVE))
+            else if (rsTypeString.equals(QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_SCROLL_INSENSITIVE))
             {
-                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using forward-only");
-                rsTypeString = "forward-only";
+                rsTypeString = QUERY_RESULTSET_TYPE_FORWARD_ONLY;
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using " + rsTypeString);
             }
-            else if (rsTypeString.equals("forward-only") && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_FORWARD_ONLY))
+            else if (rsTypeString.equals(QUERY_RESULTSET_TYPE_FORWARD_ONLY) && !dba.supportsOption(DatastoreAdapter.RESULTSET_TYPE_FORWARD_ONLY))
             {
-                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using scroll-sensitive");
-                rsTypeString = "scroll-sensitive";
+                rsTypeString = QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE;
+                NucleusLogger.DATASTORE_RETRIEVE.info("Query requested to run with result-set type of " + rsTypeString + " yet not supported by adapter. Using " + rsTypeString);
             }
         }
 
         String rsConcurrencyString = RDBMSQueryUtils.getResultSetConcurrencyForQuery(query);
-        if (rsConcurrencyString != null && (!rsConcurrencyString.equals("read-only") && !rsConcurrencyString.equals("updateable")))
+        if (rsConcurrencyString != null && (!rsConcurrencyString.equals(QUERY_RESULTSET_CONCURRENCY_READONLY) && !rsConcurrencyString.equals(QUERY_RESULTSET_CONCURRENCY_UPDATEABLE)))
         {
             throw new NucleusUserException(Localiser.msg("052511"));
         }
@@ -212,10 +220,6 @@ public class RDBMSQueryUtils extends QueryUtils
     public static void prepareStatementForExecution(PreparedStatement ps, Query query, boolean applyTimeout)
     throws SQLException
     {
-        NucleusContext nucleusCtx = query.getExecutionContext().getNucleusContext();
-        RDBMSStoreManager storeMgr = (RDBMSStoreManager) query.getStoreManager();
-        Configuration conf = nucleusCtx.getConfiguration();
-
         if (applyTimeout)
         {
             Integer timeout = query.getDatastoreReadTimeoutMillis();
@@ -232,12 +236,13 @@ public class RDBMSQueryUtils extends QueryUtils
             // FetchPlan has a size set so use that
             fetchSize = query.getFetchPlan().getFetchSize();
         }
-        if (storeMgr.getDatastoreAdapter().supportsQueryFetchSize(fetchSize))
+        if (((RDBMSStoreManager)query.getStoreManager()).getDatastoreAdapter().supportsQueryFetchSize(fetchSize))
         {
             ps.setFetchSize(fetchSize);
         }
 
         // Apply any fetch direction
+        Configuration conf = query.getExecutionContext().getNucleusContext().getConfiguration();
         String fetchDir = conf.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
         Object fetchDirExt = query.getExtension(RDBMSPropertyNames.PROPERTY_RDBMS_QUERY_FETCH_DIRECTION);
         if (fetchDirExt != null)

@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms;
 
 import org.datanucleus.properties.PropertyValidator;
+import org.datanucleus.store.rdbms.query.RDBMSQueryUtils;
 
 /**
  * Validator for persistence properties used by RDBMS.
@@ -54,9 +55,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
             if (value instanceof String)
             {
                 String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("forward-only") ||
-                    strVal.equalsIgnoreCase("scroll-sensitive") ||
-                    strVal.equalsIgnoreCase("scroll-insensitive"))
+                if (strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_FORWARD_ONLY) ||
+                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE) ||
+                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE))
                 {
                     return true;
                 }
@@ -67,8 +68,8 @@ public class RDBMSPropertyValidator implements PropertyValidator
             if (value instanceof String)
             {
                 String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("read-only") ||
-                    strVal.equalsIgnoreCase("updateable"))
+                if (strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_READONLY) ||
+                    strVal.equalsIgnoreCase(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_UPDATEABLE))
                 {
                     return true;
                 }

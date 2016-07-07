@@ -29,6 +29,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
+import org.datanucleus.store.rdbms.query.RDBMSQueryUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -327,18 +328,18 @@ public class SQLController
             int rsTypeValue = ResultSet.TYPE_FORWARD_ONLY;
             if (resultSetType != null)
             {
-                if (resultSetType.equals("scroll-sensitive"))
+                if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
                 {
                     rsTypeValue = ResultSet.TYPE_SCROLL_SENSITIVE;
                 }
-                else if (resultSetType.equals("scroll-insensitive"))
+                else if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE))
                 {
                     rsTypeValue = ResultSet.TYPE_SCROLL_INSENSITIVE;
                 }
             }
             
             int rsConcurrencyValue = ResultSet.CONCUR_READ_ONLY;
-            if (resultSetConcurrency != null && resultSetConcurrency.equals("updateable"))
+            if (resultSetConcurrency != null && resultSetConcurrency.equals(RDBMSQueryUtils.QUERY_RESULTSET_CONCURRENCY_UPDATEABLE))
             {
                 rsConcurrencyValue = ResultSet.CONCUR_UPDATABLE;
             }
