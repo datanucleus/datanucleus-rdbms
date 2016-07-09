@@ -1116,6 +1116,7 @@ public class SQLStatementHelper
             joinType = getJoinTypeForOneToOneRelationJoin(sourceMapping, sourceSqlTbl, joinType);
 
             // TODO Cater for JDOQL where user hasn't checked for null on the relation and this is an OUTER join (i.e add WHERE check for null).
+            // Note that we cannot just do this here since it applies it to the WHERE clause at the "top-level" yet this may be for some branch of the WHERE clause only
             //if (joinType == JoinType.LEFT_OUTER_JOIN)
             //{
             //SQLExpression fkExpr = stmt.getSQLExpressionFactory().newExpression(stmt, sourceSqlTbl, sourceMapping);
