@@ -145,6 +145,11 @@ public class RDBMSColumnInfo implements ListStoreSchemaData
         this.columnSize = size;
     }
 
+    public void setColumnDef(String def)
+    {
+        this.columnDef = def;
+    }
+
     public int getDecimalDigits()
     {
         return decimalDigits;
