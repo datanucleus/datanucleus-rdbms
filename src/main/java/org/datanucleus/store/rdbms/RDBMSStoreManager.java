@@ -3360,6 +3360,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 TableImpl t = (TableImpl) i.next();
 
                 boolean columnsValidated = false;
+                boolean columnsInitialised = false;
                 if (checkExistTablesOrViews)
                 {
                     if (ddlWriter != null)
@@ -3383,7 +3384,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                     if (!tablesCreated.contains(t) && t.exists(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isAutoCreateTables()))
                     {
-                        // Table has been created so add to our list so we dont process it multiple times
+                        // Table has been created so add to our list so we don't process it multiple times
                         // Any subsequent instance of this table in the list will have the columns checked only
                         tablesCreated.add(t);
                         columnsValidated = true;
@@ -3404,10 +3405,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 {
                     // Check down to the column structure where required
                     t.validate(getCurrentConnection(), rdbmsMgr.getSchemaHandler().isValidateColumns(), false, autoCreateErrors);
+                    columnsInitialised = rdbmsMgr.getSchemaHandler().isValidateColumns();
                 }
-                else if (!columnsValidated)
+
+                if (!columnsInitialised)
                 {
-                    // Validation not requested but allow initialisation of the column information
+                    // Allow initialisation of the column information TODO Arguably we should always do this
                     String initInfo = getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INIT_COLUMN_INFO);
                     if (initInfo.equalsIgnoreCase("PK"))
                     {
