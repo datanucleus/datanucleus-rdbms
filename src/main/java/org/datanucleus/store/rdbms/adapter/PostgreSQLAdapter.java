@@ -259,16 +259,27 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         }
 
         String columnDef = info.getColumnDef();
-        if (columnDef != null && columnDef.contains("::"))
+        if (columnDef != null)
         {
-            // We want to strip off any PostgreSQL-specific "::" where this is not part of the default, but allow :: when part of a string
-            if (columnDef.startsWith("'") && columnDef.endsWith("'"))
+            // Ignore some columnDef cases where we do not support PostgreSQL specific syntax
+            if (columnDef.contains("::") && (!columnDef.startsWith("'") || !columnDef.startsWith("'")))
             {
-            }
-            else
-            {
-                // Omit the PostgreSQL specific "::blah" syntax
+                // We want to strip off any PostgreSQL-specific "::" where this is not part of a default string
                 info.setColumnDef(columnDef.substring(0, columnDef.indexOf("::")));
+            }
+            else if (!columnDef.startsWith("'"))
+            {
+                // Not a String, so try Number
+                try
+                {
+                    Double.parseDouble(columnDef);
+                }
+                catch (NumberFormatException nfe)
+                {
+                    // Ignore
+                    NucleusLogger.DATASTORE.debug("Ignoring default for column " + info.getColumnName() + " : " + columnDef);
+                    info.setColumnDef(null);
+                }
             }
         }
 
