@@ -258,6 +258,20 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             info.setDecimalDigits(-1);
         }
 
+        String columnDef = info.getColumnDef();
+        if (columnDef != null && columnDef.contains("::"))
+        {
+            // We want to strip off any PostgreSQL-specific "::" where this is not part of the default, but allow :: when part of a string
+            if (columnDef.startsWith("'") && columnDef.endsWith("'"))
+            {
+            }
+            else
+            {
+                // Omit the PostgreSQL specific "::blah" syntax
+                info.setColumnDef(columnDef.substring(0, columnDef.indexOf("::")));
+            }
+        }
+
         return info;
     }
 

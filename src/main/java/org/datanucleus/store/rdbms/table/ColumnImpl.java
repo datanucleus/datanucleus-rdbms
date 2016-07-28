@@ -535,6 +535,7 @@ public class ColumnImpl implements Column
         {
             // Special case
             // Note that this really ought to be coordinated with "DEFAULT_KEYWORD_WITH_NOT_NULL_IN_COLUMN_OPTIONS"
+            this.defaultValue = null;
             return "DEFAULT NULL";
         }
 
@@ -544,6 +545,7 @@ public class ColumnImpl implements Column
             // NOTE We use single quote here but would be better to take
             // some character from the DatabaseMetaData. The "identifierQuoteString"
             // does not work for string quoting here for Postgres
+            this.defaultValue = columnMetaData.getDefaultValue();
             return "DEFAULT '" + columnMetaData.getDefaultValue() + "'";
         }
         else if (typeInfo.getTypeName().toUpperCase().indexOf("BIT") == 0)
@@ -551,10 +553,12 @@ public class ColumnImpl implements Column
             if (columnMetaData.getDefaultValue().equalsIgnoreCase("true") || columnMetaData.getDefaultValue().equalsIgnoreCase("false"))
             {
                 // Quote any "true"/"false" values for BITs
+                this.defaultValue = columnMetaData.getDefaultValue();
                 return "DEFAULT '" + columnMetaData.getDefaultValue() + "'";
             }
         }
 
+        this.defaultValue = columnMetaData.getDefaultValue();
         return "DEFAULT " + columnMetaData.getDefaultValue();
     }
 
@@ -564,9 +568,27 @@ public class ColumnImpl implements Column
     public void initializeColumnInfoFromDatastore(RDBMSColumnInfo ci)
     {
         String column_default = ci.getColumnDef();
-        if (column_default != null)
+        if (!StringUtils.isWhitespace(column_default))
         {
-            setDefaultable(column_default.replace("'", "").replace("\"", "").replace(")", "").replace("(", ""));
+            // Set column defaultValue using defaultValue defined on the datastore column
+            if (column_default.startsWith("'") && column_default.endsWith("'"))
+            {
+                // JDBC javadoc, if starts with single quotes then is a string
+                String colDefString = column_default.replace("'", "");
+                setDefaultable(colDefString);
+            }
+            else
+            {
+                if (!column_default.equalsIgnoreCase("null"))
+                {
+                    // Non-null value so use it (null is the default so don't need that)
+                    String columnDef = column_default.replace("'", "").replace("\"", "").replace(")", "").replace("(", "");
+                    if (!columnDef.equalsIgnoreCase("null"))
+                    {
+                        setDefaultable(columnDef);
+                    }
+                }
+            }
         }
 
         // TODO Make sure that this lines up with the defaultValue when set.
