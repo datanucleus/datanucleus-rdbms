@@ -741,6 +741,11 @@ public class ColumnImpl implements Column
      */
     public final Column setDefaultable(Object defaultValue)
     {
+        if (!getStoreManager().getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_COLUMN_DEFAULT_WHEN_NULL))
+        {
+            return this;
+        }
+
         flags |= DEFAULTABLE;
         this.defaultValue = defaultValue;
         return this;

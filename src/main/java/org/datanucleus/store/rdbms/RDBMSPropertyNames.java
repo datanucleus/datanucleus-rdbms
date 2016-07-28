@@ -34,6 +34,7 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_INIT_COLUMN_INFO = "datanucleus.rdbms.initializeColumnInfo";
     public static final String PROPERTY_RDBMS_STRING_DEFAULT_LENGTH = "datanucleus.rdbms.stringDefaultLength";
     public static final String PROPERTY_RDBMS_STRING_LENGTH_EXCEEDED_ACTION = "datanucleus.rdbms.stringLengthExceededAction";
+    public static final String PROPERTY_RDBMS_COLUMN_DEFAULT_WHEN_NULL = "datanucleus.rdbms.useColumnDefaultWhenNull";
     public static final String PROPERTY_RDBMS_PERSIST_EMPTY_STRING_AS_NULL = "datanucleus.rdbms.persistEmptyStringAsNull";
     public static final String PROPERTY_RDBMS_CHECK_EXISTS_TABLES_VIEWS = "datanucleus.rdbms.checkExistTablesOrViews";
     public static final String PROPERTY_RDBMS_SCHEMA_TABLE_NAME = "datanucleus.rdbms.schemaTable.tableName";
