@@ -435,10 +435,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (NucleusLogger.QUERY.isDebugEnabled())
         {
             // Give debug output of compilation
-            StringBuilder str = new StringBuilder("JoinType : default=");
+            StringBuilder str = new StringBuilder("JoinType : navigation(default=");
             str.append(defaultJoinType != null ? defaultJoinType : "(using nullability)");
             str.append(", filter=");
             str.append(defaultJoinTypeFilter != null ? defaultJoinTypeFilter : "(using nullability)");
+            str.append(")");
 
             if (extensionsByName != null)
             {
