@@ -432,6 +432,33 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     public void compile()
     {
+        if (NucleusLogger.QUERY.isDebugEnabled())
+        {
+            // Give debug output of compilation
+            StringBuilder str = new StringBuilder("JoinType : default=");
+            str.append(defaultJoinType != null ? defaultJoinType : "(using nullability)");
+            str.append(", filter=");
+            str.append(defaultJoinTypeFilter != null ? defaultJoinTypeFilter : "(using nullability)");
+
+            if (extensionsByName != null)
+            {
+                Iterator<Map.Entry<String, Object>> extensionsIter = extensionsByName.entrySet().iterator();
+                while (extensionsIter.hasNext())
+                {
+                    Map.Entry<String, Object> entry = extensionsIter.next();
+                    String key = entry.getKey();
+                    if (key.startsWith("datanucleus.query.jdoql.") && key.endsWith(".join"))
+                    {
+                        // Alias join definition
+                        String alias = key.substring("datanucleus.query.jdoql.".length(), key.lastIndexOf(".join"));
+                        str.append(", ").append(alias).append("=").append(entry.getValue());
+                    }
+                }
+            }
+
+            NucleusLogger.QUERY.debug("Compile of " + compilation.getQueryLanguage() + " into SQL - " + str);
+        }
+
         compileFrom();
         compileFilter();
 
