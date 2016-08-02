@@ -107,6 +107,12 @@ public class JPQLQuery extends AbstractJPQLQuery
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
     public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.forUpdateNowait";
 
+    /** Extension to define the JOIN TYPE to use when navigating single-valued relations, when part of the filter. */
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jpql.navigationJoinTypeForFilter";
+
+    /** Extension to define the JOIN TYPE to use when navigating single-valued relations. */
+    public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jpql.navigationJoinType";
+
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
 
@@ -821,11 +827,11 @@ public class JPQLQuery extends AbstractJPQLQuery
         {
             options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
         }
-        QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters,
-            datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
+        QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters, datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
             candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
-        sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
+        setMapperJoinTypes(sqlMapper);
         sqlMapper.compile();
+
         datastoreCompilation.setParameterNameByPosition(sqlMapper.getParameterNameByPosition());
         datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
 
@@ -1145,7 +1151,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
             }
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
-            sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
+            setMapperJoinTypes(sqlMapper);
             sqlMapper.compile();
 
             if (stmt.hasUpdates())
@@ -1265,7 +1271,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
             }
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameterValues, null, null, candidateCmd, subclasses, getFetchPlan(), ec, null, options, extensions);
-            sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
+            setMapperJoinTypes(sqlMapper);
             sqlMapper.compile();
 
             stmts.add(stmt);
@@ -1285,6 +1291,43 @@ public class JPQLQuery extends AbstractJPQLQuery
                 useInCount = true;
             }
             datastoreCompilation.addStatement(stmt, stmt.getSQLText().toSQL(), useInCount);
+        }
+    }
+
+    private void setMapperJoinTypes(QueryToSQLMapper sqlMapper)
+    {
+        String defaultJoinTypeFilter = getStringExtensionProperty(EXTENSION_NAVIGATION_JOIN_TYPE_FILTER, null);
+        if (defaultJoinTypeFilter != null)
+        {
+            if (defaultJoinTypeFilter.equalsIgnoreCase("INNERJOIN"))
+            {
+                sqlMapper.setDefaultJoinTypeFilter(JoinType.INNER_JOIN);
+            }
+            else if (defaultJoinTypeFilter.equalsIgnoreCase("LEFTOUTERJOIN"))
+            {
+                sqlMapper.setDefaultJoinTypeFilter(JoinType.LEFT_OUTER_JOIN);
+            }
+        }
+        else
+        {
+            sqlMapper.setDefaultJoinTypeFilter(JoinType.INNER_JOIN);
+        }
+
+        String defaultJoinType = getStringExtensionProperty(EXTENSION_NAVIGATION_JOIN_TYPE, null);
+        if (defaultJoinType != null)
+        {
+            if (defaultJoinType.equalsIgnoreCase("INNERJOIN"))
+            {
+                sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
+            }
+            else if (defaultJoinType.equalsIgnoreCase("LEFTOUTERJOIN"))
+            {
+                sqlMapper.setDefaultJoinType(JoinType.LEFT_OUTER_JOIN);
+            }
+        }
+        else
+        {
+            sqlMapper.setDefaultJoinType(JoinType.INNER_JOIN);
         }
     }
 

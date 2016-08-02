@@ -238,7 +238,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     /** Parent mapper if we are processing a subquery. */
     public QueryToSQLMapper parentMapper = null;
 
-    org.datanucleus.store.rdbms.sql.SQLJoin.JoinType defaultJoinType = null;
+    JoinType defaultJoinType = null;
+    JoinType defaultJoinTypeFilter = null;
 
     /**
      * State variable for whether this query is precompilable (hence whether it is cacheable).
@@ -338,9 +339,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      * hence where this method will be used, to define the default.
      * @param joinType The default join type
      */
-    void setDefaultJoinType(org.datanucleus.store.rdbms.sql.SQLJoin.JoinType joinType)
+    void setDefaultJoinType(JoinType joinType)
     {
         this.defaultJoinType = joinType;
+    }
+
+    void setDefaultJoinTypeFilter(JoinType joinType)
+    {
+        this.defaultJoinTypeFilter =joinType;
     }
 
     void setParentMapper(QueryToSQLMapper parent)
@@ -2294,19 +2300,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         // Logic for when one side is cross-joined (variable) and other side not, so transfer to a left outer join
         if (!options.contains(OPTION_EXPLICIT_JOINS))
         {
-            boolean leftIsCrossJoin = (stmt.getJoinTypeForTable(left.getSQLTable()) == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.CROSS_JOIN);
-            boolean rightIsCrossJoin = (stmt.getJoinTypeForTable(right.getSQLTable()) == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.CROSS_JOIN);
+            boolean leftIsCrossJoin = (stmt.getJoinTypeForTable(left.getSQLTable()) == JoinType.CROSS_JOIN);
+            boolean rightIsCrossJoin = (stmt.getJoinTypeForTable(right.getSQLTable()) == JoinType.CROSS_JOIN);
             if (leftIsCrossJoin && !rightIsCrossJoin && !(right instanceof SQLLiteral))
             {
                 // "a == b" and a is cross-joined currently (includes variable) so change to left outer join
                 String varName = getAliasForSQLTable(left.getSQLTable());
-                org.datanucleus.store.rdbms.sql.SQLJoin.JoinType joinType = getRequiredJoinTypeForAlias(varName);
+                JoinType joinType = getRequiredJoinTypeForAlias(varName);
                 if (joinType != null)
                 {
                     NucleusLogger.QUERY.debug("QueryToSQL.eq variable " + varName + " is mapped to table " + left.getSQLTable() +
                         " was previously bound as CROSS JOIN but changing to " + joinType);
                     String leftTblAlias = stmt.removeCrossJoin(left.getSQLTable());
-                    if (joinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN)
+                    if (joinType == JoinType.LEFT_OUTER_JOIN)
                     {
                         stmt.join(JoinType.LEFT_OUTER_JOIN, right.getSQLTable(), right.getJavaTypeMapping(), 
                             left.getSQLTable().getTable(), leftTblAlias, left.getJavaTypeMapping(), null, left.getSQLTable().getGroupName(), true);
@@ -2327,13 +2333,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 // "a == b" and b is cross-joined currently (includes variable) so change to left outer join
                 String varName = getAliasForSQLTable(right.getSQLTable());
-                org.datanucleus.store.rdbms.sql.SQLJoin.JoinType joinType = getRequiredJoinTypeForAlias(varName);
+                JoinType joinType = getRequiredJoinTypeForAlias(varName);
                 if (joinType != null)
                 {
                     NucleusLogger.QUERY.debug("QueryToSQL.eq variable " + varName + " is mapped to table " + right.getSQLTable() +
                         " was previously bound as CROSS JOIN but changing to " + joinType);
                     String rightTblAlias = stmt.removeCrossJoin(right.getSQLTable());
-                    if (joinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN)
+                    if (joinType == JoinType.LEFT_OUTER_JOIN)
                     {
                         stmt.join(JoinType.LEFT_OUTER_JOIN, left.getSQLTable(), left.getJavaTypeMapping(), 
                             right.getSQLTable().getTable(), rightTblAlias, right.getJavaTypeMapping(), null, right.getSQLTable().getGroupName(), true);
@@ -3099,9 +3105,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             sqlTbl = theStmt.getTable(relTable, primaryName);
                             if (sqlTbl == null)
                             {
-                                sqlTbl = SQLStatementHelper.addJoinForOneToOneRelation(theStmt, 
-                                    sqlMapping.table.getTable().getIdMapping(), sqlMapping.table,
-                                    relMapping, relTable, null, null, primaryName, defaultJoinType);
+                                sqlTbl = SQLStatementHelper.addJoinForOneToOneRelation(theStmt, sqlMapping.table.getTable().getIdMapping(), sqlMapping.table,
+                                    relMapping, relTable, null, null, primaryName, getDefaultJoinTypeForNavigation());
                             }
 
                             if (iter.hasNext())
@@ -3207,7 +3212,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (sqlTbl == null)
                                 {
                                     sqlTbl = SQLStatementHelper.addJoinForOneToOneRelation(theStmt, mapping, 
-                                        sqlMapping.table, relMapping, relTable, null, null, primaryName, defaultJoinType);
+                                        sqlMapping.table, relMapping, relTable, null, null, primaryName, getDefaultJoinTypeForNavigation());
                                 }
 
                                 sqlMappingNew = new SQLTableMapping(sqlTbl, relCmd, relMapping);
@@ -3235,13 +3240,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             // Join to the join table
                             CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
-                            if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.INNER_JOIN)
+                            JoinType defJoinType = getDefaultJoinTypeForNavigation();
+                            if (defJoinType == JoinType.INNER_JOIN)
                             {
                                 SQLTable joinSqlTbl = theStmt.join(JoinType.INNER_JOIN, sqlMapping.table, sqlMapping.table.getTable().getIdMapping(), joinTbl, null,
                                     joinTbl.getElementMapping(), null, null, true);
                                 sqlTbl = theStmt.join(JoinType.INNER_JOIN, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, null, relTable.getIdMapping(), null, primaryName, true);
                             }
-                            else if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN || defaultJoinType == null)
+                            else if (defJoinType == JoinType.LEFT_OUTER_JOIN || defJoinType == null)
                             {
                                 SQLTable joinSqlTbl = theStmt.join(JoinType.LEFT_OUTER_JOIN, sqlMapping.table, sqlMapping.table.getTable().getIdMapping(), joinTbl, null,
                                     joinTbl.getElementMapping(), null, null, true);
@@ -3263,18 +3269,18 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             if (!iter.hasNext() && (op == Expression.OP_EQ || op == Expression.OP_GT || op == Expression.OP_LT || op == Expression.OP_GTEQ || 
                                     op == Expression.OP_LTEQ || op == Expression.OP_NOTEQ))
                             {
-                                // Just return the FK mapping since in a "a.b == c.d" type expression and not needing
-                                // to go further than the FK
+                                // Just return the FK mapping since in a "a.b == c.d" type expression and not needing to go further than the FK
                                 sqlMappingNew = new SQLTableMapping(sqlMapping.table, relMmd.getAbstractClassMetaData(), mapping);
                             }
                             else
                             {
                                 // Join to the related table
-                                if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.INNER_JOIN)
+                                JoinType defJoinType = getDefaultJoinTypeForNavigation();
+                                if (defJoinType == JoinType.INNER_JOIN)
                                 {
                                     sqlTbl = theStmt.join(JoinType.INNER_JOIN, sqlMapping.table, mapping, relTable, null, relTable.getIdMapping(), null, primaryName, true);
                                 }
-                                else if (defaultJoinType == org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN || defaultJoinType == null)
+                                else if (defJoinType == JoinType.LEFT_OUTER_JOIN || defJoinType == null)
                                 {
                                     sqlTbl = theStmt.join(JoinType.LEFT_OUTER_JOIN, sqlMapping.table, mapping, relTable, null, relTable.getIdMapping(), null, primaryName, true);
                                 }
@@ -3320,10 +3326,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     }
 
     /**
-     * Method to process a parameter expression. The optional argument controls whether we should
-     * create this as a parameter or as a literal (i.e the param value is known etc).
-     * If the parameter doesn't have its value defined then returns ParameterLiteral
-     * otherwise we get an XXXLiteral of the (declared) type of the parameter
+     * Method to process a parameter expression. 
+     * The optional argument controls whether we should create this as a parameter or as a literal (i.e the param value is known etc).
+     * If the parameter doesn't have its value defined then returns ParameterLiteral otherwise we get an XXXLiteral of the (declared) type of the parameter
      * @param expr The ParameterExpression
      * @param asLiteral Whether to create a SQLLiteral rather than a parameter literal
      * @return The processed expression
@@ -3481,9 +3486,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         // Create the SQLExpression for this parameter, either as value-literal or as parameter-literal
         SQLExpression sqlExpr = null;
-        boolean nullParamValueUsesIsNull = options.contains(OPTION_NULL_PARAM_USE_IS_NULL);
-
-        if (paramValueSet && paramValue == null && nullParamValueUsesIsNull)
+        if (paramValueSet && paramValue == null && options.contains(OPTION_NULL_PARAM_USE_IS_NULL))
         {
             // Value is set to null, but we enforce a NullLiteral for the case of null comparisons e.g we don't want "field = ?", but instead "field IS NULL" 
             sqlExpr = exprFactory.newLiteral(stmt, null, null);
@@ -4343,12 +4346,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
     /**
      * Convenience method to return the required join type for the specified alias.
-     * If the table has a join type defined as an extension "datanucleus.query.jdoql.{alias}.join"
-     * then this returns the type. Otherwise returns null.
+     * If the table has a join type defined as an extension "datanucleus.query.jdoql.{alias}.join" then this returns the type. Otherwise returns null.
      * @param alias The alias
      * @return The join type required (if any)
      */
-    public org.datanucleus.store.rdbms.sql.SQLJoin.JoinType getRequiredJoinTypeForAlias(String alias)
+    public JoinType getRequiredJoinTypeForAlias(String alias)
     {
         if (alias == null)
         {
@@ -4360,20 +4362,38 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         String extensionName = "datanucleus.query.jdoql." + alias + ".join";
-        org.datanucleus.store.rdbms.sql.SQLJoin.JoinType joinType = null;
+        JoinType joinType = null;
         if (hasExtension(extensionName))
         {
             String joinValue = (String)getValueForExtension(extensionName);
             if (joinValue.equalsIgnoreCase("INNERJOIN"))
             {
-                joinType = org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.INNER_JOIN;
+                joinType = JoinType.INNER_JOIN;
             }
             else if (joinValue.equalsIgnoreCase("LEFTOUTERJOIN"))
             {
-                joinType = org.datanucleus.store.rdbms.sql.SQLJoin.JoinType.LEFT_OUTER_JOIN;
+                joinType = JoinType.LEFT_OUTER_JOIN;
             }
         }
         return joinType;
+    }
+
+    /**
+     * Convenience method to return the default join type to use for a relation navigation.
+     * Uses the compilation component to decide what to use.
+     * @return The join type to use
+     */
+    private JoinType getDefaultJoinTypeForNavigation()
+    {
+        if (compileComponent == CompilationComponent.FILTER)
+        {
+            if (defaultJoinTypeFilter != null)
+            {
+                // Use filter setting if provided, otherwise overall default
+                return defaultJoinTypeFilter;
+            }
+        }
+        return defaultJoinType;
     }
 
     /**
