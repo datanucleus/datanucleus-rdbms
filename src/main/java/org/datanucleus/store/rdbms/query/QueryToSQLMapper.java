@@ -3630,7 +3630,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (invokedSqlExpr instanceof NullLiteral)
         {
             // We cannot invoke anything on a null TODO Handle this "NPE"
-            NucleusLogger.QUERY.warn(">> Compilation of InvokeExpression needs to invoke method \"" + expr.getOperation() + "\" on " + invokedSqlExpr + " but not possible");
+            NucleusLogger.QUERY.warn("Compilation of InvokeExpression needs to invoke method \"" + expr.getOperation() + "\" on " + invokedSqlExpr + " but not possible");
         }
 
         String operation = expr.getOperation();
@@ -4272,6 +4272,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(subStmt, subCompilation, parameters, null, subqueryResultMapping, subCmd, true, fetchPlan, ec, importsDefinition, options,
                 extensionsByName);
+            sqlMapper.setDefaultJoinType(defaultJoinType);
+            sqlMapper.setDefaultJoinTypeFilter(defaultJoinTypeFilter);
             sqlMapper.setParentMapper(this);
             sqlMapper.compile();
 
