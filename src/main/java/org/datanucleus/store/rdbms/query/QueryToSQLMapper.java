@@ -432,7 +432,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     public void compile()
     {
-        if (NucleusLogger.QUERY.isDebugEnabled())
+        if (NucleusLogger.QUERY.isDebugEnabled() && parentMapper == null)
         {
             // Give debug output of compilation
             StringBuilder str = new StringBuilder("JoinType : navigation(default=");
@@ -717,9 +717,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         validateExpressionForResult(sqlExpr);
                         if (sqlExpr instanceof SQLLiteral)
                         {
-                            int[] cols = stmt.select(sqlExpr, alias);
                             StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                            idx.setColumnPositions(cols);
+                            idx.setColumnPositions(stmt.select(sqlExpr, alias));
                             if (alias != null)
                             {
                                 resultAliases.add(alias);
@@ -729,9 +728,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
                         else
                         {
-                            int[] cols = stmt.select(sqlExpr.getSQLTable(), sqlExpr.getJavaTypeMapping(), alias);
                             StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                            idx.setColumnPositions(cols);
+                            idx.setColumnPositions(stmt.select(sqlExpr.getSQLTable(), sqlExpr.getJavaTypeMapping(), alias));
                             if (alias != null)
                             {
                                 resultAliases.add(alias);
@@ -746,9 +744,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     processParameterExpression((ParameterExpression)resultExprs[i], true); // Second argument : parameters are literals in result
                     SQLExpression sqlExpr = stack.pop();
                     validateExpressionForResult(sqlExpr);
-                    int[] cols = stmt.select(sqlExpr, alias);
+
                     StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(cols);
+                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
                     if (alias != null)
                     {
                         resultAliases.add(alias);
@@ -768,9 +766,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         sqlExpr = stack.pop();
                         NucleusLogger.QUERY.debug("QueryToSQL.exprResult variable was still unbound, so binding via cross-join");
                     }
+
                     StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    int[] cols = stmt.select(sqlExpr, alias);
-                    idx.setColumnPositions(cols);
+                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
                     if (alias != null)
                     {
                         resultAliases.add(alias);
@@ -783,9 +781,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     processLiteral((Literal)resultExprs[i]);
                     SQLExpression sqlExpr = stack.pop();
                     validateExpressionForResult(sqlExpr);
-                    int[] cols = stmt.select(sqlExpr, alias);
+
                     StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(cols);
+                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
                     if (alias != null)
                     {
                         resultAliases.add(alias);
@@ -838,9 +836,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     {
                         resultExprs[i].evaluate(this);
                         SQLExpression sqlExpr = stack.pop();
-                        int[] cols = stmt.select(sqlExpr, alias);
+
                         StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                        idx.setColumnPositions(cols);
+                        idx.setColumnPositions(stmt.select(sqlExpr, alias));
                         if (alias != null)
                         {
                             resultAliases.add(alias);
@@ -1022,7 +1020,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         SQLExpression verExpr = new NumericExpression(stmt, verSqlTbl, verMapping);
                         SQLExpression incrExpr = verExpr.add(new IntegerLiteral(stmt, 
                             stmt.getSQLExpressionFactory().getMappingForType(Integer.class, false), Integer.valueOf(1), null));
-
                         updateSqlExpr = verExpr.eq(incrExpr);
 
                         SQLExpression[] oldArray = updateSqlExprs;
@@ -1039,7 +1036,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         Object newVersion = VersionHelper.getNextVersion(vermd.getVersionStrategy(), null);
                         JavaTypeMapping valMapping = stmt.getSQLExpressionFactory().getMappingForType(newVersion.getClass(), false);
                         SQLExpression valExpr = new TemporalLiteral(stmt, valMapping, newVersion, null);
-
                         updateSqlExpr = verExpr.eq(valExpr);
 
                         SQLExpression[] oldArray = updateSqlExprs;
@@ -1087,9 +1083,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression[] groupExprs = compilation.getExprGrouping();
             for (int i = 0; i < groupExprs.length; i++)
             {
-                Expression groupExpr = groupExprs[i];
-                SQLExpression sqlGroupExpr = (SQLExpression)groupExpr.evaluate(this);
-                stmt.addGroupingExpression(sqlGroupExpr);
+                stmt.addGroupingExpression((SQLExpression)groupExprs[i].evaluate(this));
             }
             compileComponent = null;
         }
@@ -1318,7 +1312,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                         if (i == 0)
                         {
-                            // Add where clause join table to outer table
+                            // Add where clause join table (owner) to outer table (id)
                             SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                             SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
@@ -1365,7 +1359,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                         if (i == 0)
                         {
-                            // Add where clause join table to outer table
+                            // Add where clause join table (owner) to outer table (id)
                             SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                             SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
@@ -1405,8 +1399,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             if (i == 0)
                             {
-                                // Add where clause join table to outer table
-                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                                // Add where clause join table (element) to outer table (id)
+                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                                 SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping());
                                 stmt.whereAnd(outerExpr.eq(joinExpr), false);
                             }
@@ -1420,8 +1414,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             if (i == 0)
                             {
-                                // Add where clause join table to outer table
-                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                                // Add where clause join table (value) to outer table (id)
+                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                                 SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((MapTable)joinTbl).getValueMapping());
                                 stmt.whereAnd(outerExpr.eq(joinExpr), false);
                             }
