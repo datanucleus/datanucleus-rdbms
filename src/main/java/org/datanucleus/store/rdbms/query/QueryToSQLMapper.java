@@ -1198,7 +1198,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                             SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
                         }
@@ -1244,7 +1244,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (i == 0)
                         {
                             // Add where clause join table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
                             SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
                             stmt.whereAnd(outerExpr.eq(joinExpr), false);
                         }
