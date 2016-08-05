@@ -61,6 +61,7 @@ import org.datanucleus.metadata.ForeignKeyMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.IndexMetaData;
+import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.JdbcType;
@@ -735,6 +736,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     DatastoreClass dc = storeMgr.getDatastoreClass(elementCmds[i].getFullClassName(), clr);
                                     if (dc == null)
                                     {
+                                        InheritanceMetaData inhmd = elementCmds[i].getInheritanceMetaData();
+                                        if (inhmd != null && inhmd.getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                                        {
+                                            throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + 
+                                                " since element has no table of its own ; using COMPLETE_TABLE inheritance and is abstract?");
+                                        }
                                         throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
                                     }
                                     ClassTable ct = (ClassTable) dc;
