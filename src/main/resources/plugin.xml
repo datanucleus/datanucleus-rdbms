@@ -803,6 +803,7 @@ Contributors:
         <sql-method method="log" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction2" datastore="postgresql"/>
         <sql-method method="max" evaluator="org.datanucleus.store.rdbms.sql.method.MaxFunction"/>
         <sql-method method="min" evaluator="org.datanucleus.store.rdbms.sql.method.MinFunction"/>
+        <sql-method method="power" evaluator="org.datanucleus.store.rdbms.sql.method.PowerFunction"/>
         <sql-method method="sin" evaluator="org.datanucleus.store.rdbms.sql.method.SinFunction"/>
         <sql-method method="sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
         <sql-method method="sum" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
@@ -826,6 +827,7 @@ Contributors:
         <sql-method method="LOG" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction"/>
         <sql-method method="MAX" evaluator="org.datanucleus.store.rdbms.sql.method.MaxFunction"/>
         <sql-method method="MIN" evaluator="org.datanucleus.store.rdbms.sql.method.MinFunction"/>
+        <sql-method method="POWER" evaluator="org.datanucleus.store.rdbms.sql.method.PowerFunction"/>
         <sql-method method="SIN" evaluator="org.datanucleus.store.rdbms.sql.method.SinFunction"/>
         <sql-method method="SQRT" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
         <sql-method method="SUM" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
@@ -847,6 +849,7 @@ Contributors:
         <sql-method method="Math.exp" evaluator="org.datanucleus.store.rdbms.sql.method.MathExpMethod"/>
         <sql-method method="Math.floor" evaluator="org.datanucleus.store.rdbms.sql.method.MathFloorMethod"/>
         <sql-method method="Math.log" evaluator="org.datanucleus.store.rdbms.sql.method.MathLogMethod"/>
+        <sql-method method="Math.power" evaluator="org.datanucleus.store.rdbms.sql.method.MathPowerMethod"/>
         <sql-method method="Math.sin" evaluator="org.datanucleus.store.rdbms.sql.method.MathSinMethod"/>
         <sql-method method="Math.sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.MathSqrtMethod"/>
         <sql-method method="Math.tan" evaluator="org.datanucleus.store.rdbms.sql.method.MathTanMethod"/>
