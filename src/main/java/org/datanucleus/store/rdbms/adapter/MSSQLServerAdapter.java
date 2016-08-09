@@ -450,18 +450,6 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         return "INSERT INTO " + table.toString() + " DEFAULT VALUES";
     }
 
-    /**
-     * An operator in a string expression that concatenates two or more
-     * character or binary strings, columns, or a combination of strings and
-     * column names into one expression (a string operator).
-     * 
-     * @return the operator SQL String
-     */
-    public String getOperatorConcat()
-    {
-        return "+";
-    }
-    
     public String getSelectWithLockOption()
     {
         return "(UPDLOCK, ROWLOCK)";

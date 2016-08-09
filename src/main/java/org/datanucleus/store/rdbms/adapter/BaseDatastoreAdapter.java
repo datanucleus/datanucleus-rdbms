@@ -1667,18 +1667,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     /**
-     * An operator in a string expression that concatenates two or more
-     * character or binary strings, columns, or a combination of strings and
-     * column names into one expression (a string operator).
-     * 
-     * @return the operator SQL String
-     */
-    public String getOperatorConcat()
-    {
-        return "||";
-    }
-
-    /**
      * return whether this exception represents a cancelled statement.
      * @param sqle the exception
      * @return whether it is a cancel
