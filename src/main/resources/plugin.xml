@@ -1162,6 +1162,7 @@ Contributors:
         <sql-operation name="mod" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod3Operation"/>
 
         <sql-operation name="concat" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
+        <sql-operation name="concat" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
         <sql-operation name="concat" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
         <sql-operation name="concat" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
 
