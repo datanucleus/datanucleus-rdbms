@@ -658,11 +658,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                             throw new NucleusException("Unable to add foreign-key to " + 
                                                 elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
                                         }
-                                        ClassTable ct = (ClassTable) dc;
-                                        if (ct.isInitialized())
+                                        if (dc instanceof ClassTable)
                                         {
-                                            // if the target table is already initialized, run the callbacks
-                                            ct.runCallBacks(clr);
+                                            ClassTable ct = (ClassTable) dc;
+                                            if (ct.isInitialized())
+                                            {
+                                                // if the target table is already initialized, run the callbacks
+                                                ct.runCallBacks(clr);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
+                                                " yet the related element uses a VIEW so not remotely adding element FK owner column; assumed to be part of the VIEW definition");
                                         }
                                     }
                                 }
@@ -744,11 +752,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         }
                                         throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
                                     }
-                                    ClassTable ct = (ClassTable) dc;
-                                    if (ct.isInitialized())
+                                    if (dc instanceof ClassTable)
                                     {
-                                        // if the target table is already initialized, run the callbacks
-                                        ct.runCallBacks(clr);
+                                        ClassTable ct = (ClassTable) dc;
+                                        if (ct.isInitialized())
+                                        {
+                                            // if the target table is already initialized, run the callbacks
+                                            ct.runCallBacks(clr);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
+                                            " yet the related element uses a VIEW so not remotely adding element FK owner column; assumed to be part of the VIEW definition");
                                     }
                                 }
                             }
@@ -784,11 +800,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     {
                                         storeMgr.addSchemaCallback(valueCmds[i].getFullClassName(), mmd);
                                         DatastoreClass dc = storeMgr.getDatastoreClass(valueCmds[i].getFullClassName(), clr);
-                                        ClassTable ct = (ClassTable) dc;
-                                        if (ct.isInitialized())
+                                        if (dc instanceof ClassTable)
                                         {
-                                            // if the target table is already initialized, run the callbacks
-                                            ct.runCallBacks(clr);
+                                            ClassTable ct = (ClassTable) dc;
+                                            if (ct.isInitialized())
+                                            {
+                                                // if the target table is already initialized, run the callbacks
+                                                ct.runCallBacks(clr);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
+                                                " yet the related value uses a VIEW so not remotely adding value owner FK column; assumed to be part of the VIEW definition");
                                         }
                                     }
                                 }
@@ -821,11 +845,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     {
                                         storeMgr.addSchemaCallback(keyCmds[i].getFullClassName(), mmd);
                                         DatastoreClass dc = storeMgr.getDatastoreClass(keyCmds[i].getFullClassName(), clr);
-                                        ClassTable ct = (ClassTable) dc;
-                                        if (ct.isInitialized())
+                                        if (dc instanceof ClassTable)
                                         {
-                                            // if the target table is already initialized, run the callbacks
-                                            ct.runCallBacks(clr);
+                                            ClassTable ct = (ClassTable) dc;
+                                            if (ct.isInitialized())
+                                            {
+                                                // if the target table is already initialized, run the callbacks
+                                                ct.runCallBacks(clr);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
+                                                " yet the related key uses a VIEW so not remotely adding key FK owner column; assumed to be part of the VIEW definition");
                                         }
                                     }
                                 }
@@ -1334,8 +1366,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 if (ownerTbl == null)
                                 {
                                     // Class doesn't have its own table (subclass-table) so find where it persists
-                                    AbstractClassMetaData[] ownerParentCmds = 
-                                        storeMgr.getClassesManagingTableForClass(ownerFmd.getAbstractClassMetaData(), clr);
+                                    AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(ownerFmd.getAbstractClassMetaData(), clr);
                                     if (ownerParentCmds.length > 1)
                                     {
                                         throw new NucleusUserException("Relation (" + ownerFmd.getFullFieldName() +
