@@ -188,16 +188,19 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
         }
 
-        orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
         // TODO If we have List<interface> we need to find the index by mappedBy name
         if (mmd.getOrderMetaData() != null && !mmd.getOrderMetaData().isIndexedList())
         {
             indexedList = false;
         }
-        if (orderMapping == null && indexedList)
+        if (indexedList)
         {
-            // "Indexed List" but no order mapping present!
-            throw new NucleusUserException(Localiser.msg("056041", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+            orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            if (orderMapping == null)
+            {
+                // "Indexed List" but no order mapping present!
+                throw new NucleusUserException(Localiser.msg("056041", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
+            }
         }
 
         relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
