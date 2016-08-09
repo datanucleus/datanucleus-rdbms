@@ -470,13 +470,15 @@ public class ClassView extends ViewImpl implements DatastoreClass
         return null; // No versions for Views
     }
 
-    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData fmd, int mappingType)
+    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, int mappingType)
     {
-        throw new NucleusException("N/A").setFatal();
+        // We do not support "external mappings" with a view. The mapping must be present in the view definition
+        return null;
     }
 
     public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, int mappingType)
     {
-        throw new NucleusException("N/A").setFatal();
+        // We do not support "external mappings" with a view. The mapping must be present in the view definition
+        return null;
     }
 }
