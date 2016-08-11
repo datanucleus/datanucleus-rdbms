@@ -38,6 +38,7 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.exceptions.NoSuchPersistentFieldException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -97,15 +98,15 @@ public class ClassView extends ViewImpl implements DatastoreClass
         }
 
         // Extract the view definition from MetaData
-        String viewImpStr = cmd.getValueForExtension("view-imports");
+        String viewImpStr = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_IMPORTS);
         String viewDefStr = null;
         if (dba.getVendorID() != null)
         {
-            viewDefStr = cmd.getValueForExtension("view-definition" + '-' + dba.getVendorID());
+            viewDefStr = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION + '-' + dba.getVendorID());
         }
         if (viewDefStr == null)
         {
-            viewDefStr = cmd.getValueForExtension("view-definition");
+            viewDefStr = cmd.getValueForExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
         }
         if (viewDefStr == null)
         {

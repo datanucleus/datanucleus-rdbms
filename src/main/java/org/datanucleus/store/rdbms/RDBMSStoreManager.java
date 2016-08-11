@@ -3211,11 +3211,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         boolean hasViewDef = false;
                         if (dba.getVendorID() != null)
                         {
-                            hasViewDef = cmd.hasExtension("view-definition" + '-' + dba.getVendorID());
+                            hasViewDef = cmd.hasExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION + '-' + dba.getVendorID());
                         }
                         if (!hasViewDef)
                         {
-                            hasViewDef = cmd.hasExtension("view-definition");
+                            hasViewDef = cmd.hasExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
                         }
                         if (hasViewDef)
                         {
