@@ -590,6 +590,17 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         updateExpr.getRight().evaluate(this);
                         rightSqlExpr = stack.pop();
                     }
+                    else if (updateExpr.getRight() instanceof VariableExpression)
+                    {
+                        // Subquery?
+                        processVariableExpression((VariableExpression)updateExpr.getRight());
+                        rightSqlExpr = stack.pop();
+                        if (rightSqlExpr instanceof UnboundExpression)
+                        {
+                            // TODO Support whatever this is
+                            throw new NucleusException("Found UnboundExpression in UPDATE clause!");
+                        }
+                    }
                     else
                     {
                         throw new NucleusException("Dont currently support update clause containing right expression of type " + updateExpr.getRight());
