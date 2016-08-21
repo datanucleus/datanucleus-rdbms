@@ -1748,24 +1748,36 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             previousMapping = null;
                             if (mmd.hasCollection())
                             {
-                                // TODO Cater for embedded element
-                                relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
                                 cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
-                                relMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                                if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
+                                if (mmd.getCollection().isEmbeddedElement() && mmd.getJoinMetaData() != null)
                                 {
-                                    // Join to join table, then to related table
-                                    ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
-                                    SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
-                                    sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    // Embedded element stored in join table
+                                    CollectionTable relEmbTable = (CollectionTable)storeMgr.getTable(mmd);
+                                    JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = relEmbTable.getElementMapping();
                                 }
                                 else
                                 {
-                                    // Join to related table
-                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName, true);
+                                    relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
+                                    relMmd = mmd.getRelatedMemberMetaData(clr)[0];
+                                    if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
+                                    {
+                                        // Join to join table, then to related table
+                                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
+                                        SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+                                        sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    }
+                                    else
+                                    {
+                                        // Join to related table
+                                        sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName, true);
+                                    }
+                                    tblIdMapping = sqlTbl.getTable().getIdMapping();
+                                    tblMappingSqlTbl = sqlTbl;
                                 }
-                                tblIdMapping = sqlTbl.getTable().getIdMapping();
-                                tblMappingSqlTbl = sqlTbl;
                             }
                             else if (mmd.hasMap())
                             {
@@ -1826,25 +1838,37 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             previousMapping = null;
                             if (mmd.hasCollection())
                             {
-                                // TODO Cater for embedded element
-                                relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
                                 cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
-                                if (mmd.getJoinMetaData() != null)
+                                if (mmd.getCollection().isEmbeddedElement() && mmd.getJoinMetaData() != null)
                                 {
-                                    // Join to join table, then to related table
-                                    ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
-                                    SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
-                                    sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    // Embedded element stored in join table
+                                    CollectionTable relEmbTable = (CollectionTable)storeMgr.getTable(mmd);
+                                    JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = relEmbTable.getElementMapping();
                                 }
                                 else
                                 {
-                                    // Join to related table
-                                    JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
-                                }
+                                    relTable = storeMgr.getDatastoreClass(mmd.getCollection().getElementType(), clr);
+                                    if (mmd.getJoinMetaData() != null)
+                                    {
+                                        // Join to join table, then to related table
+                                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
+                                        SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+                                        sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    }
+                                    else
+                                    {
+                                        // Join to related table
+                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
+                                    }
 
-                                tblMappingSqlTbl = sqlTbl;
-                                tblIdMapping = tblMappingSqlTbl.getTable().getIdMapping();
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = tblMappingSqlTbl.getTable().getIdMapping();
+                                }
                             }
                             else if (mmd.hasMap())
                             {
