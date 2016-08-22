@@ -250,9 +250,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     static class SQLTableMapping
     {
         SQLTable table;
-        AbstractClassMetaData cmd;
         JavaTypeMapping mapping;
-
+        AbstractClassMetaData cmd;
         AbstractMemberMetaData mmd;
 
         public SQLTableMapping(SQLTable tbl, AbstractClassMetaData cmd, JavaTypeMapping m)
@@ -1030,8 +1029,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // Increment the version
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());
                         SQLExpression verExpr = new NumericExpression(stmt, verSqlTbl, verMapping);
-                        SQLExpression incrExpr = verExpr.add(new IntegerLiteral(stmt, 
-                            stmt.getSQLExpressionFactory().getMappingForType(Integer.class, false), Integer.valueOf(1), null));
+                        SQLExpression incrExpr = verExpr.add(new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(1), null));
                         updateSqlExpr = verExpr.eq(incrExpr);
 
                         SQLExpression[] oldArray = updateSqlExprs;
@@ -1046,7 +1044,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());
                         SQLExpression verExpr = new NumericExpression(stmt, verSqlTbl, verMapping);
                         Object newVersion = VersionHelper.getNextVersion(vermd.getVersionStrategy(), null);
-                        JavaTypeMapping valMapping = stmt.getSQLExpressionFactory().getMappingForType(newVersion.getClass(), false);
+                        JavaTypeMapping valMapping = exprFactory.getMappingForType(newVersion.getClass(), false);
                         SQLExpression valExpr = new TemporalLiteral(stmt, valMapping, newVersion, null);
                         updateSqlExpr = verExpr.eq(valExpr);
 
@@ -2140,19 +2138,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         BooleanExpression right = (BooleanExpression)rightExpr;
         BooleanExpression left = (BooleanExpression)leftExpr;
-        if (left.getSQLStatement() != null && right.getSQLStatement() != null &&
-            left.getSQLStatement() != right.getSQLStatement())
+        if (left.getSQLStatement() != null && right.getSQLStatement() != null && left.getSQLStatement() != right.getSQLStatement())
         {
-            if (left.getSQLStatement() == stmt &&
-                right.getSQLStatement().isChildStatementOf(stmt))
+            if (left.getSQLStatement() == stmt && right.getSQLStatement().isChildStatementOf(stmt))
             {
                 // Apply right to its sub-statement now and return left
                 right.getSQLStatement().whereAnd(right, true);
                 stack.push(left);
                 return left;
             }
-            else if (right.getSQLStatement() == stmt &&
-                left.getSQLStatement().isChildStatementOf(stmt))
+            else if (right.getSQLStatement() == stmt && left.getSQLStatement().isChildStatementOf(stmt))
             {
                 // Apply left to its sub-statement now and return right
                 left.getSQLStatement().whereAnd(left, true);
@@ -2607,7 +2602,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         BooleanExpression opExpr = left.lt(right);
-
         stack.push(opExpr);
         return opExpr;
     }
@@ -2617,8 +2611,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected Object processLiteral(Literal expr)
     {
-        Object litValue = expr.getLiteral();
-        SQLExpression sqlExpr = getSQLLiteralForLiteralValue(litValue);
+        SQLExpression sqlExpr = getSQLLiteralForLiteralValue(expr.getLiteral());
         stack.push(sqlExpr);
         return sqlExpr;
     }
@@ -2635,6 +2628,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             String litStr = (String)litValue;
             if (litStr.startsWith("{d ") || litStr.startsWith("{t ") || litStr.startsWith("{ts "))
             {
+                // JDBC escape syntax
                 JavaTypeMapping m = exprFactory.getMappingForType(Date.class, false);
                 return exprFactory.newLiteral(stmt, m, litValue);
             }
@@ -2689,15 +2683,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // Should have a discriminator always when casting this
                         AbstractClassMetaData fieldCmd = ec.getMetaDataManager().getMetaDataForClass(castType, clr);
                         DiscriminatorMetaData dismd = fieldCmd.getDiscriminatorMetaDataRoot();
-                        SQLExpression discExpr = stmt.getSQLExpressionFactory().newExpression(stmt, sqlExpr.getSQLTable(), discMapping);
+                        SQLExpression discExpr = exprFactory.newExpression(stmt, sqlExpr.getSQLTable(), discMapping);
                         SQLExpression discVal = null;
                         if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                         {
-                            discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, castCmd.getFullClassName());
+                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getFullClassName());
                         }
                         else
                         {
-                            discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, castCmd.getDiscriminatorMetaData().getValue());
+                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getDiscriminatorMetaData().getValue());
                         }
                         BooleanExpression discRestrictExpr = discExpr.eq(discVal);
 
@@ -2705,15 +2699,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         while (subclassIter.hasNext())
                         {
                             String subclassName = subclassIter.next();
-                            AbstractClassMetaData subtypeCmd =
-                                storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
+                            AbstractClassMetaData subtypeCmd = storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
                             if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                             {
-                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
+                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
                             }
                             else
                             {
-                                discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getDiscriminatorMetaData().getValue());
+                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getDiscriminatorMetaData().getValue());
                             }
                             BooleanExpression subtypeExpr = discExpr.eq(discVal);
 
@@ -2849,7 +2842,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
 
                 SQLTableMapping sqlMapping = getSQLTableMappingForPrimaryExpression(varSqlExpr.getSQLStatement(), varExpr.getId(), expr, Boolean.FALSE);
-
                 sqlExpr = exprFactory.newExpression(sqlMapping.table.getSQLStatement(), sqlMapping.table, sqlMapping.mapping);
                 stack.push(sqlExpr);
                 return sqlExpr;
@@ -3159,6 +3151,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             // Member is in own table, so move to that SQL table mapping
                             DatastoreClass relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                             JavaTypeMapping relMapping = relTable.getMemberMapping(relMmd);
+
                             // Join to related table unless we already have the join in place
                             sqlTbl = theStmt.getTable(relTable, primaryName);
                             if (sqlTbl == null)
@@ -3324,8 +3317,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (sqlTbl == null)
                         {
                             Operator op = (primExpr.getParent() != null ? primExpr.getParent().getOperator() : null);
-                            if (!iter.hasNext() && (op == Expression.OP_EQ || op == Expression.OP_GT || op == Expression.OP_LT || op == Expression.OP_GTEQ || 
-                                    op == Expression.OP_LTEQ || op == Expression.OP_NOTEQ))
+                            if (!iter.hasNext() && 
+                                (op == Expression.OP_EQ || op == Expression.OP_GT || op == Expression.OP_LT || op == Expression.OP_GTEQ || op == Expression.OP_LTEQ || op == Expression.OP_NOTEQ))
                             {
                                 // Just return the FK mapping since in a "a.b == c.d" type expression and not needing to go further than the FK
                                 sqlMappingNew = new SQLTableMapping(sqlMapping.table, relMmd.getAbstractClassMetaData(), mapping);
@@ -4341,8 +4334,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             stack.push(subExpr);
             return subExpr;
         }
-        else if (stmt.getParentStatement() != null && parentMapper != null && 
-                parentMapper.candidateAlias != null && parentMapper.candidateAlias.equals(varName))
+        else if (stmt.getParentStatement() != null && parentMapper != null && parentMapper.candidateAlias != null && parentMapper.candidateAlias.equals(varName))
         {
             // Variable in subquery linking back to parent query
             SQLExpression varExpr = exprFactory.newExpression(stmt.getParentStatement(), stmt.getParentStatement().getPrimaryTable(),
@@ -4470,13 +4462,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Object paramFieldValue = null;
             if (ec.getApiAdapter().isPersistable(obj))
             {
-                ObjectProvider paramSM = ec.findObjectProvider(obj);
+                ObjectProvider paramOP = ec.findObjectProvider(obj);
                 AbstractClassMetaData paramCmd = ec.getMetaDataManager().getMetaDataForClass(obj.getClass(), clr);
                 AbstractMemberMetaData paramFieldMmd = paramCmd.getMetaDataForMember(fieldName);
-                if (paramSM != null)
+                if (paramOP != null)
                 {
-                    paramSM.isLoaded(paramFieldMmd.getAbsoluteFieldNumber());
-                    paramFieldValue = paramSM.provideField(paramFieldMmd.getAbsoluteFieldNumber());
+                    paramOP.isLoaded(paramFieldMmd.getAbsoluteFieldNumber());
+                    paramFieldValue = paramOP.provideField(paramFieldMmd.getAbsoluteFieldNumber());
                 }
                 else
                 {
@@ -4559,23 +4551,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             return;
         }
-        if (options.contains(OPTION_CASE_INSENSITIVE))
-        {
-            sqlTableByPrimary.put(alias.toUpperCase(), mapping);
-        }
-        else
-        {
-            sqlTableByPrimary.put(alias, mapping);
-        }
+        sqlTableByPrimary.put(options.contains(OPTION_CASE_INSENSITIVE) ? alias.toUpperCase() : alias, mapping);
     }
 
     protected boolean hasSQLTableMappingForAlias(String alias)
     {
-        if (options.contains(OPTION_CASE_INSENSITIVE))
-        {
-            return sqlTableByPrimary.containsKey(alias.toUpperCase());
-        }
-        return sqlTableByPrimary.containsKey(alias);
+        return sqlTableByPrimary.containsKey(options.contains(OPTION_CASE_INSENSITIVE) ? alias.toUpperCase() : alias);
     }
 
     /**
