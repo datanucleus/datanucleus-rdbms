@@ -127,6 +127,7 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
+import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -1746,10 +1747,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             previousMapping = null;
                             if (mmd.hasCollection())
                             {
+                                // Join across COLLECTION relation
                                 cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
                                 if (mmd.getCollection().isEmbeddedElement() && mmd.getJoinMetaData() != null)
                                 {
-                                    // Embedded element stored in join table
+                                    // Embedded element stored in (collection) join table
                                     CollectionTable relEmbTable = (CollectionTable)storeMgr.getTable(mmd);
                                     JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
@@ -1779,6 +1781,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                             else if (mmd.hasMap())
                             {
+                                // Join across MAP relation
                                 MapMetaData mapmd = mmd.getMap();
                                 tblMmd = mmd;
                                 tblIdMapping = sqlTbl.getTable().getMemberMapping(mmd);
@@ -1830,16 +1833,51 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     // TODO Join to value if entity?
                                 }
                             }
+                            else if (mmd.hasArray())
+                            {
+                                // Join across ARRAY relation
+                                cmd = mmd.getArray().getElementClassMetaData(clr, mmgr);
+                                if (mmd.getArray().isEmbeddedElement() && mmd.getJoinMetaData() != null)
+                                {
+                                    // Embedded element stored in (array) join table
+                                    ArrayTable relEmbTable = (ArrayTable)storeMgr.getTable(mmd);
+                                    JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = relEmbTable.getElementMapping();
+                                }
+                                else
+                                {
+                                    relTable = storeMgr.getDatastoreClass(mmd.getArray().getElementType(), clr);
+                                    relMmd = mmd.getRelatedMemberMetaData(clr)[0];
+                                    if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
+                                    {
+                                        // Join to join table, then to related table
+                                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
+                                        SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+                                        sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    }
+                                    else
+                                    {
+                                        // Join to related table
+                                        sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName, true);
+                                    }
+                                    tblIdMapping = sqlTbl.getTable().getIdMapping();
+                                    tblMappingSqlTbl = sqlTbl;
+                                }
+                            }
                         }
                         else if (relationType == RelationType.ONE_TO_MANY_UNI)
                         {
                             previousMapping = null;
                             if (mmd.hasCollection())
                             {
+                                // Join across COLLECTION relation
                                 cmd = mmd.getCollection().getElementClassMetaData(clr, mmgr);
                                 if (mmd.getCollection().isEmbeddedElement() && mmd.getJoinMetaData() != null)
                                 {
-                                    // Embedded element stored in join table
+                                    // Embedded element stored in (collection) join table
                                     CollectionTable relEmbTable = (CollectionTable)storeMgr.getTable(mmd);
                                     JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
@@ -1870,6 +1908,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                             else if (mmd.hasMap())
                             {
+                                // Join across MAP relation
                                 MapMetaData mapmd = mmd.getMap();
                                 cmd = mapmd.getValueClassMetaData(clr, mmgr);
                                 tblMmd = mmd;
@@ -1920,6 +1959,41 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
                                     // TODO Join to value if entity?
+                                }
+                            }
+                            else if (mmd.hasArray())
+                            {
+                                // Join across ARRAY relation
+                                cmd = mmd.getArray().getElementClassMetaData(clr, mmgr);
+                                if (mmd.getArray().isEmbeddedElement() && mmd.getJoinMetaData() != null)
+                                {
+                                    // Embedded element stored in (array) join table
+                                    ArrayTable relEmbTable = (ArrayTable)storeMgr.getTable(mmd);
+                                    JavaTypeMapping relOwnerMapping = relEmbTable.getOwnerMapping();
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relEmbTable, aliasForJoin, relOwnerMapping, null, joinTableGroupName, true);
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = relEmbTable.getElementMapping();
+                                }
+                                else
+                                {
+                                    relTable = storeMgr.getDatastoreClass(mmd.getArray().getElementType(), clr);
+                                    if (mmd.getJoinMetaData() != null)
+                                    {
+                                        // Join to join table, then to related table
+                                        ElementContainerTable joinTbl = (ElementContainerTable)storeMgr.getTable(mmd);
+                                        SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+                                        sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    }
+                                    else
+                                    {
+                                        // Join to related table
+                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
+                                    }
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = tblMappingSqlTbl.getTable().getIdMapping();
                                 }
                             }
                         }
