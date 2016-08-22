@@ -26,12 +26,13 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Representation of an index.
- **/
+ * TODO Add concept of column order (ASC|DESC)
+ */
 public class Index extends Key
 {
     private final boolean isUnique;
-    
-    /** extended index settings, mostly datastore proprietary settings **/
+
+    /** extended index settings, mostly datastore proprietary settings. */
     private final String extendedIndexSettings;
 
     /**
@@ -105,7 +106,7 @@ public class Index extends Key
     /**
      * Accessor for the size.
      * @return The size.
-     **/
+     */
     public int size()
     {
         return columns.size();
@@ -124,7 +125,7 @@ public class Index extends Key
      * Equality operator.
      * @param obj Object to compare against
      * @return Whether they are equal.
-     **/
+     */
     public boolean equals(Object obj)
     {
         if (obj == this)
@@ -157,7 +158,7 @@ public class Index extends Key
     /**
      * Stringify method.
      * @return String version of this object.
-     **/
+     */
     public String toString()
     {
         return getColumnList();

@@ -66,6 +66,7 @@ public class IndexInfo implements StoreSchemaData
             addProperty("type", Short.valueOf(rs.getShort(7)));
             addProperty("ordinal_position", Short.valueOf(rs.getShort(8)));
             addProperty("column_name", rs.getString(9));
+//            addProperty("asc_or_desc", rs.getString(10)); // "A", "D" or null
         }
         catch (SQLException e)
         {
@@ -114,12 +115,13 @@ public class IndexInfo implements StoreSchemaData
             return false;
         }
 
-        IndexInfo other = (IndexInfo)obj;
         String tableCat1 = (String)getProperty("table_cat");
         String tableSch1 = (String)getProperty("table_schema");
         String tableName1 = (String)getProperty("table_name");
         String columnName1 = (String)getProperty("column_name");
         String indexName1 = (String)getProperty("index_name");
+
+        IndexInfo other = (IndexInfo)obj;
         String tableCat2 = (String)other.getProperty("table_cat");
         String tableSch2 = (String)other.getProperty("table_schema");
         String tableName2 = (String)other.getProperty("table_name");
@@ -146,10 +148,7 @@ public class IndexInfo implements StoreSchemaData
             String tableSch = (String)getProperty("table_schema");
             String tableName = (String)getProperty("table_name");
             String columnName = (String)getProperty("column_name");
-            hash = (tableCat == null ? 0 : tableCat.hashCode()) ^
-                    (tableSch == null ? 0 : tableSch.hashCode()) ^
-                    tableName.hashCode() ^
-                    columnName.hashCode();
+            hash = (tableCat == null ? 0 : tableCat.hashCode()) ^ (tableSch == null ? 0 : tableSch.hashCode()) ^ tableName.hashCode() ^ columnName.hashCode();
         }
 
         return hash;
@@ -161,7 +160,7 @@ public class IndexInfo implements StoreSchemaData
      */
     public String toString()
     {
-        StringBuilder str= new StringBuilder();
+        StringBuilder str = new StringBuilder();
         str.append(this.getClass().getName() + "\n");
         str.append("  tableCat        = " + getProperty("table_cat") + "\n");
         str.append("  tableSchem      = " + getProperty("table_schema") + "\n");
@@ -170,6 +169,7 @@ public class IndexInfo implements StoreSchemaData
         str.append("  nonUnique       = " + getProperty("non_unique") + "\n");
         str.append("  ordinalPosition = " + getProperty("ordinal_position") + "\n");
         str.append("  indexName       = " + getProperty("index_name") + "\n");
+//        str.append("  columnOrder     = " + getProperty("asc_or_desc") + "\n");
         return str.toString();
     }
 }
