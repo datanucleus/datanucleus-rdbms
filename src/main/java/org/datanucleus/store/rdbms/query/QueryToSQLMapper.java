@@ -1470,7 +1470,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
                 
                 String joinAlias = joinExpr.getAlias();
-                PrimaryExpression joinPrimExpr = joinExpr.getPrimaryExpression();
+                Expression joinedExpr = joinExpr.getJoinedExpression();
+                if (joinedExpr instanceof DyadicExpression)
+                {
+                    // TODO Support CAST
+                    throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
+                }
+
+                // Assumed to be PrimaryExpression
+                PrimaryExpression joinPrimExpr = (PrimaryExpression)joinedExpr;
 
                 if (joinPrimExpr.getTuples().size() == 1)
                 {
