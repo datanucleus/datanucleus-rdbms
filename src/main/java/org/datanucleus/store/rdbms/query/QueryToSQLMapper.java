@@ -1192,272 +1192,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // User defined the candidate of the subquery as an implied join to the outer query
             // e.g SELECT c FROM Customer c WHERE EXISTS (SELECT o FROM c.orders o ...)
             // so add the join(s) to the outer query
-            String[] tokens = StringUtils.split(clsExpr.getCandidateExpression(), ".");
-
-            String leftAlias = tokens[0];
-            SQLTableMapping outerSqlTblMapping = parentMapper.getSQLTableMappingForAlias(leftAlias);
-            AbstractClassMetaData leftCmd = outerSqlTblMapping.cmd;
-
-            // Get array of the left-right sides of this expression so we can work back from the subquery candidate
-            AbstractMemberMetaData[] leftMmds = new AbstractMemberMetaData[tokens.length-1];
-            AbstractMemberMetaData[] rightMmds = new AbstractMemberMetaData[tokens.length-1];
-            for (int i=0;i<tokens.length-1;i++)
-            {
-                String joinedField = tokens[i+1];
-
-                AbstractMemberMetaData leftMmd = leftCmd.getMetaDataForMember(joinedField);
-                AbstractMemberMetaData rightMmd = null;
-                AbstractClassMetaData rightCmd = null;
-                RelationType relationType = leftMmd.getRelationType(clr);
-
-                if (RelationType.isBidirectional(relationType))
-                {
-                    rightMmd = leftMmd.getRelatedMemberMetaData(clr)[0]; // Take first possible
-                    rightCmd = rightMmd.getAbstractClassMetaData();
-                }
-                else if (relationType == RelationType.ONE_TO_ONE_UNI)
-                {
-                    rightCmd = mmgr.getMetaDataForClass(leftMmd.getType(), clr);
-                }
-                else if (relationType == RelationType.ONE_TO_MANY_UNI)
-                {
-                    if (leftMmd.hasCollection())
-                    {
-                        rightCmd = mmgr.getMetaDataForClass(leftMmd.getCollection().getElementType(), clr);
-                    }
-                    else if (leftMmd.hasMap())
-                    {
-                        rightCmd = mmgr.getMetaDataForClass(leftMmd.getMap().getValueType(), clr);
-                    }
-                }
-                else
-                {
-                    throw new NucleusUserException("Subquery has been specified with a candidate-expression that includes \"" + tokens[i] + "\" that isnt a relation field!!");
-                }
-
-                leftMmds[i] = leftMmd;
-                rightMmds[i] = rightMmd;
-                leftCmd = rightCmd;
-            }
-
-            // Work from subquery candidate back to outer query table, adding joins and where clause as appropriate
-            SQLTable rSqlTbl = candSqlTbl;
-            SQLTable outerSqlTbl = outerSqlTblMapping.table;
-            for (int i=leftMmds.length-1;i>=0;i--)
-            {
-                AbstractMemberMetaData leftMmd = leftMmds[i];
-                AbstractMemberMetaData rightMmd = rightMmds[i];
-                DatastoreClass leftTbl = storeMgr.getDatastoreClass(leftMmd.getClassName(true), clr);
-                SQLTable lSqlTbl = null;
-                RelationType relationType = leftMmd.getRelationType(clr);
-
-                if (relationType == RelationType.ONE_TO_ONE_UNI)
-                {
-                    // 1-1 with FK in left table
-                    if (i == 0)
-                    {
-                        // Add where clause right table to outer table
-                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
-                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                    }
-                    else
-                    {
-                        // Join to left table
-                        JavaTypeMapping leftMapping = leftTbl.getMemberMapping(leftMmd);
-                        lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftMapping, null, null, true);
-                    }
-                }
-                else if (relationType == RelationType.ONE_TO_ONE_BI)
-                {
-                    if (leftMmd.getMappedBy() != null)
-                    {
-                        // 1-1 with FK in right table
-                        JavaTypeMapping rightMapping = rSqlTbl.getTable().getMemberMapping(rightMmd);
-                        if (i == 0)
-                        {
-                            // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rightMapping);
-                            stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rightMapping, leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                        }
-                    }
-                    else
-                    {
-                        // 1-1 with FK in left table
-                        if (i == 0)
-                        {
-                            // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
-                            stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null, true);
-                        }
-                    }
-                }
-                else if (relationType == RelationType.ONE_TO_MANY_UNI)
-                {
-                    if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
-                    {
-                        // 1-N with join table to right table, so join from right to join table
-                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = null;
-                        if (leftMmd.hasCollection())
-                        {
-                            joinSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(),
-                                null, null, true);
-                        }
-                        else if (leftMmd.hasMap())
-                        {
-                            joinSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null, true);
-                        }
-
-                        if (i == 0)
-                        {
-                            // Add where clause join table (owner) to outer table (id)
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
-                            stmt.whereAnd(outerExpr.eq(joinExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                        }
-                    }
-                    else
-                    {
-                        // 1-N with FK in right table
-                        if (i == 0)
-                        {
-                            // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
-                            stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                        }
-                    }
-                }
-                else if (relationType == RelationType.ONE_TO_MANY_BI)
-                {
-                    if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
-                    {
-                        // 1-N with join table to right table, so join from right to join table
-                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = null;
-                        if (leftMmd.hasCollection())
-                        {
-                            joinSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(),
-                                null, null, true);
-                        }
-                        else if (leftMmd.hasMap())
-                        {
-                            joinSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null, true);
-                        }
-
-                        if (i == 0)
-                        {
-                            // Add where clause join table (owner) to outer table (id)
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
-                            stmt.whereAnd(outerExpr.eq(joinExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                        }
-                    }
-                    else
-                    {
-                        // 1-N with FK in right table
-                        if (i == 0)
-                        {
-                            // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
-                            stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                        }
-                    }
-                }
-                else if (relationType == RelationType.MANY_TO_ONE_BI)
-                {
-                    if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
-                    {
-                        // 1-N with join table to right table, so join from right to join table
-                        JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
-                        SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
-
-                        if (leftMmd.hasCollection())
-                        {
-                            if (i == 0)
-                            {
-                                // Add where clause join table (element) to outer table (id)
-                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                                SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping());
-                                stmt.whereAnd(outerExpr.eq(joinExpr), false);
-                            }
-                            else
-                            {
-                                // Join to left table
-                                lSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                            }
-                        }
-                        else if (leftMmd.hasMap())
-                        {
-                            if (i == 0)
-                            {
-                                // Add where clause join table (value) to outer table (id)
-                                SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
-                                SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((MapTable)joinTbl).getValueMapping());
-                                stmt.whereAnd(outerExpr.eq(joinExpr), false);
-                            }
-                            else
-                            {
-                                // Join to left table
-                                lSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, ((MapTable)joinTbl).getValueMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (i == 0)
-                        {
-                            // Add where clause right table to outer table
-                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
-                            SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
-                            stmt.whereAnd(outerExpr.eq(rightExpr), false);
-                        }
-                        else
-                        {
-                            // Join to left table
-                            lSqlTbl = stmt.join(JoinType.INNER_JOIN, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null, true);
-                        }
-                    }
-                }
-                rSqlTbl = lSqlTbl;
-            }
+            processFromClauseSubquery(clsExpr, candSqlTbl, mmgr);
         }
 
-        // Process all join expressions
+        // Process all linked JoinExpression(s) for this ClassExpression
         Expression rightExpr = clsExpr.getRight();
         SQLTable sqlTbl = candSqlTbl;
         JavaTypeMapping previousMapping = null;
@@ -2162,6 +1900,280 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     public boolean processingOnClause()
     {
         return processingOnClause;
+    }
+
+    /**
+     * Method to process a ClassExpression where it represents a subquery.
+     * User defined the candidate of the subquery as an implied join to the outer query, for example "SELECT c FROM Customer c WHERE EXISTS (SELECT o FROM c.orders o ...)"
+     * so this method will add the join(s) to the outer query.
+     * @param clsExpr The ClassExpression
+     * @param candSqlTbl Candidate SQL Table
+     * @param mmgr MetaData Manager
+     */
+    protected void processFromClauseSubquery(ClassExpression clsExpr, SQLTable candSqlTbl, MetaDataManager mmgr)
+    {
+        String[] tokens = StringUtils.split(clsExpr.getCandidateExpression(), ".");
+
+        String leftAlias = tokens[0];
+        SQLTableMapping outerSqlTblMapping = parentMapper.getSQLTableMappingForAlias(leftAlias);
+        AbstractClassMetaData leftCmd = outerSqlTblMapping.cmd;
+
+        // Get array of the left-right sides of this expression so we can work back from the subquery candidate
+        AbstractMemberMetaData[] leftMmds = new AbstractMemberMetaData[tokens.length-1];
+        AbstractMemberMetaData[] rightMmds = new AbstractMemberMetaData[tokens.length-1];
+        for (int i=0;i<tokens.length-1;i++)
+        {
+            String joinedField = tokens[i+1];
+
+            AbstractMemberMetaData leftMmd = leftCmd.getMetaDataForMember(joinedField);
+            AbstractMemberMetaData rightMmd = null;
+            AbstractClassMetaData rightCmd = null;
+            RelationType relationType = leftMmd.getRelationType(clr);
+
+            if (RelationType.isBidirectional(relationType))
+            {
+                rightMmd = leftMmd.getRelatedMemberMetaData(clr)[0]; // Take first possible
+                rightCmd = rightMmd.getAbstractClassMetaData();
+            }
+            else if (relationType == RelationType.ONE_TO_ONE_UNI)
+            {
+                rightCmd = mmgr.getMetaDataForClass(leftMmd.getType(), clr);
+            }
+            else if (relationType == RelationType.ONE_TO_MANY_UNI)
+            {
+                if (leftMmd.hasCollection())
+                {
+                    rightCmd = mmgr.getMetaDataForClass(leftMmd.getCollection().getElementType(), clr);
+                }
+                else if (leftMmd.hasMap())
+                {
+                    rightCmd = mmgr.getMetaDataForClass(leftMmd.getMap().getValueType(), clr);
+                }
+            }
+            else
+            {
+                throw new NucleusUserException("Subquery has been specified with a candidate-expression that includes \"" + tokens[i] + "\" that isnt a relation field!!");
+            }
+
+            leftMmds[i] = leftMmd;
+            rightMmds[i] = rightMmd;
+            leftCmd = rightCmd;
+        }
+
+        // Work from subquery candidate back to outer query table, adding joins and where clause as appropriate
+        SQLTable rSqlTbl = candSqlTbl;
+        SQLTable outerSqlTbl = outerSqlTblMapping.table;
+        JoinType joinType = JoinType.INNER_JOIN;
+        for (int i=leftMmds.length-1;i>=0;i--)
+        {
+            AbstractMemberMetaData leftMmd = leftMmds[i];
+            AbstractMemberMetaData rightMmd = rightMmds[i];
+            DatastoreClass leftTbl = storeMgr.getDatastoreClass(leftMmd.getClassName(true), clr);
+            SQLTable lSqlTbl = null;
+            RelationType relationType = leftMmd.getRelationType(clr);
+
+            if (relationType == RelationType.ONE_TO_ONE_UNI)
+            {
+                // 1-1 with FK in left table
+                if (i == 0)
+                {
+                    // Add where clause right table to outer table
+                    SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                    SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                    stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                }
+                else
+                {
+                    // Join to left table
+                    JavaTypeMapping leftMapping = leftTbl.getMemberMapping(leftMmd);
+                    lSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftMapping, null, null, true);
+                }
+            }
+            else if (relationType == RelationType.ONE_TO_ONE_BI)
+            {
+                if (leftMmd.getMappedBy() != null)
+                {
+                    // 1-1 with FK in right table
+                    JavaTypeMapping rightMapping = rSqlTbl.getTable().getMemberMapping(rightMmd);
+                    if (i == 0)
+                    {
+                        // Add where clause right table to outer table
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rightMapping);
+                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, rSqlTbl, rightMapping, leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                    }
+                }
+                else
+                {
+                    // 1-1 with FK in left table
+                    if (i == 0)
+                    {
+                        // Add where clause right table to outer table
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null, true);
+                    }
+                }
+            }
+            else if (relationType == RelationType.ONE_TO_MANY_UNI)
+            {
+                if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
+                {
+                    // 1-N with join table to right table, so join from right to join table
+                    JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
+                    SQLTable joinSqlTbl = null;
+                    if (leftMmd.hasCollection())
+                    {
+                        joinSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(), null, null, true);
+                    }
+                    else if (leftMmd.hasMap())
+                    {
+                        joinSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null, true);
+                    }
+
+                    if (i == 0)
+                    {
+                        // Add where clause join table (owner) to outer table (id)
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                        SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
+                        stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                    }
+                }
+                else
+                {
+                    // 1-N with FK in right table
+                    if (i == 0)
+                    {
+                        // Add where clause right table to outer table
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
+                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                    }
+                }
+            }
+            else if (relationType == RelationType.ONE_TO_MANY_BI)
+            {
+                if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
+                {
+                    // 1-N with join table to right table, so join from right to join table
+                    JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
+                    SQLTable joinSqlTbl = null;
+                    if (leftMmd.hasCollection())
+                    {
+                        joinSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((ElementContainerTable)joinTbl).getElementMapping(), null, null, true);
+                    }
+                    else if (leftMmd.hasMap())
+                    {
+                        joinSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, ((MapTable)joinTbl).getValueMapping(), null, null, true);
+                    }
+
+                    if (i == 0)
+                    {
+                        // Add where clause join table (owner) to outer table (id)
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                        SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOwnerMapping());
+                        stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                    }
+                }
+                else
+                {
+                    // 1-N with FK in right table
+                    if (i == 0)
+                    {
+                        // Add where clause right table to outer table
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd));
+                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getMemberMapping(rightMmd), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                    }
+                }
+            }
+            else if (relationType == RelationType.MANY_TO_ONE_BI)
+            {
+                if (leftMmd.getJoinMetaData() != null || rightMmd.getJoinMetaData() != null)
+                {
+                    // 1-N with join table to right table, so join from right to join table
+                    JoinTable joinTbl = (JoinTable) storeMgr.getTable(leftMmd);
+                    SQLTable joinSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+
+                    if (leftMmd.hasCollection())
+                    {
+                        if (i == 0)
+                        {
+                            // Add where clause join table (element) to outer table (id)
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping());
+                            stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                        }
+                        else
+                        {
+                            // Join to left table
+                            lSqlTbl = stmt.join(joinType, joinSqlTbl, ((ElementContainerTable)joinTbl).getElementMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                        }
+                    }
+                    else if (leftMmd.hasMap())
+                    {
+                        if (i == 0)
+                        {
+                            // Add where clause join table (value) to outer table (id)
+                            SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getIdMapping());
+                            SQLExpression joinExpr = exprFactory.newExpression(stmt, joinSqlTbl, ((MapTable)joinTbl).getValueMapping());
+                            stmt.whereAnd(outerExpr.eq(joinExpr), false);
+                        }
+                        else
+                        {
+                            // Join to left table
+                            lSqlTbl = stmt.join(joinType, joinSqlTbl, ((MapTable)joinTbl).getValueMapping(), leftTbl, null, leftTbl.getIdMapping(), null, null, true);
+                        }
+                    }
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        // Add where clause right table to outer table
+                        SQLExpression outerExpr = exprFactory.newExpression(outerSqlTbl.getSQLStatement(), outerSqlTbl, outerSqlTbl.getTable().getMemberMapping(leftMmd));
+                        SQLExpression rightExpr = exprFactory.newExpression(stmt, rSqlTbl, rSqlTbl.getTable().getIdMapping());
+                        stmt.whereAnd(outerExpr.eq(rightExpr), false);
+                    }
+                    else
+                    {
+                        // Join to left table
+                        lSqlTbl = stmt.join(joinType, rSqlTbl, rSqlTbl.getTable().getIdMapping(), leftTbl, null, leftTbl.getMemberMapping(leftMmd), null, null, true);
+                    }
+                }
+            }
+            rSqlTbl = lSqlTbl;
+        }
     }
 
     /**
