@@ -1468,30 +1468,32 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 JoinExpression joinExpr = (JoinExpression)rightExpr;
                 org.datanucleus.query.expression.JoinExpression.JoinType exprJoinType = joinExpr.getType();
                 JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
-                
                 String joinAlias = joinExpr.getAlias();
                 Expression joinedExpr = joinExpr.getJoinedExpression();
-                if (joinedExpr instanceof DyadicExpression)
+                Expression joinOnExpr = joinExpr.getOnExpression();
+
+                PrimaryExpression joinPrimExpr = null;
+                if (joinedExpr instanceof PrimaryExpression)
+                {
+                    joinPrimExpr = (PrimaryExpression)joinedExpr;
+                }
+                else
                 {
                     // TODO Support CAST
                     throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
                 }
 
-                // Assumed to be PrimaryExpression
-                PrimaryExpression joinPrimExpr = (PrimaryExpression)joinedExpr;
-
                 if (joinPrimExpr.getTuples().size() == 1)
                 {
-                    // Join to (new) root element?
-                    baseCls = resolveClass(joinPrimExpr.getId());
-                    DatastoreClass baseTbl = storeMgr.getDatastoreClass(baseCls.getName(), clr);
-                    Expression joinOnExpr = joinExpr.getOnExpression();
+                    // Join to (new) root element? We need an ON expression to be supplied in this case
                     if (joinOnExpr == null)
                     {
                         throw new NucleusUserException("Query has join to " + joinPrimExpr.getId() + " yet this is a root component and there is no ON expression");
                     }
 
                     // Add the basic join first with no condition since this root will be referenced in the "on" condition
+                    baseCls = resolveClass(joinPrimExpr.getId());
+                    DatastoreClass baseTbl = storeMgr.getDatastoreClass(baseCls.getName(), clr);
                     sqlTbl = stmt.join(joinType, candSqlTbl, baseTbl, joinAlias, null, null, true);
                     cmd = mmgr.getMetaDataForClass(baseCls, clr);
                     SQLTableMapping tblMapping = new SQLTableMapping(sqlTbl, cmd, baseTbl.getIdMapping());
@@ -2133,7 +2135,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     setSQLTableMappingForAlias(joinAlias, tblMapping);
                 }
 
-                Expression joinOnExpr = joinExpr.getOnExpression();
                 if (joinOnExpr != null)
                 {
                     // Convert the ON expression to a BooleanExpression
