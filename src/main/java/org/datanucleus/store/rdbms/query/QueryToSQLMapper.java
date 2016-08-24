@@ -1215,9 +1215,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     joinPrimExpr = (PrimaryExpression)joinedExpr;
                 }
+                else if (joinedExpr instanceof DyadicExpression && joinedExpr.getOperator() == Expression.OP_CAST)
+                {
+                    joinPrimExpr = (PrimaryExpression)joinedExpr.getLeft();
+                    String castClassName = (String) ((Literal)joinedExpr.getRight()).getLiteral();
+                    Class castCls = clr.classForName(castClassName);
+                    // TODO Remove the exception, and use the castCls below. See Issue datanucleus-rdbms#100
+                    throw new NucleusException("We do not currently support JOIN to 'CAST(" + joinPrimExpr + ") AS " + castCls.getName() + "'");
+                }
                 else
                 {
-                    // TODO Support CAST
                     throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
                 }
 
