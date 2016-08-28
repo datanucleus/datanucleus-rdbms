@@ -571,24 +571,18 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 }
             }
 
-            try
+            for (int i=0; i<listeners.size(); i++)
             {
-                for (int i=0; i<listeners.size(); i++)
-                {
-                    listeners.get(i).managedConnectionPostClose();
-                }
-            }
-            finally
-            {
-                listeners.clear();
+                listeners.get(i).managedConnectionPostClose();
             }
             if (savepoints != null)
             {
                 savepoints.clear();
                 savepoints = null;
             }
-            this.conn = null;
             this.xaRes = null;
+
+            super.close();
         }
 
         /**
