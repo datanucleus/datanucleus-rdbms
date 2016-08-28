@@ -271,6 +271,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         ManagedConnectionImpl(ExecutionContext ec, Map options)
         {
+            this.ec = ec;
             if (options != null && options.get(Transaction.TRANSACTION_ISOLATION_OPTION) != null)
             {
                 isolation = ((Number) options.get(Transaction.TRANSACTION_ISOLATION_OPTION)).intValue();
@@ -581,6 +582,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 savepoints = null;
             }
             this.xaRes = null;
+            this.connProvider = null;
+            this.ec = null;
 
             super.close();
         }
