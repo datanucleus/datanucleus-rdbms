@@ -40,6 +40,7 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldMetaData;
 import org.datanucleus.metadata.IdentityType;
+import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
@@ -951,6 +952,22 @@ public class SQLStatementHelper
                 if (relatedCmd.isEmbeddedOnly())
                 {
                     return true;
+                }
+                if (relatedCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                {
+                    // Related object uses complete-table
+                    Collection<String> relSubclassNames = storeMgr.getSubClassesForClass(relatedCmd.getFullClassName(), true, clr);
+                    if (relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 1)
+                    {
+                        // Multiple possible related types and we don't have the FK so omit
+                        return true;
+                    }
+                    else if (!relatedCmd.isMappedSuperclass() && relSubclassNames.size() > 0)
+                    {
+                        // Multiple possible related types and we don't have the FK so omit
+                        return true;
+                    }
+                    // TODO Maybe do a LEFT OUTER JOIN to each possible?
                 }
 
                 // Find the table of the related class
