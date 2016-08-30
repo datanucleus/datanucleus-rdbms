@@ -1108,7 +1108,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     /**
      * Method to return the SQLStatement and mapping for an iterator for this backing store.
      * @param ec ExecutionContext
-     * @param fp FetchPlan to use in determing which fields of element to select
+     * @param fp FetchPlan to use in determining which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
