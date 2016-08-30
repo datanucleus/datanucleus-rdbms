@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,6 +29,8 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorMetaData;
+import org.datanucleus.metadata.InheritanceMetaData;
+import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -169,6 +172,80 @@ public class RDBMSStoreHelper
         {
             AbstractClassMetaData rootCmd = rootCmdIter.next();
             DatastoreClass rootTbl = storeMgr.getDatastoreClass(rootCmd.getFullClassName(), clr);
+            InheritanceMetaData rootInhmd = rootCmd.getBaseAbstractClassMetaData().getInheritanceMetaData();
+            if (rootInhmd.getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            {
+                // COMPLETE TABLE so use one branch of UNION for each possible class
+                if (rootTbl != null)
+                {
+                    UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootCmd.getFullClassName()), false, null, null);
+                    stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                    if (sqlStmtMain == null)
+                    {
+                        sampleCmd = rootCmd;
+                        sqlStmtMain = stmtGen.getStatement();
+
+                        // WHERE (object id) = ?
+                        JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
+                        JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                        SQLExpression fieldExpr = exprFactory.newExpression(sqlStmtMain, sqlStmtMain.getPrimaryTable(), idMapping);
+                        SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmtMain, idParamMapping, id, "ID");
+                        sqlStmtMain.whereAnd(fieldExpr.eq(fieldVal), true);
+                    }
+                    else
+                    {
+                        SQLStatement sqlStmt = stmtGen.getStatement();
+
+                        // WHERE (object id) = ?
+                        JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
+                        JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                        SQLExpression fieldExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), idMapping);
+                        SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmt, idParamMapping, id, "ID");
+                        sqlStmt.whereAnd(fieldExpr.eq(fieldVal), true);
+
+                        sqlStmtMain.union(sqlStmt);
+                    }
+                }
+                Collection<String> rootSubclassNames = storeMgr.getSubClassesForClass(rootCmd.getFullClassName(), true, clr);
+                for (String rootSubclassName : rootSubclassNames)
+                {
+                    AbstractClassMetaData rootSubclassCmd = storeMgr.getMetaDataManager().getMetaDataForClass(rootSubclassName, clr);
+                    DatastoreClass rootSubclassTbl = storeMgr.getDatastoreClass(rootSubclassCmd.getFullClassName(), clr);
+                    if (rootSubclassTbl != null)
+                    {
+                        UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, clr.classForName(rootSubclassCmd.getFullClassName()), false, null, null);
+                        stmtGen.setOption(StatementGenerator.OPTION_SELECT_NUCLEUS_TYPE);
+                        if (sqlStmtMain == null)
+                        {
+                            sampleCmd = rootSubclassCmd;
+                            sqlStmtMain = stmtGen.getStatement();
+
+                            // WHERE (object id) = ?
+                            JavaTypeMapping idMapping = sqlStmtMain.getPrimaryTable().getTable().getIdMapping();
+                            JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                            SQLExpression fieldExpr = exprFactory.newExpression(sqlStmtMain, sqlStmtMain.getPrimaryTable(), idMapping);
+                            SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmtMain, idParamMapping, id, "ID");
+                            sqlStmtMain.whereAnd(fieldExpr.eq(fieldVal), true);
+                        }
+                        else
+                        {
+                            SQLStatement sqlStmt = stmtGen.getStatement();
+
+                            // WHERE (object id) = ?
+                            JavaTypeMapping idMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
+                            JavaTypeMapping idParamMapping = new PersistableIdMapping((PersistableMapping) idMapping);
+                            SQLExpression fieldExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), idMapping);
+                            SQLExpression fieldVal = exprFactory.newLiteralParameter(sqlStmt, idParamMapping, id, "ID");
+                            sqlStmt.whereAnd(fieldExpr.eq(fieldVal), true);
+
+                            sqlStmtMain.union(sqlStmt);
+                        }
+                    }
+                }
+
+                continue;
+            }
+
             if (rootTbl == null)
             {
                 // Class must be using "subclass-table" (no table of its own) so find where it is
