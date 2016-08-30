@@ -61,7 +61,6 @@ import org.datanucleus.metadata.ForeignKeyMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.IndexMetaData;
-import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.JdbcType;
@@ -691,7 +690,23 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             {
                                 AbstractClassMetaData[] elementCmds = null;
                                 // TODO : Cater for interface elements, and get the metadata for the implementation classes here
-                                if (elementCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+                                if (elementCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                                {
+                                    // COMPLETE-TABLE inheritance in element, so really need FK in each!
+                                    Collection<String> elementSubclassNames = storeMgr.getSubClassesForClass(elementCmd.getFullClassName(), true, clr);
+                                    elementCmds = new ClassMetaData[elementSubclassNames != null ? 1+elementSubclassNames.size() : 1];
+                                    int elemNo = 0;
+                                    elementCmds[elemNo++] = elementCmd;
+                                    if (elementSubclassNames != null)
+                                    {
+                                        for (String elementSubclassName : elementSubclassNames)
+                                        {
+                                            AbstractClassMetaData elemSubCmd = storeMgr.getMetaDataManager().getMetaDataForClass(elementSubclassName, clr);
+                                            elementCmds[elemNo++] = elemSubCmd;
+                                        }
+                                    }
+                                }
+                                else if (elementCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
                                 {
                                     elementCmds = storeMgr.getClassesManagingTableForClass(elementCmd, clr);
                                 }
@@ -737,34 +752,27 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     }
                                 }
 
-                                // Run callbacks for each of the element classes.
+                                // Run callbacks for each of the element classes
                                 for (int i=0;i<elementCmds.length;i++)
                                 {
                                     storeMgr.addSchemaCallback(elementCmds[i].getFullClassName(), mmd);
                                     DatastoreClass dc = storeMgr.getDatastoreClass(elementCmds[i].getFullClassName(), clr);
-                                    if (dc == null)
+                                    if (dc != null) // If dc is null then we assume the (possible) element is abstract so no FK needed
                                     {
-                                        InheritanceMetaData inhmd = elementCmds[i].getInheritanceMetaData();
-                                        if (inhmd != null && inhmd.getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+                                        if (dc instanceof ClassTable)
                                         {
-                                            throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + 
-                                                " since element has no table of its own ; using COMPLETE_TABLE inheritance and is abstract?");
+                                            ClassTable ct = (ClassTable) dc;
+                                            if (ct.isInitialized())
+                                            {
+                                                // if the target table is already initialized, run the callbacks
+                                                ct.runCallBacks(clr);
+                                            }
                                         }
-                                        throw new NucleusException("Unable to add foreign-key to " + elementCmds[i].getFullClassName() + " to " + this + " since element has no table!");
-                                    }
-                                    if (dc instanceof ClassTable)
-                                    {
-                                        ClassTable ct = (ClassTable) dc;
-                                        if (ct.isInitialized())
+                                        else
                                         {
-                                            // if the target table is already initialized, run the callbacks
-                                            ct.runCallBacks(clr);
+                                            NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
+                                                    " yet the related element uses a VIEW so not remotely adding element FK owner column; assumed to be part of the VIEW definition");
                                         }
-                                    }
-                                    else
-                                    {
-                                        NucleusLogger.DATASTORE_SCHEMA.info("Table " + toString() + " has to manage member " + mmd.getFullFieldName() +
-                                            " yet the related element uses a VIEW so not remotely adding element FK owner column; assumed to be part of the VIEW definition");
                                     }
                                 }
                             }
