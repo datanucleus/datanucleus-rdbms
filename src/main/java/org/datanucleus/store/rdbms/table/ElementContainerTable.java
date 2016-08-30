@@ -438,7 +438,7 @@ public abstract class ElementContainerTable extends JoinTable
                 }
                 else
                 {
-                    // Either no element table or multiple (where the user has element with "subclass-table" strategy)
+                    // Either no element table or multiple (where the user has element with "subclass-table" strategy, or using "complete-table")
                     // so do nothing since referential integrity will not allow multiple FKs.
                 }
             }

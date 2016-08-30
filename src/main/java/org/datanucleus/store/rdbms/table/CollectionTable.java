@@ -81,8 +81,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
         // Add column(s) for element
         boolean elementPC = (mmd.hasCollection() && mmd.getCollection().elementIsPersistent());
         Class elementClass = clr.classForName(getElementType());
-        if (isSerialisedElement() || isEmbeddedElementPC() || (isEmbeddedElement() && !elementPC) ||
-            ClassUtils.isReferenceType(elementClass))
+        if (isSerialisedElement() || isEmbeddedElementPC() || (isEmbeddedElement() && !elementPC) || ClassUtils.isReferenceType(elementClass))
         {
             // Element = PC(embedded), PC(serialised), Non-PC(serialised), Non-PC(embedded), Reference
             // Join table has : ownerMapping (PK), elementMapping, orderMapping (PK)

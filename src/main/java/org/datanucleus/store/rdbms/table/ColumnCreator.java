@@ -21,6 +21,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.table;
 
+import java.util.Collection;
+
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -28,6 +30,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.FieldRole;
+import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.DuplicateColumnException;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
@@ -171,18 +174,45 @@ public final class ColumnCreator
                     throw ntme;
                 }
             }
+
             if (destinationTable == null)
             {
-                // Maybe the owner hasn't got its own table (e.g "subclass-table" inheritance strategy)
+                // Maybe the owner hasn't got its own table (e.g "subclass-table" or "complete-table"+abstract)
                 // Alternate is when we have an embedded type which itself has an embedded collection - not catered for at all currently
-                AbstractClassMetaData ownerCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr);
-                AbstractClassMetaData[] ownerCmds = storeMgr.getClassesManagingTableForClass(ownerCmd, clr);
-                if (ownerCmds == null || ownerCmds.length == 0)
+                AbstractClassMetaData ownerCmd = storeMgr.getMetaDataManager().getMetaDataForClass(javaType, clr);
+                if (ownerCmd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
                 {
-                    throw new NucleusUserException(Localiser.msg("057023", javaType.getName())).setFatal();
+                    // COMPLETE-TABLE but abstract root, so find one of the subclasses with a table and use that for now
+                    Collection<String> ownerSubclassNames = storeMgr.getSubClassesForClass(javaType.getName(), true, clr);
+                    if (ownerSubclassNames != null && ownerSubclassNames.size() > 0)
+                    {
+                        for (String ownerSubclassName : ownerSubclassNames)
+                        {
+                            ownerCmd = storeMgr.getMetaDataManager().getMetaDataForClass(ownerSubclassName, clr);
+                            try
+                            {
+                                destinationTable = storeMgr.getDatastoreClass(ownerSubclassName, clr);
+                            }
+                            catch (NoTableManagedException ntme)
+                            {
+                            }
+                            if (destinationTable != null)
+                            {
+                                break;
+                            }
+                        }
+                    }
                 }
-                // Use the first one since they should all have the same id column(s)
-                destinationTable = storeMgr.getDatastoreClass(ownerCmds[0].getFullClassName(), clr);
+                else
+                {
+                    AbstractClassMetaData[] ownerCmds = storeMgr.getClassesManagingTableForClass(ownerCmd, clr);
+                    if (ownerCmds == null || ownerCmds.length == 0)
+                    {
+                        throw new NucleusUserException(Localiser.msg("057023", javaType.getName())).setFatal();
+                    }
+                    // Use the first one since they should all have the same id column(s)
+                    destinationTable = storeMgr.getDatastoreClass(ownerCmds[0].getFullClassName(), clr);
+                }
             }
 
             if (destinationTable != null)
