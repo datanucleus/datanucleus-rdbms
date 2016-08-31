@@ -250,13 +250,19 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         String columnDef = info.getColumnDef();
         if (columnDef != null && columnDef.contains("::"))
         {
-            // We want to strip off any PostgreSQL-specific "::" where this is not part of the default, but allow :: when part of a string
-            if (columnDef.startsWith("'") && columnDef.endsWith("'"))
+            // Ignore some columnDef cases where we do not support PostgreSQL specific syntax
+            if (columnDef.startsWith("nextval("))
             {
+                // Ignore any "nextval(...)"
+                info.setColumnDef(null);
             }
-            else
+            else if (columnDef.startsWith("'") && columnDef.endsWith("'"))
             {
-                // Omit the PostgreSQL specific "::blah" syntax
+                // Ignore when we have just a string (that may contain ::)
+            }
+            else if (columnDef.contains("::"))
+            {
+                // We want to strip off any PostgreSQL-specific "::" where this is not part of a default string
                 info.setColumnDef(columnDef.substring(0, columnDef.indexOf("::")));
             }
         }
