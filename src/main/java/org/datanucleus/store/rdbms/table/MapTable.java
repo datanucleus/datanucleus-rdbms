@@ -131,9 +131,7 @@ public class MapTable extends JoinTable implements DatastoreMap
 
         // Add owner mapping
         ColumnMetaData[] ownerColmd = null;
-        if (mmd.getJoinMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData() != null &&
-            mmd.getJoinMetaData().getColumnMetaData().length > 0)
+        if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().getColumnMetaData() != null && mmd.getJoinMetaData().getColumnMetaData().length > 0)
         {
             // Column mappings defined at this side (1-N, M-N)
             // When specified at this side they use the <join> tag
@@ -156,8 +154,7 @@ public class MapTable extends JoinTable implements DatastoreMap
         {
             // Added in value code
         }
-        else if (isSerialisedKey() || isEmbeddedKeyPC() || (isEmbeddedKey() && !keyPC) ||
-            ClassUtils.isReferenceType(keyCls))
+        else if (isSerialisedKey() || isEmbeddedKeyPC() || (isEmbeddedKey() && !keyPC) || ClassUtils.isReferenceType(keyCls))
         {
             // Key = PC(embedded), PC(serialised), Non-PC(serialised), Non-PC(embedded), Reference
             keyMapping = storeMgr.getMappingManager().getMapping(this, mmd, clr, FieldRole.ROLE_MAP_KEY);
@@ -277,9 +274,15 @@ public class MapTable extends JoinTable implements DatastoreMap
             // PK is required so maybe need to add an index to form the PK
             if (isEmbeddedKeyPC())
             {
-                if (mmd.getMap().getKeyClassMetaData(clr, storeMgr.getMetaDataManager()).getIdentityType() != IdentityType.APPLICATION)
+                if (mmd.hasExtension("surrogate-pk-column") && mmd.getValueForExtension("surrogate-pk-column").equalsIgnoreCase("true"))
                 {
-                    // Embedded key PC with datastore id so we need an index to form the PK TODO It is arguable that we can just use all embedded key fields as part of PK here
+                    // Allow user to request surrogate pk column be added (for use with JPA)
+                    orderRequired = true;
+                }
+                else if (storeMgr.getApiAdapter().getName().equalsIgnoreCase("JDO") &&
+                    mmd.getMap().getKeyClassMetaData(clr, storeMgr.getMetaDataManager()).getIdentityType() != IdentityType.APPLICATION)
+                {
+                    // Embedded key PC with datastore id so we need an index to form the PK TODO It is arguable that we can just use all embedded key fields as part of PK here always
                     orderRequired = true;
                 }
             }
