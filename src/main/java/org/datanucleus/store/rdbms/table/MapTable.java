@@ -215,8 +215,7 @@ public class MapTable extends JoinTable implements DatastoreMap
         {
             // Added in key code
         }
-        else if (isSerialisedValue() || isEmbeddedValuePC() || (isEmbeddedValue() && !valuePC) ||
-            ClassUtils.isReferenceType(valueCls))
+        else if (isSerialisedValue() || isEmbeddedValuePC() || (isEmbeddedValue() && !valuePC) || ClassUtils.isReferenceType(valueCls))
         {
             // Value = PC(embedded), PC(serialised), Non-PC(serialised), Non-PC(embedded), Reference
             valueMapping = storeMgr.getMappingManager().getMapping(this, mmd, clr, FieldRole.ROLE_MAP_VALUE);
@@ -280,7 +279,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             {
                 if (mmd.getMap().getKeyClassMetaData(clr, storeMgr.getMetaDataManager()).getIdentityType() != IdentityType.APPLICATION)
                 {
-                    // Embedded key PC with datastore id so we need an index to form the PK
+                    // Embedded key PC with datastore id so we need an index to form the PK TODO It is arguable that we can just use all embedded key fields as part of PK here
                     orderRequired = true;
                 }
             }
@@ -314,9 +313,7 @@ public class MapTable extends JoinTable implements DatastoreMap
         {
             // Order/Adapter (index) column is required (integer based)
             ColumnMetaData orderColmd = null;
-            if (mmd.getOrderMetaData() != null &&
-                mmd.getOrderMetaData().getColumnMetaData() != null &&
-                mmd.getOrderMetaData().getColumnMetaData().length > 0)
+            if (mmd.getOrderMetaData() != null && mmd.getOrderMetaData().getColumnMetaData() != null && mmd.getOrderMetaData().getColumnMetaData().length > 0)
             {
                 // Specified "order" column info
                 orderColmd = mmd.getOrderMetaData().getColumnMetaData()[0];
@@ -708,21 +705,17 @@ public class MapTable extends JoinTable implements DatastoreMap
                     {
                         JavaTypeMapping embFieldMapping = embMapping.getJavaTypeMapping(i);
                         AbstractMemberMetaData embFmd = embFieldMapping.getMemberMetaData();
-                        if (ClassUtils.isReferenceType(embFmd.getType()) && 
-                            embFieldMapping instanceof ReferenceMapping)
+                        if (ClassUtils.isReferenceType(embFmd.getType()) && embFieldMapping instanceof ReferenceMapping)
                         {
                             // Field is a reference type, so add a FK to the table of the PC for each PC implementation
-                            Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, 
-                                autoMode, storeMgr, clr);
+                            Collection fks = TableUtils.getForeignKeysForReferenceField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                             foreignKeys.addAll(fks);
                         }
                         else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                                embFieldMapping.getNumberOfDatastoreMappings() > 0 &&
-                                embFieldMapping instanceof PersistableMapping)
+                                embFieldMapping.getNumberOfDatastoreMappings() > 0 && embFieldMapping instanceof PersistableMapping)
                         {
                             // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
-                            ForeignKey fk = TableUtils.getForeignKeyForPCField(embFieldMapping, embFmd, 
-                                autoMode, storeMgr, clr);
+                            ForeignKey fk = TableUtils.getForeignKeyForPCField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
                             if (fk != null)
                             {
                                 foreignKeys.add(fk);
