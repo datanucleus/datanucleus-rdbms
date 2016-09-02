@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.types.scostore.CollectionStore;
@@ -693,15 +694,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    keyIdx.getMapping().setObject(ec, ps,
-                        keyIdx.getParameterPositionsForOccurrence(paramInstance), key);
+                    keyIdx.getMapping().setObject(ec, ps, keyIdx.getParameterPositionsForOccurrence(paramInstance), key);
                 }
 
                 try
@@ -813,6 +812,23 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
             // Select the value field(s)
             SQLTable valueSqlTbl = sqlStmt.getTable(valueTable, sqlStmt.getPrimaryTable().getGroupName());
+            if (valueSqlTbl == null)
+            {
+                // Root value candidate has no table, so try to find a value candidate with a table that exists in this statement
+                Collection<String> valueSubclassNames = storeMgr.getSubClassesForClass(valueType, true, clr);
+                for (String valueSubclassName : valueSubclassNames)
+                {
+                    DatastoreClass valueTbl = storeMgr.getDatastoreClass(valueSubclassName, clr);
+                    if (valueTbl != null)
+                    {
+                        valueSqlTbl = sqlStmt.getTable(valueTbl, sqlStmt.getPrimaryTable().getGroupName());
+                        if (valueSqlTbl != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
         }
 
