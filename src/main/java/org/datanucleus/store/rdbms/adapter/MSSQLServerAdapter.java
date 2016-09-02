@@ -527,6 +527,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         }
         else if (!hasOrdering)
         {
+            // SQLServer requires ORDER BY to be able to use OFFSET https://technet.microsoft.com/en-us/library/gg699618%28v=sql.110%29.aspx
             return "";
         }
 
