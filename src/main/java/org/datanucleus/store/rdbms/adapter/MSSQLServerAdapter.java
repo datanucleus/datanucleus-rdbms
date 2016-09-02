@@ -511,15 +511,21 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
      * restriction of ranges using the OFFSET/FETCH keywords.
      * @param offset The offset to return from
      * @param count The number of items to return
+     * @param hasOrdering Whether there is ordering present
      * @return The SQL to append to allow for ranges using OFFSET/FETCH.
      */
-    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (datastoreMajorVersion < 11) // Prior to SQLServer 2012
         {
-            return super.getRangeByLimitEndOfStatementClause(offset, count);
+            // Not supported
+            return "";
         }
         else if (offset <= 0 && count <= 0)
+        {
+            return "";
+        }
+        else if (!hasOrdering)
         {
             return "";
         }

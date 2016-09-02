@@ -736,7 +736,7 @@ public class SelectStatement extends SQLStatement
         if (rangeOffset > -1 || rangeCount > -1)
         {
             // Add a LIMIT clause to end of statement if supported by the adapter
-            String limitClause = dba.getRangeByLimitEndOfStatementClause(rangeOffset, rangeCount);
+            String limitClause = dba.getRangeByLimitEndOfStatementClause(rangeOffset, rangeCount, orderStmt != null);
             if (limitClause.length() > 0)
             {
                 sql.append(" ").append(limitClause);

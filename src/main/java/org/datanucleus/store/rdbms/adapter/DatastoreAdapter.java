@@ -585,9 +585,10 @@ public interface DatastoreAdapter
      * SELECT param ... WHERE {LIMIT}
      * @param offset The offset to return from
      * @param count The number of items to return
+     * @param hasOrdering Whether there is ordering present
      * @return The SQL to append to allow for ranges using LIMIT.
      */
-    String getRangeByLimitEndOfStatementClause(long offset, long count);
+    String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering);
 
     /**
      * Method to return the column name to use when handling ranges via
