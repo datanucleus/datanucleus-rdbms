@@ -103,10 +103,10 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     /* (non-Javadoc)
      * @see org.datanucleus.store.scostore.PersistableRelationStore#add(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
      */
-    public boolean add(ObjectProvider sm1, ObjectProvider sm2)
+    public boolean add(ObjectProvider op1, ObjectProvider op2)
     {
         String addStmt = getAddStmt();
-        ExecutionContext ec = sm1.getExecutionContext();
+        ExecutionContext ec = op1.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -116,9 +116,8 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             {
                 // Insert the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = populateOwnerInStatement(sm1, ec, ps, jdbcPosition, joinTable);
-                BackingStoreHelper.populateElementInStatement(ec, ps, sm2.getObject(), 
-                    jdbcPosition, joinTable.getRelatedMapping());
+                jdbcPosition = populateOwnerInStatement(op1, ec, ps, jdbcPosition, joinTable);
+                BackingStoreHelper.populateElementInStatement(ec, ps, op2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, addStmt, ps, true);
@@ -132,8 +131,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown inserting row into persistable relation join table", sqle);
+            throw new NucleusDataStoreException("Exception thrown inserting row into persistable relation join table", sqle);
         }
     }
 
@@ -167,18 +165,17 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown deleting row from persistable relation join table", sqle);
+            throw new NucleusDataStoreException("Exception thrown deleting row from persistable relation join table", sqle);
         }
     }
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.scostore.PersistableRelationStore#update(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
      */
-    public boolean update(ObjectProvider sm1, ObjectProvider sm2)
+    public boolean update(ObjectProvider op1, ObjectProvider op2)
     {
         String updateStmt = getUpdateStmt();
-        ExecutionContext ec = sm1.getExecutionContext();
+        ExecutionContext ec = op1.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -188,9 +185,8 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             {
                 // Update the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, sm2.getObject(), 
-                    jdbcPosition, joinTable.getRelatedMapping());
-                populateOwnerInStatement(sm1, ec, ps, jdbcPosition, joinTable);
+                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, op2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
+                populateOwnerInStatement(op1, ec, ps, jdbcPosition, joinTable);
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, updateStmt, ps, true);
@@ -204,8 +200,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         }
         catch (SQLException sqle)
         {
-            throw new NucleusDataStoreException(
-                "Exception thrown updating row into persistable relation join table", sqle);
+            throw new NucleusDataStoreException("Exception thrown updating row into persistable relation join table", sqle);
         }
     }
 
@@ -214,7 +209,6 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      * <PRE>
      * INSERT INTO JOINTABLE (OWNER_COL, RELATED_COL) VALUES (?,?)
      * </PRE>
-     *
      * @return The Statement for adding an item
      */
     protected String getAddStmt()
@@ -269,7 +263,6 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      * <PRE>
      * UPDATE JOINTABLE SET RELATED_COL = ? WHERE OWNER_COL = ?
      * </PRE>
-     *
      * @return The Statement for updating an item
      */
     protected String getUpdateStmt()
@@ -306,7 +299,6 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      * <PRE>
      * DELETE FROM JOINTABLE WHERE OWNER_COL = ?
      * </PRE>
-     *
      * @return The Statement for removing an item
      */
     protected String getRemoveStmt()
@@ -328,15 +320,14 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
-     * @param sm ObjectProvider
+     * @param op ObjectProvider
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate
      * @param joinTable Join table
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider sm, ExecutionContext ec, PreparedStatement ps, 
-            int jdbcPosition, PersistableJoinTable joinTable)
+    public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
     {
         if (!joinTable.getStoreManager().insertValuesOnInsert(joinTable.getOwnerMapping().getDatastoreMapping(0)))
         {
@@ -346,14 +337,12 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
 
         if (joinTable.getOwnerMemberMetaData() != null)
         {
-            joinTable.getOwnerMapping().setObject(ec, ps,
-                MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()),
-                sm.getObject(), sm, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+            joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()),
+                op.getObject(), op, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
-            joinTable.getOwnerMapping().setObject(ec, ps,
-                MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()), sm.getObject());
+            joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()), op.getObject());
         }
         return jdbcPosition + joinTable.getOwnerMapping().getNumberOfDatastoreMappings();
     }

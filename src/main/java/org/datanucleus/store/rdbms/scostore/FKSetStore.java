@@ -449,7 +449,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         if (ownerId1 != null && ownerId2 != null && ownerId1.equals(ownerId2))
                         {
                             // Must be attaching
-                            if (!elementOP.getExecutionContext().getApiAdapter().isDetached(newOwner))
+                            if (!ec.getApiAdapter().isDetached(newOwner))
                             {
                                 // Attaching, so make sure we set to the attached owner
                                 elementOP.replaceField(fieldNumInElement, newOwner);
@@ -738,8 +738,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     // Null the owner of the element
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(),
-                            StringUtils.toJVMIDString(element)));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                     }
 
                     int relatedFieldNumber = getFieldNumberInElementForBidirectional(elementOP);
@@ -1016,7 +1015,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext(), op.getExecutionContext().getFetchPlan(), true);
+        IteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping iteratorMappingClass = iterStmt.getStatementClassMapping();
 

@@ -173,8 +173,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 AbstractMemberMetaData vofmd = valueCmd.getMetaDataForMember(ownerFieldName);
                 if (vofmd == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
-                        ownerFieldName, valueClass.getName()));
+                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), ownerFieldName, valueClass.getName()));
                 }
 
                 // Check that the type of the value "mapped-by" field is consistent with the owner type
@@ -193,8 +192,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 if (isEmbeddedMapping(ownerMapping))
                 {
-                    throw new NucleusUserException(Localiser.msg("056055",
-                        ownerFieldName, valueType, vofmd.getTypeName(), mmd.getClassName()));
+                    throw new NucleusUserException(Localiser.msg("056055", ownerFieldName, valueType, vofmd.getTypeName(), mmd.getClassName()));
                 }
             }
             else
@@ -204,8 +202,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("056056", 
-                        mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType));
+                    throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType));
                 }
             }
 
@@ -234,8 +231,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Check that the key type is correct for the declared type
             if (!ClassUtils.typesAreCompatible(vkfmd.getType(), keyType, clr))
             {
-                throw new NucleusUserException(Localiser.msg("056051", 
-                    mmd.getFullFieldName(), keyType, vkfmd.getType().getName()));
+                throw new NucleusUserException(Localiser.msg("056051", mmd.getFullFieldName(), keyType, vkfmd.getType().getName()));
             }
 
             // Set up key field
@@ -244,8 +240,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             keyMapping = valueTable.getMemberMapping(valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
             if (keyMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056053", 
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType, keyFieldName));
+                throw new NucleusUserException(Localiser.msg("056053", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType, keyFieldName));
             }
 
             if (!keyMapping.hasSimpleDatastoreRepresentation())
@@ -286,8 +281,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 AbstractMemberMetaData kofmd = keyCmd.getMetaDataForMember(ownerFieldName);
                 if (kofmd == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), 
-                        ownerFieldName, keyClass.getName()));
+                    throw new NucleusUserException(Localiser.msg("056067", mmd.getFullFieldName(), ownerFieldName, keyClass.getName()));
                 }
 
                 // Check that the type of the key "mapped-by" field is consistent with the owner type
@@ -306,8 +300,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 if (isEmbeddedMapping(ownerMapping))
                 {
-                    throw new NucleusUserException(Localiser.msg("056055",
-                        ownerFieldName, keyType, kofmd.getTypeName(), mmd.getClassName()));
+                    throw new NucleusUserException(Localiser.msg("056055", ownerFieldName, keyType, kofmd.getTypeName(), mmd.getClassName()));
                 }
             }
             else
@@ -317,8 +310,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("056056", 
-                        mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType));
+                    throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType));
                 }
             }
 
@@ -347,8 +339,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Check that the value type is consistent with the declared type
             if (!ClassUtils.typesAreCompatible(vkfmd.getType(), valueType, clr))
             {
-                throw new NucleusUserException(Localiser.msg("056058", 
-                    mmd.getFullFieldName(), valueType, vkfmd.getType().getName()));
+                throw new NucleusUserException(Localiser.msg("056058", mmd.getFullFieldName(), valueType, vkfmd.getType().getName()));
             }
 
             // Set up value field
@@ -357,8 +348,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             valueMapping = valueTable.getMemberMapping(keyCmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
             if (valueMapping == null)
             {
-                throw new NucleusUserException(Localiser.msg("056054", 
-                    mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType, valueFieldName));
+                throw new NucleusUserException(Localiser.msg("056054", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType, valueFieldName));
             }
 
             if (!valueMapping.hasSimpleDatastoreRepresentation())
@@ -444,17 +434,18 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param newKey The key to store the value against
      * @param newValue The value to store.
      * @return The value stored.
-     **/
+     */
     public V put(final ObjectProvider op, final K newKey, V newValue)
     {
+        ExecutionContext ec = op.getExecutionContext();
         if (keyFieldNumber >= 0)
         {
             validateKeyForWriting(op, newKey);
-            validateValueType(op.getExecutionContext().getClassLoaderResolver(), newValue);
+            validateValueType(ec.getClassLoaderResolver(), newValue);
         }
         else
         {
-            validateKeyType(op.getExecutionContext().getClassLoaderResolver(), newKey);
+            validateKeyType(ec.getClassLoaderResolver(), newKey);
             validateValueForWriting(op, newValue);
         }
 
@@ -470,7 +461,6 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     removeValue(op, newKey, oldValue);
                 }
 
-                ExecutionContext ec = op.getExecutionContext();
                 final Object newOwner = op.getObject();
 
                 if (ec.getApiAdapter().isPersistent(newValue))
@@ -556,7 +546,6 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             else
             {
                 // Value is stored in the key
-                ExecutionContext ec = op.getExecutionContext();
                 final Object newOwner = op.getObject();
 
                 if (ec.getApiAdapter().isPersistent(newKey))
@@ -624,8 +613,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             }
                             vsm.replaceFieldMakeDirty(valueFieldNumber, newValueObj);
 
-                            JavaTypeMapping externalFKMapping =
-                                valueTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
@@ -657,7 +645,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Delete the old value if it is no longer contained and is dependent
             if (!containsValue(op, oldValue))
             {
-                op.getExecutionContext().deleteObjectInternal(oldValue);
+                ec.deleteObjectInternal(oldValue);
             }
         }
 
@@ -696,13 +684,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (oldValue != null)
             {
                 boolean deletingValue = false;
-                ObjectProvider vsm = ec.findObjectProvider(oldValue);
+                ObjectProvider valueOP = ec.findObjectProvider(oldValue);
                 if (ownerMemberMetaData.getMap().isDependentValue())
                 {
                     // Delete the value if it is dependent
                     deletingValue = true;
                     ec.deleteObjectInternal(oldValue);
-                    vsm.flush();
+                    valueOP.flush();
                 }
                 else if (ownerMapping.isNullable())
                 {
@@ -710,12 +698,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     if (ownerFieldNumber >= 0)
                     {
                         // Update the field in the value
-                        Object oldOwner = vsm.provideField(ownerFieldNumber);
-                        vsm.replaceFieldMakeDirty(ownerFieldNumber, null);
-                        vsm.flush();
+                        Object oldOwner = valueOP.provideField(ownerFieldNumber);
+                        valueOP.replaceFieldMakeDirty(ownerFieldNumber, null);
+                        valueOP.flush();
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(vsm).relationChange(ownerFieldNumber, oldOwner, null);
+                            ec.getRelationshipManager(valueOP).relationChange(ownerFieldNumber, oldOwner, null);
                         }
                     }
                     else
@@ -729,7 +717,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     // Not nullable, so must delete since no other way of removing from map
                     deletingValue = true;
                     ec.deleteObjectInternal(oldValue);
-                    vsm.flush();
+                    valueOP.flush();
                 }
 
                 if (ownerMemberMetaData.getMap().isDependentKey())
@@ -740,15 +728,15 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         // Null FK in value to key
                         if (keyMapping.isNullable())
                         {
-                            vsm.replaceFieldMakeDirty(keyFieldNumber, null);
-                            vsm.flush();
+                            valueOP.replaceFieldMakeDirty(keyFieldNumber, null);
+                            valueOP.flush();
                             if (ec.getManageRelations())
                             {
-                                ec.getRelationshipManager(vsm).relationChange(keyFieldNumber, key, null);
+                                ec.getRelationshipManager(valueOP).relationChange(keyFieldNumber, key, null);
                             }
                         }
                     }
-                    op.getExecutionContext().deleteObjectInternal(key);
+                    ec.deleteObjectInternal(key);
                     ObjectProvider keyOP = ec.findObjectProvider(key);
                     keyOP.flush();
                 }
@@ -760,13 +748,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (key != null)
             {
                 boolean deletingKey = false;
-                ObjectProvider ksm = ec.findObjectProvider(key);
+                ObjectProvider keyOP = ec.findObjectProvider(key);
                 if (ownerMemberMetaData.getMap().isDependentKey())
                 {
                     // Delete the key if it is dependent
                     deletingKey = true;
                     ec.deleteObjectInternal(key);
-                    ksm.flush();
+                    keyOP.flush();
                 }
                 else if (ownerMapping.isNullable())
                 {
@@ -774,12 +762,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     if (ownerFieldNumber >= 0)
                     {
                         // Update the field in the key
-                        Object oldOwner = ksm.provideField(ownerFieldNumber);
-                        ksm.replaceFieldMakeDirty(ownerFieldNumber, null);
-                        ksm.flush();
+                        Object oldOwner = keyOP.provideField(ownerFieldNumber);
+                        keyOP.replaceFieldMakeDirty(ownerFieldNumber, null);
+                        keyOP.flush();
                         if (ec.getManageRelations())
                         {
-                            ec.getRelationshipManager(ksm).relationChange(ownerFieldNumber, oldOwner, null);
+                            ec.getRelationshipManager(keyOP).relationChange(ownerFieldNumber, oldOwner, null);
                         }
                     }
                     else
@@ -793,7 +781,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     // Not nullable, so must delete since no other way of removing from map
                     deletingKey = true;
                     ec.deleteObjectInternal(key);
-                    ksm.flush();
+                    keyOP.flush();
                 }
 
                 if (ownerMemberMetaData.getMap().isDependentValue())
@@ -804,15 +792,15 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         // Null FK in key to value
                         if (valueMapping.isNullable())
                         {
-                            ksm.replaceFieldMakeDirty(valueFieldNumber, null);
-                            ksm.flush();
+                            keyOP.replaceFieldMakeDirty(valueFieldNumber, null);
+                            keyOP.flush();
                             if (ec.getManageRelations())
                             {
-                                ec.getRelationshipManager(ksm).relationChange(valueFieldNumber, oldValue, null);
+                                ec.getRelationshipManager(keyOP).relationChange(valueFieldNumber, oldValue, null);
                             }
                         }
                     }
-                    op.getExecutionContext().deleteObjectInternal(oldValue);
+                    ec.deleteObjectInternal(oldValue);
                     ObjectProvider valOP = ec.findObjectProvider(oldValue);
                     valOP.flush();
                 }
@@ -1004,8 +992,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null,
-                                op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1058,8 +1045,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null,
-                                op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1137,15 +1123,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    keyIdx.getMapping().setObject(ec, ps,
-                        keyIdx.getParameterPositionsForOccurrence(paramInstance), key);
+                    keyIdx.getMapping().setObject(ec, ps, keyIdx.getParameterPositionsForOccurrence(paramInstance), key);
                 }
 
                 try
@@ -1172,8 +1156,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                                 valueMapping instanceof EmbeddedKeyPCMapping)
                             {
                                 // Value = Serialised
-                                int ownerFieldNumber = ((JoinTable)mapTable).getOwnerMemberMetaData().getAbsoluteFieldNumber();
-                                value = valueMapping.getObject(ec, rs, param, ownerOP, ownerFieldNumber);
+                                value = valueMapping.getObject(ec, rs, param, ownerOP, ((JoinTable)mapTable).getOwnerMemberMetaData().getAbsoluteFieldNumber());
                             }
                             else
                             {
@@ -1238,8 +1221,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         if (ownerMemberMetaData.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
             getMappingDef = new StatementClassMapping();
-            if (valueTable.getDiscriminatorMetaData() != null &&
-                valueTable.getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
+            if (valueTable.getDiscriminatorMetaData() != null && valueTable.getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
             {
                 // Value class has discriminator
                 if (ClassUtils.isReferenceType(valueCls))
@@ -1292,8 +1274,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
         // Apply condition on owner field to filter by owner
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        SQLTable ownerSqlTbl =
-            SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+        SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
         SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
         SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
         sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);

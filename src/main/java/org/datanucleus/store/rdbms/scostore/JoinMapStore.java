@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -176,8 +177,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             return;
         }
 
-        HashSet puts = new HashSet();
-        HashSet updates = new HashSet();
+        Set<Map.Entry> puts = new HashSet<>();
+        Set<Map.Entry> updates = new HashSet<>();
 
         Iterator i = m.entrySet().iterator();
         while (i.hasNext())
@@ -217,11 +218,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 try
                 {
                     // Loop through all entries
-                    Iterator iter = puts.iterator();
+                    Iterator<Map.Entry> iter = puts.iterator();
                     while (iter.hasNext())
                     {
                         // Add the row to the join table
-                        Map.Entry entry = (Map.Entry)iter.next();
+                        Map.Entry entry = iter.next();
                         internalPut(op, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
                     }
                 }
@@ -246,11 +247,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 try
                 {
                     // Loop through all entries
-                    Iterator iter = updates.iterator();
+                    Iterator<Map.Entry> iter = updates.iterator();
                     while (iter.hasNext())
                     {
                         // Update the row in the join table
-                        Map.Entry entry = (Map.Entry)iter.next();
+                        Map.Entry entry = iter.next();
                         internalUpdate(op, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
                     }
                 }
@@ -633,8 +634,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Generate statement to clear the Map.
-     * Deletes the links from the join table for this Map, leaving the value
-     * objects in their own table(s).
+     * Deletes the links from the join table for this Map, leaving the value objects in their own table(s).
      * <PRE>
      * DELETE FROM MAPTABLE
      * WHERE OWNERCOL=?
@@ -980,11 +980,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param executeNow Whether to execute the statement now or wait til any batch
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected void internalUpdate(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) throws MappedDatastoreException
+    protected void internalUpdate(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) 
+    throws MappedDatastoreException
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
-        try {
+        try 
+        {
             PreparedStatement ps = sqlControl.getStatementForUpdate(conn, updateStmt, false);
             try
             {
@@ -1032,7 +1034,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @throws MappedDatastoreException Thrown if an error occurs
      */
     protected int[] internalPut(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow)
-        throws MappedDatastoreException
+    throws MappedDatastoreException
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();

@@ -290,11 +290,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 try
                 {
                     // Add a row to the join table
-                    int orderID = -1;
-                    if (orderMapping != null)
-                    {
-                        orderID = getNextIDForOrderColumn(op);
-                    }
+                    int orderID = orderMapping != null ? getNextIDForOrderColumn(op) : -1;
                     int[] returnCode = doInternalAdd(op, element, mconn, false, orderID, true);
                     if (returnCode[0] > 0)
                     {
@@ -385,12 +381,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     throw new MappedDatastoreException("SQLException", e);
                 }
 
-                int nextOrderID = 0;
-                if (orderMapping != null)
-                {
-                    // Get the order id for the first item
-                    nextOrderID = getNextIDForOrderColumn(op);
-                }
+                int nextOrderID = orderMapping != null ? getNextIDForOrderColumn(op) : 0;
 
                 // Loop through all elements to be added
                 iter = elements.iterator();
