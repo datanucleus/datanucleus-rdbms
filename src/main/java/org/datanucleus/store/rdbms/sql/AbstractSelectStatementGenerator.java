@@ -95,8 +95,7 @@ public abstract class AbstractSelectStatementGenerator implements SelectStatemen
         this.candidateTableGroupName = candidateTableGroupName;
 
         String candidateClassName = candidateType.getName();
-        AbstractClassMetaData acmd = 
-            storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
+        AbstractClassMetaData acmd = storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
 
         if (!storeMgr.getMappedTypeManager().isSupportedMappedType(candidateClassName))
         {
@@ -112,8 +111,7 @@ public abstract class AbstractSelectStatementGenerator implements SelectStatemen
                 if (subcmds == null || subcmds.length > 1)
                 {
                     throw new NucleusException("Attempt to generate SQL statement for instances of " + 
-                        candidateType.getName() + 
-                        " but has no table of its own and not single subclass with table so unsupported");
+                        candidateType.getName() + " but has no table of its own and not single subclass with table so unsupported");
                 }
 
                 candidateTable = storeMgr.getDatastoreClass(subcmds[0].getFullClassName(), clr);
