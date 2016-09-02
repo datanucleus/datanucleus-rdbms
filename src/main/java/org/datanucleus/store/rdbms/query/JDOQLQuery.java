@@ -82,6 +82,7 @@ import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * RDBMS representation of a JDOQL query for use by DataNucleus.
@@ -1325,7 +1326,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
         DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
-        boolean using_limit_where_clause = (dba.getRangeByLimitEndOfStatementClause(fromInclNo, toExclNo).length() > 0);
+        boolean using_limit_where_clause = (dba.getRangeByLimitEndOfStatementClause(fromInclNo, toExclNo, !StringUtils.isWhitespace(ordering)).length() > 0);
         boolean using_rownum = (dba.getRangeByRowNumberColumn().length() > 0) || (dba.getRangeByRowNumberColumn2().length() > 0);
 
         return using_limit_where_clause || using_rownum;

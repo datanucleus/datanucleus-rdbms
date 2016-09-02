@@ -385,7 +385,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     {
         if (datastoreMajorVersion < 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion < 5))
         {
-            return super.getRangeByLimitEndOfStatementClause(offset, count);
+            return "";
         }
         else if (offset <= 0 && count <= 0)
         {

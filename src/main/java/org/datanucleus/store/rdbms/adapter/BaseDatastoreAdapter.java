@@ -1531,9 +1531,10 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * SELECT param ... WHERE {LIMIT}
      * @param offset The offset to return from
      * @param count The number of items to return
+     * @param hasOrdering Whether there is ordering present
      * @return The SQL to append to allow for ranges using LIMIT.
      */
-    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         return "";
     }
