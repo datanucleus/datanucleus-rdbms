@@ -40,6 +40,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldMetaData;
 import org.datanucleus.metadata.FieldRole;
@@ -148,8 +149,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 throw new NucleusUserException("You have a field " + mmd.getFullFieldName() + " that has type " + mmd.getTypeName() +
                     " but this type has no known metadata. Your mapping is incorrect");
             }
-            if (refCmd.getInheritanceMetaData() != null &&
-                refCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            if (refCmd.getInheritanceMetaData() != null && refCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
             {
                 // Find the actual tables storing the other end (can be multiple subclasses)
                 AbstractClassMetaData[] cmds = storeMgr.getClassesManagingTableForClass(refCmd, clr);
@@ -171,6 +171,40 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 }
                 // TODO We need a mapping for each of the possible subclass tables
                 referenceMapping = storeMgr.getDatastoreClass(cmds[0].getFullClassName(), clr).getIdMapping();
+            }
+            else if (refCmd.getInheritanceMetaData() != null && refCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+            {
+                // Find the other side of the relation
+                DatastoreClass refTable = null;
+                if (refCmd instanceof ClassMetaData && !((ClassMetaData)refCmd).isAbstract())
+                {
+                    refTable = storeMgr.getDatastoreClass(refCmd.getFullClassName(), clr);
+                }
+                else
+                {
+                    Collection<String> refSubclasses = storeMgr.getSubClassesForClass(refCmd.getFullClassName(), true, clr);
+                    if (refSubclasses != null && !refSubclasses.isEmpty())
+                    {
+                        // if only 1 subclass then use that
+                        String refSubclassName = refSubclasses.iterator().next();
+                        refTable = storeMgr.getDatastoreClass(refSubclassName, clr);
+                        if (refSubclasses.size() > 1)
+                        {
+                            NucleusLogger.DATASTORE_SCHEMA.info("Field " + mmd.getFullFieldName() + " is a 1-1/N-1 relation and the other side had multiple possible classes " +
+                                "to which to create a foreign-key. Using first possible (" + refSubclassName + ")");
+                        }
+                    }
+                }
+
+                if (refTable != null)
+                {
+                    referenceMapping = refTable.getIdMapping();
+                }
+                else
+                {
+                    throw new NucleusUserException("Field " + mmd.getFullFieldName() + " represents either a 1-1 relation, " +
+                            "or a N-1 relation where the other end uses \"complete-table\" inheritance strategy and either no table was found, or multiple possible tables!");
+                }
             }
             else
             {

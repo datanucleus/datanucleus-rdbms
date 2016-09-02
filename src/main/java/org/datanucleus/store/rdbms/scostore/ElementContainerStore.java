@@ -22,9 +22,11 @@ import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -33,6 +35,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
+import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -223,37 +226,69 @@ public abstract class ElementContainerStore extends BaseContainerStore
             rootTbl = storeMgr.getDatastoreClass(elementType, clr);
         }
 
-        if (rootTbl == null)
+        if (emd.getBaseAbstractClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
         {
-            if (clr.classForName(elementType).isInterface())
+            // Element uses COMPLETE-TABLE so need an elementInfo for each possible element that has a table
+            List<ElementInfo> infos = new ArrayList<>();
+            if (rootTbl != null)
             {
-                info = new ElementInfo[clsNames.length];
-                for (int i=0;i<clsNames.length;i++)
+                infos.add(new ElementInfo(emd, rootTbl));
+            }
+            Collection<String> elementSubclassNames = storeMgr.getSubClassesForClass(emd.getFullClassName(), true, clr);
+            if (elementSubclassNames != null)
+            {
+                for (String elementSubclassName : elementSubclassNames)
                 {
-                    AbstractClassMetaData implCmd = storeMgr.getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
-                    DatastoreClass table = storeMgr.getDatastoreClass(clsNames[i], clr);
-                    info[i] = new ElementInfo(implCmd, table);
+                    AbstractClassMetaData elemSubCmd = storeMgr.getMetaDataManager().getMetaDataForClass(elementSubclassName, clr);
+                    DatastoreClass elemSubTbl = storeMgr.getDatastoreClass(elementSubclassName, clr);
+                    if (elemSubTbl != null)
+                    {
+                        infos.add(new ElementInfo(elemSubCmd, elemSubTbl));
+                    }
                 }
             }
-            else
+
+            info = new ElementInfo[infos.size()];
+            int infoNo = 0;
+            for (ElementInfo ci : infos)
             {
-                AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
-                info = new ElementInfo[subclassCmds.length];
-                for (int i=0;i<subclassCmds.length;i++)
-                {
-                    DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
-                    info[i] = new ElementInfo(subclassCmds[i], table);
-                }
+                info[infoNo++] = ci;
             }
         }
         else
         {
-            info = new ElementInfo[clsNames.length];
-            for (int i=0; i<clsNames.length; i++)
+            if (rootTbl == null)
             {
-                AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
-                DatastoreClass table = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
-                info[i] = new ElementInfo(cmd, table);
+                if (clr.classForName(elementType).isInterface())
+                {
+                    info = new ElementInfo[clsNames.length];
+                    for (int i=0;i<clsNames.length;i++)
+                    {
+                        AbstractClassMetaData implCmd = storeMgr.getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
+                        DatastoreClass table = storeMgr.getDatastoreClass(clsNames[i], clr);
+                        info[i] = new ElementInfo(implCmd, table);
+                    }
+                }
+                else
+                {
+                    AbstractClassMetaData[] subclassCmds = storeMgr.getClassesManagingTableForClass(emd, clr);
+                    info = new ElementInfo[subclassCmds.length];
+                    for (int i=0;i<subclassCmds.length;i++)
+                    {
+                        DatastoreClass table = storeMgr.getDatastoreClass(subclassCmds[i].getFullClassName(), clr);
+                        info[i] = new ElementInfo(subclassCmds[i], table);
+                    }
+                }
+            }
+            else
+            {
+                info = new ElementInfo[clsNames.length];
+                for (int i=0; i<clsNames.length; i++)
+                {
+                    AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clsNames[i], clr);
+                    DatastoreClass table = storeMgr.getDatastoreClass(cmd.getFullClassName(), clr);
+                    info[i] = new ElementInfo(cmd, table);
+                }
             }
         }
 

@@ -386,24 +386,43 @@ public class UnionStatementGenerator extends AbstractStatementGenerator
 
         // INNER/LEFT OUTER JOIN from the join table to the root candidate table
         // If we allow nulls we do a left outer join here, otherwise an inner join
-        JavaTypeMapping candidateIdMapping = candidateTable.getIdMapping();
         SQLTable candidateSQLTable = null;
-        if (hasOption(OPTION_ALLOW_NULLS))
+        if (candidateTable != null)
         {
-            // Put element table in same table group since all relates to the elements
-            candidateSQLTable = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            // We have a root candidate table, so join to that
+            JavaTypeMapping candidateIdMapping = candidateTable.getIdMapping();
+            if (hasOption(OPTION_ALLOW_NULLS))
+            {
+                // Put element table in same table group since all relates to the elements
+                candidateSQLTable = stmt.leftOuterJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            }
+            else
+            {
+                // Put element table in same table group since all relates to the elements
+                candidateSQLTable = stmt.innerJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            }
+
+            // Join the root candidate table to this particular candidate table
+            if (table != candidateTable)
+            {
+                // INNER JOIN from the root candidate table to this candidates table
+                stmt.innerJoin(candidateSQLTable, candidateIdMapping, table, null, table.getIdMapping(), null, stmt.getPrimaryTable().getGroupName());
+            }
         }
         else
         {
-            // Put element table in same table group since all relates to the elements
-            candidateSQLTable = stmt.innerJoin(null, joinElementMapping, candidateTable, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
-        }
-
-        if (table != candidateTable)
-        {
-            // INNER JOIN from the root candidate table to this candidates table
-            JavaTypeMapping tableIdMapping = table.getIdMapping();
-            stmt.innerJoin(candidateSQLTable, candidateIdMapping, table, null, tableIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            // No root candidate table, so join direct to this candidate
+            JavaTypeMapping candidateIdMapping = table.getIdMapping();
+            if (hasOption(OPTION_ALLOW_NULLS))
+            {
+                // Put element table in same table group since all relates to the elements
+                candidateSQLTable = stmt.leftOuterJoin(null, joinElementMapping, table, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            }
+            else
+            {
+                // Put element table in same table group since all relates to the elements
+                candidateSQLTable = stmt.innerJoin(null, joinElementMapping, table, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName());
+            }
         }
 
         // Add any discriminator restriction in the table for the specified class

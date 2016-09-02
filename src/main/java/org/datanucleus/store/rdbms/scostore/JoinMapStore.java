@@ -58,6 +58,7 @@ import org.datanucleus.store.rdbms.sql.StatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.scostore.CollectionStore;
@@ -811,6 +812,23 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
             // Select the value field(s)
             SQLTable valueSqlTbl = sqlStmt.getTable(valueTable, sqlStmt.getPrimaryTable().getGroupName());
+            if (valueSqlTbl == null)
+            {
+                // Root value candidate has no table, so try to find a value candidate with a table that exists in this statement
+                Collection<String> valueSubclassNames = storeMgr.getSubClassesForClass(valueType, true, clr);
+                for (String valueSubclassName : valueSubclassNames)
+                {
+                    DatastoreClass valueTbl = storeMgr.getDatastoreClass(valueSubclassName, clr);
+                    if (valueTbl != null)
+                    {
+                        valueSqlTbl = sqlStmt.getTable(valueTbl, sqlStmt.getPrimaryTable().getGroupName());
+                        if (valueSqlTbl != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
             SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef,
                 ownerOP.getExecutionContext().getFetchPlan(), valueSqlTbl, vmd, 0);
         }
