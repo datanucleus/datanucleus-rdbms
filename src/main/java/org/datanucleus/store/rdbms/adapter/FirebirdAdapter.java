@@ -142,6 +142,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
      * @param hasOrdering Whether ordering is present
      * @return The SQL to append to allow for ranges using LIMIT.
      */
+    @Override
     public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (offset >= 0 && count > 0)

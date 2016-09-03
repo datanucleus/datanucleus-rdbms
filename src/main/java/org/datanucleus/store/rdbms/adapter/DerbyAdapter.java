@@ -382,6 +382,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * @param hasOrdering Whether there is ordering present
      * @return The SQL to append to allow for ranges using OFFSET/FETCH.
      */
+    @Override
     public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (datastoreMajorVersion < 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion < 5))

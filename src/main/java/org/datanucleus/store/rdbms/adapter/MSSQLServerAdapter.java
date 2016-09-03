@@ -514,6 +514,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
      * @param hasOrdering Whether there is ordering present
      * @return The SQL to append to allow for ranges using OFFSET/FETCH.
      */
+    @Override
     public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (datastoreMajorVersion < 11) // Prior to SQLServer 2012
