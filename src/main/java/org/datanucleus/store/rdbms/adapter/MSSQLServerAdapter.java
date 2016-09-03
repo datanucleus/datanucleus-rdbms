@@ -535,7 +535,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         str.append("OFFSET " + offset + (offset == 1 ? " ROW " : " ROWS "));
         if (count > 0)
         {
-            str.append("FETCH NEXT " + (count > 1 ? (count + " ROWS ONLY ") : "ROW ONLY "));
+            str.append("FETCH NEXT " + count + " ROWS ONLY ");
         }
         return str.toString();
     }
