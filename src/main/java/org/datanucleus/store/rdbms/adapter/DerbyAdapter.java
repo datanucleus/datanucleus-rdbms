@@ -379,9 +379,10 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * restriction of ranges using the OFFSET/FETCH keywords.
      * @param offset The offset to return from
      * @param count The number of items to return
+     * @param hasOrdering Whether ordering is present
      * @return The SQL to append to allow for ranges using OFFSET/FETCH.
      */
-    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (datastoreMajorVersion < 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion < 5))
         {
