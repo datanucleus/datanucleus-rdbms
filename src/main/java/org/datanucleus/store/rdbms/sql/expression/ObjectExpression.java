@@ -537,11 +537,6 @@ public class ObjectExpression extends SQLExpression
         {
             // Check if there is already the cast table in the current table group
             DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
-            if (castTable == table)
-            {
-                // TODO Means that we are casting this object to a subclass
-            }
-
             SQLTable castSqlTbl = stmt.getTable(castTable, table.getGroupName());
             if (castSqlTbl == null)
             {
@@ -555,7 +550,8 @@ public class ObjectExpression extends SQLExpression
                 AbstractClassMetaData castCmd = storeMgr.getMetaDataManager().getMetaDataForClass(type, clr);
                 if (castCmd.hasDiscriminatorStrategy())
                 {
-                    // TODO Generate BooleanExpression that needs to hang off this ObjectExpression so when we propagate up to ObjectExpr == val we can then append the discrim constraint also
+                    // TODO How do we handle this? If this is part of the filter then need to hang a BooleanExpression off the ObjectExpression and apply later.
+                    // If this is part of the result, do we just return null when this is not the right type?
                     NucleusLogger.QUERY.warn(">> Currently do not support adding restriction on discriminator for table=" + table + " to " + type);
                 }
             }
