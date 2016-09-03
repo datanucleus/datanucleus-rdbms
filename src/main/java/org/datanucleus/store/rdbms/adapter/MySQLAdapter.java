@@ -387,9 +387,10 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      * restriction of ranges using the LIMUT keyword.
      * @param offset The offset to return from
      * @param count The number of items to return
+     * @param hasOrdering Whether ordering is present
      * @return The SQL to append to allow for ranges using LIMIT.
      */
-    public String getRangeByLimitEndOfStatementClause(long offset, long count)
+    public String getRangeByLimitEndOfStatementClause(long offset, long count, boolean hasOrdering)
     {
         if (offset >= 0 && count > 0)
         {
