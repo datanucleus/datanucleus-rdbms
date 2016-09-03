@@ -816,15 +816,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Root value candidate has no table, so try to find a value candidate with a table that exists in this statement
                 Collection<String> valueSubclassNames = storeMgr.getSubClassesForClass(valueType, true, clr);
-                for (String valueSubclassName : valueSubclassNames)
+                if (valueSubclassNames != null && !valueSubclassNames.isEmpty())
                 {
-                    DatastoreClass valueTbl = storeMgr.getDatastoreClass(valueSubclassName, clr);
-                    if (valueTbl != null)
+                    for (String valueSubclassName : valueSubclassNames)
                     {
-                        valueSqlTbl = sqlStmt.getTable(valueTbl, sqlStmt.getPrimaryTable().getGroupName());
-                        if (valueSqlTbl != null)
+                        DatastoreClass valueTbl = storeMgr.getDatastoreClass(valueSubclassName, clr);
+                        if (valueTbl != null)
                         {
-                            break;
+                            valueSqlTbl = sqlStmt.getTable(valueTbl, sqlStmt.getPrimaryTable().getGroupName());
+                            if (valueSqlTbl != null)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
