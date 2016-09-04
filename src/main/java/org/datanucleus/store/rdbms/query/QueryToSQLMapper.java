@@ -1218,11 +1218,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else if (joinedExpr instanceof DyadicExpression && joinedExpr.getOperator() == Expression.OP_CAST)
                 {
-                    // TREAT this join as a particular type
+                    // TREAT this join as a particular type. Cast type is processed below where we add the joins
                     joinPrimExpr = (PrimaryExpression)joinedExpr.getLeft();
                     String castClassName = (String) ((Literal)joinedExpr.getRight()).getLiteral();
                     castCls = clr.classForName(castClassName);
-                    // TODO Need to add constraint on the join also
                 }
                 else
                 {
@@ -1231,7 +1230,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                 if (joinPrimExpr.getTuples().size() == 1)
                 {
-                    // Join to (new) root element? We need an ON expression to be supplied in this case
+                    // DN Extension : Join to (new) root element? We need an ON expression to be supplied in this case
                     if (joinOnExpr == null)
                     {
                         throw new NucleusUserException("Query has join to " + joinPrimExpr.getId() + " yet this is a root component and there is no ON expression");
@@ -1380,9 +1379,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (relationType == RelationType.ONE_TO_ONE_UNI)
                         {
                             JavaTypeMapping otherMapping = null;
+                            Object[] castDiscrimValues = null;
                             if (castCls != null && lastComponent)
                             {
                                 cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
+                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
+                                    int discNo = 0;
+                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
+                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
+                                    {
+                                        for (String castSubClassName : castSubclassNames)
+                                        {
+                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
+                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
@@ -1449,7 +1465,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                                         break;
                                                     }
                                                 }
-                                                newSqlTbl = unionStmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, false);
+                                                newSqlTbl = unionStmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, false);
                                                 if (newSqlTbl != null)
                                                 {
                                                     nextSqlTbl = newSqlTbl;
@@ -1462,7 +1478,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 }
                                 else
                                 {
-                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                                 }
                             }
 
@@ -1473,9 +1489,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         else if (relationType == RelationType.ONE_TO_ONE_BI)
                         {
                             JavaTypeMapping otherMapping = null;
+                            Object[] castDiscrimValues = null;
                             if (castCls != null && lastComponent)
                             {
                                 cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
+                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
+                                    int discNo = 0;
+                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
+                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
+                                    {
+                                        for (String castSubClassName : castSubclassNames)
+                                        {
+                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
+                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
@@ -1493,7 +1526,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 {
                                     relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                                     JavaTypeMapping relMapping = relTable.getMemberMapping(relMmd);
-                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, castDiscrimValues, joinTableGroupName, true);
                                 }
                                 else
                                 {
@@ -1507,7 +1540,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                             otherMapping = embMapping.getJavaTypeMapping(mmd.getName());
                                         }
                                     }
-                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                                 }
                             }
 
@@ -1789,27 +1822,46 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             previousMapping = null;
                             relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
+                            Object[] castDiscrimValues = null;
                             if (castCls != null && lastComponent)
                             {
                                 cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
+                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
+                                    int discNo = 0;
+                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
+                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
+                                    {
+                                        for (String castSubClassName : castSubclassNames)
+                                        {
+                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
+                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
                                 cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
                             }
+
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
+                            NucleusLogger.GENERAL.info(">> N-1 join " + mmd.getFullFieldName() + " cmd=" + cmd.getFullClassName());
                             if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                             {
                                 // Join to join table, then to related table TODO Cater for Map case
                                 CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
                                 SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null, true);
-                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                             }
                             else
                             {
                                 // Join to owner table
                                 JavaTypeMapping fkMapping = sqlTbl.getTable().getMemberMapping(mmd);
-                                sqlTbl = stmt.join(joinType, sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                sqlTbl = stmt.join(joinType, sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                             }
 
                             tblMappingSqlTbl = sqlTbl;
