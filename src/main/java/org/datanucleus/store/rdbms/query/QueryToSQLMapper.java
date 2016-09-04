@@ -1211,17 +1211,17 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Expression joinOnExpr = joinExpr.getOnExpression();
 
                 PrimaryExpression joinPrimExpr = null;
+                Class castCls = null;
                 if (joinedExpr instanceof PrimaryExpression)
                 {
                     joinPrimExpr = (PrimaryExpression)joinedExpr;
                 }
                 else if (joinedExpr instanceof DyadicExpression && joinedExpr.getOperator() == Expression.OP_CAST)
                 {
+                    // TREAT this join as a particular type
                     joinPrimExpr = (PrimaryExpression)joinedExpr.getLeft();
                     String castClassName = (String) ((Literal)joinedExpr.getRight()).getLiteral();
-                    Class castCls = clr.classForName(castClassName);
-                    // TODO Remove the exception, and use the castCls below. See Issue datanucleus-rdbms#100
-                    throw new NucleusException("We do not currently support JOIN to 'CAST(" + joinPrimExpr + ") AS " + castCls.getName() + "'");
+                    castCls = clr.classForName(castClassName);
                 }
                 else
                 {
@@ -1318,6 +1318,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                     for (int k=0;k<ids.length;k++)
                     {
+                        boolean lastComponent = (k == ids.length-1);
                         AbstractMemberMetaData mmd = cmd.getMetaDataForMember(ids[k]);
                         if (mmd == null)
                         {
@@ -1378,7 +1379,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (relationType == RelationType.ONE_TO_ONE_UNI)
                         {
                             JavaTypeMapping otherMapping = null;
-                            cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
+
                             if (mmd.isEmbedded())
                             {
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
@@ -1463,7 +1472,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         else if (relationType == RelationType.ONE_TO_ONE_BI)
                         {
                             JavaTypeMapping otherMapping = null;
-                            cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
+
                             if (mmd.isEmbedded())
                             {
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
@@ -1771,7 +1788,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             previousMapping = null;
                             relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
-                            cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                             if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                             {
