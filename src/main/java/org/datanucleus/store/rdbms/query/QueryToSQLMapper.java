@@ -1222,6 +1222,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     joinPrimExpr = (PrimaryExpression)joinedExpr.getLeft();
                     String castClassName = (String) ((Literal)joinedExpr.getRight()).getLiteral();
                     castCls = clr.classForName(castClassName);
+                    // TODO Need to add constraint on the join also
                 }
                 else
                 {
