@@ -255,21 +255,11 @@ public class BackingStoreHelper
         Class cls = clr.classForName(info.getClassName());
         if (!Modifier.isAbstract(cls.getModifiers()))
         {
-            // Include element type
-            if (strategy == DiscriminatorStrategy.CLASS_NAME)
+            // Include element discriminator
+            Object discVal = info.getAbstractClassMetaData().getDiscriminatorValue();
+            if (discVal != null)
             {
-                discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), info.getClassName());
-                jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
-            }
-            else if (strategy == DiscriminatorStrategy.ENTITY_NAME)
-            {
-                discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), info.getAbstractClassMetaData().getEntityName());
-                jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
-            }
-            else if (strategy == DiscriminatorStrategy.VALUE_MAP)
-            {
-                discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping),
-                    info.getAbstractClassMetaData().getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), discVal);
                 jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
             }
         }

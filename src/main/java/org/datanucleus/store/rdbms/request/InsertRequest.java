@@ -43,8 +43,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
-import org.datanucleus.metadata.DiscriminatorMetaData;
-import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
@@ -319,32 +317,10 @@ public class InsertRequest extends Request
                     // Discriminator mapping (optional)
                     if (table.getDiscriminatorMapping(false) != null)
                     {
-                        DiscriminatorMetaData dismd = table.getDiscriminatorMetaData();
-                        if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
+                        Object discVal = op.getClassMetaData().getDiscriminatorValue();
+                        for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
-                            for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
-                            {
-                                table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k),
-                                    op.getObject().getClass().getName());
-                            }
-                        }
-                        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
-                        {
-                            for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
-                            {
-                                table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k),
-                                    op.getClassMetaData().getEntityName());
-                            }
-                        }
-                        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
-                        {
-                            // Use Discriminator info for the actual class
-                            dismd = op.getClassMetaData().getInheritanceMetaData().getDiscriminatorMetaData();
-                            for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
-                            {
-                                table.getDiscriminatorMapping(false).setObject(ec, ps,
-                                    discriminatorStmtMapping.getParameterPositionsForOccurrence(k), dismd.getValue());
-                            }
+                            table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k), discVal);
                         }
                     }
 
