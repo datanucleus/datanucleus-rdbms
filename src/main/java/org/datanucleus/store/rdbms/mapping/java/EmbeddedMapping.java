@@ -506,6 +506,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 {
                     discrimMapping.setObject(ec, ps, new int[]{param[n]}, value.getClass().getName());
                 }
+                else if (discrimMetaData.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                {
+                    discrimMapping.setObject(ec, ps, new int[]{param[n]}, embCmd.getEntityName());
+                }
                 else if (discrimMetaData.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
                 {
                     DiscriminatorMetaData valueDismd = embCmd.getInheritanceMetaData().getDiscriminatorMetaData();

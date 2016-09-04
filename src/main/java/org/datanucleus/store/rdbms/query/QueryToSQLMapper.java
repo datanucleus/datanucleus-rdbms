@@ -2816,6 +2816,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getFullClassName());
                         }
+                        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                        {
+                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getEntityName());
+                        }
                         else
                         {
                             discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getDiscriminatorMetaData().getValue());
@@ -2830,6 +2834,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                             {
                                 discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
+                            }
+                            else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                            {
+                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getEntityName());
                             }
                             else
                             {

@@ -292,7 +292,12 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         {
             // Restrict to valid discriminator values where we have a discriminator specified on this table
             String discriminatorValue = className;
-            if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
+            if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+            {
+                AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
+                discriminatorValue = targetCmd.getEntityName();
+            }
+            else if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
             {
                 // Get the MetaData for the target class since that holds the "value"
                 AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);

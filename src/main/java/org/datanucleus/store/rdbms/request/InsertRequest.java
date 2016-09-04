@@ -324,9 +324,16 @@ public class InsertRequest extends Request
                         {
                             for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
                             {
-                                table.getDiscriminatorMapping(false).setObject(ec, ps,
-                                    discriminatorStmtMapping.getParameterPositionsForOccurrence(k),
+                                table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k),
                                     op.getObject().getClass().getName());
+                            }
+                        }
+                        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                        {
+                            for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
+                            {
+                                table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k),
+                                    op.getClassMetaData().getEntityName());
                             }
                         }
                         else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)

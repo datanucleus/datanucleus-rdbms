@@ -628,6 +628,10 @@ public class ObjectExpression extends SQLExpression
                 {
                     discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, typeCmd.getFullClassName());
                 }
+                else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                {
+                    discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, typeCmd.getEntityName());
+                }
                 else
                 {
                     discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, typeCmd.getDiscriminatorMetaData().getValue());
@@ -642,6 +646,10 @@ public class ObjectExpression extends SQLExpression
                     if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
                     {
                         discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
+                    }
+                    else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+                    {
+                        discVal = stmt.getSQLExpressionFactory().newLiteral(stmt, discMapping, subtypeCmd.getEntityName());
                     }
                     else
                     {
