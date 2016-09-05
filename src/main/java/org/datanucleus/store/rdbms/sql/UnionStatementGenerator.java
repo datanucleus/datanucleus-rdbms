@@ -291,22 +291,10 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         if (discriminatorMapping != null && discriminatorMetaData.getStrategy() != DiscriminatorStrategy.NONE)
         {
             // Restrict to valid discriminator values where we have a discriminator specified on this table
-            String discriminatorValue = className;
-            if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
-            {
-                AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
-                discriminatorValue = targetCmd.getEntityName();
-            }
-            else if (discriminatorMetaData.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
-            {
-                // Get the MetaData for the target class since that holds the "value"
-                AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
-                discriminatorValue = targetCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue();
-            }
-
+            AbstractClassMetaData targetCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(className, clr);
             SQLExpression discExpr = factory.newExpression(stmt, stmt.getPrimaryTable(), discriminatorMapping);
-            SQLExpression discVal = factory.newLiteral(stmt, discriminatorMapping, discriminatorValue);
-            stmt.whereAnd(discExpr.eq(discVal), false);
+            SQLExpression discValExpr = factory.newLiteral(stmt, discriminatorMapping, targetCmd.getDiscriminatorValue());
+            stmt.whereAnd(discExpr.eq(discValExpr), false);
         }
 
         if (table.getMultitenancyMapping() != null)

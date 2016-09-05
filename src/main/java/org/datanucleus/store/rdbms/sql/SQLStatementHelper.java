@@ -1225,16 +1225,10 @@ public class SQLStatementHelper
     public static Object getDiscriminatorValueForClass(NucleusContext nucleusCtx, String className, DiscriminatorMetaData dismd, JavaTypeMapping discriminatorMapping,
             ClassLoaderResolver clr)
     {
-        Object discriminatorValue = className; // Default to the "class-name" discriminator strategy
-        if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+        AbstractClassMetaData targetCmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, clr);
+        Object discriminatorValue = targetCmd.getDiscriminatorValue();
+        if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
         {
-            AbstractClassMetaData targetCmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, clr);
-            discriminatorValue = targetCmd.getEntityName();
-        }
-        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
-        {
-            // Get the MetaData for the target class since that holds the "value"
-            AbstractClassMetaData targetCmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(className, clr);
             String strValue = null;
             if (targetCmd.getInheritanceMetaData() != null && targetCmd.getInheritanceMetaData().getDiscriminatorMetaData() != null)
             {
@@ -1276,21 +1270,13 @@ public class SQLStatementHelper
     {
         List discrimValues = new ArrayList();
         DiscriminatorStrategy strategy = discMapping.getTable().getDiscriminatorMetaData().getStrategy();
-        if (strategy == DiscriminatorStrategy.CLASS_NAME)
-        {
-            discrimValues.add(className);
-            Collection<String> subclasses = storeMgr.getSubClassesForClass(className, true, clr);
-            if (subclasses != null && subclasses.size() > 0)
-            {
-                discrimValues.addAll(subclasses);
-            }
-        }
-        else if (strategy == DiscriminatorStrategy.ENTITY_NAME)
+        if (strategy != DiscriminatorStrategy.NONE)
         {
             MetaDataManager mmgr = storeMgr.getMetaDataManager();
             AbstractClassMetaData cmd = mmgr.getMetaDataForClass(className, clr);
+            discrimValues.add(cmd.getDiscriminatorValue());
+
             Collection<String> subclasses = storeMgr.getSubClassesForClass(className, true, clr);
-            discrimValues.add(cmd.getEntityName());
             if (subclasses != null && subclasses.size() > 0)
             {
                 Iterator<String> subclassesIter = subclasses.iterator();
@@ -1298,24 +1284,7 @@ public class SQLStatementHelper
                 {
                     String subclassName = subclassesIter.next();
                     AbstractClassMetaData subclassCmd = mmgr.getMetaDataForClass(subclassName, clr);
-                    discrimValues.add(subclassCmd.getEntityName());
-                }
-            }
-        }
-        else if (strategy == DiscriminatorStrategy.VALUE_MAP)
-        {
-            MetaDataManager mmgr = storeMgr.getMetaDataManager();
-            AbstractClassMetaData cmd = mmgr.getMetaDataForClass(className, clr);
-            Collection<String> subclasses = storeMgr.getSubClassesForClass(className, true, clr);
-            discrimValues.add(cmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
-            if (subclasses != null && subclasses.size() > 0)
-            {
-                Iterator<String> subclassesIter = subclasses.iterator();
-                while (subclassesIter.hasNext())
-                {
-                    String subclassName = subclassesIter.next();
-                    AbstractClassMetaData subclassCmd = mmgr.getMetaDataForClass(subclassName, clr);
-                    discrimValues.add(subclassCmd.getInheritanceMetaData().getDiscriminatorMetaData().getValue());
+                    discrimValues.add(subclassCmd.getDiscriminatorValue());
                 }
             }
         }
