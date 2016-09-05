@@ -42,8 +42,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.DiscriminatorMetaData;
-import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
@@ -2860,42 +2858,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (discMapping != null)
                     {
                         // Should have a discriminator always when casting this
-                        AbstractClassMetaData fieldCmd = ec.getMetaDataManager().getMetaDataForClass(castType, clr);
-                        DiscriminatorMetaData dismd = fieldCmd.getDiscriminatorMetaDataRoot();
                         SQLExpression discExpr = exprFactory.newExpression(stmt, sqlExpr.getSQLTable(), discMapping);
-                        SQLExpression discVal = null;
-                        if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
-                        {
-                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getFullClassName());
-                        }
-                        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
-                        {
-                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getEntityName());
-                        }
-                        else
-                        {
-                            discVal = exprFactory.newLiteral(stmt, discMapping, castCmd.getDiscriminatorMetaData().getValue());
-                        }
-                        BooleanExpression discRestrictExpr = discExpr.eq(discVal);
+                        Object discVal = castCmd.getDiscriminatorValue();
+                        SQLExpression discValExpr = exprFactory.newLiteral(stmt, discMapping, discVal);
+                        BooleanExpression discRestrictExpr = discExpr.eq(discValExpr);
 
                         Iterator<String> subclassIter = storeMgr.getSubClassesForClass(castType.getName(), true, clr).iterator();
                         while (subclassIter.hasNext())
                         {
                             String subclassName = subclassIter.next();
                             AbstractClassMetaData subtypeCmd = storeMgr.getMetaDataManager().getMetaDataForClass(subclassName, clr);
-                            if (dismd.getStrategy() == DiscriminatorStrategy.CLASS_NAME)
-                            {
-                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getFullClassName());
-                            }
-                            else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
-                            {
-                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getEntityName());
-                            }
-                            else
-                            {
-                                discVal = exprFactory.newLiteral(stmt, discMapping, subtypeCmd.getDiscriminatorMetaData().getValue());
-                            }
-                            BooleanExpression subtypeExpr = discExpr.eq(discVal);
+                            discVal = subtypeCmd.getDiscriminatorValue();
+                            discValExpr = exprFactory.newLiteral(stmt, discMapping, discVal);
+                            BooleanExpression subtypeExpr = discExpr.eq(discValExpr);
 
                             discRestrictExpr = discRestrictExpr.ior(subtypeExpr);
                         }
