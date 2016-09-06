@@ -1384,18 +1384,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (cmd.hasDiscriminatorStrategy())
                                 {
                                     // Restrict discriminator on cast type to be the type+subclasses
-                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
-                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
-                                    int discNo = 0;
-                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
-                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
-                                    {
-                                        for (String castSubClassName : castSubclassNames)
-                                        {
-                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
-                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
-                                        }
-                                    }
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
                                 }
                             }
                             else
@@ -1494,18 +1483,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (cmd.hasDiscriminatorStrategy())
                                 {
                                     // Restrict discriminator on cast type to be the type+subclasses
-                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
-                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
-                                    int discNo = 0;
-                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
-                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
-                                    {
-                                        for (String castSubClassName : castSubclassNames)
-                                        {
-                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
-                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
-                                        }
-                                    }
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
                                 }
                             }
                             else
@@ -1827,18 +1805,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (cmd.hasDiscriminatorStrategy())
                                 {
                                     // Restrict discriminator on cast type to be the type+subclasses
-                                    Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(castCls.getName(), true, clr);
-                                    castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
-                                    int discNo = 0;
-                                    castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
-                                    if (castSubclassNames != null && !castSubclassNames.isEmpty())
-                                    {
-                                        for (String castSubClassName : castSubclassNames)
-                                        {
-                                            AbstractClassMetaData castSubCmd = mmgr.getMetaDataForClass(castSubClassName, clr);
-                                            castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
-                                        }
-                                    }
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
                                 }
                             }
                             else
@@ -1847,7 +1814,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
 
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
-                            NucleusLogger.GENERAL.info(">> N-1 join " + mmd.getFullFieldName() + " cmd=" + cmd.getFullClassName());
                             if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                             {
                                 // Join to join table, then to related table TODO Cater for Map case
@@ -1976,6 +1942,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Move on to next join in the chain
             rightExpr = rightExpr.getRight();
         }
+    }
+
+    private Object[] getDiscriminatorValuesForCastClass(AbstractClassMetaData cmd)
+    {
+        // Restrict discriminator on cast type to be the type+subclasses
+        Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(cmd.getFullClassName(), true, clr);
+        Object[] castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
+        int discNo = 0;
+        castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
+        if (castSubclassNames != null && !castSubclassNames.isEmpty())
+        {
+            for (String castSubClassName : castSubclassNames)
+            {
+                AbstractClassMetaData castSubCmd = storeMgr.getMetaDataManager().getMetaDataForClass(castSubClassName, clr);
+                castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
+            }
+        }
+        return castDiscrimValues;
     }
 
     boolean processingOnClause = false;
