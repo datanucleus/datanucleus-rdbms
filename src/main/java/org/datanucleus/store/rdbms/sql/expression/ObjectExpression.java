@@ -580,7 +580,23 @@ public class ObjectExpression extends SQLExpression
         ClassLoaderResolver clr = stmt.getClassLoaderResolver();
 
         // Extract instanceOf type
-        String instanceofClassName = (String)((StringLiteral)expr).getValue();
+        String instanceofClassName = null;
+        SQLExpression classExpr = expr;
+        if (expr instanceof TypeConverterLiteral)
+        {
+            // For some reason the user has input "TYPE(field) = :param" and param is a type-converted value
+            classExpr = ((TypeConverterLiteral)expr).getDelegate();
+        }
+
+        if (classExpr instanceof StringLiteral)
+        {
+            instanceofClassName = (String)((StringLiteral)classExpr).getValue();
+        }
+        else
+        {
+            throw new NucleusUserException("Do not currently support `instanceof` with class expression of type " + classExpr);
+        }
+
         Class type = null;
         try
         {
