@@ -1352,9 +1352,27 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 JoinExpression joinExpr = (JoinExpression)rightExpr;
                 org.datanucleus.query.expression.JoinExpression.JoinType exprJoinType = joinExpr.getType();
                 JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
-                
                 String joinAlias = joinExpr.getAlias();
-                PrimaryExpression joinPrimExpr = joinExpr.getPrimaryExpression();
+                Expression joinedExpr = joinExpr.getJoinedExpression();
+                Expression joinOnExpr = joinExpr.getOnExpression();
+
+                PrimaryExpression joinPrimExpr = null;
+                Class castCls = null;
+                if (joinedExpr instanceof PrimaryExpression)
+                {
+                    joinPrimExpr = (PrimaryExpression)joinedExpr;
+                }
+                else if (joinedExpr instanceof DyadicExpression && joinedExpr.getOperator() == Expression.OP_CAST)
+                {
+                    // TREAT this join as a particular type. Cast type is processed below where we add the joins
+                    joinPrimExpr = (PrimaryExpression)joinedExpr.getLeft();
+                    String castClassName = (String) ((Literal)joinedExpr.getRight()).getLiteral();
+                    castCls = clr.classForName(castClassName);
+                }
+                else
+                {
+                    throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
+                }
 
                 Iterator<String> iter = joinPrimExpr.getTuples().iterator();
                 String rootId = iter.next();
@@ -1417,6 +1435,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                     for (int k=0;k<ids.length;k++)
                     {
+                        boolean lastComponent = (k == ids.length-1);
                         AbstractMemberMetaData mmd = cmd.getMetaDataForMember(ids[k]);
                         if (mmd == null)
                         {
@@ -1477,7 +1496,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         if (relationType == RelationType.ONE_TO_ONE_UNI)
                         {
                             JavaTypeMapping otherMapping = null;
-                            cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            Object[] castDiscrimValues = null;
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
+                                }
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
+
                             if (mmd.isEmbedded())
                             {
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
@@ -1548,7 +1581,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 }
                                 else
                                 {
-                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                                 }
                             }
 
@@ -1559,7 +1592,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         else if (relationType == RelationType.ONE_TO_ONE_BI)
                         {
                             JavaTypeMapping otherMapping = null;
-                            cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                            Object[] castDiscrimValues = null;
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
+                                }
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
+
                             if (mmd.isEmbedded())
                             {
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
@@ -1571,7 +1618,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 {
                                     relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                                     JavaTypeMapping relMapping = relTable.getMemberMapping(relMmd);
-                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, castDiscrimValues, joinTableGroupName, true);
                                 }
                                 else
                                 {
@@ -1585,7 +1632,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                             otherMapping = embMapping.getJavaTypeMapping(mmd.getName());
                                         }
                                     }
-                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, otherMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                                 }
                             }
 
@@ -1794,20 +1841,34 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             previousMapping = null;
                             relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
-                            cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                            Object[] castDiscrimValues = null;
+                            if (castCls != null && lastComponent)
+                            {
+                                cmd = mmgr.getMetaDataForClass(castCls, clr);
+                                if (cmd.hasDiscriminatorStrategy())
+                                {
+                                    // Restrict discriminator on cast type to be the type+subclasses
+                                    castDiscrimValues = getDiscriminatorValuesForCastClass(cmd);
+                                }
+                            }
+                            else
+                            {
+                                cmd = mmgr.getMetaDataForClass(mmd.getType(), clr);
+                            }
+
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                             if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                             {
                                 // Join to join table, then to related table TODO Cater for Map case
                                 CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
                                 SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null, true);
-                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                             }
                             else
                             {
                                 // Join to owner table
                                 JavaTypeMapping fkMapping = sqlTbl.getTable().getMemberMapping(mmd);
-                                sqlTbl = stmt.join(joinType, sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                sqlTbl = stmt.join(joinType, sqlTbl, fkMapping, relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
                             }
 
                             tblMappingSqlTbl = sqlTbl;
@@ -1903,7 +1964,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     setSQLTableMappingForAlias(joinAlias, tblMapping);
                 }
 
-                Expression joinOnExpr = joinExpr.getOnExpression();
                 if (joinOnExpr != null)
                 {
                     // Convert the ON expression to a BooleanExpression
@@ -1925,6 +1985,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Move on to next join in the chain
             rightExpr = rightExpr.getRight();
         }
+    }
+
+    private Object[] getDiscriminatorValuesForCastClass(AbstractClassMetaData cmd)
+    {
+        // Restrict discriminator on cast type to be the type+subclasses
+        Collection<String> castSubclassNames = storeMgr.getSubClassesForClass(cmd.getFullClassName(), true, clr);
+        Object[] castDiscrimValues = new Object[1 + (castSubclassNames!=null ? castSubclassNames.size() : 0)];
+        int discNo = 0;
+        castDiscrimValues[discNo++] = cmd.getDiscriminatorValue();
+        if (castSubclassNames != null && !castSubclassNames.isEmpty())
+        {
+            for (String castSubClassName : castSubclassNames)
+            {
+                AbstractClassMetaData castSubCmd = storeMgr.getMetaDataManager().getMetaDataForClass(castSubClassName, clr);
+                castDiscrimValues[discNo++] = castSubCmd.getDiscriminatorValue();
+            }
+        }
+        return castDiscrimValues;
     }
 
     boolean processingOnClause = false;
