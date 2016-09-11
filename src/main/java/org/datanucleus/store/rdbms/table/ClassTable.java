@@ -1103,6 +1103,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     AbstractClassMetaData pkCmd = getClassWithPrimaryKeyForClass(cmd.getSuperAbstractClassMetaData(), clr);
                     if (pkCmd != null)
                     {
+                        // TODO Just use cmd.getPKMemberPositions to avoid iteration to find PKs
                         pkMappings = new JavaTypeMapping[pkCmd.getNoOfPrimaryKeyMembers()];
                         pkFieldNum = 0;
                         fieldCount = pkCmd.getNoOfInheritedManagedMembers() + pkCmd.getNoOfManagedMembers();
@@ -1116,6 +1117,21 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 {
                                     // PK field is overridden so use the overriding definition
                                     fmd = overriddenFmd;
+                                }
+                                else
+                                {
+                                    AbstractClassMetaData thisCmd = cmd;
+                                    while (thisCmd.getSuperAbstractClassMetaData() != null && thisCmd.getSuperAbstractClassMetaData() != pkCmd)
+                                    {
+                                        thisCmd = thisCmd.getSuperAbstractClassMetaData();
+                                        overriddenFmd = thisCmd.getOverriddenMember(fmd.getName());
+                                        if (overriddenFmd != null)
+                                        {
+                                            // PK field is overridden so use the overriding definition
+                                            fmd = overriddenFmd;
+                                            break;
+                                        }
+                                    }
                                 }
 
                                 if (fmd.getPersistenceModifier() == FieldPersistenceModifier.PERSISTENT)
