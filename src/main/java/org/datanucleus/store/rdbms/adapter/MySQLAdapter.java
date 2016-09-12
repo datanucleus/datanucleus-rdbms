@@ -201,10 +201,9 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         // The following block originated in TJDO, and was carried across up to DataNucleus 3.0-m4
         // It is now commented out so people can use BINARY/VARBINARY. What is it trying to achieve?
-/*        // Exclude BINARY and VARBINARY since these equate to CHAR(M) BINARY
-        // and VARCHAR(M) BINARY respectively, which aren't true binary
-        // types (e.g. trailing space characters are stripped).
-        String typeName = info.getTypeName();
+        // Exclude BINARY and VARBINARY since these equate to CHAR(M) BINARY and VARCHAR(M) BINARY respectively, 
+        // which aren't true binary types (e.g. trailing space characters are stripped).
+      /*String typeName = info.getTypeName();
         if (typeName.equalsIgnoreCase("binary") || typeName.equalsIgnoreCase("varbinary"))
         {
             return null;
@@ -217,12 +216,14 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
     public String getCreateDatabaseStatement(String catalogName, String schemaName)
     {
-        return "CREATE DATABASE IF NOT EXISTS " + catalogName;
+        // TODO Use catalog when we pass it in (currently just supporting schema as input)
+        return "CREATE DATABASE IF NOT EXISTS " + schemaName;
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)
     {
-        return "DROP DATABASE IF EXISTS " + catalogName;
+        // TODO Use catalog when we pass it in (currently just supporting schema as input)
+        return "DROP DATABASE IF EXISTS " + schemaName;
     }
 
     /**
