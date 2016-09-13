@@ -755,8 +755,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     /**
      * Method to set the connection pooling type (if any).
-     * Tries to use any user-provided value if possible, otherwise will fallback to something
-     * available in the CLASSPATH (if any), else use the builtin DBCP.
+     * Tries to use any user-provided value if possible, otherwise will fallback to something available in the CLASSPATH (if any), else use the builtin DBCP2.
      * @param storeMgr Store Manager
      * @param requiredPoolingType Pooling type requested by the user
      * @return Pooling type to use (name of a pool type)
@@ -768,10 +767,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         if (poolingType != null)
         {
-            // User-specified, so check availability
-            if (poolingType.equalsIgnoreCase("DBCP") && !dbcpPresent(clr))
+            // User-specified, so check availability TODO Drop this since each pooler checks itself
+            if (poolingType.equalsIgnoreCase("DBCP2") && !dbcp2Present(clr))
             {
-                NucleusLogger.CONNECTION.warn("DBCP specified but not present in CLASSPATH (or one of dependencies)");
+                NucleusLogger.CONNECTION.warn("DBCP2 specified but not present in CLASSPATH (or one of dependencies)");
                 poolingType = null;
             }
             else if (poolingType.equalsIgnoreCase("C3P0") && !c3p0Present(clr))
@@ -792,9 +791,9 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         }
 
         // Not specified, so try to find one in the CLASSPATH
-        if (poolingType == null && dbcpPresent(clr))
+        if (poolingType == null && dbcp2Present(clr))
         {
-            poolingType = "DBCP";
+            poolingType = "DBCP2";
         }
         if (poolingType == null && c3p0Present(clr))
         {
@@ -811,24 +810,24 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         if (poolingType == null)
         {
-            // Fallback to built-in DBCP
-            poolingType = "dbcp-builtin";
+            // Fallback to built-in DBCP2
+            poolingType = "dbcp2-builtin";
         }
         return poolingType;
     }
 
-    protected static boolean dbcpPresent(ClassLoaderResolver clr)
+    protected static boolean dbcp2Present(ClassLoaderResolver clr)
     {
         try
         {
-            // Need commons-dbcp, commons-pool, commons-collections
-            clr.classForName("org.apache.commons.pool.ObjectPool");
-            clr.classForName("org.apache.commons.dbcp.ConnectionFactory");
+            // Need commons-dbcp, commons-pool
+            clr.classForName("org.apache.commons.pool2.ObjectPool");
+            clr.classForName("org.apache.commons.dbcp2.ConnectionFactory");
             return true;
         }
         catch (ClassNotResolvedException cnre)
         {
-            // DBCP not available
+            // DBCP2 not available
             return false;
         }
     }
