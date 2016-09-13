@@ -216,14 +216,12 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
     public String getCreateDatabaseStatement(String catalogName, String schemaName)
     {
-        // TODO Use catalog when we pass it in (currently just supporting schema as input)
-        return "CREATE DATABASE IF NOT EXISTS " + schemaName;
+        return "CREATE DATABASE IF NOT EXISTS " + catalogName;
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)
     {
-        // TODO Use catalog when we pass it in (currently just supporting schema as input)
-        return "DROP DATABASE IF EXISTS " + schemaName;
+        return "DROP DATABASE IF EXISTS " + catalogName;
     }
 
     /**
