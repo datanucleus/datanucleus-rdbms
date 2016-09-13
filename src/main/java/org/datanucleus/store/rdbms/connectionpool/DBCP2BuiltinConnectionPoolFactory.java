@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2014 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2016 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -24,12 +24,17 @@ import javax.sql.DataSource;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
+import org.datanucleus.store.rdbms.datasource.dbcp2.ConnectionFactory;
+import org.datanucleus.store.rdbms.datasource.dbcp2.DriverManagerConnectionFactory;
+import org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnection;
+import org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnectionFactory;
+import org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource;
+import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.ObjectPool;
+import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.GenericObjectPool;
 
 /**
- * Plugin for the creation of a DBCP2 connection pool.
- * Note that all Apache DBCP classes are named explicitly in the code to avoid loading them at class initialisation.
- * (see http://jakarta.apache.org/commons/dbcp/). Also see 
- * http://jakarta.apache.org/commons/dbcp/apidocs/org/apache/commons/dbcp/package-summary.html#package_description
+ * Plugin for the creation of a DBCP2 connection pool, using repackaged DBCP2 classes.
+ * See http://jakarta.apache.org/commons/dbcp/apidocs/org/apache/commons/dbcp/package-summary.html#package_description
  * for javadocs that give pretty much the only useful description of DBCP2.
  */
 public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFactory
@@ -46,17 +51,17 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         loadDriver(dbDriver, clr);
 
-        org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource ds = null;
-        org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.GenericObjectPool<org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnection> connectionPool;
+        PoolingDataSource ds = null;
+        GenericObjectPool<PoolableConnection> connectionPool;
         try
         {
             // Create a factory to be used by the pool to create the connections
             Properties dbProps = getPropertiesForDriver(storeMgr);
-            org.datanucleus.store.rdbms.datasource.dbcp2.ConnectionFactory connectionFactory = new org.datanucleus.store.rdbms.datasource.dbcp2.DriverManagerConnectionFactory(dbURL, dbProps);
+            ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(dbURL, dbProps);
 
             // Wrap the connections and statements with pooled variants
-            org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnectionFactory poolableCF = null;
-            poolableCF = new org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnectionFactory(connectionFactory, null);
+            PoolableConnectionFactory poolableCF = null;
+            poolableCF = new PoolableConnectionFactory(connectionFactory, null);
 
             String testSQL = null;
             if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL))
@@ -66,7 +71,7 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
             }
 
             // Create the actual pool of connections, and apply any properties
-            connectionPool = new org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.GenericObjectPool(poolableCF);
+            connectionPool = new GenericObjectPool(poolableCF);
             poolableCF.setPool(connectionPool);
             if (testSQL != null)
             {
@@ -141,9 +146,9 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
 
     public class DBCPConnectionPool implements ConnectionPool
     {
-        final org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource dataSource;
-        final org.datanucleus.store.rdbms.datasource.dbcp2.pool2.ObjectPool pool;
-        public DBCPConnectionPool(org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource ds, org.datanucleus.store.rdbms.datasource.dbcp2.pool2.ObjectPool pool)
+        final PoolingDataSource dataSource;
+        final ObjectPool pool;
+        public DBCPConnectionPool(PoolingDataSource ds, ObjectPool pool)
         {
             this.dataSource = ds;
             this.pool = pool;
