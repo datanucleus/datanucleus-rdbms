@@ -128,12 +128,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 stmt = conn.createStatement();
                 NucleusLogger.DATASTORE_SCHEMA.debug(stmtText);
                 boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("createSchema returned " + success);
+                NucleusLogger.DATASTORE_SCHEMA.debug("createDatabase returned " + success);
             }
             catch (SQLException sqle)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown creating schema " + schemaName, sqle);
-                throw new NucleusException("Exception thrown in createSchema. See the log for full details : " + sqle.getMessage());
+                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown creating database cat=" + catalogName + " sch=" + schemaName, sqle);
+                throw new NucleusException("Exception thrown in createDatabase. See the log for full details : " + sqle.getMessage());
             }
             finally
             {
@@ -183,12 +183,12 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 stmt = conn.createStatement();
                 NucleusLogger.DATASTORE_SCHEMA.debug(stmtText);
                 boolean success = stmt.execute(stmtText);
-                NucleusLogger.DATASTORE_SCHEMA.debug("deleteSchema returned " + success);
+                NucleusLogger.DATASTORE_SCHEMA.debug("deleteDatabase returned " + success);
             }
             catch (SQLException sqle)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown in deleteSchema " + schemaName, sqle);
-                throw new NucleusException("Exception thrown in deleteSchema. See the log for full details : " + sqle.getMessage());
+                NucleusLogger.DATASTORE_SCHEMA.error("Exception thrown deleting database cat=" + catalogName + " sch=" + schemaName, sqle);
+                throw new NucleusException("Exception thrown in deleteDatabase. See the log for full details : " + sqle.getMessage());
             }
             finally
             {
