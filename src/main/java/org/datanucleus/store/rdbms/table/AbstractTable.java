@@ -536,7 +536,7 @@ public abstract class AbstractTable implements Table
                 NucleusLogger.DATASTORE_SCHEMA.debug("Check of existence of catalog=" + identifier.getCatalogName() + " schema=" + identifier.getSchemaName() + " returned " + (info != null));
                 if (info == null)
                 {
-                    storeMgr.getSchemaHandler().createSchema(identifier.getSchemaName(), null, conn);
+                    storeMgr.getSchemaHandler().createDatabase(identifier.getCatalogName(), identifier.getSchemaName(), null, conn);
                 }
             }
         }

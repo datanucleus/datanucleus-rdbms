@@ -105,16 +105,14 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#createSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#createDatabase(java.lang.String, java.lang.String, java.util.Properties, java.lang.Object)
      */
     @Override
-    public void createSchema(String schemaName, Properties props, Object connection)
+    public void createDatabase(String catalogName, String schemaName, Properties props, Object connection)
     {
-        // TODO Take in catalog also
         try
         {
-            RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
-            String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(rdbmsStoreMgr.getCatalogName(), schemaName);
+            String stmtText = getDatastoreAdapter().getCreateDatabaseStatement(catalogName, schemaName);
 
             ManagedConnection mconn = null;
             Connection conn = (Connection)connection;
@@ -162,16 +160,14 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#deleteSchema(java.lang.String, java.util.Properties, java.lang.Object)
+     * @see org.datanucleus.store.schema.AbstractStoreSchemaHandler#deleteSchema(java.lang.String, java.lang.String, java.util.Properties, java.lang.Object)
      */
     @Override
-    public void deleteSchema(String schemaName, Properties props, Object connection)
+    public void deleteDatabase(String catalogName, String schemaName, Properties props, Object connection)
     {
-        // TODO Take in catalog also
         try
         {
-            RDBMSStoreManager rdbmsStoreMgr = (RDBMSStoreManager)storeMgr;
-            String stmtText = getDatastoreAdapter().getDropDatabaseStatement(rdbmsStoreMgr.getCatalogName(), schemaName);
+            String stmtText = getDatastoreAdapter().getDropDatabaseStatement(catalogName, schemaName);
 
             ManagedConnection mconn = null;
             Connection conn = (Connection)connection;
