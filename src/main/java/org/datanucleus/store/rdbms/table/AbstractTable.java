@@ -412,8 +412,7 @@ public abstract class AbstractTable implements Table
                 if (dupMd == null)
                 {
                     // ColumnMetaData for required column has no parent class somehow!
-                    throw new NucleusUserException(Localiser.msg("057044",
-                        name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
+                    throw new NucleusUserException(Localiser.msg("057044", name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
                 }
             }
 
@@ -431,8 +430,8 @@ public abstract class AbstractTable implements Table
 
                 // Make sure the field JavaTypeMappings are compatible
                 if (mapping != null &&
-                        !mapping.getClass().isAssignableFrom(existingCol.getJavaTypeMapping().getClass()) &&
-                        !existingCol.getJavaTypeMapping().getClass().isAssignableFrom(mapping.getClass())) 
+                    !mapping.getClass().isAssignableFrom(existingCol.getJavaTypeMapping().getClass()) &&
+                    !existingCol.getJavaTypeMapping().getClass().isAssignableFrom(mapping.getClass())) 
                 {
                     // the mapping class must be the same (not really required, but to avoid user mistakes)
                     throw new DuplicateColumnException(this.toString(), existingCol, col);
@@ -440,15 +439,17 @@ public abstract class AbstractTable implements Table
             }
             else
             {
-                if (mapping != null && mapping.getMemberMetaData() != null)
+                if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Column " + existingCol + 
-                        " has already been defined but needing to reuse it for " + mapping.getMemberMetaData().getFullFieldName());
-                }
-                else
-                {
-                    NucleusLogger.DATASTORE_SCHEMA.warn("Column " + existingCol + 
-                        " has already been defined but needing to reuse it");
+                    if (mapping != null && mapping.getMemberMetaData() != null)
+                    {
+                        NucleusLogger.DATASTORE_SCHEMA.debug("Column " + existingCol + 
+                            " has already been defined but needing to reuse it for " + mapping.getMemberMetaData().getFullFieldName());
+                    }
+                    else
+                    {
+                        NucleusLogger.DATASTORE_SCHEMA.debug("Column " + existingCol + " has already been defined but needing to reuse it");
+                    }
                 }
             }
 
@@ -630,7 +631,7 @@ public abstract class AbstractTable implements Table
      * Equality operator.
      * @param obj The object to compare against
      * @return Whether the objects are equal
-     **/
+     */
     public final boolean equals(Object obj)
     {
         if (obj == this)
@@ -644,14 +645,13 @@ public abstract class AbstractTable implements Table
         }
 
         AbstractTable t = (AbstractTable)obj;
-
         return getClass().equals(t.getClass()) && identifier.equals(t.identifier) && storeMgr.equals(t.storeMgr);
     }
 
     /**
-     * Accessor for the hascode of this table.
+     * Accessor for the hash code of this table.
      * @return The hash code.
-     **/
+     */
     public final int hashCode()
     {
         return hashCode;
@@ -742,13 +742,13 @@ public abstract class AbstractTable implements Table
      * Accessor for the SQL create statements.
      * @param props Properties controlling the table creation
      * @return The SQL Create statements
-     **/
+     */
     protected abstract List getSQLCreateStatements(Properties props);
 
     /**
      * Accessor for the SQL drop statements.
      * @return The SQL Drop statements
-     **/
+     */
     protected abstract List getSQLDropStatements();
 
     protected void assertIsPKUninitialized()
