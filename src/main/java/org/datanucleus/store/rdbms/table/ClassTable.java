@@ -550,17 +550,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             if (secTable == null)
                             {
                                 // Secondary table doesnt exist yet so create it to users specifications.
-                                JoinMetaData[] joinmds = theCmd.getJoinMetaData();
-                                JoinMetaData joinmd = null;
+                                List<JoinMetaData> joinmds = theCmd.getJoinMetaData();
+                                JoinMetaData theJoinMD = null;
                                 if (joinmds != null)
                                 {
-                                    for (int j=0;j<joinmds.length;j++)
+                                    for (JoinMetaData joinmd : joinmds)
                                     {
-                                        if (joinmds[j].getTable().equalsIgnoreCase(mmd.getTable()) &&
-                                            (joinmds[j].getCatalog() == null || (joinmds[j].getCatalog() != null && joinmds[j].getCatalog().equalsIgnoreCase(mmd.getCatalog()))) &&
-                                            (joinmds[j].getSchema() == null || (joinmds[j].getSchema() != null && joinmds[j].getSchema().equalsIgnoreCase(mmd.getSchema()))))
+                                        if (joinmd.getTable().equalsIgnoreCase(mmd.getTable()) &&
+                                            (joinmd.getCatalog() == null || (joinmd.getCatalog() != null && joinmd.getCatalog().equalsIgnoreCase(mmd.getCatalog()))) &&
+                                            (joinmd.getSchema() == null || (joinmd.getSchema() != null && joinmd.getSchema().equalsIgnoreCase(mmd.getSchema()))))
                                         {
-                                            joinmd = joinmds[j];
+                                            theJoinMD = joinmd;
                                             break;
                                         }
                                     }
@@ -583,7 +583,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 secTableIdentifier.setCatalogName(catalogName);
                                 secTableIdentifier.setSchemaName(schemaName);
 
-                                secTable = new SecondaryTable(secTableIdentifier, storeMgr, this, joinmd, clr);
+                                secTable = new SecondaryTable(secTableIdentifier, storeMgr, this, theJoinMD, clr);
                                 secTable.preInitialize(clr);
                                 secTable.initialize(clr);
                                 secTable.postInitialize(clr);
@@ -2086,12 +2086,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         while (cmdIter.hasNext())
         {
             AbstractClassMetaData thisCmd = cmdIter.next();
-            IndexMetaData[] classIndices = thisCmd.getIndexMetaData();
+            List<IndexMetaData> classIndices = thisCmd.getIndexMetaData();
             if (classIndices != null)
             {
-                for (int i=0;i<classIndices.length;i++)
+                for (IndexMetaData idxmd : classIndices)
                 {
-                    Index index = getIndexForIndexMetaData(classIndices[i]);
+                    Index index = getIndexForIndexMetaData(idxmd);
                     if (index != null)
                     {
                         indices.add(index);
@@ -2302,12 +2302,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         while (cmdIter.hasNext())
         {
             AbstractClassMetaData thisCmd = cmdIter.next();
-            ForeignKeyMetaData[] fkmds = thisCmd.getForeignKeyMetaData();
+            List<ForeignKeyMetaData> fkmds = thisCmd.getForeignKeyMetaData();
             if (fkmds != null)
             {
-                for (int i=0;i<fkmds.length;i++)
+                for (ForeignKeyMetaData fkmd : fkmds)
                 {
-                    ForeignKey fk = getForeignKeyForForeignKeyMetaData(fkmds[i]);
+                    ForeignKey fk = getForeignKeyForForeignKeyMetaData(fkmd);
                     if (fk != null)
                     {
                         foreignKeys.add(fk);
@@ -2580,12 +2580,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         while (cmdIter.hasNext())
         {
             AbstractClassMetaData thisCmd = cmdIter.next();
-            UniqueMetaData[] classCKs = thisCmd.getUniqueMetaData();
+            List<UniqueMetaData> classCKs = thisCmd.getUniqueMetaData();
             if (classCKs != null)
             {
-                for (int i=0;i<classCKs.length;i++)
+                for (UniqueMetaData unimd : classCKs)
                 {
-                    CandidateKey ck = getCandidateKeyForUniqueMetaData(classCKs[i]);
+                    CandidateKey ck = getCandidateKeyForUniqueMetaData(unimd);
                     if (ck != null)
                     {
                         candidateKeys.add(ck);

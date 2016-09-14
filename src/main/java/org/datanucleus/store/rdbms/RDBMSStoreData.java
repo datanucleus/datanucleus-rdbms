@@ -18,6 +18,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
+import java.util.List;
+
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ImplementsMetaData;
@@ -75,10 +77,10 @@ public class RDBMSStoreData extends StoreData
         }
 
         String interfaces = null;
-        ImplementsMetaData[] implMds = cmd.getImplementsMetaData();
+        List<ImplementsMetaData> implMds = cmd.getImplementsMetaData();
         if (implMds != null)
         {
-            for (int i=0; i<cmd.getImplementsMetaData().length; i++)
+            for (ImplementsMetaData implmd : implMds)
             {
                 if (interfaces == null)
                 {
@@ -88,7 +90,7 @@ public class RDBMSStoreData extends StoreData
                 {
                     interfaces += ",";
                 }
-                interfaces += cmd.getImplementsMetaData()[i].getName();
+                interfaces += implmd.getName();
             }
             this.interfaceName = interfaces;
         }

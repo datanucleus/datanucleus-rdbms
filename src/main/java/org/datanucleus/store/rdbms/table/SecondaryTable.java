@@ -78,14 +78,17 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         {
             //if a join was not declared at field level,
             //look for joins declared at class level
-            JoinMetaData[] joins = this.primaryTable.getClassMetaData().getJoinMetaData();
-            for (int i=0; i<joins.length; i++)
+            List<JoinMetaData> joins = this.primaryTable.getClassMetaData().getJoinMetaData();
+            if (joins != null)
             {
-                if (tableName.getName().equals(joins[i].getTable()))
+                for (JoinMetaData joinmd : joins)
                 {
-                    //found a join table with same name as this table name
-                    this.joinMetaData = joins[i];
-                    break;
+                    if (tableName.getName().equals(joinmd.getTable()))
+                    {
+                        //found a join table with same name as this table name
+                        this.joinMetaData = joinmd;
+                        break;
+                    }
                 }
             }
         }
