@@ -1202,8 +1202,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (rightExpr instanceof JoinExpression)
             {
                 JoinExpression joinExpr = (JoinExpression)rightExpr;
-                org.datanucleus.query.expression.JoinExpression.JoinType exprJoinType = joinExpr.getType();
-                JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
+                JoinExpression.JoinType exprJoinType = joinExpr.getType();
                 String joinAlias = joinExpr.getAlias();
                 Expression joinedExpr = joinExpr.getJoinedExpression();
                 Expression joinOnExpr = joinExpr.getOnExpression();
@@ -1226,6 +1225,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
                 }
 
+                JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
                 if (joinPrimExpr.getTuples().size() == 1)
                 {
                     // DN Extension : Join to (new) root element? We need an ON expression to be supplied in this case
@@ -1320,8 +1320,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         AbstractMemberMetaData mmd = cmd.getMetaDataForMember(ids[k]);
                         if (mmd == null)
                         {
-                            if (exprJoinType == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER ||
-                                exprJoinType == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER_FETCH)
+                            if (exprJoinType == JoinExpression.JoinType.JOIN_LEFT_OUTER || exprJoinType == JoinExpression.JoinType.JOIN_LEFT_OUTER_FETCH)
                             {
                                 // Polymorphic join, where the field exists in a subclass (doable since we have outer join)
                                 String[] subclasses = mmgr.getSubclassesForClass(cmd.getFullClassName(), true);
@@ -1357,9 +1356,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         AbstractMemberMetaData relMmd = null;
                         if (relationType != RelationType.NONE)
                         {
-                            if (exprJoinType == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_INNER_FETCH || 
-                                exprJoinType == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER_FETCH || 
-                                exprJoinType == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_RIGHT_OUTER_FETCH)
+                            if (JoinExpression.JoinType.isFetch(exprJoinType))
                             {
                                 // Add field to FetchPlan since marked for FETCH
                                 String fgName = "QUERY_FETCH_" + mmd.getFullFieldName();
