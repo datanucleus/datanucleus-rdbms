@@ -181,8 +181,7 @@ public class InsertRequest extends Request
         insertStmt = consumer.getInsertStmt();
 
         // TODO Need to also check on whether there is inheritance with multiple tables
-        if (!hasIdentityColumn && !cmd.hasRelations(clr, table.getStoreManager().getMetaDataManager()) && 
-            externalFKStmtMappings == null)
+        if (!hasIdentityColumn && !cmd.hasRelations(clr) &&  externalFKStmtMappings == null)
         {
             // No identity, no persistence-by-reachability and no external FKs so should be safe to batch this
             batch = true;

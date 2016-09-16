@@ -109,7 +109,7 @@ public class FlushReferential extends FlushOrdered
 
     private boolean isClassSuitableForBatching(ExecutionContext ec, AbstractClassMetaData cmd)
     {
-        if (cmd.hasRelations(ec.getClassLoaderResolver(), ec.getMetaDataManager()))
+        if (cmd.hasRelations(ec.getClassLoaderResolver()))
         {
             return false;
         }

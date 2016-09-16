@@ -23,7 +23,6 @@ import java.util.Map;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -168,10 +167,9 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
-        AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
+        AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
         {
             // Map formed in join table - add join to join table, then to key/value tables (if present)
@@ -433,10 +431,9 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
-        AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
+        AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
         MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
         SelectStatement subStmt = null;
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)

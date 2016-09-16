@@ -24,7 +24,6 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -113,7 +112,6 @@ public class MapGetMethod extends AbstractSQLMethod
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         MapMetaData mapmd = mmd.getMap();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
 
         JavaTypeMapping ownerMapping = null;
         JavaTypeMapping keyMapping = null;
@@ -130,7 +128,7 @@ public class MapGetMethod extends AbstractSQLMethod
         else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
             // ForeignKey from value table to key
-            AbstractClassMetaData valCmd = mapmd.getValueClassMetaData(clr, mmgr);
+            AbstractClassMetaData valCmd = mapmd.getValueClassMetaData(clr);
             mapTbl = storeMgr.getDatastoreClass(mmd.getMap().getValueType(), clr);
             if (mmd.getMappedBy() != null)
             {
@@ -148,7 +146,7 @@ public class MapGetMethod extends AbstractSQLMethod
         else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
         {
             // ForeignKey from key table to value
-            AbstractClassMetaData keyCmd = mapmd.getKeyClassMetaData(clr, mmgr);
+            AbstractClassMetaData keyCmd = mapmd.getKeyClassMetaData(clr);
             mapTbl = storeMgr.getDatastoreClass(mmd.getMap().getKeyType(), clr);
             if (mmd.getMappedBy() != null)
             {
@@ -197,8 +195,6 @@ public class MapGetMethod extends AbstractSQLMethod
     protected SQLExpression getAsInnerJoin(MapExpression mapExpr, SQLExpression keyValExpr)
     {
         JavaTypeMapping m = mapExpr.getJavaTypeMapping();
-        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
         if (mmd != null)
         {
@@ -215,7 +211,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 stmt.whereAnd(keyExpr.eq(keyValExpr), true);
 
                 // Return value expression
-                if (mapmd.getValueClassMetaData(clr, mmgr) != null)
+                if (mapmd.getValueClassMetaData(clr) != null)
                 {
                     // Persistable value so join to its table
                     DatastoreClass valTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getValueType(), clr);
@@ -232,7 +228,7 @@ public class MapGetMethod extends AbstractSQLMethod
             {
                 // Key stored in value table, so join to value table
                 DatastoreClass valTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getValueType(), clr);
-                AbstractClassMetaData valCmd = mapmd.getValueClassMetaData(clr, mmgr);
+                AbstractClassMetaData valCmd = mapmd.getValueClassMetaData(clr);
                 JavaTypeMapping mapTblOwnerMapping;
                 if (mmd.getMappedBy() != null)
                 {
@@ -257,7 +253,7 @@ public class MapGetMethod extends AbstractSQLMethod
             {
                 // Value stored in key table, so join to key table
                 DatastoreClass keyTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getKeyType(), clr);
-                AbstractClassMetaData keyCmd = mapmd.getKeyClassMetaData(clr, mmgr);
+                AbstractClassMetaData keyCmd = mapmd.getKeyClassMetaData(clr);
                 JavaTypeMapping mapTblOwnerMapping;
                 if (mmd.getMappedBy() != null)
                 {

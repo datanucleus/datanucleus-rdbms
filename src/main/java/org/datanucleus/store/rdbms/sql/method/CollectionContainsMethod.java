@@ -286,7 +286,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
+        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr);
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
         if (elemIsUnbound)
         {
@@ -466,7 +466,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
+        AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr);
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
         String elemType = mmd.getCollection().getElementType();
         if (elemIsUnbound)

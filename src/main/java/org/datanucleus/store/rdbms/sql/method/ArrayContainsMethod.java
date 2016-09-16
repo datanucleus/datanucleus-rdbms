@@ -229,8 +229,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         AbstractMemberMetaData mmd = arrExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData elemCmd =
-            mmd.getArray().getElementClassMetaData(clr, storeMgr.getMetaDataManager());
+        AbstractClassMetaData elemCmd = mmd.getArray().getElementClassMetaData(clr);
         ArrayTable joinTbl = (ArrayTable)storeMgr.getTable(mmd);
         SelectStatement subStmt = null;
         if (joinTbl != null)

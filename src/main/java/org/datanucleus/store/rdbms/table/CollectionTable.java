@@ -160,8 +160,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             // PK is required so maybe need to add an index to form the PK
             if (isEmbeddedElementPC())
             {
-                if (mmd.getCollection().getElementClassMetaData(clr, 
-                    storeMgr.getMetaDataManager()).getIdentityType() != IdentityType.APPLICATION)
+                if (mmd.getCollection().getElementClassMetaData(clr).getIdentityType() != IdentityType.APPLICATION)
                 {
                     // Embedded PC with datastore id so we need an index to form the PK
                     orderRequired = true;

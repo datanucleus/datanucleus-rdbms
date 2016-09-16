@@ -24,7 +24,6 @@ import java.util.Map;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -249,9 +248,8 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
+        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
         {
             // Map formed in join table - add join to join table, then to key table (if present)
@@ -294,7 +292,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         else if (mmd.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
             // Map formed in value table - add join to value table, then to key table
-            AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+            AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
             DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
             AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
             JavaTypeMapping ownerMapping = null;
@@ -417,9 +415,8 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
-        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr, mmgr);
+        AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
         MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
         SelectStatement subStmt = null;
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
@@ -487,7 +484,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
         else if (mmd.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
             // Key stored in value table
-            AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr, mmgr);
+            AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
             DatastoreClass valTbl = storeMgr.getDatastoreClass(mmd.getMap().getValueType(), clr);
             JavaTypeMapping ownerMapping = null;
             if (mmd.getMappedBy() != null)

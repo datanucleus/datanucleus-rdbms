@@ -280,7 +280,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                     orderRequired = true;
                 }
                 else if (storeMgr.getApiAdapter().getName().equalsIgnoreCase("JDO") &&
-                    mmd.getMap().getKeyClassMetaData(clr, storeMgr.getMetaDataManager()).getIdentityType() != IdentityType.APPLICATION)
+                    mmd.getMap().getKeyClassMetaData(clr).getIdentityType() != IdentityType.APPLICATION)
                 {
                     // Embedded key PC with datastore id so we need an index to form the PK TODO It is arguable that we can just use all embedded key fields as part of PK here always
                     orderRequired = true;
