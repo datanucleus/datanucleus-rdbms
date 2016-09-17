@@ -89,7 +89,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
-import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.IdentityMetaData;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
@@ -2082,7 +2081,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         AbstractMemberMetaData mmd = null;
         IdentityStrategy strategy = null;
         String sequence = null;
-        ExtensionMetaData[] extensions = null;
+        Map<String, String> extensions = null;
         if (absoluteFieldNumber >= 0)
         {
             // real field
@@ -2167,12 +2166,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         // Add any extension properties
-        if (extensions != null)
+        if (extensions != null && extensions.size() > 0)
         {
-            for (int i=0;i<extensions.length;i++)
-            {
-                properties.put(extensions[i].getKey(), extensions[i].getValue());
-            }
+            properties.putAll(extensions);
         }
 
         if (strategy.equals(IdentityStrategy.NATIVE))
@@ -2254,13 +2250,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 properties.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, "" + seqmd.getDatastoreSequence());
 
                 // Add on any extensions specified on the sequence
-                ExtensionMetaData[] seqExtensions = seqmd.getExtensions();
-                if (seqExtensions != null)
+                Map<String, String> seqExtensions = seqmd.getExtensions();
+                if (seqExtensions != null && seqExtensions.size() > 0)
                 {
-                    for (int i=0;i<seqExtensions.length;i++)
-                    {
-                        properties.put(seqExtensions[i].getKey(), seqExtensions[i].getValue());
-                    }
+                    properties.putAll(seqExtensions);
                 }
             }
             else

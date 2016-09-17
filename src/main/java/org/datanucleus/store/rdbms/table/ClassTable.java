@@ -53,7 +53,6 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.ElementMetaData;
-import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.ForeignKeyAction;
@@ -2720,16 +2719,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         else
         {
             // Create the DDL
-            if (cmd.getExtensions() != null)
+            Map<String, String> emds = cmd.getExtensions();
+            if (emds != null)
             {
                 tableProps = new Properties();
-                ExtensionMetaData[] emds = cmd.getExtensions();
-                for (int i=0;i<emds.length;i++)
+                if (emds.size() > 0)
                 {
-                    if (emds[i].getVendorName().equalsIgnoreCase(MetaData.VENDOR_NAME))
-                    {
-                        tableProps.put(emds[i].getKey(), emds[i].getValue());
-                    }
+                    tableProps.putAll(emds);
                 }
             }
             stmts = super.getSQLCreateStatements(tableProps);

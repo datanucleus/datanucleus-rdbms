@@ -18,13 +18,13 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
+import java.util.Map;
 import java.util.Properties;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.metadata.ExtensionMetaData;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -72,14 +72,10 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
 
         // Create the controlling properties for this sequence
         Properties props = new Properties();
-        ExtensionMetaData[] seqExtensions = seqMetaData.getExtensions();
-        if (seqExtensions != null && seqExtensions.length > 0)
+        Map<String, String> seqExtensions = seqMetaData.getExtensions();
+        if (seqExtensions != null && seqExtensions.size() > 0)
         {
-            // Add all MetaData extension properties provided
-            for (int i=0;i<seqExtensions.length;i++)
-            {
-                props.put(seqExtensions[i].getKey(), seqExtensions[i].getValue());
-            }
+            props.putAll(seqExtensions);
         }
         props.put(ValueGenerator.PROPERTY_SEQUENCE_NAME, seqMetaData.getDatastoreSequence());
         if (seqMetaData.getAllocationSize() > 0)
