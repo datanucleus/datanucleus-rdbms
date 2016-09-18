@@ -212,11 +212,13 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             }
             else
             {
+                // Default is to use the ID of the related object
                 referenceMapping = storeMgr.getDatastoreClass(mmd.getType().getName(), clr).getIdMapping();
+                // TODO Add option to use a natural-id in the other class. Find the mapping using the targetColumnName
             }
 
             // Generate a mapping from the columns of the referenced object to this mapping's ColumnMetaData
-            CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(mmd, referenceMapping, true);
+            CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(mmd, table, referenceMapping, true);
 
             // Find any related field where this is part of a bidirectional relation
             RelationType relationType = mmd.getRelationType(clr);

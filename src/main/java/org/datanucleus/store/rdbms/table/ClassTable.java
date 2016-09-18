@@ -1420,7 +1420,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     // 1-N Map with value stored in the key
                                     colmdContainer = ownerFmd.getKeyMetaData();
                                 }
-                                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(colmdContainer, ownerIdMapping, true);
+                                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(colmdContainer, this, ownerIdMapping, true);
                                 int countIdFields = ownerIdMapping.getNumberOfDatastoreMappings();
                                 for (int i=0; i<countIdFields; i++)
                                 {

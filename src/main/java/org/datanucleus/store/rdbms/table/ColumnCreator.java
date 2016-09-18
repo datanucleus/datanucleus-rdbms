@@ -226,7 +226,7 @@ public final class ColumnCreator
                 {
                     columnContainer = (ColumnMetaDataContainer)columnMetaData[0].getParent();
                 }
-                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(columnContainer, columnMetaData, m, true);
+                CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(columnContainer, table, columnMetaData, m, true);
                 for (int i=0; i<m.getNumberOfDatastoreMappings(); i++)
                 {
                     JavaTypeMapping refDatastoreMapping = storeMgr.getMappingManager().getMapping(m.getDatastoreMapping(i).getJavaTypeMapping().getJavaType());

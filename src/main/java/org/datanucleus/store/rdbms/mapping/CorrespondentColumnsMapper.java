@@ -29,6 +29,7 @@ import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MultiMapping;
+import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -54,18 +55,17 @@ public class CorrespondentColumnsMapper
 
     /**
      * Constructor.
-     * Takes the sideB mapping and the side A definition of column metadata and matches them up as
-     * defined by the user, and if not defined by the user matches them as best it can. This constructor
-     * allows specification of the column metadata array directly, rather than taking what the container has
-     * - is used by ColumnCreator where the user has specified multiple columns but only some of them are for
-     * this field being mapped.
+     * Takes the sideB mapping and the side A definition of column metadata and matches them up as defined by the user, 
+     * and if not defined by the user matches them as best it can. This constructor allows specification of the column metadata array 
+     * directly, rather than taking what the container has - is used by ColumnCreator where the user has specified multiple columns 
+     * but only some of them are for this field being mapped.
      * @param columnContainer Container of the columns for side A
+     * @param tableA Table on side A
      * @param colmds MetaData for the columns to be used
      * @param mappingSideB the mapping in the side B
      * @param updateContainer Whether to add any missing ColumnMetaData objects to the container
      */
-    public CorrespondentColumnsMapper(ColumnMetaDataContainer columnContainer, ColumnMetaData[] colmds,
-        JavaTypeMapping mappingSideB, boolean updateContainer)
+    public CorrespondentColumnsMapper(ColumnMetaDataContainer columnContainer, Table tableA, ColumnMetaData[] colmds, JavaTypeMapping mappingSideB, boolean updateContainer)
     {
         // Go through the user-defined columns and allocate them as required
         if (columnContainer != null && colmds != null)
@@ -73,7 +73,7 @@ public class CorrespondentColumnsMapper
             int noOfUserColumns = colmds.length;
 
             // Generate string of user-specified columns for use in diagnostics
-            StringBuilder str=new StringBuilder("Columns [");
+            StringBuilder str = new StringBuilder("Columns [");
             for (int i=0;i<noOfUserColumns;i++)
             {
                 str.append(colmds[i].getName());
@@ -131,8 +131,7 @@ public class CorrespondentColumnsMapper
                     for (int j = 0; j < sideBidentifiers.length; j++)
                     {
                         // This allows for case incorrectness in the specified name
-                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) &&
-                            !sideButilised[j])
+                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) && !sideButilised[j])
                         {
                             putColumn(sideBidentifiers[j], colmds[i]);
                             sideButilised[j] = true;
@@ -145,8 +144,7 @@ public class CorrespondentColumnsMapper
                     // Check for invalid sideB column
                     if (!targetExists)
                     {
-                        throw new NucleusUserException(Localiser.msg("020004", 
-                            columnsName, colmds[i].getName(), targetColumnName)).setFatal();
+                        throw new NucleusUserException(Localiser.msg("020004", tableA, colmds[i].getName(), targetColumnName, mappingSideB.getTable(), mappingSideB)).setFatal();
                     }
                 }
             }
@@ -185,8 +183,7 @@ public class CorrespondentColumnsMapper
                 }
                 if (sideBidentifier == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("020005", 
-                        columnsName, "" + i)).setFatal();
+                    throw new NucleusUserException(Localiser.msg("020005", columnsName, "" + i)).setFatal();
                 }
 
                 // Create a new ColumnMetaData since user hasn't provided enough
@@ -218,11 +215,11 @@ public class CorrespondentColumnsMapper
      * Takes the sideB mapping and the side A definition of column metadata and matches them up as
      * defined by the user, and if not defined by the user matches them as best it can.
      * @param columnContainer Container of the columns for side A
-     * @param mappingSideB the mapping in the side B
+     * @param tableA The table on side A
+     * @param mappingSideB the mapping in the side B that we should map to
      * @param updateContainer Whether to add any missing ColumnMetaData objects to the container
      */
-    public CorrespondentColumnsMapper(ColumnMetaDataContainer columnContainer, JavaTypeMapping mappingSideB,
-        boolean updateContainer)
+    public CorrespondentColumnsMapper(ColumnMetaDataContainer columnContainer, Table tableA, JavaTypeMapping mappingSideB, boolean updateContainer)
     {
         // Go through the user-defined columns and allocate them as required
         if (columnContainer != null)
@@ -288,22 +285,19 @@ public class CorrespondentColumnsMapper
                     for (int j = 0; j < sideBidentifiers.length; j++)
                     {
                         // This allows for case incorrectness in the specified name
-                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) &&
-                            !sideButilised[j])
+                        if (sideBidentifiers[j].getName().equalsIgnoreCase(targetColumnName) && !sideButilised[j])
                         {
                             putColumn(sideBidentifiers[j], colmds[i]);
                             sideButilised[j] = true;
                             targetExists = true;
-                            
                             break;
                         }
                     }
-                    
-                    // Check for invalid sideB column
+
+                    // Check for invalid sideB column in the specified mapping
                     if (!targetExists)
                     {
-                        throw new NucleusUserException(Localiser.msg("020004", 
-                            columnsName, colmds[i].getName(), targetColumnName)).setFatal();
+                        throw new NucleusUserException(Localiser.msg("020004", tableA, colmds[i].getName(), targetColumnName, mappingSideB.getTable(), mappingSideB)).setFatal();
                     }
                 }
             }
@@ -342,8 +336,7 @@ public class CorrespondentColumnsMapper
                 }
                 if (sideBidentifier == null)
                 {
-                    throw new NucleusUserException(Localiser.msg("020005", 
-                        columnsName, "" + i)).setFatal();
+                    throw new NucleusUserException(Localiser.msg("020005", columnsName, "" + i)).setFatal();
                 }
 
                 // Create a new ColumnMetaData since user hasn't provided enough
