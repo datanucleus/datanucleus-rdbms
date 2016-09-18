@@ -33,18 +33,15 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
- * Class to make correspondence between columns in one side of an
- * association to the mapping at the other side. The 2 sides of the association are
- * referred to as "sideA" and "sideB". The JDO 2 metadata allows definition
- * of the correspondence using the
- * &lt;column name="{column-name}" target="{target-name}"/&gt; syntax.
+ * Class to make correspondence between columns in one side of an association to the mapping at the other side. 
+ * The 2 sides of the association are referred to as "sideA" and "sideB". The JDO metadata allows definition
+ * of the correspondence using the &lt;column name="{column-name}" target="{target-name}"/&gt; syntax.
  * <P>
- * This means that the column specified on sideA will be mapped to the specified "target"
- * column on sideB. If no target is provided then the first available sideB column
- * is used for the mapping. Where no columns are defined on sideA, then they will be
- * created to match those on sideB. Checks are made for consistency of the sideA data.
- * When there is insufficient ColumnMetaData on sideA then a new ColumnMetaData is added
- * to the column container.
+ * This means that the column specified on sideA will be mapped to the specified "target" column on sideB. 
+ * If no target is provided then the first available sideB column is used for the mapping. 
+ * Where no columns are defined on sideA, then they will be created to match those on sideB. 
+ * Checks are made for consistency of the sideA data.
+ * When there is insufficient ColumnMetaData on sideA then a new ColumnMetaData is added to the column container.
  */
 public class CorrespondentColumnsMapper
 {
@@ -136,11 +133,10 @@ public class CorrespondentColumnsMapper
                             putColumn(sideBidentifiers[j], colmds[i]);
                             sideButilised[j] = true;
                             targetExists = true;
-                            
                             break;
                         }
                     }
-                    
+
                     // Check for invalid sideB column
                     if (!targetExists)
                     {

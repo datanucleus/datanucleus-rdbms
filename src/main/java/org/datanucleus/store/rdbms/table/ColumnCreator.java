@@ -217,7 +217,7 @@ public final class ColumnCreator
 
             if (destinationTable != null)
             {
-                // Foreign-Key to the destination table
+                // Foreign-Key to the destination table ID mapping
                 JavaTypeMapping m = destinationTable.getIdMapping();
 
                 // For each datastore mapping, add a column.

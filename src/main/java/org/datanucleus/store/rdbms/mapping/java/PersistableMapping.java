@@ -213,8 +213,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             else
             {
                 // Default is to use the ID of the related object
-                referenceMapping = storeMgr.getDatastoreClass(mmd.getType().getName(), clr).getIdMapping();
                 // TODO Add option to use a natural-id in the other class. Find the mapping using the targetColumnName
+                referenceMapping = storeMgr.getDatastoreClass(mmd.getType().getName(), clr).getIdMapping();
             }
 
             // Generate a mapping from the columns of the referenced object to this mapping's ColumnMetaData
