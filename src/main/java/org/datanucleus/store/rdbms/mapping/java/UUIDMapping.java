@@ -29,7 +29,6 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -133,7 +132,7 @@ public class UUIDMapping extends SingleFieldMapping
         {
             return UUID.class.getName();
         }
-        return TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
+        return storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
     }
 
     /* (non-Javadoc)

@@ -29,7 +29,6 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.converters.ColumnLengthDefiningTypeConverter;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -110,7 +109,7 @@ public class TypeConverterMapping extends SingleFieldMapping
      */
     public String getJavaTypeForDatastoreMapping(int index)
     {
-        return TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
+        return storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(converter, getJavaType()).getName();
     }
 
     /* (non-Javadoc)
@@ -206,7 +205,7 @@ public class TypeConverterMapping extends SingleFieldMapping
      */
     protected Object getMemberValueFromDatastore(ResultSet resultSet, int[] exprIndex)
     {
-        Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(converter, String.class);
+        Class datastoreType = storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(converter, String.class);
         Object datastoreValue = null;
         if (Boolean.class.isAssignableFrom(datastoreType))
         {

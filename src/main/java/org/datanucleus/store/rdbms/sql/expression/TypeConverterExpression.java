@@ -26,7 +26,6 @@ import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -45,7 +44,7 @@ public class TypeConverterExpression extends DelegatedExpression
 
         TypeConverterMapping convMapping = (TypeConverterMapping)mapping;
         TypeConverter conv = convMapping.getTypeConverter();
-        Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, convMapping.getJavaType());
+        Class datastoreType = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(conv, convMapping.getJavaType());
         if (datastoreType == String.class)
         {
             delegate = new StringExpression(stmt, table, mapping);

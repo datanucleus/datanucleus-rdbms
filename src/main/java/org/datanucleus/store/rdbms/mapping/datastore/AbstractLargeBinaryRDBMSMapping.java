@@ -38,7 +38,6 @@ import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.types.converters.TypeConverter;
-import org.datanucleus.store.types.converters.TypeConverterHelper;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -244,7 +243,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         {
             // Using TypeConverterMapping so use the datastore type for the converter
             TypeConverter conv = ((TypeConverterMapping)getJavaTypeMapping()).getTypeConverter();
-            Class datastoreType = TypeConverterHelper.getDatastoreTypeForTypeConverter(conv, getJavaTypeMapping().getJavaType());
+            Class datastoreType = storeMgr.getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(conv, getJavaTypeMapping().getJavaType());
             typeName = datastoreType.getName();
         }
 
