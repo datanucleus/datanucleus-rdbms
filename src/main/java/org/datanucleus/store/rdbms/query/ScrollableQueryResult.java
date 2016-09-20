@@ -40,10 +40,11 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.SoftValueMap;
-import org.datanucleus.util.WeakValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Lazy collection results from a Query with the ResultSet scrollable.
@@ -102,7 +103,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             }
             else if (ext.equalsIgnoreCase("weak"))
             {
-                resultsObjsByIndex = new WeakValueMap();
+                resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
             else if (ext.equalsIgnoreCase("strong"))
             {
@@ -114,12 +115,12 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             }
             else
             {
-                resultsObjsByIndex = new WeakValueMap();
+                resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
             }
         }
         else
         {
-            resultsObjsByIndex = new WeakValueMap();
+            resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
         }
 
         applyRangeChecks = !query.processesRangeInDatastoreQuery();
