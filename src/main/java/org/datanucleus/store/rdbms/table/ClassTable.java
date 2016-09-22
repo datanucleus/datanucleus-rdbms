@@ -1312,7 +1312,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         {
                             // Bidirectional (element has a PC mapping to the owner)
                             // Check that the "mapped-by" field in the other class actually exists
-                            AbstractMemberMetaData fmd = managedCmd.getMetaDataForMember(ownerFmd.getMappedBy());
+                            AbstractMemberMetaData fmd = null;
+                            if (ownerFmd.getMappedBy().indexOf('.') > 0)
+                            {
+                                // TODO Can we just use getRelatedMemberMetaData always?
+                                AbstractMemberMetaData[] relMmds = ownerFmd.getRelatedMemberMetaData(clr);
+                                fmd = (relMmds != null && relMmds.length > 0) ? relMmds[0] : null;
+                            }
+                            else
+                            {
+                                fmd = managedCmd.getMetaDataForMember(ownerFmd.getMappedBy());
+                            }
                             if (fmd == null)
                             {
                                 throw new NucleusUserException(Localiser.msg("057036", ownerFmd.getMappedBy(), managedCmd.getFullClassName(), ownerFmd.getFullFieldName()));

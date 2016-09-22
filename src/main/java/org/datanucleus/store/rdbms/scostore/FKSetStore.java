@@ -137,7 +137,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         if (mmd.getMappedBy() != null)
         {
             // 1-N FK bidirectional
-            // The element class has a field for the owner.
+            // The element class has a field for the owner. TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
             AbstractMemberMetaData eofmd = elementCmd.getMetaDataForMember(mmd.getMappedBy());
             if (eofmd == null)
             {
