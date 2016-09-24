@@ -1769,12 +1769,20 @@ public class RDBMSMappingManager implements MappingManager
         }
         else
         {
-            if (!mmd.getClassName(true).equals(mmd.getAbstractClassMetaData().getFullClassName()))
+            // Commented out this code because if a member is overridden it should use the override strategy here. Can't find a case which needs this
+            /*if (!mmd.getClassName(true).equals(mmd.getAbstractClassMetaData().getFullClassName()))
             {
-                // Overriding member, so ignore
+                if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
+                {
+                    if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
+                    {
+                        NucleusLogger.GENERAL.info(">> Column addition " + mmd.getFullFieldName() + " IGNORING use of IDENTITY since override of base metadata! See RDBMSMappingManager");
+                    }
+                }
+                // Overriding member, so ignore TODO This can be incorrect in many cases
             }
             else
-            {
+            {*/
                 if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
                 {
                     if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
@@ -1783,7 +1791,7 @@ public class RDBMSMappingManager implements MappingManager
                         col.setIdentity(true);
                     }
                 }
-            }
+            /*}*/
         }
 
         if (mmd.getValueForExtension("select-function") != null)
