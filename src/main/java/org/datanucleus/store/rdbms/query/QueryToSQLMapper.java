@@ -481,11 +481,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 // Joins are made implicitly and no result so set distinct based on whether joining to other table groups
                 if (selectStmt.getNumberOfTableGroups() > 1)
                 {
-                    // Queries against an extent always consider only distinct candidate instances, regardless of
-                    // whether distinct is specified (JDO spec)
-                    if (!options.contains(OPTION_NON_DISTINCT_IMPLICIT_JOINS)) {
-                        // If user can guarantee distinct w/ query
-                        // no reason to take performance hit of distinct clause
+                    // Queries against an extent always consider only distinct candidate instances, regardless of whether distinct is specified (JDO spec)
+                    if (!options.contains(OPTION_NON_DISTINCT_IMPLICIT_JOINS))
+                    {
+                        // If user can guarantee distinct w/ query no reason to take performance hit of distinct clause
                         selectStmt.setDistinct(true);
                     }
                 }

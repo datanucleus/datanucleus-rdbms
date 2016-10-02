@@ -890,7 +890,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
         }
-        if (getBooleanExtensionProperty(EXTENSION_NON_DISTINCT_IMPLICIT_JOIN, false)) {
+        if (getBooleanExtensionProperty(EXTENSION_NON_DISTINCT_IMPLICIT_JOIN, false))
+        {
             options.add(QueryToSQLMapper.OPTION_NON_DISTINCT_IMPLICIT_JOINS);
         }
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters, datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
