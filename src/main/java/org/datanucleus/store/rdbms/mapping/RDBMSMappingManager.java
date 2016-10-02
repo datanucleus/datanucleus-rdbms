@@ -1768,13 +1768,13 @@ public class RDBMSMappingManager implements MappingManager
             // Embedded so can't be datastore-attributed
         }
         else
-        {
+        {/*
             if (!mmd.getClassName(true).equals(mmd.getAbstractClassMetaData().getFullClassName()))
             {
                 // Overriding member, so ignore
             }
             else
-            {
+            {*/
                 if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
                 {
                     if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
@@ -1783,7 +1783,7 @@ public class RDBMSMappingManager implements MappingManager
                         col.setIdentity(true);
                     }
                 }
-            }
+            /*}*/
         }
 
         if (mmd.getValueForExtension("select-function") != null)
