@@ -17,20 +17,6 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchGroup;
@@ -46,11 +32,11 @@ import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.MapMetaData;
+import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
-import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.NullOrderingType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.compiler.CompilationComponent;
@@ -75,15 +61,17 @@ import org.datanucleus.query.expression.SubqueryExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.VersionHelper;
+import org.datanucleus.store.query.QueryCompilerSyntaxException;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
+import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
 import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -91,8 +79,6 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.mapping.java.TemporalMapping;
-import org.datanucleus.store.query.QueryCompilerSyntaxException;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLJoin;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -139,6 +125,20 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 /**
  * Class which maps a compiled (generic) query to an SQL query for RDBMS datastores.
  * Takes in an SQLStatement, and use of compile() will update the SQLStatement to reflect
@@ -161,6 +161,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 {
     public static final String OPTION_CASE_INSENSITIVE = "CASE_INSENSITIVE";
     public static final String OPTION_EXPLICIT_JOINS = "EXPLICIT_JOINS";
+    public static final String OPTION_NON_DISTINCT_IMPLICIT_JOINS = "NON_DISTINCT_IMPLICIT_JOINS";
     public static final String OPTION_BULK_UPDATE_VERSION = "BULK_UPDATE_VERSION";
     public static final String OPTION_SELECT_CANDIDATE_ID_ONLY = "RESULT_CANDIDATE_ID";
     public static final String OPTION_NULL_PARAM_USE_IS_NULL = "USE_IS_NULL_FOR_NULL_PARAM";
@@ -482,7 +483,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     // Queries against an extent always consider only distinct candidate instances, regardless of
                     // whether distinct is specified (JDO spec)
-                    selectStmt.setDistinct(true);
+                    if (!options.contains(OPTION_NON_DISTINCT_IMPLICIT_JOINS)) {
+                        // If user can guarantee distinct w/ query
+                        // no reason to take performance hit of distinct clause
+                        selectStmt.setDistinct(true);
+                    }
                 }
             }
 

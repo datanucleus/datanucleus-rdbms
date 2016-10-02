@@ -17,6 +17,54 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
+import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlanForClass;
+import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
+import org.datanucleus.metadata.AbstractMemberMetaData;
+import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.RelationType;
+import org.datanucleus.query.QueryUtils;
+import org.datanucleus.query.compiler.Symbol;
+import org.datanucleus.query.expression.Expression;
+import org.datanucleus.query.inmemory.JDOQLInMemoryEvaluator;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.connection.ManagedConnectionResourceListener;
+import org.datanucleus.store.query.AbstractJDOQLQuery;
+import org.datanucleus.store.query.CandidateIdsQueryResult;
+import org.datanucleus.store.query.QueryInterruptedException;
+import org.datanucleus.store.query.QueryManager;
+import org.datanucleus.store.query.QueryResult;
+import org.datanucleus.store.query.QueryTimeoutException;
+import org.datanucleus.store.rdbms.RDBMSPropertyNames;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
+import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
+import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
+import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.query.RDBMSQueryCompilation.StatementCompilation;
+import org.datanucleus.store.rdbms.scostore.IteratorStatement;
+import org.datanucleus.store.rdbms.sql.DeleteStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
+import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
+import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.UpdateStatement;
+import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -37,54 +85,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.datanucleus.ExecutionContext;
-import org.datanucleus.FetchPlanForClass;
-import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.InheritanceStrategy;
-import org.datanucleus.metadata.RelationType;
-import org.datanucleus.query.QueryUtils;
-import org.datanucleus.query.compiler.Symbol;
-import org.datanucleus.query.expression.Expression;
-import org.datanucleus.query.inmemory.JDOQLInMemoryEvaluator;
-import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.connection.ManagedConnectionResourceListener;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
-import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.query.AbstractJDOQLQuery;
-import org.datanucleus.store.query.CandidateIdsQueryResult;
-import org.datanucleus.store.query.QueryInterruptedException;
-import org.datanucleus.store.query.QueryManager;
-import org.datanucleus.store.query.QueryResult;
-import org.datanucleus.store.query.QueryTimeoutException;
-import org.datanucleus.store.rdbms.RDBMSPropertyNames;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.SQLController;
-import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.query.RDBMSQueryCompilation.StatementCompilation;
-import org.datanucleus.store.rdbms.scostore.IteratorStatement;
-import org.datanucleus.store.rdbms.sql.DeleteStatement;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
-import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
-import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.UpdateStatement;
-import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.util.ClassUtils;
-import org.datanucleus.util.Localiser;
-import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.StringUtils;
-
 /**
  * RDBMS representation of a JDOQL query for use by DataNucleus.
  * The query can be specified via method calls, or via a single-string form.
@@ -102,6 +102,8 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to true to match Java semantics. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
+
+    public static final String EXTENSION_NON_DISTINCT_IMPLICIT_JOIN = "datanucleus.query.jdoql.dropDistinctFromImplicitJoin";
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
     public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.forUpdateNowait";
@@ -887,6 +889,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (getBooleanExtensionProperty(EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM, true))
         {
             options.add(QueryToSQLMapper.OPTION_NULL_PARAM_USE_IS_NULL);
+        }
+        if (getBooleanExtensionProperty(EXTENSION_NON_DISTINCT_IMPLICIT_JOIN, false)) {
+            options.add(QueryToSQLMapper.OPTION_NON_DISTINCT_IMPLICIT_JOINS);
         }
         QueryToSQLMapper sqlMapper = new QueryToSQLMapper(stmt, compilation, parameters, datastoreCompilation.getResultDefinitionForClass(), datastoreCompilation.getResultDefinition(),
             candidateCmd, subclasses, getFetchPlan(), ec, getParsedImports(), options, extensions);
