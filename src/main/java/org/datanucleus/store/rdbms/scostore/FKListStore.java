@@ -75,9 +75,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class FKListStore<E> extends AbstractListStore<E>
 {
-    /** Field number of owner link in element class. */
-    private final int ownerFieldNumber;
-
     /** Statement for updating a foreign key in a 1-N unidirectional */
     private String updateFkStmt;
 
@@ -169,7 +166,6 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
 
             String ownerFieldName = eofmd.getName();
-            ownerFieldNumber = elementInfo[0].getAbstractClassMetaData().getAbsolutePositionOfMember(ownerFieldName);
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null)
             {
@@ -182,9 +178,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            // 1-N FK unidirectional
-            // The element class knows nothing about the owner (but its table has external mappings)
-            ownerFieldNumber = -1;
+            // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
             if (ownerMapping == null)
@@ -937,10 +931,12 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
                 }
 
-                if (ownerFieldNumber >= 0)
+                if (ownerMemberMetaData.getMappedBy() != null)
                 {
                     // TODO This is ManagedRelations - move into RelationshipManager
                     // Managed Relations : 1-N bidir, so make sure owner is correct at persist
+                    // TODO Support DOT notation in mappedBy
+                    int ownerFieldNumber = elementInfo[0].getAbstractClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
                     Object currentOwner = elemOP.provideField(ownerFieldNumber);
                     if (currentOwner == null)
                     {

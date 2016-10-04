@@ -35,7 +35,7 @@ public class CharacterMapping extends SingleFieldMapping
 
     /**
      * Method to return the default length of this type in the datastore.
-     * Character(char will need a single character!
+     * Character/char will need a single character!
      * @param index The index position
      * @return The default length
      */

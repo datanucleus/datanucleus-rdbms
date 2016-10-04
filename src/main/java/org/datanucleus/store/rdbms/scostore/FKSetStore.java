@@ -72,9 +72,6 @@ import org.datanucleus.util.StringUtils;
  */
 public class FKSetStore<E> extends AbstractSetStore<E>
 {
-    /** Field number of owner link in element class. */
-    private final int ownerFieldNumber;
-
     /** Statement for updating a FK in the element. */
     private String updateFkStmt;
 
@@ -136,8 +133,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         // Get the field in the element table (if any)
         if (mmd.getMappedBy() != null)
         {
-            // 1-N FK bidirectional
-            // The element class has a field for the owner
+            // 1-N FK bidirectional : The element class has a field for the owner
             if (mmd.getMappedBy().indexOf('.') > 0)
             {
                 // TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
@@ -160,7 +156,6 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             }
             */
             String ownerFieldName = eofmd.getName();
-            ownerFieldNumber = elementCmd.getAbsolutePositionOfMember(ownerFieldName);
             ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
             if (ownerMapping == null && elementInfo.length > 1)
             {
@@ -178,9 +173,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
         else
         {
-            // 1-N FK unidirectional
-            // The element class knows nothing about the owner (but its table has external mappings)
-            ownerFieldNumber = -1;
+            // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
             ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
             // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
             if (ownerMapping == null)
@@ -217,22 +210,22 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      */
     protected int getFieldNumberInElementForBidirectional(ObjectProvider op)
     {
-        if (ownerFieldNumber < 0)
+        if (ownerMemberMetaData.getMappedBy() == null)
         {
             // Unidirectional
             return -1;
         }
+
         // This gives a different result when using persistent interfaces.
-        // For example with the JDO2 TCK, org.apache.jdo.tck.pc.company.PIDepartmentImpl.employees will
-        // return 3, yet the ownerMemberMetaData.getRelatedMetaData returns 8 since the generated implementation
-        // will have all fields in a single MetaData (numbering from 0), whereas in a normal inheritance
-        // tree there will be multiple MetaData (the root starting from 0)
+        // For example with the JDO2 TCK, org.apache.jdo.tck.pc.company.PIDepartmentImpl.employees will return 3, 
+        // yet the ownerMemberMetaData.getRelatedMetaData returns 8 since the generated implementation will have all fields in a single MetaData (numbering from 0), 
+        // whereas in a normal inheritance tree there will be multiple MetaData (the root starting from 0)
+        // TODO Support DOT notation in mappedBy
         return op.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
     }
 
     /**
-     * Utility to update a foreign-key (and distinguisher) in the element in the case of
-     * a unidirectional 1-N relationship.
+     * Utility to update a foreign-key (and distinguisher) in the element in the case of a unidirectional 1-N relationship.
      * @param op ObjectProvider for the owner
      * @param element The element to update
      * @param owner The owner object to set in the FK
@@ -596,11 +589,13 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
         ObjectProvider elementOP = ec.findObjectProvider(elementToRemove);
         Object oldOwner = null;
-        if (ownerFieldNumber >= 0)
+        if (ownerMemberMetaData.getMappedBy() != null)
         {
             if (!ec.getApiAdapter().isDeleted(elementToRemove))
             {
                 // Find the existing owner if the record hasn't already been deleted
+                // TODO Support DOT notation in mappedBy
+                int ownerFieldNumber = elementCmd.getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
                 elementOP.isLoaded(ownerFieldNumber);
                 oldOwner = elementOP.provideField(ownerFieldNumber);
             }
@@ -611,7 +606,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Owner of the element has been changed
-        if (ownerFieldNumber >= 0 && oldOwner != op.getObject() && oldOwner != null)
+        if (ownerMemberMetaData.getMappedBy() != null && oldOwner != op.getObject() && oldOwner != null)
         {
             return false;
         }
