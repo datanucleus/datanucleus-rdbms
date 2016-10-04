@@ -52,9 +52,6 @@ public class VersionMapping extends SingleFieldMapping
         this.table = table;
         VersionMetaData vermd = table.getVersionMetaData();
 
-        // Currently we only use a single column mapping for versioning.
-        // The MetaData supports multiple columns and so we could extend this in the future
-        // to use all MetaData information.
         ColumnMetaData versionColumnMetaData = vermd.getColumnMetaData();
         ColumnMetaData colmd;
         IdentifierFactory idFactory = table.getStoreManager().getIdentifierFactory();
