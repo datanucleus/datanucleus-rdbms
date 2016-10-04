@@ -103,6 +103,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     /** Extension for whether to convert "== ?" with null parameter to "IS NULL". Defaults to true to match Java semantics. */
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
+    /** Extension for whether to disable the setting of DISTINCT when joining with JDOQL. */
     public static final String EXTENSION_NON_DISTINCT_IMPLICIT_JOIN = "datanucleus.query.jdoql.dropDistinctFromImplicitJoin";
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
