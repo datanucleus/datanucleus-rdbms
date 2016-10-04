@@ -137,7 +137,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         if (mmd.getMappedBy() != null)
         {
             // 1-N FK bidirectional
-            // The element class has a field for the owner. TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
+            // The element class has a field for the owner
+            if (mmd.getMappedBy().indexOf('.') > 0)
+            {
+                // TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
+                throw new NucleusUserException("Member " + mmd.getFullFieldName() + " has mappedBy using DOT notation. This is not yet supported");
+            }
             AbstractMemberMetaData eofmd = elementCmd.getMetaDataForMember(mmd.getMappedBy());
             if (eofmd == null)
             {
@@ -145,10 +150,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             }
 
             // Check that the type of the element "mapped-by" field is consistent with the owner type
-            //TODO check does not work if mapped by has relation to super class. Enable this
-            //and run the PersistentInterfacesTest to reproduce the issue
-            //TODO there is equivalent code in FKList and FKMap that was
-            //not commented out. When fixing, add tests for all types of Inverses
+            // TODO check does not work if "mappedBy" has relation to super class. Enable this and run the PersistentInterfacesTest to reproduce the issue
+            // TODO there is equivalent code in FKList and FKMap that was not commented out. When fixing, add tests for all types of Inverses
             /*
             if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
             {

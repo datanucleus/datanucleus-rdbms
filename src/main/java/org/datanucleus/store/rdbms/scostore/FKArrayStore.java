@@ -134,6 +134,11 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         {
             // 1-N FK bidirectional
             // The element class has a field for the owner.
+            if (mmd.getMappedBy().indexOf('.') > 0)
+            {
+                // TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
+                throw new NucleusUserException("Member " + mmd.getFullFieldName() + " has mappedBy using DOT notation. This is not yet supported");
+            }
             AbstractClassMetaData eoCmd = storeMgr.getMetaDataManager().getMetaDataForClass(element_class, clr);
             AbstractMemberMetaData eofmd = (eoCmd != null ? eoCmd.getMetaDataForMember(mappedByFieldName) : null);
             if (eofmd == null)

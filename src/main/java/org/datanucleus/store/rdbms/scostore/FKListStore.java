@@ -150,6 +150,11 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (mappedByFieldName != null)
         {
             // 1-N FK bidirectional - the element class has a field for the owner.
+            if (mmd.getMappedBy().indexOf('.') > 0)
+            {
+                // TODO Cater for mappedBy DOT notation (embedded map and embedded class having the link back to the owner)
+                throw new NucleusUserException("Member " + mmd.getFullFieldName() + " has mappedBy using DOT notation. This is not yet supported");
+            }
             AbstractMemberMetaData eofmd = elementInfo[0].getAbstractClassMetaData().getMetaDataForMember(mappedByFieldName);
             if (eofmd == null)
             {
