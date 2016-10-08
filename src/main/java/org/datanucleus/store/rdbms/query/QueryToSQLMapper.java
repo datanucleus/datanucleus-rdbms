@@ -3910,6 +3910,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         // Invoke the method
         SQLExpression sqlExpr = null;
+        if (invokedSqlExpr instanceof org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)
+        {
+            if (operation.equalsIgnoreCase("isEmpty"))
+            {
+                // Special case of {subquery}.isEmpty(), equates to "NOT EXISTS (subquery)"
+                org.datanucleus.store.rdbms.sql.expression.SubqueryExpression subquerySqlExpr = (org.datanucleus.store.rdbms.sql.expression.SubqueryExpression) invokedSqlExpr;
+                SQLStatement subStmt = subquerySqlExpr.getSubqueryStatement();
+                SQLExpression subqueryNotExistsExpr = new BooleanSubqueryExpression(stmt, "EXISTS", subStmt).not();
+
+                stack.push(subqueryNotExistsExpr);
+                return subqueryNotExistsExpr;
+            }
+            throw new NucleusUserException("Attempt to invoke method " + operation + " on Subquery. This is not supported");
+        }
+
         if (invokedSqlExpr != null)
         {
             sqlExpr = invokedSqlExpr.invoke(operation, sqlExprArgs);
