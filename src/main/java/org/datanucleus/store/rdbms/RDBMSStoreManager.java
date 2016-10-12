@@ -166,6 +166,7 @@ import org.datanucleus.store.rdbms.valuegenerator.SequenceTable;
 import org.datanucleus.store.rdbms.valuegenerator.TableGenerator;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
+import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.ArrayStore;
@@ -2427,7 +2428,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return Collections.EMPTY_LIST;
         }
 
-        List cols = new ArrayList(tableInfo.getNumberOfChildren());
+        List<StoreSchemaData> cols = new ArrayList(tableInfo.getNumberOfChildren());
         cols.addAll(tableInfo.getChildren());
         return cols;
     }
@@ -2661,7 +2662,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         RDBMSTableInfo tableInfo = (RDBMSTableInfo)tableIter.next();
                         ps.println(tableInfo);
 
-                        Iterator columnIter = tableInfo.getChildren().iterator();
+                        Iterator<StoreSchemaData> columnIter = tableInfo.getChildren().iterator();
                         while (columnIter.hasNext())
                         {
                             // Print out the column information

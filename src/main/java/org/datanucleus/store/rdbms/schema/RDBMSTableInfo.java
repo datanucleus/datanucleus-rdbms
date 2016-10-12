@@ -50,7 +50,7 @@ public class RDBMSTableInfo implements ListStoreSchemaData
     Map<String, Object> properties = new HashMap();
 
     /** Column information for this table. */
-    List columns = new ArrayList();
+    List<StoreSchemaData> columns = new ArrayList();
 
     /** Map of column information keyed by the column name. */
     Map<String, StoreSchemaData> columnMapByColumnName = new HashMap();
@@ -128,7 +128,7 @@ public class RDBMSTableInfo implements ListStoreSchemaData
      */
     public StoreSchemaData getChild(int position)
     {
-        return (StoreSchemaData)columns.get(position);
+        return columns.get(position);
     }
 
     /**
@@ -145,7 +145,7 @@ public class RDBMSTableInfo implements ListStoreSchemaData
      * Accessor for the columns
      * @return Column schema information
      */
-    public List getChildren()
+    public List<StoreSchemaData> getChildren()
     {
         return columns;
     }
