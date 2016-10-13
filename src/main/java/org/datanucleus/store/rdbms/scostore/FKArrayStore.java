@@ -131,86 +131,92 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         elementsAreSerialised = false; // Can't serialise element when using FK relation
 
         // Find the mapping back to the owning object
-        if (mmd.getMappedBy() != null)
+        for (int i=0;i<elementInfo.length;i++)
         {
-            // 1-N FK bidirectional : The element class has a field for the owner
-            if (mmd.getMappedBy().indexOf('.') < 0)
+            JavaTypeMapping ownerMapping = null;
+            if (mmd.getMappedBy() != null)
             {
-                AbstractClassMetaData eoCmd = storeMgr.getMetaDataManager().getMetaDataForClass(element_class, clr);
-                AbstractMemberMetaData eofmd = (eoCmd != null ? eoCmd.getMetaDataForMember(mmd.getMappedBy()) : null);
-                if (eofmd == null)
+                // 1-N FK bidirectional : The element class has a field for the owner
+                if (mmd.getMappedBy().indexOf('.') < 0)
                 {
-                    throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
-                }
+                    AbstractClassMetaData eoCmd = storeMgr.getMetaDataManager().getMetaDataForClass(element_class, clr);
+                    AbstractMemberMetaData eofmd = (eoCmd != null ? eoCmd.getMetaDataForMember(mmd.getMappedBy()) : null);
+                    if (eofmd == null)
+                    {
+                        throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
+                    }
 
-                // Check that the type of the element "mapped-by" field is consistent with the owner type
-                if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
-                {
-                    throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(), 
-                        eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
-                }
+                    // Check that the type of the element "mapped-by" field is consistent with the owner type
+                    if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
+                    {
+                        throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(), 
+                            eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
+                    }
 
-                String ownerFieldName = eofmd.getName();
-                ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
-                if (ownerMapping == null)
-                {
-                    throw new NucleusUserException(Localiser.msg("056046", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                    String ownerFieldName = eofmd.getName();
+                    ownerMapping = elementInfo[i].getDatastoreClass().getMemberMapping(eofmd);
+                    if (ownerMapping == null)
+                    {
+                        throw new NucleusUserException(Localiser.msg("056046", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                    }
+                    if (isEmbeddedMapping(ownerMapping))
+                    {
+                        throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                    }
                 }
-                if (isEmbeddedMapping(ownerMapping))
+                else
                 {
-                    throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                    // mappedBy uses DOT notation, so refers to a field in an embedded field of the element
+                    AbstractMemberMetaData otherMmd = null;
+                    AbstractClassMetaData otherCmd = elementCmd;
+                    String remainingMappedBy = ownerMemberMetaData.getMappedBy();
+                    JavaTypeMapping otherMapping = null;
+                    while (remainingMappedBy.indexOf('.') > 0)
+                    {
+                        int dotPosition = remainingMappedBy.indexOf('.');
+                        String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
+                        otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
+                        if (otherMapping == null)
+                        {
+                            otherMapping = elementInfo[i].getDatastoreClass().getMemberMapping(thisMappedBy);
+                        }
+                        else
+                        {
+                            if (!(otherMapping instanceof EmbeddedPCMapping))
+                            {
+                                throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
+                                        " but expected to be embedded");
+                            }
+                            otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(thisMappedBy);
+                        }
+
+                        remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                        otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr); // TODO Cater for N-1
+                        if (remainingMappedBy.indexOf('.') < 0)
+                        {
+                            if (!(otherMapping instanceof EmbeddedPCMapping))
+                            {
+                                throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
+                                        " but expected to be embedded");
+                            }
+                            otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(remainingMappedBy);
+                        }
+                    }
+                    ownerMapping = otherMapping;
                 }
             }
             else
             {
-                // mappedBy uses DOT notation, so refers to a field in an embedded field of the element
-                AbstractMemberMetaData otherMmd = null;
-                AbstractClassMetaData otherCmd = elementCmd;
-                String remainingMappedBy = ownerMemberMetaData.getMappedBy();
-                JavaTypeMapping otherMapping = null;
-                while (remainingMappedBy.indexOf('.') > 0)
+                // 1-N FK unidirectional : the element class knows nothing about the owner (but the table has external mappings)
+                ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                if (ownerMapping == null)
                 {
-                    int dotPosition = remainingMappedBy.indexOf('.');
-                    String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
-                    otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
-                    if (otherMapping == null)
-                    {
-                        otherMapping = elementInfo[0].getDatastoreClass().getMemberMapping(thisMappedBy);
-                    }
-                    else
-                    {
-                        if (!(otherMapping instanceof EmbeddedPCMapping))
-                        {
-                            throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
-                                    " but expected to be embedded");
-                        }
-                        otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(thisMappedBy);
-                    }
-
-                    remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
-                    otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr); // TODO Cater for N-1
-                    if (remainingMappedBy.indexOf('.') < 0)
-                    {
-                        if (!(otherMapping instanceof EmbeddedPCMapping))
-                        {
-                            throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
-                                " but expected to be embedded");
-                        }
-                        otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(remainingMappedBy);
-                    }
+                    throw new NucleusUserException(Localiser.msg("056047", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
                 }
-                ownerMapping = otherMapping;
             }
+            elementInfo[i].setOwnerMapping(ownerMapping);
         }
-        else
-        {
-            // 1-N FK unidirectional : the element class knows nothing about the owner (but the table has external mappings)
-            ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-            if (ownerMapping == null)
-            {
-                throw new NucleusUserException(Localiser.msg("056047", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
-            }
-        }
+        this.ownerMapping = elementInfo[0].getOwnerMapping(); // TODO Get rid of ownerMapping and refer to elementInfo[i].getOwnerMapping
 
         orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
         if (orderMapping == null)

@@ -34,10 +34,16 @@ public class ComponentInfo
     /** Primary table storing the component. */
     DatastoreClass table;
 
+    JavaTypeMapping ownerMapping;
+
     public ComponentInfo(AbstractClassMetaData cmd, DatastoreClass table)
     {
         this.cmd = cmd;
         this.table = table;
+    }
+    public void setOwnerMapping(JavaTypeMapping m)
+    {
+        this.ownerMapping = m;
     }
 
     public String getClassName()
@@ -60,6 +66,11 @@ public class ComponentInfo
     {
         return table.getDiscriminatorMapping(false);
     }
+    public JavaTypeMapping getOwnerMapping()
+    {
+        return ownerMapping;
+    }
+
     public String toString()
     {
         return "ComponentInfo : [class=" + cmd.getFullClassName() + " table=" + table + "]";

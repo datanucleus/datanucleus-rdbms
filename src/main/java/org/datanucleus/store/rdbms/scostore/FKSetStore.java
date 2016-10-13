@@ -132,94 +132,101 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         elementsAreSerialised = false; // Can't serialise element when using FK relation
 
         // Find the mapping back to the owning object
-        if (mmd.getMappedBy() != null)
+        for (int i=0;i<elementInfo.length;i++)
         {
-            // 1-N FK bidirectional : The element class has a field for the owner
-            if (mmd.getMappedBy().indexOf('.') < 0)
+            JavaTypeMapping ownerMapping = null;
+            if (mmd.getMappedBy() != null)
             {
-                AbstractMemberMetaData eofmd = elementCmd.getMetaDataForMember(mmd.getMappedBy());
-                if (eofmd == null)
+                // 1-N FK bidirectional : The element class has a field for the owner
+                if (mmd.getMappedBy().indexOf('.') < 0)
                 {
-                    throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
-                }
+                    AbstractMemberMetaData eofmd = elementCmd.getMetaDataForMember(mmd.getMappedBy());
+                    if (eofmd == null)
+                    {
+                        throw new NucleusUserException(Localiser.msg("056024", mmd.getFullFieldName(), mmd.getMappedBy(), element_class.getName()));
+                    }
 
-                // Check that the type of the element "mapped-by" field is consistent with the owner type
-                // TODO check does not work if "mappedBy" has relation to super class. Enable this and run the PersistentInterfacesTest to reproduce the issue
-                // TODO there is equivalent code in FKList and FKMap that was not commented out. When fixing, add tests for all types of Inverses
-              /*if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
+                    // Check that the type of the element "mapped-by" field is consistent with the owner type
+                    // TODO check does not work if "mappedBy" has relation to super class. Enable this and run the PersistentInterfacesTest to reproduce the issue
+                    // TODO there is equivalent code in FKList and FKMap that was not commented out. When fixing, add tests for all types of Inverses
+                    /*if (!clr.isAssignableFrom(eofmd.getType(), mmd.getAbstractClassMetaData().getFullClassName()))
                 {
                     throw new NucleusUserException(Localiser.msg("056025", mmd.getFullFieldName(),
                         eofmd.getFullFieldName(), eofmd.getTypeName(), mmd.getAbstractClassMetaData().getFullClassName()));
                 } */
 
-                String ownerFieldName = eofmd.getName();
-                ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd);
-                if (ownerMapping == null && elementInfo.length > 1)
-                {
-                    // Lookup by name only since may be interface field with multiple implementations
-                    ownerMapping = elementInfo[0].getDatastoreClass().getMemberMapping(eofmd.getName());
+                    String ownerFieldName = eofmd.getName();
+                    ownerMapping = elementInfo[i].getDatastoreClass().getMemberMapping(eofmd);
+                    if (ownerMapping == null && elementInfo.length > 1)
+                    {
+                        // Lookup by name only since may be interface field with multiple implementations
+                        ownerMapping = elementInfo[i].getDatastoreClass().getMemberMapping(eofmd.getName());
+                    }
+                    if (ownerMapping == null)
+                    {
+                        throw new NucleusUserException(Localiser.msg("056029", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
+                    }
+                    if (isEmbeddedMapping(ownerMapping))
+                    {
+                        throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                    }
                 }
-                if (ownerMapping == null)
+                else
                 {
-                    throw new NucleusUserException(Localiser.msg("056029", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType, ownerFieldName));
-                }
-                if (isEmbeddedMapping(ownerMapping))
-                {
-                    throw new NucleusUserException(Localiser.msg("056026", ownerFieldName, elementType, eofmd.getTypeName(), mmd.getClassName()));
+                    // mappedBy uses DOT notation, so refers to a field in an embedded field of the element
+                    AbstractMemberMetaData otherMmd = null;
+                    AbstractClassMetaData otherCmd = elementInfo[i].getAbstractClassMetaData();
+                    String remainingMappedBy = ownerMemberMetaData.getMappedBy();
+                    JavaTypeMapping otherMapping = null;
+                    while (remainingMappedBy.indexOf('.') > 0)
+                    {
+                        int dotPosition = remainingMappedBy.indexOf('.');
+                        String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
+                        otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
+                        if (otherMapping == null)
+                        {
+                            otherMapping = elementInfo[i].getDatastoreClass().getMemberMapping(thisMappedBy);
+                        }
+                        else
+                        {
+                            if (!(otherMapping instanceof EmbeddedPCMapping))
+                            {
+                                throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
+                                        " but expected to be embedded");
+                            }
+                            otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(thisMappedBy);
+                        }
+
+                        remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                        otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);
+                        if (remainingMappedBy.indexOf('.') < 0)
+                        {
+                            if (!(otherMapping instanceof EmbeddedPCMapping))
+                            {
+                                throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
+                                        " but expected to be embedded");
+                            }
+                            otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(remainingMappedBy);
+                        }
+                    }
+                    ownerMapping = otherMapping;
                 }
             }
             else
             {
-                // mappedBy uses DOT notation, so refers to a field in an embedded field of the element
-                AbstractMemberMetaData otherMmd = null;
-                AbstractClassMetaData otherCmd = elementCmd;
-                String remainingMappedBy = ownerMemberMetaData.getMappedBy();
-                JavaTypeMapping otherMapping = null;
-                while (remainingMappedBy.indexOf('.') > 0)
+                // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
+                ownerMapping = elementInfo[i].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
+                if (ownerMapping == null)
                 {
-                    int dotPosition = remainingMappedBy.indexOf('.');
-                    String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
-                    otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
-                    if (otherMapping == null)
-                    {
-                        otherMapping = elementInfo[0].getDatastoreClass().getMemberMapping(thisMappedBy);
-                    }
-                    else
-                    {
-                        if (!(otherMapping instanceof EmbeddedPCMapping))
-                        {
-                            throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
-                                    " but expected to be embedded");
-                        }
-                        otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(thisMappedBy);
-                    }
-
-                    remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
-                    otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr); // TODO Cater for N-1
-                    if (remainingMappedBy.indexOf('.') < 0)
-                    {
-                        if (!(otherMapping instanceof EmbeddedPCMapping))
-                        {
-                            throw new NucleusUserException("Processing of mappedBy DOT notation for " + ownerMemberMetaData.getFullFieldName() + " found mapping=" + otherMapping + 
-                                " but expected to be embedded");
-                        }
-                        otherMapping = ((EmbeddedPCMapping)otherMapping).getJavaTypeMapping(remainingMappedBy);
-                    }
+                    throw new NucleusUserException(Localiser.msg("056030", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
                 }
-                ownerMapping = otherMapping;
             }
+            elementInfo[i].setOwnerMapping(ownerMapping);
         }
-        else
-        {
-            // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
-            ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-            // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
-            if (ownerMapping == null)
-            {
-                throw new NucleusUserException(Localiser.msg("056030", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
-            }
-        }
+        this.ownerMapping = elementInfo[0].getOwnerMapping(); // TODO Get rid of ownerMapping and refer to elementInfo[i].getOwnerMapping
 
+        // TODO Put this on ComponentInfo
         relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
         if (relationDiscriminatorMapping != null)
         {
@@ -291,15 +298,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 try
                 {
                     ComponentInfo elemInfo = getComponentInfoForElement(element);
-                    JavaTypeMapping ownerMapping = null;
-                    if (ownerMemberMetaData.getMappedBy() != null)
-                    {
-                        ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
-                    }
-                    else
-                    {
-                        ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                    }
+                    JavaTypeMapping ownerMapping = elemInfo.getOwnerMapping();
                     JavaTypeMapping elemMapping = elemInfo.getDatastoreClass().getIdMapping();
 
                     int jdbcPosition = 1;
@@ -632,10 +631,38 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             if (!ec.getApiAdapter().isDeleted(elementToRemove))
             {
                 // Find the existing owner if the record hasn't already been deleted
-                // TODO Support DOT notation in mappedBy
-                int ownerFieldNumber = elementCmd.getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
-                elementOP.isLoaded(ownerFieldNumber);
-                oldOwner = elementOP.provideField(ownerFieldNumber);
+                ObjectProvider ownerHolderOP = elementOP;
+                int ownerFieldNumberInHolder = -1;
+                if (ownerMemberMetaData.getMappedBy().indexOf('.') > 0)
+                {
+                    AbstractMemberMetaData otherMmd = null;
+                    AbstractClassMetaData otherCmd = elementOP.getClassMetaData();
+                    String remainingMappedBy = ownerMemberMetaData.getMappedBy();
+                    while (remainingMappedBy.indexOf('.') > 0)
+                    {
+                        int dotPosition = remainingMappedBy.indexOf('.');
+                        String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
+                        otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
+
+                        Object holderValueAtField = ownerHolderOP.provideField(otherMmd.getAbsoluteFieldNumber());
+                        ownerHolderOP = ec.findObjectProviderForEmbedded(holderValueAtField, ownerHolderOP, otherMmd);
+
+                        remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                        otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);
+                        if (remainingMappedBy.indexOf('.') < 0)
+                        {
+                            otherMmd = otherCmd.getMetaDataForMember(remainingMappedBy);
+                            ownerFieldNumberInHolder = otherMmd.getAbsoluteFieldNumber();
+                        }
+                    }
+                }
+                else
+                {
+                    ownerFieldNumberInHolder = elementOP.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
+                }
+
+                ownerHolderOP.isLoaded(ownerFieldNumberInHolder);
+                oldOwner = ownerHolderOP.provideField(ownerFieldNumberInHolder);
             }
         }
         else
@@ -777,15 +804,44 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                     }
 
-                    int relatedFieldNumber = getFieldNumberInElementForBidirectional(elementOP);
-                    Object currentValue = elementOP.provideField(relatedFieldNumber);
+                    ObjectProvider ownerHolderOP = elementOP;
+                    int ownerFieldNumberInHolder = -1;
+                    if (ownerMemberMetaData.getMappedBy() != null && ownerMemberMetaData.getMappedBy().indexOf('.') > 0)
+                    {
+                        AbstractMemberMetaData otherMmd = null;
+                        AbstractClassMetaData otherCmd = elementCmd;
+                        String remainingMappedBy = ownerMemberMetaData.getMappedBy();
+                        while (remainingMappedBy.indexOf('.') > 0)
+                        {
+                            int dotPosition = remainingMappedBy.indexOf('.');
+                            String thisMappedBy = remainingMappedBy.substring(0, dotPosition);
+                            otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
+
+                            Object holderValueAtField = ownerHolderOP.provideField(otherMmd.getAbsoluteFieldNumber());
+                            ownerHolderOP = ec.findObjectProviderForEmbedded(holderValueAtField, ownerHolderOP, otherMmd);
+
+                            remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
+                            otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);
+                            if (remainingMappedBy.indexOf('.') < 0)
+                            {
+                                otherMmd = otherCmd.getMetaDataForMember(remainingMappedBy);
+                                ownerFieldNumberInHolder = otherMmd.getAbsoluteFieldNumber();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ownerFieldNumberInHolder = getFieldNumberInElementForBidirectional(elementOP);
+                    }
+
+                    Object currentValue = ownerHolderOP.provideField(ownerFieldNumberInHolder);
                     if (currentValue != null)
                     {
-                        elementOP.replaceFieldMakeDirty(relatedFieldNumber, null);
+                        ownerHolderOP.replaceFieldMakeDirty(ownerFieldNumberInHolder, null);
                         if (ec.isFlushing())
                         {
                             // Make sure this change gets flushed
-                            elementOP.flush();
+                            ownerHolderOP.flush();
                         }
                     }
                 }
@@ -915,15 +971,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         stmt.append(" SET ");
-        JavaTypeMapping ownerMapping = this.ownerMapping;
-        if (ownerMemberMetaData.getMappedBy() != null)
-        {
-            ownerMapping = info.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
-        }
-        else
-        {
-            ownerMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-        }
+
+        JavaTypeMapping ownerMapping = info.getOwnerMapping();
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             if (i > 0)
@@ -995,14 +1044,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             if (elemInfo != null)
             {
                 table = elemInfo.getDatastoreClass();
-                if (ownerMemberMetaData.getMappedBy() != null)
-                {
-                    ownerMapping = elemInfo.getDatastoreClass().getMemberMapping(ownerMemberMetaData.getMappedBy());
-                }
-                else
-                {
-                    ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                }
+                ownerMapping = elemInfo.getOwnerMapping();
                 elemMapping = elemInfo.getDatastoreClass().getIdMapping();
                 relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
             }
