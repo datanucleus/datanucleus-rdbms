@@ -125,6 +125,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         // MySQL DATETIME/TIMESTAMP doesn't store millisecs!
         // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
+        // TODO Actually this is no longer true ... MariaDB 5.3+, MySQL 5.7+ but can have problems storing nanos
         supportedOptions.remove(DATETIME_STORES_MILLISECS);
 //      if (driverName.equalsIgnoreCase("mariadb-jdbc"))
 //      {
