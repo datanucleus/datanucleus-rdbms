@@ -18,7 +18,9 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.expression;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -568,8 +570,7 @@ public class ObjectExpression extends SQLExpression
     }
 
     /**
-     * An "is" (instanceOf) expression, providing a BooleanExpression whether this expression
-     * is an instanceof the provided type.
+     * An "is" (instanceOf) expression, providing a BooleanExpression whether this expression is an instanceof the provided type.
      * @param expr The expression representing the type
      * @param not Whether the operator is "!instanceof"
      * @return Whether this expression is an instance of the provided type
@@ -591,6 +592,59 @@ public class ObjectExpression extends SQLExpression
         if (classExpr instanceof StringLiteral)
         {
             instanceofClassName = (String)((StringLiteral)classExpr).getValue();
+        }
+        else if (classExpr instanceof CollectionLiteral)
+        {
+            // "a instanceof (b1,b2,b3)"
+            CollectionLiteral typesLiteral = (CollectionLiteral)classExpr;
+            Collection values = (Collection) typesLiteral.getValue();
+            if (values.size() == 1)
+            {
+                Object value = values.iterator().next();
+                String valueStr = null;
+                if (value instanceof Class)
+                {
+                    valueStr = ((Class)value).getCanonicalName();
+                }
+                else if (value instanceof String)
+                {
+                    valueStr = (String)value;
+                }
+                else
+                {
+                    throw new NucleusUserException("Do not support CollectionLiteral of element type " + value.getClass().getName());
+                }
+                return is(new StringLiteral(stmt, typesLiteral.getJavaTypeMapping(), valueStr, typesLiteral.getParameterName()), not);
+            }
+
+            List<BooleanExpression> listExp = new LinkedList<>();
+            for (Object value : values)
+            {
+                String valueStr = null;
+                if (value instanceof Class)
+                {
+                    valueStr = ((Class)value).getCanonicalName();
+                }
+                else if (value instanceof String)
+                {
+                    valueStr = (String)value;
+                }
+                else
+                {
+                    throw new NucleusUserException("Do not support CollectionLiteral of element type " + value.getClass().getName());
+                }
+                listExp.add(is(new StringLiteral(stmt, typesLiteral.getJavaTypeMapping(), valueStr, typesLiteral.getParameterName()), false));
+            }
+
+            BooleanExpression result = null;
+            for (BooleanExpression sqlExpression : listExp)
+            {
+                result = result == null ? sqlExpression : result.ior(sqlExpression);
+            }
+            if (result != null)
+            {
+                return not ? result.not() : result;
+            }
         }
         else
         {
