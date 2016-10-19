@@ -98,13 +98,13 @@ public class ArrayLiteral extends ArrayExpression implements SQLLiteral
                 Object current = Array.get(value, i);
                 if (current != null)
                 {
-                    JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
-                    SQLExpression expr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, m, current);
+                    JavaTypeMapping elemMapping = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
+                    SQLExpression elemExpr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, elemMapping, current);
 
-                    // Append the SQLExpression (should be a literal) for the current element.
+                    // Append the SQLExpression (should be a literal) for the current element
                     st.append(hadPrev ? "," : "");
-                    st.append(expr);
-                    elementExpressions.add(expr);
+                    st.append(elemExpr);
+                    elementExpressions.add(elemExpr);
 
                     hadPrev = true;
                 }

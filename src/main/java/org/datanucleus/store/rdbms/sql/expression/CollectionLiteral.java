@@ -56,14 +56,7 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
         }
         else if (parameterName != null)
         {
-            if (value instanceof Collection)
-            {
-                this.value = (Collection)value;
-            }
-            else
-            {
-                this.value = null;
-            }
+            this.value = (value instanceof Collection) ? (Collection)value : null;
             st.appendParameter(parameterName, mapping, this.value);
         }
         else if (value instanceof Collection)
@@ -73,8 +66,7 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
         }
         else
         {
-            throw new NucleusException("Cannot create " + this.getClass().getName() + 
-                " for value of type " + value.getClass().getName());
+            throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + value.getClass().getName());
         }
     }
 
@@ -115,19 +107,18 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
             st.append("(");
 
             boolean hadPrev = false;
-
             for (Iterator it=value.iterator(); it.hasNext();)
             {
-                Object current = it.next();
-                if (current != null)
+                Object element = it.next();
+                if (element != null)
                 {
-                    JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
-                    SQLExpression expr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, m, current);
+                    JavaTypeMapping elemMapping = storeMgr.getSQLExpressionFactory().getMappingForType(element.getClass(), false);
+                    SQLExpression elemExpr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, elemMapping, element);
 
-                    // Append the SQLExpression (should be a literal) for the current element.
+                    // Append the SQLExpression (should be a literal) for the current element
                     st.append(hadPrev ? "," : "");
-                    st.append(expr);
-                    elementExpressions.add(expr);
+                    st.append(elemExpr);
+                    elementExpressions.add(elemExpr);
 
                     hadPrev = true;
                 }
@@ -141,17 +132,17 @@ public class CollectionLiteral extends CollectionExpression implements SQLLitera
     {
         if (methodName.equals("get") && args.size() == 1 && value instanceof List)
         {
-            // Map.get(expr)
+            // List.get
             SQLExpression argExpr = (SQLExpression)args.get(0);
             if (argExpr instanceof SQLLiteral)
             {
+                // List.get(SQLLiteral)
                 Object val = ((List)value).get((Integer)((SQLLiteral)argExpr).getValue());
                 if (val == null)
                 {
                     return new NullLiteral(stmt, null, null, null);
                 }
-                JavaTypeMapping m = 
-                    stmt.getRDBMSManager().getSQLExpressionFactory().getMappingForType(val.getClass(), false);
+                JavaTypeMapping m = stmt.getRDBMSManager().getSQLExpressionFactory().getMappingForType(val.getClass(), false);
                 return new ObjectLiteral(stmt, m, val, null);
             }
 

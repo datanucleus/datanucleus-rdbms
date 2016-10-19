@@ -77,8 +77,7 @@ public class MapLiteral extends MapExpression implements SQLLiteral
         }
         else
         {
-            throw new NucleusException("Cannot create " + this.getClass().getName() + 
-                " for value of type " + value.getClass().getName());
+            throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + value.getClass().getName());
         }
     }
 
@@ -184,20 +183,19 @@ public class MapLiteral extends MapExpression implements SQLLiteral
                 keyExpressions = new ArrayList();
 
                 boolean hadPrev = false;
-
                 Set keys = value.keySet();
                 for (Iterator it=keys.iterator(); it.hasNext();)
                 {
                     Object current = it.next();
                     if (null != current)
                     {
-                        JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
-                        SQLExpression expr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, m, current);
+                        JavaTypeMapping keyMapping = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
+                        SQLExpression keyExpr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, keyMapping, current);
 
-                        // Append the SQLExpression (should be a literal) for the current element.
+                        // Append the SQLExpression (should be a literal) for the current key
                         st.append(hadPrev ? "," : "");
-                        st.append(expr);
-                        keyExpressions.add(expr);
+                        st.append(keyExpr);
+                        keyExpressions.add(keyExpr);
 
                         hadPrev = true;
                     }
@@ -236,8 +234,7 @@ public class MapLiteral extends MapExpression implements SQLLiteral
             }
             else
             {
-                throw new NucleusException("Cannot create " + this.getClass().getName() + 
-                    " for value of type " + (value != null ? value.getClass().getName() : null));
+                throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + (value != null ? value.getClass().getName() : null));
             }
         }
 
@@ -279,20 +276,19 @@ public class MapLiteral extends MapExpression implements SQLLiteral
                 st.append("(");
 
                 boolean hadPrev = false;
-
                 Collection values = value.values();
                 for (Iterator it=values.iterator(); it.hasNext();)
                 {
                     Object current = it.next();
                     if (null != current)
                     {
-                        JavaTypeMapping m = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
-                        SQLExpression expr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, m, current);
+                        JavaTypeMapping valueMapping = storeMgr.getSQLExpressionFactory().getMappingForType(current.getClass(), false);
+                        SQLExpression valueExpr = storeMgr.getSQLExpressionFactory().newLiteral(stmt, valueMapping, current);
 
                         // Append the SQLExpression (should be a literal) for the current element.
                         st.append(hadPrev ? "," : "");
-                        st.append(expr);
-                        valueExpressions.add(expr);
+                        st.append(valueExpr);
+                        valueExpressions.add(valueExpr);
 
                         hadPrev = true;
                     }
