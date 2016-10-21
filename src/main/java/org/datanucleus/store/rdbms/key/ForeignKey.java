@@ -66,15 +66,16 @@ public class ForeignKey extends Key
 
     /**
      * Constructor.
+     * @param dba Datastore adapter
      * @param initiallyDeferred Whether the constraints are deferred
      */
-    public ForeignKey(boolean initiallyDeferred)
+    public ForeignKey(DatastoreAdapter dba, boolean initiallyDeferred)
     {
         super(null);
 
         this.initiallyDeferred = initiallyDeferred;
         this.refTable = null;
-        this.dba = null;
+        this.dba = dba;
     }
 
     /**

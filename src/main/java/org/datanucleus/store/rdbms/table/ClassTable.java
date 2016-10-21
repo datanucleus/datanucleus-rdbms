@@ -2417,7 +2417,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         // Create the ForeignKey base details
-        ForeignKey fk = new ForeignKey(fkmd.isDeferred());
+        ForeignKey fk = new ForeignKey(dba, fkmd.isDeferred());
         fk.setForMetaData(fkmd);
 
         if (fkmd.getFkDefinitionApplies())

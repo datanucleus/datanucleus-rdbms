@@ -1014,13 +1014,29 @@ public abstract class TableImpl extends AbstractTable
                 ForeignKey fk = (ForeignKey) foreignKeysByName.get(fkIdentifier);
                 if (fk == null)
                 {
-                    fk = new ForeignKey(initiallyDeferred);
+                    fk = new ForeignKey(dba, initiallyDeferred);
                     fk.setName(fkIdentifier.getName());
                     foreignKeysByName.put(fkIdentifier, fk);
                 }
-    
+
+                // Find the referenced table from the provided name
                 String pkTableName = (String)fkInfo.getProperty("pk_table_name");
-                DatastoreClass refTable = storeMgr.getDatastoreClass(idFactory.newTableIdentifier(pkTableName));
+                DatastoreIdentifier refTableId = idFactory.newTableIdentifier(pkTableName);
+                DatastoreClass refTable = storeMgr.getDatastoreClass(refTableId);
+                if (refTable == null)
+                {
+                    // Try with same catalog/schema as this table since some JDBC don't provide this info
+                    if (getSchemaName() != null)
+                    {
+                        refTableId.setSchemaName(getSchemaName());
+                    }
+                    if (getCatalogName() != null)
+                    {
+                        refTableId.setCatalogName(getCatalogName());
+                    }
+                    refTable = storeMgr.getDatastoreClass(refTableId);
+                }
+
                 if (refTable != null)
                 {
                     String fkColumnName = (String)fkInfo.getProperty("fk_column_name");
@@ -1037,6 +1053,11 @@ public abstract class TableImpl extends AbstractTable
                     {
                         //TODO throw exception?
                     }
+                }
+                else
+                {
+                    NucleusLogger.DATASTORE_SCHEMA.warn("Retrieved ForeignKey from datastore for table=" + toString() + " referencing table " + pkTableName + 
+                        " but not found internally. Is there some catalog/schema or quoting causing problems?");
                 }
             }
         }
