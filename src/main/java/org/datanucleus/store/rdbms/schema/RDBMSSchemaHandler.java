@@ -533,37 +533,45 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             ResultSet rs = dmd.getSchemas();
             try
             {
+                String inputSchema = getNameWithoutQuotes(schemaName);
+                String inputCatalog = getNameWithoutQuotes(catalogName);
+
                 while (rs.next())
                 {
                     String schema = rs.getString("TABLE_SCHEM");
+                    String foundSchema = getNameWithoutQuotes(schema);
                     boolean schemaCorrect = false;
-                    if (StringUtils.isWhitespace(schemaName) && StringUtils.isWhitespace(schema))
+                    if (StringUtils.isWhitespace(inputSchema) && StringUtils.isWhitespace(foundSchema))
                     {
                         schemaCorrect = true;
                     }
-                    else if (schemaName != null && schemaName.equals(schema))
+                    else
                     {
-                        schemaCorrect = true;
-                    }
-                    else if (schema != null && StringUtils.isWhitespace(schemaName) && schema.equals(((RDBMSStoreManager)storeMgr).getSchemaName()))
-                    {
-                        schemaCorrect = true;
+                        if (inputSchema != null && inputSchema.equals(foundSchema))
+                        {
+                            schemaCorrect = true;
+                        }
+                        else if (foundSchema != null && StringUtils.isWhitespace(inputSchema) && foundSchema.equals(((RDBMSStoreManager)storeMgr).getSchemaName()))
+                        {
+                            schemaCorrect = true;
+                        }
                     }
 
                     boolean catalogCorrect = false;
-                    String catalog = catalogName;
+                    String catalog = inputCatalog;
                     try
                     {
                         catalog = rs.getString("TABLE_CATALOG");
-                        if (StringUtils.isWhitespace(catalogName) && StringUtils.isWhitespace(catalog))
+                        String foundCatalog = getNameWithoutQuotes(catalog);
+                        if (StringUtils.isWhitespace(inputCatalog) && StringUtils.isWhitespace(foundCatalog))
                         {
                             catalogCorrect = true;
                         }
-                        else if (catalogName != null && catalogName.equals(catalog))
+                        else if (inputCatalog != null && inputCatalog.equals(foundCatalog))
                         {
                             catalogCorrect = true;
                         }
-                        else if (catalog != null && StringUtils.isWhitespace(catalogName) && catalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
+                        else if (foundCatalog != null && StringUtils.isWhitespace(inputCatalog) && foundCatalog.equals(((RDBMSStoreManager)storeMgr).getCatalogName()))
                         {
                             catalogCorrect = true;
                         }
@@ -594,6 +602,23 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         }
 
         return null;
+    }
+
+    private static String getNameWithoutQuotes(String name)
+    {
+        String returnedName = name != null ? name.trim() : null;
+        if (returnedName != null)
+        {
+            if (returnedName.startsWith("\"") && returnedName.endsWith("\""))
+            {
+                returnedName = returnedName.substring(1, returnedName.length()-1);
+            }
+            else if (returnedName.startsWith("'") && returnedName.endsWith("'"))
+            {
+                returnedName = returnedName.substring(1, returnedName.length()-1);
+            }
+        }
+        return returnedName;
     }
 
     /**
@@ -637,8 +662,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param tableName Name of the table
      * @return The foreign key info
      */
-    protected RDBMSTableFKInfo getRDBMSTableFKInfoForTable(Connection conn,
-            String catalogName, String schemaName, String tableName)
+    protected RDBMSTableFKInfo getRDBMSTableFKInfoForTable(Connection conn, String catalogName, String schemaName, String tableName)
     {
         // We don't cache FK info, so retrieve it directly
         RDBMSTableFKInfo info = new RDBMSTableFKInfo(catalogName, schemaName, tableName);
