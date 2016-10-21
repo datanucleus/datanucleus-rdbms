@@ -528,7 +528,7 @@ public abstract class AbstractTable implements Table
             NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057029", this));
         }
 
-        if (storeMgr.getSchemaHandler().isAutoCreateSchema())
+        if (storeMgr.getSchemaHandler().isAutoCreateDatabase())
         {
             if (identifier.getSchemaName() != null || identifier.getCatalogName() != null)
             {
