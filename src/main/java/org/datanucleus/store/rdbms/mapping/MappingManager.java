@@ -37,6 +37,20 @@ import org.datanucleus.store.rdbms.table.Table;
 public interface MappingManager
 {
     /**
+     * Accessor for whether a java type is supported as being mappable.
+     * @param javaTypeName The java type name
+     * @return Whether the class is supported (to some degree)
+     */
+    boolean isSupportedMappedType(String javaTypeName);
+
+    /**
+     * Accessor for the JavaTypeMapping class for the supplied java type.
+     * @param javaTypeName The java type name
+     * @return The JavaTypeMapping class to use
+     */
+    Class getMappingType(String javaTypeName);
+
+    /**
      * Initialise the datastore mapping. 
      * @param mgr the PlyginManager
      * @param clr the ClassLoaderResolver

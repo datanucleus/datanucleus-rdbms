@@ -454,7 +454,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             {
                 // Get the mapping for this implementation
                 JavaTypeMapping m;
-                if (storeMgr.getMappedTypeManager().isSupportedMappedType(implClass.getName()))
+                if (storeMgr.getMappingManager().isSupportedMappedType(implClass.getName()))
                 {
                     m = storeMgr.getMappingManager().getMapping(implClass, serialised, embedded, mmd.getFullFieldName());
                 }

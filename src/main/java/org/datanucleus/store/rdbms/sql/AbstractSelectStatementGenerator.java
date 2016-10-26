@@ -97,7 +97,7 @@ public abstract class AbstractSelectStatementGenerator implements SelectStatemen
         String candidateClassName = candidateType.getName();
         AbstractClassMetaData acmd = storeMgr.getMetaDataManager().getMetaDataForClass(candidateType, clr);
 
-        if (!storeMgr.getMappedTypeManager().isSupportedMappedType(candidateClassName))
+        if (!storeMgr.getMappingManager().isSupportedMappedType(candidateClassName))
         {
             if (acmd == null)
             {

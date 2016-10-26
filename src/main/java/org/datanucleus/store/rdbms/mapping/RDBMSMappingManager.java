@@ -28,10 +28,13 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
+import org.datanucleus.NucleusContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -101,6 +104,9 @@ public class RDBMSMappingManager implements MappingManager
     protected MultiMap datastoreMappingsByJDBCType;
     protected MultiMap datastoreMappingsBySQLType;
 
+    /** The mapped types, keyed by the class name. */
+    protected Map<String, MappedType> mappedTypes = new ConcurrentHashMap();
+
     /**
      * Constructor for a mapping manager for an RDBMS datastore.
      * @param storeMgr The StoreManager
@@ -109,6 +115,199 @@ public class RDBMSMappingManager implements MappingManager
     {
         this.storeMgr = storeMgr;
         this.clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
+
+        // Load up the mappings of javaType -> JavaTypeMapping
+        NucleusContext nucleusCtx = storeMgr.getNucleusContext();
+        PluginManager pluginMgr = nucleusCtx.getPluginManager();
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.java_mapping", null, null);
+        if (elems != null)
+        {
+            for (int i=0;i<elems.length;i++)
+            {
+                String javaName = elems[i].getAttribute("java-type").trim();
+                String mappingClassName = elems[i].getAttribute("mapping-class");
+
+                if (javaName != null && !mappedTypes.containsKey(javaName) && !StringUtils.isWhitespace(mappingClassName)) // Use "priority" attribute to be placed higher in the list
+                {
+                    try
+                    {
+                        Class mappingType = pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), mappingClassName);
+                        try
+                        {
+                            Class cls = clr.classForName(javaName);
+                            if (cls != null)
+                            {
+                                mappedTypes.put(javaName, new MappedType(cls, mappingType));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            // Class not found so ignore. Should log this
+                        }
+                    }
+                    catch (NucleusException jpe)
+                    {
+                        NucleusLogger.PERSISTENCE.error(Localiser.msg("016004", mappingClassName));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Accessor for whether a java type is supported as being mappable.
+     * @param javaTypeName The java type name
+     * @return Whether the class is supported (to some degree)
+     */
+    public boolean isSupportedMappedType(String javaTypeName)
+    {
+        if (javaTypeName == null)
+        {
+            return false;
+        }
+
+        MappedType type = mappedTypes.get(javaTypeName);
+        if (type == null)
+        {
+            try
+            {
+                Class cls = clr.classForName(javaTypeName);
+                type = findMappedTypeForClass(cls);
+                return type != null && type.javaMappingType != null;
+            }
+            catch (Exception e)
+            {
+            }
+            return false;
+        }
+
+        return type.javaMappingType != null;
+    }
+
+    /**
+     * Accessor for the JavaTypeMapping class for the supplied java type.
+     * @param javaTypeName The java type name
+     * @return The Java mapping type
+     */
+    public Class getMappingType(String javaTypeName)
+    {
+        if (javaTypeName == null)
+        {
+            return null;
+        }
+
+        MappedType type = mappedTypes.get(javaTypeName);
+        if (type == null)
+        {
+            // Check if this is a SCO wrapper
+            TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
+            Class cls = typeMgr.getTypeForSecondClassWrapper(javaTypeName);
+            if (cls != null)
+            {
+                // Supplied class is a SCO wrapper, so return the java type mapping for the underlying java type
+                type = mappedTypes.get(cls.getName());
+                if (type != null)
+                {
+                    return type.javaMappingType;
+                }
+            }
+
+            // Not SCO wrapper so find a type
+            try
+            {
+                cls = clr.classForName(javaTypeName);
+                type = findMappedTypeForClass(cls);
+                return type.javaMappingType;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        return type.javaMappingType;
+    }
+
+    /**
+     * Definition of a java type that can be "mapped".
+     * The type is supported to some degree, maybe as FCO or maybe as SCO.
+     */
+    static class MappedType
+    {
+        /** Supported java type. */
+        final Class cls;
+
+        /** Mapping class to use. An extension of {@link org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping}*/
+        final Class javaMappingType;
+
+        /**
+         * Constructor.
+         * @param cls the java type class being supported
+         * @param mappingType the mapping class. An extension of {@link org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping}
+         */
+        public MappedType(Class cls, Class mappingType)
+        {
+            this.cls = cls;
+            this.javaMappingType = mappingType;
+        }
+
+        public String toString()
+        {
+            StringBuilder str = new StringBuilder("MappedType " + cls.getName() + " [");
+            if (javaMappingType != null)
+            {
+                str.append(" mapping=" + javaMappingType);
+            }
+            str.append("]");
+            return str.toString();
+        }
+    }
+
+    protected MappedType findMappedTypeForClass(Class cls)
+    {
+        MappedType type = mappedTypes.get(cls.getName());
+        if (type != null)
+        {
+            return type;
+        }
+
+        // Not supported so try to find one that is supported that this class derives from
+        Class componentCls = cls.isArray() ? cls.getComponentType() : null;
+        Collection<MappedType> supportedTypes = new HashSet<>(mappedTypes.values());
+        Iterator<MappedType> iter = supportedTypes.iterator();
+        while (iter.hasNext())
+        {
+            type = iter.next();
+            if (type.cls == cls)
+            {
+                return type;
+            }
+
+            if (!type.cls.getName().equals("java.lang.Object") && !type.cls.getName().equals("java.io.Serializable"))
+            {
+                if (componentCls != null)
+                {
+                    // Array type
+                    if (type.cls.isArray() && type.cls.getComponentType().isAssignableFrom(componentCls))
+                    {
+                        mappedTypes.put(cls.getName(), type);
+                        return type;
+                    }
+                }
+                else
+                {
+                    // Basic type
+                    if (type.cls.isAssignableFrom(cls))
+                    {
+                        mappedTypes.put(cls.getName(), type);
+                        return type;
+                    }
+                }
+            }
+        }
+
+        // Not supported
+        return null;
     }
 
     public String getDefaultSqlTypeForJavaType(String javaType, String jdbcType)
@@ -571,7 +770,7 @@ public class RDBMSMappingManager implements MappingManager
             }
         }
 
-        if (javaType.isInterface() && !storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getName()))
+        if (javaType.isInterface() && !storeMgr.getMappingManager().isSupportedMappedType(javaType.getName()))
         {
             // Interface field
             if (serialised)
@@ -620,7 +819,7 @@ public class RDBMSMappingManager implements MappingManager
                 return new MappingConverterDetails(ArrayMapping.class);
             }
             else if (javaType.getComponentType().isInterface() &&
-                !storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getComponentType().getName()))
+                !storeMgr.getMappingManager().isSupportedMappedType(javaType.getComponentType().getName()))
             {
                 // Array of interface objects
                 return new MappingConverterDetails(ArrayMapping.class);
@@ -646,7 +845,7 @@ public class RDBMSMappingManager implements MappingManager
         }
         if (mcd == null)
         {
-            if (storeMgr.getMappedTypeManager().isSupportedMappedType(javaType.getName()))
+            if (storeMgr.getMappingManager().isSupportedMappedType(javaType.getName()))
             {
                 // "supported" type yet no FCO mapping !
                 throw new NucleusUserException(Localiser.msg("041001", fieldName, javaType.getName()));
@@ -1145,7 +1344,7 @@ public class RDBMSMappingManager implements MappingManager
     protected MappingConverterDetails getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)
     {
         // Check for an explicit mapping
-        Class cls = storeMgr.getMappedTypeManager().getMappingType(javaType.getName());
+        Class cls = storeMgr.getMappingManager().getMappingType(javaType.getName());
 
         if (cls == null)
         {

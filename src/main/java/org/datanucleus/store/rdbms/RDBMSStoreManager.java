@@ -123,7 +123,6 @@ import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
-import org.datanucleus.store.rdbms.mapping.MappedTypeManager;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -221,9 +220,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     /** Schema name for the database (if supported). */
     protected String schemaName = null;
 
-    /** TypeManager for mapped information. */
-    protected MappedTypeManager mappedTypeMgr = null;
-
     /** Manager for the mapping between Java and datastore types. */
     protected MappingManager mappingManager;
 
@@ -284,7 +280,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         super("rdbms", clr, ctx, props);
 
-        mappedTypeMgr = new MappedTypeManager(nucleusContext);
         persistenceHandler = new RDBMSPersistenceHandler(this);
         flushProcess = new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
         schemaHandler = new RDBMSSchemaHandler(this);
@@ -521,15 +516,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Accessor for the manager of mapped type information.
-     * @return MappedTypeManager
-     */
-    public MappedTypeManager getMappedTypeManager()
-    {
-        return mappedTypeMgr;
-    }
-
-    /**
      * Accessor for the factory for creating identifiers (table/column names etc).
      * @return Identifier factory
      */
@@ -555,6 +541,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         if (mappingManager == null)
         {
+            // We get this via the DatastoreAdapter since Oracle needs to override the default mapping manager
             mappingManager = dba.getMappingManager(this);
         }
         return mappingManager;
