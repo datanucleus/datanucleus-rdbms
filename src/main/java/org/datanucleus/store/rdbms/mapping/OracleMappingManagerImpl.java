@@ -44,17 +44,16 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 
 /**
- * Mapping manager for Oracle RDBMS adapters.
- * Overrides some of the mappings in the RDBMSMappingManager to allow for Oracle strangeness 
- * on BLOB/CLOB Handling.
+ * Mapping manager implementation for Oracle datastores.
+ * Overrides some of the mappings in the default MappingManager implementation to allow for Oracle strangeness on BLOB/CLOB Handling.
  */
-public class OracleRDBMSMappingManager extends RDBMSMappingManager
+public class OracleMappingManagerImpl extends MappingManagerImpl
 {
     /**
      * Constructor for a mapping manager for an ORM datastore.
      * @param storeMgr The StoreManager
      */
-    public OracleRDBMSMappingManager(RDBMSStoreManager storeMgr)
+    public OracleMappingManagerImpl(RDBMSStoreManager storeMgr)
     {
         super(storeMgr);
     }

@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
 Contributors:
 2004 Erik Bengtson - addition of JDBC, SQL type maps
 2004 Andy Jefferson - fixed use of SQL/JDBC to find the one applicable to
@@ -90,11 +89,11 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Mapping manager for RDBMS datastores.
+ * Default Mapping manager implementation.
  * Provides mappings from standard Java types (defined in org.datanucleus.store.rdbms.mapping.java) to
  * datastore mappings for JDBC types (defined in org.datanucleus.store.rdbms.mapping.datastore).
  */
-public class RDBMSMappingManager implements MappingManager
+public class MappingManagerImpl implements MappingManager
 {
     protected final RDBMSStoreManager storeMgr;
 
@@ -111,7 +110,7 @@ public class RDBMSMappingManager implements MappingManager
      * Constructor for a mapping manager for an RDBMS datastore.
      * @param storeMgr The StoreManager
      */
-    public RDBMSMappingManager(RDBMSStoreManager storeMgr)
+    public MappingManagerImpl(RDBMSStoreManager storeMgr)
     {
         this.storeMgr = storeMgr;
         this.clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);

@@ -24,7 +24,7 @@ import java.sql.ResultSet;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
-import org.datanucleus.store.rdbms.mapping.RDBMSMappingManager;
+import org.datanucleus.store.rdbms.mapping.MappingManagerImpl;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -123,7 +123,7 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
             if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DEFAULT_SQL_TYPE))
             {
                 // This caters for when the JDBC driver has multiple sql-type for this jdbc-type, so we pick the default one specified in plugin.xml
-                String sqlTypeDflt = ((RDBMSMappingManager)storeMgr.getMappingManager()).getDefaultSqlTypeForJavaType(getJavaTypeMapping().getJavaType().getName(),
+                String sqlTypeDflt = ((MappingManagerImpl)storeMgr.getMappingManager()).getDefaultSqlTypeForJavaType(getJavaTypeMapping().getJavaType().getName(),
                     storeMgr.getDatastoreAdapter().getNameForJDBCType(getJDBCType()));
                 if (sqlTypeDflt != null)
                 {

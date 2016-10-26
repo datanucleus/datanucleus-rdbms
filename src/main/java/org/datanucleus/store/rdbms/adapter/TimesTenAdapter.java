@@ -26,7 +26,7 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.RDBMSMappingManager;
+import org.datanucleus.store.rdbms.mapping.MappingManagerImpl;
 import org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
@@ -122,9 +122,9 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
         // Re-register mapping for this adapter
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)handler.getStoreManager();
         MappingManager mapMgr = storeMgr.getMappingManager();
-        if (mapMgr instanceof RDBMSMappingManager)
+        if (mapMgr instanceof MappingManagerImpl)
         {
-            RDBMSMappingManager rdbmsMapMgr = (RDBMSMappingManager)mapMgr;
+            MappingManagerImpl rdbmsMapMgr = (MappingManagerImpl)mapMgr;
             rdbmsMapMgr.deregisterDatastoreMappingsForJDBCType("VARBINARY");
             rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class,
                 "VARBINARY", "VARBINARY", true);

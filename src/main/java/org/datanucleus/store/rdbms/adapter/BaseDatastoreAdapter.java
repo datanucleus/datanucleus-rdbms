@@ -56,7 +56,7 @@ import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.RDBMSMappingManager;
+import org.datanucleus.store.rdbms.mapping.MappingManagerImpl;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.ForeignKeyInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
@@ -565,7 +565,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public void removeUnsupportedMappings(StoreSchemaHandler handler, ManagedConnection mconn)
     {
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)handler.getStoreManager();
-        RDBMSMappingManager mapMgr = (RDBMSMappingManager)storeMgr.getMappingManager();
+        MappingManagerImpl mapMgr = (MappingManagerImpl)storeMgr.getMappingManager();
         RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
 
         Iterator<Map.Entry<Integer, String>> entryIter = supportedJdbcTypesById.entrySet().iterator();
@@ -695,7 +695,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public MappingManager getMappingManager(RDBMSStoreManager storeMgr)
     {
-        return new RDBMSMappingManager(storeMgr);
+        return new MappingManagerImpl(storeMgr);
     }
 
     /* (non-Javadoc)

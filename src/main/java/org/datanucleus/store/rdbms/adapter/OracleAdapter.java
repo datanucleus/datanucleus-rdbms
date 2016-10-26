@@ -39,7 +39,7 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.OracleRDBMSMappingManager;
+import org.datanucleus.store.rdbms.mapping.OracleMappingManagerImpl;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -253,7 +253,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
      */
     public MappingManager getMappingManager(RDBMSStoreManager storeMgr)
     {
-        return new OracleRDBMSMappingManager(storeMgr);
+        return new OracleMappingManagerImpl(storeMgr);
     }
 
     /**
