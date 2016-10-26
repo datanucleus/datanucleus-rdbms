@@ -33,11 +33,9 @@ import javax.transaction.xa.XAException;
 import javax.transaction.xa.XAResource;
 import javax.transaction.xa.Xid;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.Transaction;
-import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.ConnectionFactoryNotFoundException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
@@ -59,13 +57,14 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * ConnectionFactory for RDBMS datastores.
- * Each instance is a factory of Transactional connection or NonTransactional connection.
+ * Each instance is a factory of transactional or non-transactional connections.
  */
 public class ConnectionFactoryImpl extends AbstractConnectionFactory
 {
-    /** Datasources. */
+    /** Datasources from which to get the connections. Will have a single DataSource unless using a priority list of DataSources. */
     DataSource[] dataSources;
 
+    /** Optional locally-managed pool of connections from which we get our connections (when using URL). */
     ConnectionPool pool = null;
 
     /**
@@ -148,7 +147,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
     /**
      * Method to generate the datasource(s) used by this connection factory.
-     * Searches initially for a provided DataSource, then if not found, for JNDI DataSource(s), and finally for the DataSource at a connection URL.
+     * Searches initially for a provided DataSource then, if not found, for JNDI DataSource(s), and finally for the DataSource at a connection URL.
      * @param storeMgr Store Manager
      * @param connDS Factory data source object
      * @param connJNDI DataSource JNDI name(s)
@@ -194,7 +193,12 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         else if (connURL != null)
         {
             dataSources = new DataSource[1];
-            String poolingType = calculatePoolingType(storeMgr, requiredPoolingType);
+            String poolingType = requiredPoolingType;
+            if (StringUtils.isWhitespace(requiredPoolingType))
+            {
+                // Default to dbcp2-builtin when nothing specified
+                poolingType = "dbcp2-builtin";
+            }
 
             // User has requested internal database connection pooling so check the registered plugins
             try
@@ -750,133 +754,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         {
             super.end(xid, flags);
             ((ManagedConnectionImpl)mconn).xaRes = null;
-        }
-    }
-
-    /**
-     * Method to set the connection pooling type (if any).
-     * Tries to use any user-provided value if possible, otherwise will fallback to something available in the CLASSPATH (if any), else use the builtin DBCP2.
-     * @param storeMgr Store Manager
-     * @param requiredPoolingType Pooling type requested by the user
-     * @return Pooling type to use (name of a pool type)
-     */
-    protected static String calculatePoolingType(StoreManager storeMgr, String requiredPoolingType)
-    {
-        String poolingType = requiredPoolingType;
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-
-        if (poolingType != null)
-        {
-            // User-specified, so check availability TODO Drop this since each pooler checks itself
-            if (poolingType.equalsIgnoreCase("DBCP2") && !dbcp2Present(clr))
-            {
-                NucleusLogger.CONNECTION.warn("DBCP2 specified but not present in CLASSPATH (or one of dependencies)");
-                poolingType = null;
-            }
-            else if (poolingType.equalsIgnoreCase("C3P0") && !c3p0Present(clr))
-            {
-                NucleusLogger.CONNECTION.warn("C3P0 specified but not present in CLASSPATH (or one of dependencies)");
-                poolingType = null;
-            }
-            else if (poolingType.equalsIgnoreCase("Proxool") && !proxoolPresent(clr))
-            {
-                NucleusLogger.CONNECTION.warn("Proxool specified but not present in CLASSPATH (or one of dependencies)");
-                poolingType = null;
-            }
-            else if (poolingType.equalsIgnoreCase("BoneCP") && !bonecpPresent(clr))
-            {
-                NucleusLogger.CONNECTION.warn("BoneCP specified but not present in CLASSPATH (or one of dependencies)");
-                poolingType = null;
-            }
-        }
-
-        // Not specified, so try to find one in the CLASSPATH
-        if (poolingType == null && dbcp2Present(clr))
-        {
-            poolingType = "DBCP2";
-        }
-        if (poolingType == null && c3p0Present(clr))
-        {
-            poolingType = "C3P0";
-        }
-        if (poolingType == null && proxoolPresent(clr))
-        {
-            poolingType = "Proxool";
-        }
-        if (poolingType == null && bonecpPresent(clr))
-        {
-            poolingType = "BoneCP";
-        }
-
-        if (poolingType == null)
-        {
-            // Fallback to built-in DBCP2
-            poolingType = "dbcp2-builtin";
-        }
-        return poolingType;
-    }
-
-    protected static boolean dbcp2Present(ClassLoaderResolver clr)
-    {
-        try
-        {
-            // Need commons-dbcp, commons-pool
-            clr.classForName("org.apache.commons.pool2.ObjectPool");
-            clr.classForName("org.apache.commons.dbcp2.ConnectionFactory");
-            return true;
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-            // DBCP2 not available
-            return false;
-        }
-    }
-
-    protected static boolean c3p0Present(ClassLoaderResolver clr)
-    {
-        try
-        {
-            // Need c3p0
-            clr.classForName("com.mchange.v2.c3p0.ComboPooledDataSource");
-            return true;
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-            // C3P0 not available
-            return false;
-        }
-    }
-
-    protected static boolean proxoolPresent(ClassLoaderResolver clr)
-    {
-        try
-        {
-            // Need proxool, commons-logging
-            clr.classForName("org.logicalcobwebs.proxool.ProxoolDriver");
-            clr.classForName("org.apache.commons.logging.Log");
-            return true;
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-            // Proxool not available
-            return false;
-        }
-    }
-
-    protected static boolean bonecpPresent(ClassLoaderResolver clr)
-    {
-        try
-        {
-            // Need bonecp, slf4j, google-collections
-            clr.classForName("com.jolbox.bonecp.BoneCPDataSource");
-            clr.classForName("org.slf4j.Logger");
-            clr.classForName("com.google.common.collect.Multiset");
-            return true;
-        }
-        catch (ClassNotResolvedException cnre)
-        {
-            // BoneCP not available
-            return false;
         }
     }
 }
