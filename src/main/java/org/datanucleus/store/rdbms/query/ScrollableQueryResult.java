@@ -61,7 +61,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
     /** Map of ResultSet object values, keyed by the list index ("0", "1", etc). */
     private Map<Integer, E> resultsObjsByIndex = null;
 
-    protected Map<Integer, Object> resultIds = null;
+    protected Map<Integer, Object> resultIdsByPosition = null;
 
     /** Position of first result (origin=0). */
     int startIndex = 0;
@@ -90,7 +90,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
 
         if (query.useResultsCaching())
         {
-            resultIds = new HashMap();
+            resultIdsByPosition = new HashMap();
         }
 
         // Process any supported extensions
@@ -258,9 +258,9 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             {
                 // Put it in our cache, keyed by the list index
                 resultsObjsByIndex.put(index, obj);
-                if (resultIds != null)
+                if (resultIdsByPosition != null)
                 {
-                    resultIds.put(index, api.getIdForObject(obj));
+                    resultIdsByPosition.put(index, api.getIdForObject(obj));
                 }
             }
 
@@ -317,19 +317,19 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
 
     protected void cacheQueryResults()
     {
-        if (resultIds != null)
+        if (resultIdsByPosition != null)
         {
             List ids = new ArrayList();
-            Iterator<Integer> resultIdPositionIter = resultIds.keySet().iterator();
+            Iterator<Integer> resultIdPositionIter = resultIdsByPosition.keySet().iterator();
             while (resultIdPositionIter.hasNext())
             {
                 Integer position = resultIdPositionIter.next();
-                Object resultId = resultIds.get(position);
+                Object resultId = resultIdsByPosition.get(position);
                 ids.add(resultId);
             }
             query.getQueryManager().addQueryResult(query, query.getInputParameters(), ids);
         }
-        resultIds = null;
+        resultIdsByPosition = null;
     }
 
     // ------------------------- Implementation of List methods ----------------------
