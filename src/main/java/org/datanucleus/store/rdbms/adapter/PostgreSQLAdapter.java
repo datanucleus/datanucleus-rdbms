@@ -27,7 +27,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -55,7 +56,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     public static final String POSTGRESQL_RESERVED_WORDS =
         "ALL,ANALYSE,ANALYZE,DO,FREEZE,ILIKE,ISNULL,OFFSET,PLACING,VERBOSE";
         
-    protected Hashtable psqlTypes;
+    protected Map<String, String> psqlTypes;
 
     /**
      * Constructor.
@@ -169,7 +170,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         // PostgreSQL types for the important JDBC types.*/
         if (psqlTypes == null)
         {
-            psqlTypes = new Hashtable();
+            psqlTypes = new ConcurrentHashMap<>();
             psqlTypes.put("" + Types.BIT, "bool");
             psqlTypes.put("" + Types.TIMESTAMP, "timestamptz");
             psqlTypes.put("" + Types.BIGINT, "int8");
