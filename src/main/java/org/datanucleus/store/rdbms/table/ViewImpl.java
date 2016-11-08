@@ -157,9 +157,8 @@ public abstract class ViewImpl extends AbstractTable
     {
         assertIsInitialized();
 
-        ArrayList stmts = new ArrayList();
+        List<String> stmts = new ArrayList<>();
         stmts.add(dba.getDropViewStatement(this));
-
         return stmts;
     }
 

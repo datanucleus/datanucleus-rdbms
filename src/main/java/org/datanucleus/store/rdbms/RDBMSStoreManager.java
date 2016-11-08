@@ -2406,7 +2406,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * column info is found for the given table, an empty list is returned.
      * @throws SQLException Thrown if an error occurs
      */
-    public List getColumnInfoForTable(Table table, Connection conn)
+    public List<StoreSchemaData> getColumnInfoForTable(Table table, Connection conn)
     throws SQLException
     {
         RDBMSTableInfo tableInfo = (RDBMSTableInfo)schemaHandler.getSchemaData(conn, "columns", new Object[] {table});

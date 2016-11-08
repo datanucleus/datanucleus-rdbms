@@ -66,6 +66,7 @@ import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.schema.RDBMSTableFKInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSTableIndexInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSTablePKInfo;
+import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -210,7 +211,7 @@ public abstract class TableImpl extends AbstractTable
     throws SQLException
     {
         Map<DatastoreIdentifier, Column> unvalidated = new HashMap(columnsByIdentifier);
-        List tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
+        List<StoreSchemaData> tableColInfo = storeMgr.getColumnInfoForTable(this, conn);
         Iterator i = tableColInfo.iterator();
         while (i.hasNext())
         {
@@ -240,13 +241,12 @@ public abstract class TableImpl extends AbstractTable
             if (autoCreate)
             {
                 // Add all missing columns
-                List stmts = new ArrayList();
-                Set columnKeys = unvalidated.entrySet();
-                Iterator<Map.Entry> columnsIter = columnKeys.iterator();
+                List<String> stmts = new ArrayList<>();
+                Iterator<Map.Entry<DatastoreIdentifier, Column>> columnsIter = unvalidated.entrySet().iterator();
                 while (columnsIter.hasNext())
                 {
-                    Map.Entry entry = columnsIter.next();
-                    Column col = (Column)entry.getValue();
+                    Map.Entry<DatastoreIdentifier, Column> entry = columnsIter.next();
+                    Column col = entry.getValue();
                     String addColStmt = dba.getAddColumnStatement(this, col);
                     stmts.add(addColStmt);
                     NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057031", col.getIdentifier(), this.toString()));
@@ -675,11 +675,11 @@ public abstract class TableImpl extends AbstractTable
         boolean dbWasModified = false;
 
         // Validate and/or create all candidate keys.
-        Map actualCandidateKeysByName = null;
+        Map<DatastoreIdentifier, CandidateKey> actualCandidateKeysByName = null;
         int numActualCKs = 0;
         if (storeMgr.getCompleteDDL())
         {
-            actualCandidateKeysByName = new HashMap();
+            actualCandidateKeysByName = new HashMap<>();
         }
         else
         {
@@ -699,7 +699,7 @@ public abstract class TableImpl extends AbstractTable
         else
         {
             //validate only
-            Map stmtsByCKName = getSQLAddCandidateKeyStatements(actualCandidateKeysByName);
+            Map<String, String> stmtsByCKName = getSQLAddCandidateKeyStatements(actualCandidateKeysByName);
             if (stmtsByCKName.isEmpty())
             {
                 if (numActualCKs > 0)
@@ -732,16 +732,16 @@ public abstract class TableImpl extends AbstractTable
     private boolean createCandidateKeys(Connection conn, Collection autoCreateErrors, Map actualCandidateKeysByName)
     throws SQLException
     {
-        Map stmtsByCKName = getSQLAddCandidateKeyStatements(actualCandidateKeysByName);
+        Map<String, String> stmtsByCKName = getSQLAddCandidateKeyStatements(actualCandidateKeysByName);
         Statement stmt = conn.createStatement();
         try
         {
-            Iterator i = stmtsByCKName.entrySet().iterator();
+            Iterator<Map.Entry<String, String>> i = stmtsByCKName.entrySet().iterator();
             while (i.hasNext())
             {
-                Map.Entry e = (Map.Entry) i.next();
-                String ckName = (String) e.getKey();
-                String stmtText = (String) e.getValue();
+                Map.Entry<String, String> e = i.next();
+                String ckName = e.getKey();
+                String stmtText = e.getValue();
                 if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
                 {
                     NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058200", ckName, getCatalogName(), getSchemaName()));
@@ -789,7 +789,7 @@ public abstract class TableImpl extends AbstractTable
         }
 
         // There's no need to drop indices; we assume they'll go away quietly when the table is dropped.
-        HashSet fkNames = new HashSet();
+        Set<String> fkNames = new HashSet<>();
         StoreSchemaHandler handler = storeMgr.getSchemaHandler();
         RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
         Iterator iter = fkInfo.getChildren().iterator();
@@ -851,8 +851,8 @@ public abstract class TableImpl extends AbstractTable
         assertIsInitialized();
 
         // The following Set is to avoid the duplicate usage of columns that have already been used in conjunction with another column
-        Set colsInFKs = new HashSet();
-        ArrayList foreignKeys = new ArrayList();
+        Set<Column> colsInFKs = new HashSet<>();
+        List<ForeignKey> foreignKeys = new ArrayList<>();
         Iterator i = columns.iterator();
         while (i.hasNext())
         {
@@ -889,7 +889,7 @@ public abstract class TableImpl extends AbstractTable
     protected List<CandidateKey> getExpectedCandidateKeys()
     {
         assertIsInitialized();
-        return new ArrayList();
+        return new ArrayList<>();
     }
 
     /**
@@ -901,8 +901,6 @@ public abstract class TableImpl extends AbstractTable
     {
         assertIsInitialized();
 
-        Set<Index> indices = new HashSet();
-
         /*
          * For each foreign key, add to the list an index made up of the "from"
          * column(s) of the key, *unless* those columns also happen to be 
@@ -911,6 +909,7 @@ public abstract class TableImpl extends AbstractTable
          * if the primary key is the combination of foreign keys, e.g. in join tables.
          * This greatly decreases deadlock probability e.g. on Oracle.
          */
+        Set<Index> indices = new HashSet<>();
         PrimaryKey pk = getPrimaryKey();
         Iterator<ForeignKey> i = getExpectedForeignKeys(clr).iterator();
         while (i.hasNext())
@@ -931,10 +930,10 @@ public abstract class TableImpl extends AbstractTable
      * @return Map of primary keys
      * @throws SQLException Thrown when an error occurs in the JDBC call.
      */
-    private Map getExistingPrimaryKeys(Connection conn)
+    private Map<DatastoreIdentifier, PrimaryKey> getExistingPrimaryKeys(Connection conn)
     throws SQLException
     {
-        Map<DatastoreIdentifier, PrimaryKey> primaryKeysByName = new HashMap();
+        Map<DatastoreIdentifier, PrimaryKey> primaryKeysByName = new HashMap<>();
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
@@ -985,10 +984,10 @@ public abstract class TableImpl extends AbstractTable
      * @return Map of foreign keys
      * @throws SQLException Thrown when an error occurs in the JDBC call.
      */
-    private Map getExistingForeignKeys(Connection conn)
+    private Map<DatastoreIdentifier, ForeignKey> getExistingForeignKeys(Connection conn)
     throws SQLException
     {
-        HashMap foreignKeysByName = new HashMap();
+        Map<DatastoreIdentifier, ForeignKey> foreignKeysByName = new HashMap<>();
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
@@ -1011,7 +1010,7 @@ public abstract class TableImpl extends AbstractTable
     
                 short deferrability = ((Short)fkInfo.getProperty("deferrability")).shortValue();
                 boolean initiallyDeferred = deferrability == DatabaseMetaData.importedKeyInitiallyDeferred;
-                ForeignKey fk = (ForeignKey) foreignKeysByName.get(fkIdentifier);
+                ForeignKey fk = foreignKeysByName.get(fkIdentifier);
                 if (fk == null)
                 {
                     fk = new ForeignKey(dba, initiallyDeferred);
@@ -1070,10 +1069,10 @@ public abstract class TableImpl extends AbstractTable
      * @return Map of candidate keys
      * @throws SQLException Thrown when an error occurs in the JDBC call.
      */
-    private Map getExistingCandidateKeys(Connection conn)
+    private Map<DatastoreIdentifier, CandidateKey> getExistingCandidateKeys(Connection conn)
     throws SQLException
     {
-        HashMap candidateKeysByName = new HashMap();
+        Map<DatastoreIdentifier, CandidateKey> candidateKeysByName = new HashMap<>();
 
         if (tableExistsInDatastore(conn))
         {
@@ -1097,7 +1096,7 @@ public abstract class TableImpl extends AbstractTable
     
                     String keyName = (String)indexInfo.getProperty("index_name");
                     DatastoreIdentifier idxName = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, keyName);
-                    CandidateKey key = (CandidateKey) candidateKeysByName.get(idxName);
+                    CandidateKey key = candidateKeysByName.get(idxName);
                     if (key == null)
                     {
                         key = new CandidateKey(this);
@@ -1126,10 +1125,10 @@ public abstract class TableImpl extends AbstractTable
      * @return Map of indices (keyed by the index name)
      * @throws SQLException Thrown when an error occurs in the JDBC call.
      */
-    private Map getExistingIndices(Connection conn)
+    private Map<DatastoreIdentifier, Index> getExistingIndices(Connection conn)
     throws SQLException
     {
-        HashMap indicesByName = new HashMap();
+        Map<DatastoreIdentifier, Index> indicesByName = new HashMap<>();
 
         if (tableExistsInDatastore(conn))
         {
@@ -1149,7 +1148,7 @@ public abstract class TableImpl extends AbstractTable
     
                 String indexName = (String)indexInfo.getProperty("index_name");
                 DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, indexName);
-                Index idx = (Index) indicesByName.get(indexIdentifier);
+                Index idx = indicesByName.get(indexIdentifier);
                 if (idx == null)
                 {
                     boolean isUnique = !((Boolean)indexInfo.getProperty("non_unique")).booleanValue();
@@ -1234,7 +1233,7 @@ public abstract class TableImpl extends AbstractTable
             cols = columns.toArray(new Column[columns.size()]);
         }
 
-        ArrayList stmts = new ArrayList();        
+        List<String> stmts = new ArrayList<>();
         stmts.add(dba.getCreateTableStatement(this, cols, props, storeMgr.getIdentifierFactory()));
 
         PrimaryKey pk = getPrimaryKey();
@@ -1253,17 +1252,17 @@ public abstract class TableImpl extends AbstractTable
     }
 
     /**
-     * Get SQL statements to add expected Foreign Keys that are not yet at the
-     * table. If the returned Map is empty, the current FK setup is correct.
+     * Get SQL statements to add expected Foreign Keys that are not yet at the table.
+     * If the returned Map is empty, the current FK setup is correct.
      * @param actualForeignKeysByName Actual Map of foreign keys
      * @param clr The ClassLoaderResolver
      * @return a Map with the SQL statements
      */
-    protected Map getSQLAddFKStatements(Map actualForeignKeysByName, ClassLoaderResolver clr)
+    protected Map<String, String> getSQLAddFKStatements(Map actualForeignKeysByName, ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
-        HashMap stmtsByFKName = new HashMap();
+        Map<String, String> stmtsByFKName = new HashMap<>();
         List<ForeignKey> expectedForeignKeys = getExpectedForeignKeys(clr);
         Iterator<ForeignKey> i = expectedForeignKeys.iterator();
         int n = 1;
@@ -1302,11 +1301,11 @@ public abstract class TableImpl extends AbstractTable
      * @param actualCandidateKeysByName Actual Map of candidate keys
      * @return a Map with the SQL statements
      */
-    protected Map getSQLAddCandidateKeyStatements(Map actualCandidateKeysByName)
+    protected Map<String, String> getSQLAddCandidateKeyStatements(Map actualCandidateKeysByName)
     {
         assertIsInitialized();
 
-        HashMap stmtsByCKName = new HashMap();
+        Map<String, String> stmtsByCKName = new HashMap<>();
         List<CandidateKey> expectedCandidateKeys = getExpectedCandidateKeys();
         Iterator<CandidateKey> i = expectedCandidateKeys.iterator();
         int n = 1;
@@ -1387,10 +1386,10 @@ public abstract class TableImpl extends AbstractTable
      * @param clr The ClassLoaderResolver
      * @return Map of statements
      */
-    protected Map getSQLCreateIndexStatements(Map actualIndicesByName, ClassLoaderResolver clr)
+    protected Map<String, String> getSQLCreateIndexStatements(Map actualIndicesByName, ClassLoaderResolver clr)
     {
         assertIsInitialized();
-        HashMap stmtsByIdxName = new HashMap();
+        Map<String, String> stmtsByIdxName = new HashMap<>();
         Set<Index> expectedIndices = getExpectedIndices(clr);
 
         int n = 1;
@@ -1428,7 +1427,8 @@ public abstract class TableImpl extends AbstractTable
     protected List getSQLDropStatements()
     {
         assertIsInitialized();
-        ArrayList stmts = new ArrayList();
+
+        List<String> stmts = new ArrayList<>();
         stmts.add(dba.getDropTableStatement(this));
         return stmts;
     }

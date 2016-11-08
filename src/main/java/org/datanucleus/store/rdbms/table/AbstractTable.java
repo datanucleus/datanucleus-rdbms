@@ -815,7 +815,7 @@ public abstract class AbstractTable implements Table
      * @param conn The Connection to the datastore
      * @throws SQLException Any exceptions thrown by the statements 
      **/
-    protected void executeDdlStatementList(List stmts, Connection conn)
+    protected void executeDdlStatementList(List<String> stmts, Connection conn)
     throws SQLException
     {
         Statement stmt = conn.createStatement();
@@ -823,10 +823,10 @@ public abstract class AbstractTable implements Table
         String stmtText=null;
         try
         {
-            Iterator i = stmts.iterator();
+            Iterator<String> i = stmts.iterator();
             while (i.hasNext())
             {
-                stmtText = (String)i.next();
+                stmtText = i.next();
                 executeDdlStatement(stmt, stmtText);
             }
         }
