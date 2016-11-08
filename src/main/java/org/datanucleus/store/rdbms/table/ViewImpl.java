@@ -153,7 +153,7 @@ public abstract class ViewImpl extends AbstractTable
      * Internal method to generate the SQL statements for dropping the view.
      * @return The List of SQL statements.
      */
-    protected List getSQLDropStatements()
+    protected List<String> getSQLDropStatements()
     {
         assertIsInitialized();
 

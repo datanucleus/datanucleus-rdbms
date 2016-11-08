@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -92,12 +91,6 @@ public class MapTable extends JoinTable implements DatastoreMap
      * for use as part of the PK and a PK is required for this join table.
      */
     private JavaTypeMapping orderMapping;
-
-    /** Map of field mappings when containing an embedded PC key. Keyed by the FieldMetaData of the field. */
-    protected Map embeddedKeyMappingsMap;
-
-    /** Map of field mappings when containing an embedded PC value. Keyed by the FieldMetaData of the field. */
-    protected Map embeddedValueMappingsMap;
 
     /**
      * Constructor.

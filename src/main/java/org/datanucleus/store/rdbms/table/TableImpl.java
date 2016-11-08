@@ -1175,7 +1175,7 @@ public abstract class TableImpl extends AbstractTable
      * @param props Properties for controlling the table creation
      * @return List of statements.
      */
-    protected List getSQLCreateStatements(Properties props)
+    protected List<String> getSQLCreateStatements(Properties props)
     {
         assertIsInitialized();
 
@@ -1424,7 +1424,7 @@ public abstract class TableImpl extends AbstractTable
      * Accessor for the DROP statements for this table.
      * @return List of statements
      */
-    protected List getSQLDropStatements()
+    protected List<String> getSQLDropStatements()
     {
         assertIsInitialized();
 

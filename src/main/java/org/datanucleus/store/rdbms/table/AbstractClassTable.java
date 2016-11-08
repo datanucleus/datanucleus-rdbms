@@ -19,7 +19,6 @@ Contributors:
 package org.datanucleus.store.rdbms.table;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -177,8 +176,7 @@ public abstract class AbstractClassTable extends TableImpl
      */
     public boolean managesMapping(JavaTypeMapping mapping)
     {
-        Collection<JavaTypeMapping> mappings = memberMappingsMap.values();
-        if (mappings.contains(mapping))
+        if (memberMappingsMap.values().contains(mapping))
         {
             return true;
         }

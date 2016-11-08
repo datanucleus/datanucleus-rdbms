@@ -314,21 +314,19 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
      * Accessor for the expected foreign keys for this table.
      * @return The expected foreign keys.
      **/
-    protected List getExpectedForeignKeys()
+    protected List<ForeignKey> getExpectedForeignKeys()
     {
         assertIsInitialized();
 
-        // Auto mode allows us to decide which FKs are needed as well as using
-        // what is in the users MetaData.
+        // Auto mode allows us to decide which FKs are needed as well as using what is in the users MetaData.
         boolean autoMode = false;
         if (storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONSTRAINT_CREATE_MODE).equals("DataNucleus"))
         {
             autoMode = true;
         }
 
-        ArrayList foreignKeys = new ArrayList();
-
         // Add FK back to the primary table unless requested not to
+        List<ForeignKey> foreignKeys = new ArrayList<>();
         ForeignKeyMetaData fkmd = joinMetaData != null ? joinMetaData.getForeignKeyMetaData() : null;
         if (autoMode || (fkmd != null && fkmd.getDeleteAction() != ForeignKeyAction.NONE))
         {

@@ -414,11 +414,11 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * @param props Properties for controlling the creation of views
      * @return The SQL create statements.
      */
-    protected List getSQLCreateStatements(Properties props)
+    protected List<String> getSQLCreateStatements(Properties props)
     {
         assertIsInitialized();
 
-        ArrayList stmts = new ArrayList();
+        List<String> stmts = new ArrayList<>();
         StringTokenizer tokens = new StringTokenizer(createStatementDDL, ";");
 
         while (tokens.hasMoreTokens())

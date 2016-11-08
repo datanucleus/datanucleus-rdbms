@@ -2241,7 +2241,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             autoMode = true;
         }
 
-        ArrayList<ForeignKey> foreignKeys = new ArrayList();
+        ArrayList<ForeignKey> foreignKeys = new ArrayList<>();
 
         // Check each field for FK requirements (user-defined, or required)
         // <field><foreign-key>...</foreign-key></field>
@@ -2446,7 +2446,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         List targetCols = pk.getColumns();
 
         // Generate the columns for the source of the foreign-key
-        List sourceCols = new ArrayList();
+        List<Column> sourceCols = new ArrayList<>();
         ColumnMetaData[] colmds = fkmd.getColumnMetaData();
         String[] memberNames = fkmd.getMemberNames();
         if (colmds != null && colmds.length > 0)
@@ -2501,7 +2501,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         {
             for (int i=0;i<sourceCols.size();i++)
             {
-                Column source = (Column)sourceCols.get(i);
+                Column source = sourceCols.get(i);
                 String targetColName = (colmds != null && colmds[i] != null) ? colmds[i].getTarget() : null;
                 Column target = (Column)targetCols.get(i); // Default to matching via the natural order
                 if (targetColName != null)
@@ -2710,16 +2710,16 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param props Properties for creating the table
      * @return the SQL statements to be executed for creation
      */
-    protected List getSQLCreateStatements(Properties props)
+    protected List<String> getSQLCreateStatements(Properties props)
     {
-        List stmts;
+        List<String> stmts;
 
         // Create statements for this table
         Properties tableProps = null;
         if (createStatementDDL != null)
         {
             // User has specified the DDL
-            stmts = new ArrayList();
+            stmts = new ArrayList<>();
             StringTokenizer tokens = new StringTokenizer(createStatementDDL, ";");
             while (tokens.hasMoreTokens())
             {
@@ -2762,10 +2762,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * Drops all secondary tables (if any) followed by the table itself.
      * @return List of statements
      */
-    protected List getSQLDropStatements()
+    protected List<String> getSQLDropStatements()
     {
         assertIsInitialized();
-        ArrayList stmts = new ArrayList();
+
+        List<String> stmts = new ArrayList<>();
 
         // Drop any secondary tables
         if (secondaryTables != null)

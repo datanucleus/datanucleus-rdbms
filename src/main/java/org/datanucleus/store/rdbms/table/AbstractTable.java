@@ -95,10 +95,10 @@ public abstract class AbstractTable implements Table
     protected int state = TABLE_STATE_NEW;
 
     /** Columns for this table. */
-    protected List<org.datanucleus.store.schema.table.Column> columns = new ArrayList();
+    protected List<org.datanucleus.store.schema.table.Column> columns = new ArrayList<>();
 
     /** Index to the columns, keyed by name identifier. TODO Key this by the column name, not its identifier. */
-    protected Map<DatastoreIdentifier, Column> columnsByIdentifier = new HashMap();
+    protected Map<DatastoreIdentifier, Column> columnsByIdentifier = new HashMap<>();
 
     /** Fully qualified name of this table. */
     private String fullyQualifiedName;
@@ -542,8 +542,7 @@ public abstract class AbstractTable implements Table
             }
         }
 
-        List createStmts = getSQLCreateStatements(null);
-        
+        List<String> createStmts = getSQLCreateStatements(null);
         executeDdlStatementList(createStmts, conn);
         return !createStmts.isEmpty();
     }
@@ -743,13 +742,13 @@ public abstract class AbstractTable implements Table
      * @param props Properties controlling the table creation
      * @return The SQL Create statements
      */
-    protected abstract List getSQLCreateStatements(Properties props);
+    protected abstract List<String> getSQLCreateStatements(Properties props);
 
     /**
      * Accessor for the SQL drop statements.
      * @return The SQL Drop statements
      */
-    protected abstract List getSQLDropStatements();
+    protected abstract List<String> getSQLDropStatements();
 
     protected void assertIsPKUninitialized()
     {
