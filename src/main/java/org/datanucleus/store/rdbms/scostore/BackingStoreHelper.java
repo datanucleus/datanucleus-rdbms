@@ -60,6 +60,7 @@ public class BackingStoreHelper
     public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
     {
         Table ownerMappingTable = bcs.getOwnerMapping().getTable();
+        boolean embedded = false;
         if (op.isEmbedded() && ownerMappingTable instanceof JoinTable && ((JoinTable)ownerMappingTable).getOwnerTable() != null)
         {
             // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
@@ -67,6 +68,7 @@ public class BackingStoreHelper
             if (ownerOPs != null && ownerOPs.length == 1)
             {
                 op = ownerOPs[0];
+                embedded = true;
             }
         }
 
@@ -76,17 +78,15 @@ public class BackingStoreHelper
             return jdbcPosition;
         }
 
-        if (bcs.getOwnerMemberMetaData() != null)
+        if (bcs.getOwnerMemberMetaData() != null && !embedded)
         {
-            bcs.getOwnerMapping().setObject(ec, ps,
-                MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()),
-                op.getObject(), op, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), op.getObject(),
+                op, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
-            bcs.getOwnerMapping().setObject(ec, ps,
-                MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()),
-                op.getObject());
+            // Either we have no member info, or we are setting the owner when the provided owner is embedded, so are navigating back to the real owner
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), op.getObject());
         }
         return jdbcPosition + bcs.getOwnerMapping().getNumberOfDatastoreMappings();
     }
