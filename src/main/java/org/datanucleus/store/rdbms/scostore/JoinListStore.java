@@ -758,12 +758,24 @@ public class JoinListStore<E> extends AbstractListStore<E>
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
-                // Create the statement and set the owner
+                // Create the statement
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+
+                // Set the owner
+                ObjectProvider stmtOwnerOP = op;
+                if (op.isEmbedded())
+                {
+                    // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
+                    ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
+                    if (ownerOPs != null && ownerOPs.length == 1)
+                    {
+                        stmtOwnerOP = ownerOPs[0];
+                    }
+                }
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), op.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), stmtOwnerOP.getObject());
                 }
 
                 try
