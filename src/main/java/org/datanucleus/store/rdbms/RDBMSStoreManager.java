@@ -578,6 +578,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     /**
      * Returns the datastore container (table) for the specified field. 
      * Returns 'null' if the field is not (yet) known to the store manager.
+     * Note : if we have an embedded object (embedded into something else) that has a member which requires a join table, then this method will not cater
+     * for having different tables for the different places that the object can be embedded.
      * @param mmd The metadata for the field.
      * @return The corresponding datastore container, or 'null'.
      */
@@ -908,6 +910,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for the backing store for the specified member.
+     * Note : if we have an embedded object that is embedded into some other type and the object has a member that requires a join table (backing store), this method
+     * will not cater for the different places that can be embedded.
      * @param clr The ClassLoaderResolver
      * @param mmd metadata for the member to be persisted by this Store
      * @param type instantiated type or prefered type
@@ -1008,6 +1012,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Method to return a backing store for a Collection, consistent with this store and the instantiated type.
+     * Note : if we have an embedded object that is embedded into some other type and the object has a member that requires a join table (backing store), this method
+     * will not cater for the different places that can be embedded.
      * @param mmd MetaData for the field that has this collection
      * @param clr ClassLoader resolver
      * @param type Type of the field (optional)
