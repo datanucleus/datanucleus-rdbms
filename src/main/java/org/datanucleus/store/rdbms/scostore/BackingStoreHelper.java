@@ -63,7 +63,7 @@ public class BackingStoreHelper
         boolean embedded = false;
         if (op.isEmbedded() && ownerMappingTable instanceof JoinTable && ((JoinTable)ownerMappingTable).getOwnerTable() != null)
         {
-            // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
+            // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping) TODO Cater for nested embedded?
             ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
             if (ownerOPs != null && ownerOPs.length == 1)
             {
