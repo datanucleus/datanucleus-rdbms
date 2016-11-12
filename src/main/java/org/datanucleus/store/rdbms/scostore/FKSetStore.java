@@ -1080,12 +1080,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Accessor for an iterator for the set.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @return Iterator for the set.
      */
-    public Iterator<E> iterator(ObjectProvider op)
+    public Iterator<E> iterator(ObjectProvider ownerOP)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
 
         if (elementInfo == null || elementInfo.length == 0)
         {
@@ -1139,16 +1139,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = op;
-                if (op.isEmbedded())
-                {
-                    // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
-                    ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
-                    if (ownerOPs != null && ownerOPs.length == 1)
-                    {
-                        stmtOwnerOP = ownerOPs[0];
-                    }
-                }
+                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -1167,7 +1158,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                         }
                         rof = new PersistentClassROF(storeMgr, elementCmd, iteratorMappingClass, false, null, clr.classForName(elementType));
 
-                        return new CollectionStoreIterator(op, rs, rof, this);
+                        return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally
                     {

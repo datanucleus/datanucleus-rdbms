@@ -39,7 +39,6 @@ import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.table.JoinTable;
-import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Series of helper methods for use with RDBMS backing stores.
@@ -47,6 +46,28 @@ import org.datanucleus.store.rdbms.table.Table;
 public class BackingStoreHelper
 {
     private BackingStoreHelper(){}
+
+    /**
+     * Convenience method to return the owner ObjectProvider for a backing store. If the supplied ObjectProvider is embedded then finds its owner until it finds the
+     * owner that is not embedded.
+     * @param op Input ObjectProvider
+     * @return The owner ObjectProvider
+     */
+    public static ObjectProvider getOwnerObjectProviderForBackingStore(ObjectProvider op)
+    {
+        ObjectProvider ownerOP = op;
+        if (op.isEmbedded())
+        {
+            // Embedded object, so get the owner object it is embedded in
+            ObjectProvider[] ownerOPs = op.getExecutionContext().getOwnersForEmbeddedObjectProvider(op);
+            if (ownerOPs != null && ownerOPs.length == 1)
+            {
+                ownerOP = ownerOPs[0];
+            }
+            // TODO Cater for nested embedded? i.e recurse until not embedded
+        }
+        return ownerOP;
+    }
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
@@ -59,17 +80,12 @@ public class BackingStoreHelper
      */
     public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
     {
-        Table ownerMappingTable = bcs.getOwnerMapping().getTable();
+        // Find the real owner in case the provide object is embedded
         boolean embedded = false;
-        if (op.isEmbedded() && ownerMappingTable instanceof JoinTable && ((JoinTable)ownerMappingTable).getOwnerTable() != null)
+        ObjectProvider ownerOP = getOwnerObjectProviderForBackingStore(op);
+        if (ownerOP != op)
         {
-            // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping) TODO Cater for nested embedded?
-            ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
-            if (ownerOPs != null && ownerOPs.length == 1)
-            {
-                op = ownerOPs[0];
-                embedded = true;
-            }
+            embedded = true;
         }
 
         if (!bcs.getStoreManager().insertValuesOnInsert(bcs.getOwnerMapping().getDatastoreMapping(0)))
@@ -80,13 +96,13 @@ public class BackingStoreHelper
 
         if (bcs.getOwnerMemberMetaData() != null && !embedded)
         {
-            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), op.getObject(),
-                op, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerOP.getObject(),
+                ownerOP, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
             // Either we have no member info, or we are setting the owner when the provided owner is embedded, so are navigating back to the real owner
-            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), op.getObject());
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerOP.getObject());
         }
         return jdbcPosition + bcs.getOwnerMapping().getNumberOfDatastoreMappings();
     }

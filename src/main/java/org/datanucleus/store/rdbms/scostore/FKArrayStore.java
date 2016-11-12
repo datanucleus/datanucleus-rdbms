@@ -630,16 +630,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = ownerOP;
-                if (ownerOP.isEmbedded())
-                {
-                    // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
-                    ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(ownerOP);
-                    if (ownerOPs != null && ownerOPs.length == 1)
-                    {
-                        stmtOwnerOP = ownerOPs[0];
-                    }
-                }
+                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {

@@ -705,18 +705,18 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param startIdx The start point in the list (only for indexed lists).
      * @param endIdx End index in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected ListIterator<E> listIterator(ObjectProvider op, int startIdx, int endIdx)
+    protected ListIterator<E> listIterator(ObjectProvider ownerOP, int startIdx, int endIdx)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         Transaction tx = ec.getTransaction();
 
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
-        IteratorStatement iterStmt = getIteratorStatement(op.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
+        IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping resultMapping = iterStmt.getStatementClassMapping();
 
@@ -762,16 +762,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = op;
-                if (op.isEmbedded())
-                {
-                    // Embedded object with this join table, so get the owner object (which will be used in the ownerMapping)
-                    ObjectProvider[] ownerOPs = ec.getOwnersForEmbeddedObjectProvider(op);
-                    if (ownerOPs != null && ownerOPs.length == 1)
-                    {
-                        stmtOwnerOP = ownerOPs[0];
-                    }
-                }
+                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -786,17 +777,17 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(op, rs, null, this);
+                            return new ListStoreIterator(ownerOP, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(op, rs, null, this);
+                            return new ListStoreIterator(ownerOP, rs, null, this);
                         }
                         else
                         {
                             ResultObjectFactory rof = new PersistentClassROF(storeMgr, elementCmd, resultMapping, false, null, clr.classForName(elementType));
-                            return new ListStoreIterator(op, rs, rof, this);
+                            return new ListStoreIterator(ownerOP, rs, rof, this);
                         }
                     }
                     finally
