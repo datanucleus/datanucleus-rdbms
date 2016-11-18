@@ -714,6 +714,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     else
                     {
+                        // TODO If the user selects an alias here that is joined, should maybe respect FetchPlan for that (like above for candidate)
                         processPrimaryExpression(primExpr);
                         SQLExpression sqlExpr = stack.pop();
                         validateExpressionForResult(sqlExpr);
