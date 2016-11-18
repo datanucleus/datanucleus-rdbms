@@ -718,6 +718,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
         IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
+        NucleusLogger.GENERAL.info(">> JoinListStore.listIter stmt=" + sqlStmt.getSQLText().toString());
         StatementClassMapping resultMapping = iterStmt.getStatementClassMapping();
 
         // Input parameter(s) - the owner
@@ -924,6 +925,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
             // Select the element column - first select is assumed by ListStoreIterator
             sqlStmt.select(sqlStmt.getPrimaryTable(), elementMapping, null);
+            // TODO If embedded element and it includes 1-1/N-1 in FetchPlan then select its fields also
         }
         else if (elementMapping instanceof ReferenceMapping)
         {

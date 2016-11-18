@@ -966,6 +966,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
             // Select the element column - first select is assumed by SetStoreIterator
             sqlStmt.select(sqlStmt.getPrimaryTable(), elementMapping, null);
+            // TODO If embedded element and it includes 1-1/N-1 in FetchPlan then select its fields also
         }
         else if (elementMapping instanceof ReferenceMapping)
         {
