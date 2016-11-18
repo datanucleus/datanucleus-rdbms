@@ -1395,11 +1395,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                             if (mmd.isEmbedded())
                             {
+                                // Embedded into the same table as before, so no join needed
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
                             }
                             else
                             {
-                                otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                if (sqlTbl.getTable() instanceof CollectionTable)
+                                {
+                                    // Currently in a join table, so work from the element and this being an embedded member
+                                    CollectionTable collTbl = (CollectionTable)sqlTbl.getTable();
+                                    JavaTypeMapping elemMapping = collTbl.getElementMapping();
+                                    if (elemMapping instanceof EmbeddedMapping)
+                                    {
+                                        otherMapping = ((EmbeddedMapping)elemMapping).getJavaTypeMapping(mmd.getName());
+                                    }
+                                }
+                                else
+                                {
+                                    otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                }
+
                                 relTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                                 if (otherMapping == null && previousMapping != null)
                                 {
@@ -1494,6 +1509,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                             if (mmd.isEmbedded())
                             {
+                                // Embedded into the same table as before, so no join needed
                                 otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
                             }
                             else
@@ -1507,7 +1523,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 }
                                 else
                                 {
-                                    otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                    if (sqlTbl.getTable() instanceof CollectionTable)
+                                    {
+                                        // Currently in a join table, so work from the element and this being an embedded member
+                                        CollectionTable collTbl = (CollectionTable)sqlTbl.getTable();
+                                        JavaTypeMapping elemMapping = collTbl.getElementMapping();
+                                        if (elemMapping instanceof EmbeddedMapping)
+                                        {
+                                            otherMapping = ((EmbeddedMapping)elemMapping).getJavaTypeMapping(mmd.getName());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        otherMapping = sqlTbl.getTable().getMemberMapping(mmd);
+                                    }
+
                                     if (otherMapping == null && previousMapping != null)
                                     {
                                         if (previousMapping instanceof EmbeddedMapping)
