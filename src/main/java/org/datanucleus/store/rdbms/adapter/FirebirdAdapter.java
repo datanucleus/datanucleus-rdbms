@@ -75,7 +75,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.FirebirdTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.FirebirdTypeInfo(rs);
     }
 
     /**

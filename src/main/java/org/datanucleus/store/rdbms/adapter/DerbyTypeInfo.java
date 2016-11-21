@@ -15,38 +15,27 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.schema;
+package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.ResultSet;
 
-/**
- * SQL Type info for DB2 datastores.
- */
-public class DB2TypeInfo extends SQLTypeInfo
-{
-    /** sql type DATALINK **/
-    public static final int DATALINK = 70;
+import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 
+/**
+ * SQL Type info for Derby datastores.
+ */
+public class DerbyTypeInfo extends SQLTypeInfo
+{
     /**
      * Constructs a type information object from the current row of the given result set.
      * @param rs The result set returned from DatabaseMetaData.getTypeInfo().
      */
-    public DB2TypeInfo(ResultSet rs)
+    public DerbyTypeInfo(ResultSet rs)
     {
         super(rs);
-        if (typeName.equalsIgnoreCase("DATALINK"))
+        if (typeName.equalsIgnoreCase("DOUBLE"))
         {
-            createParams = "";
+            allowsPrecisionSpec = false;
         }
-    }
-
-    public DB2TypeInfo(String typeName, short dataType, int precision, String literalPrefix,
-            String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
-            boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
-            short minimumScale, short maximumScale, int numPrecRadix)
-    {
-        super(typeName, dataType, precision, literalPrefix, literalSuffix, createParams, nullable, caseSensitive,
-            searchable, unsignedAttribute, fixedPrecScale, autoIncrement, localTypeName, minimumScale, maximumScale,
-            numPrecRadix);
     }
 }

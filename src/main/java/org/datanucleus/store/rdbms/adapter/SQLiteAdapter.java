@@ -84,97 +84,97 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
         // Add on any missing JDBC types not provided by JDBC driver (SQLite only provides NULL, REAL, BLOB, INTEGER, TEXT)
 
         // DOUBLE -> "double"
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "double", (short)Types.DOUBLE, 0, null, null, null, 1, true, (short)3, false, false, false, "double", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
         // FLOAT -> "float"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "float", (short)Types.FLOAT, 0, null, null, null, 1, true, (short)3, false, false, false, "float", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
 
         // DECIMAL -> "float"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "decimal", (short)Types.DECIMAL, 0, null, null, null, 1, true, (short)3, false, false, false, "decimal", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DECIMAL, sqlType, true);
 
         // NUMERIC -> "numeric"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "numeric", (short)Types.NUMERIC, 0, null, null, null, 1, true, (short)3, false, false, false, "numeric", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.NUMERIC, sqlType, true);
 
         // BOOLEAN -> "integer"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "integer", (short)Types.BOOLEAN, 0, null, null, null, 1, true, (short)3, false, false, false, "integer", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
 
         // BIT -> "integer"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "integer", (short)Types.BIT, 0, null, null, null, 1, true, (short)3, false, false, false, "integer", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIT, sqlType, true);
 
         // TINYINT -> "tinyint"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "tinyint", (short)Types.TINYINT, 0, null, null, null, 1, true, (short)3, false, false, false, "tinyint", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
 
         // SMALLINT -> "smallint"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "smallint", (short)Types.SMALLINT, 0, null, null, null, 1, true, (short)3, false, false, false, "smallint", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.SMALLINT, sqlType, true);
 
         // BIGINT -> "bigint"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "bigint", (short)Types.BIGINT, 0, null, null, null, 1, true, (short)3, false, false, false, "bigint", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIGINT, sqlType, true);
 
         // CHAR -> "char"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "char", (short)Types.CHAR, 255, null, null, null, 1, true, (short)3, false, false, false, "char", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
         // VARCHAR -> "varchar"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "varchar", (short)Types.VARCHAR, 255, null, null, null, 1, true, (short)3, false, false, false, "varchar", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.VARCHAR, sqlType, true);
 
         // LONGVARCHAR -> "longvarchar"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "longvarchar", (short)Types.LONGVARCHAR, 16777215, null, null, null, 1, true, (short)3, false, false, false, "longvarchar", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARCHAR, sqlType, true);
 
         // CLOB -> "clob"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "clob", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)3, false, false, false, "clob", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
         // DATE -> "date"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "date", (short)Types.DATE, 0, null, null, null, 1, true, (short)3, false, false, false, "date", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
 
         // TIME -> "time"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "time", (short)Types.TIME, 0, null, null, null, 1, true, (short)3, false, false, false, "time", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.TIME, sqlType, true);
 
         // TIMESTAMP -> "timestamp"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "timestamp", (short)Types.TIMESTAMP, 0, null, null, null, 1, true, (short)3, false, false, false, "timestamp", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.TIMESTAMP, sqlType, true);
 
         // BINARY -> "blob"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "blob", (short)Types.BINARY, 255, null, null, null, 1, true, (short)3, false, false, false, "blob", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BINARY, sqlType, true);
 
         // VARBINARY -> "blob"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "blob", (short)Types.VARBINARY, 255, null, null, null, 1, true, (short)3, false, false, false, "blob", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.VARBINARY, sqlType, true);
 
         // LONGVARBINARY -> "blob"
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLiteTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLiteTypeInfo(
             "blob", (short)Types.LONGVARBINARY, 16777215, null, null, null, 1, true, (short)3, false, false, false, "blob", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
     }

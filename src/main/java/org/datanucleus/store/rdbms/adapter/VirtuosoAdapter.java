@@ -48,7 +48,7 @@ public class VirtuosoAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.VirtuosoTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.VirtuosoTypeInfo(rs);
     }
 
     public String getVendorID()

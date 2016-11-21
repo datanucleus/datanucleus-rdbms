@@ -149,12 +149,12 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     {
         super.initialiseTypes(handler, mconn);
 
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.NuoDBTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.NuoDBTypeInfo(
                 "FLOAT", (short) Types.DOUBLE, 53, null, null, null, 1, false, (short) 2,
                 false, false, false, null, (short) 0, (short) 0, 2);
         addSQLTypeForJDBCType(handler, mconn, (short) Types.DOUBLE, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.NuoDBTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.NuoDBTypeInfo(
                 "TEXT", (short) Types.CLOB, 2147483647, null, null, null, 1, true, (short) 1,
                 false, false, false, "TEXT", (short) 0, (short) 0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short) Types.CLOB, sqlType, true);

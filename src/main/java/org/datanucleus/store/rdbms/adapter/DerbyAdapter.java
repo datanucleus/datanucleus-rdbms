@@ -212,7 +212,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.DerbyTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.DerbyTypeInfo(rs);
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)

@@ -91,7 +91,7 @@ public class H2Adapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.H2TypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.H2TypeInfo(rs);
     }
 
     /**

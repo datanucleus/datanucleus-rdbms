@@ -18,8 +18,8 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.datastore;
 
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.adapter.DB2TypeInfo;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.DB2TypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 
 /**

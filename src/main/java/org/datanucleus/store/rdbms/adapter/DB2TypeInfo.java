@@ -15,39 +15,34 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.schema;
+package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.ResultSet;
-import java.sql.Types;
+
+import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 
 /**
- * SQL Type info for SQLServer datastores.
+ * SQL Type info for DB2 datastores.
  */
-public class SQLServerTypeInfo extends SQLTypeInfo
+public class DB2TypeInfo extends SQLTypeInfo
 {
-    /** sql type NVARCHAR **/
-    public static final int NVARCHAR = -9;
-    /** sql type NTEXT **/
-    public static final int NTEXT = -10;
-    /** sql type UNIQUEIDENTIFIER **/
-    public static final int UNIQUEIDENTIFIER = -11;
+    /** sql type DATALINK **/
+    public static final int DATALINK = 70;
 
     /**
      * Constructs a type information object from the current row of the given result set.
      * @param rs The result set returned from DatabaseMetaData.getTypeInfo().
      */
-    public SQLServerTypeInfo(ResultSet rs)
+    public DB2TypeInfo(ResultSet rs)
     {
         super(rs);
-
-        // unique identifiers does not allow any precision
-        if (typeName.equalsIgnoreCase("uniqueidentifier"))
+        if (typeName.equalsIgnoreCase("DATALINK"))
         {
-            allowsPrecisionSpec = false;
+            createParams = "";
         }
     }
 
-    public SQLServerTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
+    public DB2TypeInfo(String typeName, short dataType, int precision, String literalPrefix,
             String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
             boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
             short minimumScale, short maximumScale, int numPrecRadix)
@@ -55,28 +50,5 @@ public class SQLServerTypeInfo extends SQLTypeInfo
         super(typeName, dataType, precision, literalPrefix, literalSuffix, createParams, nullable, caseSensitive,
             searchable, unsignedAttribute, fixedPrecScale, autoIncrement, localTypeName, minimumScale, maximumScale,
             numPrecRadix);
-    }
-
-    public boolean isCompatibleWith(RDBMSColumnInfo colInfo)
-    {
-        if (super.isCompatibleWith(colInfo))
-            return true;
-
-        short colDataType = colInfo.getDataType();
-        switch (dataType)
-        {
-            case Types.VARCHAR:
-                return colDataType == NVARCHAR;
-            case Types.LONGVARCHAR:
-                return colDataType == NTEXT;
-            case Types.VARBINARY:
-            case Types.LONGVARBINARY:
-            case UNIQUEIDENTIFIER:
-                return (colDataType == Types.VARBINARY) || 
-                    (colDataType == Types.LONGVARBINARY) || 
-                    (colDataType == UNIQUEIDENTIFIER);
-            default:
-                return false;
-        }
     }
 }

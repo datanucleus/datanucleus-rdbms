@@ -33,7 +33,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
-import org.datanucleus.store.rdbms.schema.SQLServerTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -146,34 +145,34 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         super.initialiseTypes(handler, mconn);
 
         // Add on any missing JDBC types
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "UNIQUEIDENTIFIER", (short)Types.CHAR, 36, "'", "'", "", 1, false, (short)2, false, false, false, "UNIQUEIDENTIFIER", (short)0, (short)0, 10);
         sqlType.setAllowsPrecisionSpec(false);
         addSQLTypeForJDBCType(handler, mconn, (short)SQLServerTypeInfo.UNIQUEIDENTIFIER, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "IMAGE", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "BLOB", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "TEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "TEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "float", (short)Types.DOUBLE, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 2);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
 
         if (datastoreMajorVersion > 9)
         {
             // Support for build-in TIME and DATE data type for MS SQL Server version >= 2008
-            sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+            sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
                 "TIME", (short)Types.TIME, 0, null, null, null, 1, false, (short)1, true, true, false, "TIME", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.TIME, sqlType, true);
-            sqlType = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(
+            sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
                 "DATE", (short)Types.DATE, 0, null, null, null, 1, false, (short)1, true, true, false, "DATE", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
         }
@@ -348,7 +347,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        SQLTypeInfo ti = new org.datanucleus.store.rdbms.schema.SQLServerTypeInfo(rs);
+        SQLTypeInfo ti = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(rs);
 
         // Discard TINYINT type because it doesn't support negative values.
         String typeName = ti.getTypeName();

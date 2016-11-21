@@ -110,24 +110,24 @@ public class DB2Adapter extends BaseDatastoreAdapter
         super.initialiseTypes(handler, mconn);
 
         // Add on any missing JDBC types
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(
             "FLOAT", (short)Types.FLOAT, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(
             "NUMERIC", (short)Types.NUMERIC, 31, null, null, "PRECISION,SCALE", 1, false, (short)2, false, false, false, null, (short)0, (short)31, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.NUMERIC, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(
             "BIGINT", (short)Types.BIGINT, 20, null, null, null, 1, false, (short)2, false, true, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIGINT, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(
             "XML", (short)Types.SQLXML, 2147483647, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.SQLXML, sqlType, true);
 
         // DB2 doesn't have "BIT" JDBC type mapped, so map as SMALLINT
-        sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(
             "SMALLINT", (short)Types.SMALLINT, 5, null, null, null, 1, false, (short)2, false, true, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIT, sqlType, true);
     }
@@ -198,7 +198,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.DB2TypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.DB2TypeInfo(rs);
     }
 
     /**

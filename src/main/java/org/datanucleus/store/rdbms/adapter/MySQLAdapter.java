@@ -149,11 +149,11 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         super.initialiseTypes(handler, mconn);
 
         // Add on any missing JDBC types
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.MySQLTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(
             "MEDIUMBLOB", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "MEDIUMBLOB", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.MySQLTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(
             "MEDIUMTEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "MEDIUMTEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
     }
@@ -196,7 +196,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        SQLTypeInfo info = new org.datanucleus.store.rdbms.schema.MySQLTypeInfo(rs);
+        SQLTypeInfo info = new org.datanucleus.store.rdbms.adapter.MySQLTypeInfo(rs);
 
         // The following block originated in TJDO, and was carried across up to DataNucleus 3.0-m4
         // It is now commented out so people can use BINARY/VARBINARY. What is it trying to achieve?

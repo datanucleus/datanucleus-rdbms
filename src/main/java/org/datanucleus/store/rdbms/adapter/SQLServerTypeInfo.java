@@ -15,31 +15,42 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.schema;
+package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.ResultSet;
+import java.sql.Types;
+
+import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
+import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 
 /**
- * SQL Type info for Oracle datastores.
+ * SQL Type info for SQLServer datastores.
  */
-public class OracleTypeInfo extends SQLTypeInfo
+public class SQLServerTypeInfo extends SQLTypeInfo
 {
-    /** XMLType type - _SQL_TYPECODE **/
-    public static final int TYPES_SYS_XMLTYPE = 2007;
-
-    /** XMLType type - _SQL_NAME **/
-    public static final String TYPES_NAME_SYS_XMLTYPE = "SYS.XMLTYPE";
+    /** sql type NVARCHAR **/
+    public static final int NVARCHAR = -9;
+    /** sql type NTEXT **/
+    public static final int NTEXT = -10;
+    /** sql type UNIQUEIDENTIFIER **/
+    public static final int UNIQUEIDENTIFIER = -11;
 
     /**
      * Constructs a type information object from the current row of the given result set.
      * @param rs The result set returned from DatabaseMetaData.getTypeInfo().
      */
-    public OracleTypeInfo(ResultSet rs)
+    public SQLServerTypeInfo(ResultSet rs)
     {
         super(rs);
+
+        // unique identifiers does not allow any precision
+        if (typeName.equalsIgnoreCase("uniqueidentifier"))
+        {
+            allowsPrecisionSpec = false;
+        }
     }
 
-    public OracleTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
+    public SQLServerTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
             String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
             boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
             short minimumScale, short maximumScale, int numPrecRadix)
@@ -47,5 +58,28 @@ public class OracleTypeInfo extends SQLTypeInfo
         super(typeName, dataType, precision, literalPrefix, literalSuffix, createParams, nullable, caseSensitive,
             searchable, unsignedAttribute, fixedPrecScale, autoIncrement, localTypeName, minimumScale, maximumScale,
             numPrecRadix);
+    }
+
+    public boolean isCompatibleWith(RDBMSColumnInfo colInfo)
+    {
+        if (super.isCompatibleWith(colInfo))
+            return true;
+
+        short colDataType = colInfo.getDataType();
+        switch (dataType)
+        {
+            case Types.VARCHAR:
+                return colDataType == NVARCHAR;
+            case Types.LONGVARCHAR:
+                return colDataType == NTEXT;
+            case Types.VARBINARY:
+            case Types.LONGVARBINARY:
+            case UNIQUEIDENTIFIER:
+                return (colDataType == Types.VARBINARY) || 
+                    (colDataType == Types.LONGVARBINARY) || 
+                    (colDataType == UNIQUEIDENTIFIER);
+            default:
+                return false;
+        }
     }
 }

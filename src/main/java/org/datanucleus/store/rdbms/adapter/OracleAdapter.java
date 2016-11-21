@@ -45,7 +45,6 @@ import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
-import org.datanucleus.store.rdbms.schema.OracleTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -184,30 +183,30 @@ public class OracleAdapter extends BaseDatastoreAdapter
         super.initialiseTypes(handler, mconn);
 
         // Add on any missing JDBC types
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             "CLOB", (short)Types.CLOB, 1073741823, "'", "'", null, 1, true, (short)0, false, false, false, "CLOB", (short)0, (short)0, 10);
         sqlType.setAllowsPrecisionSpec(false); // Can't add precision on a CLOB
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             "DATE", (short)Types.DATE, 7, null, null, null, 1, false, (short)3, false, false, false, "DATE", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             "DECIMAL", (short)Types.DECIMAL, 38, null, null, null, 1, false, (short)3, false, true, false, "NUMBER", (short)-84, (short)127, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DECIMAL, sqlType, true);
 
         // Oracle has a synonym "DOUBLE PRECISION" (can't specify precision/scale) mapping to sql type of "FLOAT"
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             "DOUBLE PRECISION", (short)Types.DOUBLE, 38, null, null, null, 1, false, (short)3, false, true, false, "NUMBER", (short)-84, (short)127, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE, 1073741823, "'", "'", null, 1, true, (short)0, 
             false, false, false, OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE, sqlType, true);
 
-        sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(
             "NVARCHAR2", (short)Types.NVARCHAR, 4000, "'", "'", null, 1, true, (short)3, false, false, false, "NVARCHAR2", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.NVARCHAR, sqlType, true);
 
@@ -237,7 +236,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.OracleTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.OracleTypeInfo(rs);
     }
 
     /**

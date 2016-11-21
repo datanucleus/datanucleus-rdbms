@@ -15,9 +15,11 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.schema;
+package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.ResultSet;
+
+import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 
 /**
  * Type info for NuoDB.

@@ -138,25 +138,25 @@ public class HSQLAdapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types
         // CLOB - not present before v2.0
-        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
+        SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(
             "LONGVARCHAR", (short)Types.CLOB, 2147483647, "'", "'", null, 1, true, (short)3, false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
         // BLOB - not present before v2.0
-        sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(
             "LONGVARBINARY", (short)Types.BLOB, 2147483647, "'", "'", null, 1, false, (short)3, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         if (datastoreMajorVersion >= 2)
         {
             // LONGVARBINARY - not present after v2.0
-            sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
+            sqlType = new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(
                 "LONGVARBINARY", (short)Types.LONGVARBINARY, 2147483647, "'", "'", null, 1, false, (short)3, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
         }
 
         // LONGVARCHAR - not present in 2.0+
-        sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
+        sqlType = new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(
             "LONGVARCHAR", (short)Types.LONGVARCHAR, 2147483647, "'", "'", null, 1, true, (short)3, false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARCHAR, sqlType, true);
 
@@ -304,7 +304,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(rs);
     }
 
     /**

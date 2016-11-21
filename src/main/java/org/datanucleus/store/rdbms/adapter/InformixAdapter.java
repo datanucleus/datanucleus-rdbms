@@ -108,7 +108,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        return new org.datanucleus.store.rdbms.schema.InformixTypeInfo(rs);
+        return new org.datanucleus.store.rdbms.adapter.InformixTypeInfo(rs);
     }
 
     /**
