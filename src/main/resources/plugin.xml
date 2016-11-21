@@ -1192,7 +1192,6 @@ Contributors:
         <datastore-adapter vendor-id="hsql" class-name="org.datanucleus.store.rdbms.adapter.HSQLAdapter" priority="0"/>
         <datastore-adapter vendor-id="informix" class-name="org.datanucleus.store.rdbms.adapter.InformixAdapter" priority="0"/>
         <datastore-adapter vendor-id="interbase" class-name="org.datanucleus.store.rdbms.adapter.FirebirdAdapter" priority="0"/>
-        <datastore-adapter vendor-id="mckoi" class-name="org.datanucleus.store.rdbms.adapter.McKoiAdapter" priority="0"/>
         <datastore-adapter vendor-id="microsoft" class-name="org.datanucleus.store.rdbms.adapter.MSSQLServerAdapter" priority="0"/>
         <datastore-adapter vendor-id="mysql" class-name="org.datanucleus.store.rdbms.adapter.MySQLAdapter" priority="0"/>
         <datastore-adapter vendor-id="nuodb" class-name="org.datanucleus.store.rdbms.adapter.NuoDBAdapter" priority="0"/>
