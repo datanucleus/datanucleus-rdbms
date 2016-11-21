@@ -482,7 +482,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * Creates the auxiliary functions/procedures in the schema 
      * @param conn the connection to the datastore
      */
-    public void initialiseDatastore(Object conn)
+    public void initialiseDatastore(Connection conn)
     {
     }
 

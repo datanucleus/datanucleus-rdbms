@@ -147,41 +147,34 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-            "UNIQUEIDENTIFIER", (short)Types.CHAR, 36, "'", "'", "", 1, false, (short)2,
-            false, false, false, "UNIQUEIDENTIFIER", (short)0, (short)0, 10);
+            "UNIQUEIDENTIFIER", (short)Types.CHAR, 36, "'", "'", "", 1, false, (short)2, false, false, false, "UNIQUEIDENTIFIER", (short)0, (short)0, 10);
         sqlType.setAllowsPrecisionSpec(false);
         addSQLTypeForJDBCType(handler, mconn, (short)MSSQLTypeInfo.UNIQUEIDENTIFIER, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-            "IMAGE", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1,
-            false, false, false, "BLOB", (short)0, (short)0, 0);
+            "IMAGE", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "BLOB", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-            "TEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1,
-            false, false, false, "TEXT", (short)0, (short)0, 0);
+            "TEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "TEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-            "float", (short)Types.DOUBLE, 53, null, null, null, 1, false, (short)2,
-            false, false, false, null, (short)0, (short)0, 2);
+            "float", (short)Types.DOUBLE, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 2);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-            "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1,
-            false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
+            "IMAGE", (short)Types.LONGVARBINARY, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
 
         if (datastoreMajorVersion > 9)
         {
             // Support for build-in TIME and DATE data type for MS SQL Server version >= 2008
             sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-                "TIME", (short)Types.TIME, 0, null, null, null, 1, false, (short)1,
-                true, true, false, "TIME", (short)0, (short)0, 0);
+                "TIME", (short)Types.TIME, 0, null, null, null, 1, false, (short)1, true, true, false, "TIME", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.TIME, sqlType, true);
             sqlType = new org.datanucleus.store.rdbms.schema.MSSQLTypeInfo(
-                "DATE", (short)Types.DATE, 0, null, null, null, 1, false, (short)1,
-                true, true, false, "DATE", (short)0, (short)0, 0);
+                "DATE", (short)Types.DATE, 0, null, null, null, 1, false, (short)1, true, true, false, "DATE", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
         }
     }
@@ -282,8 +275,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
     /**
      * Returns the appropriate DDL to create an index.
-     * Overrides the superclass variant since Postgresql doesn't support having index names specified in
-     * a particular schema (i.e "{schema}.{indexName}").
+     * Overrides the superclass variant since Postgresql doesn't support having index names specified in a particular schema (i.e "{schema}.{indexName}").
      * @param idx An object describing the index.
      * @param factory Identifier factory
      * @return The text of the SQL statement.
@@ -330,7 +322,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
     /**
      * Method to create a column info for the current row.
-     * Overrides the dataType/columnSize/decimalDigits to cater for MSSQL particularities.
+     * Overrides the dataType/columnSize/decimalDigits to cater for SQLServer particularities.
      * @param rs ResultSet from DatabaseMetaData.getColumns()
      * @return column info
      */
@@ -543,30 +535,29 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize)
     {
         if (datastoreMajorVersion < 11)
         {
             // Not supported prior to SQLServer 2012
-            return super.getSequenceCreateStmt(sequence_name, min, max, start, increment, cache_size);
+            return super.getSequenceCreateStmt(sequenceName, min, max, start, increment, cacheSize);
         }
 
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (start != null)
         {
             stmt.append(" START WITH " + start);
@@ -583,9 +574,9 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" MAXVALUE " + max);
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
-            stmt.append(" CACHE " + cache_size);
+            stmt.append(" CACHE " + cacheSize);
         }
         else
         {
@@ -597,25 +588,25 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      **/
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
         if (datastoreMajorVersion < 11)
         {
             // Not supported prior to SQLServer 2012
-            return super.getSequenceNextStmt(sequence_name);
+            return super.getSequenceNextStmt(sequenceName);
         }
 
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         // Do we need to quote the sequence name here?
         StringBuilder stmt = new StringBuilder("SELECT NEXT VALUE FOR '");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append("'");
 
         return stmt.toString();

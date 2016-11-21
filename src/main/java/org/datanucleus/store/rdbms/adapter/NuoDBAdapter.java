@@ -241,24 +241,23 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (start != null)
         {
             stmt.append(" START WITH " + start);
@@ -270,17 +269,17 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      **/
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("SELECT NEXT VALUE FOR ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append(" FROM DUAL");
 
         return stmt.toString();

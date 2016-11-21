@@ -64,10 +64,9 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * The option to specify in "SELECT ... WITH (option)" to lock instances
-     * Null if not supported.
+     * The option to specify in "SELECT ... WITH (option)" to lock instances. Null if not supported.
      * @return The option to specify with "SELECT ... WITH (option)"
-     **/
+     */
     public String getSelectWithLockOption()
     {
         return "EXCLUSIVE LOCK";
@@ -96,24 +95,23 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (min != null)
         {
             stmt.append(" MINVALUE " + min);
@@ -130,9 +128,9 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" INCREMENT BY " + increment);
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
-            stmt.append(" CACHE " + cache_size);
+            stmt.append(" CACHE " + cacheSize);
         }
         else
         {
@@ -143,20 +141,19 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the statement for getting the next id from the sequence
-     * for this datastore.
-     * @param sequence_name Name of the sequence 
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      **/
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt=new StringBuilder("SELECT ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append(".nextval FROM dual");
 
         return stmt.toString();

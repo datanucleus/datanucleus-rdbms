@@ -111,29 +111,24 @@ public class DB2Adapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
-            "FLOAT", (short)Types.FLOAT, 53, null, null, null, 1, false, (short)2,
-            false, false, false, null, (short)0, (short)0, 0);
+            "FLOAT", (short)Types.FLOAT, 53, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
-            "NUMERIC", (short)Types.NUMERIC, 31, null, null, "PRECISION,SCALE", 1,
-             false, (short)2, false, false, false, null, (short)0, (short)31, 0);
+            "NUMERIC", (short)Types.NUMERIC, 31, null, null, "PRECISION,SCALE", 1, false, (short)2, false, false, false, null, (short)0, (short)31, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.NUMERIC, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
-            "BIGINT", (short)Types.BIGINT, 20, null, null, null, 1, false, (short)2,
-            false, true, false, null, (short)0, (short)0, 10);
+            "BIGINT", (short)Types.BIGINT, 20, null, null, null, 1, false, (short)2, false, true, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIGINT, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
-            "XML", (short)Types.SQLXML, 2147483647, null, null, null, 1, false, (short)2,
-            false, false, false, null, (short)0, (short)0, 0);
+            "XML", (short)Types.SQLXML, 2147483647, null, null, null, 1, false, (short)2, false, false, false, null, (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.SQLXML, sqlType, true);
 
         // DB2 doesn't have "BIT" JDBC type mapped, so map as SMALLINT
         sqlType = new org.datanucleus.store.rdbms.schema.DB2TypeInfo(
-            "SMALLINT", (short)Types.SMALLINT, 5, null, null, null, 1, false, (short)2,
-            false, true, false, null, (short)0, (short)0, 10);
+            "SMALLINT", (short)Types.SMALLINT, 5, null, null, null, 1, false, (short)2, false, true, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BIT, sqlType, true);
     }
 
@@ -277,24 +272,23 @@ public class DB2Adapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min,Integer max, Integer start,Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min,Integer max, Integer start,Integer increment, Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append(" AS INTEGER ");
 
         if (start != null)
@@ -313,9 +307,9 @@ public class DB2Adapter extends BaseDatastoreAdapter
         {
             stmt.append(" MAXVALUE " + max);
         }        
-        if (cache_size != null)
+        if (cacheSize != null)
         {
-            stmt.append(" CACHE " + cache_size);
+            stmt.append(" CACHE " + cacheSize);
         }
         else
         {
@@ -324,20 +318,20 @@ public class DB2Adapter extends BaseDatastoreAdapter
         
         return stmt.toString();
     }        
-    
+
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      */
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("VALUES NEXTVAL FOR ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
 
         return stmt.toString();
     }

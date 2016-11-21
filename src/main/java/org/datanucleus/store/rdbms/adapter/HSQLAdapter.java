@@ -139,29 +139,25 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         // Add on any missing JDBC types
         // CLOB - not present before v2.0
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
-            "LONGVARCHAR", (short)Types.CLOB, 2147483647, "'", "'", null, 1, true, (short)3,
-            false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
+            "LONGVARCHAR", (short)Types.CLOB, 2147483647, "'", "'", null, 1, true, (short)3, false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
         // BLOB - not present before v2.0
         sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
-            "LONGVARBINARY", (short)Types.BLOB, 2147483647, "'", "'", null, 1, false, (short)3,
-            false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
+            "LONGVARBINARY", (short)Types.BLOB, 2147483647, "'", "'", null, 1, false, (short)3, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         if (datastoreMajorVersion >= 2)
         {
             // LONGVARBINARY - not present after v2.0
             sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
-                "LONGVARBINARY", (short)Types.LONGVARBINARY, 2147483647, "'", "'", null, 1, false, (short)3,
-                false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
+                "LONGVARBINARY", (short)Types.LONGVARBINARY, 2147483647, "'", "'", null, 1, false, (short)3, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
             addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
         }
 
         // LONGVARCHAR - not present in 2.0+
         sqlType = new org.datanucleus.store.rdbms.schema.HSQLTypeInfo(
-            "LONGVARCHAR", (short)Types.LONGVARCHAR, 2147483647, "'", "'", null, 1, true, (short)3,
-            false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
+            "LONGVARCHAR", (short)Types.LONGVARCHAR, 2147483647, "'", "'", null, 1, true, (short)3, false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARCHAR, sqlType, true);
 
         // Update any types that need extra info relative to the JDBC info
@@ -278,8 +274,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle
-     * restriction of ranges using the LIMIT keyword.
+     * Method to return the SQL to append to the WHERE clause of a SELECT statement to handle restriction of ranges using the LIMIT keyword.
      * @param offset The offset to return from
      * @param count The number of items to return
      * @param hasOrdering Whether ordering is present
@@ -313,9 +308,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the Schema Name for this datastore.
-     * HSQL 1.7.0 does not support schemas (catalog)
-     * 
+     * Accessor for the Schema Name for this datastore. HSQL 1.7.0 does not support schemas (catalog).
      * @param conn Connection to the datastore
      * @return The schema name
      * @throws SQLException Thrown if error occurs in determining the schema name.
@@ -414,24 +407,23 @@ public class HSQLAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min,Integer max,Integer start,Integer increment,Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min,Integer max,Integer start,Integer increment,Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (min != null)
         {
             stmt.append(" START WITH " + min);
@@ -448,7 +440,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" INCREMENT BY " + increment);
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
             throw new NucleusUserException(Localiser.msg("051023"));
         }
@@ -458,17 +450,17 @@ public class HSQLAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      */
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("CALL NEXT VALUE FOR ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
 
         return stmt.toString();
     }

@@ -468,7 +468,7 @@ public interface DatastoreAdapter
      * Creates the auxiliary functions/procedures in the datastore 
      * @param conn the connection to the datastore
      */
-    void initialiseDatastore(Object conn);
+    void initialiseDatastore(Connection conn);
 
     /**
      * Accessor for the quote string to use when quoting identifiers.
@@ -598,8 +598,8 @@ public interface DatastoreAdapter
     String getRangeByRowNumberColumn();
 
     /**
-     * Method to return the column name to use when handling ranges via
-     * a rownumber on the select using the second method (Oracle). Defaults to an empty string (not supported).
+     * Method to return the column name to use when handling ranges via a rownumber on the select using the second method (Oracle). 
+     * Defaults to an empty string (not supported).
      * @return The row number column.
      */
     String getRangeByRowNumberColumn2();
@@ -868,23 +868,22 @@ public interface DatastoreAdapter
     /**
      * Accessor for the sequence statement to get the next id for this 
      * datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      **/
-    String getSequenceNextStmt(String sequence_name);
+    String getSequenceNextStmt(String sequenceName);
 
     /**
      * Accessor for the sequence create statement for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    String getSequenceCreateStmt(String sequence_name, Integer min, Integer max, Integer start,
-            Integer increment, Integer cache_size);
+    String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize);
 
     /**
      * Convenience method to return whether the specified sequence already exists.

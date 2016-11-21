@@ -150,13 +150,11 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.MySQLTypeInfo(
-            "MEDIUMBLOB", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1,
-            false, false, false, "MEDIUMBLOB", (short)0, (short)0, 0);
+            "MEDIUMBLOB", (short)Types.BLOB, 2147483647, null, null, null, 1, false, (short)1, false, false, false, "MEDIUMBLOB", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.MySQLTypeInfo(
-            "MEDIUMTEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1,
-            false, false, false, "MEDIUMTEXT", (short)0, (short)0, 0);
+            "MEDIUMTEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "MEDIUMTEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
     }
 

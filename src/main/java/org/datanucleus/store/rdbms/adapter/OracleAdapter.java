@@ -185,36 +185,30 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types
         SQLTypeInfo sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "CLOB", (short)Types.CLOB, 1073741823, "'", "'", null, 1, true, (short)0,
-            false, false, false, "CLOB", (short)0, (short)0, 10);
+            "CLOB", (short)Types.CLOB, 1073741823, "'", "'", null, 1, true, (short)0, false, false, false, "CLOB", (short)0, (short)0, 10);
         sqlType.setAllowsPrecisionSpec(false); // Can't add precision on a CLOB
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "DATE", (short)Types.DATE, 7, null, null, null, 1, false, (short)3,
-            false, false, false, "DATE", (short)0, (short)0, 10);
+            "DATE", (short)Types.DATE, 7, null, null, null, 1, false, (short)3, false, false, false, "DATE", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DATE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "DECIMAL", (short)Types.DECIMAL, 38, null, null, null, 1, false, (short)3,
-            false, true, false, "NUMBER", (short)-84, (short)127, 10);
+            "DECIMAL", (short)Types.DECIMAL, 38, null, null, null, 1, false, (short)3, false, true, false, "NUMBER", (short)-84, (short)127, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DECIMAL, sqlType, true);
 
         // Oracle has a synonym "DOUBLE PRECISION" (can't specify precision/scale) mapping to sql type of "FLOAT"
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "DOUBLE PRECISION", (short)Types.DOUBLE, 38, null, null, null, 1, false, (short)3,
-            false, true, false, "NUMBER", (short)-84, (short)127, 10);
+            "DOUBLE PRECISION", (short)Types.DOUBLE, 38, null, null, null, 1, false, (short)3, false, true, false, "NUMBER", (short)-84, (short)127, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.DOUBLE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE,
-            1073741823, "'", "'", null, 1, true, (short)0, 
+            OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE, 1073741823, "'", "'", null, 1, true, (short)0, 
             false, false, false, OracleTypeInfo.TYPES_NAME_SYS_XMLTYPE, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)OracleTypeInfo.TYPES_SYS_XMLTYPE, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.schema.OracleTypeInfo(
-            "NVARCHAR2", (short)Types.NVARCHAR, 4000, "'", "'", null, 1, true, (short)3,
-            false, false, false, "NVARCHAR2", (short)0, (short)0, 10);
+            "NVARCHAR2", (short)Types.NVARCHAR, 4000, "'", "'", null, 1, true, (short)3, false, false, false, "NVARCHAR2", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.NVARCHAR, sqlType, true);
 
         // Update any types that need extra info relative to the JDBC info
@@ -419,24 +413,23 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min, Integer max, Integer start, Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (min != null)
         {
             stmt.append(" MINVALUE " + min);
@@ -453,9 +446,9 @@ public class OracleAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" INCREMENT BY " + increment);
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
-            stmt.append(" CACHE " + cache_size);
+            stmt.append(" CACHE " + cacheSize);
         }
         else
         {
@@ -466,19 +459,18 @@ public class OracleAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the statement for getting the next id from the sequence
-     * for this datastore.
-     * @param sequence_name Name of the sequence 
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      **/
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("SELECT ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append(".NEXTVAL from dual ");
 
         return stmt.toString();

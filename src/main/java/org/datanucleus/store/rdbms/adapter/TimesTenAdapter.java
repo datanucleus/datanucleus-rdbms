@@ -77,7 +77,6 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
      * Constructor.
      * Overridden so we can add on our own list of NON SQL92 reserved words
      * which is returned incorrectly with the JDBC driver.
-     *
      * @param metadata MetaData for the DB
      */
     public TimesTenAdapter(DatabaseMetaData metadata)
@@ -126,8 +125,7 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
         {
             MappingManagerImpl rdbmsMapMgr = (MappingManagerImpl)mapMgr;
             rdbmsMapMgr.deregisterDatastoreMappingsForJDBCType("VARBINARY");
-            rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class,
-                "VARBINARY", "VARBINARY", true);
+            rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
         }
     }
 
@@ -208,8 +206,7 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Returns true if foreign key is self-referencing
-     *
+     * Returns true if foreign key is self-referencing.
      * @param sql foreign key creation statement
      * @param ref referenced table
      * @return true if foreign key is self-referencing

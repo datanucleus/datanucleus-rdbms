@@ -40,14 +40,14 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Provides methods for adapting SQL language elements to the Cloudscape/Derby database.
+ * Provides methods for adapting SQL language elements to the Apache Derby database.
  */
 public class DerbyAdapter extends BaseDatastoreAdapter
 {
     /**
-     * Cloudscape 10.0 beta reserved words, includes SQL92 reserved words
+     * Derby (Cloudscape) 10.0 beta reserved words, includes SQL92 reserved words
      */
-    private static final String CLOUDSCAPE_RESERVED_WORDS =
+    private static final String DERBY_RESERVED_WORDS =
         "ADD,ALL,ALLOCATE,ALTER,AND,ANY,ARE,AS," +
         "ASC,ASSERTION,AT,AUTHORIZATION,AVG,BEGIN,BETWEEN,BIT," +
         "BIT_LENGTH,BOOLEAN,BOTH,BY,CALL,CASCADE,CASCADED,CASE," +
@@ -83,7 +83,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     public DerbyAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
-        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(CLOUDSCAPE_RESERVED_WORDS));
+        reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(DERBY_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
@@ -118,11 +118,11 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * Creates the auxiliary functions/procedures in the schema 
      * @param conn the connection to the datastore
      */
-    public void initialiseDatastore(Object conn)
+    public void initialiseDatastore(Connection conn)
     {
         try
         {
-            Statement st = ((Connection) conn).createStatement();
+            Statement st = conn.createStatement();
 
             // ASCII Function
             try
@@ -182,7 +182,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     public String getSchemaName(Connection conn)
     throws SQLException
     {
-        // see http://incubator.apache.org/derby/faq.html#schema_exist
+        // see https://db.apache.org/derby/faq.html#schema_exist
         // a connection's current schema name defaults to the connection's user name
         return conn.getMetaData().getUserName().toUpperCase();
     }
@@ -238,8 +238,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         if (ck.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
-            return "CREATE UNIQUE INDEX " + identifier + " ON " + ck.getTable().toString() +
-                " " + ck.getColumnList();
+            return "CREATE UNIQUE INDEX " + identifier + " ON " + ck.getTable().toString() + " " + ck.getColumnList();
         }
         return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
     }
@@ -279,16 +278,13 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method to return the INSERT statement to use when inserting into a table that has no
-     * columns specified. This is the case when we have a single column in the table and that column
-     * is autoincrement/identity (and so is assigned automatically in the datastore).
+     * Method to return the INSERT statement to use when inserting into a table that has no columns specified. 
+     * This is the case when we have a single column in the table and that column is autoincrement/identity (and so is assigned automatically in the datastore).
      * @param table The table
      * @return The INSERT statement
      */
     public String getInsertStatementForNoColumns(Table table)
     {
-        // Note that calling "VALUES IDENTITY_VAL_LOCAL()" immediately after this with Derby 10.0.2.1 returns null!
-        // This is a bug in Derby - Apache JIRA "DERBY-439"
         return "INSERT INTO " + table.toString() + " VALUES (DEFAULT)";
     }
 
@@ -302,10 +298,8 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method returning the text to append to the end of the SELECT to perform the equivalent
-     * of "SELECT ... FOR UPDATE" (on some RDBMS).
-     * Derby doesn't support "FOR UPDATE" in all situations and has a similar one "WITH RR"
-     * See https://issues.apache.org/jira/browse/DERBY-3900
+     * Method returning the text to append to the end of the SELECT to perform the equivalent of "SELECT ... FOR UPDATE" (on some RDBMS).
+     * Derby doesn't support "FOR UPDATE" in all situations and has a similar one "WITH RR", see https://issues.apache.org/jira/browse/DERBY-3900
      * @return The "FOR UPDATE" style text
      */
     public String getSelectForUpdateText()
@@ -361,7 +355,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * return whether this exception represents a cancelled statement.
+     * Return whether this exception represents a cancelled statement.
      * @param sqle the exception
      * @return whether it is a cancel
      */
@@ -410,24 +404,23 @@ public class DerbyAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence
+     * @param sequenceName Name of the sequence
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-        Integer min,Integer max,Integer start,Integer increment,Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min,Integer max,Integer start,Integer increment,Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (start != null)
         {
             stmt.append(" START WITH " + start);
@@ -452,7 +445,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" NO MINVALUE");
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
             throw new NucleusUserException(Localiser.msg("051023"));
         }
@@ -462,17 +455,17 @@ public class DerbyAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence
+     * @param sequenceName Name of the sequence
      * @return The statement for getting the next id for the sequence
      */
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("VALUES NEXT VALUE FOR ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         stmt.append(" ");
         return stmt.toString();
     }

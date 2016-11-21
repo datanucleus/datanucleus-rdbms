@@ -189,10 +189,9 @@ public class H2Adapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the Schema Name for this datastore.
-     * 
      * @param conn Connection to the datastore
      * @return The schema name
-     **/
+     */
     public String getSchemaName(Connection conn)
     throws SQLException
     {
@@ -232,9 +231,8 @@ public class H2Adapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method to retutn the INSERT statement to use when inserting into a table that has no
-     * columns specified. This is the case when we have a single column in the table and that column
-     * is autoincrement/identity (and so is assigned automatically in the datastore).
+     * Method to return the INSERT statement to use when inserting into a table that has no columns specified. 
+     * This is the case when we have a single column in the table and that column is autoincrement/identity (and so is assigned automatically in the datastore).
      * @param table The table
      * @return The INSERT statement
      */
@@ -257,24 +255,23 @@ public class H2Adapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the sequence statement to create the sequence.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @param min Minimum value for the sequence
      * @param max Maximum value for the sequence
      * @param start Start value for the sequence
      * @param increment Increment value for the sequence
-     * @param cache_size Cache size for the sequence
+     * @param cacheSize Cache size for the sequence
      * @return The statement for getting the next id from the sequence
      */
-    public String getSequenceCreateStmt(String sequence_name,
-            Integer min,Integer max, Integer start,Integer increment, Integer cache_size)
+    public String getSequenceCreateStmt(String sequenceName, Integer min,Integer max, Integer start,Integer increment, Integer cacheSize)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
         StringBuilder stmt = new StringBuilder("CREATE SEQUENCE IF NOT EXISTS ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
         if (min != null)
         {
             stmt.append(" START WITH " + min);
@@ -291,9 +288,9 @@ public class H2Adapter extends BaseDatastoreAdapter
         {
             stmt.append(" INCREMENT BY " + increment);
         }
-        if (cache_size != null)
+        if (cacheSize != null)
         {
-            stmt.append(" CACHE " + cache_size);
+            stmt.append(" CACHE " + cacheSize);
         }
 
         return stmt.toString();
@@ -301,23 +298,23 @@ public class H2Adapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the statement for getting the next id from the sequence for this datastore.
-     * @param sequence_name Name of the sequence 
+     * @param sequenceName Name of the sequence 
      * @return The statement for getting the next id for the sequence
      */
-    public String getSequenceNextStmt(String sequence_name)
+    public String getSequenceNextStmt(String sequenceName)
     {
-        if (sequence_name == null)
+        if (sequenceName == null)
         {
             throw new NucleusUserException(Localiser.msg("051028"));
         }
         StringBuilder stmt=new StringBuilder("CALL NEXT VALUE FOR ");
-        stmt.append(sequence_name);
+        stmt.append(sequenceName);
 
         return stmt.toString();
     }
 
     /**
-     * return whether this exception represents a cancelled statement.
+     * Return whether this exception represents a cancelled statement.
      * @param sqle the exception
      * @return whether it is a cancel
      */
