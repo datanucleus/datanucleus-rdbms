@@ -21,9 +21,9 @@ import java.sql.ResultSet;
 import java.sql.Types;
 
 /**
- * SQL Type info for MSSQL datastores.
+ * SQL Type info for SQLServer datastores.
  */
-public class MSSQLTypeInfo extends SQLTypeInfo
+public class SQLServerTypeInfo extends SQLTypeInfo
 {
     /** sql type NVARCHAR **/
     public static final int NVARCHAR = -9;
@@ -36,7 +36,7 @@ public class MSSQLTypeInfo extends SQLTypeInfo
      * Constructs a type information object from the current row of the given result set.
      * @param rs The result set returned from DatabaseMetaData.getTypeInfo().
      */
-    public MSSQLTypeInfo(ResultSet rs)
+    public SQLServerTypeInfo(ResultSet rs)
     {
         super(rs);
 
@@ -47,7 +47,7 @@ public class MSSQLTypeInfo extends SQLTypeInfo
         }
     }
 
-    public MSSQLTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
+    public SQLServerTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
             String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
             boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
             short minimumScale, short maximumScale, int numPrecRadix)
