@@ -41,10 +41,10 @@ public class RDBMSTablePKInfo implements ListStoreSchemaData
     private int hash = 0;
 
     /** Properties of the table. */
-    Map properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** FK information for this table. */
-    List pks = new ArrayList();
+    List<StoreSchemaData> pks = new ArrayList<>();
 
     public RDBMSTablePKInfo()
     {
@@ -87,7 +87,7 @@ public class RDBMSTablePKInfo implements ListStoreSchemaData
      */
     public StoreSchemaData getChild(int position)
     {
-        return (StoreSchemaData)pks.get(position);
+        return pks.get(position);
     }
 
     /**

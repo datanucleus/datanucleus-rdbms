@@ -31,10 +31,10 @@ import org.datanucleus.store.schema.StoreSchemaData;
 public class RDBMSTypesInfo implements MapStoreSchemaData
 {
     /** Properties of the types. */
-    Map<String, Object> properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** JDBC Types information, keyed by type number (java.sql.Types). */
-    Map<String, StoreSchemaData> jdbcTypes = new HashMap();
+    Map<String, StoreSchemaData> jdbcTypes = new HashMap<>();
 
     public RDBMSTypesInfo()
     {

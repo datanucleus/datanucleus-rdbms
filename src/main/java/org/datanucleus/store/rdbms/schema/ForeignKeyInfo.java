@@ -48,7 +48,7 @@ import org.datanucleus.store.schema.StoreSchemaData;
 public class ForeignKeyInfo implements StoreSchemaData
 {
     /** Properties of the foreign-key. */
-    Map properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** Hashcode. Set on first use. */
     private int hash = 0;

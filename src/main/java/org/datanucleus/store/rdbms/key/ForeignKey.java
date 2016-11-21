@@ -21,6 +21,7 @@ Contributors:
 package org.datanucleus.store.rdbms.key;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.ForeignKeyAction;
@@ -60,7 +61,7 @@ public class ForeignKey extends Key
     private DatastoreClass refTable;
     private FKAction updateAction;
     private FKAction deleteAction;
-    private ArrayList refColumns = new ArrayList();
+    private List<Column> refColumns = new ArrayList<>();
 
     private String foreignKeyDefinition = null;
 

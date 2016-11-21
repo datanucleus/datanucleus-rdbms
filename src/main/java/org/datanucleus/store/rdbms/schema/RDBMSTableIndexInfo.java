@@ -41,10 +41,10 @@ public class RDBMSTableIndexInfo implements ListStoreSchemaData
     private int hash = 0;
 
     /** Properties of the table. */
-    Map properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** Index information for this table. */
-    List indices = new ArrayList();
+    List<StoreSchemaData> indices = new ArrayList<>();
 
     public RDBMSTableIndexInfo()
     {
@@ -87,7 +87,7 @@ public class RDBMSTableIndexInfo implements ListStoreSchemaData
      */
     public StoreSchemaData getChild(int position)
     {
-        return (StoreSchemaData)indices.get(position);
+        return indices.get(position);
     }
 
     /**

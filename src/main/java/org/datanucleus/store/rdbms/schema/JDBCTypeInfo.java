@@ -35,10 +35,10 @@ public class JDBCTypeInfo implements MapStoreSchemaData
     private int hash = 0;
 
     /** Properties of the JDBC type. */
-    Map properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** SQL types for this JDBC type, keyed by (SQL) type name. */
-    Map sqlTypes = new HashMap();
+    Map<String, StoreSchemaData> sqlTypes = new HashMap<>();
 
     public JDBCTypeInfo(short type)
     {
@@ -112,7 +112,7 @@ public class JDBCTypeInfo implements MapStoreSchemaData
      */
     public StoreSchemaData getChild(String key)
     {
-        return (StoreSchemaData)sqlTypes.get(key);
+        return sqlTypes.get(key);
     }
 
     /**
@@ -170,10 +170,10 @@ public class JDBCTypeInfo implements MapStoreSchemaData
     public String toString()
     {
         StringBuilder str = new StringBuilder("JDBCTypeInfo : ");
-        Iterator iter = properties.entrySet().iterator();
+        Iterator<Map.Entry<String, Object>> iter = properties.entrySet().iterator();
         while (iter.hasNext())
         {
-            Map.Entry entry = (Map.Entry)iter.next();
+            Map.Entry entry = iter.next();
             str.append(entry.getKey() + " = " + entry.getValue());
             if (iter.hasNext())
             {

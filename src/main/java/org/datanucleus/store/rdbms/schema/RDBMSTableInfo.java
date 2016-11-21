@@ -47,13 +47,13 @@ public class RDBMSTableInfo implements ListStoreSchemaData
     private int hash = 0;
 
     /** Properties of the table. */
-    Map<String, Object> properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** Column information for this table. */
-    List<StoreSchemaData> columns = new ArrayList();
+    List<StoreSchemaData> columns = new ArrayList<>();
 
     /** Map of column information keyed by the column name. */
-    Map<String, StoreSchemaData> columnMapByColumnName = new HashMap();
+    Map<String, StoreSchemaData> columnMapByColumnName = new HashMap<>();
 
     public RDBMSTableInfo()
     {

@@ -40,10 +40,10 @@ public class RDBMSSchemaInfo implements MapStoreSchemaData
     private int hash = 0;
 
     /** Properties of the schema. */
-    Map properties = new HashMap();
+    Map<String, Object> properties = new HashMap<>();
 
     /** Table information for this schema, keyed by table name. */
-    Map<String, StoreSchemaData> tables = new HashMap();
+    Map<String, StoreSchemaData> tables = new HashMap<>();
 
     public RDBMSSchemaInfo(String catalog, String schema)
     {

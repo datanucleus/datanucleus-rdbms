@@ -83,7 +83,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * Can be "types", "tables" etc. The "tables" cached here are "known tables" and not
      * just all tables for the catalog/schema.
      */
-    protected Map<String, StoreSchemaData> schemaDataByName = new HashMap();
+    protected Map<String, StoreSchemaData> schemaDataByName = new HashMap<>();
 
     public RDBMSSchemaHandler(StoreManager storeMgr)
     {

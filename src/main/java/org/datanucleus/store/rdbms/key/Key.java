@@ -41,7 +41,7 @@ abstract class Key
     protected Table table;
 
     /** Columns that the key relates to. */
-    protected List<Column> columns = new ArrayList();
+    protected List<Column> columns = new ArrayList<>();
 
     /**
      * Constructor.
