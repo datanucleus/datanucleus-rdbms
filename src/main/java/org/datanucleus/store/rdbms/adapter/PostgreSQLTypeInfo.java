@@ -26,7 +26,7 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 /**
  * SQL Type info for PostgreSQL datastores.
  */
-public class PostgresqlTypeInfo extends SQLTypeInfo
+public class PostgreSQLTypeInfo extends SQLTypeInfo
 {
     /** The maximum precision we allow to be reported. */
     public static final int MAX_PRECISION = 65000;
@@ -35,7 +35,7 @@ public class PostgresqlTypeInfo extends SQLTypeInfo
      * Constructs a type information object from the current row of the given result set.
      * @param rs The result set returned from DatabaseMetaData.getTypeInfo().
      */
-    public PostgresqlTypeInfo(ResultSet rs)
+    public PostgreSQLTypeInfo(ResultSet rs)
     {
         super(rs);
         /*
@@ -81,7 +81,7 @@ public class PostgresqlTypeInfo extends SQLTypeInfo
         }
     }
 
-    public PostgresqlTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
+    public PostgreSQLTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
             String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
             boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
             short minimumScale, short maximumScale, int numPrecRadix)

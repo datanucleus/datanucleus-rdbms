@@ -225,31 +225,31 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     {
         if (identifierType == IdentifierType.TABLE)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.COLUMN)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.CANDIDATE_KEY)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.FOREIGN_KEY)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.INDEX)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.PRIMARY_KEY)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else if (identifierType == IdentifierType.SEQUENCE)
         {
-            return SQLConstants.MAX_IDENTIFIER_LENGTH;
+            return MAX_IDENTIFIER_LENGTH;
         }
         else
         {

@@ -126,27 +126,27 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         // Add on any missing JDBC types when not available from driver
 
         // Not present in PSQL 8.1.405
-        SQLTypeInfo sqlType = new PostgresqlTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
+        SQLTypeInfo sqlType = new PostgreSQLTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
-        sqlType = new PostgresqlTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new PostgresqlTypeInfo("BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         // Not present in PSQL 9.2.8 - just mirror what BIT does
-        sqlType = new PostgresqlTypeInfo("bool", (short)Types.BOOLEAN, 0, null, null, null, 1, false, (short)3, true, false, false, "bool", (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("bool", (short)Types.BOOLEAN, 0, null, null, null, 1, false, (short)3, true, false, false, "bool", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
 
         // Not present in PSQL 9.2.8 - just mirror what SMALLINT does
-        sqlType = new PostgresqlTypeInfo("int2", (short)Types.TINYINT, 0, null, null, null, 1, false, (short)3, false, false, false, "int2", (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("int2", (short)Types.TINYINT, 0, null, null, null, 1, false, (short)3, false, false, false, "int2", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
 
         // Not present in PSQL 9.2.8
-        sqlType = new PostgresqlTypeInfo("text array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "text array", (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("text array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "text array", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
-        sqlType = new PostgresqlTypeInfo("int array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "int array", (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("int array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "int array", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
     }
 
@@ -161,7 +161,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
-        SQLTypeInfo info = new PostgresqlTypeInfo(rs);
+        SQLTypeInfo info = new PostgreSQLTypeInfo(rs);
 
         // Since PostgreSQL supports many user defined data types and uses many type aliases the 
         // default methods have trouble finding the right associations between JDBC and PostgreSQL 
@@ -247,13 +247,13 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
          * if we end up needing more of these.
          */
         int columnSize = info.getColumnSize();
-        if (columnSize > PostgresqlTypeInfo.MAX_PRECISION)
+        if (columnSize > PostgreSQLTypeInfo.MAX_PRECISION)
         {
             info.setColumnSize(-1);
         }
 
         int decimalDigits = info.getDecimalDigits();
-        if (decimalDigits > PostgresqlTypeInfo.MAX_PRECISION)
+        if (decimalDigits > PostgreSQLTypeInfo.MAX_PRECISION)
         {
             info.setDecimalDigits(-1);
         }
