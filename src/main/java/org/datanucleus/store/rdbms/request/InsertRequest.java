@@ -29,6 +29,7 @@ package org.datanucleus.store.rdbms.request;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -202,6 +203,7 @@ public class InsertRequest extends Request
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("052207", op.getObjectAsPrintable(), table));
         }
 
+        NucleusLogger.GENERAL.info(">> INSERT txn=" + ec.getTransaction());
         try
         {
             VersionMetaData vermd = table.getVersionMetaData();
@@ -259,8 +261,7 @@ public class InsertRequest extends Request
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        op.provideFields(pkFieldNumbers,
-                            storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(pkFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                     }
 
                     // Provide all non-key fields needed for the insert.
@@ -272,6 +273,13 @@ public class InsertRequest extends Request
                         {
                             if (insertFieldNumbers[i] < op.getClassMetaData().getMemberCount())
                             {
+                                AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
+                                if (mmd.hasExtension("create-timestamp"))
+                                {
+                                    // TODO Support surrogate create-timestamp
+                                    // Set "create-timestamp" to time for the start of this transaction
+                                    op.replaceField(insertFieldNumbers[i], new Timestamp(ec.getTransaction().getBeginTime()));
+                                }
                                 numberOfFieldsToProvide++;
                             }
                         }

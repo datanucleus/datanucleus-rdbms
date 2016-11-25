@@ -24,6 +24,7 @@ package org.datanucleus.store.rdbms.request;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -174,6 +175,18 @@ public class UpdateRequest extends Request
             table.provideMappingsForMembers(consumer, reqFieldMetaData, false);
         }
 
+        // TODO Support surrogate update-timestamp
+        // "update-timestamp"? TODO Make this accessible from cmd
+        AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
+        for (int i=0;i<mmds.length;i++)
+        {
+            if (mmds[i].hasExtension("update-timestamp"))
+            {
+                AbstractMemberMetaData[] updateTsMmd = {mmds[i]};
+                table.provideMappingsForMembers(consumer, updateTsMmd, false);
+            }
+        }
+
         // WHERE clause - add identity
         consumer.setWhereClauseConsumption(true);
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -186,7 +199,6 @@ public class UpdateRequest extends Request
         }
         else
         {
-            AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             table.provideMappingsForMembers(consumer, mmds, false);
         }
 
@@ -226,19 +238,21 @@ public class UpdateRequest extends Request
         // Choose the statement based on whether optimistic or not
         String stmt = null;
         ExecutionContext ec = op.getExecutionContext();
-        boolean optimisticChecks =
-            (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
-        if (optimisticChecks)
-        {
-            stmt = updateStmtOptimistic;
-        }
-        else
-        {
-            stmt = updateStmt;
-        }
+        boolean optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
+        stmt = optimisticChecks ? updateStmtOptimistic : updateStmt;
 
         if (stmt != null)
         {
+            // TODO Support surrogate update-timestamp
+            AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
+            for (int i=0;i<mmds.length;i++)
+            {
+                if (mmds[i].hasExtension("update-timestamp"))
+                {
+                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getBeginTime()));
+                }
+            }
+
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
                 // Debug info about fields being updated
@@ -262,8 +276,7 @@ public class UpdateRequest extends Request
                 }
 
                 // Debug information about what we are updating
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", 
-                    op.getObjectAsPrintable(), fieldStr.toString(), table));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", op.getObjectAsPrintable(), fieldStr.toString(), table));
             }
 
             RDBMSStoreManager storeMgr = table.getStoreManager();
