@@ -203,7 +203,6 @@ public class InsertRequest extends Request
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("052207", op.getObjectAsPrintable(), table));
         }
 
-        NucleusLogger.GENERAL.info(">> INSERT txn=" + ec.getTransaction());
         try
         {
             VersionMetaData vermd = table.getVersionMetaData();
