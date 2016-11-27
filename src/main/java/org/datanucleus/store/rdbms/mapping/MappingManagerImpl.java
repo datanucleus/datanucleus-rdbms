@@ -937,7 +937,8 @@ public class MappingManagerImpl implements MappingManager
         {
             boolean serialised = ((mmd.hasCollection() && mmd.getCollection().isSerializedElement()) ||
                     (mmd.hasArray() && mmd.getArray().isSerializedElement()));
-            boolean embeddedPC = (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null);
+            boolean embeddedPC = (mmd.hasCollection() && mmd.getCollection().elementIsPersistent() && mmd.getCollection().isEmbeddedElement()) ||
+                    (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null);
             boolean elementPC = ((mmd.hasCollection() && mmd.getCollection().elementIsPersistent()) ||
                     (mmd.hasArray() && mmd.getArray().elementIsPersistent()));
             boolean embedded = true;
@@ -1099,7 +1100,8 @@ public class MappingManagerImpl implements MappingManager
         {
             boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedKey());
             boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedKey());
-            boolean embeddedPC = (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null);
+            boolean embeddedPC = (mmd.hasMap() && mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey()) || 
+                    (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null);
             boolean keyPC = (mmd.hasMap() && mmd.getMap().keyIsPersistent());
             Class keyCls = clr.classForName(mmd.getMap().getKeyType());
             boolean keyReference = ClassUtils.isReferenceType(keyCls);
@@ -1241,7 +1243,8 @@ public class MappingManagerImpl implements MappingManager
         {
             boolean serialised = (mmd.hasMap() && mmd.getMap().isSerializedValue());
             boolean embedded = (mmd.hasMap() && mmd.getMap().isEmbeddedValue());
-            boolean embeddedPC = (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null);
+            boolean embeddedPC = (mmd.hasMap() && mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue()) || 
+                    (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null);
             boolean valuePC = (mmd.hasMap() && mmd.getMap().valueIsPersistent());
             Class valueCls = clr.classForName(mmd.getMap().getValueType());
             boolean valueReference = ClassUtils.isReferenceType(valueCls);

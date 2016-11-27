@@ -479,8 +479,14 @@ public class MapTable extends JoinTable implements DatastoreMap
             // Serialized takes precedence over embedded
             return false;
         }
+        if (mmd.getMap().keyIsPersistent() && mmd.getMap().isEmbeddedKey())
+        {
+            // Persistable key, and marked as embedded key
+            return true;
+        }
         if (mmd.getKeyMetaData() != null && mmd.getKeyMetaData().getEmbeddedMetaData() != null)
         {
+            // Embedded metadata provided for key
             return true;
         }
         return false;
@@ -543,8 +549,14 @@ public class MapTable extends JoinTable implements DatastoreMap
             // Serialized takes precedence over embedded
             return false;
         }
+        if (mmd.getMap().valueIsPersistent() && mmd.getMap().isEmbeddedValue())
+        {
+            // Persistable value, and marked as embedded value
+            return true;
+        }
         if (mmd.getValueMetaData() != null && mmd.getValueMetaData().getEmbeddedMetaData() != null)
         {
+            // Embedded metadata provided for value
             return true;
         }
         return false;
