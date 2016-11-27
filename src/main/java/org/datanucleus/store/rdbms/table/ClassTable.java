@@ -2252,7 +2252,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             AbstractMemberMetaData mmd = (AbstractMemberMetaData) iter.next();
             JavaTypeMapping memberMapping = memberMappingsMap.get(mmd);
 
-            if (mmd.getEmbeddedMetaData() != null && memberMapping instanceof EmbeddedPCMapping)
+            if (memberMapping instanceof EmbeddedPCMapping)
             {
                 EmbeddedPCMapping embMapping = (EmbeddedPCMapping)memberMapping;
                 addExpectedForeignKeysForEmbeddedPCField(foreignKeys, autoMode, clr, embMapping);
