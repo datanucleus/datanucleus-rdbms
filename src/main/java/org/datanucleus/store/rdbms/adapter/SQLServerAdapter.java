@@ -48,7 +48,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * Provides methods for adapting SQL language elements to the Microsoft SQL Server database.
  * Note that majorVersion from JDBC doesn't align to version number of SQLServer.
- * 1995 = "6", 1998 = "7", 2000/2003 = "8", 2005 = "9", 2008 = "10", 2012 = "11"
+ * 1995 = "6", 1998 = "7", 2000/2003 = "8", 2005 = "9", 2008 = "10", 2012 = "11", 2014 = "12", ...
  *
  * @see BaseDatastoreAdapter
  */
@@ -95,7 +95,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         "WHEN,WHERE,WHILE,WITH,WRITETEXT";
     
     /**
-     * Constructs a Microsoft SQL Server adapter based on the given JDBC metadata.
+     * Constructs a SQL Server adapter based on the given JDBC metadata.
      * @param metadata the database metadata.
      */
     public SQLServerAdapter(DatabaseMetaData metadata)
@@ -109,6 +109,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_OPTION_PLACED_WITHIN_JOIN);
         supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
+        supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
@@ -123,7 +124,6 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         {
             // SQLServer 2012+ support these features
             supportedOptions.add(SEQUENCES);
-            supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         }
 
         if (datastoreMajorVersion >= 12)
