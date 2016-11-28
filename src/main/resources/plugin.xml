@@ -900,6 +900,7 @@ Contributors:
         <sql-method class="java.lang.String" method="length" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
         <sql-method class="java.lang.String" method="length" datastore="sapdb" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
         <sql-method class="java.lang.String" method="length" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
+        <sql-method class="java.lang.String" method="length" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength4Method"/>
         <sql-method class="java.lang.String" method="matches" evaluator="org.datanucleus.store.rdbms.sql.method.StringMatchesMethod"/>
         <sql-method class="java.lang.String" method="matches" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringMatchesDerbyMethod"/>
         <sql-method class="java.lang.String" method="replaceAll" evaluator="org.datanucleus.store.rdbms.sql.method.StringReplaceAllMethod"/>
