@@ -110,6 +110,7 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_OPTION_PLACED_WITHIN_JOIN);
         supportedOptions.add(ANALYSIS_METHODS);
         supportedOptions.add(STORED_PROCEDURES);
+        supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
@@ -124,7 +125,6 @@ public class MSSQLServerAdapter extends BaseDatastoreAdapter
         {
             // SQLServer 2012+ support these features
             supportedOptions.add(SEQUENCES);
-            supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         }
 
         if (datastoreMajorVersion >= 12)

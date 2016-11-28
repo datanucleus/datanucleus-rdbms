@@ -2283,34 +2283,46 @@ public class SQLStatement
 
     protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, NullOrderingType orderNullDirective, DatastoreAdapter dba)
     {
-        if (orderNullDirective != null && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES) &&
-            !dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL))
-        {
-            NucleusLogger.DATASTORE_RETRIEVE.warn("Query contains NULLS directive yet this datastore doesn't provide any support for handling this. Nulls directive will be ignored");
-        }
-
         String orderParam = dba.getOrderString(rdbmsMgr, orderString, orderExpr);
-        if (orderNullDirective == NullOrderingType.NULLS_LAST)
+        if (orderNullDirective != null)
         {
-            if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL) && orderExpr.getSQLTable() != null)
+            if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
             {
-                // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
-                orderST.append("ISNULL(").append(orderParam).append("),");
+                // Apply "NULLS [FIRST | LAST]" directly since supported by this datastore
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
+                orderST.append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " NULLS FIRST" : " NULLS LAST");
             }
-            else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL) && orderExpr.getSQLTable() != null)
+            else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_CASE_NULL))
             {
-                // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
-                orderST.append(orderParam).append(" IS NULL,");
+                // "(CASE WHEN {param} IS NULL THEN 1 ELSE 0 END) [ASC|DESC], {param} [ASC|DESC]"
+                orderParam = orderExpr.toSQLText().toSQL(); // NOTE : This only works because SQLServer is the only adapter using CASE and it seemingly doesn't need orderString
+                orderST.append("(CASE WHEN " + orderParam + " IS NULL THEN 1 ELSE 0 END)").append(orderDirection ? " DESC" : " ASC");
+                orderST.append(", " + orderParam).append(orderDirection ? " DESC" : " ASC");
+            }
+            else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL))
+            {
+                if (orderNullDirective == NullOrderingType.NULLS_LAST && orderExpr.getSQLTable() != null)
+                {
+                    // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                    orderST.append(orderParam).append(" IS NULL,");
+                }
+            }
+            else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL))
+            {
+                if (orderNullDirective == NullOrderingType.NULLS_LAST && orderExpr.getSQLTable() != null)
+                {
+                    // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                    orderST.append("ISNULL(").append(orderParam).append("),");
+                }
+            }
+            else
+            {
+                NucleusLogger.DATASTORE_RETRIEVE.warn("Query contains NULLS directive yet this datastore doesn't provide any support for handling this. Nulls directive will be ignored");
             }
         }
-
-        orderST.append(orderParam);
-        orderST.append(orderDirection ? " DESC" : "");
-
-        if (orderNullDirective != null && dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
+        else
         {
-            // Apply "NULLS [FIRST | LAST]" directly since supported by this datastore
-            orderST.append(" " + (orderNullDirective == NullOrderingType.NULLS_FIRST ? "NULLS FIRST" : "NULLS LAST"));
+            orderST.append(orderParam).append(orderDirection ? " DESC" : "");
         }
     }
 

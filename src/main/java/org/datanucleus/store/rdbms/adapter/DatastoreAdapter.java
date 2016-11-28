@@ -358,12 +358,14 @@ public interface DatastoreAdapter
     /** In SAPDB any orderby has to be using the index(es) of any SELECT column(s) rather than their name(s). */
     public static final String ORDERBY_USING_SELECT_COLUMN_INDEX = "OrderByUsingSelectColumnIndex";
 
-    /** Whether we support NULLS directives in ORDER expressions. */
+    /** Whether we support ANSI "NULLS [FIRST|LAST]" directives in ORDER expressions. */
     public static final String ORDERBY_NULLS_DIRECTIVES = "OrderByWithNullsDirectives";
     /** Whether we support ordering of NULLs using ISNULL. */
     public static final String ORDERBY_NULLS_USING_ISNULL = "OrderByNullsUsingIsNull";
-    /** Whether we support ordering of NULLs using "{col} IS NULL". */
+    /** Whether we support ordering of NULLs using {col} IS NULL. */
     public static final String ORDERBY_NULLS_USING_COLUMN_IS_NULL = "OrderByNullsUsingColumnIsNull";
+    /** Whether we support ordering of NULLs using "(CASE WHEN [Order] IS NULL THEN 0 ELSE 1 END), [Order]" */
+    public static final String ORDERBY_NULLS_USING_CASE_NULL = "OrderByNullsUsingCaseNull";
 
     /** Whether this datastore supports stored procedures. */
     public static final String STORED_PROCEDURES = "StoredProcs";
