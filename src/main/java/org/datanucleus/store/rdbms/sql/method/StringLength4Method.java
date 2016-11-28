@@ -34,7 +34,7 @@ import org.datanucleus.util.Localiser;
  * Expression handler to evaluate {stringExpression}.length().
  * Returns a NumericExpression <pre>LEN({stringExpr})</pre>.
  */
-public class StringLengthMethod4 extends AbstractSQLMethod
+public class StringLength4Method extends AbstractSQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
