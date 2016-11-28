@@ -17,7 +17,10 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -25,10 +28,11 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 
 /**
- * Method for evaluating HOUR({dateExpr}) using MSSQL.
- * Returns a NumericExpression that equates to <pre>DATEPART(hh, expr)</pre>
+ * Method for evaluating HOUR({dateExpr}) using SQLServer.
+ * Returns a NumericExpression that equates to <pre>DATEPART(hh, CAST(expr AS 'DATETIME'))</pre>
  */
 public class TemporalHourMethod4 extends TemporalBaseMethod
 {
@@ -45,7 +49,12 @@ public class TemporalHourMethod4 extends TemporalBaseMethod
         ((StringLiteral)hh).generateStatementWithoutQuotes();
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(hh);
-        funcArgs.add(invokedExpr);
+
+        // CAST {invokedExpr} AS DATETIME
+        List castArgs = new ArrayList<>();
+        castArgs.add(invokedExpr);
+
+        funcArgs.add(new TemporalExpression(stmt, getMappingForClass(Date.class), "CAST", castArgs, asList("DATETIME")));
         return new NumericExpression(stmt, getMappingForClass(int.class), "DATEPART", funcArgs);
     }
 }
