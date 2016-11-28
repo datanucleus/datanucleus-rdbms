@@ -1253,32 +1253,21 @@ Contributors:
 
     <!-- SQL OPERATIONS -->
     <extension point="org.datanucleus.store.rdbms.sql_operation">
-        <sql-operation name="mod" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="h2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="hsql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="informix"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="oracle"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
-        <sql-operation name="mod" datastore="db2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Mod3Operation"/>
+        <sql-operation name="mod" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="h2" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="hsql" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="informix" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod2Operation"/>
+        <sql-operation name="mod" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Mod3Operation"/>
 
-        <sql-operation name="concat" datastore="mysql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
-        <sql-operation name="concat" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
-        <sql-operation name="concat" datastore="db2"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
+        <sql-operation name="concat" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
+        <sql-operation name="concat" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
+        <sql-operation name="concat" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat3Operation"/>
+        <sql-operation name="concat" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.operation.Concat2Operation"/>
 
-        <sql-operation name="numericToString"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation"/>
-        <sql-operation name="numericToString" datastore="mysql"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation"/>
-        <sql-operation name="numericToString" datastore="derby"
-            evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation"/>
+        <sql-operation name="numericToString" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation"/>
+        <sql-operation name="numericToString" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation"/>
+        <sql-operation name="numericToString" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation"/>
     </extension>
 
     <!-- SQL TABLE NAMING -->
