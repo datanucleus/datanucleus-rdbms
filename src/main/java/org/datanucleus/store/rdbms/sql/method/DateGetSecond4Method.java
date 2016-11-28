@@ -17,7 +17,10 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -30,8 +33,8 @@ import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.util.Localiser;
 
 /**
- * Method for evaluating {dateExpr}.getSecond() using MSSQL.
- * Returns a NumericExpression that equates to <pre>DATEPART(ss, expr)</pre>
+ * Method for evaluating {dateExpr}.getSecond() using SQLServer.
+ * Returns a NumericExpression that equates to <pre>DATEPART(ss, CAST(expr AS 'DATETIME'))</pre>
  */
 public class DateGetSecond4Method extends AbstractSQLMethod
 {
@@ -50,9 +53,14 @@ public class DateGetSecond4Method extends AbstractSQLMethod
         SQLExpression ss = exprFactory.newLiteral(stmt, mapping, "ss");
         ((StringLiteral)ss).generateStatementWithoutQuotes();
 
-        ArrayList funcArgs = new ArrayList();
+        List funcArgs = new ArrayList();
         funcArgs.add(ss);
-        funcArgs.add(expr);
+
+        // CAST {invokedExpr} AS DATETIME
+        List castArgs = new ArrayList<>();
+        castArgs.add(expr);
+
+        funcArgs.add(new TemporalExpression(stmt, getMappingForClass(Date.class), "CAST", castArgs, asList("DATETIME")));
         return new NumericExpression(stmt, getMappingForClass(int.class), "DATEPART", funcArgs);
     }
 }

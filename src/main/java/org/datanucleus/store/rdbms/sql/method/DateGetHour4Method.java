@@ -17,7 +17,10 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -31,7 +34,7 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Method for evaluating {dateExpr}.getHour() using MSSQL.
- * Returns a NumericExpression that equates to <pre>DATEPART(hh, expr)</pre>
+ * Returns a NumericExpression that equates to <pre>DATEPART(hh, CAST(expr AS 'DATETIME'))</pre>
  */
 public class DateGetHour4Method extends AbstractSQLMethod
 {
@@ -50,10 +53,14 @@ public class DateGetHour4Method extends AbstractSQLMethod
         SQLExpression hh = exprFactory.newLiteral(stmt, mapping, "hh");
         ((StringLiteral)hh).generateStatementWithoutQuotes();
         
-        
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(hh);
-        funcArgs.add(expr);
+
+        // CAST {invokedExpr} AS DATETIME
+        List castArgs = new ArrayList<>();
+        castArgs.add(expr);
+
+        funcArgs.add(new TemporalExpression(stmt, getMappingForClass(Date.class), "CAST", castArgs, asList("DATETIME")));
         return new NumericExpression(stmt, getMappingForClass(int.class), "DATEPART", funcArgs);
     }
 }
