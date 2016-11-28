@@ -594,7 +594,9 @@ Contributors:
             <includes vendor-id="postgresql"/>
         </mapping>
 
-        <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping"/>
+        <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping">
+            <excludes vendor-id="sqlserver"/>
+        </mapping>
         <mapping java-type="java.io.Serializable" jdbc-type="BLOB" sql-type="BLOB" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping">
             <excludes vendor-id="oracle"/>
         </mapping>
@@ -607,6 +609,13 @@ Contributors:
         <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping">
             <includes vendor-id="timesten"/>
         </mapping>
+        <mapping java-type="java.io.Serializable" jdbc-type="VARBINARY" sql-type="VARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.VarBinaryRDBMSMapping">
+            <includes vendor-id="sqlserver"/>
+        </mapping>
+        <mapping java-type="java.io.Serializable" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="false" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping">
+            <includes vendor-id="sqlserver"/>
+        </mapping>
+
         <mapping java-type="java.io.File" jdbc-type="LONGVARBINARY" sql-type="LONGVARBINARY" default="true" rdbms-mapping-class="org.datanucleus.store.rdbms.mapping.datastore.BinaryStreamRDBMSMapping">
         </mapping>
 
