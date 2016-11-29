@@ -1123,8 +1123,23 @@ public class SelectStatement extends SQLStatement
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_CASE_NULL))
             {
                 // "(CASE WHEN {param} IS NULL THEN 1 ELSE 0 END) [ASC|DESC], {param} [ASC|DESC]"
-                orderParam = orderExpr.toSQLText().toSQL(); // NOTE : This only works because SQLServer is the only adapter using CASE and it seemingly doesn't need orderString
-                orderST.append("(CASE WHEN " + orderParam + " IS NULL THEN 1 ELSE 0 END)").append(orderDirection ? " DESC" : " ASC");
+                // NOTE : This only works because SQLServer is the only adapter using CASE and it seemingly doesn't need orderString
+				String caseWhenOrderParam = orderExpr.toSQLText().toSQL();
+				if (orderExpr instanceof ResultAliasExpression)
+				{
+					SelectStatement orderExprStmt = (SelectStatement) orderExpr.getSQLStatement();
+					String selectAlias = ((ResultAliasExpression) orderExpr).getResultAlias();
+					for (int i = 0; i < orderExprStmt.selectedItems.size(); i++)
+					{
+						SelectedItem item = orderExprStmt.selectedItems.get(i);
+						if (selectAlias.equalsIgnoreCase(item.getAlias()))
+						{
+							caseWhenOrderParam = item.getSQLText().toSQL();
+							break;
+						}
+					}
+				}
+                orderST.append("(CASE WHEN " + caseWhenOrderParam + " IS NULL THEN 1 ELSE 0 END)").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " DESC" : " ASC");
                 orderST.append(", " + orderParam).append(orderDirection ? " DESC" : " ASC");
             }
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL))
