@@ -1149,6 +1149,8 @@ public class SelectStatement extends SQLStatement
                     // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
                     orderST.append(orderParam).append(" IS NULL,");
                 }
+                orderST.append(orderParam);
+                orderST.append(orderDirection ? " DESC" : "");
             }
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL))
             {
@@ -1157,6 +1159,8 @@ public class SelectStatement extends SQLStatement
                     // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
                     orderST.append("ISNULL(").append(orderParam).append("),");
                 }
+                orderST.append(orderParam);
+                orderST.append(orderDirection ? " DESC" : "");
             }
             else
             {
