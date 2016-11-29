@@ -161,6 +161,13 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      */
     private void advanceToEndOfResultSet()
     {
+        if (rs == null)
+        {
+            // Results already closed, so all rows loaded
+            return;
+        }
+
+        // Process all remaining rows of the results
         processNumberOfResults(-1);
     }
 
@@ -239,6 +246,12 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      */
     protected void closeResults()
     {
+        if (rs == null)
+        {
+            // Results already closed
+            return;
+        }
+
         // Close ResultSet
         super.closeResults();
 
@@ -248,6 +261,9 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
             query.getQueryManager().addQueryResult(query, query.getInputParameters(), resultIds);
             resultIds = null;
         }
+
+        // Disable range check since we have now loaded all results
+        applyRangeChecks = false;
     }
 
     /**
