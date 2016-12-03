@@ -224,11 +224,11 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             // Serialisation takes precedence over embedding
             return false;
         }
-        if (mmd.getArray().elementIsPersistent() && mmd.getArray().isEmbeddedElement())
+        /*if (mmd.getArray().elementIsPersistent() && mmd.getArray().isEmbeddedElement())
         {
             // Persistable element, and marked as embedded element
             return true;
-        }
+        }*/
         if (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
         {
             // Embedded metadata provided for element

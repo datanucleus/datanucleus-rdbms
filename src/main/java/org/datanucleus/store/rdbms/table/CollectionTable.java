@@ -334,11 +334,12 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             // Serialisation takes precedence over embedding
             return false;
         }
-        if (mmd.getCollection().elementIsPersistent() && mmd.getCollection().isEmbeddedElement())
+        // TODO Enable this ... see the comment in javadocs for the method
+/*        if (mmd.getCollection().elementIsPersistent() && mmd.getCollection().isEmbeddedElement())
         {
             // Persistable element, and marked as embedded element
             return true;
-        }
+        }*/
         if (mmd.getElementMetaData() != null && mmd.getElementMetaData().getEmbeddedMetaData() != null)
         {
             // Embedded metadata provided for element
