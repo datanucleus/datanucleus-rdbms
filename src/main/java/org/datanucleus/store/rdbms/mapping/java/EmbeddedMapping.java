@@ -50,7 +50,10 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Mapping for an embedded PC object. 
- * The PC object can be embedded directly (1-1 relation) or be the element of a collection, or be the key or value of a map.
+ * The PC object can be embedded directly (1-1 relation) or be the element of a collection/array, or be the key/value of a map.
+ * <p>
+ * Note that the <cite>mmd</cite> can be for the override of an embedded member rather than for the basic member itself. This can be the source of problems when nested.
+ * Refer to <pre>getRealMemberMetaData</pre> for the (base) metadata of the member that is embedded.
  */
 public abstract class EmbeddedMapping extends SingleFieldMapping
 {
@@ -81,10 +84,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given FieldMetaData.
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
-     * @param fmd FieldMetaData for the field to be mapped (if any)
+     * @param mmd FieldMetaData for the field to be mapped (if any)
      * @throws NucleusException if an error occurs
      */
-    public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
+    public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
         throw new NucleusException("subclass must override this method").setFatal();
     }
@@ -706,5 +709,16 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
     public Class getJavaType()
     {
         return clr.classForName(typeName);
+    }
+
+    public AbstractMemberMetaData getRealMemberMetaData()
+    {
+        if (mmd.getParent() instanceof EmbeddedMetaData)
+        {
+            // Get the real owner classMetaData (when embedded the cmd is often the embedded)
+            AbstractClassMetaData cmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
+            return cmd.getMetaDataForMember(mmd.getName());
+        }
+        return mmd;
     }
 }

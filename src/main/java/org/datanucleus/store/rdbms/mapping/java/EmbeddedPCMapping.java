@@ -20,9 +20,7 @@ package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.table.Table;
@@ -58,11 +56,6 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postFetch(ObjectProvider op)
     {
-        if (mmd.getAbsoluteFieldNumber() < 0)
-        {
-            return;
-        }
-
         // Find the OP for the embedded PC object
         ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
         if (thisOP == null)
@@ -86,18 +79,13 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postInsert(ObjectProvider op)
     {
-        if (mmd.getAbsoluteFieldNumber() < 0)
-        {
-            return;
-        }
-
         // Find the OP for the embedded PC object
         ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
         if (thisOP == null)
         {
             return;
         }
-
+ 
         // Call postInsert on any MappingCallbacks components
         for (int i=0;i<getNumberOfJavaTypeMappings();i++)
         {
@@ -115,11 +103,6 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void postUpdate(ObjectProvider op)
     {
-        if (mmd.getAbsoluteFieldNumber() < 0)
-        {
-            return;
-        }
-
         // Find the OP for the embedded PC object
         ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
         if (thisOP == null)
@@ -144,11 +127,6 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void preDelete(ObjectProvider op)
     {
-        if (mmd.getAbsoluteFieldNumber() < 0)
-        {
-            return;
-        }
-
         // Find the OP for the embedded PC object
         ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
         if (thisOP == null)
@@ -174,14 +152,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     private ObjectProvider getObjectProviderForEmbeddedObject(ObjectProvider ownerOP)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        AbstractMemberMetaData theMmd = mmd;
-        if (mmd.getParent() instanceof EmbeddedMetaData)
-        {
-            // Get the real owner classMetaData (when embedded the cmd is often the embedded)
-            AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getClassName(), clr);
-            theMmd = cmd.getMetaDataForMember(mmd.getName());
-        }
+        AbstractMemberMetaData theMmd = getRealMemberMetaData();
 
         Object value = ownerOP.provideField(theMmd.getAbsoluteFieldNumber()); // Owner (non-embedded) PC
         TypeManager typeManager = ownerOP.getExecutionContext().getTypeManager();
@@ -191,6 +162,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
             return null;
         }
 
+        ExecutionContext ec = ownerOP.getExecutionContext();
         ObjectProvider thisOP = ec.findObjectProvider(value);
         if (thisOP == null)
         {
