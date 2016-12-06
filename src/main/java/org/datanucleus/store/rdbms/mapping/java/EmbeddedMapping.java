@@ -290,8 +290,8 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             if (embMmd.getRelationType(clr) != RelationType.NONE && embMmdMapping instanceof AbstractContainerMapping)
             {
                 // TODO Support 1-N (unidirectional) relationships and use owner object as the key in the join table
-                throw new NucleusException("Embedded object at " + getMemberMetaData().getFullFieldName() + " has a member " + embMmd.getFullFieldName() + 
-                    " that is a container. Not supported as part of an embedded object!");
+                NucleusLogger.PERSISTENCE.warn("Embedded object at " + getMemberMetaData().getFullFieldName() + " has a member " + embMmd.getFullFieldName() + 
+                    " that is a container. Not fully supported as part of an embedded object!");
             }
 
             // Use field number from embMmd, since the embedded mapping info doesn't have reliable field number infos
