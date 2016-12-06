@@ -56,15 +56,23 @@ public class BackingStoreHelper
     public static ObjectProvider getOwnerObjectProviderForBackingStore(ObjectProvider op)
     {
         ObjectProvider ownerOP = op;
-        if (op.isEmbedded())
+        while (ownerOP.isEmbedded())
         {
             // Embedded object, so get the owner object it is embedded in
-            ObjectProvider[] ownerOPs = op.getExecutionContext().getOwnersForEmbeddedObjectProvider(op);
+            ObjectProvider[] ownerOPs = op.getExecutionContext().getOwnersForEmbeddedObjectProvider(ownerOP);
             if (ownerOPs != null && ownerOPs.length == 1)
             {
                 ownerOP = ownerOPs[0];
             }
-            // TODO Cater for nested embedded? i.e recurse until not embedded
+            else if (ownerOPs == null || ownerOPs.length == 0)
+            {
+                return null;
+            }
+            else
+            {
+                // Multiple owners so take first one
+                ownerOP = ownerOPs[0];
+            }
         }
         return ownerOP;
     }
