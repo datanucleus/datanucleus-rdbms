@@ -1064,7 +1064,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLTable candSqlTbl = stmt.getPrimaryTable();
         MetaDataManager mmgr = storeMgr.getMetaDataManager();
         AbstractClassMetaData cmd = mmgr.getMetaDataForClass(baseCls, clr);
-        if (baseCls != null && baseCls != compilation.getCandidateClass())
+        if (baseCls != null && !candidateAlias.equals(clsExpr.getAlias()))
         {
             // Not candidate class so must be cross join (JPA spec 4.4.5)
             DatastoreClass candTbl = storeMgr.getDatastoreClass(baseCls.getName(), clr);
