@@ -879,16 +879,18 @@ public class SelectStatement extends SQLStatement
 
     /**
      * Convenience method to reorder the joins to be in logical order.
-     * If a join needed to be changed during the generation process, it will have been removed and then
-     * the replacement added later. This method reorders the joins so that the joins are only relative to
-     * "known" tables.
+     * If a join needed to be changed during the generation process, it will have been removed and then the replacement added later. 
+     * This method reorders the joins so that the joins are only relative to "known" tables.
+     * @param joinsToAdd List of joins
+     * @return The ordered list of joins
      */
-    private void reorderJoins(List knownJoins, List joinsToAdd)
+    private List<SQLJoin> reorderJoins(List joinsToAdd)
     {
+        List orderedJoins = new ArrayList<>();
         if (joinsToAdd == null)
         {
             requiresJoinReorder = false;
-            return;
+            return orderedJoins;
         }
 
         while (joinsToAdd.size() > 0)
@@ -901,24 +903,24 @@ public class SelectStatement extends SQLStatement
                 if (join.getType() == JoinType.CROSS_JOIN)
                 {
                     // Cross joins don't relate to any other table so are fine
-                    knownJoins.add(join);
+                    orderedJoins.add(join);
                     joinIter.remove();
                 }
                 else if (join.getType() == JoinType.NON_ANSI_JOIN)
                 {
                     // Non-ANSI joins use the WHERE clause so are fine
-                    knownJoins.add(join);
+                    orderedJoins.add(join);
                     joinIter.remove();
                 }
                 else if (join.getJoinedTable().equals(primaryTable))
                 {
                     // Joins to the primary table are fine
-                    knownJoins.add(join);
+                    orderedJoins.add(join);
                     joinIter.remove();
                 }
                 else
                 {
-                    Iterator<SQLJoin> knownJoinIter = knownJoins.iterator();
+                    Iterator<SQLJoin> knownJoinIter = orderedJoins.iterator();
                     boolean valid = false;
                     while (knownJoinIter.hasNext())
                     {
@@ -932,7 +934,7 @@ public class SelectStatement extends SQLStatement
                     if (valid)
                     {
                         // Only used known joins so fine
-                        knownJoins.add(join);
+                        orderedJoins.add(join);
                         joinIter.remove();
                     }
                 }
@@ -945,7 +947,9 @@ public class SelectStatement extends SQLStatement
                     " Consider reordering the components in the WHERE clause : affected joins - " + StringUtils.collectionToString(joinsToAdd));
             }
         }
+
         requiresJoinReorder = false;
+        return orderedJoins;
     }
 
     /**
@@ -955,14 +959,15 @@ public class SelectStatement extends SQLStatement
      */
     protected SQLText getSqlForJoins(boolean lock)
     {
-        SQLText sql = new SQLText();
-        DatastoreAdapter dba = getDatastoreAdapter();
+        // TODO Consider performing a reorder in more situations to cater for use of implicit joins potentially not being in optimum order
         if (requiresJoinReorder)
         {
-            List<SQLJoin> theJoins = new ArrayList<>(joins.size());
-            reorderJoins(theJoins, joins);
+            List<SQLJoin> theJoins = reorderJoins(joins);
             joins = theJoins;
         }
+
+        SQLText sql = new SQLText();
+        DatastoreAdapter dba = getDatastoreAdapter();
         Iterator<SQLJoin> iter = joins.iterator();
         while (iter.hasNext())
         {
