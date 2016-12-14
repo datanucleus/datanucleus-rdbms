@@ -135,6 +135,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -3147,7 +3148,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         List<String> tuples = primExpr.getTuples();
 
         // Find source object
-        Iterator<String> iter = tuples.iterator();
+        ListIterator<String> iter = tuples.listIterator();
         String first = tuples.get(0);
         String primaryName = null;
         if (exprName != null)
@@ -3246,6 +3247,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     throw new NucleusUserException("Field "+ mmd.getFullFieldName() + " is not marked as persistent so cannot be queried");
                 }
+                RelationType relationType = mmd.getRelationType(clr);
 
                 // Find the table and the mapping for this field in the table
                 SQLTable sqlTbl = null;
@@ -3305,7 +3307,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     sqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(theStmt, sqlMapping.table, mapping);
                 }
 
-                RelationType relationType = mmd.getRelationType(clr);
                 if (relationType == RelationType.NONE)
                 {
                     sqlMappingNew = new SQLTableMapping(sqlTbl, cmd, mapping);
@@ -3353,40 +3354,68 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     else
                     {
                         // FK is at this side
-                        if (forceJoin == null && !iter.hasNext())
+                        if (forceJoin == null)
                         {
-                            // Further component provided, so check if we should force a join to the other side
-                            if (primExpr.getParent() != null && primExpr.getParent().getOperator() == Expression.OP_CAST)
+                            if (!iter.hasNext())
                             {
-                                // Cast and not an interface field, so do a join to the table of the persistable object
-                                if (mapping instanceof ReferenceMapping)
+                                // Further component provided, so check if we should force a join to the other side
+                                if (primExpr.getParent() != null && primExpr.getParent().getOperator() == Expression.OP_CAST)
                                 {
-                                    // Don't join with interface field since represents multiple implementations
-                                    // and the cast will be a restrict on which implementation to join to
-                                }
-                                else
-                                {
-                                    AbstractClassMetaData relCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
-                                    if (relCmd != null && !relCmd.isEmbeddedOnly())
+                                    // Cast and not an interface field, so do a join to the table of the persistable object
+                                    if (mapping instanceof ReferenceMapping)
                                     {
-                                        DatastoreClass relTable = storeMgr.getDatastoreClass(relCmd.getFullClassName(), clr);
-                                        if (relTable == null)
+                                        // Don't join with interface field since represents multiple implementations
+                                        // and the cast will be a restrict on which implementation to join to
+                                    }
+                                    else
+                                    {
+                                        AbstractClassMetaData relCmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                                        if (relCmd != null && !relCmd.isEmbeddedOnly())
                                         {
+                                            DatastoreClass relTable = storeMgr.getDatastoreClass(relCmd.getFullClassName(), clr);
+                                            if (relTable == null)
+                                            {
+                                            }
+                                            else
+                                            {
+                                                forceJoin = Boolean.TRUE;
+                                            }
                                         }
                                         else
                                         {
                                             forceJoin = Boolean.TRUE;
                                         }
                                     }
-                                    else
+                                }
+                            }
+                            else
+                            {
+                                // TODO Add optimisation to omit join if the FK is at this side and only selecting PK of the related object
+                                if (iter.hasNext())
+                                {
+                                    // Peek ahead to see if just selecting "id" of the related (i.e candidate.related.id with related FK in candidate table, so don't join)
+                                    String next = iter.next();
+                                    if (!iter.hasNext())
                                     {
-                                        forceJoin = Boolean.TRUE;
+                                        AbstractClassMetaData relCmd = storeMgr.getMetaDataManager().getMetaDataForClass(mmd.getType(), clr);
+                                        if (relCmd != null)
+                                        {
+                                            AbstractMemberMetaData mmdOfRelCmd = relCmd.getMetaDataForMember(next);
+                                            if (mmdOfRelCmd != null && mmdOfRelCmd.isPrimaryKey() && relCmd.getNoOfPrimaryKeyMembers() == 1 &&
+                                                !storeMgr.getMetaDataManager().isClassPersistable(mmdOfRelCmd.getTypeName()))
+                                            {
+                                                // TODO Potentially could avoid the join but need to know if we are comparing it to anything, and if so, what
+                                                NucleusLogger.QUERY.debug("Found implicit join to member=" + mmdOfRelCmd.getFullFieldName() +
+                                                        " which is FK of previous table so could avoid the join by returning the FK. TODO");
+//                                                return new SQLTableMapping(sqlMapping.table, relCmd, mapping);
+                                            }
+                                        }
                                     }
+                                    iter.previous();
                                 }
                             }
                         }
 
-                        // TODO If the only remaining component of the PrimaryExpression is the "id" and not persistable itself then don't join.
                         if (iter.hasNext() || Boolean.TRUE.equals(forceJoin))
                         {
                             AbstractClassMetaData relCmd = null;
@@ -3494,6 +3523,30 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         sqlTbl = theStmt.getTable(relTable, primaryName);
                         if (sqlTbl == null)
                         {
+                            if (mmd.getMappedBy() == null)
+                            {
+                                // FK at this side so check for optimisations
+                                if (iter.hasNext())
+                                {
+                                    // Peek ahead to see if just selecting "id" of the related (i.e candidate.related.id with related FK in candidate table, so don't join)
+                                    String next = iter.next();
+                                    if (!iter.hasNext())
+                                    {
+                                        AbstractClassMetaData relCmd = relMmd.getAbstractClassMetaData();
+                                        AbstractMemberMetaData mmdOfRelCmd = relCmd.getMetaDataForMember(next);
+                                        if (mmdOfRelCmd != null && mmdOfRelCmd.isPrimaryKey() && relCmd.getNoOfPrimaryKeyMembers() == 1 &&
+                                            !storeMgr.getMetaDataManager().isClassPersistable(mmdOfRelCmd.getTypeName()))
+                                        {
+                                            // TODO Potentially could avoid the join but need to know if we are comparing it to anything, and if so, what
+                                            NucleusLogger.QUERY.debug("Found implicit join to member=" + mmdOfRelCmd.getFullFieldName() +
+                                                " which is FK of previous table so could avoid the join by returning the FK. TODO");
+//                                            return new SQLTableMapping(sqlMapping.table, relCmd, mapping);
+                                        }
+                                    }
+                                    iter.previous();
+                                }
+                            }
+
                             Operator op = (primExpr.getParent() != null ? primExpr.getParent().getOperator() : null);
                             if (!iter.hasNext() && 
                                 (op == Expression.OP_EQ || op == Expression.OP_GT || op == Expression.OP_LT || op == Expression.OP_GTEQ || op == Expression.OP_LTEQ || op == Expression.OP_NOTEQ))
