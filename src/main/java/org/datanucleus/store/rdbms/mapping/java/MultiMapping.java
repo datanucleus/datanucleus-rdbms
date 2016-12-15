@@ -48,6 +48,7 @@ public abstract class MultiMapping extends JavaTypeMapping
         javaTypeMappings = new JavaTypeMapping[jtm.length+1]; 
         System.arraycopy(jtm, 0, javaTypeMappings, 0, jtm.length);
         javaTypeMappings[jtm.length] = mapping;
+        // TODO Make sure the table of the mapping is the same as for the MultiMapping
     }
 
     /**

@@ -3404,10 +3404,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                             if (mmdOfRelCmd != null && mmdOfRelCmd.isPrimaryKey() && relCmd.getNoOfPrimaryKeyMembers() == 1 &&
                                                 !storeMgr.getMetaDataManager().isClassPersistable(mmdOfRelCmd.getTypeName()))
                                             {
-                                                // TODO Potentially could avoid the join but need to know if we are comparing it to anything, and if so, what
+                                                // We have something like "a.b.id" and have the FK to the "B" table in the "A" table, so just refer to A.FK rather than joining and using B.ID
                                                 NucleusLogger.QUERY.debug("Found implicit join to member=" + mmdOfRelCmd.getFullFieldName() +
-                                                        " which is FK of previous table so could avoid the join by returning the FK. TODO");
-//                                                return new SQLTableMapping(sqlMapping.table, relCmd, mapping);
+                                                    " which is PK of the other type but FK is in this table so avoiding the join");
+                                                JavaTypeMapping subMapping = ((PersistableMapping)mapping).getJavaTypeMapping()[0];
+                                                subMapping.setTable(mapping.getTable()); // Component mappings of a PersistableMapping sometimes don't have table set, so fix it
+                                                return new SQLTableMapping(sqlMapping.table, relCmd, subMapping);
                                             }
                                         }
                                     }
@@ -3537,10 +3539,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                         if (mmdOfRelCmd != null && mmdOfRelCmd.isPrimaryKey() && relCmd.getNoOfPrimaryKeyMembers() == 1 &&
                                             !storeMgr.getMetaDataManager().isClassPersistable(mmdOfRelCmd.getTypeName()))
                                         {
-                                            // TODO Potentially could avoid the join but need to know if we are comparing it to anything, and if so, what
+                                            // We have something like "a.b.id" and have the FK to the "B" table in the "A" table, so just refer to A.FK rather than joining and using B.ID
                                             NucleusLogger.QUERY.debug("Found implicit join to member=" + mmdOfRelCmd.getFullFieldName() +
-                                                " which is FK of previous table so could avoid the join by returning the FK. TODO");
-//                                            return new SQLTableMapping(sqlMapping.table, relCmd, mapping);
+                                                " which is PK of the other type but FK is in this table so avoiding the join");
+                                            JavaTypeMapping subMapping = ((PersistableMapping)mapping).getJavaTypeMapping()[0];
+                                            subMapping.setTable(mapping.getTable()); // Component mappings of a PersistableMapping sometimes don't have table set, so fix it
+                                            return new SQLTableMapping(sqlMapping.table, relCmd, subMapping);
                                         }
                                     }
                                     iter.previous();
