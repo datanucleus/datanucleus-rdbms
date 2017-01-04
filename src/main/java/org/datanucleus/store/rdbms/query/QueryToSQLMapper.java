@@ -3180,15 +3180,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
             if (sqlMapping == null)
             {
-                if (parentMapper != null && parentMapper.hasSQLTableMappingForAlias(first))
+                if (parentMapper != null)
                 {
-                    // Try parent query
-                    sqlMapping = parentMapper.getSQLTableMappingForAlias(first);
-                    primaryName = first;
-                    iter.next(); // Skip first tuple
+                    QueryToSQLMapper theParentMapper = parentMapper;
+                    while (theParentMapper != null)
+                    {
+                        if (theParentMapper.hasSQLTableMappingForAlias(first))
+                        {
+                            // Try parent query
+                            sqlMapping = theParentMapper.getSQLTableMappingForAlias(first);
+                            primaryName = first;
+                            iter.next(); // Skip first tuple
 
-                    // This expression is for the parent statement so any joins need to go on that statement
-                    theStmt = sqlMapping.table.getSQLStatement();
+                            // This expression is for the parent statement so any joins need to go on that statement
+                            theStmt = sqlMapping.table.getSQLStatement();
+                            break;
+                        }
+                        theParentMapper = theParentMapper.parentMapper;
+                    }
                 }
             }
             if (sqlMapping == null)
