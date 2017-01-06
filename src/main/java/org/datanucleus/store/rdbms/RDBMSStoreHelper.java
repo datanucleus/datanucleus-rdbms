@@ -46,6 +46,7 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -81,7 +82,7 @@ public class RDBMSStoreHelper
         SelectStatement sqlStmt = stmtGen.getStatement(ec);
 
         // Select the discriminator
-        JavaTypeMapping discrimMapping = primaryTable.getDiscriminatorMapping(true);
+        JavaTypeMapping discrimMapping = primaryTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
         SQLTable discrimSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), discrimMapping);
         sqlStmt.select(discrimSqlTbl, discrimMapping, null);
 

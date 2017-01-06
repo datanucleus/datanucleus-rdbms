@@ -54,6 +54,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -177,7 +178,7 @@ public class FetchRequest extends Request
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore identity value for input
-            JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
+            JavaTypeMapping datastoreIdMapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
             sqlStatement.whereAnd(expr.eq(val), true);
@@ -217,18 +218,18 @@ public class FetchRequest extends Request
             }
         }
 
-        if (table.getMultitenancyMapping() != null)
+        JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+        if (multitenancyMapping != null)
         {
             // Add restriction on multi-tenancy
-            JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, tenantMapping, null, "TENANT");
+            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
+            SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
 
             StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
             if (multitenancyIdx == null)
             {
-                multitenancyIdx = new StatementMappingIndex(tenantMapping);
+                multitenancyIdx = new StatementMappingIndex(multitenancyMapping);
                 mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_MULTITENANCY, multitenancyIdx);
             }
             multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
@@ -332,7 +333,7 @@ public class FetchRequest extends Request
                             StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -340,14 +341,15 @@ public class FetchRequest extends Request
                             op.provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDef));
                         }
 
-                        if (table.getMultitenancyMapping() != null)
+                        JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+                        if (multitenancyMapping != null)
                         {
                             // Provide the tenant id to the JDBC statement
                             StatementMappingIndex multitenancyIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
                             String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
                             for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getMultitenancyMapping().setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                                multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
                             }
                         }
 
@@ -376,7 +378,7 @@ public class FetchRequest extends Request
                                 {
                                     // Surrogate version column - get from the result set using the version mapping
                                     StatementMappingIndex verIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
-                                    datastoreVersion = table.getVersionMapping(true).getObject(ec, rs, verIdx.getColumnPositions());
+                                    datastoreVersion = table.getSurrogateMapping(SurrogateColumnType.VERSION, true).getObject(ec, rs, verIdx.getColumnPositions());
                                 }
                                 else if (versionFieldName != null)
                                 {
@@ -471,7 +473,7 @@ public class FetchRequest extends Request
                             {
                                 String typeName = mmdToUse.getTypeName();
 								DatastoreClass relTable = table.getStoreManager().getDatastoreClass(typeName, clr);
-                                if (relTable != null && relTable.getDiscriminatorMapping(false) == null)
+                                if (relTable != null && relTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false) == null)
                                 {
                                     // 1-1 relation to base class with no discriminator and has subclasses
                                     // hence no way of determining the exact type, hence no point in fetching it
@@ -510,13 +512,13 @@ public class FetchRequest extends Request
             }
         }
 
-        JavaTypeMapping verMapping = table.getVersionMapping(true);
-        if (verMapping != null)
+        JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true);
+        if (versionMapping != null)
         {
             // Select version
-            StatementMappingIndex verMapIdx = new StatementMappingIndex(verMapping);
-            SQLTable verSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStatement, sqlTbl, verMapping);
-            int[] cols = sqlStatement.select(verSqlTbl, verMapping, null);
+            StatementMappingIndex verMapIdx = new StatementMappingIndex(versionMapping);
+            SQLTable verSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStatement, sqlTbl, versionMapping);
+            int[] cols = sqlStatement.select(verSqlTbl, versionMapping, null);
             verMapIdx.setColumnPositions(cols);
             mappingDef.addMappingForMember(StatementClassMapping.MEMBER_VERSION, verMapIdx);
         }

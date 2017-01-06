@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 
 /**
  * Expression handler to evaluate JDOHelper.getVersion({expression}).
@@ -78,7 +79,7 @@ public class JDOHelperGetVersionMethod extends AbstractSQLMethod
                 DatastoreClass table = (DatastoreClass) expr.getSQLTable().getTable();
                 if (table.getIdMapping() == mapping) // Version of candidate
                 {
-                    mapping = table.getVersionMapping(true);
+                    mapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true);
                     if (mapping == null)
                     {
                         throw new NucleusUserException("Cannot use JDOHelper.getVersion on object that has no version information");

@@ -21,6 +21,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 
 /**
  * Representation of a component of a collection/map. 
@@ -64,7 +65,7 @@ public class ComponentInfo
     }
     public JavaTypeMapping getDiscriminatorMapping()
     {
-        return table.getDiscriminatorMapping(false);
+        return table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
     }
     public JavaTypeMapping getOwnerMapping()
     {

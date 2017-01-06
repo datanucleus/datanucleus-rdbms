@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -336,8 +337,7 @@ public class UpdateRequest extends Request
                                     mappingDefinition.addMappingForMember(i, idxs[i]);
                                 }
                             }
-                            op.provideFields(updateFieldNumbers,
-                                storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                            op.provideFields(updateFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                         }
 
                         if (versionMetaData != null && versionMetaData.getFieldName() == null)
@@ -346,8 +346,7 @@ public class UpdateRequest extends Request
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getUpdateVersion();
                             for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getVersionMapping(false).setObject(ec, ps,
-                                    mapIdx.getParameterPositionsForOccurrence(i), nextVersion);
+                                table.getSurrogateMapping(SurrogateColumnType.VERSION, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), nextVersion);
                             }
                         }
 
@@ -358,8 +357,7 @@ public class UpdateRequest extends Request
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getWhereDatastoreId();
                             for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps,
-                                    mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                             }
                         }
                         else

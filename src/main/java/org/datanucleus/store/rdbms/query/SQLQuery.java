@@ -60,6 +60,7 @@ import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryInterruptedException;
 import org.datanucleus.store.query.QueryResult;
@@ -484,10 +485,10 @@ public final class SQLQuery extends Query
                     }
 
                     // Generate discriminator/version information for later checking they are present
-                    String discriminatorColName = (table.getDiscriminatorMapping(false) != null) ?
-                        table.getDiscriminatorMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
-                    String versionColName = (table.getVersionMapping(false) != null) ?
-                        table.getVersionMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                    JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+                    String discriminatorColName = (discrimMapping != null) ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                    JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+                    String versionColName = (versionMapping != null) ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
                     boolean discrimMissing = (discriminatorColName != null);
                     boolean versionMissing = (versionColName != null);
 
@@ -1116,10 +1117,12 @@ public final class SQLQuery extends Query
         }
 
         // Generate discriminator information for later checking it is present
-        String discrimColName = table.getDiscriminatorMapping(false) != null ? table.getDiscriminatorMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+        String discrimColName = discrimMapping != null ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Generate version information for later checking it is present
-        String versionColName = table.getVersionMapping(false) != null ? table.getVersionMapping(false).getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+        String versionColName = versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Go through the fields of the ResultSet and map to the required fields in the candidate
         ResultSetMetaData rsmd = rs.getMetaData();
@@ -1213,19 +1216,19 @@ public final class SQLQuery extends Query
         }
         if (datastoreIndex != null)
         {
-            StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(table.getDatastoreIdMapping());
+            StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false));
             datastoreMappingIdx.setColumnPositions(datastoreIndex);
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreMappingIdx);
         }
         if (discrimIndex != null)
         {
-            StatementMappingIndex discrimMappingIdx = new StatementMappingIndex(table.getDiscriminatorMapping(true));
+            StatementMappingIndex discrimMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true));
             discrimMappingIdx.setColumnPositions(discrimIndex);
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DISCRIMINATOR, discrimMappingIdx);
         }
         if (versionIndex != null)
         {
-            StatementMappingIndex versionMappingIdx = new StatementMappingIndex(table.getVersionMapping(true));
+            StatementMappingIndex versionMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.VERSION, true));
             versionMappingIdx.setColumnPositions(versionIndex);
             mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionMappingIdx);
         }

@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -1137,13 +1138,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 
-            if (table.getMultitenancyMapping() != null)
+            JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+            if (multitenancyMapping != null)
             {
                 // Multi-tenancy restriction
-                JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
-                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
+                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
@@ -1254,13 +1255,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             stmt.setClassLoaderResolver(clr);
             stmt.setCandidateClassName(candidateCmd.getFullClassName());
 
-            if (table.getMultitenancyMapping() != null)
+            JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+            if (multitenancyMapping != null)
             {
                 // Multi-tenancy restriction
-                JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
-                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
+                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?

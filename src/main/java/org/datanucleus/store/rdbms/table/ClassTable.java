@@ -102,6 +102,7 @@ import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
 import org.datanucleus.store.rdbms.mapping.java.VersionMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -1737,46 +1738,40 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         return (secondaryTables != null ? secondaryTables.values() : null);
     }
 
-    /**
-     * Accessor for the version mapping specified .
-     * @param allowSuperclasses Whether we should return just the mapping from this table
-     *     or whether we should return it when this table has none and the supertable has
-     * @return The version mapping.
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.table.Table#getSurrogateMapping(org.datanucleus.store.schema.table.SurrogateColumnType, boolean)
      */
-    public JavaTypeMapping getVersionMapping(boolean allowSuperclasses)
+    @Override
+    public JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses)
     {
-        if (versionMapping != null)
+        if (colType == SurrogateColumnType.DISCRIMINATOR)
         {
-            // We have the mapping so return it
-            return versionMapping;
+            if (discriminatorMapping != null)
+            {
+                // We have the mapping so return it
+                return discriminatorMapping;
+            }
+            if (allowSuperclasses && supertable != null)
+            {
+                // Return what the supertable has if it has the mapping
+                return supertable.getSurrogateMapping(colType, allowSuperclasses);
+            }
         }
-        if (allowSuperclasses && supertable != null)
+        else if (colType == SurrogateColumnType.VERSION)
         {
-            // Return what the supertable has if it has the mapping
-            return supertable.getVersionMapping(allowSuperclasses);
+            if (versionMapping != null)
+            {
+                // We have the mapping so return it
+                return versionMapping;
+            }
+            if (allowSuperclasses && supertable != null)
+            {
+                // Return what the supertable has if it has the mapping
+                return supertable.getSurrogateMapping(colType, allowSuperclasses);
+            }
         }
-        return null;
-    }
 
-    /**
-     * Accessor for the discriminator mapping specified .
-     * @param allowSuperclasses Whether we should return just the mapping from this table
-     *     or whether we should return it when this table has none and the supertable has
-     * @return The discriminator mapping.
-     */
-    public JavaTypeMapping getDiscriminatorMapping(boolean allowSuperclasses)
-    {
-        if (discriminatorMapping != null)
-        {
-            // We have the mapping so return it
-            return discriminatorMapping;
-        }
-        if (allowSuperclasses && supertable != null)
-        {
-            // Return what the supertable has if it has the mapping
-            return supertable.getDiscriminatorMapping(allowSuperclasses);
-        }
-        return null;
+        return super.getSurrogateMapping(colType, allowSuperclasses);
     }
 
     public ClassTable getTableManagingMapping(JavaTypeMapping mapping)

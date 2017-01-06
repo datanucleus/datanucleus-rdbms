@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -205,7 +206,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore identity value for input
-            JavaTypeMapping datastoreIdMapping = classTable.getDatastoreIdMapping();
+            JavaTypeMapping datastoreIdMapping = classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
                 datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
@@ -279,7 +280,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
                             StatementClassMapping.MEMBER_DATASTORE_ID);
                         for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            classTable.getDatastoreIdMapping().setObject(ec, ps,
+                            classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
                                 datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }

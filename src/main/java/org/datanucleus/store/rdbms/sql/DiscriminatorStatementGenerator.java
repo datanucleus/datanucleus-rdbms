@@ -34,6 +34,7 @@ import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 
 /**
  * Class to generate a SelectStatement for iterating through instances of a particular type (and 
@@ -214,7 +215,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             }
         }
 
-        JavaTypeMapping discMapping = candidateTable.getDiscriminatorMapping(true);
+        JavaTypeMapping discMapping = candidateTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
         if (discMapping != null)
         {
             // Allow for discriminator being in super-table of the candidate table
@@ -347,14 +348,14 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             stmt.whereAnd(discExpr, true);
         }
 
-        if (candidateTable.getMultitenancyMapping() != null)
+        JavaTypeMapping multitenancyMapping = candidateTable.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+        if (multitenancyMapping != null)
         {
             // Multi-tenancy restriction
             AbstractClassMetaData cmd = candidateTable.getClassMetaData();
-            JavaTypeMapping tenantMapping = candidateTable.getMultitenancyMapping();
-            SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), discrimSqlTbl.getGroupName());
-            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
+            SQLTable tenantSqlTbl = stmt.getTable(multitenancyMapping.getTable(), discrimSqlTbl.getGroupName());
+            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 

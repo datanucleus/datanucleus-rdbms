@@ -59,6 +59,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -751,7 +752,7 @@ public class ObjectExpression extends SQLExpression
             }
 
             DiscriminatorMetaData dismd = memberTable.getDiscriminatorMetaData();
-            DiscriminatorMapping discMapping = (DiscriminatorMapping)memberTable.getDiscriminatorMapping(false);
+            DiscriminatorMapping discMapping = (DiscriminatorMapping)memberTable.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
             if (discMapping != null)
             {
                 SQLTable targetSqlTbl = null;

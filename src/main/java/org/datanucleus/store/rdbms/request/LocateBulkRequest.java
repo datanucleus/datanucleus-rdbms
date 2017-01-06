@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -96,7 +97,7 @@ public class LocateBulkRequest extends BulkRequest
         // a). PK fields
         if (table.getIdentityType() == IdentityType.DATASTORE)
         {
-            JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
+            JavaTypeMapping datastoreIdMapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             int[] cols = sqlStatement.select(expr, null);
             StatementMappingIndex datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
@@ -126,7 +127,7 @@ public class LocateBulkRequest extends BulkRequest
             throw new NucleusUserException("Cannot locate objects using nondurable identity");
         }
 
-        JavaTypeMapping verMapping = table.getVersionMapping(false);
+        JavaTypeMapping verMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
         if (verMapping != null)
         {
             VersionMetaData currentVermd = table.getVersionMetaData();
@@ -166,12 +167,12 @@ public class LocateBulkRequest extends BulkRequest
         }
 
         // Add WHERE clause restricting to tenant (if any)
-        if (table.getMultitenancyMapping() != null)
+        JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+        if (multitenancyMapping != null)
         {
             // Add restriction on multi-tenancy
-            JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), tenantMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
+            SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
+            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -184,7 +185,7 @@ public class LocateBulkRequest extends BulkRequest
             if (table.getIdentityType() == IdentityType.DATASTORE)
             {
                 // Datastore identity value for input
-                JavaTypeMapping datastoreIdMapping = table.getDatastoreIdMapping();
+                JavaTypeMapping datastoreIdMapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
                 sqlStatement.whereOr(expr.eq(val), true);
@@ -301,7 +302,8 @@ public class LocateBulkRequest extends BulkRequest
                             StatementMappingIndex datastoreIdx = mappingDefinitions[i].getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
                             for (int j=0;j<datastoreIdx.getNumberOfParameterOccurrences();j++)
                             {
-                                table.getDatastoreIdMapping().setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(j), ops[i].getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(j), 
+                                    ops[i].getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -486,7 +488,8 @@ public class LocateBulkRequest extends BulkRequest
                 }
 
                 // Load version if present and not yet set
-                if (op.getTransactionalVersion() == null && table.getVersionMapping(false) != null)
+                JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+                if (op.getTransactionalVersion() == null && versionMapping != null)
                 {
                     VersionMetaData currentVermd = table.getVersionMetaData();
                     Object datastoreVersion = null;
@@ -495,8 +498,9 @@ public class LocateBulkRequest extends BulkRequest
                         if (currentVermd.getFieldName() == null)
                         {
                             // Surrogate version
+                            versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true); // Why use true now?
                             StatementMappingIndex verIdx = resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
-                            datastoreVersion = table.getVersionMapping(true).getObject(ec, rs, verIdx.getColumnPositions());
+                            datastoreVersion = versionMapping.getObject(ec, rs, verIdx.getColumnPositions());
                         }
                         else
                         {

@@ -68,6 +68,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -255,7 +256,7 @@ public class InsertRequest extends Request
                         if (!table.isObjectIdDatastoreAttributed() || !table.isBaseDatastoreClass())
                         {
                             int[] paramNumber = {IDPARAMNUMBER};
-                            table.getDatastoreIdMapping().setObject(ec, ps, paramNumber, op.getInternalObjectId());
+                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, paramNumber, op.getInternalObjectId());
                         }
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)
@@ -294,14 +295,15 @@ public class InsertRequest extends Request
                         op.provideFields(fieldNums, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
                     }
 
-                    if (table.getVersionMapping(false) != null)
+                    JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+                    if (versionMapping != null)
                     {
                         // Surrogate version - set the new version for the object
                         Object currentVersion = op.getVersion();
                         Object nextOptimisticVersion = VersionHelper.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
                         for (int k=0;k<versionStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
-                            table.getVersionMapping(false).setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
+                            versionMapping.setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
                         }
                         op.setTransactionalVersion(nextOptimisticVersion);
                     }
@@ -316,17 +318,18 @@ public class InsertRequest extends Request
                     // Multitenancy mapping (optional)
                     if (multitenancyStmtMapping != null)
                     {
-                        table.getMultitenancyMapping().setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
+                        table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
                             ec.getNucleusContext().getMultiTenancyId(ec, op.getClassMetaData()));
                     }
 
                     // Discriminator mapping (optional)
-                    if (table.getDiscriminatorMapping(false) != null)
+                    JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+                    if (discrimMapping != null)
                     {
                         Object discVal = op.getClassMetaData().getDiscriminatorValue();
                         for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
-                            table.getDiscriminatorMapping(false).setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k), discVal);
+                            discrimMapping.setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k), discVal);
                         }
                     }
 
@@ -847,18 +850,19 @@ public class InsertRequest extends Request
             if (mappingType == MappingConsumer.MAPPING_TYPE_VERSION)
             {
                 // Surrogate version column
-                if (table.getVersionMapping(false) != null)
+                JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+                if (versionMapping != null)
                 {
-                    String val = ((AbstractDatastoreMapping)table.getVersionMapping(false).getDatastoreMapping(0)).getUpdateInputParameter();
+                    String val = ((AbstractDatastoreMapping)versionMapping.getDatastoreMapping(0)).getUpdateInputParameter();
                     if (columnNames.length() > 0)
                     {
                         columnNames.append(',');
                         columnValues.append(',');
                     }
-                    columnNames.append(table.getVersionMapping(false).getDatastoreMapping(0).getColumn().getIdentifier());
+                    columnNames.append(versionMapping.getDatastoreMapping(0).getColumn().getIdentifier());
                     columnValues.append(val);
 
-                    versionStatementMapping = new StatementMappingIndex(table.getVersionMapping(false));
+                    versionStatementMapping = new StatementMappingIndex(versionMapping);
                     int[] param = { paramIndex++ };
                     versionStatementMapping.addParameterOccurrence(param);
                 }
@@ -870,18 +874,19 @@ public class InsertRequest extends Request
             else if (mappingType == MappingConsumer.MAPPING_TYPE_DISCRIMINATOR)
             {
                 // Surrogate discriminator column
-                if (table.getDiscriminatorMapping(false) != null)
+                JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+                if (discrimMapping != null)
                 {
-                    String val = ((AbstractDatastoreMapping)table.getDiscriminatorMapping(false).getDatastoreMapping(0)).getUpdateInputParameter();
+                    String val = ((AbstractDatastoreMapping)discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter();
 
                     if (columnNames.length() > 0)
                     {
                         columnNames.append(',');
                         columnValues.append(',');
                     }
-                    columnNames.append(table.getDiscriminatorMapping(false).getDatastoreMapping(0).getColumn().getIdentifier());
+                    columnNames.append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier());
                     columnValues.append(val);
-                    discriminatorStatementMapping = new StatementMappingIndex(table.getDiscriminatorMapping(false));
+                    discriminatorStatementMapping = new StatementMappingIndex(discrimMapping);
                     int[] param = { paramIndex++ };
                     discriminatorStatementMapping.addParameterOccurrence(param);
                 }
@@ -931,17 +936,17 @@ public class InsertRequest extends Request
             else if (mappingType == MappingConsumer.MAPPING_TYPE_MULTITENANCY)
             {
                 // Multitenancy column
-                JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-                String val = ((AbstractDatastoreMapping)tenantMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+                JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+                String val = ((AbstractDatastoreMapping)multitenancyMapping.getDatastoreMapping(0)).getUpdateInputParameter();
 
                 if (columnNames.length() > 0)
                 {
                     columnNames.append(',');
                     columnValues.append(',');
                 }
-                columnNames.append(tenantMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                columnNames.append(multitenancyMapping.getDatastoreMapping(0).getColumn().getIdentifier());
                 columnValues.append(val);
-                multitenancyStatementMapping = new StatementMappingIndex(tenantMapping);
+                multitenancyStatementMapping = new StatementMappingIndex(multitenancyMapping);
                 int[] param = { paramIndex++ };
                 multitenancyStatementMapping.addParameterOccurrence(param);
             }

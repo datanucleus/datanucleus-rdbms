@@ -32,6 +32,7 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 
 /**
  * Representation of a table in an RDBMS.
@@ -100,38 +101,24 @@ public interface Table extends org.datanucleus.store.schema.table.Table
     JavaTypeMapping getMemberMapping(AbstractMemberMetaData mmd);
 
     /**
+     * Accessor for the mapping for the specified surrogate type.
+     * @param colType Column type for the surrogate
+     * @param allowSuperclasses Whether to allow searching superclasses when not specified in this table.
+     * @return The mapping
+     */
+    JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses);
+
+    /**
      * Accessor for Discriminator MetaData.
      * @return Returns the Discriminator MetaData.
      */
     DiscriminatorMetaData getDiscriminatorMetaData();
 
     /**
-     * Accessor for the discriminator mapping specified.
-     * @param allowSuperclasses Whether we should return just the mapping from this table
-     *     or whether we should return it when this table has none and the supertable has
-     * @return The discriminator mapping
-     */
-    JavaTypeMapping getDiscriminatorMapping(boolean allowSuperclasses);
-
-    /**
-     * Accessor for the multi-tenancy mapping (if any).
-     * @return The multi-tenancy mapping
-     */
-    JavaTypeMapping getMultitenancyMapping();
-
-    /**
      * Accessor for the Version MetaData.
      * @return Returns the Version MetaData.
      */
     VersionMetaData getVersionMetaData();
-
-    /**
-     * Accessor for the version mapping.
-     * @param allowSuperclasses Whether we should return just the mapping from this table
-     *     or whether we should return it when this table has none and the supertable has
-     * @return The version mapping.
-     */
-    JavaTypeMapping getVersionMapping(boolean allowSuperclasses);
 
     /**
      * Pre-initialize method; for things that must be initialized right after construction.

@@ -289,26 +289,29 @@ public abstract class AbstractTable implements Table
         throw new UnsupportedOperationException("Not supported on this table");
     }
 
-    /**
-     * Accessor for Discriminator MetaData
-     * @return Returns the Discriminator MetaData.
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.table.Table#getSurrogateMapping(org.datanucleus.store.schema.table.SurrogateColumnType, boolean)
      */
-    public DiscriminatorMetaData getDiscriminatorMetaData()
+    @Override
+    public JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses)
     {
-        return null;
-    }
-
-    /**
-     * Accessor for the discriminator mapping specified .
-     * @return The mapping for the discriminator datastore field
-     **/
-    public JavaTypeMapping getDiscriminatorMapping(boolean allowSuperclasses)
-    {
-        return null;
-    }
-
-    public JavaTypeMapping getMultitenancyMapping()
-    {
+        if (colType == SurrogateColumnType.DISCRIMINATOR)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.MULTITENANCY)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.VERSION)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.DATASTORE_ID)
+        {
+            return null;
+        }
+        // TODO Support other types
         return null;
     }
 
@@ -322,10 +325,10 @@ public abstract class AbstractTable implements Table
     }  
 
     /**
-     * Accessor for the version mapping specified.
-     * @return The mapping for the version datastore field
-     **/
-    public JavaTypeMapping getVersionMapping(boolean allowSuperclasses)
+     * Accessor for Discriminator MetaData
+     * @return Returns the Discriminator MetaData.
+     */
+    public DiscriminatorMetaData getDiscriminatorMetaData()
     {
         return null;
     }

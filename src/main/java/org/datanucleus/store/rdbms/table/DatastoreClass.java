@@ -122,12 +122,6 @@ public interface DatastoreClass extends Table
     // --------------------------- Mapping Access ------------------------------
 
     /**
-     * Accessor for a mapping for the datastore ID for this object.
-     * @return The datastoreId mapping.
-     */
-    JavaTypeMapping getDatastoreIdMapping();
-
-    /**
      * Accessor for the mapping for the specified member name.
      * Doesn't cope with fields of the same name in different subclasses - you
      * should call the equivalent method passing FieldMetaData for those.

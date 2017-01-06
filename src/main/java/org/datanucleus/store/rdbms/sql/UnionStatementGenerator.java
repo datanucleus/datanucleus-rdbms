@@ -38,6 +38,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
@@ -286,7 +287,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         // Add any discriminator restriction in this table for the specified class
         // Caters for the case where we have more than 1 class stored in this table
         SQLExpressionFactory factory = storeMgr.getSQLExpressionFactory();
-        JavaTypeMapping discriminatorMapping = table.getDiscriminatorMapping(false);
+        JavaTypeMapping discriminatorMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
         DiscriminatorMetaData discriminatorMetaData = table.getDiscriminatorMetaData();
         if (discriminatorMapping != null && discriminatorMetaData.getStrategy() != DiscriminatorStrategy.NONE)
         {
@@ -297,14 +298,14 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             stmt.whereAnd(discExpr.eq(discValExpr), false);
         }
 
-        if (table.getMultitenancyMapping() != null)
+        JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
+        if (multitenancyMapping != null)
         {
             // Multi-tenancy restriction
             AbstractClassMetaData cmd = table.getClassMetaData();
-            JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
-            SQLTable tenantSqlTbl = stmt.getTable(tenantMapping.getTable(), tblGroupName);
-            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, tenantMapping);
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, tenantMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
+            SQLTable tenantSqlTbl = stmt.getTable(multitenancyMapping.getTable(), tblGroupName);
+            SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
+            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
@@ -423,7 +424,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         // Add any discriminator restriction in the table for the specified class
         // Caters for the case where we have more than 1 class stored in this table
         SQLExpressionFactory factory = storeMgr.getSQLExpressionFactory();
-        JavaTypeMapping discriminatorMapping = table.getDiscriminatorMapping(false);
+        JavaTypeMapping discriminatorMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
         DiscriminatorMetaData discriminatorMetaData = table.getDiscriminatorMetaData();
         if (discriminatorMapping != null && discriminatorMetaData.getStrategy() != DiscriminatorStrategy.NONE)
         {

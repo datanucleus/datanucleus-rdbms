@@ -437,29 +437,10 @@ public class ClassView extends ViewImpl implements DatastoreClass
     }
 
     /**
-     * Accessor for the datastore identity id mapping.
-     * Returns null since we dont use datastore identity for views.
-     * @return Datastore identity ID mapping
-     */
-    public JavaTypeMapping getDatastoreIdMapping()
-    {
-        return null;
-    }
-
-    /**
      * Accessor for Discriminator MetaData
      * @return Returns the Discriminator MetaData.
      */
     public final DiscriminatorMetaData getDiscriminatorMetaData()
-    {
-        return null; // No discriminators for Views
-    }
-    
-    /**
-     * Accessor for the discriminator mapping specified .
-     * @return The mapping for the discriminator datastore field
-     **/
-    public JavaTypeMapping getDiscriminatorMapping(boolean allowSuperclasses)
     {
         return null; // No discriminators for Views
     }
@@ -469,15 +450,6 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * @return Returns the Version MetaData.
      */
     public final VersionMetaData getVersionMetaData()
-    {
-        return null; // No versions for Views
-    }
-
-    /**
-     * Accessor for the version mapping specified .
-     * @return The mapping for the version datastore field
-     **/
-    public JavaTypeMapping getVersionMapping(boolean allowSuperclasses)
     {
         return null; // No versions for Views
     }

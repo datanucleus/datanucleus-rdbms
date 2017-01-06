@@ -65,6 +65,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.PersistableJoinTable;
 import org.datanucleus.store.rdbms.table.SecondaryDatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.NucleusLogger;
 
@@ -496,7 +497,7 @@ public class SQLStatementHelper
         if (candidateCmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore-identity surrogate column
-            JavaTypeMapping idMapping = candidateTbl.getDatastoreIdMapping();
+            JavaTypeMapping idMapping = candidateTbl.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             int[] colNumbers = stmt.select(stmt.getPrimaryTable(), idMapping, "DN_DATASTOREID", false);
             if (mappingDefinition != null)
             {
@@ -529,7 +530,7 @@ public class SQLStatementHelper
             }
         }
 
-        JavaTypeMapping verMapping = candidateTbl.getVersionMapping(true);
+        JavaTypeMapping verMapping = candidateTbl.getSurrogateMapping(SurrogateColumnType.VERSION, true);
         if (verMapping != null)
         {
             // Version surrogate column (adds inner join to any required superclass table)
@@ -543,7 +544,7 @@ public class SQLStatementHelper
             }
         }
 
-        JavaTypeMapping discrimMapping = candidateTbl.getDiscriminatorMapping(true);
+        JavaTypeMapping discrimMapping = candidateTbl.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
         if (discrimMapping != null)
         {
             // Discriminator surrogate column (adds inner join to any required superclass table)
@@ -644,7 +645,7 @@ public class SQLStatementHelper
         if (sourceCmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore-identity surrogate column
-            JavaTypeMapping idMapping = sourceTbl.getDatastoreIdMapping();
+            JavaTypeMapping idMapping = sourceTbl.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             int[] colNumbers = stmt.select(sourceSqlTbl, idMapping, null);
             if (mappingDefinition != null)
             {
@@ -654,7 +655,7 @@ public class SQLStatementHelper
             }
         }
 
-        JavaTypeMapping verMapping = sourceTbl.getVersionMapping(true);
+        JavaTypeMapping verMapping = sourceTbl.getSurrogateMapping(SurrogateColumnType.VERSION, true);
         if (verMapping != null)
         {
             // Version surrogate column (adds inner join to any required superclass table)
@@ -668,7 +669,7 @@ public class SQLStatementHelper
             }
         }
 
-        JavaTypeMapping discrimMapping = sourceTbl.getDiscriminatorMapping(true);
+        JavaTypeMapping discrimMapping = sourceTbl.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
         if (discrimMapping != null)
         {
             // Discriminator surrogate column (adds inner join to any required superclass table)
@@ -816,7 +817,7 @@ public class SQLStatementHelper
 
                     DatastoreClass relatedTbl = storeMgr.getDatastoreClass(clsNames[0], clr);
                     JavaTypeMapping relatedMapping = relatedTbl.getMemberMapping(relatedMmd);
-                    JavaTypeMapping relatedDiscrimMapping = relatedTbl.getDiscriminatorMapping(true);
+                    JavaTypeMapping relatedDiscrimMapping = relatedTbl.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
                     Object[] discrimValues = null;
                     JavaTypeMapping relatedTypeMapping = null;
                     AbstractClassMetaData relatedCmd = relatedMmd.getAbstractClassMetaData();

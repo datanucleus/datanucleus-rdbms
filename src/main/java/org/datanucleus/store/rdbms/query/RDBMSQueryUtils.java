@@ -53,6 +53,7 @@ import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -443,7 +444,7 @@ public class RDBMSQueryUtils extends QueryUtils
                 DatastoreClass tbl = candidateTables.get(i);
                 Class cls = candidateClasses.get(i);
                 SelectStatementGenerator stmtGen = null;
-                if (tbl.getDiscriminatorMapping(true) != null || QueryUtils.resultHasOnlyAggregates(result))
+                if (tbl.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true) != null || QueryUtils.resultHasOnlyAggregates(result))
                 {
                     // Either has a discriminator, or only selecting aggregates so need single select
                     // TODO Add option to omit discriminator restriction

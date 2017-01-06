@@ -119,6 +119,7 @@ import org.datanucleus.store.rdbms.table.ElementContainerTable;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Imports;
 import org.datanucleus.util.Localiser;
@@ -648,8 +649,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                             if (selectedCmd.getIdentityType() == IdentityType.DATASTORE)
                             {
-                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getDatastoreIdMapping(), alias);
-                                StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getDatastoreIdMapping());
+                                int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false), alias);
+                                StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false));
                                 idx.setColumnPositions(cols);
                                 map.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, idx);
                             }
@@ -1024,7 +1025,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 SQLExpression updateSqlExpr = null;
 
                 ClassTable table = (ClassTable)stmt.getPrimaryTable().getTable();
-                JavaTypeMapping verMapping = table.getVersionMapping(true);
+                JavaTypeMapping verMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true);
                 ClassTable verTable = table.getTableManagingMapping(verMapping);
                 if (verTable == stmt.getPrimaryTable().getTable())
                 {

@@ -57,6 +57,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.util.Localiser;
@@ -273,7 +274,7 @@ public class DeleteRequest extends Request
                         StatementMappingIndex mapIdx = mappingStatementIndex.getWhereDatastoreId();
                         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            table.getDatastoreIdMapping().setObject(ec, ps,
+                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
                                 mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }
@@ -293,7 +294,8 @@ public class DeleteRequest extends Request
 
                     if (multitenancyStatementMapping != null)
                     {
-                        table.getMultitenancyMapping().setObject(ec, ps, multitenancyStatementMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getMultiTenancyId(ec, cmd));
+                        table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, 
+                            multitenancyStatementMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getMultiTenancyId(ec, cmd));
                     }
 
                     if (optimisticChecks)
@@ -685,7 +687,7 @@ public class DeleteRequest extends Request
             else if (mappingType == MappingConsumer.MAPPING_TYPE_MULTITENANCY)
             {
                 // Multitenancy column
-                JavaTypeMapping tenantMapping = table.getMultitenancyMapping();
+                JavaTypeMapping tenantMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                 if (where.length() > 0)
                 {
                     where.append(" AND ");

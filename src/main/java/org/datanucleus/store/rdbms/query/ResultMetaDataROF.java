@@ -48,6 +48,7 @@ import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
@@ -167,17 +168,13 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     boolean found = false;
                     if (acmd.getIdentityType() == IdentityType.DATASTORE)
                     {
-                        Column df = dc.getDatastoreIdMapping().getDatastoreMapping(0).getColumn();
+                        JavaTypeMapping datastoreIdMapping = dc.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
+                        Column df = datastoreIdMapping.getDatastoreMapping(0).getColumn();
                         if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                         {
                             //add +1 because result sets in jdbc starts with 1
                             int datastoreIdentityExpressionIndex = j+1;
-                            //get object id if datastore identifier
-                            if (dc.getDatastoreIdMapping() != null)
-                            {
-                                id = dc.getDatastoreIdMapping().getObject(ec, rs, 
-                                    new int[] {datastoreIdentityExpressionIndex});
-                            }
+                            id = datastoreIdMapping.getObject(ec, rs, new int[] {datastoreIdentityExpressionIndex});
                             found=true;
                         }
                     }

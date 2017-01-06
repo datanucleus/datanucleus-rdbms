@@ -82,17 +82,23 @@ public abstract class AbstractClassTable extends TableImpl
     /** Mappings for members mapped to this table, keyed by the metadata for the member. */
     protected Map<AbstractMemberMetaData, JavaTypeMapping> memberMappingsMap = new LinkedHashMap<>();
 
-    /** Mapping for datastore identity (optional). */
-    protected JavaTypeMapping datastoreIDMapping;
-
     /** Mappings for application identity (optional). */
     protected JavaTypeMapping[] pkMappings;
 
-    /** Mapping for the id of the table. */
+    /** Mapping for the overall "identity" of the table. */
     protected JavaTypeMapping idMapping;
+
+    /** Mapping for any datastore identity. */
+    protected JavaTypeMapping datastoreIDMapping;
 
     /** Mapping for any version/timestamp column. */
     protected JavaTypeMapping versionMapping;
+
+    /** Mapping for any discriminator column. */
+    protected JavaTypeMapping discriminatorMapping;
+
+    /** Mapping for any multi-tenancy column. */
+    protected JavaTypeMapping multitenancyMapping;
 
     /** MetaData for versioning of objects stored in this table. */
     protected VersionMetaData versionMetaData;
@@ -100,14 +106,8 @@ public abstract class AbstractClassTable extends TableImpl
     /** MetaData for discriminator for objects stored in this table. */
     protected DiscriminatorMetaData discriminatorMetaData;
 
-    /** Mapping for any discriminator column. */
-    protected JavaTypeMapping discriminatorMapping;
-
     /** Highest absolute field/property number managed by this table */
     protected int highestMemberNumber = 0;
-
-    /** Mapping for multi-tenancy. */
-    protected JavaTypeMapping tenantMapping;
 
     /**
      * Constructor.
@@ -197,7 +197,7 @@ public abstract class AbstractClassTable extends TableImpl
         {
             return true;
         }
-        else if (mapping == tenantMapping)
+        else if (mapping == multitenancyMapping)
         {
             return true;
         }
@@ -455,17 +455,17 @@ public abstract class AbstractClassTable extends TableImpl
 
         if (typeName.equals(Integer.class.getName()))
         {
-            tenantMapping = new IntegerMapping();
+            multitenancyMapping = new IntegerMapping();
         }
         else
         {
-            tenantMapping = new StringMapping();
+            multitenancyMapping = new StringMapping();
         }
-        tenantMapping.setTable(this);
-        tenantMapping.initialize(storeMgr, typeName);
-        Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), tenantMapping, colmd);
-        storeMgr.getMappingManager().createDatastoreMapping(tenantMapping, tenantColumn, typeName);
-        logMapping("MULTITENANCY", tenantMapping);
+        multitenancyMapping.setTable(this);
+        multitenancyMapping.initialize(storeMgr, typeName);
+        Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), multitenancyMapping, colmd);
+        storeMgr.getMappingManager().createDatastoreMapping(multitenancyMapping, tenantColumn, typeName);
+        logMapping("MULTITENANCY", multitenancyMapping);
     }
 
     /**
@@ -518,7 +518,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
         else if (colType == SurrogateColumnType.MULTITENANCY)
         {
-            return tenantMapping != null ? tenantMapping.getDatastoreMapping(0).getColumn() : null;
+            return multitenancyMapping != null ? multitenancyMapping.getDatastoreMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.VERSION)
         {
@@ -528,53 +528,31 @@ public abstract class AbstractClassTable extends TableImpl
         return null;
     }
 
-    /**
-     * Accessor for a mapping for the datastore ID for this table.
-     * @return The datastoreId mapping.
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.table.Table#getSurrogateMapping(org.datanucleus.store.schema.table.SurrogateColumnType, boolean)
      */
-    public JavaTypeMapping getDatastoreIdMapping()
+    @Override
+    public JavaTypeMapping getSurrogateMapping(SurrogateColumnType colType, boolean allowSuperclasses)
     {
         assertIsInitialized();
-        return datastoreIDMapping;
-    }
-
-    /**
-     * Accessor for the version mapping specified .
-     * @param allowSuperclasses Whether we should return just the mapping from this table or whether we should return it when this table has none and the supertable has
-     * @return The version mapping.
-     */
-    public JavaTypeMapping getVersionMapping(boolean allowSuperclasses)
-    {
-        // We dont have superclasstables here so just return what we have
-        return versionMapping;
-    }
-
-    /**
-     * Accessor for the discriminator mapping specified.
-     * @return The mapping for the discriminator column
-     */
-    public JavaTypeMapping getDiscriminatorMapping(boolean allowSuperclasses)
-    {
-        return discriminatorMapping;
-    }
-
-    public JavaTypeMapping getMultitenancyMapping()
-    {
-        return tenantMapping;
-    }
-
-    /**
-     * Accessor for a mapping for the datastore ID (OID) for this table.
-     * @param consumer Consumer for the mappings
-     **/
-    final public void provideDatastoreIdMappings(MappingConsumer consumer)
-    {
-        consumer.preConsumeMapping(highestMemberNumber + 1);
-
-        if (getIdentityType() == IdentityType.DATASTORE)
+        if (colType == SurrogateColumnType.DISCRIMINATOR)
         {
-            consumer.consumeMapping(getDatastoreIdMapping(), MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+            return discriminatorMapping;
         }
+        else if (colType == SurrogateColumnType.MULTITENANCY)
+        {
+            return multitenancyMapping;
+        }
+        else if (colType == SurrogateColumnType.VERSION)
+        {
+            return versionMapping;
+        }
+        else if (colType == SurrogateColumnType.DATASTORE_ID)
+        {
+            return datastoreIDMapping;
+        }
+
+        return super.getSurrogateMapping(colType, allowSuperclasses);
     }
 
     /**
@@ -632,15 +610,30 @@ public abstract class AbstractClassTable extends TableImpl
     }
 
     /**
+     * Accessor for a mapping for the datastore ID (OID) for this table.
+     * @param consumer Consumer for the mappings
+     **/
+    final public void provideDatastoreIdMappings(MappingConsumer consumer)
+    {
+        consumer.preConsumeMapping(highestMemberNumber + 1);
+
+        if (getIdentityType() == IdentityType.DATASTORE)
+        {
+            consumer.consumeMapping(datastoreIDMapping, MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+        }
+    }
+
+    /**
      * Provide the version mappings.
      * @param consumer Consumer for the version mappings
      */
     final public void provideVersionMappings(MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
-        if (getVersionMapping(false) != null)
+        JavaTypeMapping versionMapping = getSurrogateMapping(SurrogateColumnType.VERSION, false);
+        if (versionMapping != null)
         {
-            consumer.consumeMapping(getVersionMapping(false), MappingConsumer.MAPPING_TYPE_VERSION);
+            consumer.consumeMapping(versionMapping, MappingConsumer.MAPPING_TYPE_VERSION);
         }
     }
 
@@ -651,9 +644,10 @@ public abstract class AbstractClassTable extends TableImpl
     final public void provideDiscriminatorMappings(MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
-        if (getDiscriminatorMapping(false) != null)
+        JavaTypeMapping discrimMapping = getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+        if (discrimMapping != null)
         {
-            consumer.consumeMapping(getDiscriminatorMapping(false), MappingConsumer.MAPPING_TYPE_DISCRIMINATOR);
+            consumer.consumeMapping(discrimMapping, MappingConsumer.MAPPING_TYPE_DISCRIMINATOR);
         }
     }
 
@@ -664,9 +658,9 @@ public abstract class AbstractClassTable extends TableImpl
     final public void provideMultitenancyMapping(MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
-        if (tenantMapping != null)
+        if (multitenancyMapping != null)
         {
-            consumer.consumeMapping(tenantMapping, MappingConsumer.MAPPING_TYPE_MULTITENANCY);
+            consumer.consumeMapping(multitenancyMapping, MappingConsumer.MAPPING_TYPE_MULTITENANCY);
         }
     }
 }

@@ -39,6 +39,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.NucleusLogger;
 
 /**
@@ -892,7 +893,7 @@ public abstract class SQLStatement
             joinCondition = sourceExpr.eq(targetExpr);
 
             // Process discriminator for any additional conditions
-            JavaTypeMapping discrimMapping = targetTable.getTable().getDiscriminatorMapping(false);
+            JavaTypeMapping discrimMapping = targetTable.getTable().getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
             if (discrimMapping != null && discrimValues != null)
             {
                 SQLExpression discrimExpr = factory.newExpression(this, targetTable, discrimMapping);
