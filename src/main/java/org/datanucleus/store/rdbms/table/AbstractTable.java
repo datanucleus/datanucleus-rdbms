@@ -55,6 +55,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaInfo;
 import org.datanucleus.store.schema.table.MemberColumnMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -244,37 +245,10 @@ public abstract class AbstractTable implements Table
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getDatastoreIdColumn()
+     * @see org.datanucleus.store.schema.table.Table#getSurrogateColumn(org.datanucleus.store.schema.table.SurrogateColumnType)
      */
     @Override
-    public org.datanucleus.store.schema.table.Column getDatastoreIdColumn()
-    {
-        throw new UnsupportedOperationException("Not supported on this table");
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getVersionColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getVersionColumn()
-    {
-        throw new UnsupportedOperationException("Not supported on this table");
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getDiscriminatorColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getDiscriminatorColumn()
-    {
-        throw new UnsupportedOperationException("Not supported on this table");
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getMultitenancyColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getMultitenancyColumn()
+    public Column getSurrogateColumn(SurrogateColumnType colType)
     {
         throw new UnsupportedOperationException("Not supported on this table");
     }

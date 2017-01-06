@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.AbstractGenerator;
 import org.datanucleus.util.Localiser;
@@ -500,6 +501,33 @@ public abstract class AbstractClassTable extends TableImpl
 
     // -------------------------- Mapping Accessors --------------------------------
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getSurrogateColumn(org.datanucleus.store.schema.table.SurrogateColumnType)
+     */
+    @Override
+    public Column getSurrogateColumn(SurrogateColumnType colType)
+    {
+        assertIsInitialized();
+        if (colType == SurrogateColumnType.DATASTORE_ID)
+        {
+            return datastoreIDMapping != null ? datastoreIDMapping.getDatastoreMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.DISCRIMINATOR)
+        {
+            return discriminatorMapping != null ? discriminatorMapping.getDatastoreMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.MULTITENANCY)
+        {
+            return tenantMapping != null ? tenantMapping.getDatastoreMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.VERSION)
+        {
+            return versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn() : null;
+        }
+        // TODO Support other column types
+        return null;
+    }
+
     /**
      * Accessor for a mapping for the datastore ID for this table.
      * @return The datastoreId mapping.
@@ -510,35 +538,15 @@ public abstract class AbstractClassTable extends TableImpl
         return datastoreIDMapping;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getDatastoreIdColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getDatastoreIdColumn()
-    {
-        assertIsInitialized();
-        return datastoreIDMapping != null ? datastoreIDMapping.getDatastoreMapping(0).getColumn() : null;
-    }
-
     /**
      * Accessor for the version mapping specified .
-     * @param allowSuperclasses Whether we should return just the mapping from this table
-     *     or whether we should return it when this table has none and the supertable has
+     * @param allowSuperclasses Whether we should return just the mapping from this table or whether we should return it when this table has none and the supertable has
      * @return The version mapping.
      */
     public JavaTypeMapping getVersionMapping(boolean allowSuperclasses)
     {
         // We dont have superclasstables here so just return what we have
         return versionMapping;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getVersionColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getVersionColumn()
-    {
-        return versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn() : null;
     }
 
     /**
@@ -550,27 +558,9 @@ public abstract class AbstractClassTable extends TableImpl
         return discriminatorMapping;
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getDiscriminatorColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getDiscriminatorColumn()
-    {
-        return discriminatorMapping != null ? discriminatorMapping.getDatastoreMapping(0).getColumn() : null;
-    }
-
     public JavaTypeMapping getMultitenancyMapping()
     {
         return tenantMapping;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.table.Table#getMultitenancyColumn()
-     */
-    @Override
-    public org.datanucleus.store.schema.table.Column getMultitenancyColumn()
-    {
-        return tenantMapping != null ? tenantMapping.getDatastoreMapping(0).getColumn() : null;
     }
 
     /**

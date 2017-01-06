@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.exceptions.ViewDefinitionException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.MacroString;
 import org.datanucleus.util.NucleusLogger;
@@ -225,16 +226,6 @@ public class ClassView extends ViewImpl implements DatastoreClass
      * @return Secondary tables (if any)
      */
     public Collection getSecondaryDatastoreClasses()
-    {
-        return null;
-    }
-
-    /**
-     * Accessor for the datastore identity id mapping.
-     * Returns null since we dont use datastore identity for views.
-     * @return Datastore identity ID mapping
-     */
-    public JavaTypeMapping getDatastoreIdMapping()
     {
         return null;
     }
@@ -434,7 +425,27 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
         return stmts;
     }
-    
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.table.Table#getSurrogateColumn(org.datanucleus.store.schema.table.SurrogateColumnType)
+     */
+    @Override
+    public Column getSurrogateColumn(SurrogateColumnType colType)
+    {
+        // No surrogate columns on a view
+        return null;
+    }
+
+    /**
+     * Accessor for the datastore identity id mapping.
+     * Returns null since we dont use datastore identity for views.
+     * @return Datastore identity ID mapping
+     */
+    public JavaTypeMapping getDatastoreIdMapping()
+    {
+        return null;
+    }
+
     /**
      * Accessor for Discriminator MetaData
      * @return Returns the Discriminator MetaData.
