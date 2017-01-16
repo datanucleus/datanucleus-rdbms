@@ -195,9 +195,10 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
             super(fmd.getParent(), fmd);
             this.singleCollectionMetadata = fmd;
             this.type = type;
-            // Column definitions are always at the element - when metadata is defined in the field it will be moved to
-            // the element
-            this.columnMetaData = fmd.getElementMetaData().getColumnMetaData();
+
+            // Use element definition in preference to field since it may be copied to the element in metadata processing
+            this.columnMetaData = (fmd.getElementMetaData() != null) ? fmd.getElementMetaData().getColumnMetaData() : fmd.getColumnMetaData();
+
             this.relationType = fmd.getRelationType(clr);
             this.relatedMemberMetaData = fmd.getRelatedMemberMetaData(clr);
 
