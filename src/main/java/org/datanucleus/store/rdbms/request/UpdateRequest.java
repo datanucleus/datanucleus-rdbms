@@ -296,7 +296,7 @@ public class UpdateRequest extends Request
                     {
                         Object currentVersion = op.getTransactionalVersion();
                         Object nextVersion = null;
-                        if (versionMetaData != null)
+                        if (versionMetaData != null) // TODO What if strategy is NONE?
                         {
                             // Set the next version in the object
                             if (versionMetaData.getFieldName() != null)
