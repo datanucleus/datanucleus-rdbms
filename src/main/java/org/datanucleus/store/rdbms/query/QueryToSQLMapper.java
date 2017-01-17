@@ -1048,7 +1048,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // Set version to the time of update
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());
                         SQLExpression verExpr = new NumericExpression(stmt, verSqlTbl, verMapping);
-                        Object newVersion = ec.getNextVersion(vermd.getVersionStrategy(), null);
+                        Object newVersion = ec.getNextVersion(vermd, null);
                         JavaTypeMapping valMapping = exprFactory.getMappingForType(newVersion.getClass(), false);
                         SQLExpression valExpr = new TemporalLiteral(stmt, valMapping, newVersion, null);
                         updateSqlExpr = verExpr.eq(valExpr);

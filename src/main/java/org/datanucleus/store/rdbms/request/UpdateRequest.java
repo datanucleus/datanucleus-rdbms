@@ -308,7 +308,7 @@ public class UpdateRequest extends Request
                                     // Cater for Integer-based versions
                                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
                                 }
-                                nextVersion = ec.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
+                                nextVersion = ec.getNextVersion(versionMetaData, currentVersion);
                                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                                 {
                                     // Cater for Integer-based versions TODO Generalise this
@@ -319,7 +319,7 @@ public class UpdateRequest extends Request
                             else
                             {
                                 // Surrogate version column
-                                nextVersion = ec.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
+                                nextVersion = ec.getNextVersion(versionMetaData, currentVersion);
                             }
                             op.setTransactionalVersion(nextVersion);
                         }
