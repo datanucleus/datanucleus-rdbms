@@ -44,7 +44,6 @@ import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.VersionHelper;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -309,7 +308,7 @@ public class UpdateRequest extends Request
                                     // Cater for Integer-based versions
                                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
                                 }
-                                nextVersion = VersionHelper.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
+                                nextVersion = ec.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
                                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                                 {
                                     // Cater for Integer-based versions TODO Generalise this
@@ -320,7 +319,7 @@ public class UpdateRequest extends Request
                             else
                             {
                                 // Surrogate version column
-                                nextVersion = VersionHelper.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
+                                nextVersion = ec.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
                             }
                             op.setTransactionalVersion(nextVersion);
                         }

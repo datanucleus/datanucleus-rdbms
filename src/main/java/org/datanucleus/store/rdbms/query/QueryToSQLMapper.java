@@ -60,7 +60,6 @@ import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.SubqueryExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.VersionHelper;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -1049,7 +1048,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         // Set version to the time of update
                         SQLTable verSqlTbl = stmt.getTable(verTable, stmt.getPrimaryTable().getGroupName());
                         SQLExpression verExpr = new NumericExpression(stmt, verSqlTbl, verMapping);
-                        Object newVersion = VersionHelper.getNextVersion(vermd.getVersionStrategy(), null);
+                        Object newVersion = ec.getNextVersion(vermd.getVersionStrategy(), null);
                         JavaTypeMapping valMapping = exprFactory.getMappingForType(newVersion.getClass(), false);
                         SQLExpression valExpr = new TemporalLiteral(stmt, valMapping, newVersion, null);
                         updateSqlExpr = verExpr.eq(valExpr);

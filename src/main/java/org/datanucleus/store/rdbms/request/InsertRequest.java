@@ -51,7 +51,6 @@ import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.ActivityState;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.VersionHelper;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -219,7 +218,7 @@ public class InsertRequest extends Request
                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
                 }
 
-                Object nextOptimisticVersion = VersionHelper.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
+                Object nextOptimisticVersion = ec.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                 {
                     // Cater for Integer based versions TODO Generalise this
@@ -300,7 +299,7 @@ public class InsertRequest extends Request
                     {
                         // Surrogate version - set the new version for the object
                         Object currentVersion = op.getVersion();
-                        Object nextOptimisticVersion = VersionHelper.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
+                        Object nextOptimisticVersion = ec.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
                         for (int k=0;k<versionStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
                             versionMapping.setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
@@ -311,7 +310,7 @@ public class InsertRequest extends Request
                     {
                         // Version field - set the new version for the object
                         Object currentVersion = op.getVersion();
-                        Object nextOptimisticVersion = VersionHelper.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
+                        Object nextOptimisticVersion = ec.getNextVersion(table.getVersionMetaData().getVersionStrategy(), currentVersion);
                         op.setTransactionalVersion(nextOptimisticVersion);
                     }
 
