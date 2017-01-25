@@ -66,6 +66,7 @@ public class StatementClassMapping
     public static final int MEMBER_VERSION = -2;
     public static final int MEMBER_DISCRIMINATOR = -3;
     public static final int MEMBER_MULTITENANCY = -4;
+    public static final int MEMBER_SOFTDELETE = -5;
 
     /** Name of the class. */
     String className;
@@ -188,6 +189,10 @@ public class StatementClassMapping
         if (mappings.containsKey(MEMBER_MULTITENANCY))
         {
             length--; // Ignore multitenancy
+        }
+        if (mappings.containsKey(MEMBER_SOFTDELETE))
+        {
+            length--; // Ignore softDelete
         }
 
         int[] positions = new int[length];

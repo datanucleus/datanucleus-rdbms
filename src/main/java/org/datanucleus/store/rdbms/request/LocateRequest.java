@@ -137,8 +137,8 @@ public class LocateRequest extends Request
         {
             // Add restriction on multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
-            SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
-            sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
+            SQLExpression tenantValParam = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
+            sqlStatement.whereAnd(tenantExpr.eq(tenantValParam), true);
 
             StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
             if (multitenancyIdx == null)
@@ -147,6 +147,23 @@ public class LocateRequest extends Request
                 mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_MULTITENANCY, multitenancyIdx);
             }
             multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
+        }
+
+        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+        if (softDeleteMapping != null)
+        {
+            // Add restriction on soft-delete
+            SQLExpression softDeleteExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), softDeleteMapping);
+            SQLExpression softDeleteValParam = exprFactory.newLiteralParameter(sqlStatement, softDeleteMapping, null, "SOFTDELETE");
+            sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteValParam), true);
+
+            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+            if (softDeleteIdx == null)
+            {
+                softDeleteIdx = new StatementMappingIndex(softDeleteMapping);
+                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_SOFTDELETE, softDeleteIdx);
+            }
+            softDeleteIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
 
         // Generate the unlocked and locked JDBC statements
@@ -207,11 +224,23 @@ public class LocateRequest extends Request
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
+                            // Set MultiTenancy parameter in statement
                             StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
                             String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
                             for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                            }
+                        }
+
+                        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                        if (softDeleteMapping != null)
+                        {
+                            // Set SoftDelete parameter in statement
+                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+                            for (int i=0;i<softDeleteIdx.getNumberOfParameterOccurrences();i++)
+                            {
+                                softDeleteMapping.setObject(ec, ps, softDeleteIdx.getParameterPositionsForOccurrence(i), Boolean.FALSE);
                             }
                         }
 

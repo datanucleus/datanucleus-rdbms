@@ -166,14 +166,22 @@ public class LocateBulkRequest extends BulkRequest
             }
         }
 
-        // Add WHERE clause restricting to tenant (if any)
         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
         if (multitenancyMapping != null)
         {
-            // Add restriction on multi-tenancy
+            // Add WHERE clause restricting to tenant
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
             SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
+        }
+
+        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+        if (softDeleteMapping != null)
+        {
+            // Add WHERE clause restricting to soft-delete unset
+            SQLExpression softDeleteExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), softDeleteMapping);
+            SQLExpression softDeleteVal = exprFactory.newLiteral(sqlStatement, softDeleteMapping, Boolean.FALSE);
+            sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteVal), true);
         }
 
         // Add WHERE clause restricting to the identities of the objects
