@@ -129,14 +129,14 @@ public class DeleteRequest extends Request
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            table.provideDatastoreIdMappings(consumer);
+            table.provideSurrogateMapping(SurrogateColumnType.DATASTORE_ID, consumer);
         }
         else
         {
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             table.provideMappingsForMembers(consumer, mmds, false);
         }
-        table.provideMultitenancyMapping(consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
 
         // Basic delete statement
         deleteStmt = consumer.getStatement();
@@ -154,7 +154,7 @@ public class DeleteRequest extends Request
             else
             {
                 // Surrogate version column
-                table.provideVersionMappings(consumer);
+                table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
             }
         }
 

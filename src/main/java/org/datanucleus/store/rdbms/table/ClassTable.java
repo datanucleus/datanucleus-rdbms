@@ -112,8 +112,7 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Table representing a Java class (or classes) as a first class object (FCO).
- * Uses the inheritance strategy to control whether this represents multiple classes
- * or just the one class.
+ * Uses the inheritance strategy to control whether this represents multiple classes or just the one class.
  * <h3>Mappings</h3>
  * This class adds some additional mappings over what the superclass provides. Here we add
  * <ul>
@@ -122,9 +121,8 @@ import org.datanucleus.util.StringUtils;
  * <li><b>externalFkDiscriminatorMappings</b> - mappings for any discriminator column used when sharing external foreign keys to distinguish the element owner field</li>
  * </ul>
  * <h3>Classes</h3>
- * A table can represent multiple classes. It has a nominal owner which is the class
- * that has an inheritance strategy of "new-table". All classes that utilise this table
- * have their MetaData stored in this object.
+ * A table can represent multiple classes. It has a nominal owner which is the class that has an inheritance strategy of "new-table". 
+ * All classes that utilise this table have their MetaData stored in this object.
  * <h3>Secondary Tables</h3>
  * This class represents a "primary" table. That is, the main table where objects of a class are persisted. 
  * It can have several "secondary" tables where some of the classes fields are stored at persistence.
@@ -2992,7 +2990,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         if (getIdentityType() == IdentityType.DATASTORE)
         {
-            mapping.addJavaTypeMapping(datastoreIDMapping);
+            mapping.addJavaTypeMapping(datastoreIdMapping);
         }
         else if (getIdentityType() == IdentityType.APPLICATION)
         {

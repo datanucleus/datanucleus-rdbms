@@ -398,7 +398,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         mapping.initialize(getStoreManager(), primaryTable.getClassMetaData().getFullClassName());
         if (getIdentityType() == IdentityType.DATASTORE)
         {
-            mapping.addJavaTypeMapping(datastoreIDMapping);
+            mapping.addJavaTypeMapping(datastoreIdMapping);
         }
         else if (getIdentityType() == IdentityType.APPLICATION)
         {

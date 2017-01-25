@@ -150,12 +150,12 @@ public class InsertRequest extends Request
         super(table);
 
         InsertMappingConsumer consumer = new InsertMappingConsumer(clr, cmd, IDPARAMNUMBER);
-        table.provideDatastoreIdMappings(consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.DATASTORE_ID, consumer);
         table.provideNonPrimaryKeyMappings(consumer);
         table.providePrimaryKeyMappings(consumer);
-        table.provideVersionMappings(consumer);
-        table.provideDiscriminatorMappings(consumer);
-        table.provideMultitenancyMapping(consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
@@ -948,6 +948,10 @@ public class InsertRequest extends Request
                 multitenancyStatementMapping = new StatementMappingIndex(multitenancyMapping);
                 int[] param = { paramIndex++ };
                 multitenancyStatementMapping.addParameterOccurrence(param);
+            }
+            else if (mappingType == MappingConsumer.MAPPING_TYPE_SOFTDELETE)
+            {
+                // SoftDelete column TODO Implement this
             }
         }
 

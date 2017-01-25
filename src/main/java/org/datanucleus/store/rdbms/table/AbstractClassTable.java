@@ -70,7 +70,7 @@ import org.datanucleus.util.StringUtils;
  * class. The mappings are keyed by the FieldMetaData of the field. Any embedded field
  * will have a single mapping here of type EmbeddedPCMapping, with a set of datastore
  * mappings attached.</LI>
- * <LI><B>datastoreIDMapping</B> - the Identity mapping when using "datastore identity"</LI>
+ * <LI><B>datastoreIdMapping</B> - the Identity mapping when using "datastore identity"</LI>
  * <LI><B>pkMappings</B> - the mappings for the primary key column(s).</LI>
  * <LI><B>discriminatorMapping</B> - mapping for any discriminator column. This is only
  * used where classes share this table and some of them use "superclass-table" strategy</LI>
@@ -89,7 +89,7 @@ public abstract class AbstractClassTable extends TableImpl
     protected JavaTypeMapping idMapping;
 
     /** Mapping for any datastore identity. */
-    protected JavaTypeMapping datastoreIDMapping;
+    protected JavaTypeMapping datastoreIdMapping;
 
     /** Mapping for any version/timestamp column. */
     protected JavaTypeMapping versionMapping;
@@ -99,6 +99,9 @@ public abstract class AbstractClassTable extends TableImpl
 
     /** Mapping for any multi-tenancy column. */
     protected JavaTypeMapping multitenancyMapping;
+
+    /** Mapping for any soft-delete column. */
+    protected JavaTypeMapping softDeleteMapping;
 
     /** MetaData for versioning of objects stored in this table. */
     protected VersionMetaData versionMetaData;
@@ -189,7 +192,7 @@ public abstract class AbstractClassTable extends TableImpl
         {
             return true;
         }
-        else if (mapping == datastoreIDMapping)
+        else if (mapping == datastoreIdMapping)
         {
             return true;
         }
@@ -316,9 +319,9 @@ public abstract class AbstractClassTable extends TableImpl
     void addDatastoreId(ColumnMetaData columnMetaData, DatastoreClass refTable, AbstractClassMetaData cmd)
     {
         // Create the mapping, setting its table
-        datastoreIDMapping = new DatastoreIdMapping();
-        datastoreIDMapping.setTable(this);
-        datastoreIDMapping.initialize(storeMgr, cmd.getFullClassName());
+        datastoreIdMapping = new DatastoreIdMapping();
+        datastoreIdMapping.setTable(this);
+        datastoreIdMapping.initialize(storeMgr, cmd.getFullClassName());
 
         // Create a ColumnMetaData in the container if none is defined
         ColumnMetaData colmd = null;
@@ -346,7 +349,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
 
         // Add the datastore identity column as the PK
-        Column idColumn = addColumn(DatastoreId.class.getName(), storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIDMapping, colmd);
+        Column idColumn = addColumn(DatastoreId.class.getName(), storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colmd.getName()), datastoreIdMapping, colmd);
         idColumn.setPrimaryKey();
 
         // Set the identity column type based on the IdentityStrategy
@@ -413,8 +416,8 @@ public abstract class AbstractClassTable extends TableImpl
             }
         }
 
-        storeMgr.getMappingManager().createDatastoreMapping(datastoreIDMapping, idColumn, valueGeneratedType.getName());
-        logMapping("DATASTORE_ID", datastoreIDMapping);
+        storeMgr.getMappingManager().createDatastoreMapping(datastoreIdMapping, idColumn, valueGeneratedType.getName());
+        logMapping("DATASTORE_ID", datastoreIdMapping);
 
         // Handle any auto-increment requirement
         if (isObjectIdDatastoreAttributed())
@@ -510,7 +513,7 @@ public abstract class AbstractClassTable extends TableImpl
         assertIsInitialized();
         if (colType == SurrogateColumnType.DATASTORE_ID)
         {
-            return datastoreIDMapping != null ? datastoreIDMapping.getDatastoreMapping(0).getColumn() : null;
+            return datastoreIdMapping != null ? datastoreIdMapping.getDatastoreMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.DISCRIMINATOR)
         {
@@ -523,6 +526,10 @@ public abstract class AbstractClassTable extends TableImpl
         else if (colType == SurrogateColumnType.VERSION)
         {
             return versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.SOFTDELETE)
+        {
+            return softDeleteMapping != null ? softDeleteMapping.getDatastoreMapping(0).getColumn() : null;
         }
         // TODO Support other column types
         return null;
@@ -549,7 +556,11 @@ public abstract class AbstractClassTable extends TableImpl
         }
         else if (colType == SurrogateColumnType.DATASTORE_ID)
         {
-            return datastoreIDMapping;
+            return datastoreIdMapping;
+        }
+        else if (colType == SurrogateColumnType.SOFTDELETE)
+        {
+            return softDeleteMapping;
         }
 
         return super.getSurrogateMapping(colType, allowSuperclasses);
@@ -610,57 +621,54 @@ public abstract class AbstractClassTable extends TableImpl
     }
 
     /**
-     * Accessor for a mapping for the datastore ID (OID) for this table.
+     * Accessor for a mapping for a surrogate column (if present).
+     * @param colType The type of the surrogate column
      * @param consumer Consumer for the mappings
      **/
-    final public void provideDatastoreIdMappings(MappingConsumer consumer)
+    final public void provideSurrogateMapping(SurrogateColumnType colType, MappingConsumer consumer)
     {
         consumer.preConsumeMapping(highestMemberNumber + 1);
 
-        if (getIdentityType() == IdentityType.DATASTORE)
+        if (colType == SurrogateColumnType.DATASTORE_ID)
         {
-            consumer.consumeMapping(datastoreIDMapping, MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+            if (getIdentityType() == IdentityType.DATASTORE)
+            {
+                consumer.consumeMapping(datastoreIdMapping, MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+            }
         }
-    }
-
-    /**
-     * Provide the version mappings.
-     * @param consumer Consumer for the version mappings
-     */
-    final public void provideVersionMappings(MappingConsumer consumer)
-    {
-        consumer.preConsumeMapping(highestMemberNumber + 1);
-        JavaTypeMapping versionMapping = getSurrogateMapping(SurrogateColumnType.VERSION, false);
-        if (versionMapping != null)
+        else if (colType == SurrogateColumnType.DISCRIMINATOR)
         {
-            consumer.consumeMapping(versionMapping, MappingConsumer.MAPPING_TYPE_VERSION);
+            JavaTypeMapping discrimMapping = getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+            if (discrimMapping != null)
+            {
+                consumer.consumeMapping(discrimMapping, MappingConsumer.MAPPING_TYPE_DISCRIMINATOR);
+            }
         }
-    }
-
-    /**
-     * Provide the discriminator mappings
-     * @param consumer Consumer for the mappings
-     */
-    final public void provideDiscriminatorMappings(MappingConsumer consumer)
-    {
-        consumer.preConsumeMapping(highestMemberNumber + 1);
-        JavaTypeMapping discrimMapping = getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
-        if (discrimMapping != null)
+        else if (colType == SurrogateColumnType.MULTITENANCY)
         {
-            consumer.consumeMapping(discrimMapping, MappingConsumer.MAPPING_TYPE_DISCRIMINATOR);
+            if (multitenancyMapping != null)
+            {
+                consumer.consumeMapping(multitenancyMapping, MappingConsumer.MAPPING_TYPE_MULTITENANCY);
+            }
         }
-    }
-
-    /**
-     * Provide the multitenancy mapping.
-     * @param consumer Consumer for the mapping
-     */
-    final public void provideMultitenancyMapping(MappingConsumer consumer)
-    {
-        consumer.preConsumeMapping(highestMemberNumber + 1);
-        if (multitenancyMapping != null)
+        else if (colType == SurrogateColumnType.VERSION)
         {
-            consumer.consumeMapping(multitenancyMapping, MappingConsumer.MAPPING_TYPE_MULTITENANCY);
+            JavaTypeMapping versionMapping = getSurrogateMapping(SurrogateColumnType.VERSION, false);
+            if (versionMapping != null)
+            {
+                consumer.consumeMapping(versionMapping, MappingConsumer.MAPPING_TYPE_VERSION);
+            }
+        }
+        else if (colType == SurrogateColumnType.SOFTDELETE)
+        {
+            if (softDeleteMapping != null)
+            {
+                consumer.consumeMapping(softDeleteMapping, MappingConsumer.MAPPING_TYPE_SOFTDELETE);
+            }
+        }
+        else
+        {
+            // TODO Support other types
         }
     }
 }

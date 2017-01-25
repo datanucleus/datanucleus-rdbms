@@ -49,6 +49,9 @@ public interface MappingConsumer
     /** mapping a datastore column representing a multitenancy discriminator. **/
     public static int MAPPING_TYPE_MULTITENANCY = 7;
 
+    /** mapping a datastore column representing a soft delete flag. **/
+    public static int MAPPING_TYPE_SOFTDELETE = 8;
+
     /**
      * This method is called before consuming the mappings
      * @param highestFieldNumber the highest number for the fields that are going to be provided in the consumer

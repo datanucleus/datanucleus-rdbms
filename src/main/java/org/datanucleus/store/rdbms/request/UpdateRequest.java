@@ -166,7 +166,7 @@ public class UpdateRequest extends Request
             {
                 // Surrogate version column
                 table.provideMappingsForMembers(consumer, reqFieldMetaData, false);
-                table.provideVersionMappings(consumer);
+                table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
             }
         }
         else
@@ -195,7 +195,7 @@ public class UpdateRequest extends Request
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            table.provideDatastoreIdMappings(consumer);
+            table.provideSurrogateMapping(SurrogateColumnType.DATASTORE_ID, consumer);
         }
         else
         {
@@ -218,7 +218,7 @@ public class UpdateRequest extends Request
             else
             {
                 // Surrogate version column
-                table.provideVersionMappings(consumer);
+                table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
             }
         }
         updateStmtOptimistic = consumer.getStatement();

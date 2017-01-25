@@ -24,6 +24,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 
 /**
  * Representation of a Java class in a datastore.
@@ -43,8 +44,7 @@ public interface DatastoreClass extends Table
     public IdentityType getIdentityType();
 
     /**
-     * Accessor for whether the object id will be attributed by the datastore
-     * directly, or whether values have to be supplied.
+     * Accessor for whether the object id will be attributed by the datastore directly, or whether values have to be supplied.
      * @return Whether it is attributed in the datastore
      */
     boolean isObjectIdDatastoreAttributed();
@@ -64,8 +64,7 @@ public interface DatastoreClass extends Table
     DatastoreClass getBaseDatastoreClass();
 
     /**
-     * Method to return the base DatastoreClass that persists the
-     * specified field. This navigates up through the superclass
+     * Method to return the base DatastoreClass that persists the specified field. This navigates up through the superclass
      * tables to find a table that manages the field.
      * @param fmd MetaData for the field required
      * @return The DatastoreClass managing that field
@@ -123,8 +122,7 @@ public interface DatastoreClass extends Table
 
     /**
      * Accessor for the mapping for the specified member name.
-     * Doesn't cope with fields of the same name in different subclasses - you
-     * should call the equivalent method passing FieldMetaData for those.
+     * Doesn't cope with fields of the same name in different subclasses - you should call the equivalent method passing FieldMetaData for those.
      * @param memberName Name of field/property
      * @return The Mapping for the field/property
      */
@@ -143,12 +141,6 @@ public interface DatastoreClass extends Table
      * @return The Mapping for the field (or null if not present here)
      */
     JavaTypeMapping getMemberMappingInDatastoreClass(AbstractMemberMetaData mmd);
-
-    /**
-     * Accessor for a mapping for the datastore ID (OID) for this table.
-     * @param consumer Consumer for the mappings
-     */
-    void provideDatastoreIdMappings(MappingConsumer consumer);
 
     /**
      * Provide the mappings to the consumer for all primary-key fields mapped to
@@ -172,26 +164,15 @@ public interface DatastoreClass extends Table
     void provideMappingsForMembers(MappingConsumer consumer, AbstractMemberMetaData[] mmds, boolean includeSecondaryTables);
 
     /**
-     * Provide the mappings to version mappings
-     * @param consumer Consumer for the version mappings
+     * Provide the mapping for the specified surrogate column (if present). This can be datastore id, discriminator, version, multitenancy, soft-delete, etc.
+     * @param colType Type of surrogate column
+     * @param consumer The consumer for the mapping
      */
-    void provideVersionMappings(MappingConsumer consumer);
+    void provideSurrogateMapping(SurrogateColumnType colType, MappingConsumer consumer);
 
     /**
-     * Provide the mappings to discriminator mappings
-     * @param consumer Consumer for the mappings
-     */
-    void provideDiscriminatorMappings(MappingConsumer consumer);
-
-    /**
-     * Provide the mapping for multitenancy discriminator (if any).
-     * @param consumer Consumer for the mapping
-     */
-    void provideMultitenancyMapping(MappingConsumer consumer);
-
-    /**
-     * Instruction to provide all columns without mappings.
-     * @param consumer The consumer for the columns
+     * Instruction to provide all columns without members in the class.
+     * @param consumer The consumer for the unmapped columns
      */
     void provideUnmappedColumns(MappingConsumer consumer);
 
@@ -204,8 +185,7 @@ public interface DatastoreClass extends Table
 
     /**
      * Accessor for the external mapping for the specified field of the specified type.
-     * An external mapping is a mapping for which there is no field in the actual class
-     * to represent it (part of a relation).
+     * An external mapping is a mapping for which there is no field in the actual class to represent it (part of a relation).
      * The type can be FK, FK discriminator, order, etc
      * @param mmd MetaData for the (external) field/property
      * @param mappingType The type of mapping

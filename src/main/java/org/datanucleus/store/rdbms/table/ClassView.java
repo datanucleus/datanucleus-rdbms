@@ -305,15 +305,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
         return false;
     }
 
-    public void provideDatastoreIdMappings(MappingConsumer consumer)
-    {
-    }
-
-    public void provideDiscriminatorMappings(MappingConsumer consumer)
-    {
-    }
-
-    public void provideMultitenancyMapping(MappingConsumer consumer)
+    public void provideSurrogateMapping(SurrogateColumnType colType, MappingConsumer consumer)
     {
     }
 
@@ -321,15 +313,11 @@ public class ClassView extends ViewImpl implements DatastoreClass
     {
     }
 
-    public void provideNonPrimaryKeyMappings(MappingConsumer consumer)
-    {
-    }
-
     public void providePrimaryKeyMappings(MappingConsumer consumer)
     {
     }
 
-    public void provideVersionMappings(MappingConsumer consumer)
+    public void provideNonPrimaryKeyMappings(MappingConsumer consumer)
     {
     }
 
