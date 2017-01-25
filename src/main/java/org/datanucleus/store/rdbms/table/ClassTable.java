@@ -91,6 +91,7 @@ import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
 import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.IndexMapping;
@@ -100,6 +101,7 @@ import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
+import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.mapping.java.VersionMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
@@ -342,7 +344,36 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
             }
-            addMultitenancyMapping(colmd);
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "TENANT_ID";
+            String typeName = (colmd.getJdbcType() == JdbcType.INTEGER) ? Integer.class.getName() : String.class.getName();
+
+            multitenancyMapping = (typeName.equals(Integer.class.getName())) ? new IntegerMapping() : new StringMapping();
+            multitenancyMapping.setTable(this);
+            multitenancyMapping.initialize(storeMgr, typeName);
+            Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), multitenancyMapping, colmd);
+            storeMgr.getMappingManager().createDatastoreMapping(multitenancyMapping, tenantColumn, typeName);
+            logMapping("MULTITENANCY", multitenancyMapping);
+        }
+
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE))
+        {
+            // SoftDelete flag column
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME))
+            {
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME));
+            }
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "DELETED";
+            String typeName = Boolean.class.getName(); // TODO Allow integer?
+
+            softDeleteMapping = new BooleanMapping();
+            softDeleteMapping.setTable(this);
+            softDeleteMapping.initialize(storeMgr, typeName);
+            Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), softDeleteMapping, colmd);
+            storeMgr.getMappingManager().createDatastoreMapping(softDeleteMapping, tenantColumn, typeName);
+            logMapping("SOFTDELETE", softDeleteMapping);
         }
 
         // Initialise any SecondaryTables

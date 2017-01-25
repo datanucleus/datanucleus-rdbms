@@ -36,17 +36,14 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.IdentityStrategy;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
-import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
-import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.AbstractGenerator;
@@ -434,41 +431,6 @@ public abstract class AbstractClassTable extends TableImpl
         {
             throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), "datastore-identity")).setFatal();
         }
-    }
-
-    /**
-     * Method to add a multi-tenancy discriminator column.
-     * @param colmd Metadata defining the column required
-     */
-    protected void addMultitenancyMapping(ColumnMetaData colmd)
-    {
-        String colName = "TENANT_ID";
-        if (colmd != null && colmd.getName() != null)
-        {
-            colName = colmd.getName();
-        }
-        String typeName = String.class.getName();
-        if (colmd != null && colmd.getJdbcType() != null)
-        {
-            if (colmd.getJdbcType() == JdbcType.INTEGER)
-            {
-                typeName = Integer.class.getName();
-            }
-        }
-
-        if (typeName.equals(Integer.class.getName()))
-        {
-            multitenancyMapping = new IntegerMapping();
-        }
-        else
-        {
-            multitenancyMapping = new StringMapping();
-        }
-        multitenancyMapping.setTable(this);
-        multitenancyMapping.initialize(storeMgr, typeName);
-        Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), multitenancyMapping, colmd);
-        storeMgr.getMappingManager().createDatastoreMapping(multitenancyMapping, tenantColumn, typeName);
-        logMapping("MULTITENANCY", multitenancyMapping);
     }
 
     /**

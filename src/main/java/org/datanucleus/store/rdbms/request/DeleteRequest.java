@@ -117,6 +117,8 @@ public class DeleteRequest extends Request
             versionChecks = true;
         }
 
+        // TODO Check for SoftDelete, and do UPDATE if so
+
         mappingStatementIndex = new StatementMappingDefinition(); // Populated using the subsequent lines
         DeleteMappingConsumer consumer = new DeleteMappingConsumer(clr, cmd);
         table.provideNonPrimaryKeyMappings(consumer); // to compute callbacks
