@@ -127,6 +127,9 @@ public class InsertRequest extends Request
     /** StatementExpressionIndex for multi-tenancy. **/
     private StatementMappingIndex multitenancyStmtMapping;
 
+    /** StatementExpressionIndex for soft-delete. **/
+    private StatementMappingIndex softDeleteStmtMapping;
+
     /** StatementExpressionIndex for external FKs */
     private StatementMappingIndex[] externalFKStmtMappings;
 
@@ -156,16 +159,19 @@ public class InsertRequest extends Request
         table.provideSurrogateMapping(SurrogateColumnType.VERSION, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.SOFTDELETE, consumer);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
         table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
         table.provideUnmappedColumns(consumer);
-        callbacks = (MappingCallbacks[])consumer.getMappingCallbacks().toArray(new MappingCallbacks[consumer.getMappingCallbacks().size()]);
 
+        callbacks = (MappingCallbacks[])consumer.getMappingCallbacks().toArray(new MappingCallbacks[consumer.getMappingCallbacks().size()]);
         stmtMappings = consumer.getStatementMappings();
         versionStmtMapping = consumer.getVersionStatementMapping();
         discriminatorStmtMapping = consumer.getDiscriminatorStatementMapping();
         multitenancyStmtMapping = consumer.getMultitenancyStatementMapping();
+        softDeleteStmtMapping = consumer.getSoftDeleteStatementMapping();
+
         externalFKStmtMappings = consumer.getExternalFKStatementMapping();
         externalFKDiscrimStmtMappings = consumer.getExternalFKDiscrimStatementMapping();
         externalOrderStmtMappings = consumer.getExternalOrderStatementMapping();
@@ -314,17 +320,23 @@ public class InsertRequest extends Request
                         op.setTransactionalVersion(nextOptimisticVersion);
                     }
 
-                    // Multitenancy mapping (optional)
                     if (multitenancyStmtMapping != null)
                     {
+                        // Multitenancy mapping
                         table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
                             ec.getNucleusContext().getMultiTenancyId(ec, op.getClassMetaData()));
                     }
 
-                    // Discriminator mapping (optional)
+                    if (softDeleteStmtMapping != null)
+                    {
+                        // Soft-Delete mapping
+                        table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false).setObject(ec, ps, softDeleteStmtMapping.getParameterPositionsForOccurrence(0), Boolean.FALSE);
+                    }
+
                     JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
                     if (discrimMapping != null)
                     {
+                        // Discriminator mapping
                         Object discVal = op.getClassMetaData().getDiscriminatorValue();
                         for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
@@ -647,8 +659,11 @@ public class InsertRequest extends Request
         /** StatementExpressionIndex for discriminator **/
         private StatementMappingIndex discriminatorStatementMapping;
 
-        /** StatementExpressionIndex for multitenancy. **/
+        /** StatementExpressionIndex for multi-tenancy. **/
         private StatementMappingIndex multitenancyStatementMapping;
+
+        /** StatementExpressionIndex for soft-delete. **/
+        private StatementMappingIndex softDeleteStatementMapping;
 
         private StatementMappingIndex[] externalFKStmtExprIndex;
 
@@ -951,7 +966,20 @@ public class InsertRequest extends Request
             }
             else if (mappingType == MappingConsumer.MAPPING_TYPE_SOFTDELETE)
             {
-                // SoftDelete column TODO Implement this
+                // SoftDelete column
+                JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                String val = ((AbstractDatastoreMapping)softDeleteMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+
+                if (columnNames.length() > 0)
+                {
+                    columnNames.append(',');
+                    columnValues.append(',');
+                }
+                columnNames.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                columnValues.append(val);
+                softDeleteStatementMapping = new StatementMappingIndex(softDeleteMapping);
+                int[] param = { paramIndex++ };
+                softDeleteStatementMapping.addParameterOccurrence(param);
             }
         }
 
@@ -1162,6 +1190,15 @@ public class InsertRequest extends Request
         public StatementMappingIndex getMultitenancyStatementMapping()
         {
             return multitenancyStatementMapping;
+        }
+
+        /** 
+         * Obtain the mapping for soft-delete in the statement
+         * @return the StatementMappingIndex
+         */
+        public StatementMappingIndex getSoftDeleteStatementMapping()
+        {
+            return softDeleteStatementMapping;
         }
 
         /** 
