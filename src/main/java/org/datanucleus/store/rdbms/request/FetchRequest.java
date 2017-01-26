@@ -235,6 +235,23 @@ public class FetchRequest extends Request
             multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
 
+        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+        if (softDeleteMapping != null)
+        {
+            // Add restriction on soft-delete
+            SQLExpression softDeleteExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), softDeleteMapping);
+            SQLExpression softDeleteValParam = exprFactory.newLiteralParameter(sqlStatement, softDeleteMapping, null, "SOFTDELETE");
+            sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteValParam), true);
+
+            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+            if (softDeleteIdx == null)
+            {
+                softDeleteIdx = new StatementMappingIndex(softDeleteMapping);
+                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_SOFTDELETE, softDeleteIdx);
+            }
+            softDeleteIdx.addParameterOccurrence(new int[] {inputParamNum++});
+        }
+
         // Generate convenience string for logging
         StringBuilder str = new StringBuilder();
         if (mmds != null)
@@ -350,6 +367,17 @@ public class FetchRequest extends Request
                             for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                            }
+                        }
+
+                        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                        if (softDeleteMapping != null)
+                        {
+                            // Set SoftDelete parameter in statement
+                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+                            for (int i=0;i<softDeleteIdx.getNumberOfParameterOccurrences();i++)
+                            {
+                                softDeleteMapping.setObject(ec, ps, softDeleteIdx.getParameterPositionsForOccurrence(i), Boolean.FALSE);
                             }
                         }
 
