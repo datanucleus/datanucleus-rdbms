@@ -309,6 +309,16 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
+        JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+        if (softDeleteMapping != null)
+        {
+            // Soft-delete restriction
+            SQLTable softDeleteSqlTbl = stmt.getTable(softDeleteMapping.getTable(), tblGroupName);
+            SQLExpression softDeleteExpr = stmt.getSQLExpressionFactory().newExpression(stmt, softDeleteSqlTbl, softDeleteMapping);
+            SQLExpression softDeleteVal = stmt.getSQLExpressionFactory().newLiteral(stmt, softDeleteMapping, Boolean.FALSE);
+            stmt.whereAnd(softDeleteExpr.eq(softDeleteVal), true);
+        }
+
         // Eliminate any subclasses (catered for in separate UNION statement)
         Iterator<String> subIter = storeMgr.getSubClassesForClass(className, false, clr).iterator();
         while (subIter.hasNext())

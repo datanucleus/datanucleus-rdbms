@@ -311,6 +311,10 @@ public abstract class AbstractTable implements Table
         {
             return null;
         }
+        else if (colType == SurrogateColumnType.SOFTDELETE)
+        {
+            return null;
+        }
         // TODO Support other types
         return null;
     }

@@ -1137,12 +1137,21 @@ public class JPQLQuery extends AbstractJPQLQuery
             if (multitenancyMapping != null)
             {
                 // Multi-tenancy restriction
-                SQLTable tenantSqlTbl = stmt.getPrimaryTable();
-                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
+                SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(), multitenancyMapping);
                 SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, candidateCmd));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
+
             // TODO Discriminator restriction?
+
+            JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+            if (softDeleteMapping != null)
+            {
+                // Soft-delete restriction
+                SQLExpression softDeleteExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(), softDeleteMapping);
+                SQLExpression softDeleteVal = stmt.getSQLExpressionFactory().newLiteral(stmt, softDeleteMapping, Boolean.FALSE);
+                stmt.whereAnd(softDeleteExpr.eq(softDeleteVal), true);
+            }
 
             Set<String> options = new HashSet<>();
             options.add(QueryToSQLMapper.OPTION_CASE_INSENSITIVE);
@@ -1243,6 +1252,12 @@ public class JPQLQuery extends AbstractJPQLQuery
         {
             // Generate statement for candidate
             DatastoreClass table = bulkTable.table;
+            JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+            if (softDeleteMapping != null)
+            {
+                throw new NucleusUserException("Cannot use BulkDelete queries when using SoftDelete on an affected table (" + table + ")");
+            }
+
             Map<String, Object> extensions = null;
             if (!storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.UPDATE_DELETE_STATEMENT_ALLOW_TABLE_ALIAS_IN_WHERE_CLAUSE))
             {

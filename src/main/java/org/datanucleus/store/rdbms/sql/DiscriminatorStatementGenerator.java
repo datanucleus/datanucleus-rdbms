@@ -359,6 +359,16 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             stmt.whereAnd(tenantExpr.eq(tenantVal), true);
         }
 
+        JavaTypeMapping softDeleteMapping = candidateTable.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+        if (softDeleteMapping != null)
+        {
+            // Soft-delete restriction
+            SQLTable softDeleteSqlTbl = stmt.getTable(softDeleteMapping.getTable(), discrimSqlTbl.getGroupName());
+            SQLExpression softDeleteExpr = stmt.getSQLExpressionFactory().newExpression(stmt, softDeleteSqlTbl, softDeleteMapping);
+            SQLExpression softDeleteVal = stmt.getSQLExpressionFactory().newLiteral(stmt, softDeleteMapping, Boolean.FALSE);
+            stmt.whereAnd(softDeleteExpr.eq(softDeleteVal), true);
+        }
+
         return stmt;
     }
 }
