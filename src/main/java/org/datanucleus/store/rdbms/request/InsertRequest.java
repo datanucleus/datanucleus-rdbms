@@ -55,6 +55,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -160,9 +161,9 @@ public class InsertRequest extends Request
         table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.SOFTDELETE, consumer);
-        table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-        table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
-        table.provideExternalMappings(consumer, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+        table.provideExternalMappings(consumer, MappingType.EXTERNAL_FK);
+        table.provideExternalMappings(consumer, MappingType.EXTERNAL_FK_DISCRIMINATOR);
+        table.provideExternalMappings(consumer, MappingType.EXTERNAL_INDEX);
         table.provideUnmappedColumns(consumer);
 
         callbacks = (MappingCallbacks[])consumer.getMappingCallbacks().toArray(new MappingCallbacks[consumer.getMappingCallbacks().size()]);
@@ -354,13 +355,11 @@ public class InsertRequest extends Request
                             {
                                 // Need to provide the owner field number so PCMapping can work out if it is inserted yet
                                 AbstractMemberMetaData ownerFmd = 
-                                    table.getMetaDataForExternalMapping(externalFKStmtMappings[i].getMapping(), 
-                                        MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                    table.getMetaDataForExternalMapping(externalFKStmtMappings[i].getMapping(), MappingType.EXTERNAL_FK);
                                 for (int k=0;k<externalFKStmtMappings[i].getNumberOfParameterOccurrences();k++)
                                 {
                                     externalFKStmtMappings[i].getMapping().setObject(ec, ps,
-                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), 
-                                        fkValue, null, ownerFmd.getAbsoluteFieldNumber());
+                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), fkValue, null, ownerFmd.getAbsoluteFieldNumber());
                                 }
                             }
                             else
@@ -859,9 +858,9 @@ public class InsertRequest extends Request
          * @param m The mapping.
          * @param mappingType the Mapping type
          */
-        public void consumeMapping(JavaTypeMapping m, int mappingType)
+        public void consumeMapping(JavaTypeMapping m, MappingType mappingType)
         {
-            if (mappingType == MappingConsumer.MAPPING_TYPE_VERSION)
+            if (mappingType == MappingType.VERSION)
             {
                 // Surrogate version column
                 JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
@@ -885,7 +884,7 @@ public class InsertRequest extends Request
                     versionStatementMapping = null;
                 }
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_DISCRIMINATOR)
+            else if (mappingType == MappingType.DISCRIMINATOR)
             {
                 // Surrogate discriminator column
                 JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
@@ -909,7 +908,7 @@ public class InsertRequest extends Request
                     discriminatorStatementMapping = null;
                 }
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_DATASTORE_ID)
+            else if (mappingType == MappingType.DATASTORE_ID)
             {
                 // Surrogate datastore id column
                 if (table.getIdentityType() == IdentityType.DATASTORE)
@@ -932,22 +931,22 @@ public class InsertRequest extends Request
                     }
                 }
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK)
+            else if (mappingType == MappingType.EXTERNAL_FK)
             {
                 // External FK mapping (1-N uni)
                 externalFKStmtExprIndex = processExternalMapping(m, statementMappings, externalFKStmtExprIndex);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM)
+            else if (mappingType == MappingType.EXTERNAL_FK_DISCRIMINATOR)
             {
                 // External FK discriminator mapping (1-N uni with shared FK)
                 externalFKDiscrimStmtExprIndex = processExternalMapping(m, statementMappings, externalFKDiscrimStmtExprIndex);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX)
+            else if (mappingType == MappingType.EXTERNAL_INDEX)
             {
                 // External FK order mapping (1-N uni List)
                 externalOrderStmtExprIndex = processExternalMapping(m, statementMappings, externalOrderStmtExprIndex);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_MULTITENANCY)
+            else if (mappingType == MappingType.MULTITENANCY)
             {
                 // Multitenancy column
                 JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
@@ -964,7 +963,7 @@ public class InsertRequest extends Request
                 int[] param = { paramIndex++ };
                 multitenancyStatementMapping.addParameterOccurrence(param);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_SOFTDELETE)
+            else if (mappingType == MappingType.SOFTDELETE)
             {
                 // SoftDelete column
                 JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);

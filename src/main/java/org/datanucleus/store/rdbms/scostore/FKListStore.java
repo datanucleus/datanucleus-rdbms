@@ -43,8 +43,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -221,7 +221,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             else
             {
                 // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
-                ownerMapping = elementInfo[i].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = elementInfo[i].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
                 if (ownerMapping == null)
                 {
@@ -239,7 +239,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
         if (indexedList)
         {
-            orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
             if (orderMapping == null)
             {
                 // "Indexed List" but no order mapping present!
@@ -247,7 +247,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
         }
 
-        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         if (relationDiscriminatorMapping != null)
         {
             relationDiscriminatorValue = mmd.getValueForExtension("relation-discriminator-value");
@@ -323,7 +323,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     if (elemInfo != null)
                     {
                         elemMapping = elemInfo.getDatastoreClass().getIdMapping();
-                        orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                        orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
                     }
 
                     int jdbcPosition = 1;
@@ -403,7 +403,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     ComponentInfo elemInfo = getComponentInfoForElement(element);
                     JavaTypeMapping ownerMapping = elemInfo.getOwnerMapping();
                     JavaTypeMapping elemMapping = elemInfo.getDatastoreClass().getIdMapping();
-                    JavaTypeMapping orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                    JavaTypeMapping orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
 
                     int jdbcPosition = 1;
                     if (owner == null)
@@ -917,7 +917,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         final JavaTypeMapping orderMapping;
         if (info != null)
         {
-            orderMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            orderMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
         }
         else
         {
@@ -932,7 +932,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 // Find the (element) table storing the FK back to the owner
                 if (elementTable != null)
                 {
-                    JavaTypeMapping externalFKMapping = elementTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    JavaTypeMapping externalFKMapping = elementTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
@@ -1190,8 +1190,8 @@ public class FKListStore<E> extends AbstractListStore<E>
                 table = elemInfo.getDatastoreClass();
                 ownerMapping = elemInfo.getOwnerMapping();
                 elemMapping = elemInfo.getDatastoreClass().getIdMapping();
-                orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
-                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+                orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
+                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
             }
         }
 
@@ -1341,8 +1341,8 @@ public class FKListStore<E> extends AbstractListStore<E>
             table = elemInfo.getDatastoreClass();
             elemMapping = elemInfo.getDatastoreClass().getIdMapping();
             ownerMapping = elemInfo.getOwnerMapping();
-            orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
-            relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+            orderMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_INDEX);
+            relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         }
 
         // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE

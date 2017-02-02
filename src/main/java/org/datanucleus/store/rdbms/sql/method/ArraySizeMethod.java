@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -100,7 +100,7 @@ public class ArraySizeMethod extends AbstractSQLMethod
             {
                 // ForeignKey
                 arrayTbl = storeMgr.getDatastoreClass(elementType, clr);
-                ownerMapping = ((DatastoreClass)arrayTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)arrayTbl).getExternalMapping(ownerMmd, MappingType.EXTERNAL_FK);
             }
         }
 

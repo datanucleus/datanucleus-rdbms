@@ -26,7 +26,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -136,7 +136,7 @@ public class MapGetMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             String keyFieldName = mmd.getKeyMetaData().getMappedBy();
             AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(keyFieldName);
@@ -154,7 +154,7 @@ public class MapGetMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             keyMapping = mapTbl.getIdMapping();
             String valFieldName = mmd.getValueMetaData().getMappedBy();
@@ -236,7 +236,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 }
                 else
                 {
-                    mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
                 SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTable, null, mapTblOwnerMapping, null, null);
 
@@ -261,7 +261,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 }
                 else
                 {
-                    mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
                 SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTable, null, mapTblOwnerMapping, null, null);
 

@@ -38,6 +38,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.util.Localiser;
@@ -253,9 +254,9 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Convenience accessor for the base table for this table which has the specified field.
-     * @param mmd Field MetaData for this field
-     * @return The base table which has the field specified
+     * Convenience accessor for the base table for this table which has the specified member.
+     * @param mmd MetaData for this member
+     * @return The base table which has the member specified
      */
     public DatastoreClass getBaseDatastoreClassWithMember(AbstractMemberMetaData mmd)
     {
@@ -291,7 +292,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Accessor for whether this table manages the specified class
+     * Accessor for whether this table manages the specified class.
      * @param className Name of the class
      * @return Whether it is managed by this table
      */
@@ -313,7 +314,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     /**
      * Accessor for the expected foreign keys for this table.
      * @return The expected foreign keys.
-     **/
+     */
     protected List<ForeignKey> getExpectedForeignKeys()
     {
         assertIsInitialized();
@@ -342,10 +343,9 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Accessor for the field/property Mapping.
-     * Returns the mapping if it is present in this table.
-     * @param mmd Field MetaData for this field/property
-     * @return the Mapping for the field/property
+     * Accessor for the member Mapping. Returns the mapping if it is present in this table.
+     * @param mmd MetaData for this member
+     * @return the Mapping for the member
      */
     public JavaTypeMapping getMemberMapping(AbstractMemberMetaData mmd)
     {
@@ -362,9 +362,9 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Accessor for the mapping for the specified field only in this datastore class.
-     * @param mmd Metadata of the field/property
-     * @return The Mapping for the field (or null if not present here)
+     * Accessor for the mapping for the specified member only in this datastore class.
+     * @param mmd Metadata of the member
+     * @return The Mapping for the member (or null if not present here)
      */
     public JavaTypeMapping getMemberMappingInDatastoreClass(AbstractMemberMetaData mmd)
     {
@@ -372,15 +372,15 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Accessor for the field mapping for the specified field.
-     * TODO Use of this is discouraged since the fieldName is not fully qualified
-     * and if a superclass-table inheritance is used we could have 2 fields of that name here.
-     * @param fieldName Name of the field
-     * @return The mapping for the field
+     * Accessor for the mapping for the specified member.
+     * TODO Use of this is discouraged since the memberName is not fully qualified
+     * and if a superclass-table inheritance is used we could have 2 members of that name here.
+     * @param memberName Name of the member
+     * @return The mapping for the member
      */
-    public JavaTypeMapping getMemberMapping(String fieldName)
+    public JavaTypeMapping getMemberMapping(String memberName)
     {
-        return getMemberMapping(primaryTable.getMetaDataForMember(fieldName));
+        return getMemberMapping(primaryTable.getMetaDataForMember(memberName));
     }
 
     /**
@@ -412,8 +412,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Provide the mappings to the consumer for all primary-key fields mapped to
-     * this table (for application identity).
+     * Provide the mappings to the consumer for all primary-key fields mapped to this table (for application identity).
      * @param consumer Consumer for the mappings
      */
     public void providePrimaryKeyMappings(MappingConsumer consumer)
@@ -445,7 +444,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
         }
     }
 
-    public void provideExternalMappings(MappingConsumer consumer, int mappingType)
+    public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
     }
 
@@ -457,12 +456,12 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     {
     }
 
-    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData fmd, int mappingType)
+    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData fmd, MappingType mappingType)
     {
         throw new NucleusException("N/A").setFatal();
     }
 
-    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, int mappingType)
+    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, MappingType mappingType)
     {
         throw new NucleusException("N/A").setFatal();
     }

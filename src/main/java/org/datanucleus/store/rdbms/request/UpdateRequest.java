@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.fieldmanager.OldValueParameterSetter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -654,9 +655,9 @@ public class UpdateRequest extends Request
          * @param m The mapping.
          * @param mappingType the Mapping type
          */
-        public void consumeMapping(JavaTypeMapping m, int mappingType)
+        public void consumeMapping(JavaTypeMapping m, MappingType mappingType)
         {
-            if (mappingType == MappingConsumer.MAPPING_TYPE_VERSION)
+            if (mappingType == MappingType.VERSION)
             {
                 // Surrogate version column
                 String inputParam = ((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter();
@@ -688,7 +689,7 @@ public class UpdateRequest extends Request
                     stmtMappingDefinition.setUpdateVersion(versStmtIdx);
                 }
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_DATASTORE_ID)
+            else if (mappingType == MappingType.DATASTORE_ID)
             {
                 // Surrogate datastore-id column
                 if (where.length() > 0)

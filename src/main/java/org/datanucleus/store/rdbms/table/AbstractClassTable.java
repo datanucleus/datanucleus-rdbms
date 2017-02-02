@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
@@ -595,7 +596,7 @@ public abstract class AbstractClassTable extends TableImpl
         {
             if (getIdentityType() == IdentityType.DATASTORE)
             {
-                consumer.consumeMapping(datastoreIdMapping, MappingConsumer.MAPPING_TYPE_DATASTORE_ID);
+                consumer.consumeMapping(datastoreIdMapping, MappingType.DATASTORE_ID);
             }
         }
         else if (colType == SurrogateColumnType.DISCRIMINATOR)
@@ -603,14 +604,14 @@ public abstract class AbstractClassTable extends TableImpl
             JavaTypeMapping discrimMapping = getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
             if (discrimMapping != null)
             {
-                consumer.consumeMapping(discrimMapping, MappingConsumer.MAPPING_TYPE_DISCRIMINATOR);
+                consumer.consumeMapping(discrimMapping, MappingType.DISCRIMINATOR);
             }
         }
         else if (colType == SurrogateColumnType.MULTITENANCY)
         {
             if (multitenancyMapping != null)
             {
-                consumer.consumeMapping(multitenancyMapping, MappingConsumer.MAPPING_TYPE_MULTITENANCY);
+                consumer.consumeMapping(multitenancyMapping, MappingType.MULTITENANCY);
             }
         }
         else if (colType == SurrogateColumnType.VERSION)
@@ -618,14 +619,14 @@ public abstract class AbstractClassTable extends TableImpl
             JavaTypeMapping versionMapping = getSurrogateMapping(SurrogateColumnType.VERSION, false);
             if (versionMapping != null)
             {
-                consumer.consumeMapping(versionMapping, MappingConsumer.MAPPING_TYPE_VERSION);
+                consumer.consumeMapping(versionMapping, MappingType.VERSION);
             }
         }
         else if (colType == SurrogateColumnType.SOFTDELETE)
         {
             if (softDeleteMapping != null)
             {
-                consumer.consumeMapping(softDeleteMapping, MappingConsumer.MAPPING_TYPE_SOFTDELETE);
+                consumer.consumeMapping(softDeleteMapping, MappingType.SOFTDELETE);
             }
         }
         else

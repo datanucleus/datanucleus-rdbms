@@ -22,7 +22,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -141,13 +141,13 @@ public class ListGetMethod extends AbstractSQLMethod
                 if (relatedMmds != null)
                 {
                     ownerMapping = elemTbl.getMemberMapping(relatedMmds[0]);
-                    indexMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                    indexMapping = elemTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
                     elemMapping = elemTbl.getIdMapping();
                 }
                 else
                 {
-                    ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-                    indexMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                    ownerMapping = elemTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
+                    indexMapping = elemTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
                     elemMapping = elemTbl.getIdMapping();
                 }
             }
@@ -216,12 +216,12 @@ public class ListGetMethod extends AbstractSQLMethod
         if (relatedMmds != null)
         {
             targetMapping = elementTbl.getMemberMapping(relatedMmds[0]);
-            orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            orderMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
         }
         else
         {
-            targetMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
-            orderMapping = elementTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+            targetMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
+            orderMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
         }
         SQLTable elemSqlTbl = stmt.innerJoin(listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(),
             elementTbl, null, targetMapping, null, null);

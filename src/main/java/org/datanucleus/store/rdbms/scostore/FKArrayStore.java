@@ -36,8 +36,8 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -208,7 +208,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             else
             {
                 // 1-N FK unidirectional : the element class knows nothing about the owner (but the table has external mappings)
-                ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056047", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
@@ -218,13 +218,13 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
         this.ownerMapping = elementInfo[0].getOwnerMapping(); // TODO Get rid of ownerMapping and refer to elementInfo[i].getOwnerMapping
 
-        orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+        orderMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
         if (orderMapping == null)
         {
             throw new NucleusUserException(Localiser.msg("056048", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), elementType));
         }
 
-        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         if (relationDiscriminatorMapping != null)
         {
             relationDiscriminatorValue = mmd.getValueForExtension("relation-discriminator-value");

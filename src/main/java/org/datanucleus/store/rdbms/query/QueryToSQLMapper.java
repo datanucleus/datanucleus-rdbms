@@ -63,7 +63,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
@@ -1626,7 +1626,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
 
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
@@ -1641,7 +1641,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
 
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
@@ -1713,7 +1713,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     else
                                     {
                                         // Join to related table
-                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
                                     }
 
@@ -1754,7 +1754,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
 
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
@@ -1769,7 +1769,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
 
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
@@ -1803,7 +1803,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     else
                                     {
                                         // Join to related table
-                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
                                     }
 
@@ -1909,7 +1909,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
                                 }
@@ -1924,7 +1924,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                                        mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
                                 }

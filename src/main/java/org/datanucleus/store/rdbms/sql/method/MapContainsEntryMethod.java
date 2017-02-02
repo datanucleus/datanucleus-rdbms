@@ -25,7 +25,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -256,7 +256,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
 
@@ -319,7 +319,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = keyTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
 
@@ -499,7 +499,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, mapExpr.getSQLTable(),
@@ -544,7 +544,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = keyTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
 
             AbstractMemberMetaData keyValMmd =

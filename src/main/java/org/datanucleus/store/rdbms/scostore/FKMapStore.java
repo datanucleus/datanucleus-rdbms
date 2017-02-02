@@ -40,8 +40,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -199,7 +199,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // 1-N Unidirectional : The value class knows nothing about the owner
                 ownerFieldNumber = -1;
-                ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valueTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType));
@@ -307,7 +307,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // 1-N Unidirectional : The key class knows nothing about the owner
                 ownerFieldNumber = -1;
-                ownerMapping = valueTable.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valueTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType));
@@ -526,7 +526,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             }
                             vsm.replaceFieldMakeDirty(keyFieldNumber, newKey);
 
-                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
@@ -613,7 +613,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             }
                             vsm.replaceFieldMakeDirty(valueFieldNumber, newValueObj);
 
-                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate

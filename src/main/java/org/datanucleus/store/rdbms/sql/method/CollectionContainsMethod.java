@@ -27,7 +27,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -390,7 +390,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = elemTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
 
             SQLTable elemSqlTbl = stmt.join(joinType, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping(), elemTbl, elemAlias, ownerMapping, null, null);
@@ -556,7 +556,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = elemTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = elemTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             SQLExpression ownerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
             SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, collExpr.getSQLTable(), collExpr.getSQLTable().getTable().getIdMapping());

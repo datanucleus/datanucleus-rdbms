@@ -90,6 +90,7 @@ import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
 import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
@@ -3084,17 +3085,17 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param mappingType Type of mapping
      * @return The (external) mapping
      */
-    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, int mappingType)
+    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, MappingType mappingType)
     {
-        if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK)
+        if (mappingType == MappingType.EXTERNAL_FK)
         {
             return getExternalFkMappings().get(mmd);
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM)
+        else if (mappingType == MappingType.EXTERNAL_FK_DISCRIMINATOR)
         {
             return getExternalFkDiscriminatorMappings().get(mmd);
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX)
+        else if (mappingType == MappingType.EXTERNAL_INDEX)
         {
             return getExternalOrderMappings().get(mmd);
         }
@@ -3110,9 +3111,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param mappingType The mapping type
      * @return metadata for the external mapping
      */
-    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, int mappingType)
+    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, MappingType mappingType)
     {
-        if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK)
+        if (mappingType == MappingType.EXTERNAL_FK)
         {
             Set entries = getExternalFkMappings().entrySet();
             Iterator iter = entries.iterator();
@@ -3125,7 +3126,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
             }
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM)
+        else if (mappingType == MappingType.EXTERNAL_FK_DISCRIMINATOR)
         {
             Set entries = getExternalFkDiscriminatorMappings().entrySet();
             Iterator iter = entries.iterator();
@@ -3138,7 +3139,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
             }
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX)
+        else if (mappingType == MappingType.EXTERNAL_INDEX)
         {
             Set entries = getExternalOrderMappings().entrySet();
             Iterator iter = entries.iterator();
@@ -3484,9 +3485,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param consumer Consumer for the mappings
      * @param mappingType Type of external mapping
      */
-    final public void provideExternalMappings(MappingConsumer consumer, int mappingType)
+    final public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
-        if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK && externalFkMappings != null)
+        if (mappingType == MappingType.EXTERNAL_FK && externalFkMappings != null)
         {
             consumer.preConsumeMapping(highestMemberNumber + 1);
 
@@ -3497,11 +3498,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 JavaTypeMapping fieldMapping = externalFkMappings.get(fmd);
                 if (fieldMapping != null)
                 {
-                    consumer.consumeMapping(fieldMapping, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    consumer.consumeMapping(fieldMapping, MappingType.EXTERNAL_FK);
                 }
             }
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM && externalFkDiscriminatorMappings != null)
+        else if (mappingType == MappingType.EXTERNAL_FK_DISCRIMINATOR && externalFkDiscriminatorMappings != null)
         {
             consumer.preConsumeMapping(highestMemberNumber + 1);
 
@@ -3512,11 +3513,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 JavaTypeMapping fieldMapping = externalFkDiscriminatorMappings.get(fmd);
                 if (fieldMapping != null)
                 {
-                    consumer.consumeMapping(fieldMapping, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+                    consumer.consumeMapping(fieldMapping, MappingType.EXTERNAL_FK_DISCRIMINATOR);
                 }
             }
         }
-        else if (mappingType == MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX && externalOrderMappings != null)
+        else if (mappingType == MappingType.EXTERNAL_INDEX && externalOrderMappings != null)
         {
             consumer.preConsumeMapping(highestMemberNumber + 1);
 
@@ -3527,7 +3528,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 JavaTypeMapping fieldMapping = externalOrderMappings.get(fmd);
                 if (fieldMapping != null)
                 {
-                    consumer.consumeMapping(fieldMapping, MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                    consumer.consumeMapping(fieldMapping, MappingType.EXTERNAL_INDEX);
                 }
             }
         }

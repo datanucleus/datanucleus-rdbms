@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 
@@ -181,24 +182,23 @@ public interface DatastoreClass extends Table
      * @param consumer The consumer for the mappings
      * @param mappingType Type of external mapping to provide
      */
-    void provideExternalMappings(MappingConsumer consumer, int mappingType);
+    void provideExternalMappings(MappingConsumer consumer, MappingType mappingType);
 
     /**
-     * Accessor for the external mapping for the specified field of the specified type.
+     * Accessor for the external mapping for the specified member of the specified mapping type.
      * An external mapping is a mapping for which there is no field in the actual class to represent it (part of a relation).
      * The type can be FK, FK discriminator, order, etc
      * @param mmd MetaData for the (external) field/property
      * @param mappingType The type of mapping
      * @return The external mapping
      */
-    JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, int mappingType);
+    JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, MappingType mappingType);
 
     /**
-     * Accessor for the owner field metadata for the specified external mapping of the
-     * specified type
+     * Accessor for the owner field metadata for the specified external mapping of the specified type
      * @param mapping The external mapping
      * @param mappingType The type of mapping
      * @return Field MetaData in the owner class
      */
-    AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, int mappingType);
+    AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, MappingType mappingType);
 }

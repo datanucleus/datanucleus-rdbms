@@ -28,30 +28,6 @@ import org.datanucleus.store.rdbms.table.Column;
  */
 public interface MappingConsumer
 {
-    /** mapping a field representing the version of a PC **/
-    public static int MAPPING_TYPE_VERSION = 1;
-
-    /** mapping a field representing the id of a PC **/
-    public static int MAPPING_TYPE_DATASTORE_ID = 2;
-
-    /** mapping a field representing the discriminator of a PC **/
-    public static int MAPPING_TYPE_DISCRIMINATOR = 3;
-
-    /** mapping a datastore column that is an index for an external list. */
-    public static int MAPPING_TYPE_EXTERNAL_INDEX = 4;
-
-    /** mapping a datastore column that is a FK for an external collection. */
-    public static int MAPPING_TYPE_EXTERNAL_FK = 5;
-
-    /** mapping a datastore column that is the discriminator for a FK for an external collection. */
-    public static int MAPPING_TYPE_EXTERNAL_FK_DISCRIM = 6;
-
-    /** mapping a datastore column representing a multitenancy discriminator. **/
-    public static int MAPPING_TYPE_MULTITENANCY = 7;
-
-    /** mapping a datastore column representing a soft delete flag. **/
-    public static int MAPPING_TYPE_SOFTDELETE = 8;
-
     /**
      * This method is called before consuming the mappings
      * @param highestFieldNumber the highest number for the fields that are going to be provided in the consumer
@@ -59,18 +35,18 @@ public interface MappingConsumer
     void preConsumeMapping(int highestFieldNumber);
 
     /**
-     * Consumes a mapping associated to a field
+     * Consumes a mapping associated to a member
      * @param m The Java type mapping
-     * @param fmd Field MetaData for the field
+     * @param mmd MetaData for the member
      */
-    void consumeMapping(JavaTypeMapping m, AbstractMemberMetaData fmd);
+    void consumeMapping(JavaTypeMapping m, AbstractMemberMetaData mmd);
 
     /**
-     * Consumes a mapping not associated to a field
+     * Consumes a mapping not associated to a member
      * @param m Java type mapping
      * @param mappingType the Mapping type
      */
-    void consumeMapping(JavaTypeMapping m, int mappingType);
+    void consumeMapping(JavaTypeMapping m, MappingType mappingType);
 
     /**
      * Consume a column without mapping.

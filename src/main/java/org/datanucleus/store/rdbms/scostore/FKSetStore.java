@@ -40,8 +40,8 @@ import org.datanucleus.state.RelationshipManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -215,7 +215,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             else
             {
                 // 1-N FK unidirectional : The element class knows nothing about the owner (but its table has external mappings)
-                ownerMapping = elementInfo[i].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = elementInfo[i].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 // TODO Allow for the situation where the user specified "table" in the elementMetaData to put the FK in a supertable. This only checks against default element table
                 if (ownerMapping == null)
                 {
@@ -227,7 +227,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         this.ownerMapping = elementInfo[0].getOwnerMapping(); // TODO Get rid of ownerMapping and refer to elementInfo[i].getOwnerMapping
 
         // TODO Put this on ComponentInfo
-        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        relationDiscriminatorMapping = elementInfo[0].getDatastoreClass().getExternalMapping(mmd, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         if (relationDiscriminatorMapping != null)
         {
             relationDiscriminatorValue = mmd.getValueForExtension("relation-discriminator-value");
@@ -448,7 +448,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             {
                 if (elementTbl != null)
                 {
-                    JavaTypeMapping externalFKMapping = elementTbl.getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                    JavaTypeMapping externalFKMapping = elementTbl.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
@@ -983,7 +983,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             stmt.append("=NULL");
         }
 
-        JavaTypeMapping relDiscrimMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+        JavaTypeMapping relDiscrimMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         if (relDiscrimMapping != null)
         {
             for (int i=0; i<relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
@@ -1046,7 +1046,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 table = elemInfo.getDatastoreClass();
                 ownerMapping = elemInfo.getOwnerMapping();
                 elemMapping = elemInfo.getDatastoreClass().getIdMapping();
-                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK_DISCRIM);
+                relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
             }
         }
 

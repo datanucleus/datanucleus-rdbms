@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -79,8 +79,7 @@ public class IndexFunction extends AbstractSQLMethod
             {
                 // 1-N via FK
                 orderTable = elemSqlExpr.getSQLTable();
-                orderMapping = ((ClassTable)elemSqlExpr.getSQLTable().getTable()).getExternalMapping(mmd, 
-                    MappingConsumer.MAPPING_TYPE_EXTERNAL_INDEX);
+                orderMapping = ((ClassTable)elemSqlExpr.getSQLTable().getTable()).getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
             }
 
             return new NumericExpression(stmt, orderTable, orderMapping);

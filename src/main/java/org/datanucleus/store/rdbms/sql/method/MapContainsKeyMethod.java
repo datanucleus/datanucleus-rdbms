@@ -26,7 +26,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -302,7 +302,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
 
             SQLTable valSqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
@@ -352,7 +352,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = keyTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             SQLTable keySqlTbl = stmt.join(joinType, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, keyAlias, ownerMapping, null, null);
 
@@ -493,7 +493,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = valTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = valTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
             AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
             if (keyCmd == null)
@@ -562,7 +562,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = keyTbl.getExternalMapping(mmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = keyTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
 
             subStmt = new SelectStatement(stmt, storeMgr, keyTbl, null, null);

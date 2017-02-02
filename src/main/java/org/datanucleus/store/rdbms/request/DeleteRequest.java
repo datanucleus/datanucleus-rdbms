@@ -49,6 +49,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
@@ -77,6 +78,9 @@ public class DeleteRequest extends Request
 
     /** Statement for deleting the object from the datastore (optimistic txns). */
     private final String deleteStmtOptimistic;
+
+    /** Statement for soft-deleting the object from the datastore. */
+    private final String softDeleteStmt;
 
     /** the index for the expression(s) in the delete statement. */
     private StatementMappingDefinition mappingStatementIndex;
@@ -116,8 +120,6 @@ public class DeleteRequest extends Request
             // Only apply a version check if we have a strategy defined
             versionChecks = true;
         }
-
-        // TODO Check for SoftDelete, and do UPDATE if so
 
         mappingStatementIndex = new StatementMappingDefinition(); // Populated using the subsequent lines
         DeleteMappingConsumer consumer = new DeleteMappingConsumer(clr, cmd);
@@ -163,6 +165,9 @@ public class DeleteRequest extends Request
         // Optimistic delete statement
         deleteStmtOptimistic = consumer.getStatement();
 
+        // Soft-delete statement for this delete
+        softDeleteStmt = (table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE) != null) ? consumer.getSoftDeleteStatement() : null;
+
         whereFieldNumbers = consumer.getWhereFieldNumbers();
         callbacks = (MappingCallbacks[])consumer.getMappingCallBacks().toArray(new MappingCallbacks[consumer.getMappingCallBacks().size()]);
         oneToOneNonOwnerFields = consumer.getOneToOneNonOwnerFields();
@@ -185,26 +190,23 @@ public class DeleteRequest extends Request
         // a). Delete any dependent objects
         // b). Null any non-dependent objects with FK at other side
         ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        HashSet relatedObjectsToDelete = null;
+        Set relatedObjectsToDelete = null;
         for (int i = 0; i < callbacks.length; ++i)
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", op.getObjectAsPrintable(),
-                    ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
             }
             callbacks[i].preDelete(op);
 
-            // Check for any dependent related 1-1 objects where we hold the FK and where the object hasn't
-            // been deleted. This can happen if this DeleteRequest was triggered by delete-orphans
-            // and so the related object has to be deleted *after* this object
-            // It's likely we could do this better by using AttachFieldManager and just marking 
-            // the "orphan" (i.e this object) as deleted (see AttachFieldManager TODO regarding when not copying)
+            // Check for any dependent related 1-1 objects where we hold the FK and where the object hasn't been deleted. 
+            // This can happen if this DeleteRequest was triggered by delete-orphans and so the related object has to be deleted *after* this object.
+            // It's likely we could do this better by using AttachFieldManager and just marking the "orphan" (i.e this object) as deleted 
+            // (see AttachFieldManager TODO regarding when not copying)
             JavaTypeMapping mapping = (JavaTypeMapping) callbacks[i];
             AbstractMemberMetaData mmd = mapping.getMemberMetaData();
             RelationType relationType = mmd.getRelationType(clr);
-            if (mmd.isDependent() && (relationType == RelationType.ONE_TO_ONE_UNI ||
-                (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)))
+            if (mmd.isDependent() && (relationType == RelationType.ONE_TO_ONE_UNI || (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)))
             {
                 try
                 {
@@ -241,14 +243,22 @@ public class DeleteRequest extends Request
         String stmt = null;
         ExecutionContext ec = op.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        boolean optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
-        if (optimisticChecks)
+        boolean optimisticChecks = false;
+        if (table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE) != null)
         {
-            stmt = deleteStmtOptimistic;
+            stmt = softDeleteStmt;
         }
         else
         {
-            stmt = deleteStmt;
+            optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
+            if (optimisticChecks)
+            {
+                stmt = deleteStmtOptimistic;
+            }
+            else
+            {
+                stmt = deleteStmt;
+            }
         }
 
         // Process the delete of this object
@@ -267,6 +277,7 @@ public class DeleteRequest extends Request
                     // or if using nontransactional writes (since we want it sending to the datastore now)
                     batch = false;
                 }
+
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, batch);
                 try
                 {
@@ -276,8 +287,7 @@ public class DeleteRequest extends Request
                         StatementMappingIndex mapIdx = mappingStatementIndex.getWhereDatastoreId();
                         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
-                                mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }
                     else
@@ -323,8 +333,7 @@ public class DeleteRequest extends Request
                     if (optimisticChecks && rcs[0] == 0)
                     {
                         // No object deleted so either object disappeared or failed optimistic version checks
-                        String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), 
-                            "" + op.getTransactionalVersion());
+                        String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + op.getTransactionalVersion());
                         NucleusLogger.DATASTORE.error(msg);
                         throw new NucleusOptimisticException(msg, op.getObject());
                     }
@@ -654,9 +663,9 @@ public class DeleteRequest extends Request
          * @param m The mapping
          * @param mappingType the Mapping type
          */
-        public void consumeMapping(JavaTypeMapping m, int mappingType)
+        public void consumeMapping(JavaTypeMapping m, MappingType mappingType)
         {
-            if (mappingType == MappingConsumer.MAPPING_TYPE_DATASTORE_ID)
+            if (mappingType == MappingType.DATASTORE_ID)
             {
                 if (where.length() > 0)
                 {
@@ -671,7 +680,7 @@ public class DeleteRequest extends Request
                 int[] param = { paramIndex++ };
                 datastoreMappingIdx.addParameterOccurrence(param);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_VERSION)
+            else if (mappingType == MappingType.VERSION)
             {
                 if (where.length() > 0)
                 {
@@ -686,7 +695,7 @@ public class DeleteRequest extends Request
                 int[] param = { paramIndex++ };
                 versStmtIdx.addParameterOccurrence(param);
             }
-            else if (mappingType == MappingConsumer.MAPPING_TYPE_MULTITENANCY)
+            else if (mappingType == MappingType.MULTITENANCY)
             {
                 // Multitenancy column
                 JavaTypeMapping tenantMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
@@ -757,6 +766,12 @@ public class DeleteRequest extends Request
         public String getStatement()
         {
             return "DELETE FROM " + table.toString() + " WHERE " + where;
+        }
+
+        public String getSoftDeleteStatement()
+        {
+            org.datanucleus.store.schema.table.Column softDeleteCol = table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE);
+            return "UPDATE " + table.toString() + " SET " + softDeleteCol.getName() + "=TRUE WHERE " + where;
         }
     }
 }

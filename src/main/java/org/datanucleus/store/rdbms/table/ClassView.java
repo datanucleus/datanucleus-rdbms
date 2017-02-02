@@ -46,6 +46,7 @@ import org.datanucleus.store.rdbms.exceptions.PersistentSuperclassNotAllowedExce
 import org.datanucleus.store.rdbms.exceptions.ViewDefinitionException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
@@ -321,7 +322,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
     {
     }
 
-    public void provideExternalMappings(MappingConsumer consumer, int mappingType)
+    public void provideExternalMappings(MappingConsumer consumer, MappingType mappingType)
     {
     }
 
@@ -442,13 +443,13 @@ public class ClassView extends ViewImpl implements DatastoreClass
         return null; // No versions for Views
     }
 
-    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, int mappingType)
+    public JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, MappingType mappingType)
     {
         // We do not support "external mappings" with a view. The mapping must be present in the view definition
         return null;
     }
 
-    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, int mappingType)
+    public AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, MappingType mappingType)
     {
         // We do not support "external mappings" with a view. The mapping must be present in the view definition
         return null;

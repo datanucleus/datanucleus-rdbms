@@ -24,7 +24,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -89,7 +89,7 @@ public class MapSizeMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingType.EXTERNAL_FK);
             }
         }
         else if (ownerMmd.getMap().getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
@@ -103,7 +103,7 @@ public class MapSizeMethod extends AbstractSQLMethod
             }
             else
             {
-                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)mapTbl).getExternalMapping(ownerMmd, MappingType.EXTERNAL_FK);
             }
         }
         else

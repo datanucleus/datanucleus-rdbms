@@ -24,7 +24,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.store.rdbms.mapping.MappingConsumer;
+import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -117,8 +117,7 @@ public class CollectionSizeMethod extends AbstractSQLMethod
             {
                 // ForeignKey
                 collectionTbl = storeMgr.getDatastoreClass(elementType, clr);
-                ownerMapping = ((DatastoreClass)collectionTbl).getExternalMapping(mmd, 
-                    MappingConsumer.MAPPING_TYPE_EXTERNAL_FK);
+                ownerMapping = ((DatastoreClass)collectionTbl).getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
         }
 
