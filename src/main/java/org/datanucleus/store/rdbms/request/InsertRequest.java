@@ -228,8 +228,8 @@ public class InsertRequest extends Request
                 Object nextOptimisticVersion = ec.getNextVersion(vermd, currentVersion);
                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                 {
-                    // Cater for Integer based versions TODO Generalise this
-                    nextOptimisticVersion = Integer.valueOf(((Long)nextOptimisticVersion).intValue());
+                    // Cater for Integer based versions
+                    nextOptimisticVersion = Integer.valueOf(((Number)nextOptimisticVersion).intValue());
                 }
                 op.replaceField(verfmd.getAbsoluteFieldNumber(), nextOptimisticVersion);
             }
