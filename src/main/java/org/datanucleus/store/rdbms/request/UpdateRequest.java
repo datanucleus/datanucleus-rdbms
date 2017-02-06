@@ -311,8 +311,8 @@ public class UpdateRequest extends Request
                                 nextVersion = VersionHelper.getNextVersion(versionMetaData.getVersionStrategy(), currentVersion);
                                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                                 {
-                                    // Cater for Integer-based versions TODO Generalise this
-                                    nextVersion = Integer.valueOf(((Long)nextVersion).intValue());
+                                    // Cater for Integer-based versions
+                                    nextVersion = Integer.valueOf(((Number)nextVersion).intValue());
                                 }
                                 op.replaceField(verfmd.getAbsoluteFieldNumber(), nextVersion);
                             }
