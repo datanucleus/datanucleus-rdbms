@@ -2217,6 +2217,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
         {
             // User has specified a SequenceGenerator (JDO/JPA)
+            if (seqmd.getSchemaName() != null)
+            {
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA, seqmd.getSchemaName());
+            }
+            if (seqmd.getCatalogName() != null)
+            {
+                properties.put(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG, seqmd.getCatalogName());
+            }
+
             if (StringUtils.isWhitespace(sequence))
             {
                 // Apply default to sequence name, as name of sequence metadata
