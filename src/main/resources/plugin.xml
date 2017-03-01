@@ -24,7 +24,6 @@ Contributors:
 **********************************************************************-->
 <plugin id="org.datanucleus.store.rdbms" provider-name="DataNucleus">
     <extension-point id="datastoreadapter" name="Datastore Adapter" schema="schema/datastoreadapter.exsd"/>
-    <extension-point id="connectionprovider" name="Connection Provider" schema="schema/connectionprovider.exsd"/>
     <extension-point id="connectionpool" name="ConnectionPool" schema="schema/connectionpool.exsd"/>
     <extension-point id="sql_expression" name="SQL Expressions" schema="schema/sql_expression.exsd"/>
     <extension-point id="sql_method" name="SQL Methods" schema="schema/sql_method.exsd"/>
@@ -56,11 +55,6 @@ Contributors:
     <extension point="org.datanucleus.store_connectionfactory">
         <connectionfactory name="rdbms/tx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="true" datastore="rdbms"/>
         <connectionfactory name="rdbms/nontx" class-name="org.datanucleus.store.rdbms.ConnectionFactoryImpl" transactional="false" datastore="rdbms"/>
-    </extension>
-
-    <!-- CONNECTION PROVIDER -->
-    <extension point="org.datanucleus.store.rdbms.connectionprovider">
-        <connection-provider class-name="org.datanucleus.store.rdbms.ConnectionProviderPriorityList" name="PriorityList"/>
     </extension>
 
     <!-- CONNECTIONPOOL -->

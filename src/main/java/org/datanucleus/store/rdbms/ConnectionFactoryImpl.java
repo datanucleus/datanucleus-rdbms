@@ -57,14 +57,17 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * ConnectionFactory for RDBMS datastores.
- * Each instance is a factory of transactional or non-transactional connections.
+ * Each instance is a factory of transactional or non-transactional connections, obtained through a javax.sql.DataSource.
  */
 public class ConnectionFactoryImpl extends AbstractConnectionFactory
 {
-    /** Datasources from which to get the connections. Will have a single DataSource unless using a priority list of DataSources. */
-    DataSource[] dataSources;
+    /** DataSource from which to get the connections. */
+    DataSource dataSource;
 
-    /** Optional locally-managed pool of connections from which we get our connections (when using URL). */
+    /**
+     * Optional locally-managed pool of connections from which we get our connections (when using URL), that backs the dataSource. 
+     * This is stored so that we can close the pool upon close.
+     */
     ConnectionPool pool = null;
 
     /**
@@ -78,7 +81,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         if (resourceName.equals(RESOURCE_NAME_TX))
         {
             // Primary DataSource to be present always
-            initialiseDataSources();
+            initialiseDataSource();
         }
     }
 
@@ -101,10 +104,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
     }
 
     /**
-     * Method to initialise the DataSource(s) used by this ConnectionFactory.
+     * Method to initialise the DataSource used by this ConnectionFactory.
      * Only invoked when the request for the first connection comes in.
      */
-    protected synchronized void initialiseDataSources()
+    protected synchronized void initialiseDataSource()
     {
         if (getResourceName().equals(RESOURCE_NAME_TX))
         {
@@ -113,8 +116,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             Object connDS = storeMgr.getConnectionFactory();
             String connJNDI = storeMgr.getConnectionFactoryName();
             String connURL = storeMgr.getConnectionURL();
-            dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
-            if (dataSources == null)
+            dataSource = generateDataSource(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
+            if (dataSource == null)
             {
                 throw new NucleusUserException(Localiser.msg("047009", "transactional")).setFatal();
             }
@@ -130,15 +133,15 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             Object connDS = storeMgr.getConnectionFactory2();
             String connJNDI = storeMgr.getConnectionFactory2Name();
             String connURL = storeMgr.getConnectionURL();
-            dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
-            if (dataSources == null)
+            dataSource = generateDataSource(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
+            if (dataSource == null)
             {
                 // Fallback to transactional settings
                 connDS = storeMgr.getConnectionFactory();
                 connJNDI = storeMgr.getConnectionFactoryName();
-                dataSources = generateDataSources(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
+                dataSource = generateDataSource(storeMgr, connDS, connJNDI, getResourceName(), requiredPoolingType, connURL);
             }
-            if (dataSources == null)
+            if (dataSource == null)
             {
                 throw new NucleusUserException(Localiser.msg("047009", "non-transactional")).setFatal();
             }
@@ -146,53 +149,46 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
     }
 
     /**
-     * Method to generate the datasource(s) used by this connection factory.
-     * Searches initially for a provided DataSource then, if not found, for JNDI DataSource(s), and finally for the DataSource at a connection URL.
+     * Method to generate the datasource used by this connection factory.
+     * Searches initially for a provided DataSource then, if not found, for JNDI DataSource, and finally for the DataSource at a connection URL.
      * @param storeMgr Store Manager
      * @param connDS Factory data source object
      * @param connJNDI DataSource JNDI name(s)
      * @param resourceType Type of resource
      * @param requiredPoolingType Type of connection pool
      * @param connURL URL for connections
-     * @return The DataSource(s)
+     * @return The DataSource
      */
-    private DataSource[] generateDataSources(StoreManager storeMgr, Object connDS, String connJNDI, String resourceType, String requiredPoolingType, String connURL)
+    private DataSource generateDataSource(StoreManager storeMgr, Object connDS, String connJNDI, String resourceType, String requiredPoolingType, String connURL)
     {
-        DataSource[] dataSources = null;
+        DataSource dataSource = null;
         if (connDS != null)
         {
             if (!(connDS instanceof DataSource) && !(connDS instanceof XADataSource))
             {
                 throw new UnsupportedConnectionFactoryException(connDS);
             }
-            dataSources = new DataSource[1];
-            dataSources[0] = (DataSource) connDS;
+            dataSource = (DataSource) connDS;
         }
         else if (connJNDI != null)
         {
-            String[] connectionFactoryNames = StringUtils.split(connJNDI, ",");
-            dataSources = new DataSource[connectionFactoryNames.length];
-            for (int i=0; i<connectionFactoryNames.length; i++)
+            String connectionFactoryName = connJNDI.trim();
+            try
             {
-                Object obj;
-                try
-                {
-                    obj = new InitialContext().lookup(connectionFactoryNames[i]);
-                }
-                catch (NamingException e)
-                {
-                    throw new ConnectionFactoryNotFoundException(connectionFactoryNames[i], e);
-                }
+                Object obj = new InitialContext().lookup(connectionFactoryName);
                 if (!(obj instanceof DataSource) && !(obj instanceof XADataSource))
                 {
                     throw new UnsupportedConnectionFactoryException(obj);
                 }
-                dataSources[i] = (DataSource) obj;
+                dataSource = (DataSource) obj;
+            }
+            catch (NamingException e)
+            {
+                throw new ConnectionFactoryNotFoundException(connectionFactoryName, e);
             }
         }
         else if (connURL != null)
         {
-            dataSources = new DataSource[1];
             String poolingType = requiredPoolingType;
             if (StringUtils.isWhitespace(requiredPoolingType))
             {
@@ -215,7 +211,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
                 // Create the ConnectionPool and get the DataSource
                 pool = connPoolFactory.createConnectionPool(storeMgr);
-                dataSources[0] = pool.getDataSource();
+                dataSource = pool.getDataSource();
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
                     NucleusLogger.CONNECTION.debug(Localiser.msg("047008", resourceType, poolingType));
@@ -236,7 +232,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 throw new NucleusException(Localiser.msg("047004", poolingType, e.getMessage()),e).setFatal();
             }
         }
-        return dataSources;
+        return dataSource;
     }
 
     /**
@@ -247,10 +243,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
      */
     public ManagedConnection createManagedConnection(ExecutionContext ec, Map options)
     {
-        if (dataSources == null)
+        if (dataSource == null)
         {
-            // Lazy initialisation of DataSource(s)
-            initialiseDataSources();
+            // Lazy initialisation of DataSource
+            initialiseDataSource();
         }
 
         ManagedConnection mconn = new ManagedConnectionImpl(ec, options);
@@ -271,8 +267,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
         int isolation;
         boolean needsCommitting = false;
 
-        ConnectionProvider connProvider = null;
-
         ManagedConnectionImpl(ExecutionContext ec, Map options)
         {
             this.ec = ec;
@@ -283,27 +277,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             else
             {
                 isolation = TransactionUtils.getTransactionIsolationLevelForName(storeMgr.getStringProperty(PropertyNames.PROPERTY_TRANSACTION_ISOLATION));
-            }
-
-            // Use the required ConnectionProvider
-            try
-            {
-                connProvider = (ConnectionProvider) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store.rdbms.connectionprovider", "name",
-                        storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME), "class-name", null, null);
-                if (connProvider == null)
-                {
-                    // No provider with this name (missing plugin ?)
-                    throw new NucleusException(Localiser.msg("050000",
-                        storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME))).setFatal();
-                }
-                connProvider.setFailOnError(storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_FAIL_ON_ERROR));
-            }
-            catch (Exception e)
-            {
-                // Error creating provider
-                throw new NucleusException(Localiser.msg("050001",
-                    storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME), e.getMessage()), e).setFatal();
             }
         }
 
@@ -404,7 +377,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                             reqdIsolationLevel = rdba.getRequiredTransactionIsolationLevel();
                         }
 
-                        cnx = connProvider.getConnection(dataSources);
+                        cnx = dataSource.getConnection();
                         boolean succeeded = false;
                         try
                         {
@@ -485,10 +458,10 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                     else
                     {
                         // Create basic Connection since no DatastoreAdapter created yet
-                        cnx = dataSources[0].getConnection();
+                        cnx = dataSource.getConnection();
                         if (cnx == null)
                         {
-                            String msg = Localiser.msg("009010", dataSources[0]);
+                            String msg = Localiser.msg("009010", dataSource);
                             NucleusLogger.CONNECTION.error(msg);
                             throw new NucleusDataStoreException(msg);
                         }
@@ -586,7 +559,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 savepoints = null;
             }
             this.xaRes = null;
-            this.connProvider = null;
             this.ec = null;
 
             super.close();
