@@ -871,6 +871,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (result == null && !(resultClass != null && resultClass != candidateClass))
         {
             // Select of candidates, so check for any immediate multi-valued fields that are marked for fetching
+            // TODO If the query joins to a 1-1/N-1 and then we have a multi-valued field, we should allow that too
             FetchPlanForClass fpc = getFetchPlan().getFetchPlanForClass(candidateCmd);
             int[] fpMembers = fpc.getMemberNumbers();
             for (int i=0;i<fpMembers.length;i++)
