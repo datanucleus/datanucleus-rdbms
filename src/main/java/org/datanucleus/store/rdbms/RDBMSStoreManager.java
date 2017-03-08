@@ -2327,7 +2327,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 return "sequence";
             }
-            return "table-sequence"; // Maybe ought to use "increment"
+            return "increment";
         }
         return super.getStrategyForNative(cmd, absFieldNumber);
     }

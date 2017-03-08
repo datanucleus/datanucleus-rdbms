@@ -132,7 +132,6 @@ Contributors:
         <valuegenerator name="increment" class-name="org.datanucleus.store.rdbms.valuegenerator.TableGenerator" datastore="rdbms"/>
         <valuegenerator name="max" class-name="org.datanucleus.store.rdbms.valuegenerator.MaxGenerator" datastore="rdbms"/>
         <valuegenerator name="sequence" class-name="org.datanucleus.store.rdbms.valuegenerator.SequenceGenerator" datastore="rdbms"/>
-        <valuegenerator name="table-sequence" class-name="org.datanucleus.store.rdbms.valuegenerator.TableGenerator" datastore="rdbms"/>
     </extension>
 
     <!-- RDBMS : JAVA TYPES MAPPING -->

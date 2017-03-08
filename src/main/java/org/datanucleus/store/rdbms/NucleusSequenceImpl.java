@@ -38,7 +38,7 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Basic implementation of a DataNucleus datastore sequence for RDBMS.
- * Utilises the <B>org.datanucleus.store.valuegenerator</B> classes to generate sequence values.
+ * Utilises the <b>org.datanucleus.store.valuegenerator</b> classes to generate sequence values.
  */
 public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceImpl
 {
@@ -67,7 +67,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
         }
         else
         {
-            valueGeneratorName = "table-sequence";
+            valueGeneratorName = "increment";
         }
 
         // Create the controlling properties for this sequence
