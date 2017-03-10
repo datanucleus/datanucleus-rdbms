@@ -55,16 +55,19 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.types.scostore.Store;
 
 /**
- * Helper class to generate the necessary statement for multi-valued field bulk-fetch.
+ * Helper class to generate the necessary statement for multi-valued field bulk-fetch using EXISTS subquery semantics.
+ * <p>
  * In simple terms if we have a query with resultant SQL like
  * <pre>SELECT COL1, COL2, COL3, ... FROM CANDIDATE_TBL T1 WHERE T1.COL2 = value</pre>
+ * 
  * then to retrieve a multi-valued collection field of the candidate class it generates an SQL like
  * <pre>SELECT ELEM.COL1, ELEM.COL2, ... FROM ELEMENT_TBL ELEM WHERE EXISTS (
  * SELECT T1.ID FROM CANDIDATE_TBL T1 WHERE T1.COL2 = value AND ELEM.OWNER_ID = T1.ID)</pre>
+ * 
  * Obviously there are differences when using a join-table, or when the elements are embedded into the join-table, but the
  * basic idea is we generate an iterator statement for the elements (just like the backing store normally would) except
- * instead of restricting the statement to just a particular owner, it adds an EXISTS clause with the query as the exists
- * subquery).
+ * instead of restricting the statement to just a particular owner, it adds an EXISTS clause with the query as the exists subquery.
+ * </p>
  */
 public class BulkFetchExistsHelper
 {
