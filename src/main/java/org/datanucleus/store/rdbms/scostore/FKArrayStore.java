@@ -678,6 +678,15 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Method to return the SQLStatement and mapping for an iterator for this backing store.
+     * Create a statement of the form
+     * <pre>
+     * SELECT ELEM_COLS
+     * FROM ELEM_TBL
+     * [WHERE]
+     *   [ELEM_TBL.OWNER_ID = {value}] [AND]
+     *   [ELEM_TBL.DISCRIM = {discrimValue}]
+     * [ORDER BY {orderClause}]
+     * </pre>
      * @param ec ExecutionContext
      * @param fp FetchPlan to use in determing which fields of element to select
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
