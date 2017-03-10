@@ -17,12 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,16 +32,11 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.scostore.BaseContainerStore;
 import org.datanucleus.store.rdbms.scostore.FKArrayStore;
 import org.datanucleus.store.rdbms.scostore.FKListStore;
-import org.datanucleus.store.rdbms.scostore.FKMapStore;
 import org.datanucleus.store.rdbms.scostore.FKSetStore;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.rdbms.scostore.JoinArrayStore;
 import org.datanucleus.store.rdbms.scostore.JoinListStore;
-import org.datanucleus.store.rdbms.scostore.JoinMapStore;
 import org.datanucleus.store.rdbms.scostore.JoinSetStore;
-import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
-import org.datanucleus.store.rdbms.sql.SQLStatementParameter;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
@@ -55,7 +45,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.types.scostore.Store;
 
 /**
- * Helper class to generate the necessary statement for multi-valued field bulk-fetch using EXISTS subquery semantics.
+ * Bulk-Fetch handler to generate the necessary statement for multi-valued field bulk-fetch using EXISTS subquery semantics.
  * <p>
  * In simple terms if we have a query with resultant SQL like
  * <pre>SELECT COL1, COL2, COL3, ... FROM CANDIDATE_TBL T1 WHERE T1.COL2 = value</pre>
@@ -69,15 +59,8 @@ import org.datanucleus.store.types.scostore.Store;
  * instead of restricting the statement to just a particular owner, it adds an EXISTS clause with the query as the exists subquery.
  * </p>
  */
-public class BulkFetchExistsHelper
+public class BulkFetchExistsHandler implements BulkFetchHandler
 {
-    Query query;
-
-    public BulkFetchExistsHelper(Query q)
-    {
-        this.query = q;
-    }
-
     /**
      * Convenience method to generate a bulk-fetch statement for the specified multi-valued field of the owning query.
      * @param candidateCmd Metadata for the candidate
@@ -87,52 +70,31 @@ public class BulkFetchExistsHelper
      * @param mapperOptions Any options for the query to SQL mapper
      * @return The bulk-fetch statement for retrieving this multi-valued field.
      */
-    public IteratorStatement getSQLStatementForContainerField(AbstractClassMetaData candidateCmd, Map parameters, AbstractMemberMetaData mmd,
-            RDBMSQueryCompilation datastoreCompilation, Set<String> mapperOptions)
+    public IteratorStatement getStatementToBulkFetchField(AbstractClassMetaData candidateCmd, AbstractMemberMetaData mmd, 
+            Query query, Map parameters, RDBMSQueryCompilation datastoreCompilation, Set<String> mapperOptions)
     {
         IteratorStatement iterStmt = null;
         ExecutionContext ec = query.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         RDBMSStoreManager storeMgr = (RDBMSStoreManager) query.getStoreManager();
         Store backingStore = storeMgr.getBackingStoreForField(clr, mmd, null);
-        if (backingStore instanceof JoinSetStore)
-        {
-            iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof FKSetStore)
-        {
-            iterStmt = ((FKSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof JoinListStore)
-        {
-            iterStmt = ((JoinListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof FKListStore)
-        {
-            iterStmt = ((FKListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
-        }
-        else if (backingStore instanceof JoinArrayStore)
-        {
-            iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof FKArrayStore)
-        {
-            iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
-        }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-            return null;
-        }
 
         if (backingStore instanceof JoinSetStore || backingStore instanceof JoinListStore || backingStore instanceof JoinArrayStore)
         {
             // Set/List/array using join-table : Generate an iterator query of the form
+            if (backingStore instanceof JoinSetStore)
+            {
+                iterStmt = ((JoinSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
+            }
+            else if (backingStore instanceof JoinListStore)
+            {
+                iterStmt = ((JoinListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
+            }
+            else if (backingStore instanceof JoinArrayStore)
+            {
+                iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
+            }
+
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
             // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
             SelectStatement sqlStmt = iterStmt.getSelectStatement();
@@ -171,6 +133,19 @@ public class BulkFetchExistsHelper
         }
         else if (backingStore instanceof FKSetStore || backingStore instanceof FKListStore || backingStore instanceof FKArrayStore)
         {
+            if (backingStore instanceof FKSetStore)
+            {
+                iterStmt = ((FKSetStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
+            }
+            else if (backingStore instanceof FKListStore)
+            {
+                iterStmt = ((FKListStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false, -1, -1);
+            }
+            else if (backingStore instanceof FKArrayStore)
+            {
+                iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
+            }
+
             // Set/List/array using foreign-key : Generate an iterator query of the form
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM ELEM_TBL
             // WHERE EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND ELEM_TBL.OWNER_ID = OWNER_TBL.ID)
@@ -207,72 +182,7 @@ public class BulkFetchExistsHelper
             ownerMapIdx.setColumnPositions(ownerColIndexes);
             iterStmt.setOwnerMapIndex(ownerMapIdx);
         }
-        else if (backingStore instanceof JoinMapStore)
-        {
-            // TODO Implement this
-        }
-        else if (backingStore instanceof FKMapStore)
-        {
-            // TODO Implement this
-        }
+
         return iterStmt;
-    }
-
-    /**
-     * Convenience method to apply the passed parameters to the provided bulk-fetch statement.
-     * Takes care of applying parameters across any UNIONs of elements.
-     * @param ps PreparedStatement
-     * @param datastoreCompilation The datastore compilation for the query itself
-     * @param sqlStmt The bulk-fetch iterator statement
-     * @param parameters The map of parameters passed in to the query
-     */
-    public void applyParametersToStatement(PreparedStatement ps, RDBMSQueryCompilation datastoreCompilation, SQLStatement sqlStmt, Map parameters)
-    {
-        Map<Integer, String> stmtParamNameByPosition = null;
-        List<SQLStatementParameter> stmtParams = null;
-        if (datastoreCompilation.getStatementParameters() != null)
-        {
-            stmtParams = new ArrayList<>();
-            stmtParams.addAll(datastoreCompilation.getStatementParameters());
-
-            if (sqlStmt instanceof SelectStatement)
-            {
-                SelectStatement selectStmt = (SelectStatement)sqlStmt;
-                int numUnions = selectStmt.getNumberOfUnions();
-                for (int i=0;i<numUnions;i++)
-                {
-                    stmtParams.addAll(datastoreCompilation.getStatementParameters());
-                }
-
-                if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
-                {
-                    // ParameterNameByPosition is only populated with implicit parameters
-                    stmtParamNameByPosition = new HashMap<>();
-                    stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
-
-                    int numParams = stmtParamNameByPosition.size();
-                    for (int i=0;i<numUnions;i++)
-                    {
-                        Iterator<Map.Entry<Integer, String>> paramEntryIter = datastoreCompilation.getParameterNameByPosition().entrySet().iterator();
-                        while (paramEntryIter.hasNext())
-                        {
-                            Map.Entry<Integer, String> paramEntry = paramEntryIter.next();
-                            stmtParamNameByPosition.put(numParams*(i+1) + paramEntry.getKey(), paramEntry.getValue());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (datastoreCompilation.getParameterNameByPosition() != null && datastoreCompilation.getParameterNameByPosition().size() > 0)
-                {
-                    // ParameterNameByPosition is only populated with implicit parameters
-                    stmtParamNameByPosition = new HashMap<>();
-                    stmtParamNameByPosition.putAll(datastoreCompilation.getParameterNameByPosition());
-                }
-            }
-
-            SQLStatementHelper.applyParametersToStatement(ps, query.getExecutionContext(), stmtParams, stmtParamNameByPosition, parameters);
-        }
     }
 }
