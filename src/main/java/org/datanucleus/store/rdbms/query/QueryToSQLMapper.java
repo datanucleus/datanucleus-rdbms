@@ -51,6 +51,7 @@ import org.datanucleus.query.expression.CreatorExpression;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.Expression.Operator;
+import org.datanucleus.query.expression.JoinExpression.JoinQualifier;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.JoinExpression;
 import org.datanucleus.query.expression.Literal;
@@ -167,6 +168,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     public static final String OPTION_SELECT_CANDIDATE_ID_ONLY = "RESULT_CANDIDATE_ID";
     public static final String OPTION_NULL_PARAM_USE_IS_NULL = "USE_IS_NULL_FOR_NULL_PARAM";
 
+    public static final String MAP_KEY_ALIAS_SUFFIX = "_KEY";
     public static final String MAP_VALUE_ALIAS_SUFFIX = "_VALUE";
 
     final String candidateAlias;
@@ -1209,9 +1211,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 JoinExpression joinExpr = (JoinExpression)rightExpr;
                 JoinExpression.JoinType exprJoinType = joinExpr.getType();
-                String joinAlias = joinExpr.getAlias();
+                JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
+                JoinQualifier joinQualifier = joinExpr.getQualifier();
                 Expression joinedExpr = joinExpr.getJoinedExpression();
                 Expression joinOnExpr = joinExpr.getOnExpression();
+                String joinAlias = joinExpr.getAlias();
 
                 PrimaryExpression joinPrimExpr = null;
                 Class castCls = null;
@@ -1231,8 +1235,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
                 }
 
-                JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
-                if (joinPrimExpr.getTuples().size() == 1)
+                if (joinPrimExpr.getTuples().size() == 1 && joinQualifier == null)
                 {
                     // DN Extension : Join to (new) root element? We need an ON expression to be supplied in this case
                     if (joinOnExpr == null)
@@ -1265,6 +1268,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 Iterator<String> iter = joinPrimExpr.getTuples().iterator();
                 String rootId = iter.next();
                 String joinTableGroupName = null;
+                SQLTable tblMappingSqlTbl = null;
+                JavaTypeMapping tblIdMapping = null;
+                AbstractMemberMetaData tblMmd = null;
+
                 if (rootId.equalsIgnoreCase(candidateAlias))
                 {
                     // Join relative to the candidate
@@ -1276,37 +1283,118 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else
                 {
-                    // Join relative to some other alias
-                    SQLTableMapping sqlTblMapping = getSQLTableMappingForAlias(rootId);
-                    if (sqlTblMapping != null)
+                    if (!iter.hasNext() && joinQualifier != null)
                     {
-                        if (sqlTblMapping.mmd != null)
+                        // Special case of KEY(mapValueAlias) or VALUE(keyValueAlias) TODO Allow for "KEY(mapValueAlias).field.otherField"
+                        SQLTableMapping sqlTblMapping = getSQLTableMappingForAlias(rootId);
+                        if (sqlTblMapping != null && sqlTblMapping.mmd != null && sqlTblMapping.mmd.hasMap())
                         {
-                            // Map alias : assumed to be referring to the value of the Map
-                            cmd = sqlTblMapping.mmd.getMap().getValueClassMetaData(clr);
-                            // TODO Clean this up so we match when it is present
-                            sqlTbl = stmt.getTable(rootId + MAP_VALUE_ALIAS_SUFFIX);
-                            if (sqlTbl == null)
+                            AbstractMemberMetaData mmd = sqlTblMapping.mmd;
+                            MapMetaData mapmd = mmd.getMap();
+                            if (joinQualifier == JoinQualifier.MAP_KEY)
                             {
-                                sqlTbl = stmt.getTable((rootId + MAP_VALUE_ALIAS_SUFFIX).toUpperCase());
+                                // KEY(mapValueAlias)
+                                cmd = mmd.getMap().getKeyClassMetaData(clr);
+
+                                // Get the "map" table (the table storing the key/value linkage)
+                                SQLTable mapSqlTable = stmt.getTable(rootId);
+                                if (mapSqlTable == null)
+                                {
+                                    mapSqlTable = stmt.getTable((rootId).toUpperCase());
+                                }
+
+                                if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
+                                {
+                                    // Add join to key table
+                                    boolean embeddedKey = mapmd.isEmbeddedKey() || mapmd.isSerializedKey();
+                                    if (!embeddedKey)
+                                    {
+                                        DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
+                                        String keyTableAlias = rootId + MAP_KEY_ALIAS_SUFFIX;
+                                        sqlTbl = stmt.join(joinType, mapSqlTable, ((MapTable)mapSqlTable.getTable()).getKeyMapping(), 
+                                            keyTable, keyTableAlias, keyTable.getIdMapping(), null, joinTableGroupName, true);
+
+                                        tblMappingSqlTbl = sqlTbl;
+                                        tblIdMapping = keyTable.getIdMapping();
+                                    }
+                                    else
+                                    {
+                                        tblMappingSqlTbl = mapSqlTable;
+                                        tblIdMapping = ((MapTable)mapSqlTable.getTable()).getKeyMapping();
+                                    }
+                                }
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
+                                {
+                                    boolean embeddedKey = mapmd.isEmbeddedKey() || mapmd.isSerializedKey();
+                                    if (!embeddedKey)
+                                    {
+                                        AbstractClassMetaData valueCmd = mapmd.getValueClassMetaData(clr);
+                                        DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
+                                        String keyTableAlias = rootId + MAP_KEY_ALIAS_SUFFIX;
+                                        String keyFieldInValue = mmd.getKeyMetaData().getMappedBy();
+                                        JavaTypeMapping mapTblKeyMapping = ((DatastoreClass)mapSqlTable).getMemberMapping(valueCmd.getMetaDataForMember(keyFieldInValue));
+                                        sqlTbl = stmt.join(joinType, mapSqlTable, mapTblKeyMapping, 
+                                            keyTable, keyTableAlias, keyTable.getIdMapping(), null, joinTableGroupName, true);
+
+                                        tblMappingSqlTbl = sqlTbl;
+                                        tblIdMapping = keyTable.getIdMapping();
+                                    }
+                                    else
+                                    {
+                                        tblMappingSqlTbl = mapSqlTable;
+                                        tblIdMapping = ((MapTable)mapSqlTable.getTable()).getKeyMapping();
+                                    }
+                                }
+                                else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
+                                {
+                                    // The "map" table is the key table
+                                    tblMappingSqlTbl = mapSqlTable;
+                                    tblIdMapping = mapSqlTable.getTable().getIdMapping();
+                                }
+                            }
+                            else
+                            {
+                                // VALUE(mapKeyAlias)
+                                cmd = mapmd.getValueClassMetaData(clr);
                             }
                         }
                         else
                         {
-                            cmd = sqlTblMapping.cmd;
-                            sqlTbl = sqlTblMapping.table;
+                        throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet it is unknown!");
                         }
-                        joinTableGroupName = sqlTbl.getGroupName() + joinPrimExpr.getId().substring(rootId.length());
                     }
                     else
                     {
-                        throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet the first component " + rootId + " is unknown!");
+                        // Join relative to some other alias
+                        SQLTableMapping sqlTblMapping = getSQLTableMappingForAlias(rootId);
+                        if (sqlTblMapping != null)
+                        {
+                            if (sqlTblMapping.mmd != null)
+                            {
+                                // Map alias : assumed to be referring to the value of the Map
+                                cmd = sqlTblMapping.mmd.getMap().getValueClassMetaData(clr);
+
+                                // TODO Clean this up so we match when it is present
+                                sqlTbl = stmt.getTable(rootId + MAP_VALUE_ALIAS_SUFFIX);
+                                if (sqlTbl == null)
+                                {
+                                    sqlTbl = stmt.getTable((rootId + MAP_VALUE_ALIAS_SUFFIX).toUpperCase());
+                                }
+                            }
+                            else
+                            {
+                                cmd = sqlTblMapping.cmd;
+                                sqlTbl = sqlTblMapping.table;
+                            }
+                            joinTableGroupName = sqlTbl.getGroupName() + joinPrimExpr.getId().substring(rootId.length());
+                        }
+                        else
+                        {
+                            throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet the first component " + rootId + " is unknown!");
+                        }
                     }
                 }
 
-                SQLTable tblMappingSqlTbl = null;
-                JavaTypeMapping tblIdMapping = null;
-                AbstractMemberMetaData tblMmd = null;
                 while (iter.hasNext())
                 {
                     String id = iter.next();
@@ -1734,18 +1822,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 {
                                     // Add join to join table, then to related table (value)
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
-                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mmd.getMap().isSerializedValue();
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
+
+                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mmd.getMap().isSerializedValue();
                                     if (!embeddedValue)
                                     {
                                         // Join to value table and use that
                                         relTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
                                         String valueTableAlias = (aliasForJoin != null ? aliasForJoin+MAP_VALUE_ALIAS_SUFFIX : null);
                                         stmt.join(joinType, sqlTbl, joinTbl.getValueMapping(), relTable, valueTableAlias, relTable.getIdMapping(), null, joinTableGroupName, true);
+                                        // TODO We really ought to set sqlTbl to the value table here, but if there is an ON clause it needs to go on the correct join
                                     }
                                 }
                                 else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
                                 {
+                                    // Join to value table
                                     DatastoreClass valTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
                                     JavaTypeMapping mapTblOwnerMapping;
                                     if (mmd.getMappedBy() != null)
@@ -1756,11 +1847,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
-
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
                                 }
                                 else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
                                 {
+                                    // Join to key table, and then to value table
                                     DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
                                     JavaTypeMapping mapTblOwnerMapping;
                                     if (mmd.getMappedBy() != null)
@@ -1771,9 +1862,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
-
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
-                                    // TODO Join to value if entity?
+
+                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mmd.getMap().isSerializedValue();
+                                    if (!embeddedValue)
+                                    {
+                                        // TODO Join to value table and use that
+                                    }
                                 }
                             }
                             else if (mmd.hasArray())
@@ -1897,6 +1992,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     // Add join to join table
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
+                                    // TODO Join to value type?!
                                 }
                                 else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
                                 {
