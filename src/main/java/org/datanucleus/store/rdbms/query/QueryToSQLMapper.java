@@ -51,7 +51,6 @@ import org.datanucleus.query.expression.CreatorExpression;
 import org.datanucleus.query.expression.DyadicExpression;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.expression.Expression.Operator;
-import org.datanucleus.query.expression.JoinExpression.JoinQualifier;
 import org.datanucleus.query.expression.InvokeExpression;
 import org.datanucleus.query.expression.JoinExpression;
 import org.datanucleus.query.expression.Literal;
@@ -1212,7 +1211,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 JoinExpression joinExpr = (JoinExpression)rightExpr;
                 JoinExpression.JoinType exprJoinType = joinExpr.getType();
                 JoinType joinType = org.datanucleus.store.rdbms.sql.SQLJoin.getJoinTypeForJoinExpressionType(exprJoinType);
-                JoinQualifier joinQualifier = joinExpr.getQualifier();
                 Expression joinedExpr = joinExpr.getJoinedExpression();
                 Expression joinOnExpr = joinExpr.getOnExpression();
                 String joinAlias = joinExpr.getAlias();
@@ -1235,7 +1233,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     throw new NucleusException("We do not currently support JOIN to " + joinedExpr);
                 }
 
-                if (joinPrimExpr.getTuples().size() == 1 && joinQualifier == null)
+                Iterator<String> iter = joinPrimExpr.getTuples().iterator();
+                String rootId = iter.next();
+
+                if (joinPrimExpr.getTuples().size() == 1 && !rootId.endsWith("#KEY") && !rootId.endsWith("#VALUE"))
                 {
                     // DN Extension : Join to (new) root element? We need an ON expression to be supplied in this case
                     if (joinOnExpr == null)
@@ -1265,8 +1266,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     continue;
                 }
 
-                Iterator<String> iter = joinPrimExpr.getTuples().iterator();
-                String rootId = iter.next();
                 String joinTableGroupName = null;
                 SQLTable tblMappingSqlTbl = null;
                 JavaTypeMapping tblIdMapping = null;
@@ -1283,24 +1282,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
                 else
                 {
-                    if (!iter.hasNext() && joinQualifier != null)
+                    if (rootId.endsWith("#KEY") || rootId.endsWith("#VALUE"))
                     {
-                        // Special case of KEY(mapValueAlias) or VALUE(keyValueAlias) TODO Allow for "KEY(mapValueAlias).field.otherField"
-                        SQLTableMapping sqlTblMapping = getSQLTableMappingForAlias(rootId);
+                        // Special case of KEY(mapValueAlias) or VALUE(keyValueAlias)
+                        String rootIdForLookup = rootId.substring(0, rootId.length()-4);
+                        SQLTableMapping sqlTblMapping = getSQLTableMappingForAlias(rootIdForLookup);
                         if (sqlTblMapping != null && sqlTblMapping.mmd != null && sqlTblMapping.mmd.hasMap())
                         {
                             AbstractMemberMetaData mmd = sqlTblMapping.mmd;
                             MapMetaData mapmd = mmd.getMap();
-                            if (joinQualifier == JoinQualifier.MAP_KEY)
+                            if (rootId.endsWith("#KEY"))
                             {
                                 // KEY(mapValueAlias)
                                 cmd = mmd.getMap().getKeyClassMetaData(clr);
 
                                 // Get the "map" table (the table storing the key/value linkage)
-                                SQLTable mapSqlTable = stmt.getTable(rootId);
+                                SQLTable mapSqlTable = stmt.getTable(rootIdForLookup);
                                 if (mapSqlTable == null)
                                 {
-                                    mapSqlTable = stmt.getTable((rootId).toUpperCase());
+                                    mapSqlTable = stmt.getTable((rootIdForLookup).toUpperCase());
                                 }
 
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
@@ -1310,7 +1310,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (!embeddedKey)
                                     {
                                         DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
-                                        String keyTableAlias = rootId + MAP_KEY_ALIAS_SUFFIX;
+                                        String keyTableAlias = rootIdForLookup + MAP_KEY_ALIAS_SUFFIX;
                                         sqlTbl = stmt.join(joinType, mapSqlTable, ((MapTable)mapSqlTable.getTable()).getKeyMapping(), 
                                             keyTable, keyTableAlias, keyTable.getIdMapping(), null, joinTableGroupName, true);
 
@@ -1330,7 +1330,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         AbstractClassMetaData valueCmd = mapmd.getValueClassMetaData(clr);
                                         DatastoreClass keyTable = storeMgr.getDatastoreClass(mapmd.getKeyType(), clr);
-                                        String keyTableAlias = rootId + MAP_KEY_ALIAS_SUFFIX;
+                                        String keyTableAlias = rootIdForLookup + MAP_KEY_ALIAS_SUFFIX;
                                         String keyFieldInValue = mmd.getKeyMetaData().getMappedBy();
                                         JavaTypeMapping mapTblKeyMapping = ((DatastoreClass)mapSqlTable).getMemberMapping(valueCmd.getMetaDataForMember(keyFieldInValue));
                                         sqlTbl = stmt.join(joinType, mapSqlTable, mapTblKeyMapping, 
@@ -1354,13 +1354,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                             else
                             {
-                                // VALUE(mapKeyAlias)
+                                // VALUE(mapKeyAlias) TODO Handle #VALUE
                                 cmd = mapmd.getValueClassMetaData(clr);
                             }
                         }
                         else
                         {
-                        throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet it is unknown!");
+                            throw new NucleusUserException("Query has " + joinPrimExpr.getId() + " yet it is unknown!");
                         }
                     }
                     else
