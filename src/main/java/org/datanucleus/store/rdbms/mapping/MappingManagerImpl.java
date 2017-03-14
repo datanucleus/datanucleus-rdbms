@@ -198,8 +198,16 @@ public class MappingManagerImpl implements MappingManager
         MappedType type = mappedTypes.get(javaTypeName);
         if (type == null)
         {
-            // Check if this is a SCO wrapper
+            // No explicit <java_mapping> so check for a default TypeConverter against the basic <java-type>
             TypeManager typeMgr = storeMgr.getNucleusContext().getTypeManager();
+            TypeConverter defaultTypeConv = typeMgr.getDefaultTypeConverterForType(clr.classForName(javaTypeName));
+            if (defaultTypeConv != null)
+            {
+                // We have no explicit mapping and there is a defined default TypeConverter so return and that will be picked
+                return null;
+            }
+
+            // Check if this is a SCO wrapper
             Class cls = typeMgr.getTypeForSecondClassWrapper(javaTypeName);
             if (cls != null)
             {
@@ -1347,7 +1355,6 @@ public class MappingManagerImpl implements MappingManager
     {
         // Check for an explicit mapping
         Class cls = storeMgr.getMappingManager().getMappingType(javaType.getName());
-
         if (cls == null)
         {
             // No explicit mapping for this java type, so fall back to TypeConverter if available
