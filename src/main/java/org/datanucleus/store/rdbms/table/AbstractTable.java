@@ -380,7 +380,7 @@ public abstract class AbstractTable implements Table
                 if (md == null)
                 {
                     // ColumnMetaData for existing column has no parent class somehow!
-                    throw new NucleusUserException(Localiser.msg("057043", name.getName(), getDatastoreIdentifierFullyQualified(), colmd.toString()));
+                    throw new NucleusUserException(Localiser.msg("057043", name.getName(), getDatastoreIdentifierFullyQualified()));
                 }
                 md = md.getParent();
             }
