@@ -35,7 +35,8 @@ import org.datanucleus.store.schema.naming.NamingCase;
  * <li>Class called "MyClass" will generate table name of "MYCLASS"</li>
  * <li>Field called "myField" will generate column name of "MYFIELD"</li>
  * <li>Join table will be named after the ownerClass and the otherClass so "MyClass" joining to "MyOtherClass" will have a join table called "MYCLASS_MYOTHERCLASS"</li>
- * <li>Join table for Collection/Map of nonPC will be based on "ownerEntity_memberName"</li>
+ * <li>Join table for Collection element/Map value of nonPC will be based on "{ownerEntity}_{memberName}"</li>
+ * <li>Join table column for Map key will be "{memberName}_KEY"</li>
  * <li>Datastore-identity column for class "MyClass" will be "MYCLASS_ID" (not part of JPA)</li>
  * <li>1-N uni between "MyClass" (field="myField") and "MyElement" will have FK in "MYELEMENT" of MYFIELD_MYCLASS_ID</li>
  * <li>1-N bi between "MyClass" (field="myField") and "MyElement" (field="myClassRef") will have FK in "MYELEMENT" of name "MYCLASSREF_MYCLASS_ID".</li>
@@ -179,14 +180,15 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Generate a fallback name
             if (mmd.getRelationType(clr) == RelationType.NONE)
             {
-                // CollectionTable, so default based on owner entity name + separator + member name
+                // CollectionTable, so default based on owner-entity-name + separator + member-name
                 identifierName = mmd.getAbstractClassMetaData().getEntityName() + getWordSeparator() + mmd.getName();
             }
             else
             {
-                // JoinTable, so default based on the ownerClass/otherClass names
-                // TODO This should be based on "ownerTableName_otherTableName" not the class names.
-                String ownerClass = mmd.getClassName(false);
+                // JoinTable, so default to owner-table-name + separator + related-table-name
+                // NOTE: In DN up to and including v5.0 this defaulted to "ownerClass_otherClass" names (not table names)
+                AbstractClassMetaData ownerCmd = mmd.getAbstractClassMetaData();
+
                 String otherClass = mmd.getTypeName();
                 if (mmd.hasCollection())
                 {
@@ -200,22 +202,31 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 {
                     otherClass = mmd.getMap().getValueType();
                 }
-
                 if (mmd.hasCollection() && relatedMmds != null && relatedMmds[0].hasCollection() && mmd.getMappedBy() != null)
                 {
                     // M-N collection and the owner is the other side
-                    ownerClass = relatedMmds[0].getClassName(false);
+                    ownerCmd = relatedMmds[0].getAbstractClassMetaData();
                     otherClass = relatedMmds[0].getCollection().getElementType();
                 }
-                otherClass = otherClass.substring(otherClass.lastIndexOf('.')+1);
+                AbstractClassMetaData otherCmd = mmd.getMetaDataManager().getMetaDataForClass(otherClass, clr);
 
-                identifierName = ownerClass + getWordSeparator() + otherClass;
+                String ownerIdComponent = newTableIdentifier(ownerCmd).getName();
+                String otherIdComponent = null;
+                if (otherCmd == null)
+                {
+                    // Interface TODO Use an implementation to define the table name
+                    otherIdComponent = otherClass.substring(otherClass.lastIndexOf('.')+1); // Fallback to the class name (of the interface)
+                }
+                else
+                {
+                    otherIdComponent = newTableIdentifier(otherCmd).getName();
+                }
+                identifierName = ownerIdComponent + getWordSeparator() + otherIdComponent;
             }
         }
 
         // Generate the table identifier now that we have the identifier name
-        DatastoreIdentifier identifier = newTableIdentifier(identifierName, catalogName, schemaName);
-        return identifier;
+        return newTableIdentifier(identifierName, catalogName, schemaName);
     }
 
     /**
@@ -391,25 +402,29 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                 fieldRole == FieldRole.ROLE_MAP_KEY ||
                 fieldRole == FieldRole.ROLE_MAP_VALUE)
             {
-                if (destinationId != null)
+                if (fieldRole == FieldRole.ROLE_MAP_KEY)
                 {
-                    // FK to other table
-                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getName());
+                    // MapKeyColumn and MapKeyJoinColumn imply that the key column should have suffix "_KEY"
+                    identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "KEY");
                 }
                 else
                 {
-                    // Column in join table
-                    if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT || fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
+                    if (destinationId != null)
                     {
-                        identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "ELEMENT");
+                        // FK to other table
+                        identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + destinationId.getName());
                     }
-                    else if (fieldRole == FieldRole.ROLE_MAP_KEY)
+                    else
                     {
-                        identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "KEY");
-                    }
-                    else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
-                    {
-                        identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "VALUE");
+                        // Column in join table
+                        if (fieldRole == FieldRole.ROLE_ARRAY_ELEMENT || fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT)
+                        {
+                            identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "ELEMENT");
+                        }
+                        else if (fieldRole == FieldRole.ROLE_MAP_VALUE)
+                        {
+                            identifier = newColumnIdentifier(ownerFmd.getName() + getWordSeparator() + "VALUE");
+                        }
                     }
                 }
             }

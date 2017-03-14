@@ -220,7 +220,7 @@ public final class ColumnCreator
                 // Foreign-Key to the destination table ID mapping
                 JavaTypeMapping m = destinationTable.getIdMapping();
 
-                // For each datastore mapping, add a column.
+                // For each column in the destination mapping, add a column here
                 ColumnMetaDataContainer columnContainer = null;
                 if (columnMetaData != null && columnMetaData.length > 0)
                 {
@@ -234,9 +234,10 @@ public final class ColumnCreator
                     try
                     {
                         DatastoreIdentifier identifier = null;
-                        if (colmd.getName() == null)
+                        if (fieldRole == FieldRole.ROLE_MAP_KEY && columnContainer == null)
                         {
-                            // User hasn't provided a name, so we use default naming
+                            // TODO If no column Metadata was specified then we should always go to the idFactory for Collection/Map join table columns not just for the map key
+                            // Map KEY field and no metadata defined
                             if (isReferenceField)
                             {
                                 // Create reference identifier
@@ -246,19 +247,43 @@ public final class ColumnCreator
                             }
                             else
                             {
-                                // Create join table identifier (FK using destination table identifier)
+                                // Create join table identifier
                                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                                 // TODO If the mmd is an "embedded" type this can create invalid identifiers
                                 // TODO Cater for more than 1 related field
                                 identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
-                                    m.getDatastoreMapping(i).getColumn().getIdentifier(), 
-                                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
+                                        m.getDatastoreMapping(i).getColumn().getIdentifier(), 
+                                        storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                             }
                         }
                         else
                         {
-                            // User defined name, so we use that.
-                            identifier = idFactory.newColumnIdentifier(colmd.getName());
+                            if (colmd.getName() == null)
+                            {
+                                // User hasn't provided a name, so we use default naming
+                                if (isReferenceField)
+                                {
+                                    // Create reference identifier
+                                    identifier = idFactory.newReferenceFieldIdentifier(mmd, storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr),
+                                        m.getDatastoreMapping(i).getColumn().getIdentifier(),
+                                        storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
+                                }
+                                else
+                                {
+                                    // Create join table identifier
+                                    AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
+                                    // TODO If the mmd is an "embedded" type this can create invalid identifiers
+                                    // TODO Cater for more than 1 related field
+                                    identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
+                                            m.getDatastoreMapping(i).getColumn().getIdentifier(), 
+                                            storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
+                                }
+                            }
+                            else
+                            {
+                                // User defined name, so we use that.
+                                identifier = idFactory.newColumnIdentifier(colmd.getName());
+                            }
                         }
 
                         // Only add the column if not currently present
