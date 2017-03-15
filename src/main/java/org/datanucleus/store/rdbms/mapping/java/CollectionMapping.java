@@ -263,6 +263,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Field is stored with the main object so nothing to clean up
             return;
         }
+        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
         ownerOP.isLoaded(getAbsoluteFieldNumber());
@@ -309,11 +310,12 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationChange(getAbsoluteFieldNumber(), value, null);
         }
 
-        // TODO Why dont we just do clear here always ? THe backing store should take care of if nulling or deleting etc
+        // TODO Why dont we just do clear here always ? The backing store should take care of if nulling or deleting etc
         if (dependent || hasJoin || !hasFK)
         {
-            // Elements are either dependent (in which case we need to delete them) or theres a join (in which case
-            // we need to remove the join entries), or there are no FKs specified (in which case we need to clean up)
+            // Elements are either dependent (in which case we need to delete them) 
+            // or there is a join (in which case we need to remove the join entries), 
+            // or there are no FKs specified (in which case we need to clean up)
             if (!(value instanceof SCO))
             {
                 value = (Collection)SCOUtils.wrapSCOField(ownerOP, getAbsoluteFieldNumber(), value, true);

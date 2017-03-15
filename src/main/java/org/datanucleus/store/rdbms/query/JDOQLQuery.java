@@ -55,6 +55,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -872,8 +873,15 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         SelectStatement stmt = null;
         try
         {
+            boolean includeSoftDeletes = getBooleanExtensionProperty("include-soft-deletes", false);
+            Set<String> options = null;
+            if (includeSoftDeletes)
+            {
+                options = new HashSet<>();
+                options.add(SelectStatementGenerator.OPTION_INCLUDE_SOFT_DELETES);
+            }
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, options);
         }
         catch (NucleusException ne)
         {
@@ -1080,7 +1088,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         try
         {
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, null);
         }
         catch (NucleusException ne)
         {

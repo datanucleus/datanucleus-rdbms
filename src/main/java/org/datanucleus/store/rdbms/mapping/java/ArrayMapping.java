@@ -319,26 +319,27 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called before any delete of the owner class element, if the field in the owner is dependent
-     * @param op ObjectProvider of the owner
+     * @param ownerOP ObjectProvider of the owner
      */
-    public void preDelete(ObjectProvider op)
+    public void preDelete(ObjectProvider ownerOP)
     {
         if (containerIsStoredInSingleColumn())
         {
             // Do nothing when stored in a single column since we are handled in the main request
             return;
         }
+        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
-        op.isLoaded(getAbsoluteFieldNumber());
-        Object value = op.provideField(getAbsoluteFieldNumber());
+        ownerOP.isLoaded(getAbsoluteFieldNumber());
+        Object value = ownerOP.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
         }
 
         // Clear the array via its backing store
-        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(op.getExecutionContext().getClassLoaderResolver(), mmd, null);
-        backingStore.clear(op);
+        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, null);
+        backingStore.clear(ownerOP);
     }
 }

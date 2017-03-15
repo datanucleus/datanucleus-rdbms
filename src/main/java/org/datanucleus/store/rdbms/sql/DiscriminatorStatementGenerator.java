@@ -360,7 +360,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
         }
 
         JavaTypeMapping softDeleteMapping = candidateTable.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
-        if (softDeleteMapping != null)
+        if (softDeleteMapping != null && !hasOption(OPTION_INCLUDE_SOFT_DELETES))
         {
             // Soft-delete restriction
             SQLTable softDeleteSqlTbl = stmt.getTable(softDeleteMapping.getTable(), discrimSqlTbl.getGroupName());

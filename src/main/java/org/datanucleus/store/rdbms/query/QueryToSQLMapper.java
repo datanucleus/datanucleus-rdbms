@@ -4646,7 +4646,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             StatementResultMapping subqueryResultMapping = new StatementResultMapping();
             // TODO Fix "avg(something)" arg - not essential but is a hack right now
-            SQLStatement subStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, stmt, subCmd, null, ec, subCompilation.getCandidateClass(), true, "avg(something)", subAlias, null);
+            SQLStatement subStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, stmt, subCmd, null, ec, subCompilation.getCandidateClass(), true, "avg(something)", subAlias, null, null);
 
             QueryToSQLMapper sqlMapper = new QueryToSQLMapper(subStmt, subCompilation, parameters, null, subqueryResultMapping, subCmd, true, fetchPlan, ec, importsDefinition, options,
                 extensionsByName);

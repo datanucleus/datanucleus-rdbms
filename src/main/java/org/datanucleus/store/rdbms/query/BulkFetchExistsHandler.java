@@ -103,7 +103,7 @@ public class BulkFetchExistsHandler implements BulkFetchHandler
 
             // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SelectStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null, null);
             Set<String> options = new HashSet<>();
             if (mapperOptions != null)
             {
@@ -153,7 +153,7 @@ public class BulkFetchExistsHandler implements BulkFetchHandler
 
             // Generate the EXISTS subquery (based on the JDOQL/JPQL query)
             SelectStatement existsStmt = RDBMSQueryUtils.getStatementForCandidates(storeMgr, sqlStmt, candidateCmd,
-                datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null);
+                datastoreCompilation.getResultDefinitionForClass(), ec, query.getCandidateClass(), query.isSubclasses(), query.getResult(), null, null, null);
             Set<String> options = new HashSet<>();
             if (mapperOptions != null)
             {

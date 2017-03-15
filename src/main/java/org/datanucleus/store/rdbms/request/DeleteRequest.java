@@ -380,6 +380,12 @@ public class DeleteRequest extends Request
      */
     private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider op, AbstractMemberMetaData fmd)
     {
+        if (softDeleteStmt != null)
+        {
+            // If we are soft deleting the owner then no need to null the linkage BUT we need to check the soft delete status on retrieval of the owner from related
+            return;
+        }
+
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", op.getObjectAsPrintable(), fmd.getFullFieldName()));
@@ -423,17 +429,17 @@ public class DeleteRequest extends Request
         {
             classes = new String[] {fullClassName};
         }
-        Set datastoreClasses = new HashSet();
+        Set<DatastoreClass> datastoreClasses = new HashSet();
         for (int i=0; i<classes.length; i++)
         {
             // just remove duplicates
             datastoreClasses.add(storeMgr.getDatastoreClass(classes[i], clr));
         }
 
-        Iterator it = datastoreClasses.iterator();
+        Iterator<DatastoreClass> it = datastoreClasses.iterator();
         while (it.hasNext())
         {
-            DatastoreClass refTable = (DatastoreClass)it.next();
+            DatastoreClass refTable = it.next();
             JavaTypeMapping refMapping = refTable.getMemberMapping(fmd.getMappedBy());
             if (refMapping.isNullable()) // Only clear the references that can be cleared
             {

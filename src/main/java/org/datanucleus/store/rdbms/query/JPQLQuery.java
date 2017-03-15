@@ -817,7 +817,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         // Generate statement for candidate(s)
         SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
             datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, 
-            compilation.getCandidateAlias(), compilation.getCandidateAlias());
+            compilation.getCandidateAlias(), compilation.getCandidateAlias(), null);
 
         // Update the SQLStatement with filter, ordering, result etc
         Set<String> options = new HashSet<>();
@@ -973,7 +973,7 @@ public class JPQLQuery extends AbstractJPQLQuery
 
         // Generate statement for candidate(s)
         SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-            datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null);
+            datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, null);
 
         if (stmt.allUnionsForSamePrimaryTable())
         {

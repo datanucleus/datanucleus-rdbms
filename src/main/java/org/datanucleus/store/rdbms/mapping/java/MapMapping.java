@@ -280,6 +280,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Do nothing when serialised since we are handled in the main request
             return;
         }
+        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
         ownerOP.isLoaded(getAbsoluteFieldNumber());

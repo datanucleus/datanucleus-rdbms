@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -292,12 +293,13 @@ public class RDBMSQueryUtils extends QueryUtils
      * @param result The result clause
      * @param candidateAlias alias for the candidate (if any)
      * @param candidateTableGroupName TableGroup name for the candidate (if any)
+     * @param options Any options for the statement for getting candidates. See SelectStatementGenerator for some options.
      * @return The SQLStatement
      * @throws NucleusException if there are no tables for concrete classes in this query (hence would return null)
      */
     public static SelectStatement getStatementForCandidates(RDBMSStoreManager storeMgr, SQLStatement parentStmt, 
             AbstractClassMetaData cmd, StatementClassMapping clsMapping, ExecutionContext ec, Class candidateCls, 
-            boolean subclasses, String result, String candidateAlias, String candidateTableGroupName)
+            boolean subclasses, String result, String candidateAlias, String candidateTableGroupName, Set<String> options)
     {
         SelectStatement stmt = null;
 
@@ -450,11 +452,25 @@ public class RDBMSQueryUtils extends QueryUtils
                     // TODO Add option to omit discriminator restriction
                     stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
+                    if (options != null)
+                    {
+                        for (String option : options)
+                        {
+                            stmtGen.setOption(option);
+                        }
+                    }
                 }
                 else
                 {
                     // No discriminator, so try to identify using UNIONs (hopefully one per class)
                     stmtGen = new UnionStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
+                    if (options != null)
+                    {
+                        for (String option : options)
+                        {
+                            stmtGen.setOption(option);
+                        }
+                    }
                     if (result == null)
                     {
                         // Returning one row per candidate so include distinguisher column
