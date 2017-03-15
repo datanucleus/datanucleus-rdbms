@@ -1675,7 +1675,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        // Join to related table
+                                        // Join to related table FK
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName, true);
                                     }
                                     tblIdMapping = sqlTbl.getTable().getIdMapping();
@@ -1689,11 +1689,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 tblMmd = mmd;
                                 tblIdMapping = sqlTbl.getTable().getMemberMapping(mmd);
                                 tblMappingSqlTbl = sqlTbl;
+                                boolean embeddedValue = mapmd.isEmbeddedValue() || mapmd.isSerializedValue();
 
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
                                     // Add join to join table, then to related table (value)
-                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mapmd.isSerializedValue();
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
                                     if (!embeddedValue)
@@ -1716,7 +1716,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
-
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), valTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
                                 }
                                 else if (mapmd.getMapType() == MapType.MAP_TYPE_VALUE_IN_KEY)
@@ -1731,9 +1730,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     {
                                         mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                     }
-
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
-                                    // TODO Join to value if entity?
+
+                                    if (!embeddedValue)
+                                    {
+                                        // TODO Join to value table and use that
+                                    }
                                 }
                             }
                             else if (mmd.hasArray())
@@ -1763,7 +1765,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        // Join to related table
+                                        // Join to related table FK
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relTable.getMemberMapping(relMmd), null, joinTableGroupName, true);
                                     }
                                     tblIdMapping = sqlTbl.getTable().getIdMapping();
@@ -1800,7 +1802,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        // Join to related table
+                                        // Join to related table FK
                                         JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
                                     }
@@ -1817,6 +1819,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 tblMmd = mmd;
                                 tblIdMapping = sqlTbl.getTable().getMemberMapping(mmd);
                                 tblMappingSqlTbl = sqlTbl;
+                                boolean embeddedValue = mapmd.isEmbeddedValue() || mapmd.isSerializedValue();
 
                                 if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
                                 {
@@ -1824,14 +1827,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
 
-                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mmd.getMap().isSerializedValue();
                                     if (!embeddedValue)
                                     {
                                         // Join to value table and use that
                                         relTable = storeMgr.getDatastoreClass(mapmd.getValueType(), clr);
                                         String valueTableAlias = (aliasForJoin != null ? aliasForJoin+MAP_VALUE_ALIAS_SUFFIX : null);
                                         stmt.join(joinType, sqlTbl, joinTbl.getValueMapping(), relTable, valueTableAlias, relTable.getIdMapping(), null, joinTableGroupName, true);
-                                        // TODO We really ought to set sqlTbl to the value table here, but if there is an ON clause it needs to go on the correct join
+                                        // TODO We really ought to set sqlTbl to the value table here, but if there is an ON clause it needs to go on the correct join See rdbms-177
                                     }
                                 }
                                 else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
@@ -1864,7 +1866,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), keyTable, aliasForJoin, mapTblOwnerMapping, null, null, true);
 
-                                    boolean embeddedValue = mapmd.isEmbeddedValue() || mmd.getMap().isSerializedValue();
                                     if (!embeddedValue)
                                     {
                                         // TODO Join to value table and use that
@@ -1897,7 +1898,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     }
                                     else
                                     {
-                                        // Join to related table
+                                        // Join to related table FK
                                         JavaTypeMapping relMapping = relTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                                         sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), relTable, aliasForJoin, relMapping, null, joinTableGroupName, true);
                                     }
@@ -1915,9 +1916,20 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
 
                             // Join to join table, then to related table
-                            CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
-                            SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
-                            sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                            if (mmd.hasCollection())
+                            {
+                                CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
+                                SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null, true);
+                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getElementMapping(), relTable, aliasForJoin, relTable.getIdMapping(), null, joinTableGroupName, true);
+                            }
+                            else if (mmd.hasMap())
+                            {
+                                NucleusLogger.QUERY.warn("We do not support joining across a M-N MAP field : " + mmd.getFullFieldName());
+                            }
+                            else if (mmd.hasArray())
+                            {
+                                NucleusLogger.QUERY.warn("We do not support joining across a M-N ARRAY field : " + mmd.getFullFieldName());
+                            }
 
                             tblMappingSqlTbl = sqlTbl;
                             tblIdMapping = tblMappingSqlTbl.getTable().getIdMapping();
@@ -1944,10 +1956,21 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             relMmd = mmd.getRelatedMemberMetaData(clr)[0];
                             if (mmd.getJoinMetaData() != null || relMmd.getJoinMetaData() != null)
                             {
-                                // Join to join table, then to related table TODO Cater for Map case
-                                CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
-                                SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null, true);
-                                sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
+                                // Join to join table, then to related table
+                                if (mmd.hasCollection())
+                                {
+                                    CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(relMmd);
+                                    SQLTable joinSqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null, true);
+                                    sqlTbl = stmt.join(joinType, joinSqlTbl, joinTbl.getOwnerMapping(), relTable, aliasForJoin, relTable.getIdMapping(), castDiscrimValues, joinTableGroupName, true);
+                                }
+                                else if (mmd.hasMap())
+                                {
+                                    NucleusLogger.QUERY.warn("We do not support joining across a N-1 MAP field : " + mmd.getFullFieldName());
+                                }
+                                else if (mmd.hasArray())
+                                {
+                                    NucleusLogger.QUERY.warn("We do not support joining across a N-1 ARRAY field : " + mmd.getFullFieldName());
+                                }
                             }
                             else
                             {
@@ -2058,7 +2081,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     BooleanExpression joinOnSqlExpr = (BooleanExpression) stack.pop();
                     processingOnClause = false;
 
-                    // Add the ON expression to the most recent SQLTable at the end of this chain
+                    // Add the ON expression to the most recent SQLTable at the end of this chain 
+                    // TODO Allow for SQL JOIN "grouping" [rdbms-177]. This applies to all cases where we join to a join table then to an element/value table and
+                    // need to apply the ON clause across both
                     SQLJoin join = stmt.getJoinForTable(sqlTbl);
                     join.addAndCondition(joinOnSqlExpr);
                 }
