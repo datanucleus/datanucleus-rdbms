@@ -671,7 +671,7 @@ public abstract class SQLStatement
         while (joinIter.hasNext())
         {
             SQLJoin join = joinIter.next();
-            if (join.getTable().equals(sqlTbl))
+            if (join.getTargetTable().equals(sqlTbl))
             {
                 return join.getType();
             }
@@ -694,7 +694,7 @@ public abstract class SQLStatement
         while (joinIter.hasNext())
         {
             SQLJoin join = joinIter.next();
-            if (join.getTable().equals(sqlTbl))
+            if (join.getTargetTable().equals(sqlTbl))
             {
                 return join;
             }
@@ -722,12 +722,12 @@ public abstract class SQLStatement
         while (joinIter.hasNext())
         {
             SQLJoin join = joinIter.next();
-            if (join.getTable().equals(targetSqlTbl) && join.getType() == JoinType.CROSS_JOIN)
+            if (join.getTargetTable().equals(targetSqlTbl) && join.getType() == JoinType.CROSS_JOIN)
             {
                 joinIter.remove();
                 requiresJoinReorder = true;
-                tables.remove(join.getTable().alias.getName());
-                String removedAliasName = join.getTable().alias.getName();
+                tables.remove(join.getTargetTable().alias.getName());
+                String removedAliasName = join.getTargetTable().alias.getName();
 
                 return removedAliasName;
             }
@@ -807,7 +807,7 @@ public abstract class SQLStatement
                     int i=1;
                     for (SQLJoin sqlJoin : joins)
                     {
-                        if (sqlJoin.getJoinedTable() == sourceTable)
+                        if (sqlJoin.getSourceTable() == sourceTable)
                         {
                             position = i;
                             break;

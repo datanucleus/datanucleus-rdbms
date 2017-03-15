@@ -69,7 +69,7 @@ public class DeleteStatement extends SQLStatement
 
             // Create sub-statement selecting the first joined table, joining back to the outer statement
             SQLJoin subJoin = joinIter.next();
-            SQLStatement subStmt = new SelectStatement(this, rdbmsMgr, subJoin.getTable().getTable(), subJoin.getTable().getAlias(), subJoin.getTable().getGroupName());
+            SQLStatement subStmt = new SelectStatement(this, rdbmsMgr, subJoin.getTargetTable().getTable(), subJoin.getTargetTable().getAlias(), subJoin.getTargetTable().getGroupName());
             subStmt.whereAnd(subJoin.getCondition(), false);
             if (where != null)
             {

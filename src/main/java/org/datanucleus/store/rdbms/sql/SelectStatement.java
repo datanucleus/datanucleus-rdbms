@@ -912,7 +912,7 @@ public class SelectStatement extends SQLStatement
                     orderedJoins.add(join);
                     joinIter.remove();
                 }
-                else if (join.getJoinedTable().equals(primaryTable))
+                else if (join.getSourceTable().equals(primaryTable))
                 {
                     // Joins to the primary table are fine
                     orderedJoins.add(join);
@@ -925,7 +925,7 @@ public class SelectStatement extends SQLStatement
                     while (knownJoinIter.hasNext())
                     {
                         SQLJoin currentJoin = knownJoinIter.next();
-                        if (join.getJoinedTable().equals(currentJoin.getTable()))
+                        if (join.getSourceTable().equals(currentJoin.getTargetTable()))
                         {
                             valid = true;
                             break;
@@ -981,12 +981,12 @@ public class SelectStatement extends SQLStatement
                 }
                 else if (dba.supportsOption(DatastoreAdapter.CROSSJOIN_ASINNER11_SYNTAX))
                 {
-                    sql.append(" INNER JOIN " + join.getTable() + " ON 1=1");
+                    sql.append(" INNER JOIN " + join.getTargetTable() + " ON 1=1");
                 }
                 else
                 {
                     // "ANSI-86" style cross join, separate join by comma
-                    sql.append(",").append(join.getTable().toString());
+                    sql.append(",").append(join.getTargetTable().toString());
                 }
             }
             else
@@ -1467,12 +1467,12 @@ public class SelectStatement extends SQLStatement
         while (joinIter.hasNext())
         {
             SQLJoin join = joinIter.next();
-            if (join.getTable().equals(targetSqlTbl) && join.getType() == JoinType.CROSS_JOIN)
+            if (join.getTargetTable().equals(targetSqlTbl) && join.getType() == JoinType.CROSS_JOIN)
             {
                 joinIter.remove();
                 requiresJoinReorder = true;
-                tables.remove(join.getTable().alias.getName());
-                String removedAliasName = join.getTable().alias.getName();
+                tables.remove(join.getTargetTable().alias.getName());
+                String removedAliasName = join.getTargetTable().alias.getName();
 
                 if (unions != null)
                 {

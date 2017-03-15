@@ -44,10 +44,10 @@ public class SQLJoin
     private JoinType type;
 
     /** Table we are joining to. This is always set irrespective the type of join. */
-    private SQLTable table;
+    private SQLTable targetTable;
 
-    /** The current table that we are joining to to introduce this table. */
-    private SQLTable joinedTable;
+    /** The current table that we are joining from to introduce this table. */
+    private SQLTable sourceTable;
 
     /** Optional condition for the join. */
     private BooleanExpression condition;
@@ -55,11 +55,11 @@ public class SQLJoin
     /**
      * Constructor for a join.
      * @param type Type of join (one of the defined types in this class).
-     * @param tbl Table to join to (required)
-     * @param joinedTbl Table we join to
+     * @param targetTbl Target table that we are joining to
+     * @param sourceTbl Table we are joining from
      * @param condition Join condition
      */
-    public SQLJoin(JoinType type, SQLTable tbl, SQLTable joinedTbl, BooleanExpression condition)
+    public SQLJoin(JoinType type, SQLTable targetTbl, SQLTable sourceTbl, BooleanExpression condition)
     {
         if (type != JoinType.NON_ANSI_JOIN && 
             type != JoinType.INNER_JOIN && 
@@ -69,14 +69,14 @@ public class SQLJoin
         {
             throw new NucleusException("Unsupported join type specified : " + type);
         }
-        else if (tbl == null)
+        else if (targetTbl == null)
         {
             throw new NucleusException("Specification of join must supply the table reference");
         }
 
         this.type = type;
-        this.table = tbl;
-        this.joinedTable = joinedTbl;
+        this.targetTable = targetTbl;
+        this.sourceTable = sourceTbl;
         this.condition = condition;
     }
 
@@ -90,14 +90,22 @@ public class SQLJoin
         this.type = type;
     }
 
-    public SQLTable getTable()
+    /**
+     * Accessor for the table we are joining to.
+     * @return The table joined to
+     */
+    public SQLTable getTargetTable()
     {
-        return table;
+        return targetTable;
     }
 
-    public SQLTable getJoinedTable()
+    /**
+     * Accessor for the table we are joining from.
+     * @return The table we join from to bring in this other table
+     */
+    public SQLTable getSourceTable()
     {
-        return joinedTable;
+        return sourceTable;
     }
 
     /**
@@ -123,11 +131,11 @@ public class SQLJoin
     {
         if (type == JoinType.CROSS_JOIN)
         {
-            return "JoinType: CROSSJOIN " + type + " tbl=" + table;
+            return "JoinType: CROSSJOIN " + type + " tbl=" + targetTable;
         }
         else if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN)
         {
-            return "JoinType: " + (type == JoinType.INNER_JOIN ? "INNERJOIN" : "OUTERJOIN") + " tbl=" + table + " joinedTbl=" + joinedTable;
+            return "JoinType: " + (type == JoinType.INNER_JOIN ? "INNERJOIN" : "OUTERJOIN") + " tbl=" + targetTable + " joinedTbl=" + sourceTable;
         }
         return super.toString();
     }
@@ -154,7 +162,7 @@ public class SQLJoin
             {
                 st.append("CROSS JOIN ");
             }
-            st.append(table.toString());
+            st.append(targetTable.toString());
 
             if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
             {
@@ -167,8 +175,8 @@ public class SQLJoin
                 {
                     // No "on" condition so join as 1=0 (i.e no join, likely part of a polymorphic join or some such)
                     st.append(" ON 1=0");
-                    NucleusLogger.DATASTORE_RETRIEVE.debug("Join condition has no 'on' condition defined! table=" + table + 
-                        " type=" + type + " joinedTable=" + joinedTable + " : so using ON clause as 1=0");
+                    NucleusLogger.DATASTORE_RETRIEVE.debug("Join condition has no 'on' condition defined! table=" + targetTable + 
+                        " type=" + type + " joinedTable=" + sourceTable + " : so using ON clause as 1=0");
                 }
             }
 
@@ -179,7 +187,7 @@ public class SQLJoin
         }
         else
         {
-            st.append("" + table);
+            st.append("" + targetTable);
         }
         return st;
     }
