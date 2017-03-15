@@ -38,6 +38,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
@@ -655,10 +656,20 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         stmt.append(">=0");
                     }
                 }
+
+                JavaTypeMapping softDeleteMapping = containerTable.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                if (softDeleteMapping != null)
+                {
+                    stmt.append(" AND ").append(containerAlias).append(".");
+                    stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    stmt.append("=FALSE");
+                }
+
                 if (relationDiscriminatorMapping != null)
                 {
                     BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerAlias, false);
                 }
+
                 sizeStmt = stmt.toString();
                 return sizeStmt;
             }
@@ -705,6 +716,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                         stmt.append(">=0");
                     }
+                }
+
+                JavaTypeMapping softDeleteMapping = containerTable.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                if (softDeleteMapping != null)
+                {
+                    stmt.append(" AND ").append(containerAlias).append(".");
+                    stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    stmt.append("=FALSE");
                 }
 
                 // Add a discriminator filter for collections with an element discriminator
@@ -781,6 +800,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
                             stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                             stmt.append(">=0");
                         }
+                    }
+
+                    JavaTypeMapping softDeleteMapping = containerTable.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
+                    if (softDeleteMapping != null)
+                    {
+                        stmt.append(" AND ").append(containerAlias).append(".");
+                        stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                        stmt.append("=FALSE");
                     }
 
                     // Add a discriminator filter for collections with an element discriminator
