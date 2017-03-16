@@ -247,6 +247,13 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             return;
         }
 
+        if (getExtension("include-soft-deletes") != null)
+        {
+            // If using an extension that can change the datastore query then evict any existing compilation
+            QueryManager qm = getQueryManager();
+            qm.removeQueryCompilation("JDOQL", getQueryCacheKey());
+        }
+
         // Compile the generic query expressions
         super.compileInternal(parameterValues);
 
@@ -1412,7 +1419,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (key != null && key.equals(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
+            getQueryManager().removeDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.addExtension(key, value);
     }
@@ -1427,7 +1434,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         if (extensions != null && extensions.containsKey(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
+            getQueryManager().removeDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.setExtensions(extensions);
     }

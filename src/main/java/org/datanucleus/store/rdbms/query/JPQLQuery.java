@@ -1414,7 +1414,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (key != null && key.equals(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
+            getQueryManager().removeDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.addExtension(key, value);
     }
@@ -1429,7 +1429,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (extensions != null && extensions.containsKey(EXTENSION_EVALUATE_IN_MEMORY))
         {
             datastoreCompilation = null;
-            getQueryManager().deleteDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
+            getQueryManager().removeDatastoreQueryCompilation(getStoreManager().getQueryCacheKey(), getLanguage(), toString());
         }
         super.setExtensions(extensions);
     }
