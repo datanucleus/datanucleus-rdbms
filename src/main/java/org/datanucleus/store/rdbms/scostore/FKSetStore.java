@@ -34,6 +34,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
@@ -271,22 +272,22 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Utility to update a foreign-key (and distinguisher) in the element in the case of a unidirectional 1-N relationship.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param element The element to update
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
      */
-    private boolean updateElementFk(ObjectProvider op, Object element, Object owner)
+    private boolean updateElementFk(ObjectProvider ownerOP, Object element, Object owner)
     {
         if (element == null)
         {
             return false;
         }
 
-        validateElementForWriting(op.getExecutionContext(), element, null);
+        validateElementForWriting(ownerOP.getExecutionContext(), element, null);
 
         boolean retval;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         String stmt = getUpdateFkStmt(element);
         try
         {
@@ -304,11 +305,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     int jdbcPosition = 1;
                     if (owner == null)
                     {
-                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, ownerOP, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     else
                     {
-                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), op.getObject(), op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                        ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), ownerOP.getObject(), ownerOP, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
                     jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
                     if (relationDiscriminatorMapping != null)
@@ -340,27 +341,27 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param coll The collection to use
      */
-    public void update(ObjectProvider op, Collection coll)
+    public void update(ObjectProvider ownerOP, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
-            clear(op);
+            clear(ownerOP);
             return;
         }
 
         // Find existing elements, and remove any that are no longer present
         // TODO Create set of elements to remove and remove in one call, and add new ones in one call
-        Iterator elemIter = iterator(op);
+        Iterator elemIter = iterator(ownerOP);
         Collection existing = new HashSet();
         while (elemIter.hasNext())
         {
             Object elem = elemIter.next();
             if (!coll.contains(elem))
             {
-                remove(op, elem, -1, true);
+                remove(ownerOP, elem, -1, true);
             }
             else
             {
@@ -377,7 +378,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 E elem = iter.next();
                 if (!existing.contains(elem))
                 {
-                    add(op, elem, 0);
+                    add(ownerOP, elem, 0);
                 }
             }
         }
@@ -385,11 +386,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to add an object to the relationship at the collection end.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param element Element to be added
      * @return Success indicator
      */
-    public boolean add(final ObjectProvider op, E element, int size)
+    public boolean add(final ObjectProvider ownerOP, E element, int size)
     {
         if (element == null)
         {
@@ -398,8 +399,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Make sure that the element is persisted in the datastore (reachability)
-        final Object newOwner = op.getObject();
-        final ExecutionContext ec = op.getExecutionContext();
+        final Object newOwner = ownerOP.getObject();
+        final ExecutionContext ec = ownerOP.getExecutionContext();
 
         // Find the (element) table storing the FK back to the owner
         boolean isPersistentInterface = storeMgr.getNucleusContext().getMetaDataManager().isPersistentInterface(elementType);
@@ -452,7 +453,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
-                        elementOP.setAssociatedValue(externalFKMapping, op.getObject());
+                        elementOP.setAssociatedValue(externalFKMapping, ownerOP.getObject());
                     }
                     if (relationDiscriminatorMapping != null)
                     {
@@ -470,7 +471,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", ownerOP.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject())));
                         elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
                     }
@@ -488,10 +489,10 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                                 elementOP.replaceField(fieldNumInElement, newOwner);
                             }
                         }
-                        else if (op.getReferencedPC() == null)
+                        else if (ownerOP.getReferencedPC() == null)
                         {
                             // Not being attached so must be inconsistent owner, so throw exception
-                            throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                            throw new NucleusUserException(Localiser.msg("056038", ownerOP.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                                 StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(currentOwner)));
                         }
                     }
@@ -539,7 +540,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("055009", ownerOP.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                 }
 
                 elementOP.replaceFieldMakeDirty(fieldNumInElement, newOwner);
@@ -565,17 +566,17 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // 1-N unidir so update the FK if not set to be contained in the set
-        boolean contained = contains(op, element);
-        return (contained ? false : updateElementFk(op, element, newOwner));
+        boolean contained = contains(ownerOP, element);
+        return (contained ? false : updateElementFk(ownerOP, element, newOwner));
     }
  
     /**
      * Method to add a collection of object to the relationship at the collection end.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param elements Elements to be added
      * @return Success indicator
      */
-    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
+    public boolean addAll(ObjectProvider ownerOP, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -586,7 +587,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         Iterator<E> iter = elements.iterator();
         while (iter.hasNext())
         {
-            if (add(op, iter.next(), -1))
+            if (add(ownerOP, iter.next(), -1))
             {
                 success = true;
             }
@@ -599,25 +600,25 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * Method to remove the link to the collection object specified.
      * Depending on the column characteristics in the collection table, the id of the owner field may
      * be NULLed, or the record may be deleted completely (as per cascade-delete in EJB).
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param element The element of the collection to be deleted.
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return A success indicator.
      */
-    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider ownerOP, Object element, int size, boolean allowDependentField)
     {
         if (element == null)
         {
             return false;
         }
-        if (!validateElementForReading(op, element))
+        if (!validateElementForReading(ownerOP, element))
         {
             return false;
         }
 
         // Find the ObjectProvider for the element
         Object elementToRemove = element;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         if (ec.getApiAdapter().isDetached(element)) // User passed in detached object to collection.remove()!
         {
             // Find an attached equivalent of this detached object (DON'T attach the object itself)
@@ -671,12 +672,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Owner of the element has been changed
-        if (ownerMemberMetaData.getMappedBy() != null && oldOwner != op.getObject() && oldOwner != null)
+        if (ownerMemberMetaData.getMappedBy() != null && oldOwner != ownerOP.getObject() && oldOwner != null)
         {
             return false;
         }
 
-        boolean deleteElement = checkRemovalOfElementShouldDelete(op);
+        boolean deleteElement = checkRemovalOfElementShouldDelete(ownerOP);
         if (deleteElement)
         {
             if (ec.getApiAdapter().isPersistable(elementToRemove) && ec.getApiAdapter().isDeleted(elementToRemove))
@@ -693,10 +694,10 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         else
         {
             // Perform any necessary "managed relationships" updates on the element (when bidirectional)
-            manageRemovalOfElement(op, elementToRemove);
+            manageRemovalOfElement(ownerOP, elementToRemove);
 
             // Update the datastore FK
-            updateElementFk(op, elementToRemove, null);
+            updateElementFk(ownerOP, elementToRemove, null);
         }
 
         return true;
@@ -706,12 +707,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * Method to remove the links to a collection of elements specified.
      * Depending on the column characteristics in the collection table, the id
      * of the owner fields may be NULLed, or the records may be deleted completely.
-     *
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param elements The elements of the collection to be deleted.
      * @return A success indicator.
      */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider ownerOP, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -725,7 +725,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         Iterator iter=elements.iterator();
         while (iter.hasNext())
         {
-            if (remove(op, iter.next(), -1, true))
+            if (remove(ownerOP, iter.next(), -1, true))
             {
                 success = false;
             }
@@ -736,10 +736,10 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Convenience method to return if the removal of an element should delete the element.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @return Whether we should delete the element on removing from the collection
      */
-    protected boolean checkRemovalOfElementShouldDelete(ObjectProvider op)
+    protected boolean checkRemovalOfElementShouldDelete(ObjectProvider ownerOP)
     {
         boolean delete = false;
         boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
@@ -783,12 +783,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     /**
      * Convenience method to manage the removal of an element from the collection, performing
      * any necessary "managed relationship" updates when the field is bidirectional.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      * @param element The element
      */
-    protected void manageRemovalOfElement(ObjectProvider op, Object element)
+    protected void manageRemovalOfElement(ObjectProvider ownerOP, Object element)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         if (relationType == RelationType.ONE_TO_MANY_BI)
         {
             // TODO Move this into RelationshipManager
@@ -801,7 +801,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     // Null the owner of the element
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("055010", ownerOP.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(element)));
                     }
 
                     ObjectProvider ownerHolderOP = elementOP;
@@ -854,16 +854,16 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * This is called by the List.clear() method, or when the container object is being deleted
      * and the elements are to be removed (maybe for dependent field), or also when updating a Collection
      * and removing all existing prior to adding all new.
-     * @param op ObjectProvider for the owner.
+     * @param ownerOP ObjectProvider for the owner.
      */
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider ownerOP)
     {
-        ExecutionContext ec = op.getExecutionContext();
-        boolean deleteElements = checkRemovalOfElementShouldDelete(op);
+        ExecutionContext ec = ownerOP.getExecutionContext();
+        boolean deleteElements = checkRemovalOfElementShouldDelete(ownerOP);
         if (deleteElements)
         {
             // Find elements present in the datastore and delete them one-by-one
-            Iterator elementsIter = iterator(op);
+            Iterator elementsIter = iterator(ownerOP);
             if (elementsIter != null)
             {
                 while (elementsIter.hasNext())
@@ -884,9 +884,11 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
         else
         {
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+
             // Perform any necessary "managed relationships" updates on the element
-            op.isLoaded(ownerMemberMetaData.getAbsoluteFieldNumber()); // Make sure the field is loaded
-            Collection value = (Collection) op.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+            ownerOP.isLoaded(ownerMemberMetaData.getAbsoluteFieldNumber()); // Make sure the field is loaded
+            Collection value = (Collection) ownerOP.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
             Iterator elementsIter = null;
             if (value != null && !value.isEmpty())
             {
@@ -895,48 +897,54 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             else
             {
                 // Maybe deleting the owner with optimistic transactions so the elements are no longer cached
-                elementsIter = iterator(op);
+                elementsIter = iterator(ownerOP);
             }
-            if (elementsIter != null)
+            if (!ownerSoftDelete)
             {
-                while (elementsIter.hasNext())
+                if (elementsIter != null)
                 {
-                    Object element = elementsIter.next();
-                    manageRemovalOfElement(op, element);
+                    while (elementsIter.hasNext())
+                    {
+                        Object element = elementsIter.next();
+                        manageRemovalOfElement(ownerOP, element);
+                    }
                 }
             }
 
-            // Clear the FKs in the datastore
-            // TODO This is likely not necessary in the 1-N bidir case since we've just set the owner FK to null above
-            for (int i=0;i<elementInfo.length;i++)
+            if (!ownerSoftDelete)
             {
-                String stmt = getClearNullifyStmt(elementInfo[i]);
-                try
+                // Clear the FKs in the datastore
+                // TODO This is likely not necessary in the 1-N bidir case since we've just set the owner FK to null above
+                for (int i=0;i<elementInfo.length;i++)
                 {
-                    ManagedConnection mconn = storeMgr.getConnection(ec);
-                    SQLController sqlControl = storeMgr.getSQLController();
+                    String stmt = getClearNullifyStmt(elementInfo[i]);
                     try
                     {
-                        PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                        ManagedConnection mconn = storeMgr.getConnection(ec);
+                        SQLController sqlControl = storeMgr.getSQLController();
                         try
                         {
-                            int jdbcPosition = 1;
-                            BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                            sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                            PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                            try
+                            {
+                                int jdbcPosition = 1;
+                                BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                                sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                            }
+                            finally
+                            {
+                                sqlControl.closeStatement(mconn, ps);
+                            }
                         }
                         finally
                         {
-                            sqlControl.closeStatement(mconn, ps);
+                            mconn.release();
                         }
                     }
-                    finally
+                    catch (SQLException e)
                     {
-                        mconn.release();
+                        throw new NucleusDataStoreException(Localiser.msg("056013",stmt), e);
                     }
-                }
-                catch (SQLException e)
-                {
-                    throw new NucleusDataStoreException(Localiser.msg("056013",stmt), e);
                 }
             }
         }

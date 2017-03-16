@@ -37,6 +37,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.ObjectProvider;
@@ -270,21 +271,21 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to set an object in the List at a position.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param index The item index
      * @param element What to set it to.
      * @param allowDependentField Whether to enable dependent-field deletes during the set
      * @return The value before setting.
      */
-    public E set(ObjectProvider op, int index, Object element, boolean allowDependentField)
+    public E set(ObjectProvider ownerOP, int index, Object element, boolean allowDependentField)
     {
-        validateElementForWriting(op, element, -1); // Last argument means don't set the position on any INSERT
-        E oldElement = get(op, index);
+        validateElementForWriting(ownerOP, element, -1); // Last argument means don't set the position on any INSERT
+        E oldElement = get(ownerOP, index);
 //        return set(op, index, element, allowDependentField, oldElement);
 
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = ownerOP.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -295,7 +296,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                     if (orderMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
@@ -327,7 +328,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
 
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps2, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps2, jdbcPosition, this);
                     if (orderMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps2, index, jdbcPosition, orderMapping);
@@ -366,7 +367,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             if (oldElement != null)
             {
                 // Delete the element if it is dependent and doesnt have a duplicate entry in the list
-                op.getExecutionContext().deleteObjectInternal(oldElement);
+                ownerOP.getExecutionContext().deleteObjectInternal(oldElement);
             }
         }
 
@@ -375,20 +376,20 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     /**
      * Utility to update a foreign-key in the element in the case of a unidirectional 1-N relationship.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param element The element to update
      * @param owner The owner object to set in the FK
      * @param index The index position (or -1 if not known)
      * @return Whether it was performed successfully
      */
-    private boolean updateElementFk(ObjectProvider op, Object element, Object owner, int index)
+    private boolean updateElementFk(ObjectProvider ownerOP, Object element, Object owner, int index)
     {
         if (element == null)
         {
             return false;
         }
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         String updateFkStmt = getUpdateFkStmt(element);
         boolean retval;
         try
@@ -410,7 +411,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null, ownerOP, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -420,7 +421,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
                     else
                     {
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                     }
                     if (orderMapping != null)
                     {
@@ -455,26 +456,26 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param coll The collection to use
      */
-    public void update(ObjectProvider op, Collection coll)
+    public void update(ObjectProvider ownerOP, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
-            clear(op);
+            clear(ownerOP);
             return;
         }
 
         // Find existing elements, and remove any that are no longer present
         Collection existing = new ArrayList();
-        Iterator elemIter = iterator(op);
+        Iterator elemIter = iterator(ownerOP);
         while (elemIter.hasNext())
         {
             Object elem = elemIter.next();
             if (!coll.contains(elem))
             {
-                remove(op, elem, -1, true);
+                remove(ownerOP, elem, -1, true);
             }
             else
             {
@@ -489,20 +490,20 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         // TODO Improve this - need to allow for list element position changes etc
-        clear(op);
-        addAll(op, coll, 0);
+        clear(ownerOP);
+        addAll(ownerOP, coll, 0);
     }
 
     /**
      * Internal method for adding an item to the List.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param startAt The start position
      * @param atEnd Whether to add at the end
      * @param c The Collection of elements to add.
      * @param size Current size of list (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection<E> c, int size)
+    protected boolean internalAdd(ObjectProvider ownerOP, int startAt, boolean atEnd, Collection<E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -510,7 +511,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         // Check what we have persistent already
-        int currentListSize = (size < 0 ? size(op) : size);
+        int currentListSize = (size < 0 ? size(ownerOP) : size);
 
         boolean shiftingElements = true;
         if (atEnd || startAt == currentListSize)
@@ -531,7 +532,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 position = -1;
             }
 
-            boolean inserted = validateElementForWriting(op, elementIter.next(), position);
+            boolean inserted = validateElementForWriting(ownerOP, elementIter.next(), position);
             if (!inserted || shiftingElements)
             {
                 // This element wasnt positioned in the validate so we need to set the positions later
@@ -555,7 +556,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 // This is used where inserting between existing elements and have to shift down all elements after the start point
                 int shift = c.size();
 
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = ownerOP.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnection(ec);
                 try
                 {
@@ -563,7 +564,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     for (int i=currentListSize-1; i>=startAt; i--)
                     {
                         // Shift the index of this row by "shift"
-                        internalShift(op, mconn, true, i, shift, false);
+                        internalShift(ownerOP, mconn, true, i, shift, false);
                     }
                 }
                 finally
@@ -586,7 +587,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             while (elementIter.hasNext())
             {
                 Object element = elementIter.next();
-                updateElementFk(op, element, op.getObject(), startAt);
+                updateElementFk(ownerOP, element, ownerOP.getObject(), startAt);
                 startAt++;
             }
         }
@@ -600,11 +601,11 @@ public class FKListStore<E> extends AbstractListStore<E>
      * removes an element and shuffles the indexes, then removes an element
      * and shuffles the indexes, then removes an element and shuffles the
      * indexes etc ... a bit inefficient !!!
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider ownerOP, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -615,7 +616,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (indexedList)
         {
             // Get the indices of the elements to remove in reverse order (highest first)
-            int[] indices = getIndicesOf(op,elements);
+            int[] indices = getIndicesOf(ownerOP,elements);
             if (indices == null)
             {
                 return false;
@@ -625,7 +626,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             // TODO : Change this to remove all in one go and then shift once
             for (int i=0;i<indices.length;i++)
             {
-                internalRemoveAt(op, indices[i], -1);
+                internalRemoveAt(ownerOP, indices[i], -1);
                 modified = true;
             }
 
@@ -639,7 +640,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 // "delete-dependent" : delete elements if the collection is marked as dependent
                 // TODO What if the collection contains elements that are not in the List ? should not delete them
-                op.getExecutionContext().deleteObjects(elements.toArray());
+                ownerOP.getExecutionContext().deleteObjects(elements.toArray());
             }
         }
         else
@@ -649,7 +650,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             while (iter.hasNext())
             {
                 Object element = iter.next();
-                remove(op, element, size, true);
+                remove(ownerOP, element, size, true);
             }
         }
 
@@ -658,22 +659,22 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     /**
      * Convenience method to remove the specified element from the List.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param element The element
      * @return Whether the List was modified
      */
-    protected boolean internalRemove(ObjectProvider op, Object element, int size)
+    protected boolean internalRemove(ObjectProvider ownerOP, Object element, int size)
     {
         if (indexedList)
         {
             // Indexed List
             // The element can be at one position only (no duplicates allowed in FK list)
-            int index = indexOf(op, element);
+            int index = indexOf(ownerOP, element);
             if (index == -1)
             {
                 return false;
             }
-            internalRemoveAt(op, index, size);
+            internalRemoveAt(ownerOP, index, size);
         }
         else
         {
@@ -681,14 +682,14 @@ public class FKListStore<E> extends AbstractListStore<E>
             if (ownerMapping.isNullable())
             {
                 // Nullify the FK
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = ownerOP.getExecutionContext();
                 ObjectProvider elementSM = ec.findObjectProvider(element);
                 if (relationType == RelationType.ONE_TO_MANY_BI)
                 {
                     // Set field in element to null (so it nulls the FK)
                     // TODO This is ManagedRelations - move into RelationshipManager
                     elementSM.replaceFieldMakeDirty(ownerMemberMetaData.getRelatedMemberMetaData(clr)[0].getAbsoluteFieldNumber(), null);
-                    if (op.getExecutionContext().isFlushing())
+                    if (ownerOP.getExecutionContext().isFlushing())
                     {
                         elementSM.flush();
                     }
@@ -696,13 +697,13 @@ public class FKListStore<E> extends AbstractListStore<E>
                 else
                 {
                     // Null the (external) FK in the element
-                    updateElementFk(op, element, null, -1);
+                    updateElementFk(ownerOP, element, null, -1);
                 }
             }
             else
             {
                 // Delete the element
-                op.getExecutionContext().deleteObjectInternal(element);
+                ownerOP.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
@@ -748,11 +749,11 @@ public class FKListStore<E> extends AbstractListStore<E>
     /**
      * Internal method to remove an object at a location in the List.
      * Differs from the JoinTable List in that it nulls out the owner FK.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      * @param index The location
      * @param size Current size of list (if known). -1 if not known
      */
-    protected void internalRemoveAt(ObjectProvider op, int index, int size)
+    protected void internalRemoveAt(ObjectProvider ownerOP, int index, int size)
     {
         if (!indexedList)
         {
@@ -782,7 +783,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             // TODO Really ought to make this delete via ExecutionContext
             stmt = getRemoveAtStmt();
         }
-        internalRemoveAt(op, index, stmt, size);
+        internalRemoveAt(ownerOP, index, stmt, size);
     }
 
     /**
@@ -790,12 +791,12 @@ public class FKListStore<E> extends AbstractListStore<E>
      * This is called by the List.clear() method, or when the container object is being deleted
      * and the elements are to be removed (maybe for dependent field), or also when updating a Collection
      * and removing all existing prior to adding all new.
-     * @param op ObjectProvider for the owner
+     * @param ownerOP ObjectProvider for the owner
      */
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider ownerOP)
     {
         boolean deleteElements = false;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = ownerOP.getExecutionContext();
         boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
         if (ownerMemberMetaData.isCascadeRemoveOrphans())
         {
@@ -832,7 +833,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         if (deleteElements)
         {
             // Find elements present in the datastore and delete them one-by-one
-            Iterator elementsIter = iterator(op);
+            Iterator elementsIter = iterator(ownerOP);
             if (elementsIter != null)
             {
                 while (elementsIter.hasNext())
@@ -854,39 +855,43 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            // Clear without delete
-            // TODO If the relation is bidirectional we need to clear the owner in the element
-            String clearNullifyStmt = getClearNullifyStmt();
-            try
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+            if (!ownerSoftDelete)
             {
-                ManagedConnection mconn = storeMgr.getConnection(ec);
-                SQLController sqlControl = storeMgr.getSQLController();
+                // Clear without delete
+                // TODO If the relation is bidirectional we need to clear the owner in the element
+                String clearNullifyStmt = getClearNullifyStmt();
                 try
                 {
-                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearNullifyStmt, false);
+                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {
-                        int jdbcPosition = 1;
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        if (relationDiscriminatorMapping != null)
+                        PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearNullifyStmt, false);
+                        try
                         {
-                            BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                            int jdbcPosition = 1;
+                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                            if (relationDiscriminatorMapping != null)
+                            {
+                                BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                            }
+                            sqlControl.executeStatementUpdate(ec, mconn, clearNullifyStmt, ps, true);
                         }
-                        sqlControl.executeStatementUpdate(ec, mconn, clearNullifyStmt, ps, true);
+                        finally
+                        {
+                            sqlControl.closeStatement(mconn, ps);
+                        }
                     }
                     finally
                     {
-                        sqlControl.closeStatement(mconn, ps);
+                        mconn.release();
                     }
                 }
-                finally
+                catch (SQLException e)
                 {
-                    mconn.release();
+                    throw new NucleusDataStoreException(Localiser.msg("056013", clearNullifyStmt), e);
                 }
-            }
-            catch (SQLException e)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("056013", clearNullifyStmt), e);
             }
         }
     }

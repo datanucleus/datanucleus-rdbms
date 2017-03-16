@@ -33,6 +33,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -433,40 +434,44 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
         else
         {
-            // TODO Cater for multiple element roots
-            // TODO If the relation is bidirectional we need to clear the owner in the element
-            String clearNullifyStmt = getClearNullifyStmt();
-            try
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+            if (!ownerSoftDelete)
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
-                SQLController sqlControl = storeMgr.getSQLController();
+                // TODO Cater for multiple element roots
+                // TODO If the relation is bidirectional we need to clear the owner in the element
+                String clearNullifyStmt = getClearNullifyStmt();
                 try
                 {
-                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearNullifyStmt, false);
+                    ExecutionContext ec = ownerOP.getExecutionContext();
+                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {
-                        int jdbcPosition = 1;
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                        if (relationDiscriminatorMapping != null)
+                        PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearNullifyStmt, false);
+                        try
                         {
-                            BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                            int jdbcPosition = 1;
+                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                            if (relationDiscriminatorMapping != null)
+                            {
+                                BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                            }
+                            sqlControl.executeStatementUpdate(ec, mconn, clearNullifyStmt, ps, true);
                         }
-                        sqlControl.executeStatementUpdate(ec, mconn, clearNullifyStmt, ps, true);
+                        finally
+                        {
+                            sqlControl.closeStatement(mconn, ps);
+                        }
                     }
                     finally
                     {
-                        sqlControl.closeStatement(mconn, ps);
+                        mconn.release();
                     }
                 }
-                finally
+                catch (SQLException e)
                 {
-                    mconn.release();
+                    throw new NucleusDataStoreException(Localiser.msg("056013", clearNullifyStmt), e);
                 }
-            }
-            catch (SQLException e)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("056013", clearNullifyStmt), e);
             }
         }
     }

@@ -32,6 +32,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
+import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -324,39 +325,53 @@ public abstract class ElementContainerStore extends BaseContainerStore
             }
         }
 
-        String clearStmt = getClearStmt();
-        try
+        boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+        boolean elementSoftDelete = (elementInfo != null ? elementInfo[0].cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE) : false);
+
+        if (ownerSoftDelete && elementSoftDelete)
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
+            // Owner and elements are being soft deleted, so no need to touch join table entries
+        }
+        else if (!dependent && ownerSoftDelete)
+        {
+            // Not deleting the elements, but owner is being soft deleted, so leave join table entries
+        }
+        else
+        {
+            String clearStmt = getClearStmt();
             try
             {
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearStmt, false);
+                ExecutionContext ec = ownerOP.getExecutionContext();
+                ManagedConnection mconn = storeMgr.getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
                 try
                 {
-                    int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
-                    if (relationDiscriminatorMapping != null)
+                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, clearStmt, false);
+                    try
                     {
-                        BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
-                    }
+                        int jdbcPosition = 1;
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                        if (relationDiscriminatorMapping != null)
+                        {
+                            BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
+                        }
 
-                    sqlControl.executeStatementUpdate(ec, mconn, clearStmt, ps, true);
+                        sqlControl.executeStatementUpdate(ec, mconn, clearStmt, ps, true);
+                    }
+                    finally
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
                 }
                 finally
                 {
-                    sqlControl.closeStatement(mconn, ps);
+                    mconn.release();
                 }
             }
-            finally
+            catch (SQLException e)
             {
-                mconn.release();
+                throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
             }
-        }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
         }
 
         // Cascade-delete
