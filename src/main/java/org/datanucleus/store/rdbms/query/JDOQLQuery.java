@@ -535,7 +535,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     hasParams = true;
                 }
 
-                if (!statementReturnsEmpty && queryCacheKey != null)
+                if (!statementReturnsEmpty && queryCacheKey != null && useCaching())
                 {
                     // TODO Allow caching of queries with subqueries
                     if (!datastoreCompilation.isPrecompilable() || (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
