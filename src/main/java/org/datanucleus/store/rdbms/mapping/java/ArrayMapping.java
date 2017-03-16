@@ -328,7 +328,6 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // Do nothing when stored in a single column since we are handled in the main request
             return;
         }
-        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
         ownerOP.isLoaded(getAbsoluteFieldNumber());

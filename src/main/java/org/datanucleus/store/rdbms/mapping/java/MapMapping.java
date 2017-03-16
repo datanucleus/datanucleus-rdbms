@@ -280,7 +280,6 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Do nothing when serialised since we are handled in the main request
             return;
         }
-        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
         ownerOP.isLoaded(getAbsoluteFieldNumber());
@@ -288,18 +287,17 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value == null)
         {
             // Do nothing
+            return;
         }
-        else
-        {
-            if (!(value instanceof SCO))
-            {
-                // Make sure we have a SCO wrapper so we can clear from the datastore
-                value = (java.util.Map)SCOUtils.wrapSCOField(ownerOP, mmd.getAbsoluteFieldNumber(), value, true);
-            }
-            value.clear();
 
-            // Flush any outstanding updates for this backing store
-            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+        if (!(value instanceof SCO))
+        {
+            // Make sure we have a SCO wrapper so we can clear from the datastore
+            value = (java.util.Map)SCOUtils.wrapSCOField(ownerOP, mmd.getAbsoluteFieldNumber(), value, true);
         }
+        value.clear();
+
+        // Flush any outstanding updates for this backing store
+        ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
     }
 }

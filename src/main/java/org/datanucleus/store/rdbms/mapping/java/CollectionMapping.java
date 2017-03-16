@@ -263,7 +263,6 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Field is stored with the main object so nothing to clean up
             return;
         }
-        // TODO Add handling for owner being softDeleted
 
         // makes sure field is loaded
         ownerOP.isLoaded(getAbsoluteFieldNumber());
