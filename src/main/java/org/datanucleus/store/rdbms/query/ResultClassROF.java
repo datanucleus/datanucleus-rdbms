@@ -277,6 +277,15 @@ public class ResultClassROF implements ResultObjectFactory
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
                     PersistentClassROF rof = new PersistentClassROF(storeMgr, acmd, classMap, false, ec.getFetchPlan(), cls);
                     fieldValues[i] = rof.getObject(ec, rs);
+
+                    if (resultDefinition.getNumberOfResultExpressions() == 1)
+                    {
+                        if (classMap.getClassName().equals(resultClass.getName()))
+                        {
+                            // Special case of the result class being a persistent class so just return it
+                            return fieldValues[0];
+                        }
+                    }
                 }
             }
         }
