@@ -48,7 +48,6 @@ import org.datanucleus.store.types.scostore.Store;
  * Obviously there are differences when using a join-table, or when the elements are embedded into the join-table, but the basic idea is 
  * we generate an iterator statement for the elements (just like the backing store normally would) except instead of restricting the statement 
  * to just a particular owner, it adds a JOIN, restricting to the candidates implied by the query
- * </p>
  * <b>This is work-in-progress</b>
  */
 public class BulkFetchJoinHandler implements BulkFetchHandler
