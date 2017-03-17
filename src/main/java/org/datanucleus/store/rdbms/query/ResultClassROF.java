@@ -42,25 +42,23 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Take a ResultSet, and for each row retrieves an object of a specified type.
- * Follows the rules in JDO2 spec [14.6.12] regarding the result class.
- * 
+ * Follows the rules in the JDO spec [14.6.12] regarding the result class.
  * <P>
  * The <B>resultClass</B> will be used to create objects of that type when calling
  * <I>getObject()</I>. The <B>resultClass</B> can be one of the following
  * <UL>
- * <LI>Simple type - String, Long, Integer, Float, Boolean, Byte, Character, Double,
- * Short, BigDecimal, BigInteger, java.util.Date, java.sql.Date, java.sql.Time, java.sql.Timestamp</LI>
- * <LI>java.util.Map - the JDO impl will choose the concrete impl of java.util.Map to use</LI>
+ * <LI>Simple type - String, Long, Integer, Float, Boolean, Byte, Character, Double, Short, BigDecimal, BigInteger, java.util.Date, 
+ * java.sql.Date, java.sql.Time, java.sql.Timestamp</LI>
+ * <LI>java.util.Map - DataNucleus will choose the concrete impl of java.util.Map to use</LI>
  * <LI>Object[]</LI>
- * <LI>User defined type with either a constructor taking the result set fields,
- * or a default constructor and setting the fields using a put(Object,Object) method, setXXX methods, or public fields</LI>
+ * <LI>User defined type with either a constructor taking the result set fields, or a default constructor and setting the fields using a 
+ * put(Object,Object) method, setXXX methods, or public fields</LI>
  * </UL>
  *
  * <P>
- * Objects of this class are created in 2 distinct situations. The first is where a
- * candidate class is available, and consequently field position mappings are
- * available. The second is where no candidate class is available and so
- * only the field names are available, and the results are taken in ResultSet order.
+ * Objects of this class are created in 2 distinct situations. 
+ * The first is where a candidate class is available, and consequently field position mappings are available. 
+ * The second is where no candidate class is available and so only the field names are available, and the results are taken in ResultSet order.
  * These 2 modes have their own constructor.
  */
 public class ResultClassROF implements ResultObjectFactory
@@ -143,8 +141,7 @@ public class ResultClassROF implements ResultObjectFactory
                 }
                 else
                 {
-                    throw new NucleusUserException("Unsupported component " + stmtMap.getClass().getName() +
-                        " found in results");
+                    throw new NucleusUserException("Unsupported component " + stmtMap.getClass().getName() + " found in results");
                 }
             }
         }
@@ -277,6 +274,15 @@ public class ResultClassROF implements ResultObjectFactory
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
                     PersistentClassROF rof = new PersistentClassROF(storeMgr, acmd, classMap, false, ec.getFetchPlan(), cls);
                     fieldValues[i] = rof.getObject(ec, rs);
+
+                    if (resultDefinition.getNumberOfResultExpressions() == 1)
+                    {
+                        if (classMap.getClassName().equals(resultClass.getName()))
+                        {
+                            // Special case of the result class being a persistent class so just return it
+                            return fieldValues[0];
+                        }
+                    }
                 }
             }
         }
@@ -370,8 +376,7 @@ public class ResultClassROF implements ResultObjectFactory
                             ctr_arg_types[i] = null;
                         }
                     }
-                    NucleusLogger.QUERY.debug(Localiser.msg("021206",
-                        resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
+                    NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
                 }
                 else
                 {
