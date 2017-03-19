@@ -1255,8 +1255,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     joinOnExpr.evaluate(this);
                     BooleanExpression joinOnSqlExpr = (BooleanExpression) stack.pop();
                     processingOnClause = false;
-                    SQLJoin join = stmt.getJoinForTable(sqlTbl);
-                    join.addAndCondition(joinOnSqlExpr);
+                    stmt.addAndConditionToJoinForTable(sqlTbl, joinOnSqlExpr, true);
 
                     // Move on to next join in the chain
                     rightExpr = rightExpr.getRight();

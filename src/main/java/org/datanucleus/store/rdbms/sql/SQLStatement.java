@@ -680,6 +680,21 @@ public abstract class SQLStatement
     }
 
     /**
+     * Method to find the JOIN for the specified table and add the specified 'and' condition to the JOIN as an 'ON' clause.
+     * @param sqlTbl The table
+     * @param andCondition The 'ON' condition to add
+     * @param applyToUnions Whether to apply to unions (see SelectStatement)
+     */
+    public void addAndConditionToJoinForTable(SQLTable sqlTbl, BooleanExpression andCondition, boolean applyToUnions)
+    {
+        SQLJoin join = getJoinForTable(sqlTbl);
+        if (join != null)
+        {
+            join.addAndCondition(andCondition);
+        }
+    }
+
+    /**
      * Accessor for the type of join used for the specified table.
      * @param sqlTbl The table to check
      * @return The join type, or null if not joined in this statement
