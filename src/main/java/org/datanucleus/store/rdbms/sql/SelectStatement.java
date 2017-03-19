@@ -442,6 +442,32 @@ public class SelectStatement extends SQLStatement
     }
 
     /**
+     * Method to find the JOIN for the specified table and add the specified 'and' condition to the JOIN as an 'ON' clause.
+     * @param sqlTbl The table
+     * @param andCondition The 'ON' condition to add
+     * @param applyToUnions Whether to apply to unions (see SelectStatement)
+     */
+    public void addAndConditionToJoinForTable(SQLTable sqlTbl, BooleanExpression andCondition, boolean applyToUnions)
+    {
+        SQLJoin join = getJoinForTable(sqlTbl);
+        if (join != null)
+        {
+            join.addAndCondition(andCondition);
+        }
+
+        if (unions != null && applyToUnions)
+        {
+            // Apply the select to all unions
+            Iterator<SelectStatement> unionIter = unions.iterator();
+            while (unionIter.hasNext())
+            {
+                SelectStatement stmt = unionIter.next();
+                stmt.addAndConditionToJoinForTable(sqlTbl, andCondition, applyToUnions);
+            }
+        }
+    }
+
+    /**
      * Method to add a grouping expression to the query.
      * Adds the grouping to any unioned queries
      * @param expr The expression
