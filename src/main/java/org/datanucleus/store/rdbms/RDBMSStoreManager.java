@@ -1755,7 +1755,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (IdentityUtils.isDatastoreIdentity(id))
         {
             // Datastore Identity, so identity is an OID, and the object is of the target class or a subclass
-            String className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            String className = IdentityUtils.getTargetClassNameForIdentity(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.DATASTORE)
@@ -1766,7 +1766,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         else if (IdentityUtils.isSingleFieldIdentity(id))
         {
             // Using SingleFieldIdentity so can assume that object is of the target class or a subclass
-            String className = IdentityUtils.getTargetClassNameForIdentitySimple(id);
+            String className = IdentityUtils.getTargetClassNameForIdentity(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
             rootCmds.add(cmd);
             if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))

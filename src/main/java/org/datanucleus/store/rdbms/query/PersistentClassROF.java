@@ -359,7 +359,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 if (IdentityUtils.isSingleFieldIdentity(id))
                 {
                     // Any single-field identity will have the precise target class determined above, so use it
-                    pcClassForObject = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentitySimple(id));
+                    pcClassForObject = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentity(id));
                 }
 
                 obj = findObjectWithIdAndLoadFields(id, ec, rs, mappingDefinition, mappedFieldNumbers, pcClassForObject, cmd, surrogateVersion);
@@ -373,7 +373,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
             if (id != null)
             {
-                if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
+                if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentity(id)))
                 {
                     // Get a DatastoreId for the right inheritance level
                     id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));
@@ -550,7 +550,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             Object id = mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
             if (id != null)
             {
-                if (!pcClass.getName().equals(IdentityUtils.getTargetClassNameForIdentitySimple(id)))
+                if (!pcClass.getName().equals(IdentityUtils.getTargetClassNameForIdentity(id)))
                 {
                     // Get a DatastoreId for the right inheritance level
                     id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClass.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));

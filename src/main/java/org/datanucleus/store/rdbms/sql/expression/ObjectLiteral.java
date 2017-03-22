@@ -92,7 +92,7 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
         }
         else if (IdentityUtils.isDatastoreIdentity(value))
         {
-            objClassName = IdentityUtils.getTargetClassNameForIdentitySimple(value);
+            objClassName = IdentityUtils.getTargetClassNameForIdentity(value);
         }
         AbstractClassMetaData cmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(objClassName, clr);
         if (cmd != null)
