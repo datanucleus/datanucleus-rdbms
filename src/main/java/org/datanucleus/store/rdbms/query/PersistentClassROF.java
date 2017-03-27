@@ -356,10 +356,11 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 }
 
                 Object id = getIdentityForResultSetRow(storeMgr, rs, mappingDefinition, ec, cmd, pcClassForObject, requiresInheritanceCheck);
-                if (IdentityUtils.isSingleFieldIdentity(id))
+                String idClassName = IdentityUtils.getTargetClassNameForIdentity(id);
+                if (idClassName != null)
                 {
-                    // Any single-field identity will have the precise target class determined above, so use it
-                    pcClassForObject = ec.getClassLoaderResolver().classForName(IdentityUtils.getTargetClassNameForIdentity(id));
+                    // "identity" defines the class name
+                    pcClassForObject = ec.getClassLoaderResolver().classForName(idClassName);
                 }
 
                 obj = findObjectWithIdAndLoadFields(id, ec, rs, mappingDefinition, mappedFieldNumbers, pcClassForObject, cmd, surrogateVersion);
@@ -373,7 +374,8 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
             if (id != null)
             {
-                if (!pcClassForObject.getName().equals(IdentityUtils.getTargetClassNameForIdentity(id)))
+                String idClassName = IdentityUtils.getTargetClassNameForIdentity(id);
+                if (!pcClassForObject.getName().equals(idClassName))
                 {
                     // Get a DatastoreId for the right inheritance level
                     id = ec.getNucleusContext().getIdentityManager().getDatastoreId(pcClassForObject.getName(), IdentityUtils.getTargetKeyForDatastoreIdentity(id));

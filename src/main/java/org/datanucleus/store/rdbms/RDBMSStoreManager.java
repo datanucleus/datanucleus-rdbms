@@ -1727,12 +1727,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Returns the class corresponding to the given object identity.
-     * If the identity is an instanceof OID then returns the associated persistable class name.
      * If the identity is a SCOID, return the SCO class.
+     * If the identity is a DatastoreId then returns the associated persistable class name.
      * If the identity is a SingleFieldIdentity then returns the associated persistable class name.
      * If the object is an AppID PK, returns the associated PC class (as far as determinable).
-     * If the object id is an application id and the user supplies the "ec" argument then
-     * a check can be performed in the datastore where necessary.
+     * If the object id is an application id and the user supplies the "ec" argument then a check can be performed in the datastore where necessary.
      * @param id The identity of some object.
      * @param clr ClassLoader resolver
      * @param ec execution context (optional - to allow check inheritance level in datastore)
@@ -1752,31 +1751,27 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Really ought to be for a single inheritance tree (hence one element in the List) but we allow for
         // a user reusing their PK class in multiple trees
         List<AbstractClassMetaData> rootCmds = new ArrayList<>();
-        if (IdentityUtils.isDatastoreIdentity(id))
+
+        String className = IdentityUtils.getTargetClassNameForIdentity(id);
+        if (className != null)
         {
-            // Datastore Identity, so identity is an OID, and the object is of the target class or a subclass
-            String className = IdentityUtils.getTargetClassNameForIdentity(id);
             AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-            rootCmds.add(cmd);
-            if (cmd.getIdentityType() != IdentityType.DATASTORE)
+
+            // Basic error checking
+            if (IdentityUtils.isDatastoreIdentity(id) && cmd.getIdentityType() != IdentityType.DATASTORE)
             {
-                throw new NucleusUserException(Localiser.msg("050022", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
             }
-        }
-        else if (IdentityUtils.isSingleFieldIdentity(id))
-        {
-            // Using SingleFieldIdentity so can assume that object is of the target class or a subclass
-            String className = IdentityUtils.getTargetClassNameForIdentity(id);
-            AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-            rootCmds.add(cmd);
-            if (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName()))
+            if (IdentityUtils.isSingleFieldIdentity(id) && (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName())))
             {
-                throw new NucleusUserException(Localiser.msg("050022", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
             }
+
+            rootCmds.add(cmd);
         }
         else
         {
-            // Find all of the class with a PK class of this type
+            // Find all of the classes with a PK class of this type
             Collection<AbstractClassMetaData> pkCmds = getMetaDataManager().getClassMetaDataWithApplicationId(id.getClass().getName());
             if (pkCmds != null && pkCmds.size() > 0)
             {

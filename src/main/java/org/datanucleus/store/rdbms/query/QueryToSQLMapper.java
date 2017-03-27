@@ -77,6 +77,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.mapping.java.TemporalMapping;
+import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
 import org.datanucleus.store.rdbms.sql.SQLJoin;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -3963,16 +3964,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Try to determine from provided parameter value or from symbol table (declared type)
             if (paramValue != null)
             {
-                String className = storeMgr.getClassNameForObjectID(paramValue, clr, ec);
-                if (className != null)
+                if (!storeMgr.getMetaDataManager().isClassPersistable(paramValue.getClass().getName()) &&
+                    !paramValue.getClass().isArray() && !paramValue.getClass().isInterface() && !Collection.class.isAssignableFrom(paramValue.getClass()) && 
+                    !Map.class.isAssignableFrom(paramValue.getClass()) &&
+                    !storeMgr.getNucleusContext().getTypeManager().isSupportedSecondClassType(paramValue.getClass().getName()))
                 {
-                    // Identity for persistable class
-                    AbstractClassMetaData cmd = storeMgr.getMetaDataManager().getMetaDataForClass(className, clr);
-                    if (cmd.getIdentityType() == IdentityType.APPLICATION)
+                    // Test for this being the "id" of a persistable object
+                    // Persistable/array/interface/collection/map/simple cannot be an object "id"
+                    String className = storeMgr.getClassNameForObjectID(paramValue, clr, ec);
+                    if (className != null)
                     {
-                        Class cls = clr.classForName(className);
-                        m = exprFactory.getMappingForType(cls, false);
-                        m = new PersistableIdMapping((PersistableMapping) m);
+                        // Identity for persistable class
+                        AbstractClassMetaData cmd = storeMgr.getMetaDataManager().getMetaDataForClass(className, clr);
+                        if (cmd.getIdentityType() == IdentityType.APPLICATION)
+                        {
+                            Class cls = clr.classForName(className);
+                            m = exprFactory.getMappingForType(cls, false);
+                            m = new PersistableIdMapping((PersistableMapping) m);
+                        }
                     }
                 }
 
@@ -3982,6 +3991,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     try
                     {
                         m = exprFactory.getMappingForType(paramValue.getClass(), false);
+                        if (m instanceof TypeConverterMapping && expr.getSymbol().getValueType() != null && expr.getSymbol().getValueType() != m.getJavaType())
+                        {
+                            // Try to use the symbol type for this parameter, and if not possible then just use this
+                            // This is because if we have a parameter of type "ZoneInfo" it needs to use TimeZone since we have the TypeConverter for that
+                            try
+                            {
+                                m = exprFactory.getMappingForType(expr.getSymbol().getValueType(), false);
+                            }
+                            catch (NucleusUserException nue)
+                            {
+                                
+                            }
+                        }
                     }
                     catch (NucleusUserException nue)
                     {
