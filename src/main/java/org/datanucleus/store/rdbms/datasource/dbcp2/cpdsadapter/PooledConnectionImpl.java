@@ -20,7 +20,8 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.cpdsadapter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
@@ -66,13 +67,12 @@ class PooledConnectionImpl implements PooledConnection,
     /**
      * ConnectionEventListeners
      */
-    private final Vector<ConnectionEventListener> eventListeners;
+    private final List<ConnectionEventListener> eventListeners;
 
     /**
      * StatementEventListeners
      */
-    private final Vector<StatementEventListener> statementEventListeners =
-            new Vector<>();
+    private final List<StatementEventListener> statementEventListeners = new ArrayList<>();
 
     /**
      * flag set to true, once close() is called.
@@ -98,7 +98,7 @@ class PooledConnectionImpl implements PooledConnection,
         } else {
             this.delegatingConnection = new DelegatingConnection<>(connection);
         }
-        eventListeners = new Vector<>();
+        eventListeners = new ArrayList<>();
         isClosed = false;
     }
 
