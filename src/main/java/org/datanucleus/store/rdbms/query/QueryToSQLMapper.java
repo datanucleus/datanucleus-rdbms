@@ -809,6 +809,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         JavaTypeMapping discrimMapping = sqlExpr.getSQLTable().getTable().getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
                         if (discrimMapping == null)
                         {
+                            // TODO If we have a UNIONED primary expression then it would be possible to just select the DN_TYPE from the particular union
                             throw new NucleusException("Result has call to " + typeExpr + " but contained expression has no discriminator. Not supported");
                         }
 
