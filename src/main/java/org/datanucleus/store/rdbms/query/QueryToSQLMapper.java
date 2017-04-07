@@ -58,6 +58,7 @@ import org.datanucleus.query.expression.OrderExpression;
 import org.datanucleus.query.expression.ParameterExpression;
 import org.datanucleus.query.expression.PrimaryExpression;
 import org.datanucleus.query.expression.SubqueryExpression;
+import org.datanucleus.query.expression.TypeExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
@@ -795,6 +796,30 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         idx.setColumnAlias(alias);
                     }
                     resultDefinition.addMappingForResultExpression(i, idx);
+                }
+                else if (resultExprs[i] instanceof TypeExpression)
+                {
+                    // TYPE(identification_variable | single_valued_path_expr | input_parameter)
+                    TypeExpression typeExpr = (TypeExpression)resultExprs[i];
+                    Expression containedExpr = typeExpr.getContainedExpression();
+                    if (containedExpr instanceof PrimaryExpression)
+                    {
+                        processPrimaryExpression((PrimaryExpression)containedExpr);
+                        SQLExpression sqlExpr = stack.pop();
+                        JavaTypeMapping discrimMapping = sqlExpr.getSQLTable().getTable().getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true);
+                        if (discrimMapping == null)
+                        {
+                            throw new NucleusException("Result has call to " + typeExpr + " but contained expression has no discriminator. Not supported");
+                        }
+
+                        StatementMappingIndex idx = new StatementMappingIndex(discrimMapping);
+                        idx.setColumnPositions(stmt.select(sqlExpr.getSQLTable(), discrimMapping, null, true));
+                        resultDefinition.addMappingForResultExpression(i, idx);
+                    }
+                    else
+                    {
+                        throw new NucleusException("Result has call to " + typeExpr + " but contained expression not supported");
+                    }
                 }
                 else if (resultExprs[i] instanceof CreatorExpression)
                 {
