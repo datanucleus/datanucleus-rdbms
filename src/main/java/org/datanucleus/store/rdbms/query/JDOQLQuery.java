@@ -894,7 +894,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // Statement would result in no results, so just catch it and avoid generating the statement
             NucleusLogger.QUERY.warn("Query for candidates of " + candidateClass.getName() +
-                (subclasses ? " and subclasses" : "") + " resulted in no possible candidates", ne);
+                (subclasses ? " and subclasses" : "") + " resulted in no possible candidates : " + StringUtils.getMessageFromRootCauseOfThrowable(ne));
             statementReturnsEmpty = true;
             return;
         }

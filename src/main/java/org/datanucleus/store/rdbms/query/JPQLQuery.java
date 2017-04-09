@@ -766,7 +766,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
         catch (SQLException sqle)
         {
-            NucleusLogger.DATASTORE_RETRIEVE.warn("Error cancelling query", sqle);
+            NucleusLogger.DATASTORE_RETRIEVE.warn("Error cancelling query : " + StringUtils.getMessageFromRootCauseOfThrowable(sqle));
             return false;
         }
     }
