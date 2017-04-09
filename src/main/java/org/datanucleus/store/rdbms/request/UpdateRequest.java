@@ -408,9 +408,7 @@ public class UpdateRequest extends Request
                         {
                             // No object updated so either object disappeared or failed optimistic version checks
                             // TODO Batching : when we use batching here we need to process these somehow
-                            String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + currentVersion);
-                            NucleusLogger.PERSISTENCE.error(msg);
-                            throw new NucleusOptimisticException(msg, op.getObject());
+                            throw new NucleusOptimisticException(Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + currentVersion), op.getObject());
                         }
                     }
                     finally

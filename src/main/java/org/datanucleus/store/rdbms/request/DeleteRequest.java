@@ -333,9 +333,7 @@ public class DeleteRequest extends Request
                     if (optimisticChecks && rcs[0] == 0)
                     {
                         // No object deleted so either object disappeared or failed optimistic version checks
-                        String msg = Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + op.getTransactionalVersion());
-                        NucleusLogger.DATASTORE.error(msg);
-                        throw new NucleusOptimisticException(msg, op.getObject());
+                        throw new NucleusOptimisticException(Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + op.getTransactionalVersion()), op.getObject());
                     }
 
                     if (relatedObjectsToDelete != null && !relatedObjectsToDelete.isEmpty())
