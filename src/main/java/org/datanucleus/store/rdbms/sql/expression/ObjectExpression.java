@@ -58,6 +58,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.util.Localiser;
@@ -524,7 +525,7 @@ public class ObjectExpression extends SQLExpression
                 if (type.isAssignableFrom(implType))
                 {
                     DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                    SQLTable castSqlTbl = stmt.leftOuterJoin(table, implMappings[i], refMapping, castTable, null, castTable.getIdMapping(), null, null, null);
+                    SQLTable castSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, table, implMappings[i], refMapping, castTable, null, castTable.getIdMapping(), null, null, null, true);
                     return exprFactory.newExpression(stmt, castSqlTbl, castTable.getIdMapping());
                 }
             }

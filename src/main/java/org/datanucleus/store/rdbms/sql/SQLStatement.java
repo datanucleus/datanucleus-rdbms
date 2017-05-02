@@ -524,26 +524,6 @@ public abstract class SQLStatement
     }
 
     /**
-     * Method to form an inner join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param sourceParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param targetParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable innerJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.INNER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
-    }
-
-    /**
      * Method to form a left outer join to the specified table using the provided mappings.
      * Will be applied to all unioned statements.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
@@ -562,26 +542,6 @@ public abstract class SQLStatement
     }
 
     /**
-     * Method to form a left outer join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param sourceParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param targetParentMapping Optional, if this source mapping is a sub mapping (e.g interface impl).
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable leftOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.LEFT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
-    }
-
-    /**
      * Method to form a right outer join to the specified table using the provided mappings.
      * Will be applied to all unioned statements.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
@@ -597,26 +557,6 @@ public abstract class SQLStatement
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
     {
         return join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
-    }
-
-    /**
-     * Method to form a right outer join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param sourceParentMapping mapping for the parent of the source
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param targetParentMapping mapping for the parent of the target
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable rightOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -675,6 +615,13 @@ public abstract class SQLStatement
             {
                 return join.getType();
             }
+            if (join.getSubJoin() != null)
+            {
+                if (join.getSubJoin().getTargetTable().equals(sqlTbl))
+                {
+                    return join.getSubJoin().getType();
+                }
+            }
         }
         return null;
     }
@@ -712,6 +659,13 @@ public abstract class SQLStatement
             if (join.getTargetTable().equals(sqlTbl))
             {
                 return join;
+            }
+            if (join.getSubJoin() != null)
+            {
+                if (join.getSubJoin().getTargetTable().equals(sqlTbl))
+                {
+                    return join.getSubJoin();
+                }
             }
         }
         return null;
