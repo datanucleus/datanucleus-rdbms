@@ -25,9 +25,9 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Representation of a join in an SQL statement.
- * The join is of a type (see ANSI SQL), and with inner/left outer/right outer is accompanied by
- * join condition(s), joining from the source table to the target table via columns. Additionally
- * other conditions can be applied to restrict the join (such as discriminator).
+ * The join is of a type (see ANSI SQL), and with inner/left outer/right outer is accompanied by join condition(s), 
+ * joining from the source table to the target table via columns. 
+ * Additionally other conditions can be applied to restrict the join (such as discriminator).
  */
 public class SQLJoin
 {
@@ -51,6 +51,9 @@ public class SQLJoin
 
     /** Optional condition for the join. */
     private BooleanExpression condition;
+
+    /** Optional sub-join, for when we have JOIN grouping. */
+    private SQLJoin subJoin;
 
     /**
      * Constructor for a join.
@@ -127,8 +130,18 @@ public class SQLJoin
         condition = (condition != null) ? condition.and(expr) : expr;
     }
 
+    public void setSubJoin(SQLJoin join)
+    {
+        this.subJoin = join;
+    }
+    public SQLJoin getSubJoin()
+    {
+        return this.subJoin;
+    }
+
     public String toString()
     {
+        // TODO Include any subJoin
         if (type == JoinType.CROSS_JOIN)
         {
             return "JoinType: CROSSJOIN " + type + " tbl=" + targetTable;
@@ -162,7 +175,25 @@ public class SQLJoin
             {
                 st.append("CROSS JOIN ");
             }
-            st.append(targetTable.toString());
+
+            if (subJoin != null)
+            {
+                // Generate JOIN groups SQL like this
+                // LEFT OUTER JOIN
+                // (
+                //     MYTABLE1 T1
+                //     INNER JOIN MYTABLE2 T2 ON T1.ID = T2.T1_ID
+                // )
+                // ON T0.ID = T1.T0_ID
+                st.append("(");
+                st.append(targetTable.toString()).append(" ");
+                st.append(subJoin.toSQLText(dba, lock));
+                st.append(")");
+            }
+            else
+            {
+                st.append(targetTable.toString());
+            }
 
             if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
             {
