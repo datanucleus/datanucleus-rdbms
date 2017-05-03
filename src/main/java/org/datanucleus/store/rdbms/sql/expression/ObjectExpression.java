@@ -544,8 +544,7 @@ public class ObjectExpression extends SQLExpression
             if (castSqlTbl == null)
             {
                 // Join not present, so join to the cast table
-                castSqlTbl = stmt.leftOuterJoin(table, table.getTable().getIdMapping(),
-                    castTable, null, castTable.getIdMapping(), null, table.getGroupName());
+                castSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, table, table.getTable().getIdMapping(), castTable, null, castTable.getIdMapping(), null, table.getGroupName());
             }
 
             if (castSqlTbl == table)
@@ -763,7 +762,7 @@ public class ObjectExpression extends SQLExpression
                     targetSqlTbl = stmt.getTable(memberTable, null);
                     if (targetSqlTbl == null)
                     {
-                        targetSqlTbl = stmt.innerJoin(getSQLTable(), mapping, memberTable, null, memberTable.getIdMapping(), null, null);
+                        targetSqlTbl = stmt.join(JoinType.INNER_JOIN, getSQLTable(), mapping, memberTable, null, memberTable.getIdMapping(), null, null);
                     }
                 }
                 else
@@ -897,13 +896,13 @@ public class ObjectExpression extends SQLExpression
                 // b). The member table doesn't manage the instanceof type, so do inner join to 
                 // the table of the instanceof to impose the instanceof condition
                 DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                stmt.innerJoin(this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+                stmt.join(JoinType.INNER_JOIN, this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
                 return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
             }
 
             // Do inner join to this table to impose the instanceOf
             DatastoreClass instanceofTable = storeMgr.getDatastoreClass(type.getName(), clr);
-            stmt.innerJoin(this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
+            stmt.join(JoinType.INNER_JOIN, this.table, this.table.getTable().getIdMapping(), instanceofTable, null, instanceofTable.getIdMapping(), null, this.table.getGroupName());
             JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, true);
             return exprFactory.newLiteral(stmt, m, true).eq(exprFactory.newLiteral(stmt, m, !not));
         }

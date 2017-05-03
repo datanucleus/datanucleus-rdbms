@@ -5157,8 +5157,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     }
 
     /**
-     * Method to bind the specified unbound variable (as cross join) on the assumption that the type
-     * is a persistable class.
+     * Method to bind the specified unbound variable (as cross join) on the assumption that the type is a persistable class.
      * @param expr Unbound expression
      * @param type The type to bind as
      */

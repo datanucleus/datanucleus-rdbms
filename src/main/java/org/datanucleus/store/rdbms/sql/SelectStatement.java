@@ -1382,7 +1382,7 @@ public class SelectStatement extends SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
 
         if (unions != null && applyToUnions)
         {
@@ -1424,7 +1424,7 @@ public class SelectStatement extends SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, joinType);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
 
         if (unions != null && applyToUnions)
         {
@@ -1465,7 +1465,7 @@ public class SelectStatement extends SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
 
-        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition);
+        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition, null);
 
         if (unions != null)
         {

@@ -455,12 +455,12 @@ public class SQLStatementHelper
                 if (innerJoin && !forceLeftOuter)
                 {
                     // Add join from {sourceTbl}.ID to {secondaryTbl}.ID
-                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.join(JoinType.INNER_JOIN, sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
                 else
                 {
                     // Add join from {sourceTbl}.ID to {secondaryTbl}.ID
-                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
             }
             else
@@ -468,12 +468,12 @@ public class SQLStatementHelper
                 if (forceLeftOuter)
                 {
                     // Add join from {sourceTbl}.ID to {superclassTbl}.ID
-                    mappingSqlTbl = stmt.leftOuterJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
                 else
                 {
                     // Add join from {sourceTbl}.ID to {superclassTbl}.ID
-                    mappingSqlTbl = stmt.innerJoin(sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
+                    mappingSqlTbl = stmt.join(JoinType.INNER_JOIN, sqlTbl, sqlTbl.getTable().getIdMapping(), mappingTbl, null, mappingTbl.getIdMapping(), null, sqlTbl.getGroupName());
                 }
             }
         }
@@ -751,7 +751,8 @@ public class SQLStatementHelper
                         {
                             // Join to the join table
                             JavaTypeMapping referenceMapping = collTable.getElementMapping();
-                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), collTable, null, referenceMapping, null, tableGroupName);
+                            joinSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), null, collTable, null, referenceMapping,
+                                null, null, tableGroupName, true);
                         }
                         else
                         {
@@ -874,20 +875,20 @@ public class SQLStatementHelper
                                 // Nullable - left outer join from {sourceTable}.ID to {relatedBaseTable}.FK
                                 // and inner join from {relatedBaseTable}.ID to {relatedTable}.ID
                                 // (joins the relation and restricts to the right type)
-                                relatedSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
-                                    relatedMapping.getTable(), null, relatedMapping, null, tableGroupName);
-                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl, relatedMapping.getTable().getIdMapping(),
-                                    relatedTbl, null, relatedTbl.getIdMapping(), null, tableGroupName);
+                                relatedSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), null, 
+                                    relatedMapping.getTable(), null, relatedMapping, null, null, tableGroupName, true);
+                                relatedSqlTbl = stmt.join(JoinType.INNER_JOIN, relatedSqlTbl, relatedMapping.getTable().getIdMapping(), null, 
+                                    relatedTbl, null, relatedTbl.getIdMapping(), null, null, tableGroupName, true);
                             }
                             else
                             {
                                 // Not nullable - inner join from {sourceTable}.ID to {relatedBaseTable}.FK
                                 // and inner join from {relatedBaseTable}.ID to {relatedTable}.ID
                                 // (joins the relation and restricts to the right type)
-                                relatedSqlTbl = stmt.innerJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
-                                    relatedMapping.getTable(), null, relatedMapping, null, tableGroupName);
-                                relatedSqlTbl = stmt.innerJoin(relatedSqlTbl, relatedMapping.getTable().getIdMapping(),
-                                    relatedTbl, null, relatedTbl.getIdMapping(), null, tableGroupName);
+                                relatedSqlTbl = stmt.join(JoinType.INNER_JOIN, sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), null, 
+                                    relatedMapping.getTable(), null, relatedMapping, null, null, tableGroupName, true);
+                                relatedSqlTbl = stmt.join(JoinType.INNER_JOIN, relatedSqlTbl, relatedMapping.getTable().getIdMapping(), null, 
+                                    relatedTbl, null, relatedTbl.getIdMapping(), null, null, tableGroupName, true);
                             }
                         }
                         else
@@ -942,8 +943,8 @@ public class SQLStatementHelper
                                 Class implType = clr.classForName(mmd.getClassName(true));
                                 referenceMapping = refMap.getJavaTypeMappingForType(implType);
                             }
-                            joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
-                                collTable, null, referenceMapping, null, tableGroupName + "_JOIN");
+                            joinSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), null, 
+                                collTable, null, referenceMapping, null, null, tableGroupName + "_JOIN", true);
                         }
                         else
                         {
@@ -961,8 +962,8 @@ public class SQLStatementHelper
                 {
                     // Add left outer join from {sourceTable}.ID to {joinTable}.OWNER_FK
                     PersistableJoinTable joinTable = (PersistableJoinTable) storeMgr.getTable(mmd);
-                    SQLTable joinSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(),
-                        joinTable, null, joinTable.getOwnerMapping(), null, tableGroupName + "_JOIN");
+                    SQLTable joinSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceSqlTbl.getTable().getIdMapping(), null, 
+                        joinTable, null, joinTable.getOwnerMapping(), null, null, tableGroupName + "_JOIN", true);
 
                     int[] colNumbers = stmt.select(joinSqlTbl, joinTable.getRelatedMapping(), null);
                     stmtMapping.setColumnPositions(colNumbers);
@@ -1147,17 +1148,17 @@ public class SQLStatementHelper
         if (joinType == JoinType.LEFT_OUTER_JOIN)
         {
             // left outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.leftOuterJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.INNER_JOIN)
         {
             // inner join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.innerJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.join(JoinType.INNER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.RIGHT_OUTER_JOIN)
         {
             // right outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.rightOuterJoin(sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            targetSqlTbl = stmt.join(JoinType.RIGHT_OUTER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.CROSS_JOIN)
         {

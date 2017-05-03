@@ -518,7 +518,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(), joinTbl, null, joinTbl.getElementMapping(), null, null);
+                SQLTable joinSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), null, joinTbl, null, joinTbl.getElementMapping(),
+                    null, null, null, true);
 
                 // Restrict to collection owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
@@ -569,7 +570,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 {
                     // Variable is defined as a subclass of the declared type so add extra join to variable type
                     DatastoreClass varTbl = storeMgr.getDatastoreClass(elemType, clr);
-                    SQLTable varSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), elemTbl.getIdMapping(), varTbl, null, varTbl.getIdMapping(), null, null);
+                    SQLTable varSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), null, varTbl, null, varTbl.getIdMapping(),
+                        null, null, null, true);
                     elemIdExpr = exprFactory.newExpression(subStmt, varSqlTbl, varTbl.getIdMapping());
                 }
                 else

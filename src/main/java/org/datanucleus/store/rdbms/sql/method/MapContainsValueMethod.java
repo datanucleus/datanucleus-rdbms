@@ -461,7 +461,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), valTbl.getIdMapping(), joinTbl, null, joinTbl.getValueMapping(), null, null);
+                SQLTable joinSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), valTbl.getIdMapping(), null, joinTbl, null, joinTbl.getValueMapping(), null, null, null, true);
 
                 // Restrict to map owner
                 JavaTypeMapping ownerMapping = joinTbl.getOwnerMapping();
@@ -571,7 +571,8 @@ public class MapContainsValueMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to key table
-                SQLTable keySqlTbl = subStmt.innerJoin(subStmt.getPrimaryTable(), valTbl.getIdMapping(), keyTbl, null, keyTbl.getMemberMapping(keyValMmd), null, null);
+                SQLTable keySqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), valTbl.getIdMapping(), null, keyTbl, null, keyTbl.getMemberMapping(keyValMmd),
+                    null, null, null, true);
 
                 // Restrict to map owner (on key table)
                 SQLExpression ownerExpr = exprFactory.newExpression(subStmt, keySqlTbl, ownerMapping);

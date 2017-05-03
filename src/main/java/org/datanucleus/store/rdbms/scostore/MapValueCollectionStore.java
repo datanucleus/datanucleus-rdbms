@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -400,7 +401,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
             {
                 // Join to key table and select value fields
                 JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
+                containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
@@ -417,7 +418,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
             {
                 // Join to join table and select value fields
                 JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
+                containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
@@ -438,7 +439,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
+                    containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
                         ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
@@ -456,8 +457,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                         if (elemSqlTblForValue == null)
                         {
                             // Add join to key table holding value
-                            elemSqlTblForValue = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
-                                elementMapping.getTable(), null, elementMapping.getTable().getIdMapping(), null, null);
+                            elemSqlTblForValue = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
+                                null, elementMapping.getTable(), null, elementMapping.getTable().getIdMapping(), null, null, null, true);
                         }
                     }
                     sqlStmt.select(elemSqlTblForValue, elementMapping, null);
@@ -488,7 +489,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null);
+                    containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }

@@ -29,6 +29,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SubqueryExpression;
@@ -98,7 +99,7 @@ public class MapKeyMethod extends AbstractSQLMethod
                 SQLTable joinSqlTbl = stmt.getTable(mapJoinAlias);
                 if (joinSqlTbl == null)
                 {
-                    joinSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
+                    joinSqlTbl = stmt.join(JoinType.INNER_JOIN, mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), joinTbl, mapJoinAlias, joinTbl.getOwnerMapping(), null, null);
                 }
 
                 // Return key expression
@@ -109,7 +110,7 @@ public class MapKeyMethod extends AbstractSQLMethod
                     SQLTable keySqlTbl = stmt.getTable(mapJoinAlias+"_KEY");
                     if (keySqlTbl == null)
                     {
-                        keySqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getKeyMapping(), keyTable, mapJoinAlias+"_KEY", keyTable.getIdMapping(), null, null);
+                        keySqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, joinTbl.getKeyMapping(), keyTable, mapJoinAlias+"_KEY", keyTable.getIdMapping(), null, null);
                     }
                     return exprFactory.newExpression(stmt, keySqlTbl, keyTable.getIdMapping());
                 }
@@ -130,7 +131,7 @@ public class MapKeyMethod extends AbstractSQLMethod
                 {
                     mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
-                SQLTable valSqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), valTable, mapJoinAlias, mapTblOwnerMapping, null, null);
+                SQLTable valSqlTbl = stmt.join(JoinType.INNER_JOIN, mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), valTable, mapJoinAlias, mapTblOwnerMapping, null, null);
 
                 // Return key expression
                 AbstractMemberMetaData valKeyMmd = mapmd.getValueClassMetaData(clr).getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
@@ -151,7 +152,7 @@ public class MapKeyMethod extends AbstractSQLMethod
                 {
                     mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
-                SQLTable keySqlTbl = stmt.innerJoin(mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), keyTable, mapJoinAlias, mapTblOwnerMapping, null, null);
+                SQLTable keySqlTbl = stmt.join(JoinType.INNER_JOIN, mapSqlTbl, mapSqlTbl.getTable().getIdMapping(), keyTable, mapJoinAlias, mapTblOwnerMapping, null, null);
 
                 // Return key expression
                 return exprFactory.newExpression(stmt, keySqlTbl, keyTable.getIdMapping());

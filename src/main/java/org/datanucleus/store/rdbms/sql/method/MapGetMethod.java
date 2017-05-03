@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
@@ -204,7 +205,8 @@ public class MapGetMethod extends AbstractSQLMethod
                 MapTable joinTbl = (MapTable)stmt.getRDBMSManager().getTable(mmd);
 
                 // Add join to join table
-                SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+                SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), 
+                    joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
                 // Add condition on key
                 SQLExpression keyExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getKeyMapping());
@@ -215,7 +217,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 {
                     // Persistable value so join to its table
                     DatastoreClass valTable = stmt.getRDBMSManager().getDatastoreClass(mapmd.getValueType(), clr);
-                    SQLTable valueSqlTbl = stmt.innerJoin(joinSqlTbl, joinTbl.getValueMapping(), valTable, null, valTable.getIdMapping(), null, null);
+                    SQLTable valueSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, joinTbl.getValueMapping(), valTable, null, valTable.getIdMapping(), null, null);
 
                     return exprFactory.newExpression(stmt, valueSqlTbl, valTable.getIdMapping());
                 }
@@ -238,7 +240,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 {
                     mapTblOwnerMapping = valTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
-                SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTable, null, mapTblOwnerMapping, null, null);
+                SQLTable valSqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTable, null, mapTblOwnerMapping, null, null);
 
                 // Add condition on key
                 JavaTypeMapping keyMapping = valTable.getMemberMapping(valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy()));
@@ -263,7 +265,7 @@ public class MapGetMethod extends AbstractSQLMethod
                 {
                     mapTblOwnerMapping = keyTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 }
-                SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTable, null, mapTblOwnerMapping, null, null);
+                SQLTable keySqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTable, null, mapTblOwnerMapping, null, null);
 
                 // Add condition on key
                 SQLExpression keyExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTable.getIdMapping());

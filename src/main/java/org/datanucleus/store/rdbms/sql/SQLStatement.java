@@ -416,7 +416,7 @@ public abstract class SQLStatement
     }
 
     /**
-     * Method to form a join to the specified table using the provided mappings.
+     * Method to form a join to the specified table using the provided mappings, with the join condition derived from the source-target mappings.
      * @param joinType Type of join.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
      * @param sourceMapping Mapping in this table to join from
@@ -459,13 +459,14 @@ public abstract class SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
 
         return targetTbl;
     }
 
     /**
-     * Method to form a join to the specified table using the provided mappings.
+     * Method to form a join to the specified table using the provided mappings and applying the provided join condition (rather than generating one from the source/target mappings).
+     * This is used with JPQL where we allow two root entities to be joined using a provide "ON" condition.
      * @param joinType Type of join.
      * @param sourceTable SQLTable for the source (null implies primaryTable)
      * @param target Table to join to
@@ -500,63 +501,9 @@ public abstract class SQLStatement
         SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
         putSQLTableInGroup(targetTbl, tableGrpName, joinType);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
 
         return targetTbl;
-    }
-
-    /**
-     * Method to form an inner join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable innerJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
-            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.INNER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
-    }
-
-    /**
-     * Method to form a left outer join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable leftOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
-            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.LEFT_OUTER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
-    }
-
-    /**
-     * Method to form a right outer join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param sourceTable SQLTable for the source (null implies primaryTable)
-     * @param sourceMapping Mapping in this table to join from
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
-     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable rightOuterJoin(SQLTable sourceTable, JavaTypeMapping sourceMapping, 
-            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
-    {
-        return join(JoinType.RIGHT_OUTER_JOIN, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
     }
 
     /**
@@ -569,7 +516,8 @@ public abstract class SQLStatement
      */
     public SQLTable crossJoin(Table target, String targetAlias, String tableGrpName)
     {
-        invalidateStatement();
+        return join(JoinType.CROSS_JOIN, null, null, null, target, targetAlias, null, null, null, tableGrpName, true);
+        /*invalidateStatement();
 
         // Create the SQLTable to join to.
         if (tables == null)
@@ -591,9 +539,9 @@ public abstract class SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
 
-        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition);
+        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition, null);
 
-        return targetTbl;
+        return targetTbl;*/
     }
 
     /**
@@ -729,8 +677,9 @@ public abstract class SQLStatement
      * @param sourceTable SQLTable to join from
      * @param targetTable SQLTable to join to
      * @param joinCondition Condition for the join
+     * @param parentJoin Optional parent join (which will mean this join becomes a sub-join)
      */
-    protected void addJoin(SQLJoin.JoinType joinType, SQLTable sourceTable, SQLTable targetTable, BooleanExpression joinCondition)
+    protected void addJoin(SQLJoin.JoinType joinType, SQLTable sourceTable, SQLTable targetTable, BooleanExpression joinCondition, SQLJoin parentJoin)
     {
         if (tables == null)
         {
@@ -747,18 +696,23 @@ public abstract class SQLStatement
         {
             throw new NucleusUserException("RIGHT OUTER JOIN is not supported by this datastore");
         }
+        if (parentJoin != null && parentJoin.getSubJoin() != null)
+        {
+            throw new NucleusException("Attempt to create sub-join for " + parentJoin + " but already has a sub-join");
+        }
 
         // Add the table to the referenced tables for this statement
         tables.put(targetTable.alias.getName(), targetTable);
+
+        if (joins == null)
+        {
+            joins = new ArrayList<>();
+        }
 
         if (rdbmsMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.ANSI_JOIN_SYNTAX))
         {
             // "ANSI-92" style join
             SQLJoin join = new SQLJoin(joinType, targetTable, sourceTable, joinCondition);
-            if (joins == null)
-            {
-                joins = new ArrayList<>();
-            }
 
             int position = -1;
             if (queryGenerator != null && queryGenerator.processingOnClause())
@@ -781,33 +735,43 @@ public abstract class SQLStatement
                             position = i;
                             break;
                         }
+                        else if (sqlJoin.getSubJoin() != null && sqlJoin.getSubJoin().getSourceTable() == sourceTable)
+                        {
+                            position = i;
+                            break;
+                        }
                         i++;
                     }
                 }
             }
 
-            if (position >= 0)
+            if (parentJoin == null)
             {
-                joins.add(position, join);
+                if (position >= 0)
+                {
+                    joins.add(position, join);
+                }
+                else
+                {
+                    joins.add(join);
+                }
             }
             else
             {
-                joins.add(join);
+                parentJoin.setSubJoin(join);
             }
         }
         else
         {
             // "ANSI-86" style join
             SQLJoin join = new SQLJoin(JoinType.NON_ANSI_JOIN, targetTable, sourceTable, null);
-            if (joins == null)
-            {
-                joins = new ArrayList<>();
-            }
             joins.add(join);
 
             // Specify joinCondition in the WHERE clause since not allowed in FROM clause with ANSI-86
             // TODO Cater for Oracle LEFT OUTER syntax "(+)"
             whereAnd(joinCondition, false);
+
+            // TODO Support JOIN groups for non-ANSI joins?
         }
     }
 

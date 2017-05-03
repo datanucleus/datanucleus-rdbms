@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
@@ -195,7 +196,7 @@ public class ListGetMethod extends AbstractSQLMethod
             CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
 
             // Add join to join table
-            SQLTable joinSqlTbl = stmt.innerJoin(listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(),
+            SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), 
                 joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
             // Add condition on index
@@ -223,7 +224,7 @@ public class ListGetMethod extends AbstractSQLMethod
             targetMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             orderMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
         }
-        SQLTable elemSqlTbl = stmt.innerJoin(listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(),
+        SQLTable elemSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), 
             elementTbl, null, targetMapping, null, null);
 
         // Add condition on index

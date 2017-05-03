@@ -64,6 +64,7 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.JoinTable;
@@ -1261,7 +1262,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (valueCmd != null)
             {
                 // Left outer join to value table (so we allow for null values)
-                SQLTable valueSqlTbl = sqlStmt.leftOuterJoin(sqlStmt.getPrimaryTable(), valueMapping, valueTable, null, valueTable.getIdMapping(), null, null);
+                SQLTable valueSqlTbl = sqlStmt.join(JoinType.LEFT_OUTER_JOIN, sqlStmt.getPrimaryTable(), valueMapping, null, valueTable, null, valueTable.getIdMapping(), 
+                    null, null, null, true);
 
                 // Select the value field(s)
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);

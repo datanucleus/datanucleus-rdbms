@@ -48,6 +48,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -459,8 +460,8 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             if (entrySqlTblForKey == null)
             {
                 // Add join to key table
-                entrySqlTblForKey = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
-                    keyMapping.getTable(), null, keyMapping.getTable().getIdMapping(), null, null);
+                entrySqlTblForKey = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
+                    null, keyMapping.getTable(), null, keyMapping.getTable().getIdMapping(), null, null, null, true);
             }
         }
         iteratorKeyResultCols = sqlStmt.select(entrySqlTblForKey, keyMapping, null);
@@ -474,8 +475,8 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             if (entrySqlTblForVal == null)
             {
                 // Add join to key table
-                entrySqlTblForVal = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
-                    valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null);
+                entrySqlTblForVal = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
+                    null, valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null, null, true);
             }
         }
         iteratorValueResultCols = sqlStmt.select(entrySqlTblForVal, valueMapping, null);

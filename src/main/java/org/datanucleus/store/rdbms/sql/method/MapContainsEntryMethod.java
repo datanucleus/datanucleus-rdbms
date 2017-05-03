@@ -30,6 +30,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
@@ -152,8 +153,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         if (keyIsUnbound)
         {
             keyVarName = ((UnboundExpression)keyExpr).getVariableName();
-            NucleusLogger.QUERY.debug(">> Map.containsEntry binding unbound variable " + keyVarName +
-                " using INNER JOIN");
+            NucleusLogger.QUERY.debug(">> Map.containsEntry binding unbound variable " + keyVarName + " using INNER JOIN");
             // TODO What if the variable is declared as a subtype, handle this see CollectionContainsMethod
         }
         boolean valIsUnbound = (valExpr instanceof UnboundExpression);
@@ -161,8 +161,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         if (valIsUnbound)
         {
             valVarName = ((UnboundExpression)valExpr).getVariableName();
-            NucleusLogger.QUERY.debug(">> Map.containsEntry binding unbound variable " + valVarName +
-                " using INNER JOIN");
+            NucleusLogger.QUERY.debug(">> Map.containsEntry binding unbound variable " + valVarName + " using INNER JOIN");
             // TODO What if the variable is declared as a subtype, handle this see CollectionContainsMethod
         }
 
@@ -174,13 +173,12 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         {
             // Map formed in join table - add join to join table, then to key/value tables (if present)
             MapTable mapTbl = (MapTable)storeMgr.getTable(mmd);
-            SQLTable joinSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(),
+            SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), 
                 mapTbl, null, mapTbl.getOwnerMapping(), null, null);
             if (valCmd != null)
             {
                 DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                SQLTable valSqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getValueMapping(), 
-                    valTbl, null, valTbl.getIdMapping(), null, null);
+                SQLTable valSqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, mapTbl.getValueMapping(), valTbl, null, valTbl.getIdMapping(), null, null);
 
                 SQLExpression valIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getIdMapping());
                 if (valIsUnbound)
@@ -214,8 +212,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             if (keyCmd != null)
             {
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                SQLTable keySqlTbl = stmt.innerJoin(joinSqlTbl, mapTbl.getKeyMapping(), 
-                    keyTbl, null, keyTbl.getIdMapping(), null, null);
+                SQLTable keySqlTbl = stmt.join(JoinType.INNER_JOIN, joinSqlTbl, mapTbl.getKeyMapping(), keyTbl, null, keyTbl.getIdMapping(), null, null);
 
                 SQLExpression keyIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
                 if (keyIsUnbound)
@@ -258,7 +255,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 ownerMapping = valTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
-            SQLTable valSqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
+            SQLTable valSqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), valTbl, null, ownerMapping, null, null);
 
             SQLExpression valIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getIdMapping());
             if (valIsUnbound)
@@ -277,7 +274,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
                 // Add inner join to key table
                 AbstractMemberMetaData valKeyMmd = valCmd.getMetaDataForMember(mmd.getKeyMetaData().getMappedBy());
                 DatastoreClass keyTbl = storeMgr.getDatastoreClass(keyCmd.getFullClassName(), clr);
-                SQLTable keySqlTbl = stmt.innerJoin(valSqlTbl, valTbl.getMemberMapping(valKeyMmd), keyTbl, null, keyTbl.getIdMapping(), null, null);
+                SQLTable keySqlTbl = stmt.join(JoinType.INNER_JOIN, valSqlTbl, valTbl.getMemberMapping(valKeyMmd), keyTbl, null, keyTbl.getIdMapping(), null, null);
 
                 SQLExpression keyIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
                 if (keyIsUnbound)
@@ -321,7 +318,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 ownerMapping = keyTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             }
-            SQLTable keySqlTbl = stmt.innerJoin(mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
+            SQLTable keySqlTbl = stmt.join(JoinType.INNER_JOIN, mapExpr.getSQLTable(), mapExpr.getSQLTable().getTable().getIdMapping(), keyTbl, null, ownerMapping, null, null);
 
             SQLExpression keyIdExpr = exprFactory.newExpression(stmt, keySqlTbl, keyTbl.getIdMapping());
             if (keyIsUnbound)
@@ -339,7 +336,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
             {
                 // Add inner join to value table
                 DatastoreClass valTbl = storeMgr.getDatastoreClass(valCmd.getFullClassName(), clr);
-                SQLTable valSqlTbl = stmt.innerJoin(keySqlTbl, keyTbl.getMemberMapping(keyValMmd), valTbl, null, valTbl.getIdMapping(), null, null);
+                SQLTable valSqlTbl = stmt.join(JoinType.INNER_JOIN, keySqlTbl, keyTbl.getMemberMapping(keyValMmd), valTbl, null, valTbl.getIdMapping(), null, null);
 
                 SQLExpression valIdExpr = exprFactory.newExpression(stmt, valSqlTbl, valTbl.getIdMapping());
                 if (valIsUnbound)
