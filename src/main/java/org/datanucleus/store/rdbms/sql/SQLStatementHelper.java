@@ -1145,25 +1145,15 @@ public class SQLStatementHelper
         }
 
         SQLTable targetSqlTbl = null;
-        if (joinType == JoinType.LEFT_OUTER_JOIN)
+        if (joinType == JoinType.INNER_JOIN || joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
         {
-            // left outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
-        }
-        else if (joinType == JoinType.INNER_JOIN)
-        {
-            // inner join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.join(JoinType.INNER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
-        }
-        else if (joinType == JoinType.RIGHT_OUTER_JOIN)
-        {
-            // right outer join from {sourceTable}.{key} to {relatedTable}.{key}
-            targetSqlTbl = stmt.join(JoinType.RIGHT_OUTER_JOIN, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
+            // join from {sourceTable}.{key} to {relatedTable}.{key}
+            targetSqlTbl = stmt.join(joinType, sourceSqlTbl, sourceMapping, targetTable, targetAlias, targetMapping, discrimValues, targetTablegroupName);
         }
         else if (joinType == JoinType.CROSS_JOIN)
         {
             // cross join to {relatedTable}.{key}
-            targetSqlTbl = stmt.crossJoin(targetTable, targetAlias, targetTablegroupName);
+            targetSqlTbl = stmt.join(JoinType.CROSS_JOIN, null, null, null, targetTable, targetAlias, null, null, null, targetTablegroupName, true, null);
         }
 
         return targetSqlTbl;

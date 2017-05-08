@@ -548,44 +548,6 @@ public abstract class SQLStatement
     }
 
     /**
-     * Method to form a right outer join to the specified table using the provided mappings.
-     * Will be applied to all unioned statements.
-     * @param target Table to join to
-     * @param targetAlias Alias for the target table (if known)
-     * @param tableGrpName Name of the table group for the target (null implies a new group)
-     * @return SQLTable for the target
-     */
-    public SQLTable crossJoin(Table target, String targetAlias, String tableGrpName)
-    {
-        return join(JoinType.CROSS_JOIN, null, null, null, target, targetAlias, null, null, null, tableGrpName, true, null);
-        /*invalidateStatement();
-
-        // Create the SQLTable to join to.
-        if (tables == null)
-        {
-            tables = new HashMap();
-        }
-        if (tableGrpName == null)
-        {
-            tableGrpName = "Group" + tableGroups.size();
-        }
-        if (targetAlias == null)
-        {
-            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
-        }
-        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
-        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
-        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
-
-        // Generate the join condition to use
-        BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
-
-        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition, null);
-
-        return targetTbl;*/
-    }
-
-    /**
      * Accessor for the type of join used for the specified table.
      * @param sqlTbl The table to check
      * @return The join type, or null if not joined in this statement

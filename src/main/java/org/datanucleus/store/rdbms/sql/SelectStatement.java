@@ -1442,47 +1442,6 @@ public class SelectStatement extends SQLStatement
     }
 
     @Override
-    public SQLTable crossJoin(Table target, String targetAlias, String tableGrpName)
-    {
-        invalidateStatement();
-
-        // Create the SQLTable to join to.
-        if (tables == null)
-        {
-            tables = new HashMap();
-        }
-        if (tableGrpName == null)
-        {
-            tableGrpName = "Group" + tableGroups.size();
-        }
-        if (targetAlias == null)
-        {
-            targetAlias = namer.getAliasForTable(this, target, tableGrpName);
-        }
-        DatastoreIdentifier targetId = rdbmsMgr.getIdentifierFactory().newTableIdentifier(targetAlias);
-        SQLTable targetTbl = new SQLTable(this, target, targetId, tableGrpName);
-        putSQLTableInGroup(targetTbl, tableGrpName, JoinType.CROSS_JOIN);
-
-        // Generate the join condition to use
-        BooleanExpression joinCondition = getJoinConditionForJoin(primaryTable, null, null, targetTbl, null, null, null);
-
-        addJoin(JoinType.CROSS_JOIN, primaryTable, targetTbl, joinCondition, null);
-
-        if (unions != null)
-        {
-            // Apply the join to all unions
-            Iterator<SelectStatement> unionIter = unions.iterator();
-            while (unionIter.hasNext())
-            {
-                SelectStatement stmt = unionIter.next();
-                stmt.crossJoin(target, targetAlias, tableGrpName);
-            }
-        }
-
-        return targetTbl;
-    }
-
-    @Override
     public String removeCrossJoin(SQLTable targetSqlTbl)
     {
         if (joins == null)

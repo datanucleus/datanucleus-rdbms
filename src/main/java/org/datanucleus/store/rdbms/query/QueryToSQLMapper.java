@@ -1213,7 +1213,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             // Not candidate class so must be cross join (JPA spec 4.4.5)
             DatastoreClass candTbl = storeMgr.getDatastoreClass(baseCls.getName(), clr);
-            candSqlTbl = stmt.crossJoin(candTbl, clsExpr.getAlias(), null);
+            candSqlTbl = stmt.join(JoinType.CROSS_JOIN, null, null, null, candTbl, clsExpr.getAlias(), null, null, null, null, true, null);
             SQLTableMapping tblMapping = new SQLTableMapping(candSqlTbl, cmd, candTbl.getIdMapping());
             setSQLTableMappingForAlias(clsExpr.getAlias(), tblMapping);
         }
@@ -5191,7 +5191,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             // Variable is persistent type, so add cross join (may need changing later on in compilation)
             DatastoreClass varTable = storeMgr.getDatastoreClass(varSym.getValueType().getName(), clr);
-            SQLTable varSqlTbl = stmt.crossJoin(varTable, "VAR_" + varName, null);
+            SQLTable varSqlTbl = stmt.join(JoinType.CROSS_JOIN, null, null, null, varTable, "VAR_" + varName, null, null, null, null, true, null);
             SQLTableMapping varSqlTblMapping = new SQLTableMapping(varSqlTbl, cmd, varTable.getIdMapping());
             setSQLTableMappingForAlias(varName, varSqlTblMapping);
             return exprFactory.newExpression(stmt, varSqlTbl, varTable.getIdMapping());
