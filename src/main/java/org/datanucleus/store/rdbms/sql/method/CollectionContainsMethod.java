@@ -344,7 +344,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                                 break;
                             }
                         }
-                        elemSqlTbl = stmt.join(joinType, joinSqlTbl, elemMapping, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null, true);
+                        elemSqlTbl = stmt.join(joinType, joinSqlTbl, elemMapping, joinTbl.getElementMapping(), elemTbl, elemAlias, elemTbl.getIdMapping(), null, null, null, true, null);
                     }
                     else
                     {
@@ -518,8 +518,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                 subStmt.select(exprFactory.newLiteral(subStmt, oneMapping, 1), null);
 
                 // Join to join table
-                SQLTable joinSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), null, joinTbl, null, joinTbl.getElementMapping(),
-                    null, null, null, true);
+                SQLTable joinSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), joinTbl, null, joinTbl.getElementMapping(),
+                    null, null, true, null);
 
                 // Restrict to collection owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();
@@ -571,7 +571,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
                     // Variable is defined as a subclass of the declared type so add extra join to variable type
                     DatastoreClass varTbl = storeMgr.getDatastoreClass(elemType, clr);
                     SQLTable varSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), null, varTbl, null, varTbl.getIdMapping(),
-                        null, null, null, true);
+                        null, null, null, true, null);
                     elemIdExpr = exprFactory.newExpression(subStmt, varSqlTbl, varTbl.getIdMapping());
                 }
                 else

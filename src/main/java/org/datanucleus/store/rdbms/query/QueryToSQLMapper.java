@@ -2093,11 +2093,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (mmd.getJoinMetaData() != null)
                                 {
                                     // Join to join table
-                                    MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);
+                                    CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
                                     sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
 
                                     tblMappingSqlTbl = sqlTbl;
-                                    tblIdMapping = tblMappingSqlTbl.getTable().getIdMapping();
+                                    tblIdMapping = joinTbl.getElementMapping();
                                 }
                                 else
                                 {
@@ -2120,10 +2120,27 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     tblMappingSqlTbl = sqlTbl;
                                     tblIdMapping = joinTbl.getValueMapping();
                                 }
+                                else
+                                {
+                                    throw new NucleusUserException("FROM clause contains join to Map field at " + mmd.getFullFieldName() + " yet this has no join table");
+                                }
                             }
                             else if (mmd.hasArray())
                             {
-                                // TODO Support this?
+                                cmd = null;
+                                if (mmd.getJoinMetaData() != null)
+                                {
+                                    // Join to join table
+                                    ArrayTable joinTbl = (ArrayTable)storeMgr.getTable(mmd);
+                                    sqlTbl = stmt.join(joinType, sqlTbl, sqlTbl.getTable().getIdMapping(), joinTbl, aliasForJoin, joinTbl.getOwnerMapping(), null, null, true);
+
+                                    tblMappingSqlTbl = sqlTbl;
+                                    tblIdMapping = joinTbl.getElementMapping();
+                                }
+                                else
+                                {
+                                    throw new NucleusUserException("FROM clause contains join to array field at " + mmd.getFullFieldName() + " yet this has no join table");
+                                }
                             }
                         }
                     }

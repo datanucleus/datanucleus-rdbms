@@ -1354,7 +1354,8 @@ public class SelectStatement extends SQLStatement
 
     @Override
     public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
+            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions,
+            SQLJoin parentJoin)
     {
         invalidateStatement();
 
@@ -1382,7 +1383,7 @@ public class SelectStatement extends SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, parentJoin);
 
         if (unions != null && applyToUnions)
         {
@@ -1391,7 +1392,7 @@ public class SelectStatement extends SQLStatement
             while (unionIter.hasNext())
             {
                 SelectStatement stmt = unionIter.next();
-                stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true);
+                stmt.join(joinType, sourceTable, sourceMapping, sourceParentMapping, target, targetAlias, targetMapping, targetParentMapping, discrimValues, tableGrpName, true, parentJoin);
             }
         }
 

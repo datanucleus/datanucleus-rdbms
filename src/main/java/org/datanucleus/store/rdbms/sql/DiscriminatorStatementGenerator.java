@@ -207,13 +207,13 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             if (hasOption(OPTION_ALLOW_NULLS))
             {
                 // Put element table in same table group since all relates to the elements
-                discrimSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, null, candidateTable, null, candidateIdMapping, null, null, 
+                discrimSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, candidateTable, null, candidateIdMapping, null, 
                     stmt.getPrimaryTable().getGroupName(), true);
             }
             else
             {
                 // Put element table in same table group since all relates to the elements
-                discrimSqlTbl = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, null, candidateTable, null, candidateIdMapping, null, null, 
+                discrimSqlTbl = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, candidateTable, null, candidateIdMapping, null, 
                     stmt.getPrimaryTable().getGroupName(), true);
             }
         }

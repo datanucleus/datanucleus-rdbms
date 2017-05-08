@@ -281,7 +281,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             // INNER JOIN from the root candidate table to this candidates table
             JavaTypeMapping candidateIdMapping = candidateTable.getIdMapping();
             JavaTypeMapping tableIdMapping = table.getIdMapping();
-            SQLTable tableSqlTbl = stmt.join(JoinType.INNER_JOIN, null, candidateIdMapping, null, table, null, tableIdMapping, null, null, stmt.getPrimaryTable().getGroupName(), true);
+            SQLTable tableSqlTbl = stmt.join(JoinType.INNER_JOIN, null, candidateIdMapping, table, null, tableIdMapping, null, stmt.getPrimaryTable().getGroupName(), true);
             tblGroupName = tableSqlTbl.getGroupName();
         }
 
@@ -353,7 +353,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping tableIdMapping = table.getIdMapping();
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = stmt.join(JoinType.LEFT_OUTER_JOIN, null, tableIdMapping, null, subclassTables[i], null, subclassIdMapping, null, null, 
+                    SQLTable sqlTableSubclass = stmt.join(JoinType.LEFT_OUTER_JOIN, null, tableIdMapping, subclassTables[i], null, subclassIdMapping, null, 
                         stmt.getPrimaryTable().getGroupName(), true);
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
                     SQLExpression nullExpr = new NullLiteral(stmt, null, null, null);
@@ -402,21 +402,21 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             if (hasOption(OPTION_ALLOW_NULLS))
             {
                 // Put element table in same table group since all relates to the elements
-                candidateSQLTable = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, null, candidateTable, null, candidateIdMapping, null, null, 
+                candidateSQLTable = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, candidateTable, null, candidateIdMapping, null, 
                     stmt.getPrimaryTable().getGroupName(), true);
             }
             else
             {
                 // Put element table in same table group since all relates to the elements
-                candidateSQLTable = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, null, candidateTable, null, candidateIdMapping, 
-                    null, null, stmt.getPrimaryTable().getGroupName(), true);
+                candidateSQLTable = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, candidateTable, null, candidateIdMapping, 
+                    null, stmt.getPrimaryTable().getGroupName(), true);
             }
 
             // Join the root candidate table to this particular candidate table
             if (table != candidateTable)
             {
                 // INNER JOIN from the root candidate table to this candidates table
-                stmt.join(JoinType.INNER_JOIN, candidateSQLTable, candidateIdMapping, null, table, null, table.getIdMapping(), null, null, stmt.getPrimaryTable().getGroupName(), true);
+                stmt.join(JoinType.INNER_JOIN, candidateSQLTable, candidateIdMapping, table, null, table.getIdMapping(), null, stmt.getPrimaryTable().getGroupName(), true);
             }
         }
         else
@@ -426,13 +426,13 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
             if (hasOption(OPTION_ALLOW_NULLS))
             {
                 // Put element table in same table group since all relates to the elements
-                candidateSQLTable = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, null, table, null, candidateIdMapping, null, null, 
+                candidateSQLTable = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, table, null, candidateIdMapping, null, 
                     stmt.getPrimaryTable().getGroupName(), true);
             }
             else
             {
                 // Put element table in same table group since all relates to the elements
-                candidateSQLTable = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, null, table, null, candidateIdMapping, null, null, stmt.getPrimaryTable().getGroupName(), true);
+                candidateSQLTable = stmt.join(JoinType.INNER_JOIN, null, joinElementMapping, table, null, candidateIdMapping, null, stmt.getPrimaryTable().getGroupName(), true);
             }
         }
 
@@ -480,7 +480,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
                     // Adds FROM clause of "LEFT OUTER JOIN {subTable} ON ..."
                     // and WHERE clause of "{subTable}.ID = NULL"
                     JavaTypeMapping subclassIdMapping = subclassTables[i].getIdMapping();
-                    SQLTable sqlTableSubclass = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, null, subclassTables[i], null, subclassIdMapping, null, null, 
+                    SQLTable sqlTableSubclass = stmt.join(JoinType.LEFT_OUTER_JOIN, null, joinElementMapping, subclassTables[i], null, subclassIdMapping, null, 
                         stmt.getPrimaryTable().getGroupName(), true);
                     SQLExpression subclassIdExpr = factory.newExpression(stmt, sqlTableSubclass, subclassIdMapping);
                     SQLExpression nullExpr = new NullLiteral(stmt, null, null, null);

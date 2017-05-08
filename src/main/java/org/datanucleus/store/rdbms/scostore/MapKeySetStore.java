@@ -293,7 +293,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 // MAP_TYPE_KEY_IN_VALUE, MAP_TYPE_JOIN
                 // Join to join table and select key fields
                 JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), keyIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
+                containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null, true);
 
                 iteratorMappingDef = new StatementClassMapping();
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
@@ -326,7 +326,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     sqlStmt = stmtGen.getStatement(ec);
 
                     JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
-                    containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), keyIdMapping, null, containerTable, null, elementMapping, null, null, null, true);
+                    containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null, true);
 
                     SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
                 }
@@ -344,7 +344,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                         {
                             // Add join to element table
                             elemSqlTblForKey = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(),
-                                null, elementMapping.getTable(), null, elementMapping.getTable().getIdMapping(), null, null, null, true);
+                                elementMapping.getTable(), null, elementMapping.getTable().getIdMapping(), null, null, true);
                         }
                     }
                     sqlStmt.select(elemSqlTblForKey, elementMapping, null);

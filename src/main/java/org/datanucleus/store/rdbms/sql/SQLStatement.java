@@ -390,10 +390,29 @@ public abstract class SQLStatement
      * @param tableGrpName Name of the table group for the target (null implies a new group)
      * @return SQLTable for the target
      */
-    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping,
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName)
     {
-        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true);
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true, null);
+    }
+
+    /**
+     * Method to form a join to the specified table using the provided mappings, with the join also being applied to any UNIONed statements.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param sourceMapping Mapping in this table to join from
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @param parentJoin Parent join when this join will be a sub-join (part of "join grouping")
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping,
+            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName, SQLJoin parentJoin)
+    {
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, true, parentJoin);
     }
 
     /**
@@ -412,7 +431,27 @@ public abstract class SQLStatement
     public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
             Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
     {
-        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, applyToUnions);
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, applyToUnions, null);
+    }
+
+    /**
+     * Method to form a join to the specified table using the provided mappings.
+     * @param joinType Type of join.
+     * @param sourceTable SQLTable for the source (null implies primaryTable)
+     * @param sourceMapping Mapping in this table to join from
+     * @param target Table to join to
+     * @param targetAlias Alias for the target table (if known)
+     * @param targetMapping Mapping in the other table to join to (also defines the table to join to)
+     * @param discrimValues Any discriminator values to apply for the joined table (null if not)
+     * @param tableGrpName Name of the table group for the target (null implies a new group)
+     * @param applyToUnions Whether to apply to any unioned statements (only applies to SELECT statements)
+     * @param parentJoin Parent join when this join will be a sub-join (part of "join grouping")
+     * @return SQLTable for the target
+     */
+    public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, 
+            Table target, String targetAlias, JavaTypeMapping targetMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions, SQLJoin parentJoin)
+    {
+        return join(joinType, sourceTable, sourceMapping, null, target, targetAlias, targetMapping, null, discrimValues, tableGrpName, applyToUnions, parentJoin);
     }
 
     /**
@@ -428,10 +467,12 @@ public abstract class SQLStatement
      * @param discrimValues Any discriminator values to apply for the joined table (null if not)
      * @param tableGrpName Name of the table group for the target (null implies a new group)
      * @param applyToUnions Whether to apply to any unioned statements (only applies to SELECT statements)
+     * @param parentJoin Parent join when this join will be a sub-join (part of "join grouping")
      * @return SQLTable for the target
      */
     public SQLTable join(JoinType joinType, SQLTable sourceTable, JavaTypeMapping sourceMapping, JavaTypeMapping sourceParentMapping,
-            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions)
+            Table target, String targetAlias, JavaTypeMapping targetMapping, JavaTypeMapping targetParentMapping, Object[] discrimValues, String tableGrpName, boolean applyToUnions,
+            SQLJoin parentJoin)
     {
         invalidateStatement();
 
@@ -459,7 +500,7 @@ public abstract class SQLStatement
         // Generate the join condition to use
         BooleanExpression joinCondition = getJoinConditionForJoin(sourceTable, sourceMapping, sourceParentMapping, targetTbl, targetMapping, targetParentMapping, discrimValues);
 
-        addJoin(joinType, sourceTable, targetTbl, joinCondition, null);
+        addJoin(joinType, sourceTable, targetTbl, joinCondition, parentJoin);
 
         return targetTbl;
     }
@@ -516,7 +557,7 @@ public abstract class SQLStatement
      */
     public SQLTable crossJoin(Table target, String targetAlias, String tableGrpName)
     {
-        return join(JoinType.CROSS_JOIN, null, null, null, target, targetAlias, null, null, null, tableGrpName, true);
+        return join(JoinType.CROSS_JOIN, null, null, null, target, targetAlias, null, null, null, tableGrpName, true, null);
         /*invalidateStatement();
 
         // Create the SQLTable to join to.

@@ -273,7 +273,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
 
                 // Join to join table
                 SQLTable joinSqlTbl = subStmt.join(JoinType.INNER_JOIN, subStmt.getPrimaryTable(), elemTbl.getIdMapping(), null, joinTbl, null, joinTbl.getElementMapping(),
-                    null, null, null, true);
+                    null, null, null, true, null);
 
                 // Restrict to array owner
                 JavaTypeMapping ownerMapping = ((JoinTable)joinTbl).getOwnerMapping();

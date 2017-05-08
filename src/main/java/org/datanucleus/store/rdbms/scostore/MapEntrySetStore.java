@@ -461,7 +461,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             {
                 // Add join to key table
                 entrySqlTblForKey = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
-                    null, keyMapping.getTable(), null, keyMapping.getTable().getIdMapping(), null, null, null, true);
+                    keyMapping.getTable(), null, keyMapping.getTable().getIdMapping(), null, null, true);
             }
         }
         iteratorKeyResultCols = sqlStmt.select(entrySqlTblForKey, keyMapping, null);
@@ -476,7 +476,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             {
                 // Add join to key table
                 entrySqlTblForVal = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
-                    null, valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null, null, true);
+                    valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null, true);
             }
         }
         iteratorValueResultCols = sqlStmt.select(entrySqlTblForVal, valueMapping, null);

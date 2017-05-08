@@ -525,7 +525,7 @@ public class ObjectExpression extends SQLExpression
                 if (type.isAssignableFrom(implType))
                 {
                     DatastoreClass castTable = storeMgr.getDatastoreClass(type.getName(), clr);
-                    SQLTable castSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, table, implMappings[i], refMapping, castTable, null, castTable.getIdMapping(), null, null, null, true);
+                    SQLTable castSqlTbl = stmt.join(JoinType.LEFT_OUTER_JOIN, table, implMappings[i], refMapping, castTable, null, castTable.getIdMapping(), null, null, null, true, null);
                     return exprFactory.newExpression(stmt, castSqlTbl, castTable.getIdMapping());
                 }
             }

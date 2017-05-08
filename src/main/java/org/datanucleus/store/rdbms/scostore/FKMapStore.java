@@ -1262,8 +1262,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (valueCmd != null)
             {
                 // Left outer join to value table (so we allow for null values)
-                SQLTable valueSqlTbl = sqlStmt.join(JoinType.LEFT_OUTER_JOIN, sqlStmt.getPrimaryTable(), valueMapping, null, valueTable, null, valueTable.getIdMapping(), 
-                    null, null, null, true);
+                SQLTable valueSqlTbl = sqlStmt.join(JoinType.LEFT_OUTER_JOIN, sqlStmt.getPrimaryTable(), valueMapping, valueTable, null, valueTable.getIdMapping(), 
+                    null, null, true);
 
                 // Select the value field(s)
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
