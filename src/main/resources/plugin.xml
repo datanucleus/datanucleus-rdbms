@@ -952,6 +952,12 @@ Contributors:
         <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
         <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
         <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
+        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
         <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
         <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
         <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
@@ -1021,6 +1027,12 @@ Contributors:
         <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
         <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
         <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
+        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
         <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
         <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
         <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
