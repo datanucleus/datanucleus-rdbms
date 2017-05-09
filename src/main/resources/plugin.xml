@@ -1078,6 +1078,12 @@ Contributors:
         <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
         <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
         <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
         <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
         <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
         <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
@@ -1094,6 +1100,12 @@ Contributors:
         <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
         <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
         <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
+        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
         <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
         <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
         <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
