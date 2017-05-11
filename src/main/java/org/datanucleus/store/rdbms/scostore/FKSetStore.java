@@ -1183,11 +1183,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
-        }
-        catch (MappedDatastoreException e)
+        catch (SQLException | MappedDatastoreException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

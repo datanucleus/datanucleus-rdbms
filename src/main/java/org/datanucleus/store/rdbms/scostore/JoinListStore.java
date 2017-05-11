@@ -309,11 +309,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (MappedDatastoreException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056009", addStmt), e);
-        }
-        catch (SQLException e)
+        catch (SQLException | MappedDatastoreException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056009", addStmt), e);
         }
@@ -805,11 +801,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
-        }
-        catch (MappedDatastoreException e)
+        catch (SQLException | MappedDatastoreException e)
         {
             throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
         }

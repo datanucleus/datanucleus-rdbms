@@ -597,10 +597,8 @@ public class FKListStore<E> extends AbstractListStore<E>
 
     /**
      * Remove all elements from a collection from the association owner vs elements.
-     * TODO : Change the query to do all in one go for efficiency. Currently
-     * removes an element and shuffles the indexes, then removes an element
-     * and shuffles the indexes, then removes an element and shuffles the
-     * indexes etc ... a bit inefficient !!!
+     * TODO : Change the query to do all in one go for efficiency. Currently removes an element and shuffles the indexes, then removes an element
+     * and shuffles the indexes, then removes an element and shuffles the indexes etc ... a bit inefficient !!!
      * @param ownerOP ObjectProvider for the owner
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
@@ -1137,13 +1135,9 @@ public class FKListStore<E> extends AbstractListStore<E>
                 mconn.release();
             }
         }
-        catch (SQLException e)
+        catch (SQLException | MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
-        }
-        catch (MappedDatastoreException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056006", stmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056006", stmt), e);
         }
     }
 
