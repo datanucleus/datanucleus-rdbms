@@ -526,6 +526,9 @@ public class FetchRequest extends Request
                                 }
                             }
                         }
+
+                        // TODO We should use the actual FetchPlan, and the max fetch depth, so then it can pull in all related objects within reach.
+                        // But this will mean we cannot cache the statement, since it is for a specific ExecutionContext
                         // TODO If this field is a 1-1 and the other side has a discriminator or version then we really ought to fetch it
                         SQLStatementHelper.selectMemberOfSourceInStatement(sqlStatement, mappingDef, null, sqlTbl, mmd, clr, depth, null);
                         number++;
