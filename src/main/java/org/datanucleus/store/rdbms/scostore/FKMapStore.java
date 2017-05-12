@@ -1250,7 +1250,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             }
 
             // Select the value field(s)
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), valueCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), valueCmd, ec.getFetchPlan().getMaxFetchDepth());
         }
         else
         {
@@ -1264,7 +1264,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 SQLTable valueSqlTbl = sqlStmt.leftOuterJoin(sqlStmt.getPrimaryTable(), valueMapping, valueTable, null, valueTable.getIdMapping(), null, null);
 
                 // Select the value field(s)
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, ec.getFetchPlan().getMaxFetchDepth());
             }
             else
             {

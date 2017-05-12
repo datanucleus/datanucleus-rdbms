@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.DiscriminatorStrategy;
@@ -257,6 +258,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         final Class keyCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
+        FetchPlan fp = ec.getFetchPlan();
         if (elementCmd != null && elementCmd.getDiscriminatorStrategyForTable() != null &&
             elementCmd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
         {
@@ -285,7 +287,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
             else
             {
@@ -295,7 +297,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
         }
         else
@@ -310,7 +312,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 sqlStmt = stmtGen.getStatement(ec);
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
             else
             {
@@ -327,7 +329,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                     JavaTypeMapping keyIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
                     containerSqlTbl = sqlStmt.innerJoin(sqlStmt.getPrimaryTable(), keyIdMapping, containerTable, null, elementMapping, null, null);
 
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
                 }
                 else
                 {

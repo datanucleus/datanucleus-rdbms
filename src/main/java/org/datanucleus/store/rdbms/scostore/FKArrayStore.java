@@ -710,7 +710,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
         }
         else
         {
@@ -731,7 +731,8 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     }
                     else
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 
+                            fp.getMaxFetchDepth());
                     }
                 }
                 else
@@ -742,7 +743,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     }
                     else
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
                     }
                 }
 

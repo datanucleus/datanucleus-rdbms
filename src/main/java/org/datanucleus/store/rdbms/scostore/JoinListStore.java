@@ -998,7 +998,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
             // Select the required fields
             SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, elementCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
         }
 
         if (addRestrictionOnOwner)
