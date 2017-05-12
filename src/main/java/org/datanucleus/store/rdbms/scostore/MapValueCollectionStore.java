@@ -25,6 +25,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -375,6 +376,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         final Class valueCls = clr.classForName(elementType);
         SQLTable containerSqlTbl = null;
         MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
+        FetchPlan fp = ec.getFetchPlan();
         if (elementCmd != null && elementCmd.getDiscriminatorStrategyForTable() != null && elementCmd.getDiscriminatorStrategyForTable() != DiscriminatorStrategy.NONE)
         {
             // Map<?, PC> where value has discriminator
@@ -404,7 +406,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null, true);
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
             else if (mapType == MapType.MAP_TYPE_KEY_IN_VALUE)
             {
@@ -412,7 +414,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
             else
             {
@@ -421,7 +423,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null, true);
 
                 iteratorMappingDef = new StatementClassMapping();
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
         }
         else
@@ -441,8 +443,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
                     containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null, true);
 
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef,
-                        ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
                 }
                 else
                 {
@@ -474,7 +475,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 sqlStmt = stmtGen.getStatement(ec);
                 containerSqlTbl = sqlStmt.getPrimaryTable();
 
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
             }
             else
             {
@@ -491,7 +492,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                     JavaTypeMapping valueIdMapping = sqlStmt.getPrimaryTable().getTable().getIdMapping();
                     containerSqlTbl = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), valueIdMapping, containerTable, null, elementMapping, null, null, true);
 
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, ec.getFetchPlan(), sqlStmt.getPrimaryTable(), elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingDef, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
                 }
                 else
                 {

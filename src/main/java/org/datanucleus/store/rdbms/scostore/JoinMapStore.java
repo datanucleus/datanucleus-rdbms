@@ -832,7 +832,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                     }
                 }
             }
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, getMappingDef, ec.getFetchPlan(), valueSqlTbl, valueCmd, ec.getFetchPlan().getMaxFetchDepth());
         }
 
         // Apply condition on owner field to filter by owner

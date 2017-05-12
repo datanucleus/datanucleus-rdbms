@@ -1236,7 +1236,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 //            NucleusLogger.GENERAL.info(">> FKSetStore.iter iterMapDef=" + iteratorMappingDef + " table=" + sqlStmt.getPrimaryTable() +
 //                " emd=" + emd.getFullClassName() + " elem.subclasses=" + StringUtils.objectArrayToString(elemSubclasses));
             // Select the required fields (of the element class)
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
         }
         else
         {
@@ -1263,12 +1263,12 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     if (sqlStmt == null)
                     {
                         SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass,
-                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
                     }
                     else
                     {
                         SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null,
-                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                            fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
                     }
                 }
                 else

@@ -31,7 +31,6 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -436,20 +435,6 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     {
         SelectStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
-
-        MapType mapType = getOwnerMemberMetaData().getMap().getMapType();
-        if (mapType == MapType.MAP_TYPE_JOIN)
-        {
-            
-        }
-        else if (mapType == MapType.MAP_TYPE_KEY_IN_VALUE)
-        {
-            
-        }
-        else if (mapType == MapType.MAP_TYPE_VALUE_IN_KEY)
-        {
-            
-        }
 
         // Select the key mapping
         // TODO If key is persistable and has inheritance also select a discriminator to get the type
