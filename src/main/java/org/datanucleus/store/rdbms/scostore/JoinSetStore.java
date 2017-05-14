@@ -1035,13 +1035,13 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
                     // Select the required fields
                     SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[i].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
                 }
                 else
                 {
                     // Select the required fields
                     SQLTable elementSqlTbl = elementStmt.getTable(elementInfo[i].getDatastoreClass(), elementStmt.getPrimaryTable().getGroupName());
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(elementStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, 0);
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(elementStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
 
                     sqlStmt.union(elementStmt);
                 }

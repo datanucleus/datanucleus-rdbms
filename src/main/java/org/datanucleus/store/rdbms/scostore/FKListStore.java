@@ -1553,7 +1553,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, 0);
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
         }
         else
         {
@@ -1574,7 +1574,8 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
                     else
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(),
+                            fp.getMaxFetchDepth());
                     }
                 }
                 else
@@ -1585,7 +1586,8 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
                     else
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), 0);
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, null, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(),
+                            fp.getMaxFetchDepth());
                     }
                 }
 
