@@ -84,11 +84,8 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
         if (cmd.getIdentityType() == IdentityType.APPLICATION || cmd.getIdentityType() == IdentityType.DATASTORE)
         {
-            throw new NucleusUserException(Localiser.msg("031005", cmd.getFullClassName(), cmd.getIdentityType()));
-        }
-        else if (cmd.getIdentityType() == IdentityType.NONDURABLE)
-        {
-            // Do nothing. We need this type
+            // In all version until 5.1.0.M3 this required NONDURABLE to continue here
+            NucleusLogger.DATASTORE_SCHEMA.debug("Mapping VIEW " + tableName + " to class " + cmd.getFullClassName() + " which uses " + cmd.getIdentityType());
         }
 
         // We expect a flat class here to map to a view.
