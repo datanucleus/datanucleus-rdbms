@@ -53,8 +53,6 @@ import org.datanucleus.query.inmemory.JPQLInMemoryEvaluator;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.query.AbstractJPQLQuery;

@@ -21,9 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-
 /**
  * Definition of the mapping of result expressions in a datastore statement.
  * In a typical RDBMS SQL statement the result clause will contain many expressions.

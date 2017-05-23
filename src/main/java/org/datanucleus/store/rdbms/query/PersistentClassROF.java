@@ -46,8 +46,6 @@ import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;

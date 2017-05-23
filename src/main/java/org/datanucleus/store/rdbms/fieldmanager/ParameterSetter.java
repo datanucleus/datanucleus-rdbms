@@ -29,14 +29,14 @@ import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
+import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
 

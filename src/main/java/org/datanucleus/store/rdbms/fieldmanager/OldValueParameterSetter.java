@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.fieldmanager;
 import java.sql.PreparedStatement;
 
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
 
 /**
  * Parameter setter that uses old values when available.

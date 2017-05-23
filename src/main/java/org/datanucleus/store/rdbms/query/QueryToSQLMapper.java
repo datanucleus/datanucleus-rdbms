@@ -65,8 +65,6 @@ import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;

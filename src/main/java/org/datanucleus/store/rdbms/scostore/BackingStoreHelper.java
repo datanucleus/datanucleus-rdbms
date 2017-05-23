@@ -30,14 +30,14 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
+import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.table.JoinTable;
 
 /**

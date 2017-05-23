@@ -18,7 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.request;
 
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
+import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 
 /**
  * Holder for the StatementExpressionIndex for the various details in UPDATE/DELETE statements.

@@ -34,6 +34,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
+import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;

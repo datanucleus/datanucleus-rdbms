@@ -17,8 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.scostore;
 
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
+import org.datanucleus.store.rdbms.query.StatementClassMapping;
+import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.types.scostore.Store;
 

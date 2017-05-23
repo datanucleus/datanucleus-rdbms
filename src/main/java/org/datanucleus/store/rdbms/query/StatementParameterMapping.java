@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
-
 /**
  * Definition of the mapping of parameters in a datastore statement.
  * A typical use is for RDBMS where we have a JDBC statement and each parameter is looked up

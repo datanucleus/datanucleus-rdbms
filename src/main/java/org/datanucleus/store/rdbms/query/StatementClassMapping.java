@@ -15,7 +15,7 @@ limitations under the License.
 Contributors:
     ...
 **********************************************************************/
-package org.datanucleus.store.rdbms.mapping;
+package org.datanucleus.store.rdbms.query;
 
 import java.util.HashMap;
 import java.util.Iterator;

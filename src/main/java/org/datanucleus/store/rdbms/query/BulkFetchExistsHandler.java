@@ -27,7 +27,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.scostore.BaseContainerStore;
 import org.datanucleus.store.rdbms.scostore.FKArrayStore;

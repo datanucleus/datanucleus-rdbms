@@ -41,7 +41,6 @@ import org.datanucleus.query.QueryUtils;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
-import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
