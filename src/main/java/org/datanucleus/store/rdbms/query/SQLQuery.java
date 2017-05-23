@@ -1218,19 +1218,19 @@ public final class SQLQuery extends Query
         {
             StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false));
             datastoreMappingIdx.setColumnPositions(datastoreIndex);
-            mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreMappingIdx);
+            mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreMappingIdx);
         }
         if (discrimIndex != null)
         {
             StatementMappingIndex discrimMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true));
             discrimMappingIdx.setColumnPositions(discrimIndex);
-            mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DISCRIMINATOR, discrimMappingIdx);
+            mappingDefinition.addMappingForMember(SurrogateColumnType.DISCRIMINATOR.getFieldNumber(), discrimMappingIdx);
         }
         if (versionIndex != null)
         {
             StatementMappingIndex versionMappingIdx = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.VERSION, true));
             versionMappingIdx.setColumnPositions(versionIndex);
-            mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionMappingIdx);
+            mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionMappingIdx);
         }
 
         return new PersistentClassROF(storeMgr, candidateCmd, mappingDefinition, ignoreCache, getFetchPlan(), getCandidateClass());

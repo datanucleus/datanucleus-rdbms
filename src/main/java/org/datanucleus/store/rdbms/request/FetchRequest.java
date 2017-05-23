@@ -183,11 +183,11 @@ public class FetchRequest extends Request
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
             sqlStatement.whereAnd(expr.eq(val), true);
 
-            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             if (datastoreIdx == null)
             {
                 datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
             }
             datastoreIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -226,11 +226,11 @@ public class FetchRequest extends Request
             SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
 
-            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
             if (multitenancyIdx == null)
             {
                 multitenancyIdx = new StatementMappingIndex(multitenancyMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_MULTITENANCY, multitenancyIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.MULTITENANCY.getFieldNumber(), multitenancyIdx);
             }
             multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -243,11 +243,11 @@ public class FetchRequest extends Request
             SQLExpression softDeleteValParam = exprFactory.newLiteralParameter(sqlStatement, softDeleteMapping, null, "SOFTDELETE");
             sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteValParam), true);
 
-            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.SOFTDELETE.getFieldNumber());
             if (softDeleteIdx == null)
             {
                 softDeleteIdx = new StatementMappingIndex(softDeleteMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_SOFTDELETE, softDeleteIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.SOFTDELETE.getFieldNumber(), softDeleteIdx);
             }
             softDeleteIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -347,7 +347,7 @@ public class FetchRequest extends Request
                         // Provide the primary key field(s) to the JDBC statement
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
@@ -362,7 +362,7 @@ public class FetchRequest extends Request
                         if (multitenancyMapping != null)
                         {
                             // Provide the tenant id to the JDBC statement
-                            StatementMappingIndex multitenancyIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+                            StatementMappingIndex multitenancyIdx = mappingDef.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
                             String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
                             for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                             {
@@ -374,7 +374,7 @@ public class FetchRequest extends Request
                         if (softDeleteMapping != null)
                         {
                             // Set SoftDelete parameter in statement
-                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.SOFTDELETE.getFieldNumber());
                             for (int i=0;i<softDeleteIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 softDeleteMapping.setObject(ec, ps, softDeleteIdx.getParameterPositionsForOccurrence(i), Boolean.FALSE);
@@ -405,7 +405,7 @@ public class FetchRequest extends Request
                                 if (fetchingSurrogateVersion)
                                 {
                                     // Surrogate version column - get from the result set using the version mapping
-                                    StatementMappingIndex verIdx = mappingDef.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
+                                    StatementMappingIndex verIdx = mappingDef.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
                                     datastoreVersion = table.getSurrogateMapping(SurrogateColumnType.VERSION, true).getObject(ec, rs, verIdx.getColumnPositions());
                                 }
                                 else if (versionFieldName != null)
@@ -551,7 +551,7 @@ public class FetchRequest extends Request
             SQLTable verSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStatement, sqlTbl, versionMapping);
             int[] cols = sqlStatement.select(verSqlTbl, versionMapping, null);
             verMapIdx.setColumnPositions(cols);
-            mappingDef.addMappingForMember(StatementClassMapping.MEMBER_VERSION, verMapIdx);
+            mappingDef.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), verMapIdx);
         }
 
         return number;

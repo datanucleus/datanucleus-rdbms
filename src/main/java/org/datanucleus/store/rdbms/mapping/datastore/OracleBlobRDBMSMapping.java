@@ -332,11 +332,11 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
             SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
             sqlStmt.whereAnd(expr.eq(val), true);
 
-            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             if (datastoreIdx == null)
             {
                 datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
             }
             datastoreIdx.addParameterOccurrence(new int[] {inputParamNum});
         }
@@ -395,8 +395,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
                     // Provide the primary key field(s) to the JDBC statement
                     if (cmd.getIdentityType() == IdentityType.DATASTORE)
                     {
-                        StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(
-                            StatementClassMapping.MEMBER_DATASTORE_ID);
+                        StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                         for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                         {
                             classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,

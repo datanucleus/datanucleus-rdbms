@@ -49,6 +49,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.mapping.StatementClassMapping;
 import org.datanucleus.store.rdbms.mapping.StatementMappingIndex;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.util.Localiser;
@@ -120,7 +121,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         // Find the class of the returned object in this row of the ResultSet
         String className = null;
         boolean requiresInheritanceCheck = true;
-        StatementMappingIndex discrimMapIdx = stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DISCRIMINATOR);
+        StatementMappingIndex discrimMapIdx = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
         if (discrimMapIdx != null)
         {
             // Discriminator mapping registered so use that
@@ -282,7 +283,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         {
             if (vermd.getFieldName() == null)
             {
-                versionMapping = stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
+                versionMapping = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
             }
             else
             {
@@ -369,7 +370,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Generate the "id" for this object (of type pcClassForObject), and find the object for that
-            StatementMappingIndex datastoreIdMapping = stmtMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdMapping = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
             Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
             if (id != null)
@@ -547,7 +548,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             {
                 pcClass = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
             }
-            StatementMappingIndex datastoreIdMapping = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdMapping = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
             Object id = mapping.getObject(ec, resultSet, datastoreIdMapping.getColumnPositions());
             if (id != null)

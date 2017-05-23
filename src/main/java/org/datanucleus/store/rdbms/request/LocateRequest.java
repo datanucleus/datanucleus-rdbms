@@ -93,11 +93,11 @@ public class LocateRequest extends Request
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
             sqlStatement.whereAnd(expr.eq(val), true);
 
-            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             if (datastoreIdx == null)
             {
                 datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
             }
             datastoreIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -140,11 +140,11 @@ public class LocateRequest extends Request
             SQLExpression tenantValParam = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
             sqlStatement.whereAnd(tenantExpr.eq(tenantValParam), true);
 
-            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
             if (multitenancyIdx == null)
             {
                 multitenancyIdx = new StatementMappingIndex(multitenancyMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_MULTITENANCY, multitenancyIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.MULTITENANCY.getFieldNumber(), multitenancyIdx);
             }
             multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -157,11 +157,11 @@ public class LocateRequest extends Request
             SQLExpression softDeleteValParam = exprFactory.newLiteralParameter(sqlStatement, softDeleteMapping, null, "SOFTDELETE");
             sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteValParam), true);
 
-            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.SOFTDELETE.getFieldNumber());
             if (softDeleteIdx == null)
             {
                 softDeleteIdx = new StatementMappingIndex(softDeleteMapping);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_SOFTDELETE, softDeleteIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.SOFTDELETE.getFieldNumber(), softDeleteIdx);
             }
             softDeleteIdx.addParameterOccurrence(new int[] {inputParamNum++});
         }
@@ -210,7 +210,7 @@ public class LocateRequest extends Request
                         // Provide the primary key field(s)
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
@@ -225,7 +225,7 @@ public class LocateRequest extends Request
                         if (multitenancyMapping != null)
                         {
                             // Set MultiTenancy parameter in statement
-                            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_MULTITENANCY);
+                            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
                             String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
                             for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                             {
@@ -237,7 +237,7 @@ public class LocateRequest extends Request
                         if (softDeleteMapping != null)
                         {
                             // Set SoftDelete parameter in statement
-                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_SOFTDELETE);
+                            StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.SOFTDELETE.getFieldNumber());
                             for (int i=0;i<softDeleteIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 softDeleteMapping.setObject(ec, ps, softDeleteIdx.getParameterPositionsForOccurrence(i), Boolean.FALSE);

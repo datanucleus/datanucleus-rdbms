@@ -503,7 +503,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex datastoreIdIdx = new StatementMappingIndex(idMapping);
                 datastoreIdIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdIdx);
             }
         }
         else if (candidateCmd.getIdentityType() == IdentityType.APPLICATION)
@@ -540,7 +540,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex versionIdx = new StatementMappingIndex(verMapping);
                 versionIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionIdx);
             }
         }
 
@@ -554,7 +554,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex discrimIdx = new StatementMappingIndex(discrimMapping);
                 discrimIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DISCRIMINATOR, discrimIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DISCRIMINATOR.getFieldNumber(), discrimIdx);
             }
         }
 
@@ -651,7 +651,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex datastoreIdIdx = new StatementMappingIndex(idMapping);
                 datastoreIdIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdIdx);
             }
         }
 
@@ -665,7 +665,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex versionIdx = new StatementMappingIndex(verMapping);
                 versionIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_VERSION, versionIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionIdx);
             }
         }
 
@@ -679,7 +679,7 @@ public class SQLStatementHelper
             {
                 StatementMappingIndex discrimIdx = new StatementMappingIndex(discrimMapping);
                 discrimIdx.setColumnPositions(colNumbers);
-                mappingDefinition.addMappingForMember(StatementClassMapping.MEMBER_DISCRIMINATOR, discrimIdx);
+                mappingDefinition.addMappingForMember(SurrogateColumnType.DISCRIMINATOR.getFieldNumber(), discrimIdx);
             }
         }
     }
@@ -1092,7 +1092,7 @@ public class SQLStatementHelper
                     }
                     else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
                     {
-                        StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+                        StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                         selectFK = false;
                         stmtMapping.setColumnPositions(pkIdx.getColumnPositions());
                     }

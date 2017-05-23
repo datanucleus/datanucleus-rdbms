@@ -21,13 +21,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.datanucleus.store.schema.table.SurrogateColumnType;
+
 /**
  * Definition of statement mapping for a particular class.
  * Provides a definition of how the results of a datastore query are mapped on to the fields of a class.
  * If we take the example of this being the candidate class retrieved, then the memberName will be null
  * and any children represent persistent objects also retrieved in this statement. So we process all fields
- * in the result-set for this class, then instantiate any child object (with its id field(s)), and process
- * all of its fields, etc.
+ * in the result-set for this class, then instantiate any child object (with its id field(s)), and process all of its fields, etc.
  * <p>
  * We can have a result set with fields for multiple objects and instantiate more than 1 related object. 
  * To give an example of what an object of this type can look like
@@ -57,17 +58,11 @@ import java.util.Map;
  *        ]}
  * ]</pre>
  * In this example we have a persistable object as candidate, and it has 2 1-1 relations (field=1, field=2).
- * These are both being retrieved in the same query, hence the sub-mappings. Note that the column(s) of the FK
- * in the owner object is the same as the PK field(s) of the related object.
+ * These are both being retrieved in the same query, hence the sub-mappings. 
+ * Note that the column(s) of the FK in the owner object is the same as the PK field(s) of the related object.
  */
 public class StatementClassMapping
 {
-    public static final int MEMBER_DATASTORE_ID = -1;
-    public static final int MEMBER_VERSION = -2;
-    public static final int MEMBER_DISCRIMINATOR = -3;
-    public static final int MEMBER_MULTITENANCY = -4;
-    public static final int MEMBER_SOFTDELETE = -5;
-
     /** Name of the class. */
     String className;
 
@@ -174,23 +169,23 @@ public class StatementClassMapping
         }
 
         int length = mappings.size();
-        if (mappings.containsKey(MEMBER_DATASTORE_ID))
+        if (mappings.containsKey(SurrogateColumnType.DATASTORE_ID.getFieldNumber()))
         {
             length--; // Ignore datastore id
         }
-        if (mappings.containsKey(MEMBER_VERSION))
+        if (mappings.containsKey(SurrogateColumnType.VERSION.getFieldNumber()))
         {
             length--; // Ignore version
         }
-        if (mappings.containsKey(MEMBER_DISCRIMINATOR))
+        if (mappings.containsKey(SurrogateColumnType.DISCRIMINATOR.getFieldNumber()))
         {
             length--; // Ignore discriminator
         }
-        if (mappings.containsKey(MEMBER_MULTITENANCY))
+        if (mappings.containsKey(SurrogateColumnType.MULTITENANCY.getFieldNumber()))
         {
             length--; // Ignore multitenancy
         }
-        if (mappings.containsKey(MEMBER_SOFTDELETE))
+        if (mappings.containsKey(SurrogateColumnType.SOFTDELETE.getFieldNumber()))
         {
             length--; // Ignore softDelete
         }
@@ -221,7 +216,7 @@ public class StatementClassMapping
         memberNumbers = null;
         if (children == null)
         {
-            children = new HashMap();
+            children = new HashMap<>();
         }
         children.put(position, defn);
     }

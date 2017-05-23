@@ -676,7 +676,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false), alias);
                                     StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false));
                                     idx.setColumnPositions(cols);
-                                    map.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, idx);
+                                    map.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), idx);
                                 }
 
                                 // Select the FetchPlan members

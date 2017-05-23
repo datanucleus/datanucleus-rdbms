@@ -102,7 +102,7 @@ public class LocateBulkRequest extends BulkRequest
             int[] cols = sqlStatement.select(expr, null);
             StatementMappingIndex datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
             datastoreIdx.setColumnPositions(cols);
-            resultMapping.addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
+            resultMapping.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
         }
         else if (table.getIdentityType() == IdentityType.APPLICATION)
         {
@@ -138,7 +138,7 @@ public class LocateBulkRequest extends BulkRequest
                 int[] cols = sqlStatement.select(expr, null);
                 StatementMappingIndex mapIdx = new StatementMappingIndex(verMapping);
                 mapIdx.setColumnPositions(cols);
-                resultMapping.addMappingForMember(StatementClassMapping.MEMBER_VERSION, mapIdx);
+                resultMapping.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), mapIdx);
             }
         }
 
@@ -199,7 +199,7 @@ public class LocateBulkRequest extends BulkRequest
                 sqlStatement.whereOr(expr.eq(val), true);
 
                 StatementMappingIndex datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
-                mappingDefinitions[i].addMappingForMember(StatementClassMapping.MEMBER_DATASTORE_ID, datastoreIdx);
+                mappingDefinitions[i].addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
                 datastoreIdx.addParameterOccurrence(new int[] {inputParamNum++});
             }
             else if (table.getIdentityType() == IdentityType.APPLICATION)
@@ -307,7 +307,7 @@ public class LocateBulkRequest extends BulkRequest
                     {
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            StatementMappingIndex datastoreIdx = mappingDefinitions[i].getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+                            StatementMappingIndex datastoreIdx = mappingDefinitions[i].getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                             for (int j=0;j<datastoreIdx.getNumberOfParameterOccurrences();j++)
                             {
                                 table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(j), 
@@ -381,7 +381,7 @@ public class LocateBulkRequest extends BulkRequest
             Object key = null;
             if (cmd.getIdentityType() == IdentityType.DATASTORE)
             {
-                StatementMappingIndex idx = resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_DATASTORE_ID);
+                StatementMappingIndex idx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                 JavaTypeMapping idMapping = idx.getMapping();
                 key = idMapping.getObject(ec, rs, idx.getColumnPositions());
                 if (IdentityUtils.isDatastoreIdentity(key))
@@ -507,7 +507,7 @@ public class LocateBulkRequest extends BulkRequest
                         {
                             // Surrogate version
                             versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, true); // Why use true now?
-                            StatementMappingIndex verIdx = resultMapping.getMappingForMemberPosition(StatementClassMapping.MEMBER_VERSION);
+                            StatementMappingIndex verIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
                             datastoreVersion = versionMapping.getObject(ec, rs, verIdx.getColumnPositions());
                         }
                         else
