@@ -61,6 +61,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
     /** Map of ResultSet object values, keyed by the list index ("0", "1", etc). */
     private Map<Integer, E> resultsObjsByIndex = null;
 
+    /** Map of persistable object id, keyed by the result position (0, 1, 2, ...). */
     protected Map<Integer, Object> resultIdsByPosition = null;
 
     /** Position of first result (origin=0). */
@@ -90,7 +91,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
 
         if (query.useResultsCaching())
         {
-            resultIdsByPosition = new HashMap();
+            resultIdsByPosition = new HashMap<>();
         }
 
         // Process any supported extensions
@@ -107,7 +108,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             }
             else if (ext.equalsIgnoreCase("strong"))
             {
-                resultsObjsByIndex = new HashMap();
+                resultsObjsByIndex = new HashMap<>();
             }
             else if (ext.equalsIgnoreCase("none"))
             {
