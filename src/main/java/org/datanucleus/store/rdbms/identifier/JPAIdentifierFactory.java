@@ -275,13 +275,18 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             schemaName = getIdentifierInAdapterCase(schemaName);
         }
 
-        // No user-specified name, so generate a default using the previously created fallback
+        // No user-specified name, so fallback to the default
         if (identifierName == null)
         {
-            // Generate a fallback name, based on the last part of the class name ("MyClass" becomes "MYCLASS")
-            String unique_name = cmd.getFullClassName().substring(cmd.getFullClassName().lastIndexOf('.')+1);
-
-            identifierName = unique_name;
+            // Generate a fallback name, based on the entity name, or else on the last part of the class name ("MyClass" becomes "MYCLASS")
+            if (cmd.getEntityName() != null)
+            {
+                identifierName = cmd.getEntityName();
+            }
+            else
+            {
+                identifierName = cmd.getFullClassName().substring(cmd.getFullClassName().lastIndexOf('.')+1);
+            }
         }
 
         // Generate the table identifier now that we have the identifier name
