@@ -365,7 +365,8 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
                 fieldRole == FieldRole.ROLE_MAP_KEY ||
-                fieldRole == FieldRole.ROLE_MAP_VALUE)
+                fieldRole == FieldRole.ROLE_MAP_VALUE ||
+                fieldRole == FieldRole.ROLE_PERSISTABLE_RELATION)
             {
                 if (destinationId != null)
                 {
@@ -405,7 +406,8 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
                 fieldRole == FieldRole.ROLE_MAP_KEY ||
-                fieldRole == FieldRole.ROLE_MAP_VALUE)
+                fieldRole == FieldRole.ROLE_MAP_VALUE ||
+                fieldRole == FieldRole.ROLE_PERSISTABLE_RELATION)
             {
                 if (fieldRole == FieldRole.ROLE_MAP_KEY)
                 {
