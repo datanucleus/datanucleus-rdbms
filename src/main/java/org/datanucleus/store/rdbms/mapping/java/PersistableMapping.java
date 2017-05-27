@@ -229,14 +229,18 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // TODO Cater for more than 1 related field
                 createDatastoreMappings = (relatedMmds[0].getJoinMetaData() == null);
             }
-            else if (relationType == RelationType.ONE_TO_ONE_BI)
+            else if (relationType == RelationType.ONE_TO_ONE_BI) // TODO If join table then don't need this
             {
                 // Put the FK at the end without "mapped-by"
                 createDatastoreMappings = (mmd.getMappedBy() == null);
             }
 
-            if (relationType == RelationType.MANY_TO_ONE_UNI)
+            if (mmd.getJoinMetaData() != null && (relationType == RelationType.MANY_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_BI))
             {
+                if (relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_BI)
+                {
+                    throw new NucleusUserException("We do not currently support 1-1 relations via join table : " + mmd.getFullFieldName());
+                }
                 // create join table
                 storeMgr.newJoinTable(table, mmd, clr);
             }
