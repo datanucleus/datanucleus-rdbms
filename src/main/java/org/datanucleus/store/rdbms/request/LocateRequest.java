@@ -30,7 +30,7 @@ import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.state.LockManager;
+import org.datanucleus.state.LockMode;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -184,10 +184,10 @@ public class LocateRequest extends Request
             ExecutionContext ec = op.getExecutionContext();
             RDBMSStoreManager storeMgr = table.getStoreManager();
             boolean locked = ec.getSerializeReadForClass(op.getClassMetaData().getFullClassName());
-            short lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
-            if (lockType != LockManager.LOCK_MODE_NONE)
+            LockMode lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
+            if (lockType != LockMode.LOCK_NONE)
             {
-                if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ || lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
+                if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
                 {
                     // Override with pessimistic lock
                     locked = true;

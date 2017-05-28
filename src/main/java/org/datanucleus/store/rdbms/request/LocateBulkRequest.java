@@ -33,7 +33,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.VersionMetaData;
-import org.datanucleus.state.LockManager;
+import org.datanucleus.state.LockMode;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.fieldmanager.FieldManager;
@@ -281,10 +281,10 @@ public class LocateBulkRequest extends BulkRequest
         RDBMSStoreManager storeMgr = table.getStoreManager();
         AbstractClassMetaData cmd = ops[0].getClassMetaData();
         boolean locked = ec.getSerializeReadForClass(cmd.getFullClassName());
-        short lockType = ec.getLockManager().getLockMode(ops[0].getInternalObjectId());
-        if (lockType != LockManager.LOCK_MODE_NONE)
+        LockMode lockType = ec.getLockManager().getLockMode(ops[0].getInternalObjectId());
+        if (lockType != LockMode.LOCK_NONE)
         {
-            if (lockType == LockManager.LOCK_MODE_PESSIMISTIC_READ || lockType == LockManager.LOCK_MODE_PESSIMISTIC_WRITE)
+            if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
             {
                 // Override with pessimistic lock
                 locked = true;

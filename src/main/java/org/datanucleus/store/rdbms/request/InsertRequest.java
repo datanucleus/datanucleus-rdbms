@@ -225,7 +225,7 @@ public class InsertRequest extends Request
                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
                 }
 
-                Object nextOptimisticVersion = ec.getNextVersion(vermd, currentVersion);
+                Object nextOptimisticVersion = ec.getLockManager().getNextVersion(vermd, currentVersion);
                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                 {
                     // Cater for Integer based versions
@@ -306,7 +306,7 @@ public class InsertRequest extends Request
                     {
                         // Surrogate version - set the new version for the object
                         Object currentVersion = op.getVersion();
-                        Object nextOptimisticVersion = ec.getNextVersion(vermd, currentVersion);
+                        Object nextOptimisticVersion = ec.getLockManager().getNextVersion(vermd, currentVersion);
                         for (int k=0;k<versionStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
                             versionMapping.setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
@@ -317,7 +317,7 @@ public class InsertRequest extends Request
                     {
                         // Version field - set the new version for the object
                         Object currentVersion = op.getVersion();
-                        Object nextOptimisticVersion = ec.getNextVersion(vermd, currentVersion);
+                        Object nextOptimisticVersion = ec.getLockManager().getNextVersion(vermd, currentVersion);
                         op.setTransactionalVersion(nextOptimisticVersion);
                     }
 
