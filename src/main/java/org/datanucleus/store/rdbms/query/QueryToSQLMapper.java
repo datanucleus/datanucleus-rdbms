@@ -4352,7 +4352,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 stack.push(subqueryNotExistsExpr);
                 return subqueryNotExistsExpr;
             }
-            throw new NucleusUserException("Attempt to invoke method " + operation + " on Subquery. This is not supported");
+            else if (operation.equalsIgnoreCase("size"))
+            {
+                // {subquery}.size() should simply be changed to have a subquery of "SELECT COUNT(*) FROM ..."
+                throw new NucleusUserException("Attempt to invoke method `" + operation + "` on Subquery. This is not supported. Change the subquery to return COUNT() instead.");
+            }
+            throw new NucleusUserException("Attempt to invoke method `" + operation + "` on Subquery. This is not supported");
         }
 
         if (invokedSqlExpr != null)
