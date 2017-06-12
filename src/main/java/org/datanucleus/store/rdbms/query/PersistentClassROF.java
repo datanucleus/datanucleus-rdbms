@@ -50,10 +50,11 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * ResultObjectFactory that takes a JDBC ResultSet and create a persistable object instance for each row in the ResultSet. 
@@ -81,7 +82,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
     private final boolean ignoreCache;
 
     /** Resolved classes for metadata / discriminator keyed by class names. */
-    private Map resolvedClasses = new SoftValueMap();
+    private Map resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Constructor.

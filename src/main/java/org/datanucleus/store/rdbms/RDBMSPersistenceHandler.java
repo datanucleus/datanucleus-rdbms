@@ -19,7 +19,6 @@ package org.datanucleus.store.rdbms;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,9 +52,10 @@ import org.datanucleus.store.rdbms.request.UpdateRequest;
 import org.datanucleus.store.rdbms.table.ClassView;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryDatastoreClass;
+import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.SoftValueMap;
+import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
  * Handler for persistence for RDBMS datastores.
@@ -63,7 +63,7 @@ import org.datanucleus.util.SoftValueMap;
 public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 {
     /** The cache of database requests. Access is synchronized on the map object itself. */
-    private Map<RequestIdentifier, Request> requestsByID = Collections.synchronizedMap(new SoftValueMap());
+    private Map<RequestIdentifier, Request> requestsByID = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
     /**
      * Constructor.

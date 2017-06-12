@@ -43,7 +43,6 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.util.ConcurrentReferenceHashMap;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.SoftValueMap;
 import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
 
 /**
@@ -100,7 +99,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
         {
             if (ext.equalsIgnoreCase("soft"))
             {
-                resultsObjsByIndex = new SoftValueMap();
+                resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
             }
             else if (ext.equalsIgnoreCase("weak"))
             {
