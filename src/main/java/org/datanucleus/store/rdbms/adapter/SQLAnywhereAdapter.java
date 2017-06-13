@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.adapter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
@@ -88,20 +89,23 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         // Determine the keyword list. This list is obtained from the JDBC driver using
         // DatabaseMetaData.getSQLKeywords(), but there are also user configurable options
         // Instead, attempt to query the set of reserved words for SQL Anywhere directly.
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             // Query the standard keywords
-            Connection conn = metadata.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT \"reserved_word\" FROM sa_reserved_words() ORDER BY \"reserved_word\"");
+            conn = metadata.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT \"reserved_word\" FROM sa_reserved_words() ORDER BY \"reserved_word\"");
             while (rs.next())
             {
                 reservedKeywords.add(rs.getString(1).trim().toUpperCase());
             }
             rs.close();
+
             // Also use user-specified keywords, if they are specified
-            rs = stmt.executeQuery("SELECT \"option\", \"setting\" FROM SYS.SYSOPTION" +
-                    " WHERE \"option\" = 'reserved_keywords' or \"option\" = 'non_keywords'");
+            rs = stmt.executeQuery("SELECT \"option\", \"setting\" FROM SYS.SYSOPTION WHERE \"option\" = 'reserved_keywords' or \"option\" = 'non_keywords'");
             while (rs.next())
             {
                 if (rs.getString(1).toLowerCase().equals("reserved_keywords"))
@@ -135,6 +139,42 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         catch (Throwable t)
         {
             // JDBC metadata is still used for keywords, and assume LIMIT is set elsewhere
+        }
+        finally
+        {
+            try
+            {
+                if (rs != null && !rs.isClosed())
+                {
+                    rs.close();
+                }
+            }
+            catch (SQLException sqle)
+            {
+                rs = null;
+            }
+            try
+            {
+                if (stmt != null && !stmt.isClosed())
+                {
+                    stmt.close();
+                }
+            }
+            catch (SQLException sqle)
+            {
+                stmt = null;
+            }
+            try
+            {
+                if (conn != null && !conn.isClosed())
+                {
+                    conn.close();
+                }
+            }
+            catch (SQLException sqle)
+            {
+                conn = null;
+            }
         }
 
         // Provide supported / unsupported capabilities for SQL Anywhere
