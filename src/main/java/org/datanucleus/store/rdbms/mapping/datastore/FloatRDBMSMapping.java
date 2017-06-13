@@ -127,7 +127,7 @@ public class FloatRDBMSMapping extends DoubleRDBMSMapping
             }
             else
             {
-                ps.setFloat(param, ((Double) value).floatValue());
+                ps.setFloat(param, ((Number) value).floatValue());
             }
         }
         catch (SQLException e)

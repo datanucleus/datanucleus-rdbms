@@ -184,8 +184,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
                 if (valIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), 
-                        valIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(valVarName, valCmd, valIdExpr.getSQLTable(), valIdExpr.getJavaTypeMapping());
                 }
                 else
                 {
@@ -199,8 +198,7 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
                 if (valIsUnbound)
                 {
                     // Bind the variable in the QueryGenerator
-                    stmt.getQueryGenerator().bindVariable(valVarName, null, valIdExpr.getSQLTable(), 
-                        valIdExpr.getJavaTypeMapping());
+                    stmt.getQueryGenerator().bindVariable(valVarName, null, valIdExpr.getSQLTable(), valIdExpr.getJavaTypeMapping());
                 }
                 else
                 {

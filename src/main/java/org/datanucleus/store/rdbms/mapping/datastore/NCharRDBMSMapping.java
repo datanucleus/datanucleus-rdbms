@@ -315,10 +315,6 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                 {
                     ps.setNString(param, ((java.sql.Date) value).toString());
                 }
-                else if (value instanceof java.util.Date)
-                {
-                    ps.setNString(param, getJavaUtilDateFormat().format((java.util.Date) value));
-                }
                 else if (value instanceof java.sql.Timestamp)
                 {
                     Calendar cal = storeMgr.getCalendarForDateTimezone();
@@ -332,6 +328,10 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
                     {
                         ps.setTimestamp(param, (Timestamp) value);
                     }
+                }
+                else if (value instanceof java.util.Date)
+                {
+                    ps.setNString(param, getJavaUtilDateFormat().format((java.util.Date) value));
                 }
                 else if (value instanceof String)
                 {

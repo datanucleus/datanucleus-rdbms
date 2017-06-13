@@ -33,7 +33,6 @@ import org.datanucleus.store.rdbms.sql.expression.ArrayExpression;
 import org.datanucleus.store.rdbms.sql.expression.ArrayLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
-import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
@@ -124,8 +123,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
                 // Check if we should compare using an "IN (...)" expression
                 SQLExpression collElementExpr = collElementExprs.get(0);
                 if (collElementExpr instanceof StringExpression || collElementExpr instanceof NumericExpression ||
-                    collElementExpr instanceof TemporalExpression || collElementExpr instanceof CharacterExpression ||
-                    collElementExpr instanceof ByteExpression || collElementExpr instanceof EnumExpression)
+                    collElementExpr instanceof TemporalExpression || collElementExpr instanceof CharacterExpression || collElementExpr instanceof EnumExpression)
                 {
                     useInExpression = true;
                 }

@@ -103,6 +103,10 @@ public class StringExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
+        else if (expr instanceof EnumLiteral)
+        {
+            return new BooleanExpression(this, Expression.OP_EQ, expr);   
+        }
         else if (expr instanceof EnumExpression)
         {
             // Swap and handle in EnumExpression
@@ -142,10 +146,6 @@ public class StringExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
-        else if (expr instanceof EnumLiteral)
-        {
-            return new BooleanExpression(this, Expression.OP_EQ, expr);   
-        }
         else
         {
             return super.eq(expr);
@@ -166,6 +166,10 @@ public class StringExpression extends SQLExpression
         else if (expr instanceof ColumnExpression)
         {
             return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
+        }
+        else if (expr instanceof EnumLiteral)
+        {
+            return new BooleanExpression(this, Expression.OP_NOTEQ, expr);   
         }
         else if (expr instanceof EnumExpression)
         {
@@ -206,10 +210,6 @@ public class StringExpression extends SQLExpression
         {
             return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
-        else if (expr instanceof EnumLiteral)
-        {
-            return new BooleanExpression(this, Expression.OP_NOTEQ, expr);   
-        }  
         else
         {
             return super.ne(expr);

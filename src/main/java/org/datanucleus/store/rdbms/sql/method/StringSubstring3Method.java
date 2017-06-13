@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
-import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -52,7 +51,7 @@ public class StringSubstring3Method extends AbstractSQLMethod
         {
             // {stringExpr}.substring(numExpr1)
             SQLExpression startExpr = args.get(0);
-            if (!(startExpr instanceof NumericExpression) && !(startExpr instanceof IntegerLiteral) && !(startExpr instanceof ParameterLiteral))
+            if (!(startExpr instanceof NumericExpression) && !(startExpr instanceof ParameterLiteral))
             {
                 throw new NucleusException(Localiser.msg("060003", "substring", "StringExpression", 0, "NumericExpression/IntegerLiteral/ParameterLiteral"));
             }

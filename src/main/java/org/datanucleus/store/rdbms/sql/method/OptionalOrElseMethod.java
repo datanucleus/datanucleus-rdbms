@@ -50,7 +50,7 @@ public class OptionalOrElseMethod extends AbstractSQLMethod
      */
     public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
     {
-        if (args != null && args.size() != 1)
+        if (args == null || args.size() != 1)
         {
             throw new NucleusException("Optional.orElse should be passed 1 argument");
         }

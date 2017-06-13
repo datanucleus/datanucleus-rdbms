@@ -360,7 +360,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Bidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                identifier = newColumnIdentifier(relatedFmd.getName() + getWordSeparator() + destinationId.getName());
+                identifier = newColumnIdentifier(relatedFmd.getName() + getWordSeparator() + (destinationId != null ? destinationId.getName() : "OWNER"));
             }
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
@@ -393,7 +393,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
+                identifier = newColumnIdentifier((destinationId!=null) ? destinationId.getName() : null, embedded, fieldRole, false);
             }
         }
         else
@@ -401,7 +401,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             // Unidirectional
             if (fieldRole == FieldRole.ROLE_OWNER)
             {
-                identifier = newColumnIdentifier(ownerFmd.getClassName(false) + getWordSeparator() + destinationId.getName());
+                identifier = newColumnIdentifier(ownerFmd.getClassName(false) + getWordSeparator() + (destinationId!=null ? destinationId.getName() : "OWNER"));
             }
             else if (fieldRole == FieldRole.ROLE_COLLECTION_ELEMENT ||
                 fieldRole == FieldRole.ROLE_ARRAY_ELEMENT ||
@@ -438,7 +438,7 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
             else
             {
                 // Not a known role for a join table so use JPOX-style naming
-                identifier = newColumnIdentifier(destinationId.getName(), embedded, fieldRole, false);
+                identifier = newColumnIdentifier((destinationId!=null) ? destinationId.getName() : null, embedded, fieldRole, false);
             }
         }
 

@@ -137,14 +137,7 @@ public class TimestampRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-                if (cal != null)
-                {
-                    ps.setTimestamp(param, (Timestamp) value, cal);
-                }
-                else
-                {
-                    ps.setTimestamp(param, (Timestamp) value);
-                }
+                throw new NucleusDataStoreException("Cannot set TIMESTAMP RDBMS type with value of type " + value.getClass().getName());
             }
         }
         catch (SQLException e)

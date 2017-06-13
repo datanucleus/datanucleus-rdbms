@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -80,13 +79,13 @@ public class TimeRDBMSMapping extends AbstractDatastoreMapping
             {
                 ps.setTime(param, (Time)value);
             }
-            else if (value instanceof Date)
+            else if (value instanceof java.util.Date)
             {
-                ps.setTime(param, new Time(((Date)value).getTime()));
+                ps.setTime(param, new Time(((java.util.Date)value).getTime()));
             }
             else
             {
-                ps.setTime(param, (Time)value);
+                throw new NucleusDataStoreException("Cannot set TIME RDBMS type with value of type " + value.getClass().getName());
             }
         }
         catch (SQLException e)

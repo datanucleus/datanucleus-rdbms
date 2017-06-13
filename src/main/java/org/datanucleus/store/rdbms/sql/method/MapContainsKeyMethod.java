@@ -34,7 +34,6 @@ import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
-import org.datanucleus.store.rdbms.sql.expression.ByteExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
@@ -120,8 +119,7 @@ public class MapContainsKeyMethod extends AbstractSQLMethod
                 // Check if we should compare using an "IN (...)" expression
                 SQLExpression mapKeyExpr = mapKeyExprs.get(0);
                 if (mapKeyExpr instanceof StringExpression || mapKeyExpr instanceof NumericExpression ||
-                    mapKeyExpr instanceof TemporalExpression || mapKeyExpr instanceof CharacterExpression ||
-                    mapKeyExpr instanceof ByteExpression || mapKeyExpr instanceof EnumExpression)
+                    mapKeyExpr instanceof TemporalExpression || mapKeyExpr instanceof CharacterExpression || mapKeyExpr instanceof EnumExpression)
                 {
                     useInExpression = true;
                 }

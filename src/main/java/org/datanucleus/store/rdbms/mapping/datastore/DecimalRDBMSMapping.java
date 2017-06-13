@@ -263,7 +263,7 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
                 }                
                 else
                 {
-                    ps.setInt(param, ((Integer)value).intValue());
+                    ps.setInt(param, ((Number)value).intValue());
                 }
             }
         }

@@ -121,8 +121,7 @@ public class CharacterExpression extends SQLExpression
         {
             return expr.ne(this);
         }
-        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression ||
-                expr instanceof StringExpression)
+        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression || expr instanceof StringExpression)
         {
             return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
@@ -147,8 +146,7 @@ public class CharacterExpression extends SQLExpression
         {
             return expr.lt(this);
         }
-        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression ||
-                expr instanceof StringExpression)
+        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression || expr instanceof StringExpression)
         {
             return new BooleanExpression(this, Expression.OP_LT, expr);
         }
@@ -173,8 +171,7 @@ public class CharacterExpression extends SQLExpression
         {
             return expr.le(this);
         }
-        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression ||
-                expr instanceof StringExpression)
+        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression || expr instanceof StringExpression)
         {
             return new BooleanExpression(this, Expression.OP_LTEQ, expr);
         }
@@ -199,8 +196,7 @@ public class CharacterExpression extends SQLExpression
         {
             return expr.gt(this);
         }
-        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression ||
-                expr instanceof StringExpression)
+        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression || expr instanceof StringExpression)
         {
             return new BooleanExpression(this, Expression.OP_GT, expr);
         }
@@ -225,8 +221,7 @@ public class CharacterExpression extends SQLExpression
         {
             return expr.ge(this);
         }
-        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression ||
-                expr instanceof StringExpression)
+        else if (expr instanceof ColumnExpression || expr instanceof CharacterExpression || expr instanceof StringExpression)
         {
             return new BooleanExpression(this, Expression.OP_GTEQ, expr);
         }
@@ -280,18 +275,13 @@ public class CharacterExpression extends SQLExpression
     {
         if (expr instanceof NumericExpression)
         {
-            return new NumericExpression(ExpressionUtils.getNumericExpression(this), 
-                Expression.OP_MUL, expr);
+            return new NumericExpression(ExpressionUtils.getNumericExpression(this), Expression.OP_MUL, expr);
+            //return ExpressionUtils.getNumericExpression(this).mul(expr);
         }
         else if (expr instanceof CharacterExpression)
         {
-            return new NumericExpression(ExpressionUtils.getNumericExpression(this), 
-                Expression.OP_MUL, ExpressionUtils.getNumericExpression(expr));
+            return new NumericExpression(ExpressionUtils.getNumericExpression(this), Expression.OP_MUL, ExpressionUtils.getNumericExpression(expr));
         }
-        else if (expr instanceof NumericExpression)
-        {
-            return ExpressionUtils.getNumericExpression(this).mul(expr);
-        }               
         else
         {
             return super.mul(expr);
@@ -302,17 +292,12 @@ public class CharacterExpression extends SQLExpression
     {
         if (expr instanceof NumericExpression)
         {
-            return new NumericExpression(ExpressionUtils.getNumericExpression(this), 
-                Expression.OP_DIV, expr);
+            return new NumericExpression(ExpressionUtils.getNumericExpression(this), Expression.OP_DIV, expr);
+            //return ExpressionUtils.getNumericExpression(this).div(expr);
         }
         else if (expr instanceof CharacterExpression)
         {
-            return new NumericExpression(ExpressionUtils.getNumericExpression(this), 
-                Expression.OP_DIV, ExpressionUtils.getNumericExpression(expr));
-        }
-        else if (expr instanceof NumericExpression)
-        {
-            return ExpressionUtils.getNumericExpression(this).div(expr);
+            return new NumericExpression(ExpressionUtils.getNumericExpression(this), Expression.OP_DIV, ExpressionUtils.getNumericExpression(expr));
         }               
         else
         {
@@ -336,8 +321,7 @@ public class CharacterExpression extends SQLExpression
             }        
             else if (expr instanceof NumericExpression)
             {
-                return stmt.getSQLExpressionFactory().invokeOperation("mod",
-                    ExpressionUtils.getNumericExpression(this), expr);
+                return stmt.getSQLExpressionFactory().invokeOperation("mod", ExpressionUtils.getNumericExpression(this), expr);
             }
         }
         catch (UnsupportedOperationException uoe)
@@ -355,8 +339,7 @@ public class CharacterExpression extends SQLExpression
 
     public SQLExpression com()
     {
-        return ExpressionUtils.getNumericExpression(this).neg().sub(
-            new IntegerLiteral(stmt, mapping, BigInteger.ONE, null));
+        return ExpressionUtils.getNumericExpression(this).neg().sub(new IntegerLiteral(stmt, mapping, BigInteger.ONE, null));
     }
 
     public BooleanExpression in(SQLExpression expr, boolean not)
@@ -366,7 +349,6 @@ public class CharacterExpression extends SQLExpression
 
     public SQLExpression invoke(String methodName, List args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Character.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Character.class.getName(), methodName, this, args);
     }
 }

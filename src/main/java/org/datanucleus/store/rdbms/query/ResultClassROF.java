@@ -100,7 +100,7 @@ public class ResultClassROF implements ResultObjectFactory
         else if (cls == null)
         {
             // No result class specified so return Object/Object[] depending on number of expressions
-            if (resultDefinition.getNumberOfResultExpressions() == 1)
+            if (resultDefinition != null && resultDefinition.getNumberOfResultExpressions() == 1)
             {
                 tmpClass = Object.class;
             }

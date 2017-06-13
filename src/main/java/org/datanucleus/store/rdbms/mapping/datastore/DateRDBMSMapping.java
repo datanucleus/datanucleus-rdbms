@@ -82,18 +82,17 @@ public class DateRDBMSMapping extends AbstractDatastoreMapping
             {
                 ps.setDate(param, new Date(((java.util.Calendar)value).getTime().getTime()));
             }
-            else if (value instanceof Date)
+            else if (value instanceof java.sql.Date)
             {
-                ps.setDate(param, (Date)value);
+                ps.setDate(param, (java.sql.Date)value);
             }
             else if (value instanceof java.util.Date)
             {
-                ps.setDate(param, new Date(((java.util.Date)value).getTime()));
+                ps.setDate(param, new java.sql.Date(((java.util.Date)value).getTime()));
             }
             else
             {
-                // If the "value" was a java.sql.Date it would have been handled above, so this will give ClassCastException!
-                ps.setDate(param, (Date)value);
+                throw new NucleusDataStoreException("Cannot set DATE RDBMS type with value of type " + value.getClass().getName());
             }
         }
         catch (SQLException e)
