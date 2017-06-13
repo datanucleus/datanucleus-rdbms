@@ -312,7 +312,7 @@ public class SQLStatementHelper
                         else if (mapping.getNumberOfDatastoreMappings() > 1 && param.getColumnNumber() == (mapping.getNumberOfDatastoreMappings()-1))
                         {
                             // Set whole object and this is the last parameter entry for it, so set now
-                            mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num - mapping.getNumberOfDatastoreMappings()+1, mapping), value);
+                            mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num - mapping.getNumberOfDatastoreMappings() + 1, mapping), value);
                         }
                     }
                 }
