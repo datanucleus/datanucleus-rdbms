@@ -641,7 +641,7 @@ public class ColumnImpl implements Column
                     }
                 }
 
-                if (columnMetaData.getScale() != null && actualScale >= 0)
+                if (this.columnMetaData != null && columnMetaData.getScale() != null && actualScale >= 0)
                 {
                     if (columnMetaData.getScale().intValue() != actualScale)
                     {

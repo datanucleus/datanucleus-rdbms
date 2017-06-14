@@ -1052,7 +1052,7 @@ public class MappingManagerImpl implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc != null ? mc.getName() : null, e), e).setFatal();
             }
         }
 
@@ -1195,7 +1195,7 @@ public class MappingManagerImpl implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc != null ? mc.getName() : null, e), e).setFatal();
             }
         }
 
@@ -1338,7 +1338,7 @@ public class MappingManagerImpl implements MappingManager
             }
             catch (Exception e)
             {
-                throw new NucleusException(Localiser.msg("041009", mc.getName(), e), e).setFatal();
+                throw new NucleusException(Localiser.msg("041009", mc != null ? mc.getName() : null, e), e).setFatal();
             }
         }
 

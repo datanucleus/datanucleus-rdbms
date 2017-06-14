@@ -91,22 +91,22 @@ public class UUIDMapping extends SingleFieldMapping
                     useConverter = false;
                 }
             }
-        }
 
-        if (useConverter)
-        {
-            if (mmd.getTypeConverterName() != null)
+            if (useConverter)
             {
-                // Use specified converter (if found)
-                converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
-                if (converter == null)
+                if (mmd.getTypeConverterName() != null)
                 {
-                    throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+                    // Use specified converter (if found)
+                    converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForName(mmd.getTypeConverterName());
+                    if (converter == null)
+                    {
+                        throw new NucleusUserException(Localiser.msg("044062", mmd.getFullFieldName(), mmd.getTypeConverterName()));
+                    }
                 }
-            }
-            else
-            {
-                converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
+                else
+                {
+                    converter = table.getStoreManager().getNucleusContext().getTypeManager().getTypeConverterForType(mmd.getType(), String.class);
+                }
             }
         }
 

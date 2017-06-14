@@ -112,7 +112,7 @@ public class BlobRDBMSMapping extends AbstractLargeBinaryRDBMSMapping
             {
                 if (value == null)
                 {
-                    if (column.isDefaultable() && column.getDefaultValue() != null)
+                    if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
                     {
                         ps.setString(param, column.getDefaultValue().toString().trim());
                     }
