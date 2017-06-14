@@ -181,8 +181,7 @@ public class BackingStoreHelper
      * @param elementMapping mapping for the element
      * @return The next position in the JDBC statement
      */
-    public static int populateElementForWhereClauseInStatement(ExecutionContext ec, PreparedStatement ps, Object element,
-            int jdbcPosition, JavaTypeMapping elementMapping)
+    public static int populateElementForWhereClauseInStatement(ExecutionContext ec, PreparedStatement ps, Object element, int jdbcPosition, JavaTypeMapping elementMapping)
     {
         if (elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getDatastoreMapping(0)))
         {
@@ -203,8 +202,11 @@ public class BackingStoreHelper
                         }
                     }
                 }
-                elementMapping.setObject(ec, ps, positions, element);
-                jdbcPosition = jdbcPosition + positions.length;
+                if (positions != null)
+                {
+                    elementMapping.setObject(ec, ps, positions, element);
+                    jdbcPosition = jdbcPosition + positions.length;
+                }
             }
             else
             {

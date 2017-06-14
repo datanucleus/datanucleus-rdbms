@@ -575,7 +575,7 @@ public final class SQLQuery extends Query
     {
         if (parameters.size() != (parameterNames != null ? parameterNames.length : 0))
         {
-            throw new NucleusUserException(Localiser.msg("059019", "" + parameterNames.length,"" + parameters.size()));
+            throw new NucleusUserException(Localiser.msg("059019", (parameterNames!=null) ? "" + parameterNames.length : 0,"" + parameters.size()));
         }
 
         if (type == QueryType.BULK_DELETE || type == QueryType.BULK_UPDATE)

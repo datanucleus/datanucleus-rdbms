@@ -303,8 +303,8 @@ public class ForeignKey extends Key
         {
             return false;
         }
-        if (colList.equals(fk.getColumnList()) && getTable() == fk.getTable() && 
-            refColList.equals(fk.getRefColumnList()) && getRefTable().equals(fk.getRefTable()))
+        if (colList != null && colList.equals(fk.getColumnList()) && getTable() == fk.getTable() && 
+            refColList != null && refColList.equals(fk.getRefColumnList()) && getRefTable().equals(fk.getRefTable()))
         {
             return true;
         }

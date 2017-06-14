@@ -93,121 +93,121 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
         AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
-        DatastoreClass table = rdbmsMgr.getDatastoreClass(op.getObject().getClass().getName(), clr);
-        JavaTypeMapping fieldMapping = table.getMemberMapping(mmd);
-        if (fieldMapping != null)
+        if (mmd != null)
         {
-            if (fieldMapping instanceof InterfaceMapping)
+            DatastoreClass table = rdbmsMgr.getDatastoreClass(op.getObject().getClass().getName(), clr);
+            JavaTypeMapping fieldMapping = table.getMemberMapping(mmd);
+            if (fieldMapping != null)
             {
-                // 1-1 Interface field
-                InterfaceMapping intfMapping = (InterfaceMapping)fieldMapping;
-                if (mmd != null)
+                if (fieldMapping instanceof InterfaceMapping)
                 {
+                    // 1-1 Interface field
+                    InterfaceMapping intfMapping = (InterfaceMapping)fieldMapping;
                     if (mmd.getFieldTypes() != null || mmd.hasExtension(MetaData.EXTENSION_MEMBER_IMPLEMENTATION_CLASSES))
                     {
                         // Field is defined to not accept this type so just return
                         return;
                     }
-                }
 
-                processInterfaceMappingForValue(intfMapping, value, mmd, ec);
-            }
-            else if (mmd.hasCollection() || mmd.hasArray())
-            {
-                boolean hasJoin = false;
-                if (mmd.getJoinMetaData() != null)
-                {
-                    hasJoin = true;
+                    processInterfaceMappingForValue(intfMapping, value, mmd, ec);
                 }
-                else
+                else if (mmd.hasCollection() || mmd.hasArray())
                 {
-                    AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
-                    if (relMmds != null && relMmds[0].getJoinMetaData() != null)
+                    boolean hasJoin = false;
+                    if (mmd.getJoinMetaData() != null)
                     {
                         hasJoin = true;
                     }
-                }
-                if (!hasJoin)
-                {
-                    // Not join table so no supported schema updates
-                    return;
-                }
-
-                Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
-                ElementContainerTable collTbl = (ElementContainerTable)joinTbl;
-                JavaTypeMapping elemMapping = collTbl.getElementMapping();
-                if (elemMapping instanceof InterfaceMapping)
-                {
-                    InterfaceMapping intfMapping = (InterfaceMapping)elemMapping;
-                    if (mmd.hasCollection())
+                    else
                     {
-                        Collection coll = (Collection)value;
-                        if (coll.isEmpty())
+                        AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
+                        if (relMmds != null && relMmds[0].getJoinMetaData() != null)
                         {
-                            return;
+                            hasJoin = true;
                         }
-
-                        // Update value mapping using first element. Maybe we should do the same for all elements?
-                        Object elementValue = coll.iterator().next();
-                        processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
                     }
-                    else if (mmd.hasArray())
+                    if (!hasJoin)
                     {
-                        if (Array.getLength(value) == 0)
-                        {
-                            return;
-                        }
+                        // Not join table so no supported schema updates
+                        return;
+                    }
 
-                        // Update value mapping using first element. Maybe we should do the same for all elements?
-                        Object elementValue = Array.get(value,  0);
-                        processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
+                    Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
+                    ElementContainerTable collTbl = (ElementContainerTable)joinTbl;
+                    JavaTypeMapping elemMapping = collTbl.getElementMapping();
+                    if (elemMapping instanceof InterfaceMapping)
+                    {
+                        InterfaceMapping intfMapping = (InterfaceMapping)elemMapping;
+                        if (mmd.hasCollection())
+                        {
+                            Collection coll = (Collection)value;
+                            if (coll.isEmpty())
+                            {
+                                return;
+                            }
+
+                            // Update value mapping using first element. Maybe we should do the same for all elements?
+                            Object elementValue = coll.iterator().next();
+                            processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
+                        }
+                        else if (mmd.hasArray())
+                        {
+                            if (Array.getLength(value) == 0)
+                            {
+                                return;
+                            }
+
+                            // Update value mapping using first element. Maybe we should do the same for all elements?
+                            Object elementValue = Array.get(value,  0);
+                            processInterfaceMappingForValue(intfMapping, elementValue, mmd, ec);
+                        }
                     }
                 }
-            }
-            else if (mmd.hasMap())
-            {
-                boolean hasJoin = false;
-                if (mmd.getJoinMetaData() != null)
+                else if (mmd.hasMap())
                 {
-                    hasJoin = true;
-                }
-                else
-                {
-                    AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
-                    if (relMmds != null && relMmds[0].getJoinMetaData() != null)
+                    boolean hasJoin = false;
+                    if (mmd.getJoinMetaData() != null)
                     {
                         hasJoin = true;
                     }
-                }
-                if (!hasJoin)
-                {
-                    // Not join table so no supported schema updates
-                    return;
-                }
+                    else
+                    {
+                        AbstractMemberMetaData[] relMmds = mmd.getRelatedMemberMetaData(clr);
+                        if (relMmds != null && relMmds[0].getJoinMetaData() != null)
+                        {
+                            hasJoin = true;
+                        }
+                    }
+                    if (!hasJoin)
+                    {
+                        // Not join table so no supported schema updates
+                        return;
+                    }
 
-                Map map = (Map)value;
-                if (map.isEmpty())
-                {
-                    return;
-                }
+                    Map map = (Map)value;
+                    if (map.isEmpty())
+                    {
+                        return;
+                    }
 
-                Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
-                MapTable mapTbl = (MapTable)joinTbl;
-                JavaTypeMapping keyMapping = mapTbl.getKeyMapping();
-                if (keyMapping instanceof InterfaceMapping)
-                {
-                    // Update key mapping using first key. Maybe we should do the same for all keys?
-                    InterfaceMapping intfMapping = (InterfaceMapping)keyMapping;
-                    Object keyValue = map.keySet().iterator().next();
-                    processInterfaceMappingForValue(intfMapping, keyValue, mmd, ec);
-                }
-                JavaTypeMapping valMapping = mapTbl.getValueMapping();
-                if (valMapping instanceof InterfaceMapping)
-                {
-                    // Update value mapping using first value. Maybe we should do the same for all values?
-                    InterfaceMapping intfMapping = (InterfaceMapping)valMapping;
-                    Object valValue = map.values().iterator().next();
-                    processInterfaceMappingForValue(intfMapping, valValue, mmd, ec);
+                    Table joinTbl = fieldMapping.getStoreManager().getTable(mmd);
+                    MapTable mapTbl = (MapTable)joinTbl;
+                    JavaTypeMapping keyMapping = mapTbl.getKeyMapping();
+                    if (keyMapping instanceof InterfaceMapping)
+                    {
+                        // Update key mapping using first key. Maybe we should do the same for all keys?
+                        InterfaceMapping intfMapping = (InterfaceMapping)keyMapping;
+                        Object keyValue = map.keySet().iterator().next();
+                        processInterfaceMappingForValue(intfMapping, keyValue, mmd, ec);
+                    }
+                    JavaTypeMapping valMapping = mapTbl.getValueMapping();
+                    if (valMapping instanceof InterfaceMapping)
+                    {
+                        // Update value mapping using first value. Maybe we should do the same for all values?
+                        InterfaceMapping intfMapping = (InterfaceMapping)valMapping;
+                        Object valValue = map.values().iterator().next();
+                        processInterfaceMappingForValue(intfMapping, valValue, mmd, ec);
+                    }
                 }
             }
         }

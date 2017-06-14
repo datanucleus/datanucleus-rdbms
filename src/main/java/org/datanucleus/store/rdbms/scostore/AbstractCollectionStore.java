@@ -27,6 +27,7 @@ import java.util.Collection;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
@@ -233,7 +234,6 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         else
         {
             elemInfo = getComponentInfoForElement(element);
-            // TODO What if no suitable elementInfo found?
             if (elemInfo != null)
             {
                 selectTable = elemInfo.getDatastoreClass();
@@ -247,6 +247,11 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     ownerMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                 }
                 relDiscrimMapping = elemInfo.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
+            }
+            else
+            {
+                // TODO What if no suitable elementInfo found?
+                throw new NucleusException("Unable to locate owner mapping for backing store at " + ownerMemberMetaData.getFullFieldName());
             }
         }
 
