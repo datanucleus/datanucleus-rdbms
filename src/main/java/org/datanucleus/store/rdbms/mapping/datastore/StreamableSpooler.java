@@ -88,7 +88,21 @@ public class StreamableSpooler
 
     public void spoolStreamTo(InputStream is, File target) throws IOException 
     {
-        copyStream(is, new BufferedOutputStream(new FileOutputStream(target)), false, true);
+        FileOutputStream fos = new FileOutputStream(target);
+        try
+        {
+            copyStream(is, new BufferedOutputStream(fos), false, true);
+        }
+        finally
+        {
+            try
+            {
+                fos.close();
+            }
+            catch (IOException ioe)
+            {
+            }
+        }
     }
 
     public File spoolStream(InputStream is) throws IOException
@@ -102,7 +116,21 @@ public class StreamableSpooler
         NucleusLogger.GENERAL.debug("spool file created: " + spool.getAbsolutePath());
         spool.deleteOnExit();
 
-        copyStream(is, new BufferedOutputStream(new FileOutputStream(spool)), false, true);
+        FileOutputStream fos = new FileOutputStream(spool);
+        try
+        {
+            copyStream(is, new BufferedOutputStream(fos), false, true);
+        }
+        finally
+        {
+            try
+            {
+                fos.close();
+            }
+            catch (IOException ioe)
+            {
+            }
+        }
 
         return spool;
     }
