@@ -191,7 +191,7 @@ public class ObjectExpression extends SQLExpression
         BooleanExpression bExpr = null;
         if (isParameter() || expr.isParameter())
         {
-            if (this.subExprs.size() > 1)
+            if (subExprs != null && subExprs.size() > 1)
             {
                 for (int i=0;i<subExprs.size();i++)
                 {
@@ -206,16 +206,19 @@ public class ObjectExpression extends SQLExpression
         }
         else if (expr instanceof NullLiteral)
         {
-            for (int i=0;i<subExprs.size();i++)
+            if (subExprs != null)
             {
-                BooleanExpression subexpr = expr.eq(subExprs.getExpression(i));
-                bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
+                for (int i=0;i<subExprs.size();i++)
+                {
+                    BooleanExpression subexpr = expr.eq(subExprs.getExpression(i));
+                    bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
+                }
             }
             return bExpr;
         }
         else if (literalIsValidForSimpleComparison(expr))
         {
-            if (subExprs.size() > 1)
+            if (subExprs != null && subExprs.size() > 1)
             {
                 // More than 1 value to compare with a simple literal!
                 return super.eq(expr);
@@ -239,8 +242,7 @@ public class ObjectExpression extends SQLExpression
         }
     }
 
-    protected BooleanExpression processComparisonOfImplementationWithReference(SQLExpression refExpr, SQLExpression implExpr,
-            boolean negate)
+    protected BooleanExpression processComparisonOfImplementationWithReference(SQLExpression refExpr, SQLExpression implExpr, boolean negate)
     {
         ReferenceMapping refMapping = (ReferenceMapping)refExpr.mapping;
         JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
@@ -297,7 +299,7 @@ public class ObjectExpression extends SQLExpression
         BooleanExpression bExpr = null;
         if (isParameter() || expr.isParameter())
         {
-            if (this.subExprs.size() > 1)
+            if (subExprs != null && subExprs.size() > 1)
             {
                 for (int i=0;i<subExprs.size();i++)
                 {
@@ -312,16 +314,19 @@ public class ObjectExpression extends SQLExpression
         }
         else if (expr instanceof NullLiteral)
         {
-            for (int i=0;i<subExprs.size();i++)
+            if (subExprs != null)
             {
-                BooleanExpression subexpr = expr.eq(subExprs.getExpression(i));
-                bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
+                for (int i=0;i<subExprs.size();i++)
+                {
+                    BooleanExpression subexpr = expr.eq(subExprs.getExpression(i));
+                    bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
+                }
             }
             return new BooleanExpression(Expression.OP_NOT, bExpr != null ? bExpr.encloseInParentheses() : null);
         }
         else if (literalIsValidForSimpleComparison(expr))
         {
-            if (subExprs.size() > 1)
+            if (subExprs != null && subExprs.size() > 1)
             {
                 // More than 1 value to compare with a literal!
                 return super.ne(expr);

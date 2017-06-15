@@ -141,6 +141,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 }
             }
         }
+        if (rootEmbCmd == null)
+        {
+            throw new NucleusUserException("Unable to find root class embedded metadata for field=" + mmd.getFullFieldName());
+        }
 
         embCmd = rootEmbCmd;
 

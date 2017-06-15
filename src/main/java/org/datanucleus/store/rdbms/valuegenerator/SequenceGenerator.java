@@ -172,28 +172,28 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         if (sequenceName == null)
         {
             // Set the name of the sequence (including catalog/schema as required)
-            String sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
-            if (sequenceCatalogName == null)
+            String inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
+            if (inputSeqCatalogName == null)
             {
-                sequenceCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
+                inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
             }
-            String sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
-            if (sequenceSchemaName == null)
+            String inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
+            if (inputSeqSchemaName == null)
             {
-                sequenceSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
+                inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
             }
-            String sequenceName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
+            String inputSeqName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
 
             RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
             DatastoreAdapter dba = srm.getDatastoreAdapter();
-            DatastoreIdentifier identifier = srm.getIdentifierFactory().newSequenceIdentifier(sequenceName);
-            if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS) && sequenceCatalogName != null)
+            DatastoreIdentifier identifier = srm.getIdentifierFactory().newSequenceIdentifier(inputSeqName);
+            if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS) && inputSeqCatalogName != null)
             {
-                identifier.setCatalogName(sequenceCatalogName);
+                identifier.setCatalogName(inputSeqCatalogName);
             }
-            if (dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS) && sequenceSchemaName != null)
+            if (dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS) && inputSeqSchemaName != null)
             {
-                identifier.setSchemaName(sequenceSchemaName);
+                identifier.setSchemaName(inputSeqSchemaName);
             }
             this.sequenceName = identifier.getFullyQualifiedName(true);
         }
