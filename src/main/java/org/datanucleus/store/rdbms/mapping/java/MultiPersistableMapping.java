@@ -185,21 +185,24 @@ public abstract class MultiPersistableMapping extends MultiMapping
                     {
                         // Update any detached reference to refer to the attached variant
                         ownerOP.replaceFieldMakeDirty(ownerFieldNumber, pcNew);
-                        RelationType relationType = mmd.getRelationType(clr);
-                        if (relationType == RelationType.ONE_TO_ONE_BI)
+                        if (mmd != null)
                         {
-                            ObjectProvider relatedSM = ec.findObjectProvider(pcNew);
-                            AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
-                            // TODO Allow for multiple related fields
-                            relatedSM.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerOP.getObject());
-                        }
-                        else if (relationType == RelationType.MANY_TO_ONE_BI)
-                        {
-                            // TODO Update the container element with the attached variant
-                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                            RelationType relationType = mmd.getRelationType(clr);
+                            if (relationType == RelationType.ONE_TO_ONE_BI)
                             {
-                                NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + " has field " + ownerFieldNumber +
-                                    " that is 1-N bidirectional - should really update the reference in the relation. Not yet supported");
+                                ObjectProvider relatedSM = ec.findObjectProvider(pcNew);
+                                AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
+                                // TODO Allow for multiple related fields
+                                relatedSM.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerOP.getObject());
+                            }
+                            else if (relationType == RelationType.MANY_TO_ONE_BI)
+                            {
+                                // TODO Update the container element with the attached variant
+                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                                {
+                                    NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + " has field " + ownerFieldNumber +
+                                            " that is 1-N bidirectional - should really update the reference in the relation. Not yet supported");
+                                }
                             }
                         }
                     }

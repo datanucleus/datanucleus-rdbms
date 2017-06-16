@@ -492,7 +492,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     catch (NotYetFlushedException nfe)
                     {
                         // Could not flush it, maybe it has a relation to this object! so set as null TODO check nullability
-                        ownerOP.updateFieldAfterInsert(value, ownerFieldNumber);
+                        if (ownerOP != null)
+                        {
+                            ownerOP.updateFieldAfterInsert(value, ownerFieldNumber);
+                        }
                         setObjectAsNull(ec, ps, param);
                         return;
                     }
@@ -615,7 +618,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             ec.flushInternal(false);
                         }
                         id = api.getIdForObject(pcNew);
-                        if (ec.getApiAdapter().isDetached(value) && ownerOP != null)
+                        if (ec.getApiAdapter().isDetached(value) && ownerOP != null && mmd != null)
                         {
                             // Update any detached reference to refer to the attached variant
                             ownerOP.replaceFieldMakeDirty(ownerFieldNumber, pcNew);
@@ -628,7 +631,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                                     NucleusLogger.PERSISTENCE.info("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + 
                                         " has field " + ownerFieldNumber + " that is 1-N bidirectional." + 
                                         " Have just attached the N side so should really update the reference in the 1 side collection" +
-                                        " to refer to this attached object. Not yet implemented");
+                                            " to refer to this attached object. Not yet implemented");
                                 }
                             }
                             else if (relationType == RelationType.ONE_TO_ONE_BI)
@@ -998,7 +1001,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             {
                 hasFK = true;
             }
-            if (relatedMmds != null && relatedMmds[0].getForeignKeyMetaData() != null)
+            if (RelationType.isBidirectional(relationType) && relatedMmds[0].getForeignKeyMetaData() != null)
             {
                 hasFK = true;
             }

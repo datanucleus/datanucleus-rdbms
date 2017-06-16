@@ -186,7 +186,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 ColumnMetaData disColmd = new ColumnMetaData();
                 disColmd.setAllowsNull(Boolean.TRUE);
 
-                DiscriminatorMetaData embDismd = emd.getDiscriminatorMetaData();
+                DiscriminatorMetaData embDismd = (emd != null) ? emd.getDiscriminatorMetaData() : null;
                 if (embDismd != null && embDismd.getColumnMetaData() != null)
                 {
                     disColmd.setName(embDismd.getColumnMetaData().getName());
@@ -651,7 +651,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                         // Check for the null column and its value and break if this matches the null check
                         if (nullColumn != null && mapping.getMemberMetaData().getColumnMetaData()[0].getName().equals(nullColumn))
                         {
-                            if ((nullValue == null && fieldValue == null) || (nullValue != null && fieldValue.toString().equals(nullValue)))
+                            if ((nullValue == null && fieldValue == null) || (nullValue != null && fieldValue != null && fieldValue.toString().equals(nullValue)))
                             {
                                 value = null;
                                 break;
@@ -692,7 +692,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 int ownerFieldNumberInElement = embCmd.getAbsolutePositionOfMember(ownerField);
                 if (ownerFieldNumberInElement >= 0)
                 {
-                    embOP.replaceField(ownerFieldNumberInElement, ownerOP.getObject());
+                    embOP.replaceField(ownerFieldNumberInElement, ownerOP != null ? ownerOP.getObject() : null);
                 }
             }
         }
