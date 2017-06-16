@@ -474,7 +474,10 @@ public class RDBMSQueryUtils extends QueryUtils
                     {
                         // Returning one row per candidate so include distinguisher column
                         stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
-                        clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                        if (clsMapping != null)
+                        {
+                            clsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                        }
                     }
                 }
                 stmtGen.setParentStatement(parentStmt);
