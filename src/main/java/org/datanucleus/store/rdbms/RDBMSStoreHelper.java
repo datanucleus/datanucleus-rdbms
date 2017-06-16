@@ -112,13 +112,10 @@ public class RDBMSStoreHelper
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
                     try
                     {
-                        if (rs != null)
+                        while (rs.next())
                         {
-                            while (rs.next())
-                            {
-                                DiscriminatorMetaData dismd = discrimMapping.getTable().getDiscriminatorMetaData();
-                                return RDBMSQueryUtils.getClassNameFromDiscriminatorResultSetRow(discrimMapping, dismd, rs, ec);
-                            }
+                            DiscriminatorMetaData dismd = discrimMapping.getTable().getDiscriminatorMetaData();
+                            return RDBMSQueryUtils.getClassNameFromDiscriminatorResultSetRow(discrimMapping, dismd, rs, ec);
                         }
                     }
                     finally
@@ -324,25 +321,25 @@ public class RDBMSStoreHelper
         }
 
         // Perform the query
-        try
+        if (sqlStmtMain != null)
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
-            if (ec.getSerializeReadForClass(sampleCmd.getFullClassName()))
-            {
-                sqlStmtMain.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-            }
-
             try
             {
-                PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmtMain, ec, mconn, null, null);
-                String statement = sqlStmtMain.getSQLText().toSQL();
+                ManagedConnection mconn = storeMgr.getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
+                if (sampleCmd != null && ec.getSerializeReadForClass(sampleCmd.getFullClassName()))
+                {
+                    sqlStmtMain.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
+                }
+
                 try
                 {
-                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
+                    PreparedStatement ps = SQLStatementHelper.getPreparedStatementForSQLStatement(sqlStmtMain, ec, mconn, null, null);
+                    String statement = sqlStmtMain.getSQLText().toSQL();
                     try
                     {
-                        if (rs != null)
+                        ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
+                        try
                         {
                             while (rs.next())
                             {
@@ -355,26 +352,26 @@ public class RDBMSStoreHelper
                                 }
                             }
                         }
+                        finally
+                        {
+                            rs.close();
+                        }
                     }
                     finally
                     {
-                        rs.close();
+                        sqlControl.closeStatement(mconn, ps);
                     }
                 }
                 finally
                 {
-                    sqlControl.closeStatement(mconn, ps);
+                    mconn.release();
                 }
             }
-            finally
+            catch (SQLException sqe)
             {
-                mconn.release();
+                NucleusLogger.DATASTORE.error("Exception with UNION statement", sqe);
+                throw new NucleusDataStoreException(sqe.toString());
             }
-        }
-        catch (SQLException sqe)
-        {
-            NucleusLogger.DATASTORE.error("Exception with UNION statement", sqe);
-            throw new NucleusDataStoreException(sqe.toString());
         }
 
         return null;
