@@ -43,6 +43,7 @@ public class TypeConverterLiteral extends DelegatedExpression implements SQLLite
         TypeConverterMapping convMapping = (TypeConverterMapping)mapping;
         TypeConverter conv = convMapping.getTypeConverter();
         Class datastoreType = stmt.getRDBMSManager().getNucleusContext().getTypeManager().getDatastoreTypeForTypeConverter(conv, convMapping.getJavaType());
+        value = conv.toDatastoreType(value);
         if (datastoreType == String.class)
         {
             delegate = new StringLiteral(stmt, mapping, value, parameterName);
