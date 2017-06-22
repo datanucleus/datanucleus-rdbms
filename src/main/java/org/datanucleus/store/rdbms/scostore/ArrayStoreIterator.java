@@ -93,10 +93,14 @@ public class ArrayStoreIterator implements Iterator
                     }
                     nextElement = elementMapping.getObject(ec, rs, param);
                 }
-                else
+                else if (rof != null)
                 {
                     // Element = PC
                     nextElement = rof.getObject(ec, rs);
+                }
+                else
+                {
+                    nextElement = null;
                 }
 
                 results.add(nextElement);

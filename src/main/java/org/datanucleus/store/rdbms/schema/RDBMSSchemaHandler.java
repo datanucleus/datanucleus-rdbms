@@ -1186,8 +1186,10 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                         table.addProperty("time", now);
                     }
 
-                    RDBMSColumnInfo col = getDatastoreAdapter().newRDBMSColumnInfo(rs);
-                    table.addChild(col);
+                    if (table != null)
+                    {
+                        table.addChild(getDatastoreAdapter().newRDBMSColumnInfo(rs));
+                    }
                 }
             }
         }

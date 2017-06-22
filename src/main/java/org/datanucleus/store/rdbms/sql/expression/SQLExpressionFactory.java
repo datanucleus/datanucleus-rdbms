@@ -96,8 +96,7 @@ public class SQLExpressionFactory
                 return false;
             }
             MethodKey otherKey = (MethodKey)other;
-            return (otherKey.clsName.equals(clsName) && otherKey.methodName.equals(methodName) &&
-                otherKey.datastoreName.equals(datastoreName));
+            return (otherKey.clsName.equals(clsName) && otherKey.methodName.equals(methodName) && otherKey.datastoreName.equals(datastoreName));
         }
     }
 
@@ -115,8 +114,7 @@ public class SQLExpressionFactory
         this.clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        ConfigurationElement[] methodElems = 
-            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.sql_method", null, null);
+        ConfigurationElement[] methodElems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.sql_method", null, null);
         if (methodElems != null)
         {
             for (int i=0;i<methodElems.length;i++)
@@ -129,8 +127,7 @@ public class SQLExpressionFactory
             }
         }
 
-        ConfigurationElement[] operationElems = 
-            pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.sql_operation", null, null);
+        ConfigurationElement[] operationElems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.sql_operation", null, null);
         if (operationElems != null)
         {
             for (int i=0;i<operationElems.length;i++)
@@ -166,16 +163,14 @@ public class SQLExpressionFactory
     public SQLExpression newExpression(SQLStatement stmt, SQLTable sqlTbl, JavaTypeMapping mapping,
             JavaTypeMapping parentMapping)
     {
-        SQLTable exprSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, sqlTbl, 
-            parentMapping == null ? mapping : parentMapping);
+        SQLTable exprSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, sqlTbl, parentMapping == null ? mapping : parentMapping);
         Object[] args = new Object[] {stmt, exprSqlTbl, mapping};
 
         Class expressionClass = expressionClassByMappingName.get(mapping.getClass().getName());
         if (expressionClass != null)
         {
             // Use cached expression class
-            return (SQLExpression)ClassUtils.newInstance(expressionClass, EXPR_CREATION_ARG_TYPES, 
-                new Object[] {stmt, exprSqlTbl, mapping});
+            return (SQLExpression)ClassUtils.newInstance(expressionClass, EXPR_CREATION_ARG_TYPES, new Object[] {stmt, exprSqlTbl, mapping});
         }
 
         try
@@ -243,8 +238,9 @@ public class SQLExpressionFactory
         }
         catch (Exception e)
         {
-            NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mapping.getClass().getName(), e);
-            throw new NucleusException(Localiser.msg("060007", mapping.getClass().getName()));
+            String mappingName = (mapping != null) ? mapping.getClass().getName() : null;
+            NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mappingName, e);
+            throw new NucleusException(Localiser.msg("060007", mappingName));
         }
     }
 
@@ -280,8 +276,9 @@ public class SQLExpressionFactory
         }
         catch (Exception e)
         {
-            NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mapping.getClass().getName(), e);
-            throw new NucleusException(Localiser.msg("060007", mapping.getClass().getName()));
+            String mappingName = (mapping != null) ? mapping.getClass().getName() : null;
+            NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mappingName, e);
+            throw new NucleusException(Localiser.msg("060007", mappingName));
         }
     }
 
@@ -312,15 +309,13 @@ public class SQLExpressionFactory
     public boolean isMethodRegistered(String className, String methodName)
     {
         // Try to find datastore-dependent evaluator for class+method
-        MethodKey methodKey = getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName);
-        if (methodNamesSupported.contains(methodKey))
+        if (methodNamesSupported.contains(getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName)))
         {
             return true;
         }
 
         // Try to find datastore-independent evaluator for class+method
-        methodKey = getSQLMethodKey(null, className, methodName);
-        if (methodNamesSupported.contains(methodKey))
+        if (methodNamesSupported.contains(getSQLMethodKey(null, className, methodName)))
         {
             return true;
         }
@@ -475,18 +470,15 @@ public class SQLExpressionFactory
 
         // Fallback to plugin lookup of class+method[+datastore]
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        String[] attrNames = 
-            (datastoreDependent ? new String[] {"class", "method", "datastore"} : new String[] {"class", "method"});
-        String[] attrValues =
-            (datastoreDependent ? new String[] {className, methodName, datastoreId} : new String[] {className, methodName});
+        String[] attrNames = (datastoreDependent ? new String[] {"class", "method", "datastore"} : new String[] {"class", "method"});
+        String[] attrValues = (datastoreDependent ? new String[] {className, methodName, datastoreId} : new String[] {className, methodName});
         try
         {
             method = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", 
                 attrNames, attrValues, "evaluator", new Class[]{}, new Object[]{});
 
             // Register the method
-            MethodKey key = getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName);
-            methodByClassMethodName.put(key, method);
+            methodByClassMethodName.put(getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName), method);
 
             return method;
         }
@@ -531,15 +523,12 @@ public class SQLExpressionFactory
         }
 
         PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        String[] attrNames = 
-            (datastoreDependent ? new String[] {"name", "datastore"} : new String[] {"name"});
-        String[] attrValues =
-            (datastoreDependent ? new String[] {name, datastoreId} : new String[] {name});
+        String[] attrNames = (datastoreDependent ? new String[] {"name", "datastore"} : new String[] {"name"});
+        String[] attrValues = (datastoreDependent ? new String[] {name, datastoreId} : new String[] {name});
         try
         {
             // Use SQLOperation().getExpression(SQLExpression, SQLExpression)
-            operation = (SQLOperation)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_operation", 
-                attrNames, attrValues, "evaluator", null, null);
+            operation = (SQLOperation)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_operation", attrNames, attrValues, "evaluator", null, null);
             operation.setExpressionFactory(this);
             synchronized (operation)
             {

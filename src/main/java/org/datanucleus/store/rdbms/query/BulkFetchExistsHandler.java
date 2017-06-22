@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.query.Query;
@@ -92,6 +93,10 @@ public class BulkFetchExistsHandler implements BulkFetchHandler
             {
                 iterStmt = ((JoinArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
             }
+            else
+            {
+                throw new NucleusUserException("We do not support BulkFetch using EXISTS for backingStore = " + backingStore);
+            }
 
             // SELECT ELEM_TBL.COL1, ELEM_TBL.COL2, ... FROM JOIN_TBL INNER_JOIN ELEM_TBL WHERE JOIN_TBL.ELEMENT_ID = ELEM_TBL.ID 
             // AND EXISTS (SELECT OWNER_TBL.ID FROM OWNER_TBL WHERE (queryWhereClause) AND JOIN_TBL.OWNER_ID = OWNER_TBL.ID)
@@ -142,6 +147,10 @@ public class BulkFetchExistsHandler implements BulkFetchHandler
             else if (backingStore instanceof FKArrayStore)
             {
                 iterStmt = ((FKArrayStore)backingStore).getIteratorStatement(ec, ec.getFetchPlan(), false);
+            }
+            else
+            {
+                throw new NucleusUserException("We do not support BulkFetch using EXISTS for backingStore = " + backingStore);
             }
 
             // Set/List/array using foreign-key : Generate an iterator query of the form
