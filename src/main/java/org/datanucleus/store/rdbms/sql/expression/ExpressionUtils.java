@@ -491,7 +491,7 @@ public class ExpressionUtils
             }
             if (!equals)
             {
-                resultExpr = new BooleanExpression(Expression.OP_NOT, resultExpr.encloseInParentheses());
+                resultExpr = new BooleanExpression(Expression.OP_NOT, resultExpr != null ? resultExpr.encloseInParentheses() : null);
             }
             return resultExpr;
         }

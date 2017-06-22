@@ -1858,16 +1858,19 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     concreteClassName = rootCmd.getFullClassName();
                     numConcrete++;
                 }
-                for (String subclassName : subclasses)
+                if (subclasses != null)
                 {
-                    Class subcls = clr.classForName(subclassName);
-                    if (!Modifier.isAbstract(subcls.getModifiers()))
+                    for (String subclassName : subclasses)
                     {
-                        if (concreteClassName == null)
+                        Class subcls = clr.classForName(subclassName);
+                        if (!Modifier.isAbstract(subcls.getModifiers()))
                         {
-                            concreteClassName = subclassName;
+                            if (concreteClassName == null)
+                            {
+                                concreteClassName = subclassName;
+                            }
+                            numConcrete++;
                         }
-                        numConcrete++;
                     }
                 }
                 if (numConcrete == 1)
@@ -2270,17 +2273,21 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             throw new NucleusUserException(Localiser.msg("032013", cmd.getFullClassName()));
         }
+        if (t == null)
+        {
+            throw new NucleusUserException("Attempt to find table for class=" + cmd.getFullClassName() + " but no table found! Check the metadata");
+        }
 
-        if (fieldNumber>=0)
+        if (fieldNumber >= 0)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             t = t.getBaseDatastoreClassWithMember(mmd);
         }
-        else if (t!=null)
+        else
         {
             // Go up to overall superclass to find id for that class.
-            boolean has_superclass = true;
-            while (has_superclass)
+            boolean hasSuperclass = true;
+            while (hasSuperclass)
             {
                 DatastoreClass supert = t.getSuperDatastoreClass();
                 if (supert != null)
@@ -2289,10 +2296,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 else
                 {
-                    has_superclass = false;
+                    hasSuperclass = false;
                 }
             }
         }
+
         return t;
     }
 
