@@ -618,9 +618,7 @@ public class SQLController
             } 
             catch (SQLException sqle)
             {
-                // workaround for DBCP bug: even though PreparedStatement.close()
-                // is defined as having no effect if already closed, DBCP
-                // will throw SQLException
+                // workaround for DBCP bug: even though PreparedStatement.close() is defined as having no effect if already closed, DBCP will throw SQLException
                 if (!sqle.getMessage().equals("Already closed"))
                 {
                     throw sqle;

@@ -343,14 +343,14 @@ public class JoinListStore<E> extends AbstractListStore<E>
             }
         }
 
-        String setStmt = getSetStmt();
+        String theSetStmt = getSetStmt();
         try
         {
             ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, setStmt, false);
+                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, theSetStmt, false);
                 try
                 {
                     int jdbcPosition = 1;
@@ -370,7 +370,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
 
-                    sqlControl.executeStatementUpdate(ec, mconn, setStmt, ps, true);
+                    sqlControl.executeStatementUpdate(ec, mconn, theSetStmt, ps, true);
                 }
                 finally
                 {
@@ -384,7 +384,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056015", setStmt), e);
+            throw new NucleusDataStoreException(Localiser.msg("056015", theSetStmt), e);
         }
 
         // Dependent field

@@ -283,16 +283,18 @@ public class FKListStore<E> extends AbstractListStore<E>
         E oldElement = get(ownerOP, index);
 //        return set(op, index, element, allowDependentField, oldElement);
 
+        ManagedConnection mconn = null;
         try
         {
             ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
+            mconn = storeMgr.getConnection(ec);
+
+            // Unset the existing object from this position
+            String theUnsetStmt = getUnsetStmt();
             try
             {
-                // Unset the existing object from this position
-                String unsetStmt = getUnsetStmt();
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, unsetStmt, false);
+                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, theUnsetStmt, false);
                 try
                 {
                     int jdbcPosition = 1;
@@ -306,16 +308,26 @@ public class FKListStore<E> extends AbstractListStore<E>
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                     }
 
-                    sqlControl.executeStatementUpdate(ec, mconn, unsetStmt, ps, true);
+                    sqlControl.executeStatementUpdate(ec, mconn, theUnsetStmt, ps, true);
                 }
                 finally
                 {
                     sqlControl.closeStatement(mconn, ps);
                 }
+            }
+            catch (SQLException e)
+            {
+                throw new NucleusDataStoreException(Localiser.msg("056015", theUnsetStmt), e);
+            }
+            finally
+            {
+            }
 
-                // Set the new object at this position
-                String setStmt = getSetStmt(element);
-                PreparedStatement ps2 = sqlControl.getStatementForUpdate(mconn, setStmt, false);
+            // Set the new object at this position
+            String theSetStmt = getSetStmt(element);
+            try
+            {
+                PreparedStatement ps2 = sqlControl.getStatementForUpdate(mconn, theSetStmt, false);
                 try
                 {
                     ComponentInfo elemInfo = getComponentInfoForElement(element);
@@ -339,21 +351,24 @@ public class FKListStore<E> extends AbstractListStore<E>
                     }
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps2, element, jdbcPosition, elemMapping);
 
-                    sqlControl.executeStatementUpdate(ec, mconn, setStmt, ps2, true);
+                    sqlControl.executeStatementUpdate(ec, mconn, theSetStmt, ps2, true);
                 }
                 finally
                 {
-                    ps2.close();
+                    sqlControl.closeStatement(mconn, ps2);
                 }
             }
-            finally
+            catch (SQLException e)
+            {
+                throw new NucleusDataStoreException(Localiser.msg("056015", theSetStmt), e);
+            }
+        }
+        finally
+        {
+            if (mconn != null)
             {
                 mconn.release();
             }
-        }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("056015", setStmt), e);
         }
 
         // Dependent field
