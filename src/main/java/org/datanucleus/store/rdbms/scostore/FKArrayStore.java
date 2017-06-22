@@ -767,6 +767,10 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 }
             }
         }
+        if (sqlStmt == null)
+        {
+            throw new NucleusException("Error in generation of SQL statement for iterator over (FK) array. Statement is null");
+        }
 
         if (addRestrictionOnOwner)
         {

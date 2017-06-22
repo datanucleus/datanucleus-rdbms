@@ -330,25 +330,28 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
                 }
             }
 
-            if (hasOption(OPTION_ALLOW_NULLS))
+            if (discExpr != null)
             {
-                // Allow for null value of discriminator
-                SQLExpression expr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discMapping);
-                SQLExpression val = new NullLiteral(stmt, null, null, null);
-                BooleanExpression nullDiscExpr = expr.eq(val);
-                discExpr = discExpr.ior(nullDiscExpr);
-                if (!multipleCandidates)
+                if (hasOption(OPTION_ALLOW_NULLS))
                 {
-                    multipleCandidates = true;
+                    // Allow for null value of discriminator
+                    SQLExpression expr = stmt.getSQLExpressionFactory().newExpression(stmt, discrimSqlTbl, discMapping);
+                    SQLExpression val = new NullLiteral(stmt, null, null, null);
+                    BooleanExpression nullDiscExpr = expr.eq(val);
+                    discExpr = discExpr.ior(nullDiscExpr);
+                    if (!multipleCandidates)
+                    {
+                        multipleCandidates = true;
+                    }
                 }
-            }
 
-            // Apply the discriminator to the query statement
-            if (multipleCandidates)
-            {
-                discExpr.encloseInParentheses();
+                // Apply the discriminator to the query statement
+                if (multipleCandidates)
+                {
+                    discExpr.encloseInParentheses();
+                }
+                stmt.whereAnd(discExpr, true);
             }
-            stmt.whereAnd(discExpr, true);
         }
 
         JavaTypeMapping multitenancyMapping = candidateTable.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);

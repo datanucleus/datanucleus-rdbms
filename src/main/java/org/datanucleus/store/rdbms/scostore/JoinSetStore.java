@@ -31,6 +31,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -1052,6 +1053,10 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     sqlStmt.union(elementStmt);
                 }
             }
+        }
+        if (sqlStmt == null)
+        {
+            throw new NucleusException("Error in generation of SQL statement for iterator over (Join) set. Statement is null");
         }
 
         if (addRestrictionOnOwner)

@@ -220,10 +220,8 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         }
 
         SelectStatement stmt = null;
-        iter = candidateClassNames.iterator();
-        while (iter.hasNext())
+        for (String candidateClassName : candidateClassNames)
         {
-            String candidateClassName = iter.next();
             SelectStatement candidateStmt = null;
             if (joinTable == null)
             {
@@ -235,6 +233,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
                 // Select of join table and join to element
                 candidateStmt = getSQLStatementForCandidateViaJoin(candidateClassName);
             }
+
             if (candidateStmt != null)
             {
                 if (stmt == null)
@@ -373,8 +372,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
 
     /**
      * Convenience method to return the SQLStatement for a particular class selecting a join table.
-     * Returns a SQLStatement with primaryTable of the "joinTable", and which joins to
-     * the table of the class.
+     * Returns a SQLStatement with primaryTable of the "joinTable", and which joins to the table of the class.
      * @param className The class name to generate the statement for
      * @return The SQLStatement
      */
@@ -385,6 +383,7 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         {
             // Only support if there is a single table where the class is actually persisted
             // TODO Cater for use of single subclass-table
+            throw new NucleusException("We do not currently support a UNION statement for class=" + className + " since it has no table of its own");
         }
 
         // Start from an SQL SELECT of the join table

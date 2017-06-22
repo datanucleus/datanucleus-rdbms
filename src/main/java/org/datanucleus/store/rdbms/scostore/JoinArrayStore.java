@@ -26,6 +26,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -308,8 +309,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                             cls[j] = clr.classForName(clsNames[j]);
                         }
 
-                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, 
-                            true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
@@ -318,8 +318,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                     }
                     else
                     {
-                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls,
-                            true, null, null, containerTable, null, elementMapping);
+                        SelectStatementGenerator stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         if (allowNulls)
                         {
                             stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
@@ -349,6 +348,10 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                 {
                     sqlStmt.union(elementStmt);
                 }
+            }
+            if (sqlStmt == null)
+            {
+                throw new NucleusException("Error in generation of SQL statement for iterator over (Join) array. Statement is null");
             }
 
             // Select the required fields
