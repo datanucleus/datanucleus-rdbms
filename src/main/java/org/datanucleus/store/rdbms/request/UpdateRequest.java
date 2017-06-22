@@ -102,12 +102,11 @@ public class UpdateRequest extends Request
      * table to build a basic query. The query will be of the form
      * <PRE>
      * UPDATE table-name SET param1=?,param2=? WHERE id1=? AND id2=?
-     *</PRE>
-     *or (when also performing version checks)
+     * </PRE>
+     * or (when also performing version checks)
      * <PRE>
      * UPDATE table-name SET param1=?,param2=?,version={newvers} WHERE id1=? AND id2=? AND version={oldvers}
-     *</PRE>
-     *
+     * </PRE>
      * @param table The Class Table representing the datastore table to update
      * @param reqFieldMetaData MetaData of the fields to update
      * @param cmd ClassMetaData of objects being updated
@@ -258,13 +257,16 @@ public class UpdateRequest extends Request
             {
                 // Debug info about fields being updated
                 StringBuilder fieldStr = new StringBuilder();
-                for (int i=0;i<updateFieldNumbers.length;i++)
+                if (updateFieldNumbers != null)
                 {
-                    if (fieldStr.length() > 0)
+                    for (int i=0;i<updateFieldNumbers.length;i++)
                     {
-                        fieldStr.append(",");
+                        if (fieldStr.length() > 0)
+                        {
+                            fieldStr.append(",");
+                        }
+                        fieldStr.append(cmd.getMetaDataForManagedMemberAtAbsolutePosition(updateFieldNumbers[i]).getName());
                     }
-                    fieldStr.append(cmd.getMetaDataForManagedMemberAtAbsolutePosition(updateFieldNumbers[i]).getName());
                 }
 
                 if (versionMetaData != null && versionMetaData.getFieldName() == null)

@@ -26,6 +26,7 @@ import java.util.List;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.IdentityUtils;
@@ -236,6 +237,11 @@ public class LocateBulkRequest extends BulkRequest
                     }
                     pkIdx.addParameterOccurrence(inputParams);
                 }
+                if (pkExpr == null)
+                {
+                    throw new NucleusException("Unable to generate PK expression for WHERE clause of locate statement");
+                }
+
                 pkExpr = (BooleanExpression)pkExpr.encloseInParentheses();
                 sqlStatement.whereOr(pkExpr, true);
             }
@@ -451,7 +457,7 @@ public class LocateBulkRequest extends BulkRequest
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
                     Object opKey = IdentityUtils.getTargetKeyForDatastoreIdentity(opId);
-                    if (opKey.getClass() != key.getClass())
+                    if (key != null && opKey.getClass() != key.getClass())
                     {
                         opKey = TypeConversionHelper.convertTo(opKey, key.getClass());
                     }
