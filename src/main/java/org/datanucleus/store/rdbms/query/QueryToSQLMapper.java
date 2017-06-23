@@ -1408,6 +1408,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                     for (int k=0;k<ids.length;k++)
                     {
+                        if (cmd == null)
+                        {
+                            throw new NucleusUserException("Error in JOIN clause. id=" + id + " but component prior to " + ids[k] + " has no metadata");
+                        }
+
                         boolean lastComponent = (k == ids.length-1);
                         String thisComponent = ids[k];
 
@@ -4385,7 +4390,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             processVariableExpression((VariableExpression)subqueryExpr);
             SQLExpression subquerySqlExpr = stack.pop();
-            if (keyword != null && keyword.equals("EXISTS"))
+            if (keyword.equals("EXISTS"))
             {
                 // EXISTS expressions need to be Boolean
                 if (subquerySqlExpr instanceof org.datanucleus.store.rdbms.sql.expression.SubqueryExpression)
