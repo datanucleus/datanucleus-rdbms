@@ -274,18 +274,24 @@ public class InsertRequest extends Request
                     // This provides "persistence-by-reachability" for these fields
                     if (insertFieldNumbers.length > 0)
                     {
+                        // TODO Support surrogate current-user, create-timestamp
                         int numberOfFieldsToProvide = 0;
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
                             if (insertFieldNumbers[i] < op.getClassMetaData().getMemberCount())
                             {
                                 AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
-                                if (mmd.hasExtension("create-timestamp"))
+                                if (mmd.isCreateTimestamp())
                                 {
-                                    // TODO Support surrogate create-timestamp
-                                    // Set "create-timestamp" to time for the start of this transaction
+                                    // Set create timestamp to time for the start of this transaction
                                     op.replaceField(insertFieldNumbers[i], new Timestamp(ec.getTransaction().getBeginTime()));
                                 }
+                                else if (mmd.isCreateUser())
+                                {
+                                    // Set create user to current user
+                                    op.replaceField(insertFieldNumbers[i], ec.getNucleusContext().getCurrentUser(ec));
+                                }
+
                                 numberOfFieldsToProvide++;
                             }
                         }

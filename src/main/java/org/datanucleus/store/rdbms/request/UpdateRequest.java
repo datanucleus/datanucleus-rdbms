@@ -175,15 +175,19 @@ public class UpdateRequest extends Request
             table.provideMappingsForMembers(consumer, reqFieldMetaData, false);
         }
 
-        // TODO Support surrogate update-timestamp
-        // "update-timestamp"? TODO Make this accessible from cmd
+        // TODO Support surrogate update user/timestamp
         AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
         for (int i=0;i<mmds.length;i++)
         {
-            if (mmds[i].hasExtension("update-timestamp"))
+            if (mmds[i].isUpdateTimestamp()) // TODO Make this accessible from cmd
             {
                 AbstractMemberMetaData[] updateTsMmd = {mmds[i]};
                 table.provideMappingsForMembers(consumer, updateTsMmd, false);
+            }
+            else if (mmds[i].isUpdateUser()) // TODO Make this accessible from cmd
+            {
+                AbstractMemberMetaData[] updateUserMmd = {mmds[i]};
+                table.provideMappingsForMembers(consumer, updateUserMmd, false);
             }
         }
 
@@ -243,13 +247,17 @@ public class UpdateRequest extends Request
 
         if (stmt != null)
         {
-            // TODO Support surrogate update-timestamp
+            // TODO Support surrogate update user/timestamp
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             for (int i=0;i<mmds.length;i++)
             {
-                if (mmds[i].hasExtension("update-timestamp"))
+                if (mmds[i].isUpdateTimestamp()) // TODO Make this accessible from cmd
                 {
                     op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getBeginTime()));
+                }
+                else if (mmds[i].isUpdateUser()) // TODO Make this accessible from cmd
+                {
+                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getNucleusContext().getCurrentUser(ec));
                 }
             }
 
