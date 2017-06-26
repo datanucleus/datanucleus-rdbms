@@ -62,6 +62,8 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     /** Default to closing the statement when closing the resultSet, but allow override. */
     protected boolean closeStatementWithResultSet = true;
 
+    boolean applyRangeChecks = false;
+
     /**
      * Constructor of the result from a Query.
      * @param query The Query
@@ -73,6 +75,8 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
         super(query);
         this.rof = rof;
         this.rs = rs;
+
+        this.applyRangeChecks = !query.processesRangeInDatastoreQuery();
     }
 
     public void setCloseStatementWithResultSet(boolean flag)

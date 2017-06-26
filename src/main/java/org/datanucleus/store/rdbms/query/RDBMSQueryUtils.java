@@ -98,6 +98,21 @@ public class RDBMSQueryUtils extends QueryUtils
         return rowClassName;
     }
 
+    public static AbstractRDBMSQueryResult getQueryResultForQuery(Query q, ResultObjectFactory rof, ResultSet rs, Collection candidates)
+    {
+        String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(q);
+        AbstractRDBMSQueryResult qr = null;
+        if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) || resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
+        {
+            qr = new ScrollableQueryResult(q, rof, rs, candidates);
+        }
+        else
+        {
+            qr = new ForwardQueryResult(q, rof, rs, candidates);
+        }
+        return qr;
+    }
+
     /**
      * Accessor for the result set type for the specified query.
      * Uses the persistence property "datanucleus.rdbms.query.resultSetType" and allows it to be overridden by the query extension of the same name.

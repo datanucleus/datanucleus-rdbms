@@ -64,8 +64,6 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
     /** The candidate list restriction (optional). */
     private Collection candidates;
 
-    private boolean applyRangeChecks = false;
-
     /**
      * Constructor of the result from a Query.
      * @param query The Query
@@ -75,7 +73,6 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @throws SQLException if can't read ResultSet
      */
     public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, Collection candidates)
-    throws SQLException
     {
         super(query, rof, rs);
 
@@ -83,8 +80,6 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
         {
             resultIds = new ArrayList();
         }
-
-        this.applyRangeChecks = !query.processesRangeInDatastoreQuery();
 
         if (candidates != null)
         {
@@ -516,8 +511,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
 
     /**
      * Method to get the size using the "resultSizeMethod".
-     * This implementation supports "LAST" method. Override this in subclasses to implement
-     * other methods.
+     * This implementation supports "LAST" method. Override this in subclasses to implement other methods.
      * @return The size
      */
     protected int getSizeUsingMethod()

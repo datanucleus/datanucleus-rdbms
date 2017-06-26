@@ -713,17 +713,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         }
 
         // Create the required type of QueryResult
-        String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(this);
-        AbstractRDBMSQueryResult qr = null;
-        if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) || resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
-        {
-            qr = new ScrollableQueryResult(this, rof, rs, null);
-        }
-        else
-        {
-            qr = new ForwardQueryResult(this, rof, rs, null);
-            ((ForwardQueryResult)qr).setCloseStatementWithResultSet(false);
-        }
+        AbstractRDBMSQueryResult qr = RDBMSQueryUtils.getQueryResultForQuery(this, rof, rs, null);
         qr.setCloseStatementWithResultSet(false); // In case there are multiple result sets
         qr.initialise();
 

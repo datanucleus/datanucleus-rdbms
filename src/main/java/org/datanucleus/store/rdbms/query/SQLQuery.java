@@ -663,15 +663,7 @@ public final class SQLQuery extends Query
                             }
 
                             // Return the associated type of results depending on whether scrollable or not
-                            String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(this);
-                            if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) || resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
-                            {
-                                qr = new ScrollableQueryResult(this, rof, rs, null);
-                            }
-                            else
-                            {
-                                qr = new ForwardQueryResult(this, rof, rs, null);
-                            }
+                            qr = RDBMSQueryUtils.getQueryResultForQuery(this, rof, rs, null);
                             qr.initialise();
 
                             final QueryResult qr1 = qr;

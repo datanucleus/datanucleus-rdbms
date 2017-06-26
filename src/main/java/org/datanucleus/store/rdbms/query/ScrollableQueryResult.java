@@ -69,8 +69,6 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
     /** Position of last result (origin=0, set when known). */
     int endIndex = -1;
 
-    boolean applyRangeChecks = false;
-
     /**
      * Constructor of the result from a Query.
      * @param query The Query
@@ -123,7 +121,6 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             resultsObjsByIndex = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.WEAK);
         }
 
-        applyRangeChecks = !query.processesRangeInDatastoreQuery();
         if (applyRangeChecks)
         {
             startIndex = (int) query.getRangeFromIncl();

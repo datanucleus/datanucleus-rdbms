@@ -681,15 +681,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             }
 
                             // Create the required type of QueryResult
-                            String resultSetType = RDBMSQueryUtils.getResultSetTypeForQuery(this);
-                            if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) || resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
-                            {
-                                qr = new ScrollableQueryResult(this, rof, rs, getResultDistinct() ? null : candidateCollection);
-                            }
-                            else
-                            {
-                                qr = new ForwardQueryResult(this, rof, rs, getResultDistinct() ? null : candidateCollection);
-                            }
+                            qr = RDBMSQueryUtils.getQueryResultForQuery(this, rof, rs, getResultDistinct() ? null : candidateCollection);
 
                             // Register any bulk loaded member resultSets that need loading
                             Map<String, IteratorStatement> scoIterStmts = datastoreCompilation.getSCOIteratorStatements();
