@@ -359,7 +359,7 @@ public class SQLController
         }
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("052110", StringUtils.toJVMIDString(ps)));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("052109", ps, StringUtils.toJVMIDString(c)));
         }
 
         if (!jdbcStatements)
