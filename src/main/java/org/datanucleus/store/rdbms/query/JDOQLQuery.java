@@ -325,8 +325,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             if (!nullParameter)
             {
                 // Allowing caching so try to find compiled (datastore) query
-                datastoreCompilation = (RDBMSQueryCompilation)qm.getDatastoreQueryCompilation(datastoreKey,
-                    getLanguage(), queryCacheKey);
+                datastoreCompilation = (RDBMSQueryCompilation)qm.getDatastoreQueryCompilation(datastoreKey, getLanguage(), queryCacheKey);
                 if (datastoreCompilation != null)
                 {
                     // Cached compilation exists for this datastore so reuse it
@@ -431,8 +430,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                             {
                                                 // TODO Handle StatementClassMapping
                                                 // TODO Handle StatementNewObjectMapping
-                                                throw new NucleusUserException("Don't support result clause of " + 
-                                                        result + " with resultClass of " + resultClass.getName());
+                                                throw new NucleusUserException("Don't support result clause of " + result + " with resultClass of " + resultClass.getName());
                                             }
                                         }
                                         else if (QueryUtils.resultClassIsUserType(resultClass.getName()))
@@ -531,11 +529,6 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     }
                 }
 
-                if (NucleusLogger.QUERY.isDebugEnabled())
-                {
-                    NucleusLogger.QUERY.debug(Localiser.msg("021085", this, datastoreCompilation.getSQL()));
-                }
-
                 boolean hasParams = false;
                 if (explicitParameters != null)
                 {
@@ -551,8 +544,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                     // TODO Allow caching of queries with subqueries
                     if (!datastoreCompilation.isPrecompilable() || (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
                     {
-                        // Some parameters had their clauses evaluated during compilation so the query
-                        // didn't gain any parameters, so don't cache it
+                        // Some parameters had their clauses evaluated during compilation so the query didn't gain any parameters, so don't cache it
                         NucleusLogger.QUERY.debug(Localiser.msg("021075"));
                     }
                     else
@@ -810,8 +802,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     }
 
     /**
-     * Method that will throw an {@link UnsupportedOperationException} if the query implementation doesn't
-     * support cancelling queries.
+     * Method that will throw an {@link UnsupportedOperationException} if the query implementation doesn't support cancelling queries.
      */
     protected void assertSupportsCancel()
     {

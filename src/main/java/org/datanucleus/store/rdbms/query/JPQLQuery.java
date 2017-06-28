@@ -470,11 +470,6 @@ public class JPQLQuery extends AbstractJPQLQuery
                 });
             }
 
-            if (NucleusLogger.QUERY.isDebugEnabled())
-            {
-                NucleusLogger.QUERY.debug(Localiser.msg("021085", this, datastoreCompilation.getSQL()));
-            }
-
             boolean hasParams = false;
             if (explicitParameters != null)
             {
@@ -486,8 +481,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
             if (!datastoreCompilation.isPrecompilable() || (datastoreCompilation.getSQL().indexOf('?') < 0 && hasParams))
             {
-                // Some parameters had their clauses evaluated during compilation so the query
-                // didn't gain any parameters, so don't cache it
+                // Some parameters had their clauses evaluated during compilation so the query didn't gain any parameters, so don't cache it
                 NucleusLogger.QUERY.debug(Localiser.msg("021075"));
             }
             else
