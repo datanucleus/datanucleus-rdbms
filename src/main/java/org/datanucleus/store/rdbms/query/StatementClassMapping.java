@@ -139,11 +139,7 @@ public class StatementClassMapping
      */
     public StatementClassMapping getMappingDefinitionForMemberPosition(int position)
     {
-        if (children != null)
-        {
-            return children.get(position);
-        }
-        return null;
+        return (children != null) ? children.get(position) : null;
     }
 
     /**

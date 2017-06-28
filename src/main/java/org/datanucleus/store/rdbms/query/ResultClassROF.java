@@ -94,7 +94,7 @@ public class ResultClassROF implements ResultObjectFactory
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
         {
-            // Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
+            // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
             tmpClass = HashMap.class;
         }
         else if (cls == null)
@@ -165,7 +165,7 @@ public class ResultClassROF implements ResultObjectFactory
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
         {
-            // Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
+            // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
             tmpClass = HashMap.class;
         }
         else
@@ -203,7 +203,7 @@ public class ResultClassROF implements ResultObjectFactory
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
         {
-            // Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
+            // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
             tmpClass = HashMap.class;
         }
         else
@@ -405,8 +405,7 @@ public class ResultClassROF implements ResultObjectFactory
     }
 
     /**
-     * Convenience method to return the value of a NewObject mapping for the current row of the provided
-     * query results.
+     * Convenience method to return the value of a NewObject mapping for the current row of the provided query results.
      * @param newMap new object mapping
      * @param ec ExecutionContext
      * @param rs Query results
@@ -521,11 +520,10 @@ public class ResultClassROF implements ResultObjectFactory
     }
 
     /** Map<Class, ResultSetGetter> ResultSetGetters by result classes */
-    private static Map<Class, ResultSetGetter> resultSetGetters = new HashMap(20);
+    private static Map<Class, ResultSetGetter> resultSetGetters = new HashMap(15);
     static
     {
         // any type specific getter from ResultSet that we can guess from the desired result class
-
         resultSetGetters.put(Boolean.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException

@@ -50,11 +50,7 @@ public class StatementNewObjectMapping
      */
     public Object getConstructorArgMapping(int position)
     {
-        if (ctrArgMappings == null)
-        {
-            return null;
-        }
-        return ctrArgMappings.get(position);
+        return (ctrArgMappings == null) ? null : ctrArgMappings.get(position);
     }
 
     /**
@@ -79,7 +75,7 @@ public class StatementNewObjectMapping
 
     public int getNumberOfConstructorArgMappings()
     {
-        return (ctrArgMappings != null ? ctrArgMappings.size() : 0);
+        return (ctrArgMappings != null) ? ctrArgMappings.size() : 0;
     }
 
     public String toString()

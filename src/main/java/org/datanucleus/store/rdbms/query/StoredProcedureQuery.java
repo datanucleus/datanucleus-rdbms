@@ -191,14 +191,11 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                 this.stmt = conn.prepareCall(stmtStr.toString());
 
                 boolean hasOutputParams = false;
-                if (storedProcParams != null && !storedProcParams.isEmpty())
+                if (storedProcParams != null)
                 {
-                    Iterator<StoredProcedureParameter> paramIter = storedProcParams.iterator();
-                    while (paramIter.hasNext())
+                    for (StoredProcedureParameter param : storedProcParams)
                     {
-                        StoredProcedureParameter param = paramIter.next();
-                        if (param.getMode() == StoredProcQueryParameterMode.IN ||
-                            param.getMode() == StoredProcQueryParameterMode.INOUT)
+                        if (param.getMode() == StoredProcQueryParameterMode.IN || param.getMode() == StoredProcQueryParameterMode.INOUT)
                         {
                             if (param.getType() == Integer.class)
                             {
@@ -316,8 +313,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                             }
                         }
 
-                        if (param.getMode() == StoredProcQueryParameterMode.OUT || 
-                            param.getMode() == StoredProcQueryParameterMode.INOUT)
+                        if (param.getMode() == StoredProcQueryParameterMode.OUT || param.getMode() == StoredProcQueryParameterMode.INOUT)
                         {
                             // Register output params
                             if (param.getType() == Integer.class)
@@ -450,12 +446,9 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                 // For any output parameters, get their values
                 if (hasOutputParams)
                 {
-                    Iterator<StoredProcedureParameter> paramIter = storedProcParams.iterator();
-                    while (paramIter.hasNext())
+                    for (StoredProcedureParameter param : storedProcParams)
                     {
-                        StoredProcedureParameter param = paramIter.next();
-                        if (param.getMode() == StoredProcQueryParameterMode.OUT || 
-                            param.getMode() == StoredProcQueryParameterMode.INOUT)
+                        if (param.getMode() == StoredProcQueryParameterMode.OUT || param.getMode() == StoredProcQueryParameterMode.INOUT)
                         {
                             Object value = null;
                             if (param.getType() == Integer.class)
@@ -708,8 +701,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         else
         {
             // Each row of the ResultSet is either an instance of resultClass, or Object[]
-            rof = RDBMSQueryUtils.getResultObjectFactoryForNoCandidateClass(storeMgr, rs, 
-                resultClasses != null ? resultClasses[resultSetNumber] : null);
+            rof = RDBMSQueryUtils.getResultObjectFactoryForNoCandidateClass(storeMgr, rs, resultClasses != null ? resultClasses[resultSetNumber] : null);
         }
 
         // Create the required type of QueryResult

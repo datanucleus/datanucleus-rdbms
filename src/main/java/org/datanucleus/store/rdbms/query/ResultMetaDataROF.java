@@ -123,7 +123,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int columnCount = rsmd.getColumnCount();
                 columnNames = new String[columnCount];
-                for( int i=0; i<columnCount; i++)
+                for (int i=0; i<columnCount; i++)
                 {
                     String colName = rsmd.getColumnName(i+1);
                     String colLabel = rsmd.getColumnLabel(i+1);
@@ -143,9 +143,9 @@ public class ResultMetaDataROF implements ResultObjectFactory
             int startColumnIndex = 0;
             for (int i=0;i<persistentTypes.length;i++)
             {
-                Set columnsInThisType = new HashSet();
-                AbstractMemberMetaData[] fmds = new AbstractMemberMetaData[columnNames.length];
-                Map fieldColumns = new HashMap();
+                Set<String> columnsInThisType = new HashSet<>();
+                AbstractMemberMetaData[] mmds = new AbstractMemberMetaData[columnNames.length];
+                Map<String, AbstractMemberMetaData> fieldColumns = new HashMap<>();
                 DatastoreClass dc = storeMgr.getDatastoreClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 Object id = null;
@@ -185,7 +185,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                             {
                                 fieldColumns.put(columnNames[j], apmd);
                                 columnsInThisType.add(columnNames[j]);
-                                fmds[j] = apmd;
+                                mmds[j] = apmd;
                                 found = true;
                             }
                         }
@@ -199,7 +199,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                                 {
                                     fieldColumns.put(columnNames[j], apmd);
                                     columnsInThisType.add(columnNames[j]);
-                                    fmds[j] = apmd;
+                                    mmds[j] = apmd;
                                     found = true;
                                 }
                             }
@@ -214,24 +214,21 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 }
 
                 // Build fields and mappings in the results
-                StatementMappingIndex[] stmtMappings = 
-                    new StatementMappingIndex[acmd.getNoOfManagedMembers() + acmd.getNoOfInheritedManagedMembers()];
+                StatementMappingIndex[] stmtMappings = new StatementMappingIndex[acmd.getNoOfManagedMembers() + acmd.getNoOfInheritedManagedMembers()];
 
-                Set fields = new HashSet();
-                fields.addAll(fieldColumns.values());
-                int[] fieldNumbers = new int[fields.size()];
-                Iterator it = fields.iterator();
+                Set<AbstractMemberMetaData> resultMmds = new HashSet<>();
+                resultMmds.addAll(fieldColumns.values());
+                int[] resultFieldNumbers = new int[resultMmds.size()];
                 int j=0;
-                while (it.hasNext())
+                for (AbstractMemberMetaData apmd : resultMmds)
                 {
-                    AbstractMemberMetaData apmd = (AbstractMemberMetaData)it.next();
                     StatementMappingIndex stmtMapping = new StatementMappingIndex(dc.getMemberMapping(apmd));
 
-                    fieldNumbers[j] = apmd.getAbsoluteFieldNumber();
+                    resultFieldNumbers[j] = apmd.getAbsoluteFieldNumber();
                     List indexes = new ArrayList();
-                    for (int k=0; k<fmds.length; k++)
+                    for (int k=0; k<mmds.length; k++)
                     {
-                        if (fmds[k] == apmd)
+                        if (mmds[k] == apmd)
                         {
                             indexes.add(Integer.valueOf(k));
                         }
@@ -243,18 +240,18 @@ public class ResultMetaDataROF implements ResultObjectFactory
                         indxs[k] = ((Integer)indexes.get(k)).intValue()+1;
                     }
                     stmtMapping.setColumnPositions(indxs);
-                    stmtMappings[fieldNumbers[j]] = stmtMapping;
+                    stmtMappings[resultFieldNumbers[j]] = stmtMapping;
                     j++;
                 }
                 Object obj = null;
                 Class type = ec.getClassLoaderResolver().classForName(persistentTypes[i].getClassName());
                 if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    obj = getObjectForApplicationId(ec, rs, fieldNumbers, acmd, type, false, stmtMappings);
+                    obj = getObjectForApplicationId(ec, rs, resultFieldNumbers, acmd, type, false, stmtMappings);
                 }
                 else if (acmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    obj = getObjectForDatastoreId(ec, rs, fieldNumbers, acmd, id, type, stmtMappings);
+                    obj = getObjectForDatastoreId(ec, rs, resultFieldNumbers, acmd, id, type, stmtMappings);
                 }
                 returnObjects.add(obj);
             }

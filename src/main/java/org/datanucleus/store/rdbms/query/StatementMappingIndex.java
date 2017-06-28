@@ -146,11 +146,10 @@ public class StatementMappingIndex
      */
     public void removeParameterOccurrence(int[] positions)
     {
-        if (paramPositions == null)
+        if (paramPositions != null)
         {
-            return;
+            paramPositions.remove(positions);
         }
-        paramPositions.remove(positions);
     }
 
     /**
@@ -159,7 +158,7 @@ public class StatementMappingIndex
      */
     public int getNumberOfParameterOccurrences()
     {
-        return (paramPositions != null ? paramPositions.size() : 0);
+        return (paramPositions != null) ? paramPositions.size() : 0;
     }
 
     /**
@@ -169,11 +168,7 @@ public class StatementMappingIndex
      */
     public int[] getParameterPositionsForOccurrence(int num)
     {
-        if (paramPositions == null)
-        {
-            return null;
-        }
-        return paramPositions.get(num);
+        return (paramPositions == null) ? null : paramPositions.get(num);
     }
 
     /**

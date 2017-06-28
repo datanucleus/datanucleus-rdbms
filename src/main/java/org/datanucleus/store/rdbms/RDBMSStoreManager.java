@@ -702,10 +702,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         schemaLock.readLock().lock();
         try
         {
-            Iterator iterator = storeDataMgr.getManagedStoreData().iterator();
-            while (iterator.hasNext())
+            for (StoreData sd : storeDataMgr.getManagedStoreData())
             {
-                StoreData sd = (StoreData) iterator.next();
                 if (sd instanceof RDBMSStoreData)
                 {
                     RDBMSStoreData tsd = (RDBMSStoreData)sd;
@@ -766,15 +764,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
 
             // Find subclasses who manage the tables winto which our class is persisted
-            HashSet managingClasses=new HashSet();
-            Iterator managedClassesIter = storeDataMgr.getManagedStoreData().iterator();
-            while (managedClassesIter.hasNext())
+            Set<AbstractClassMetaData> managingClasses = new HashSet<>();
+            for (StoreData sd : storeDataMgr.getManagedStoreData())
             {
-                StoreData data = (StoreData)managedClassesIter.next();
-                if (data.isFCO() && ((AbstractClassMetaData)data.getMetaData()).getSuperAbstractClassMetaData() != null &&
-                    ((AbstractClassMetaData)data.getMetaData()).getSuperAbstractClassMetaData().getFullClassName().equals(cmd.getFullClassName()))
+                if (sd.isFCO() && ((AbstractClassMetaData)sd.getMetaData()).getSuperAbstractClassMetaData() != null &&
+                    ((AbstractClassMetaData)sd.getMetaData()).getSuperAbstractClassMetaData().getFullClassName().equals(cmd.getFullClassName()))
                 {
-                    AbstractClassMetaData[] superCmds = getClassesManagingTableForClass((AbstractClassMetaData)data.getMetaData(), clr);
+                    AbstractClassMetaData[] superCmds = getClassesManagingTableForClass((AbstractClassMetaData)sd.getMetaData(), clr);
                     if (superCmds != null)
                     {
                         for (int i=0;i<superCmds.length;i++)
@@ -785,12 +781,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
             }
 
-            Iterator managingClassesIter = managingClasses.iterator();
+            Iterator<AbstractClassMetaData> managingClassesIter = managingClasses.iterator();
             AbstractClassMetaData managingCmds[] = new AbstractClassMetaData[managingClasses.size()];
             int i=0;
             while (managingClassesIter.hasNext())
             {
-                managingCmds[i++] = (AbstractClassMetaData)(managingClassesIter.next());
+                managingCmds[i++] = managingClassesIter.next();
             }
             return managingCmds;
         }
@@ -2466,10 +2462,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return Collections.EMPTY_SET;
         }
 
-        Collection tables = new HashSet();
-        for (Iterator<StoreData> i = storeDataMgr.getManagedStoreData().iterator(); i.hasNext();)
+        Collection<Table> tables = new HashSet<>();
+        for (StoreData sd : storeDataMgr.getManagedStoreData())
         {
-            RDBMSStoreData sd = (RDBMSStoreData) i.next();
             if (sd.getTable() != null)
             {
                 // Catalog/Schema match if either managed table not set, or input requirements not set
@@ -2486,7 +2481,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
                 if (catalogMatches && schemaMatches)
                 {
-                    tables.add(sd.getTable());
+                    tables.add((Table)sd.getTable());
                 }
             }
         }
@@ -2929,7 +2924,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                             }
 
                             // Process all errors from the above
-                            if (autoCreateErrors.size() > 0)
+                            if (!autoCreateErrors.isEmpty())
                             {
                                 // Verify the list of errors, log the errors and raise NucleusDataStoreException when fail on error is enabled.
                                 Iterator errorsIter = autoCreateErrors.iterator();
@@ -3016,7 +3011,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             addClassTablesRecursionCounter += 1;
             try
             {
-                Iterator iter = getMetaDataManager().getReferencedClasses(classNames, clr).iterator();
                 AutoStartMechanism starter = rdbmsMgr.getNucleusContext().getAutoStartMechanism();
                 try
                 {
@@ -3026,14 +3020,14 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
 
                     // Pass through the classes and create necessary tables
+                    Iterator iter = getMetaDataManager().getReferencedClasses(classNames, clr).iterator();
                     while (iter.hasNext())
                     {
                         addClassTable((ClassMetaData) iter.next(), clr);
                     }
 
                     // For data where the table wasn't defined, make a second pass.
-                    // This is necessary where a subclass uses "superclass-table" and the superclass' table
-                    // hadn't been defined at the point of adding this class
+                    // This is necessary where a subclass uses "superclass-table" and the superclass' table hadn't been defined at the point of adding this class
                     Iterator<RDBMSStoreData> addedIter = new HashSet(this.schemaDataAdded).iterator();
                     while (addedIter.hasNext())
                     {
@@ -3122,27 +3116,24 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         {
                             // We already have at least 1 class using the same app id PK class
                             // so check if it is has the same persistable root class.
-                            boolean in_same_tree = false;
-                            String sample_class_in_other_tree = null;
-
-                            Iterator<AbstractClassMetaData> iter = pkCmds.iterator();
-                            while (iter.hasNext())
+                            boolean inSameTree = false;
+                            String sampleClassInOtherTree = null;
+                            for (AbstractClassMetaData pkCmd : pkCmds)
                             {
-                                AbstractClassMetaData pkCmd = iter.next();
                                 String otherClassBaseClass = pkCmd.getBaseAbstractClassMetaData().getFullClassName();
                                 if (otherClassBaseClass.equals(baseClassWithMetaData))
                                 {
-                                    in_same_tree = true;
+                                    inSameTree = true;
                                     break;
                                 }
-                                sample_class_in_other_tree = pkCmd.getFullClassName();
+                                sampleClassInOtherTree = pkCmd.getFullClassName();
                             }
 
-                            if (!in_same_tree)
+                            if (!inSameTree)
                             {
-                                String error_msg = Localiser.msg("050021", cmd.getFullClassName(), cmd.getObjectidClass(), sample_class_in_other_tree);
-                                NucleusLogger.DATASTORE.error(error_msg);
-                                throw new NucleusUserException(error_msg);
+                                String errorMsg = Localiser.msg("050021", cmd.getFullClassName(), cmd.getObjectidClass(), sampleClassInOtherTree);
+                                NucleusLogger.DATASTORE.error(errorMsg);
+                                throw new NucleusUserException(errorMsg);
                             }
                         }
                     }
@@ -3216,15 +3207,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         {
                             hasViewDef = cmd.hasExtension(MetaData.EXTENSION_CLASS_VIEW_DEFINITION);
                         }
-                        if (hasViewDef)
-                        {
-                            t = new ClassView(tableName, RDBMSStoreManager.this, cmd);
-                        }
-                        else
-                        {
-                            t = new ClassTable(tableName, RDBMSStoreManager.this, cmd);
-                        }
-
+                        
+                        t = (hasViewDef) ? new ClassView(tableName, RDBMSStoreManager.this, cmd) : new ClassTable(tableName, RDBMSStoreManager.this, cmd);
                         sdNew = new RDBMSStoreData(cmd, t, true);
                         rdbmsMgr.registerStoreData(sdNew);
 
@@ -3516,7 +3500,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          */
         private boolean hasDuplicateTablesFromList(List<Table> newTables)
         {
-            Map map = new HashMap();
+            Map<String, Table> map = new HashMap<>();
             for (int i=0; i<newTables.size(); i++)
             {
                 Table t1 = newTables.get(i);
@@ -3622,10 +3606,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         starter.open();
                     }
-                    Iterator<RDBMSStoreData> schema_added_iter = schemaDataAdded.iterator();
-                    while (schema_added_iter.hasNext())
+
+                    for (RDBMSStoreData sd : schemaDataAdded)
                     {
-                        RDBMSStoreData sd = schema_added_iter.next();
                         starter.deleteClass(sd.getName());
                     }                            
                 }
@@ -3648,16 +3631,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          */
         private Table addJoinTableForContainer(Table ownerTable, AbstractMemberMetaData mmd, ClassLoaderResolver clr, int type)
         {
-            DatastoreIdentifier tableName = null;
             RDBMSStoreData sd = (RDBMSStoreData) storeDataMgr.get(mmd);
-            if (sd != null && sd.getDatastoreIdentifier() != null)
-            {
-                tableName = sd.getDatastoreIdentifier();
-            }
-            else
-            {
-                tableName = identifierFactory.newTableIdentifier(mmd);
-            }
+            DatastoreIdentifier tableName = (sd != null && sd.getDatastoreIdentifier() != null) ? tableName = sd.getDatastoreIdentifier() : identifierFactory.newTableIdentifier(mmd);
 
             Table join = null;
             if (type == JOIN_TABLE_COLLECTION)
@@ -3706,7 +3681,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public Collection getSupportedOptions()
     {
-        Set set = new HashSet();
+        Set<String> set = new HashSet<>();
         set.add(StoreManager.OPTION_APPLICATION_ID);
         set.add(StoreManager.OPTION_APPLICATION_COMPOSITE_ID);
         set.add(StoreManager.OPTION_DATASTORE_ID);
@@ -3979,10 +3954,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             Set<String> seqTablesGenerated = new HashSet();
             Set<String> sequencesGenerated = new HashSet();
-            Iterator<String> classNameIter = classNames.iterator();
-            while (classNameIter.hasNext())
+            for (String className : classNames)
             {
-                String className = classNameIter.next();
                 AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
                 if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getValueStrategy() != null)
                 {
@@ -4004,24 +3977,23 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                 }
 
-                AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
-                for (int j=0;j<mmds.length;j++)
+                for (AbstractMemberMetaData mmd : cmd.getManagedMembers())
                 {
-                    IdentityStrategy str = mmds[j].getValueStrategy();
+                    IdentityStrategy str = mmd.getValueStrategy();
                     if (str == IdentityStrategy.INCREMENT)
                     {
-                        addSequenceTableForMetaData(mmds[j], clr, seqTablesGenerated);
+                        addSequenceTableForMetaData(mmd, clr, seqTablesGenerated);
                     }
                     else if (str == IdentityStrategy.SEQUENCE)
                     {
-                        String seqName = mmds[j].getSequence();
+                        String seqName = mmd.getSequence();
                         if (StringUtils.isWhitespace(seqName))
                         {
-                            seqName = mmds[j].getValueGeneratorName();
+                            seqName = mmd.getValueGeneratorName();
                         }
                         if (!StringUtils.isWhitespace(seqName))
                         {
-                            addSequenceForMetaData(mmds[j], seqName, clr, sequencesGenerated, ddlWriter);
+                            addSequenceForMetaData(mmd, seqName, clr, sequencesGenerated, ddlWriter);
                         }
                     }
                 }
@@ -4179,8 +4151,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public void deleteSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
-
-        if (classNames.size() > 0)
+        if (!classNames.isEmpty())
         {
             // Delete the tables
             String ddlFilename = props != null ? props.getProperty("ddlFilename") : null;
@@ -4300,20 +4271,16 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public void validateSchemaForClasses(Set<String> inputClassNames, Properties props)
     {
         Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
-        if (classNames != null && classNames.size() > 0)
+        if (classNames != null && !classNames.isEmpty())
         {
             // Validate the tables/constraints
-            ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
-
-            String[] classNameArray = classNames.toArray(new String[classNames.size()]);
-            manageClasses(clr, classNameArray); // Validates since we have the flags set
+            manageClasses(nucleusContext.getClassLoaderResolver(null), classNames.toArray(new String[classNames.size()])); // Validates since we have the flags set
         }
         else
         {
             String msg = Localiser.msg("014039");
             NucleusLogger.DATASTORE_SCHEMA.error(msg);
             System.out.println(msg);
-
             throw new NucleusException(msg);
         }
     }
@@ -4374,8 +4341,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (inputClassNames == null || inputClassNames.size() == 0)
         {
             // Use all "known" persistable classes
-            Collection classesWithMetadata = ctx.getMetaDataManager().getClassesWithMetaData();
-            classNames.addAll(classesWithMetadata);
+            classNames.addAll(ctx.getMetaDataManager().getClassesWithMetaData());
         }
         else
         {

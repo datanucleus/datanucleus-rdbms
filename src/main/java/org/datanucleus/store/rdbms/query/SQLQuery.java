@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -975,17 +974,15 @@ public final class SQLQuery extends Query
 
         // Cycle through the expected params
         paramPos = 1;
-        Iterator expectedParamIter = expectedParams.iterator();
-        while (expectedParamIter.hasNext())
+        for (Object expectedParam : expectedParams)
         {
-            Object key = expectedParamIter.next();
-            if (!params.containsKey(key))
+            if (!params.containsKey(expectedParam))
             {
                 // Expected parameter is not provided
-                throw new NucleusUserException(Localiser.msg("059031", "" + key, inputSQL));
+                throw new NucleusUserException(Localiser.msg("059031", "" + expectedParam, inputSQL));
             }
 
-            executeMap.put(Integer.valueOf(paramPos), params.get(key));
+            executeMap.put(Integer.valueOf(paramPos), params.get(expectedParam));
             paramNames.add("" + paramPos);
             paramPos++;
         }

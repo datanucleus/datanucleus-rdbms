@@ -43,11 +43,7 @@ public class StatementParameterMapping
      */
     public StatementMappingIndex getMappingForParameter(String name)
     {
-        if (mappings == null)
-        {
-            return null;
-        }
-        return mappings.get(name);
+        return (mappings == null) ? null : mappings.get(name);
     }
 
     /**

@@ -45,11 +45,7 @@ public class StatementResultMapping
      */
     public Object getMappingForResultExpression(int position)
     {
-        if (mappings == null)
-        {
-            return null;
-        }
-        return mappings.get(position);
+        return (mappings == null) ? null : mappings.get(position);
     }
 
     public void addMappingForResultExpression(int position, StatementMappingIndex mapping)
@@ -81,12 +77,12 @@ public class StatementResultMapping
 
     public boolean isEmpty()
     {
-        return (getNumberOfResultExpressions() == 0);
+        return getNumberOfResultExpressions() == 0;
     }
 
     public int getNumberOfResultExpressions()
     {
-        return (mappings != null ? mappings.size() : 0);
+        return (mappings != null) ? mappings.size() : 0;
     }
 
     public String toString()

@@ -23,6 +23,7 @@ import org.datanucleus.FetchGroup;
 import org.datanucleus.FetchGroupManager;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.FetchPlanForClass;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -498,11 +499,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         // Check for variables that haven't been bound to the query (declared but not used)
-        Collection<String> symbols = compilation.getSymbolTable().getSymbolNames();
-        Iterator<String> symIter = symbols.iterator();
-        while (symIter.hasNext())
+        for (String symbol : compilation.getSymbolTable().getSymbolNames())
         {
-            Symbol sym = compilation.getSymbolTable().getSymbol(symIter.next());
+            Symbol sym = compilation.getSymbolTable().getSymbol(symbol);
             if (sym.getType() == Symbol.VARIABLE)
             {
                 if (compilation.getCompilationForSubquery(sym.getQualifiedName()) == null && !hasSQLTableMappingForAlias(sym.getQualifiedName()))
@@ -910,7 +909,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             int maxFetchDepth = fetchPlan.getMaxFetchDepth();
             if (maxFetchDepth < 0)
             {
-                NucleusLogger.QUERY.debug("No limit specified on query fetch so limiting to 3 levels from candidate. Specify the 'datanucleus.maxFetchDepth' to override this");
+                NucleusLogger.QUERY.debug("No limit specified on query fetch so limiting to 3 levels from candidate. " + 
+                    "Specify the '" + PropertyNames.PROPERTY_MAX_FETCH_DEPTH + "' to override this");
                 maxFetchDepth = 3; // TODO Arbitrary
             }
 
@@ -1327,14 +1327,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         {
                             // First component is Map-related (i.e m#KEY, m#VALUE), so add any necessary join(s)
                             MapMetaData mapmd = sqlTblMapping.mmd.getMap();
-                            if (mapKey)
-                            {
-                                cmd = mapmd.getKeyClassMetaData(clr);
-                            }
-                            else
-                            {
-                                cmd = mapmd.getValueClassMetaData(clr);
-                            }
+                            cmd = mapKey ? mapmd.getKeyClassMetaData(clr) : mapmd.getValueClassMetaData(clr);
 
                             // Find the table forming the Map. This may be a join table, or the key or value depending on the type
                             sqlTbl = stmt.getTable(rootComponent + "_MAP");
@@ -1396,15 +1389,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 while (iter.hasNext())
                 {
                     String id = iter.next();
-                    String[] ids = null;
-                    if (id.contains("."))
-                    {
-                        ids = StringUtils.split(id, ".");
-                    }
-                    else
-                    {
-                        ids = new String[] {id};
-                    }
+                    String[] ids = id.contains(".") ? StringUtils.split(id, ".") : new String[] {id};
 
                     for (int k=0;k<ids.length;k++)
                     {
@@ -4047,7 +4032,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             }
                             catch (NucleusUserException nue)
                             {
-                                
                             }
                         }
                     }
