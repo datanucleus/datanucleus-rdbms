@@ -3686,6 +3686,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         set.add(StoreManager.OPTION_APPLICATION_COMPOSITE_ID);
         set.add(StoreManager.OPTION_DATASTORE_ID);
         set.add(StoreManager.OPTION_NONDURABLE_ID);
+        set.add(StoreManager.OPTION_TRANSACTION_ACID);
         set.add(StoreManager.OPTION_ORM);
         set.add(StoreManager.OPTION_ORM_SECONDARY_TABLE);
         set.add(StoreManager.OPTION_ORM_EMBEDDED_PC);
