@@ -154,12 +154,12 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
      * @param storeMgr Store Manager
      * @param connDS Factory data source object
      * @param connJNDI DataSource JNDI name(s)
-     * @param resourceType Type of resource
+     * @param resourceName Resource name
      * @param requiredPoolingType Type of connection pool
      * @param connURL URL for connections
      * @return The DataSource
      */
-    private DataSource generateDataSource(StoreManager storeMgr, Object connDS, String connJNDI, String resourceType, String requiredPoolingType, String connURL)
+    private DataSource generateDataSource(StoreManager storeMgr, Object connDS, String connJNDI, String resourceName, String requiredPoolingType, String connURL)
     {
         DataSource dataSource = null;
         if (connDS != null)
@@ -214,7 +214,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 dataSource = pool.getDataSource();
                 if (NucleusLogger.CONNECTION.isDebugEnabled())
                 {
-                    NucleusLogger.CONNECTION.debug(Localiser.msg("047008", resourceType, poolingType));
+                    NucleusLogger.CONNECTION.debug(Localiser.msg("047008", resourceName, poolingType));
                 }
             }
             catch (ClassNotFoundException cnfe)
@@ -298,7 +298,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                     if (!dba.supportsOption(DatastoreAdapter.HOLD_CURSORS_OVER_COMMIT))
                     {
                         // Call mcPreClose since this datastore doesn't hold open results when calling conn.commit (Firebird)
-                        for (int i=0; i<listeners.size(); i++)
+                        for (int i=0;i<listeners.size();i++)
                         {
                             listeners.get(i).managedConnectionPreClose();
                         }
@@ -365,28 +365,22 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 try
                 {
                     RDBMSStoreManager rdbmsMgr = (RDBMSStoreManager)storeMgr;
+                    DatastoreAdapter dba = rdbmsMgr.getDatastoreAdapter();
                     boolean readOnly = ec != null ? ec.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) : storeMgr.getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY);
-                    if (rdbmsMgr.getDatastoreAdapter() != null)
+                    if (dba != null)
                     {
                         // Create Connection following DatastoreAdapter capabilities
-                        DatastoreAdapter rdba = rdbmsMgr.getDatastoreAdapter();
-                        int reqdIsolationLevel = isolation;
-                        if (rdba.getRequiredTransactionIsolationLevel() >= 0)
-                        {
-                            // Override with the adapters required isolation level
-                            reqdIsolationLevel = rdba.getRequiredTransactionIsolationLevel();
-                        }
-
                         cnx = dataSource.getConnection();
                         boolean succeeded = false;
                         try
                         {
                             if (cnx.isReadOnly() != readOnly)
                             {
-                                NucleusLogger.CONNECTION.debug("Setting readonly=" + readOnly + " to connection: " + cnx.toString());
+                                NucleusLogger.CONNECTION.debug("Setting readonly=" + readOnly + " for connection: " + cnx.toString());
                                 cnx.setReadOnly(readOnly);
                             }
 
+                            int reqdIsolationLevel = (dba.getRequiredTransactionIsolationLevel() >= 0) ? dba.getRequiredTransactionIsolationLevel() : isolation;
                             if (reqdIsolationLevel == TransactionIsolation.NONE)
                             {
                                 if (!cnx.getAutoCommit())
@@ -400,7 +394,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                 {
                                     cnx.setAutoCommit(false);
                                 }
-                                if (rdba.supportsTransactionIsolation(reqdIsolationLevel))
+
+                                if (dba.supportsTransactionIsolation(reqdIsolationLevel))
                                 {
                                     int currentIsolationLevel = cnx.getTransactionIsolation();
                                     if (currentIsolationLevel != reqdIsolationLevel)
@@ -413,13 +408,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                     NucleusLogger.CONNECTION.warn(Localiser.msg("051008", reqdIsolationLevel));
                                 }
                             }
-
-                            if (NucleusLogger.CONNECTION.isDebugEnabled())
-                            {
-                                NucleusLogger.CONNECTION.debug(Localiser.msg("009012", this.toString(),
-                                    TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel), cnx.getAutoCommit()));
-                            }
-
                             if (reqdIsolationLevel != isolation && isolation == TransactionIsolation.NONE)
                             {
                                 // User asked for a level that implies auto-commit so make sure it has that
@@ -430,7 +418,14 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                 }
                             }
 
+                            this.conn = cnx;
                             succeeded = true;
+
+                            if (NucleusLogger.CONNECTION.isDebugEnabled())
+                            {
+                                NucleusLogger.CONNECTION.debug(Localiser.msg("009012", this.toString(), getResourceName(),
+                                    TransactionUtils.getNameForTransactionIsolationLevel(reqdIsolationLevel), cnx.getAutoCommit()));
+                            }
                         }
                         catch (SQLException e)
                         {
@@ -457,7 +452,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                     }
                     else
                     {
-                        // Create basic Connection since no DatastoreAdapter created yet
+                        // Create Connection from DataSource since no DatastoreAdapter created yet
                         cnx = dataSource.getConnection();
                         if (cnx == null)
                         {
@@ -467,16 +462,16 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                         }
                         if (NucleusLogger.CONNECTION.isDebugEnabled())
                         {
-                            NucleusLogger.CONNECTION.debug(Localiser.msg("009011", this.toString()));
+                            NucleusLogger.CONNECTION.debug(Localiser.msg("009011", this.toString(), getResourceName()));
                         }
+
+                        this.conn = cnx;
                     }
                 }
                 catch (SQLException e)
                 {
                     throw new NucleusDataStoreException(e.getMessage(),e);
                 }
-
-                this.conn = cnx;
             }
             needsCommitting = true;
             return this.conn;
@@ -487,7 +482,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
          */
         public void close()
         {
-            for (int i=0; i<listeners.size(); i++)
+            for (int i=0;i<listeners.size();i++)
             {
                 listeners.get(i).managedConnectionPreClose();
             }
@@ -509,12 +504,13 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                                 sqlController.processConnectionStatement(this);
                             }
 
-                            conn.commit();
-                            needsCommitting = false;
                             if (NucleusLogger.CONNECTION.isDebugEnabled())
                             {
                                 NucleusLogger.CONNECTION.debug(Localiser.msg("009015", this.toString()));
                             }
+                            conn.commit();
+
+                            needsCommitting = false;
                         }
                     }
                 }
@@ -549,10 +545,11 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 }
             }
 
-            for (int i=0; i<listeners.size(); i++)
+            for (int i=0;i<listeners.size();i++)
             {
                 listeners.get(i).managedConnectionPostClose();
             }
+
             if (savepoints != null)
             {
                 savepoints.clear();
@@ -693,6 +690,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             super.commit(xid, onePhase);
             try
             {
+                NucleusLogger.CONNECTION.debug(Localiser.msg("009015", mconn.toString()));
                 conn.commit();
                 ((ManagedConnectionImpl)mconn).xaRes = null;
             }
@@ -710,6 +708,7 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             super.rollback(xid);
             try
             {
+                NucleusLogger.CONNECTION.debug(Localiser.msg("009016", mconn.toString()));
                 conn.rollback();
                 ((ManagedConnectionImpl)mconn).xaRes = null;
             }
