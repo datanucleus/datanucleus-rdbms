@@ -648,12 +648,12 @@ public final class SQLQuery extends Query
                             if (resultMetaData != null)
                             {
                                 // Each row of the ResultSet is defined by MetaData
-                                rof = new ResultMetaDataROF(storeMgr, resultMetaData);
+                                rof = new ResultMetaDataROF(ec, rs, resultMetaData);
                             }
                             else if (resultClass != null || candidateClass == null)
                             {
                                 // Each row of the ResultSet is either an instance of resultClass, or Object[]
-                                rof = RDBMSQueryUtils.getResultObjectFactoryForNoCandidateClass(storeMgr, rs, resultClass);
+                                rof = RDBMSQueryUtils.getResultObjectFactoryForNoCandidateClass(ec, rs, resultClass);
                             }
                             else
                             {
@@ -1113,7 +1113,7 @@ public final class SQLQuery extends Query
 
         // Go through the fields of the ResultSet and map to the required fields in the candidate
         ResultSetMetaData rsmd = rs.getMetaData();
-        HashSet remainingColumnNames = new HashSet(columnFieldNumberMap.size());
+        HashSet remainingColumnNames = new HashSet(columnFieldNumberMap.size()); // TODO We put nothing in this, so what is it for?!
         int colCount = rsmd.getColumnCount();
         int[] datastoreIndex = null;
         int[] versionIndex = null;
@@ -1220,7 +1220,7 @@ public final class SQLQuery extends Query
             mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionMappingIdx);
         }
 
-        return new PersistentClassROF(storeMgr, candidateCmd, mappingDefinition, ignoreCache, getFetchPlan(), getCandidateClass());
+        return new PersistentClassROF(ec, rs, mappingDefinition, candidateCmd, ignoreCache, getFetchPlan(), getCandidateClass());
     }
 
     /**

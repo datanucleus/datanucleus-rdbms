@@ -107,7 +107,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
                 }
                 else
                 {
-                    nextElement = rof.getObject(ec, resultSet);
+                    nextElement = rof.getObject();
                 }
 
                 results.add(nextElement);

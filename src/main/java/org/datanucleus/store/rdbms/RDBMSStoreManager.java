@@ -1936,12 +1936,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     public FieldManager getFieldManagerForResultProcessing(ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
     {
-        return new ResultSetGetter(this, op, rs, resultMappings);
+        return new ResultSetGetter(op, rs, resultMappings);
     }
 
     public FieldManager getFieldManagerForResultProcessing(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
     {
-        return new ResultSetGetter(this, ec, rs, resultMappings, cmd);
+        return new ResultSetGetter(ec, rs, resultMappings, cmd);
     }
 
     /**

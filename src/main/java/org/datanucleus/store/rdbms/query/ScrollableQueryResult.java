@@ -230,7 +230,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
             // ResultSet is numbered 1, 2, ... N
             // List is indexed 0, 1, 2, ... N-1
             rs.absolute(index+1);
-            E obj = rof.getObject(query.getExecutionContext(), rs);
+            E obj = rof.getObject();
             JDBCUtils.logWarnings(rs);
 
             // Process any bulk loaded members

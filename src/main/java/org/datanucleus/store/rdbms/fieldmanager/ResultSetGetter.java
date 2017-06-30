@@ -27,7 +27,6 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -39,107 +38,108 @@ import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.store.types.TypeManager;
 
 /**
- * ResultSet getter implementation of a field manager.
+ * ResultSet getter implementation of a field manager, extracting field values from a ResultSet.
  */
 public class ResultSetGetter extends AbstractFieldManager
 {
-    private final RDBMSStoreManager storeMgr;
-    private final ObjectProvider op;
-    private final AbstractClassMetaData cmd;
-    private final ExecutionContext ec;
-    private final ResultSet resultSet;
-    private final StatementClassMapping resultMappings;
+    protected final ExecutionContext ec;
+    protected final ResultSet rs;
+    protected final StatementClassMapping resultMappings;
+
+    protected ObjectProvider op;
+    protected AbstractClassMetaData cmd;
 
     /**
      * Constructor where we know the object to put the field values in.
-     * @param storeMgr RDBMS StoreManager
      * @param op ObjectProvider where we are putting the results
      * @param rs the ResultSet
      * @param resultMappings Mappings for the results for this class
      */
-    public ResultSetGetter(RDBMSStoreManager storeMgr, ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
+    public ResultSetGetter(ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
     {
-        this.storeMgr = storeMgr;
-        this.op = op;
-        this.cmd = op.getClassMetaData();
         this.ec = op.getExecutionContext();
-        this.resultSet = rs;
+        this.rs = rs;
         this.resultMappings = resultMappings;
+
+        setObjectProvider(op);
     }
 
     /**
      * Constructor without the ObjectProvider, where we know the result set but don't have the object yet.
-     * @param storeMgr RDBMS StoreManager
      * @param ec Execution Context
      * @param rs the ResultSet
      * @param resultMappings Mappings for the results for this class
      * @param cmd Metadata for the class
      */
-    public ResultSetGetter(RDBMSStoreManager storeMgr, ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
+    public ResultSetGetter(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
     {
-        this.storeMgr = storeMgr;
+        this.ec = ec;
+        this.rs = rs;
+        this.resultMappings = resultMappings;
         this.op = null;
         this.cmd = cmd;
-        this.ec = ec;
-        this.resultSet = rs;
-        this.resultMappings = resultMappings;
+    }
+
+    public void setObjectProvider(ObjectProvider op)
+    {
+        this.op = op;
+        this.cmd = op.getClassMetaData();
     }
 
     public boolean fetchBooleanField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getBoolean(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getBoolean(ec, rs, mapIdx.getColumnPositions());
     }
 
     public char fetchCharField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getChar(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getChar(ec, rs, mapIdx.getColumnPositions());
     }
 
     public byte fetchByteField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getByte(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getByte(ec, rs, mapIdx.getColumnPositions());
     }
 
     public short fetchShortField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getShort(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getShort(ec, rs, mapIdx.getColumnPositions());
     }
 
     public int fetchIntField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getInt(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getInt(ec, rs, mapIdx.getColumnPositions());
     }
 
     public long fetchLongField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getLong(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getLong(ec, rs, mapIdx.getColumnPositions());
     }
 
     public float fetchFloatField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getFloat(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getFloat(ec, rs, mapIdx.getColumnPositions());
     }
 
     public double fetchDoubleField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getDouble(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getDouble(ec, rs, mapIdx.getColumnPositions());
     }
 
     public String fetchStringField(int fieldNumber)
     {
         StatementMappingIndex mapIdx = resultMappings.getMappingForMemberPosition(fieldNumber);
-        return mapIdx.getMapping().getString(ec, resultSet, mapIdx.getColumnPositions());
+        return mapIdx.getMapping().getString(ec, rs, mapIdx.getColumnPositions());
     }
 
     public Object fetchObjectField(int fieldNumber)
@@ -152,7 +152,7 @@ public class ResultSetGetter extends AbstractFieldManager
         Object value;
         if (mapping instanceof EmbeddedPCMapping || mapping instanceof SerialisedPCMapping || mapping instanceof SerialisedReferenceMapping)
         {
-            value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions(), op, fieldNumber);
+            value = mapping.getObject(ec, rs, mapIdx.getColumnPositions(), op, fieldNumber);
         }
         else
         {
@@ -163,14 +163,13 @@ public class ResultSetGetter extends AbstractFieldManager
                 {
                     Class type = ec.getClassLoaderResolver().classForName(mmd.getCollection().getElementType());
                     value = processSubObjectFields(mapping, type, relationMappings);
-                    
-                    TypeManager typeManager = ec.getTypeManager();
-                    ElementContainerHandler containerHandler = typeManager.getContainerHandler(mmd.getType());
+
+                    ElementContainerHandler containerHandler = ec.getTypeManager().getContainerHandler(mmd.getType());
                     value = containerHandler.newContainer(mmd, value);
                 }
                 else
                 {
-                    value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions());
+                    value = mapping.getObject(ec, rs, mapIdx.getColumnPositions());
                 }
             }
             else if (RelationType.isRelationSingleValued(relationType))
@@ -183,20 +182,20 @@ public class ResultSetGetter extends AbstractFieldManager
                 }
                 else
                 {
-                    value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions());
+                    value = mapping.getObject(ec, rs, mapIdx.getColumnPositions());
                 }
             }
             else
             {
-                value = mapping.getObject(ec, resultSet, mapIdx.getColumnPositions());
+                value = mapping.getObject(ec, rs, mapIdx.getColumnPositions());
             }
         }
 
-        // Return the field value (as a wrapper if wrappable)
         if (op != null)
         {
-            if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+            if (cmd.getSCOMutableMemberFlags()[fieldNumber])
             {
+                // Wrap any SCO mutable fields
                 return SCOUtils.wrapSCOField(op, fieldNumber, value, false);
             }
             else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
@@ -228,7 +227,7 @@ public class ResultSetGetter extends AbstractFieldManager
             }
         }
 
-        ResultObjectFactory relationROF = new PersistentClassROF(storeMgr, relatedCmd, relationMappings, false, ec.getFetchPlan(), fieldType);
-        return relationROF.getObject(ec, resultSet);
+        ResultObjectFactory relationROF = new PersistentClassROF(ec, rs, relationMappings, relatedCmd, false, ec.getFetchPlan(), fieldType);
+        return relationROF.getObject();
     }
 }

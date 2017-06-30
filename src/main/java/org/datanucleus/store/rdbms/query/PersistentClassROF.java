@@ -64,16 +64,17 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
  */
 public final class PersistentClassROF<T> implements ResultObjectFactory<T>
 {
-    protected final RDBMSStoreManager storeMgr;
+    protected final ExecutionContext ec;
+    protected final ResultSet rs;
 
     /** Metadata for the persistent class. */
-    protected final AbstractClassMetaData acmd;
+    protected final AbstractClassMetaData acmd; // TODO We work out the cmd for each row getObject, so is this needed?
 
     /** Persistent class that this factory will generate (may be the base class). */
     private Class<T> persistentClass;
 
-    /** Mapping for the statement to members of this class (and sub-objects). */
-    protected StatementClassMapping stmtMapping = null;
+    /** Mapping of the results to members of this class (and sub-objects). */
+    protected StatementClassMapping resultMapping = null;
 
     /** Fetch Plan to use when loading fields (if any). */
     protected final FetchPlan fetchPlan;
@@ -86,23 +87,25 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
 
     /**
      * Constructor.
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
+     * @param rs ResultSet being processed
+     * @param resultMapping Mapping information for the result set and how it maps to the class
      * @param acmd MetaData for the class (base class)
-     * @param mappingDefinition Mapping information for the result set and how it maps to the class
      * @param ignoreCache Whether to ignore the cache
-     * @param fetchPlan the Fetch Plan
+     * @param fetchPlan the Fetch Plan // TODO Do we need this?
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(RDBMSStoreManager storeMgr, AbstractClassMetaData acmd, StatementClassMapping mappingDefinition,
+    public PersistentClassROF(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMapping, AbstractClassMetaData acmd,
                            boolean ignoreCache, FetchPlan fetchPlan, Class<T> persistentClass)
     {
-        if (mappingDefinition == null)
+        if (resultMapping == null)
         {
             throw new NucleusException("Attempt to create PersistentClassROF with null mappingDefinition");
         }
 
-        this.storeMgr = storeMgr;
-        this.stmtMapping = mappingDefinition;
+        this.ec = ec;
+        this.rs = rs;
+        this.resultMapping = resultMapping;
         this.acmd = acmd;
         this.ignoreCache = ignoreCache;
         this.fetchPlan = fetchPlan;
@@ -110,17 +113,15 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
     }
 
     /**
-     * Method to convert the current ResultSet row into an Object.
-     * @param ec execution context
-     * @param rs The ResultSet from the Query.
-     * @return The (persisted) object.
+     * Method to convert the current ResultSet row into a persistable Object.
+     * @return The persistable object.
      */
-    public T getObject(final ExecutionContext ec, final ResultSet rs)
+    public T getObject()
     {
         // Find the class of the returned object in this row of the ResultSet
         String className = null;
         boolean requiresInheritanceCheck = true;
-        StatementMappingIndex discrimMapIdx = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
+        StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
         if (discrimMapIdx != null)
         {
             // Discriminator mapping registered so use that
@@ -143,12 +144,12 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 NucleusLogger.DATASTORE_RETRIEVE.debug("Exception obtaining value of discriminator : " + sqle.getMessage());
             }
         }
-        else if (stmtMapping.getNucleusTypeColumnName() != null)
+        else if (resultMapping.getNucleusTypeColumnName() != null)
         {
             // Extract the object type using the NucleusType column (if available)
             try
             {
-                className = rs.getString(stmtMapping.getNucleusTypeColumnName());
+                className = rs.getString(resultMapping.getNucleusTypeColumnName());
                 if (className == null)
                 {
                     // Discriminator has no value so return null object
@@ -251,26 +252,26 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             return null;
         }
 
-        int[] fieldNumbers = stmtMapping.getMemberNumbers();
+        int[] fieldNumbers = resultMapping.getMemberNumbers();
         StatementClassMapping mappingDefinition;
         int[] mappedFieldNumbers;
         if (acmd instanceof InterfaceMetaData)
         {
             // Persistent-interface : create new mapping definition for a result type of the implementation
             mappingDefinition = new StatementClassMapping();
-            mappingDefinition.setNucleusTypeColumnName(stmtMapping.getNucleusTypeColumnName());
+            mappingDefinition.setNucleusTypeColumnName(resultMapping.getNucleusTypeColumnName());
             mappedFieldNumbers = new int[fieldNumbers.length];
             for (int i = 0; i < fieldNumbers.length; i++)
             {
                 AbstractMemberMetaData mmd = acmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
                 mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
-                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], stmtMapping.getMappingForMemberPosition(fieldNumbers[i]));
+                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], resultMapping.getMappingForMemberPosition(fieldNumbers[i]));
             }
         }
         else
         {
             // Persistent class
-            mappingDefinition = stmtMapping;
+            mappingDefinition = resultMapping;
             mappedFieldNumbers = fieldNumbers;
         }
 
@@ -282,12 +283,12 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         {
             if (vermd.getFieldName() == null)
             {
-                versionMapping = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
+                versionMapping = resultMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
             }
             else
             {
                 AbstractMemberMetaData vermmd = cmd.getMetaDataForMember(vermd.getFieldName());
-                versionMapping = stmtMapping.getMappingForMemberPosition(vermmd.getAbsoluteFieldNumber());
+                versionMapping = resultMapping.getMappingForMemberPosition(vermmd.getAbsoluteFieldNumber());
             }
         }
         if (versionMapping != null)
@@ -355,7 +356,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                     NucleusLogger.DATASTORE_RETRIEVE.warn(warnMsg);
                 }
 
-                Object id = getIdentityForResultSetRow(storeMgr, rs, mappingDefinition, ec, cmd, pcClassForObject, requiresInheritanceCheck);
+                Object id = getIdentityForResultSetRow(rs, mappingDefinition, ec, cmd, pcClassForObject, requiresInheritanceCheck);
                 String idClassName = IdentityUtils.getTargetClassNameForIdentity(id);
                 if (idClassName != null)
                 {
@@ -369,7 +370,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Generate the "id" for this object (of type pcClassForObject), and find the object for that
-            StatementMappingIndex datastoreIdMapping = stmtMapping.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
+            StatementMappingIndex datastoreIdMapping = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
             JavaTypeMapping mapping = datastoreIdMapping.getMapping();
             Object id = mapping.getObject(ec, rs, datastoreIdMapping.getColumnPositions());
             if (id != null)
@@ -430,7 +431,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                 {
                     // Version stored in a normal field
                     int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
-                    if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
+                    if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         ObjectProvider objOP = ec.findObjectProvider(obj);
                         Object verFieldValue = objOP.provideField(versionFieldNumber);
@@ -465,7 +466,8 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         {
             public void fetchFields(ObjectProvider op)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                // TODO This creates a ResultSetGetter for each row; optimise this!
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
                 op.replaceFields(fieldNumbers, fm, false);
 
                 // Set version
@@ -479,7 +481,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
                     // Version stored in a normal field
                     VersionMetaData vermd = cmd.getVersionMetaData();
                     int versionFieldNumber = acmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
-                    if (stmtMapping.getMappingForMemberPosition(versionFieldNumber) != null)
+                    if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
                         Object verFieldValue = op.provideField(versionFieldNumber);
                         if (verFieldValue != null)
@@ -491,7 +493,8 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
             }
             public void fetchNonLoadedFields(ObjectProvider op)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
+                // TODO This creates a ResultSetGetter for each row; optimise this!
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(op, resultSet, mappingDefinition);
                 op.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()
@@ -503,7 +506,6 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
 
     /**
      * Method to return the object identity for a row of the result set.
-     * @param storeMgr RDBMS StoreManager
      * @param resultSet Result set
      * @param mappingDefinition Mapping definition for the candidate class
      * @param ec Execution Context
@@ -512,7 +514,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
      * @param inheritanceCheck Whether need an inheritance check (may be for a subclass)
      * @return The identity (if found) or null (if either not sure of inheritance, or not known).
      */
-    public static Object getIdentityForResultSetRow(RDBMSStoreManager storeMgr, final ResultSet resultSet, final StatementClassMapping mappingDefinition,
+    public static Object getIdentityForResultSetRow(final ResultSet resultSet, final StatementClassMapping mappingDefinition,
             ExecutionContext ec, AbstractClassMetaData cmd, Class pcClass, boolean inheritanceCheck)
     {
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -521,7 +523,7 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
         }
         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
-            FieldManager resultsFM = new ResultSetGetter(storeMgr, ec, resultSet, mappingDefinition, cmd);
+            FieldManager resultsFM = new ResultSetGetter(ec, resultSet, mappingDefinition, cmd);
             return IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, pcClass, inheritanceCheck, resultsFM);
         }
         return null;

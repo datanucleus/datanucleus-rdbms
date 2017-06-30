@@ -516,12 +516,12 @@ public class RDBMSQueryUtils extends QueryUtils
      * Utility to take a ResultSet and return a ResultObjectFactory for extracting the results,
      * assuming that no candidate class is supplied. The QueryResult will return either a
      * result class type, or Object/Object[] depending on whether a ResultClass has been defined.
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
      * @param rs The ResultSet
      * @param resultClass Result class if required (or null)
      * @return The query ResultObjectFactory
      */
-    public static ResultObjectFactory getResultObjectFactoryForNoCandidateClass(RDBMSStoreManager storeMgr, ResultSet rs, Class resultClass)
+    public static ResultObjectFactory getResultObjectFactoryForNoCandidateClass(ExecutionContext ec, ResultSet rs, Class resultClass)
     {
         // No candidate class, so use resultClass or Object/Object[]
         Class requiredResultClass = resultClass;
@@ -558,6 +558,6 @@ public class RDBMSQueryUtils extends QueryUtils
             // Do nothing
         }
 
-        return new ResultClassROF(storeMgr, requiredResultClass, resultFieldNames);
+        return new ResultClassROF(ec, rs, requiredResultClass, resultFieldNames);
     }
 }

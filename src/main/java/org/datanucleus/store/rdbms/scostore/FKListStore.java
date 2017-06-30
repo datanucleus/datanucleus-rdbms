@@ -1132,7 +1132,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                             throw new NucleusException("Cannot have FK set with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(storeMgr, elementCmd, resultMapping, false, null, clr.classForName(elementType));
+                        rof = new PersistentClassROF(ec, rs, resultMapping, elementCmd, false, null, clr.classForName(elementType));
                         return new ListStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

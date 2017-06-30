@@ -32,7 +32,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.state.ObjectProvider;
@@ -70,7 +69,6 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @param rof The factory to retrieve results from
      * @param rs The ResultSet from the Query Statement
      * @param candidates Candidate elements
-     * @throws SQLException if can't read ResultSet
      */
     public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, Collection candidates)
     {
@@ -179,8 +177,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
         }
 
         // Convert this row into its associated object and save it
-        ExecutionContext ec = query.getExecutionContext();
-        E nextElement = rof.getObject(ec, rs);
+        E nextElement = rof.getObject();
         JDBCUtils.logWarnings(rs);
         resultObjs.add(nextElement);
         if (resultIds != null)
@@ -194,7 +191,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
             Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(nextElement));
             if (memberValues != null)
             {
-                ObjectProvider op = ec.findObjectProvider(nextElement);
+                ObjectProvider op = query.getExecutionContext().findObjectProvider(nextElement);
                 Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                 while (memberValIter.hasNext())
                 {

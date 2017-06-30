@@ -640,14 +640,14 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = new PersistentClassROF(storeMgr, acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
                             List candidates = new ArrayList();
                             while (rs.next())
                             {
-                                candidates.add(rof.getObject(ec, rs));
+                                candidates.add(rof.getObject());
                             }
 
                             // Perform in-memory filter/result/order etc
@@ -660,16 +660,16 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             if (result != null)
                             {
                                 // Each result row is of a result type
-                                rof = new ResultClassROF(storeMgr, resultClass, datastoreCompilation.getResultDefinition());
+                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinition());
                             }
                             else if (resultClass != null && resultClass != candidateClass)
                             {
-                                rof = new ResultClassROF(storeMgr, resultClass, datastoreCompilation.getResultDefinitionForClass());
+                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinitionForClass());
                             }
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = new PersistentClassROF(storeMgr, acmd, datastoreCompilation.getResultDefinitionForClass(), ignoreCache, getFetchPlan(), candidateClass);
+                                rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
                             }
 
                             // Create the required type of QueryResult

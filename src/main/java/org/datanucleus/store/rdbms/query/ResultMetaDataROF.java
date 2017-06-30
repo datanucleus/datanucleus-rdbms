@@ -86,33 +86,34 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class ResultMetaDataROF implements ResultObjectFactory
 {
-    RDBMSStoreManager storeMgr;
+    protected ExecutionContext ec;
+    protected ResultSet rs;
 
     /** MetaData defining the result from the Query. */
     QueryResultMetaData queryResultMetaData = null;
 
     String[] columnNames = null;
 
-    private boolean ignoreCache = false;
+    protected boolean ignoreCache = false;
 
     /**
      * Constructor.
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
+     * @param rs ResultSet
      * @param qrmd MetaData defining the results from the query.
      */
-    public ResultMetaDataROF(RDBMSStoreManager storeMgr, QueryResultMetaData qrmd)
+    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, QueryResultMetaData qrmd)
     {
-        this.storeMgr = storeMgr;
+        this.ec = ec;
+        this.rs = rs;
         this.queryResultMetaData = qrmd;
     }
 
     /**
-     * Accessor for the object(s) from a row of the ResultSet.
-     * @param ec execution context
-     * @param rs ResultSet
+     * Accessor for the object(s) from the current row of the ResultSet.
      * @return The object(s) for this row of the ResultSet.
      */
-    public Object getObject(ExecutionContext ec, ResultSet rs)
+    public Object getObject()
     {
         List returnObjects = new ArrayList();
         if (columnNames == null)
@@ -146,7 +147,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 Set<String> columnsInThisType = new HashSet<>();
                 AbstractMemberMetaData[] mmds = new AbstractMemberMetaData[columnNames.length];
                 Map<String, AbstractMemberMetaData> fieldColumns = new HashMap<>();
-                DatastoreClass dc = storeMgr.getDatastoreClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
+                DatastoreClass dc = ((RDBMSStoreManager)ec.getStoreManager()).getDatastoreClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(persistentTypes[i].getClassName(), ec.getClassLoaderResolver());
                 Object id = null;
 
@@ -247,11 +248,11 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 Class type = ec.getClassLoaderResolver().classForName(persistentTypes[i].getClassName());
                 if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    obj = getObjectForApplicationId(ec, rs, resultFieldNumbers, acmd, type, false, stmtMappings);
+                    obj = getObjectForApplicationId(rs, resultFieldNumbers, acmd, type, false, stmtMappings);
                 }
                 else if (acmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    obj = getObjectForDatastoreId(ec, rs, resultFieldNumbers, acmd, id, type, stmtMappings);
+                    obj = getObjectForDatastoreId(rs, resultFieldNumbers, acmd, id, type, stmtMappings);
                 }
                 returnObjects.add(obj);
             }
@@ -358,7 +359,6 @@ public class ResultMetaDataROF implements ResultObjectFactory
 
     /**
      * Returns a PC instance from a ResultSet row with an application identity.
-     * @param ec execution context
      * @param rs The ResultSet
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
@@ -367,7 +367,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param stmtMappings mappings for the results in the statement
      * @return The object with this application identity
      */
-    private Object getObjectForApplicationId(final ExecutionContext ec, final ResultSet rs, final int[] fieldNumbers, 
+    private Object getObjectForApplicationId(final ResultSet rs, final int[] fieldNumbers, 
             AbstractClassMetaData cmd, Class pcClass, boolean requiresInheritanceCheck, 
             StatementMappingIndex[] stmtMappings)
     {
@@ -378,18 +378,18 @@ public class ResultMetaDataROF implements ResultObjectFactory
         }
 
         Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, requiresInheritanceCheck, 
-            storeMgr.getFieldManagerForResultProcessing(ec, rs, resultMappings, cmd));
+            ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(ec, rs, resultMappings, cmd));
 
         return ec.findObject(id, new FieldValues()
         {
             public void fetchFields(ObjectProvider sm)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, rs, resultMappings);
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
                 sm.replaceFields(fieldNumbers, fm, false);
             }
             public void fetchNonLoadedFields(ObjectProvider sm)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, rs, resultMappings);
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
                 sm.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()
@@ -401,7 +401,6 @@ public class ResultMetaDataROF implements ResultObjectFactory
 
     /**
      * Returns a PC instance from a ResultSet row with a datastore identity.
-     * @param ec execution context
      * @param rs The ResultSet
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
@@ -410,7 +409,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param stmtMappings mappings for the results in the statement
      * @return The Object
      */
-    private Object getObjectForDatastoreId(final ExecutionContext ec, final ResultSet rs, final int[] fieldNumbers,
+    private Object getObjectForDatastoreId(final ResultSet rs, final int[] fieldNumbers,
             AbstractClassMetaData cmd, Object oid, Class pcClass, StatementMappingIndex[] stmtMappings)
     {
         final StatementClassMapping resultMappings = new StatementClassMapping();
@@ -423,12 +422,12 @@ public class ResultMetaDataROF implements ResultObjectFactory
         {
             public void fetchFields(ObjectProvider sm)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, rs, resultMappings);
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
                 sm.replaceFields(fieldNumbers, fm, false);
             }
             public void fetchNonLoadedFields(ObjectProvider sm)
             {
-                FieldManager fm = storeMgr.getFieldManagerForResultProcessing(sm, rs, resultMappings);
+                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
                 sm.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()

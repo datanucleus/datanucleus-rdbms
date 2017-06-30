@@ -96,7 +96,7 @@ public class ArrayStoreIterator implements Iterator
                 else if (rof != null)
                 {
                     // Element = PC
-                    nextElement = rof.getObject(ec, rs);
+                    nextElement = rof.getObject();
                 }
                 else
                 {

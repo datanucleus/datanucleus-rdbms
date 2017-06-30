@@ -30,7 +30,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.query.AbstractQueryResult;
 import org.datanucleus.store.query.Query;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
@@ -149,12 +148,12 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 {
                     String elementType = mmd.hasCollection() ? 
                             backingStore.getOwnerMemberMetaData().getCollection().getElementType() : backingStore.getOwnerMemberMetaData().getArray().getElementType();
-                    ResultObjectFactory<E> scoROF = new PersistentClassROF((RDBMSStoreManager)query.getStoreManager(), backingStore.getElementClassMetaData(),
-                        iterStmt.getStatementClassMapping(), false, null, ec.getClassLoaderResolver().classForName(elementType));
+                    ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, iterStmt.getStatementClassMapping(),
+                        backingStore.getElementClassMetaData(), false, null, ec.getClassLoaderResolver().classForName(elementType));
                     while (rs.next())
                     {
                         Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
-                        Object element = scoROF.getObject(ec, rs);
+                        Object element = scoROF.getObject();
                         addOwnerMemberValue(mmd, owner, element);
                     }
                 }

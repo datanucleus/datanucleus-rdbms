@@ -32,7 +32,6 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.query.QueryUtils;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -61,7 +60,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class ResultClassROF implements ResultObjectFactory
 {
-    private final RDBMSStoreManager storeMgr;
+    protected final ExecutionContext ec;
+
+    protected final ResultSet rs;
 
     /** The result class that we should create for each row of results. */
     private final Class resultClass;
@@ -82,13 +83,15 @@ public class ResultClassROF implements ResultObjectFactory
 
     /**
      * Constructor for a resultClass object factory where we have a result clause specified.
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
+     * @param rs ResultSet being processed
      * @param cls The result class to use (if any)
      * @param resultDefinition The mapping information for the result expressions
      */
-    public ResultClassROF(RDBMSStoreManager storeMgr, Class cls, StatementResultMapping resultDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementResultMapping resultDefinition)
     {
-        this.storeMgr = storeMgr;
+        this.ec = ec;
+        this.rs = rs;
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -153,13 +156,15 @@ public class ResultClassROF implements ResultObjectFactory
     /**
      * Constructor for a resultClass object factory where we have no result clause specified but a result class.
      * In this case the result will match the candidate class, but may not be the actual candidate class (e.g Object[])
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
+     * @param rs ResultSet being processed
      * @param cls The result class to use
      * @param classDefinition The mapping information for the (candidate) class
      */
-    public ResultClassROF(RDBMSStoreManager storeMgr, Class cls, StatementClassMapping classDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition)
     {
-        this.storeMgr = storeMgr;
+        this.ec = ec;
+        this.rs = rs;
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -192,13 +197,15 @@ public class ResultClassROF implements ResultObjectFactory
      * Constructor for cases where we have no candidate class and so have no mapping information
      * to base field positions on. The fields will be retrieved in the ResultSet order.
      * Used for SQL queries.
-     * @param storeMgr RDBMS StoreManager
+     * @param ec ExecutionContext
+     * @param rs ResultSet being processed
      * @param cls The result class to use
      * @param resultFieldNames Names for the result fields
      */
-    public ResultClassROF(RDBMSStoreManager storeMgr, Class cls, String[] resultFieldNames)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames)
     {
-        this.storeMgr = storeMgr;
+        this.ec = ec;
+        this.rs = rs;
 
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
@@ -238,14 +245,12 @@ public class ResultClassROF implements ResultObjectFactory
     }
 
     /**
-     * Method to convert the ResultSet row into an Object of the ResultClass type. We have a special
-     * handling for "result" expressions when they include literals or "new Object()" expression due to
+     * Method to convert the ResultSet row into an Object of the ResultClass type. 
+     * We have a special handling for "result" expressions when they include literals or "new Object()" expression due to
      * the fact that complex literals and "new Object()" cannot be added to the SQL queries.
-     * @param ec execution context
-     * @param rs The ResultSet from the Query.
      * @return The ResultClass object.
      */
-    public Object getObject(final ExecutionContext ec, final ResultSet rs)
+    public Object getObject()
     {
         // Retrieve the field values from the ResultSet
         Object[] fieldValues = null;
@@ -270,8 +275,8 @@ public class ResultClassROF implements ResultObjectFactory
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(storeMgr, acmd, classMap, false, ec.getFetchPlan(), cls);
-                    fieldValues[i] = rof.getObject(ec, rs);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, false, ec.getFetchPlan(), cls);
+                    fieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)
                     {
@@ -500,7 +505,7 @@ public class ResultClassROF implements ResultObjectFactory
         {
             Field field = declaredFields[i];
             if (!field.isSynthetic() && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null && 
-                !field.getName().startsWith(storeMgr.getMetaDataManager().getEnhancedMethodNamePrefix()))
+                !field.getName().startsWith(ec.getMetaDataManager().getEnhancedMethodNamePrefix()))
             {
                 throw new NucleusUserException(Localiser.msg("021210", field.getName()));
             }

@@ -17,18 +17,14 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
-import java.sql.ResultSet;
-
-import org.datanucleus.ExecutionContext;
 import org.datanucleus.store.query.QueryResult;
 
 /**
  * An object that reads result set rows and returns corresponding object(s) from them.
- * Different queries accomplish this in different ways so a query supplies a suitable ResultObjectFactory 
- * to each QueryResult when it is executed. The QueryResult only uses it to turn ResultSet rows into objects
- * and otherwise manages the ResultSet itself.
+ * Different queries accomplish this in different ways so a query supplies a suitable ResultObjectFactory to each QueryResult when it is executed. 
+ * The QueryResult only uses it to turn ResultSet rows into objects and otherwise manages the ResultSet itself.
  * <p>
- * For example an implementation of this interface could return a single Persistent object per row (PersistentIDROF).
+ * For example an implementation of this interface could return a single Persistent object per row (PersistentClassROF).
  * Another implementation could return all columns of the result set as separate objects.
  * </p>
  * @see QueryResult
@@ -38,9 +34,7 @@ public interface ResultObjectFactory<T>
 {
     /**
      * Instantiates object(s) from the current row of the given result set.
-     * @param ec ExecutionContext
-     * @param rs The result set which will be used to convert the current row into the returned object(s).
      * @return The object(s) for this row of the ResultSet.
      */
-    T getObject(ExecutionContext ec, ResultSet rs);
+    T getObject();
 }

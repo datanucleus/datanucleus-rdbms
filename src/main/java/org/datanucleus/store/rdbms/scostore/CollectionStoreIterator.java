@@ -47,7 +47,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
     private E lastElement = null;
 
     CollectionStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
-        throws MappedDatastoreException
+    throws MappedDatastoreException
     {
         this.op = op;
         this.ec = op.getExecutionContext();
@@ -97,7 +97,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
                 else
                 {
                     // Element = PC
-                    nextElement = rof.getObject(ec, rs);
+                    nextElement = rof.getObject();
                 }
 
                 results.add(nextElement);
