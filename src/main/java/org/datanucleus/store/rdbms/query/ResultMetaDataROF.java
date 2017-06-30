@@ -109,6 +109,15 @@ public class ResultMetaDataROF implements ResultObjectFactory
         this.queryResultMetaData = qrmd;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.query.ResultObjectFactory#getResultSet()
+     */
+    @Override
+    public ResultSet getResultSet()
+    {
+        return rs;
+    }
+
     /**
      * Accessor for the object(s) from the current row of the ResultSet.
      * @return The object(s) for this row of the ResultSet.

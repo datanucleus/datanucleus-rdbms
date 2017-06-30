@@ -149,7 +149,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                     String elementType = mmd.hasCollection() ? 
                             backingStore.getOwnerMemberMetaData().getCollection().getElementType() : backingStore.getOwnerMemberMetaData().getArray().getElementType();
                     ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, iterStmt.getStatementClassMapping(),
-                        backingStore.getElementClassMetaData(), false, null, ec.getClassLoaderResolver().classForName(elementType));
+                        backingStore.getElementClassMetaData(), false, ec.getClassLoaderResolver().classForName(elementType));
                     while (rs.next())
                     {
                         Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());

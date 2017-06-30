@@ -571,7 +571,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                         if (evaluateInMemory())
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -600,7 +600,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
+                                rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, candidateClass);
                             }
 
                             // Create the required type of QueryResult

@@ -1006,8 +1006,8 @@ public final class SQLQuery extends Query
     }
 
     /**
-     * Method to generate a ResultObjectFactory for converting rows of the provided ResultSet into
-     * instances of the candidate class. Populates stmtMappings.
+     * Method to generate a ResultObjectFactory for converting rows of the provided ResultSet into instances of the candidate class. 
+     * Populates "stmtMappings".
      * @param rs The ResultSet
      * @return The ResultObjectFactory
      * @throws SQLException Thrown if an error occurs processing the ResultSet
@@ -1220,7 +1220,7 @@ public final class SQLQuery extends Query
             mappingDefinition.addMappingForMember(SurrogateColumnType.VERSION.getFieldNumber(), versionMappingIdx);
         }
 
-        return new PersistentClassROF(ec, rs, mappingDefinition, candidateCmd, ignoreCache, getFetchPlan(), getCandidateClass());
+        return new PersistentClassROF(ec, rs, mappingDefinition, candidateCmd, ignoreCache, getCandidateClass());
     }
 
     /**

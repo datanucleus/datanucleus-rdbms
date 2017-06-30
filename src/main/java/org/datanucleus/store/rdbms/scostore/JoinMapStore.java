@@ -749,7 +749,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, getMappingDef, valueCmd, false, null, clr.classForName(valueType));
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, getMappingDef, valueCmd, false, clr.classForName(valueType));
                             value = rof.getObject();
                         }
 

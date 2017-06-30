@@ -640,7 +640,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                         if (inMemory)
                         {
                             // IN-MEMORY EVALUATION
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, candidateClass);
 
                             // Just instantiate the candidates for later in-memory processing
                             // TODO Use a queryResult rather than an ArrayList so we load when required
@@ -669,7 +669,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             else
                             {
                                 // Each result row is a candidate object
-                                rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, getFetchPlan(), candidateClass);
+                                rof = new PersistentClassROF(ec, rs, datastoreCompilation.getResultDefinitionForClass(), acmd, ignoreCache, candidateClass);
                             }
 
                             // Create the required type of QueryResult

@@ -38,18 +38,17 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Take a ResultSet, and for each row retrieves an object of a specified type.
+ * Take a ResultSet, and for each row retrieves an object of a specified result class type.
  * Follows the rules in the JDO spec [14.6.12] regarding the result class.
  * <P>
  * The <B>resultClass</B> will be used to create objects of that type when calling
  * <I>getObject()</I>. The <B>resultClass</B> can be one of the following
  * <UL>
- * <LI>Simple type - String, Long, Integer, Float, Boolean, Byte, Character, Double, Short, BigDecimal, BigInteger, java.util.Date, 
- * java.sql.Date, java.sql.Time, java.sql.Timestamp</LI>
+ * <LI>Simple type - String, Long, Integer, Float, Boolean, Byte, Character, Double, Short, BigDecimal, BigInteger, java.util.Date, java.sql.Date, java.sql.Time, java.sql.Timestamp</LI>
  * <LI>java.util.Map - DataNucleus will choose the concrete impl of java.util.Map to use</LI>
  * <LI>Object[]</LI>
- * <LI>User defined type with either a constructor taking the result set fields, or a default constructor and setting the fields using a 
- * put(Object,Object) method, setXXX methods, or public fields</LI>
+ * <LI>User defined type with either a constructor taking the result set fields, or a default constructor 
+ * and setting the fields using a put(Object,Object) method, setXXX methods, or public fields</LI>
  * </UL>
  *
  * <P>
@@ -244,6 +243,15 @@ public class ResultClassROF implements ResultObjectFactory
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.query.ResultObjectFactory#getResultSet()
+     */
+    @Override
+    public ResultSet getResultSet()
+    {
+        return rs;
+    }
+
     /**
      * Method to convert the ResultSet row into an Object of the ResultClass type. 
      * We have a special handling for "result" expressions when they include literals or "new Object()" expression due to
@@ -275,7 +283,7 @@ public class ResultClassROF implements ResultObjectFactory
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, false, ec.getFetchPlan(), cls);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, false, cls);
                     fieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)

@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
-import org.datanucleus.store.query.QueryResult;
+import java.sql.ResultSet;
 
 /**
  * An object that reads result set rows and returns corresponding object(s) from them.
@@ -27,11 +27,13 @@ import org.datanucleus.store.query.QueryResult;
  * For example an implementation of this interface could return a single Persistent object per row (PersistentClassROF).
  * Another implementation could return all columns of the result set as separate objects.
  * </p>
- * @see QueryResult
  * @param <T> Type of the returned object
  */
 public interface ResultObjectFactory<T>
 {
+    /** Accessor for the JDBC ResultSet being processed. */
+    ResultSet getResultSet();
+
     /**
      * Instantiates object(s) from the current row of the given result set.
      * @return The object(s) for this row of the ResultSet.
