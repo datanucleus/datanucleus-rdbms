@@ -48,6 +48,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -87,6 +88,7 @@ import org.datanucleus.util.TypeConversionHelper;
 public class ResultMetaDataROF implements ResultObjectFactory
 {
     protected ExecutionContext ec;
+
     protected ResultSet rs;
 
     /** MetaData defining the result from the Query. */
@@ -257,11 +259,11 @@ public class ResultMetaDataROF implements ResultObjectFactory
                 Class type = ec.getClassLoaderResolver().classForName(persistentTypes[i].getClassName());
                 if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    obj = getObjectForApplicationId(rs, resultFieldNumbers, acmd, type, false, stmtMappings);
+                    obj = getObjectForApplicationId(resultFieldNumbers, acmd, type, false, stmtMappings);
                 }
                 else if (acmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    obj = getObjectForDatastoreId(rs, resultFieldNumbers, acmd, id, type, stmtMappings);
+                    obj = getObjectForDatastoreId(resultFieldNumbers, acmd, id, type, stmtMappings);
                 }
                 returnObjects.add(obj);
             }
@@ -368,7 +370,6 @@ public class ResultMetaDataROF implements ResultObjectFactory
 
     /**
      * Returns a PC instance from a ResultSet row with an application identity.
-     * @param rs The ResultSet
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
      * @param pcClass persistable class
@@ -376,9 +377,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param stmtMappings mappings for the results in the statement
      * @return The object with this application identity
      */
-    private Object getObjectForApplicationId(final ResultSet rs, final int[] fieldNumbers, 
-            AbstractClassMetaData cmd, Class pcClass, boolean requiresInheritanceCheck, 
-            StatementMappingIndex[] stmtMappings)
+    private Object getObjectForApplicationId(final int[] fieldNumbers, AbstractClassMetaData cmd, Class pcClass, boolean requiresInheritanceCheck, StatementMappingIndex[] stmtMappings)
     {
         final StatementClassMapping resultMappings = new StatementClassMapping();
         for (int i=0;i<fieldNumbers.length;i++)
@@ -386,20 +385,21 @@ public class ResultMetaDataROF implements ResultObjectFactory
             resultMappings.addMappingForMember(fieldNumbers[i], stmtMappings[fieldNumbers[i]]);
         }
 
-        Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, requiresInheritanceCheck, 
-            ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(ec, rs, resultMappings, cmd));
+        // TODO This creates a new ResultSetGetter per row. See below also
+        Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, requiresInheritanceCheck, new ResultSetGetter(ec, rs, resultMappings, cmd));
 
         return ec.findObject(id, new FieldValues()
         {
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(ObjectProvider op)
             {
-                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
-                sm.replaceFields(fieldNumbers, fm, false);
+                // TODO This creates 2 ResultSetGetter per row!!
+                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
+                op.replaceFields(fieldNumbers, fm, false);
             }
-            public void fetchNonLoadedFields(ObjectProvider sm)
+            public void fetchNonLoadedFields(ObjectProvider op)
             {
-                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
-                sm.replaceNonLoadedFields(fieldNumbers, fm);
+                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
+                op.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()
             {
@@ -410,7 +410,6 @@ public class ResultMetaDataROF implements ResultObjectFactory
 
     /**
      * Returns a PC instance from a ResultSet row with a datastore identity.
-     * @param rs The ResultSet
      * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
      * @param cmd MetaData for the class
      * @param oid The object id
@@ -418,8 +417,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param stmtMappings mappings for the results in the statement
      * @return The Object
      */
-    private Object getObjectForDatastoreId(final ResultSet rs, final int[] fieldNumbers,
-            AbstractClassMetaData cmd, Object oid, Class pcClass, StatementMappingIndex[] stmtMappings)
+    private Object getObjectForDatastoreId(final int[] fieldNumbers, AbstractClassMetaData cmd, Object oid, Class pcClass, StatementMappingIndex[] stmtMappings)
     {
         final StatementClassMapping resultMappings = new StatementClassMapping();
         for (int i=0;i<fieldNumbers.length;i++)
@@ -429,15 +427,16 @@ public class ResultMetaDataROF implements ResultObjectFactory
 
         return ec.findObject(oid, new FieldValues()
         {
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(ObjectProvider op)
             {
-                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
-                sm.replaceFields(fieldNumbers, fm, false);
+                // TODO This creates 2 ResultSetGetter per row!!
+                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
+                op.replaceFields(fieldNumbers, fm, false);
             }
-            public void fetchNonLoadedFields(ObjectProvider sm)
+            public void fetchNonLoadedFields(ObjectProvider op)
             {
-                FieldManager fm = ((RDBMSStoreManager)ec.getStoreManager()).getFieldManagerForResultProcessing(sm, rs, resultMappings);
-                sm.replaceNonLoadedFields(fieldNumbers, fm);
+                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
+                op.replaceNonLoadedFields(fieldNumbers, fm);
             }
             public FetchPlan getFetchPlanForLoading()
             {

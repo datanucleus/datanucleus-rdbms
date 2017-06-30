@@ -33,6 +33,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
+import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
@@ -168,7 +169,7 @@ public class MappingHelper
         }
         // TODO Use any other (non-PK) param values
 
-        final FieldManager resultsFM = mapping.getStoreManager().getFieldManagerForResultProcessing(ec, rs, resultMappings, cmd);
+        final FieldManager resultsFM = new ResultSetGetter(ec, rs, resultMappings, cmd);
         Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, false, resultsFM);
         Class type = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         return ec.findObject(id, new FieldValues()

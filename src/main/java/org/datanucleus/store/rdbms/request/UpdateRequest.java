@@ -49,6 +49,7 @@ import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.fieldmanager.OldValueParameterSetter;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -347,7 +348,7 @@ public class UpdateRequest extends Request
                                     mappingDefinition.addMappingForMember(i, idxs[i]);
                                 }
                             }
-                            op.provideFields(updateFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                            op.provideFields(updateFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
                         }
 
                         if (versionMetaData != null && versionMetaData.getFieldName() == null)
@@ -390,7 +391,7 @@ public class UpdateRequest extends Request
                             }
                             else
                             {
-                                fm = storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition);
+                                fm = new ParameterSetter(op, ps, mappingDefinition);
                             }
                             op.provideFields(whereFieldNumbers, fm);
                         }

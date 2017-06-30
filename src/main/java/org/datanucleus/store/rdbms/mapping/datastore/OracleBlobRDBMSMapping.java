@@ -50,6 +50,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.OracleAdapter;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -298,7 +299,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
      * SELECT {blobColumn} FROM TABLE WHERE ID=? FOR UPDATE
      * </pre>
      * and then updates the Blob value returned.
-     * @param sm ObjectProvider of the object
+     * @param op ObjectProvider of the object
      * @param table Table storing the BLOB column
      * @param mapping Datastore mapping for the BLOB column
      * @param bytes The bytes to store in the BLOB
@@ -306,10 +307,9 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
      * @throws NucleusDataStoreException thrown if an error occurs in datastore communication
      */
     @SuppressWarnings("deprecation")
-    public static void updateBlobColumn(ObjectProvider sm, Table table,
-            DatastoreMapping mapping, byte[] bytes)
+    public static void updateBlobColumn(ObjectProvider op, Table table, DatastoreMapping mapping, byte[] bytes)
     {
-        ExecutionContext ec = sm.getExecutionContext();
+        ExecutionContext ec = op.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
         DatastoreClass classTable = (DatastoreClass)table; // Don't support join tables yet
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -321,14 +321,13 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
         SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
         sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
         StatementClassMapping mappingDefinition = new StatementClassMapping();
-        AbstractClassMetaData cmd = sm.getClassMetaData();
+        AbstractClassMetaData cmd = op.getClassMetaData();
         int inputParamNum = 1;
         if (cmd.getIdentityType() == IdentityType.DATASTORE)
         {
             // Datastore identity value for input
             JavaTypeMapping datastoreIdMapping = classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
-            SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
-                datastoreIdMapping);
+            SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
             sqlStmt.whereAnd(expr.eq(val), true);
 
@@ -348,8 +347,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
             {
                 AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
                 JavaTypeMapping pkMapping = classTable.getMemberMapping(mmd);
-                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(),
-                    pkMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), pkMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, pkMapping, null, "PK" + i);
                 sqlStmt.whereAnd(expr.eq(val), true);
 
@@ -370,15 +368,15 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
 
         String textStmt = sqlStmt.getSQLText().toSQL();
 
-        if (sm.isEmbedded())
+        if (op.isEmbedded())
         {
             // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-            ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(sm);
+            ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(op);
             if (embeddedOwners != null)
             {
                 // Just use the first owner
                 // TODO Should check if the owner is stored in this table
-                sm = embeddedOwners[0];
+                op = embeddedOwners[0];
             }
         }
 
@@ -399,13 +397,12 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
                         for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                         {
                             classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
-                                datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
+                                datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
                         }
                     }
                     else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        sm.provideFields(cmd.getPKMemberPositions(),
-                            storeMgr.getFieldManagerForStatementGeneration(sm, ps, mappingDefinition));
+                        op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
                     }
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);
@@ -414,7 +411,7 @@ public class OracleBlobRDBMSMapping extends AbstractDatastoreMapping
                     {
                         if (!rs.next())
                         {
-                            throw new NucleusObjectNotFoundException("No such database row", sm.getInternalObjectId());
+                            throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
                         }
 
                         DatastoreAdapter dba = storeMgr.getDatastoreAdapter();

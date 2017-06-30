@@ -46,6 +46,8 @@ import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -355,7 +357,7 @@ public class FetchRequest extends Request
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDef));
+                            op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDef));
                         }
 
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
@@ -396,7 +398,7 @@ public class FetchRequest extends Request
                             }
 
                             // Copy the results into the object
-                            op.replaceFields(memberNumbersToFetch, storeMgr.getFieldManagerForResultProcessing(op, rs, mappingDef));
+                            op.replaceFields(memberNumbersToFetch, new ResultSetGetter(op, rs, mappingDef));
 
                             if (op.getTransactionalVersion() == null)
                             {

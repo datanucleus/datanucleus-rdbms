@@ -112,14 +112,11 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
-import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
-import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
@@ -131,7 +128,6 @@ import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
-import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
@@ -168,10 +164,6 @@ import org.datanucleus.store.schema.SchemaScriptAwareStoreManager;
 import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
 import org.datanucleus.store.types.SCOUtils;
-import org.datanucleus.store.types.scostore.ArrayStore;
-import org.datanucleus.store.types.scostore.CollectionStore;
-import org.datanucleus.store.types.scostore.MapStore;
-import org.datanucleus.store.types.scostore.PersistableRelationStore;
 import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
 import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator.ConnectionPreference;
@@ -987,144 +979,116 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
             if (mmd.getMap() != null)
             {
-                store = getBackingStoreForMap(mmd, clr);
+                Table datastoreTable = getTable(mmd);
+                if (datastoreTable == null)
+                {
+                    store = new FKMapStore(mmd, this, clr);
+                }
+                else
+                {
+                    store = new JoinMapStore((MapTable)datastoreTable, clr);
+                }
             }
             else if (mmd.getArray() != null)
             {
-                store = getBackingStoreForArray(mmd, clr);
+                Table datastoreTable = getTable(mmd);
+                if (datastoreTable != null)
+                {
+                    store = new JoinArrayStore(mmd, (ArrayTable)datastoreTable, clr);
+                }
+                else
+                {
+                    store = new FKArrayStore(mmd, this, clr);
+                }
             }
             else if (mmd.getCollection() != null)
             {
-                store = getBackingStoreForCollection(mmd, clr, type);
+                Table datastoreTable = getTable(mmd);
+                if (type == null)
+                {
+                    // No type to base it on so create it based on the field declared type
+                    if (datastoreTable == null)
+                    {
+                        // We need a "FK" relation
+                        if (Set.class.isAssignableFrom(mmd.getType()))
+                        {
+                            store = new FKSetStore(mmd, this, clr);
+                        }
+                        else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
+                        {
+                            store = new FKListStore(mmd, this, clr);
+                        }
+                        else if (mmd.getOrderMetaData() != null)
+                        {
+                            // User has requested ordering
+                            store = new FKListStore(mmd, this, clr);
+                        }
+                        else
+                        {
+                            store = new FKSetStore(mmd, this, clr);
+                        }
+                    }
+                    else
+                    {
+                        // We need a "JoinTable" relation.
+                        if (Set.class.isAssignableFrom(mmd.getType()))
+                        {
+                            store = new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                        else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
+                        {
+                            store = new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                        else if (mmd.getOrderMetaData() != null)
+                        {
+                            // User has requested ordering
+                            store = new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                        else
+                        {
+                            store = new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                    }
+                }
+                else
+                {
+                    // Instantiated type specified, so use it to pick the associated backing store
+                    if (datastoreTable == null)
+                    {
+                        if (SCOUtils.isListBased(type))
+                        {
+                            // List required
+                            store = new FKListStore(mmd, this, clr);
+                        }
+                        else
+                        {
+                            // Set required
+                            store = new FKSetStore(mmd, this, clr);
+                        }
+                    }
+                    else
+                    {
+                        if (SCOUtils.isListBased(type))
+                        {
+                            // List required
+                            store = new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                        else
+                        {
+                            // Set required
+                            store = new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
+                        }
+                    }
+                }
             }
             else
             {
-                store = getBackingStoreForPersistableRelation(mmd, clr);
+                store = new JoinPersistableRelationStore(mmd, (PersistableJoinTable)getTable(mmd), clr);
             }
+
             backingStoreByMemberName.put(mmd.getFullFieldName(), store);
             return store;
         }
-    }
-
-    /**
-     * Method to return a backing store for a Collection, consistent with this store and the instantiated type.
-     * Note : if we have an embedded object that is embedded into some other type and the object has a member that requires a join table (backing store), this method
-     * will not cater for the different places that can be embedded.
-     * @param mmd MetaData for the field that has this collection
-     * @param clr ClassLoader resolver
-     * @param type Type of the field (optional)
-     * @return The backing store of this collection in this store
-     */
-    protected CollectionStore getBackingStoreForCollection(AbstractMemberMetaData mmd, ClassLoaderResolver clr, Class type)
-    {
-        Table datastoreTable = getTable(mmd);
-        if (type == null)
-        {
-            // No type to base it on so create it based on the field declared type
-            if (datastoreTable == null)
-            {
-                // We need a "FK" relation
-                if (Set.class.isAssignableFrom(mmd.getType()))
-                {
-                    return new FKSetStore(mmd, this, clr);
-                }
-                else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
-                {
-                    return new FKListStore(mmd, this, clr);
-                }
-                else if (mmd.getOrderMetaData() != null)
-                {
-                    // User has requested ordering
-                    return new FKListStore(mmd, this, clr);
-                }
-
-                return new FKSetStore(mmd, this, clr);
-            }
-
-            // We need a "JoinTable" relation.
-            if (Set.class.isAssignableFrom(mmd.getType()))
-            {
-                return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
-            }
-            else if (List.class.isAssignableFrom(mmd.getType()) || Queue.class.isAssignableFrom(mmd.getType()))
-            {
-                return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
-            }
-            else if (mmd.getOrderMetaData() != null)
-            {
-                // User has requested ordering
-                return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
-            }
-
-            return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
-        }
-
-        // Instantiated type specified, so use it to pick the associated backing store
-        if (datastoreTable == null)
-        {
-            if (SCOUtils.isListBased(type))
-            {
-                // List required
-                return new FKListStore(mmd, this, clr);
-            }
-
-            // Set required
-            return new FKSetStore(mmd, this, clr);
-        }
-
-        if (SCOUtils.isListBased(type))
-        {
-            // List required
-            return new JoinListStore(mmd, (CollectionTable)datastoreTable, clr);
-        }
-
-        // Set required
-        return new JoinSetStore(mmd, (CollectionTable)datastoreTable, clr);
-    }
-
-    /**
-     * Method to return a backing store for a Map, consistent with this store and the instantiated type.
-     * @param mmd MetaData for the field that has this map
-     * @param clr ClassLoader resolver
-     * @return The backing store of this map in this store
-     */
-    protected MapStore getBackingStoreForMap(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        Table datastoreTable = getTable(mmd);
-        if (datastoreTable == null)
-        {
-            return new FKMapStore(mmd, this, clr);
-        }
-
-        return new JoinMapStore((MapTable)datastoreTable, clr);
-    }
-
-    /**
-     * Method to return a backing store for an array, consistent with this store and the instantiated type.
-     * @param mmd MetaData for the field/property that has this array
-     * @param clr ClassLoader resolver
-     * @return The backing store of this array in this store
-     */
-    protected ArrayStore getBackingStoreForArray(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        Table datastoreTable = getTable(mmd);
-        if (datastoreTable != null)
-        {
-            return new JoinArrayStore(mmd, (ArrayTable)datastoreTable, clr);
-        }
-
-        return new FKArrayStore(mmd, this, clr);
-    }
-
-    /**
-     * Method to return a backing store for a persistable relation (N-1 uni via join).
-     * @param mmd MetaData for the member being stored
-     * @param clr ClassLoader resolver
-     * @return The backing store of this persistable relation in this store
-     */
-    protected PersistableRelationStore getBackingStoreForPersistableRelation(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
-    {
-        return new JoinPersistableRelationStore(mmd, (PersistableJoinTable)getTable(mmd), clr);
     }
 
     /**
@@ -1714,8 +1678,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void validateTable(final TableImpl table, ClassLoaderResolver clr)
     {
-        ValidateTableSchemaTransaction validateTblTxn = new ValidateTableSchemaTransaction(this, 
-            Connection.TRANSACTION_READ_COMMITTED, table);
+        ValidateTableSchemaTransaction validateTblTxn = new ValidateTableSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, table);
         validateTblTxn.execute(clr);
     }
 
@@ -1932,28 +1895,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     rootCmd.getFullClassName() + " : unable to determine if actually of a subclass");
         }
         return rootCmd.getFullClassName();
-    }
-
-    public FieldManager getFieldManagerForResultProcessing(ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
-    {
-        return new ResultSetGetter(op, rs, resultMappings);
-    }
-
-    public FieldManager getFieldManagerForResultProcessing(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMappings, AbstractClassMetaData cmd)
-    {
-        return new ResultSetGetter(ec, rs, resultMappings, cmd);
-    }
-
-    /**
-     * Method to return a FieldManager for populating information in statements.
-     * @param sm The ObjectProvider for the object.
-     * @param ps The Prepared Statement to set values on.
-     * @param stmtMappings the index of parameters/mappings
-     * @return The FieldManager to use
-     */
-    public FieldManager getFieldManagerForStatementGeneration(ObjectProvider sm, PreparedStatement ps, StatementClassMapping stmtMappings)
-    {
-        return new ParameterSetter(sm, ps, stmtMappings);
     }
 
     /**

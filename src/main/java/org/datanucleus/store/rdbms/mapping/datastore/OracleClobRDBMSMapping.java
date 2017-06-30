@@ -35,6 +35,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
@@ -171,6 +172,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
     {
         return getString(rs, param);
     }
+
     /**
      * Convenience method to update the contents of a CLOB column.
      * Oracle requires that a CLOB is initialised with EMPTY_CLOB() and then you retrieve
@@ -207,8 +209,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
         {
             // Datastore identity value for input
             JavaTypeMapping datastoreIdMapping = classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
-            SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), 
-                datastoreIdMapping);
+            SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
             sqlStmt.whereAnd(expr.eq(val), true);
 
@@ -228,8 +229,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
             {
                 AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
                 JavaTypeMapping pkMapping = classTable.getMemberMapping(mmd);
-                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(),
-                    pkMapping);
+                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), pkMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, pkMapping, null, "PK" + i);
                 sqlStmt.whereAnd(expr.eq(val), true);
 
@@ -285,8 +285,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
                     }
                     else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        op.provideFields(cmd.getPKMemberPositions(),
-                            storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
                     }
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);

@@ -44,6 +44,8 @@ import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
@@ -322,7 +324,7 @@ public class LocateBulkRequest extends BulkRequest
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            ops[i].provideFields(cmd.getPKMemberPositions(), storeMgr.getFieldManagerForStatementGeneration(ops[i], ps, mappingDefinitions[i]));
+                            ops[i].provideFields(cmd.getPKMemberPositions(), new ParameterSetter(ops[i], ps, mappingDefinitions[i]));
                         }
                     }
 
@@ -382,7 +384,7 @@ public class LocateBulkRequest extends BulkRequest
         ExecutionContext ec = ops[0].getExecutionContext();
         while (rs.next())
         {
-            FieldManager resultFM = table.getStoreManager().getFieldManagerForResultProcessing(ec, rs, resultMapping, cmd);
+            FieldManager resultFM = new ResultSetGetter(ec, rs, resultMapping, cmd);
             Object id = null;
             Object key = null;
             if (cmd.getIdentityType() == IdentityType.DATASTORE)

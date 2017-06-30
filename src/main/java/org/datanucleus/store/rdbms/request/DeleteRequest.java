@@ -61,6 +61,7 @@ import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -301,7 +302,7 @@ public class DeleteRequest extends Request
                                 mappingDefinition.addMappingForMember(i, idxs[i]);
                             }
                         }
-                        op.provideFields(whereFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(whereFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
                     }
 
                     if (multitenancyStatementMapping != null)

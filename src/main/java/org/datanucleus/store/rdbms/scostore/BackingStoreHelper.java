@@ -29,6 +29,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
@@ -353,10 +354,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementSM = bcs.getObjectProviderForEmbeddedPCObject(op, element, ownerFieldMetaData,
-            ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
-        elementSM.provideFields(elementFieldNumbers, 
-            elementMapping.getStoreManager().getFieldManagerForStatementGeneration(elementSM, ps, mappingDefinition));
+        ObjectProvider elementOP = bcs.getObjectProviderForEmbeddedPCObject(op, element, ownerFieldMetaData, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
+        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;
     }
@@ -394,10 +393,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementSM = mapStore.getObjectProviderForEmbeddedPCObject(op, key, 
-            joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_KEY_PC);
-        elementSM.provideFields(elementFieldNumbers,
-            embeddedMapping.getStoreManager().getFieldManagerForStatementGeneration(elementSM, ps, mappingDefinition));
+        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(op, key, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_KEY_PC);
+        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;
     }
@@ -435,10 +432,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementSM = mapStore.getObjectProviderForEmbeddedPCObject(op, value, 
-            joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_VALUE_PC);
-        elementSM.provideFields(elementFieldNumbers,
-            embeddedMapping.getStoreManager().getFieldManagerForStatementGeneration(elementSM, ps, mappingDefinition));
+        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(op, value, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_VALUE_PC);
+        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;
     }

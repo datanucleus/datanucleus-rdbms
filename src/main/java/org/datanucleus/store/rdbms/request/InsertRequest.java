@@ -65,6 +65,7 @@ import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -267,7 +268,7 @@ public class InsertRequest extends Request
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        op.provideFields(pkFieldNumbers, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
                     }
 
                     // Provide all non-key fields needed for the insert.
@@ -304,7 +305,7 @@ public class InsertRequest extends Request
                                 fieldNums[j++] = insertFieldNumbers[i];
                             }
                         }
-                        op.provideFields(fieldNums, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(fieldNums, new ParameterSetter(op, ps, mappingDefinition));
                     }
 
                     JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
@@ -486,7 +487,7 @@ public class InsertRequest extends Request
                             }
                         }
                         NucleusLogger.PERSISTENCE.debug("Performing reachability on fields " + StringUtils.intArrayToString(fieldNums));
-                        op.provideFields(fieldNums, storeMgr.getFieldManagerForStatementGeneration(op, ps, mappingDefinition));
+                        op.provideFields(fieldNums, new ParameterSetter(op, ps, mappingDefinition));
                     }
                 }
                 finally
