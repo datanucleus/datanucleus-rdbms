@@ -52,22 +52,7 @@ public class ResultSetGetter extends AbstractFieldManager
     protected AbstractClassMetaData cmd;
 
     /**
-     * Constructor where we know the object to put the field values in.
-     * @param op ObjectProvider where we are putting the results
-     * @param rs the ResultSet
-     * @param resultMappings Mappings for the results for this class
-     */
-    public ResultSetGetter(ObjectProvider op, ResultSet rs, StatementClassMapping resultMappings)
-    {
-        this.ec = op.getExecutionContext();
-        this.rs = rs;
-        this.resultMappings = resultMappings;
-
-        setObjectProvider(op);
-    }
-
-    /**
-     * Constructor without the ObjectProvider, where we know the result set but don't have the object yet.
+     * Constructor for a ResultSet with particular result mappings and root class metadata.
      * @param ec Execution Context
      * @param rs the ResultSet
      * @param resultMappings Mappings for the results for this class
@@ -78,10 +63,16 @@ public class ResultSetGetter extends AbstractFieldManager
         this.ec = ec;
         this.rs = rs;
         this.resultMappings = resultMappings;
+
         this.op = null;
         this.cmd = cmd;
     }
 
+    /**
+     * Method to set the ObjectProvider that processing applies to.
+     * This is typically called just before processing the current persistable object on the current row.
+     * @param op The ObjectProvider that we are applying to.
+     */
     public void setObjectProvider(ObjectProvider op)
     {
         this.op = op;

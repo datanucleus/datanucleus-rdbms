@@ -42,7 +42,6 @@ import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeMapping;
 import org.datanucleus.metadata.QueryResultMetaData.PersistentTypeMapping;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
-import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -65,8 +64,8 @@ import org.datanucleus.util.TypeConversionHelper;
  * Each call to getObject() will then return a set of objects as per the MetaData definition.
  * <h3>ResultSet to object mapping</h3>
  * Each row of the ResultSet has a set of columns, and these columns are either used for direct outputting
- * back to the user as a "simple" object, or as a field in a persistent object. So you could have a situation
- * like this :-
+ * back to the user as a "simple" object, or as a field in a persistent object. 
+ * So you could have a situation like this :-
  * <pre>
  * ResultSet Column   Output Object
  * ================   =============
@@ -80,10 +79,12 @@ import org.datanucleus.util.TypeConversionHelper;
  * COL8               PC1.field3
  * ...
  * </pre>
- * So this example will return an Object[4] ... Object[0] = instance of PC1, Object[1] = instance of PC2,
- * Object[2] = simple object, Object[3] = simple object. 
+ * So this example will return an Object[4] comprised of Object[0] = instance of PC1, Object[1] = instance of PC2, Object[2] = simple object, Object[3] = simple object. 
  * When creating the instance of PC1 we take the ResultSet columns (COL1, COL2, COL8).
  * When creating the instance of PC2 we take the ResultSet columns (COL5, COL6, COL4).
+ * <h3>Columns to persistable object mapping</h3>
+ * Where we have a number of columns forming a persistable object, such as (COL1, COL2, COL8) above we make use of ResultSetGetter
+ * to populate the fields of the persistable object from the ResultSet.
  */
 public class ResultMetaDataROF implements ResultObjectFactory
 {
@@ -94,9 +95,13 @@ public class ResultMetaDataROF implements ResultObjectFactory
     /** MetaData defining the result from the Query. */
     QueryResultMetaData queryResultMetaData = null;
 
+    /** Column names in the ResultSet. */
     String[] columnNames = null;
 
     protected boolean ignoreCache = false;
+
+    /** ResultSetGetter objects used for any persistable objects in the result. Set when processing the first row. */
+    protected ResultSetGetter[] persistentTypeResultSetGetters = null;
 
     /**
      * Constructor.
@@ -109,6 +114,24 @@ public class ResultMetaDataROF implements ResultObjectFactory
         this.ec = ec;
         this.rs = rs;
         this.queryResultMetaData = qrmd;
+
+        try
+        {
+            //obtain column names
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnCount = rsmd.getColumnCount();
+            columnNames = new String[columnCount];
+            for (int i=0; i<columnCount; i++)
+            {
+                String colName = rsmd.getColumnName(i+1);
+                String colLabel = rsmd.getColumnLabel(i+1);
+                columnNames[i] = (StringUtils.isWhitespace(colLabel) ? colName : colLabel);
+            }
+        }
+        catch(SQLException ex)
+        {
+            throw new NucleusDataStoreException("Error obtaining objects",ex);
+        }
     }
 
     /* (non-Javadoc)
@@ -127,31 +150,16 @@ public class ResultMetaDataROF implements ResultObjectFactory
     public Object getObject()
     {
         List returnObjects = new ArrayList();
-        if (columnNames == null)
-        {
-            try
-            {
-                //obtain column names
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int columnCount = rsmd.getColumnCount();
-                columnNames = new String[columnCount];
-                for (int i=0; i<columnCount; i++)
-                {
-                    String colName = rsmd.getColumnName(i+1);
-                    String colLabel = rsmd.getColumnLabel(i+1);
-                    columnNames[i] = (StringUtils.isWhitespace(colLabel) ? colName : colLabel);
-                }
-            }
-            catch(SQLException ex)
-            {
-                throw new NucleusDataStoreException("Error obtaining objects",ex);
-            }
-        }
 
         // A). Process persistent types
         PersistentTypeMapping[] persistentTypes = queryResultMetaData.getPersistentTypeMappings();
         if (persistentTypes != null)
         {
+            if (persistentTypeResultSetGetters == null)
+            {
+                persistentTypeResultSetGetters = new ResultSetGetter[persistentTypes.length];
+            }
+
             int startColumnIndex = 0;
             for (int i=0;i<persistentTypes.length;i++)
             {
@@ -255,16 +263,79 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     stmtMappings[resultFieldNumbers[j]] = stmtMapping;
                     j++;
                 }
+
                 Object obj = null;
                 Class type = ec.getClassLoaderResolver().classForName(persistentTypes[i].getClassName());
                 if (acmd.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    obj = getObjectForApplicationId(resultFieldNumbers, acmd, type, false, stmtMappings);
+                    if (persistentTypeResultSetGetters[i] == null)
+                    {
+                        final StatementClassMapping resultMappings = new StatementClassMapping();
+                        for (int k=0;k<resultFieldNumbers.length;k++)
+                        {
+                            resultMappings.addMappingForMember(resultFieldNumbers[k], stmtMappings[resultFieldNumbers[k]]);
+                        }
+                        persistentTypeResultSetGetters[i] = new ResultSetGetter(ec, rs, resultMappings, acmd);
+                    }
+                    ResultSetGetter rsGetter = persistentTypeResultSetGetters[i];
+
+                    id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, acmd, null, false, rsGetter);
+
+                    obj = ec.findObject(id, new FieldValues()
+                    {
+                        public void fetchFields(ObjectProvider op)
+                        {
+                            rsGetter.setObjectProvider(op);
+                            op.replaceFields(resultFieldNumbers, rsGetter, false);
+                        }
+                        public void fetchNonLoadedFields(ObjectProvider op)
+                        {
+                            rsGetter.setObjectProvider(op);
+                            op.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
+                        }
+                        public FetchPlan getFetchPlanForLoading()
+                        {
+                            return null;
+                        }
+                    }, type, ignoreCache, false);
                 }
                 else if (acmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    obj = getObjectForDatastoreId(resultFieldNumbers, acmd, id, type, stmtMappings);
+                    if (persistentTypeResultSetGetters[i] == null)
+                    {
+                        final StatementClassMapping resultMappings = new StatementClassMapping();
+                        for (int k=0;k<resultFieldNumbers.length;k++)
+                        {
+                            resultMappings.addMappingForMember(resultFieldNumbers[k], stmtMappings[resultFieldNumbers[k]]);
+                        }
+                        persistentTypeResultSetGetters[i] = new ResultSetGetter(ec, rs, resultMappings, acmd);
+                    }
+                    ResultSetGetter rsGetter = persistentTypeResultSetGetters[i];
+
+                    obj = ec.findObject(id, new FieldValues()
+                    {
+                        public void fetchFields(ObjectProvider op)
+                        {
+                            rsGetter.setObjectProvider(op);
+                            op.replaceFields(resultFieldNumbers, rsGetter, false);
+                        }
+                        public void fetchNonLoadedFields(ObjectProvider op)
+                        {
+                            rsGetter.setObjectProvider(op);
+                            op.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
+                        }
+                        public FetchPlan getFetchPlanForLoading()
+                        {
+                            return null;
+                        }
+                    }, type, ignoreCache, false);
                 }
+                else
+                {
+                    // TODO Handle non-durable
+                    NucleusLogger.QUERY.warn("We do not currently support non-durable objects in the results of this type of query.");
+                }
+
                 returnObjects.add(obj);
             }
         }
@@ -277,7 +348,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
             {
                 try
                 {
-                    Object obj = getResultObject(rs, columns[i]);
+                    Object obj = rs.getObject(columns[i]);
                     returnObjects.add(obj);
                 }
                 catch (SQLException sqe)
@@ -312,7 +383,7 @@ public class ResultMetaDataROF implements ResultObjectFactory
                         ConstructorTypeColumn ctrCol = colIter.next();
                         try
                         {
-                            Object colVal = getResultObject(rs, ctrCol.getColumnName());
+                            Object colVal = rs.getObject(ctrCol.getColumnName());
                             ctrArgTypes[j] = colVal.getClass();
                             if (ctrCol.getJavaType() != null)
                             {
@@ -353,95 +424,5 @@ public class ResultMetaDataROF implements ResultObjectFactory
             // Return Object[]
             return returnObjects.toArray(new Object[returnObjects.size()]);
         }
-    }
-
-    /**
-     * Convenience method to read the value of a column out of the ResultSet.
-     * @param rs ResultSet
-     * @param columnName Name of the column
-     * @return Value for the column for this row.
-     * @throws SQLException Thrown if an error occurs on reading
-     */
-    private Object getResultObject(final ResultSet rs, String columnName)
-    throws SQLException
-    {
-        return rs.getObject(columnName);
-    }
-
-    /**
-     * Returns a PC instance from a ResultSet row with an application identity.
-     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param cmd MetaData for the class
-     * @param pcClass persistable class
-     * @param requiresInheritanceCheck Whether we need to check the inheritance level of the returned object
-     * @param stmtMappings mappings for the results in the statement
-     * @return The object with this application identity
-     */
-    private Object getObjectForApplicationId(final int[] fieldNumbers, AbstractClassMetaData cmd, Class pcClass, boolean requiresInheritanceCheck, StatementMappingIndex[] stmtMappings)
-    {
-        final StatementClassMapping resultMappings = new StatementClassMapping();
-        for (int i=0;i<fieldNumbers.length;i++)
-        {
-            resultMappings.addMappingForMember(fieldNumbers[i], stmtMappings[fieldNumbers[i]]);
-        }
-
-        // TODO This creates a new ResultSetGetter per row. See below also
-        Object id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, cmd, null, requiresInheritanceCheck, new ResultSetGetter(ec, rs, resultMappings, cmd));
-
-        return ec.findObject(id, new FieldValues()
-        {
-            public void fetchFields(ObjectProvider op)
-            {
-                // TODO This creates 2 ResultSetGetter per row!!
-                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
-                op.replaceFields(fieldNumbers, fm, false);
-            }
-            public void fetchNonLoadedFields(ObjectProvider op)
-            {
-                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
-                op.replaceNonLoadedFields(fieldNumbers, fm);
-            }
-            public FetchPlan getFetchPlanForLoading()
-            {
-                return null;
-            }
-        }, pcClass, ignoreCache, false);
-    }
-
-    /**
-     * Returns a PC instance from a ResultSet row with a datastore identity.
-     * @param fieldNumbers Numbers of the fields (of the class) found in the ResultSet
-     * @param cmd MetaData for the class
-     * @param oid The object id
-     * @param pcClass The persistable class (where we know the instance type required, null if not)
-     * @param stmtMappings mappings for the results in the statement
-     * @return The Object
-     */
-    private Object getObjectForDatastoreId(final int[] fieldNumbers, AbstractClassMetaData cmd, Object oid, Class pcClass, StatementMappingIndex[] stmtMappings)
-    {
-        final StatementClassMapping resultMappings = new StatementClassMapping();
-        for (int i=0;i<fieldNumbers.length;i++)
-        {
-            resultMappings.addMappingForMember(fieldNumbers[i], stmtMappings[fieldNumbers[i]]);
-        }
-
-        return ec.findObject(oid, new FieldValues()
-        {
-            public void fetchFields(ObjectProvider op)
-            {
-                // TODO This creates 2 ResultSetGetter per row!!
-                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
-                op.replaceFields(fieldNumbers, fm, false);
-            }
-            public void fetchNonLoadedFields(ObjectProvider op)
-            {
-                FieldManager fm = new ResultSetGetter(op, rs, resultMappings);
-                op.replaceNonLoadedFields(fieldNumbers, fm);
-            }
-            public FetchPlan getFetchPlanForLoading()
-            {
-                return ec.getFetchPlan();
-            }
-        }, pcClass, ignoreCache, false);
     }
 }

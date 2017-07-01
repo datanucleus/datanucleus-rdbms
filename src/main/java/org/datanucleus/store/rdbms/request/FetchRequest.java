@@ -398,7 +398,9 @@ public class FetchRequest extends Request
                             }
 
                             // Copy the results into the object
-                            op.replaceFields(memberNumbersToFetch, new ResultSetGetter(op, rs, mappingDef));
+                            ResultSetGetter rsGetter = new ResultSetGetter(ec, rs, mappingDef, op.getClassMetaData());
+                            rsGetter.setObjectProvider(op);
+                            op.replaceFields(memberNumbersToFetch, rsGetter);
 
                             if (op.getTransactionalVersion() == null)
                             {
