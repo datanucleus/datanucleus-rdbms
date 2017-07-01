@@ -165,11 +165,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
-            Iterator<SecondaryDatastoreClass> tablesIter = secondaryTables.iterator();
-            while (tablesIter.hasNext())
+            for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                insertObjectInTable(tablesIter.next(), op, clr);
+                insertObjectInTable(secTable, op, clr);
             }
         }
     }
@@ -230,8 +229,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                     {
                         AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(memberNumbers[i]);
                         RelationType relationType = mmd.getRelationType(clr);
-                        if (relationType != RelationType.ONE_TO_MANY_UNI && relationType != RelationType.ONE_TO_MANY_BI &&
-                                relationType != RelationType.MANY_TO_MANY_BI)
+                        if (relationType != RelationType.ONE_TO_MANY_UNI && relationType != RelationType.ONE_TO_MANY_BI && relationType != RelationType.MANY_TO_MANY_BI)
                         {
                             fetchPerformsSelect = true;
                             break;
@@ -304,8 +302,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                     str.append(mmds[i].getName());
                 }
             }
-            NucleusLogger.PERSISTENCE.info("Request to load fields \"" + str.toString() +
-                "\" of class " + op.getClassMetaData().getFullClassName() + " but object is embedded, so ignored");
+            NucleusLogger.PERSISTENCE.info("Request to load fields \"" + str.toString() + "\" of class " + op.getClassMetaData().getFullClassName() + " but object is embedded, so ignored");
         }
         else
         {
@@ -412,11 +409,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
-            Iterator<SecondaryDatastoreClass> tablesIter = secondaryTables.iterator();
-            while (tablesIter.hasNext())
+            for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                updateObjectInTable(tablesIter.next(), op, clr, mmds);
+                updateObjectInTable(secTable, op, clr, mmds);
             }
         }
     }
@@ -487,11 +483,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
         if (secondaryTables != null)
         {
-            Iterator<SecondaryDatastoreClass> tablesIter = secondaryTables.iterator();
-            while (tablesIter.hasNext())
+            for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                deleteObjectFromTable(tablesIter.next(), sm, clr);
+                deleteObjectFromTable(secTable, sm, clr);
             }
         }
 
@@ -646,11 +641,9 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         synchronized(requestsByID)
         {
             // Synchronise on the "requestsById" set since while it is "synchronised itself, all iterators needs this sync
-            Set keySet = new HashSet(requestsByID.keySet());
-            Iterator<RequestIdentifier> keyIter = keySet.iterator();
-            while (keyIter.hasNext())
+            Set<RequestIdentifier> keySet = new HashSet(requestsByID.keySet());
+            for (RequestIdentifier reqId : keySet)
             {
-                RequestIdentifier reqId = keyIter.next();
                 if (reqId.getTable() == table)
                 {
                     requestsByID.remove(reqId);

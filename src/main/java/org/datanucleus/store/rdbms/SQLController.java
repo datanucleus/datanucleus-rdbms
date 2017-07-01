@@ -123,8 +123,7 @@ public class SQLController
 
         public String toString()
         {
-            return "StmtState : stmt=" + StringUtils.toJVMIDString(stmt) + " sql=" + stmtText + 
-                " batch=" + batchSize + " closeOnProcess=" + closeStatementOnProcess;
+            return "StmtState : stmt=" + StringUtils.toJVMIDString(stmt) + " sql=" + stmtText + " batch=" + batchSize + " closeOnProcess=" + closeStatementOnProcess;
         }
     }
 
@@ -151,7 +150,7 @@ public class SQLController
 
         if (stmtLogging.equalsIgnoreCase("jdbc"))
         {
-            jdbcStatements = true;
+            this.jdbcStatements = true;
         }
         else if (stmtLogging.equalsIgnoreCase("values-in-brackets"))
         {
@@ -186,8 +185,7 @@ public class SQLController
      * @return The PreparedStatement
      * @throws SQLException thrown if an error occurs creating the statement
      */
-    public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable,
-            boolean getGeneratedKeysFlag)
+    public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable, boolean getGeneratedKeysFlag)
     throws SQLException
     {
         Connection c = (Connection) conn.getConnection();
@@ -251,9 +249,7 @@ public class SQLController
             }
         }
 
-        PreparedStatement ps = getGeneratedKeysFlag ?
-                c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : 
-                    c.prepareStatement(stmtText);
+        PreparedStatement ps = getGeneratedKeysFlag ? c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(stmtText);
         ps.clearBatch(); // In case using statement caching and given one with batched statements left hanging (C3P0)
         if (!jdbcStatements)
         {
@@ -305,8 +301,7 @@ public class SQLController
      * @return The PreparedStatement
      * @throws SQLException thrown if an error occurs creating the statement
      */
-    public PreparedStatement getStatementForQuery(ManagedConnection conn, String stmtText,
-            String resultSetType, String resultSetConcurrency)
+    public PreparedStatement getStatementForQuery(ManagedConnection conn, String stmtText, String resultSetType, String resultSetConcurrency)
     throws SQLException
     {
         Connection c = (Connection) conn.getConnection();
@@ -439,9 +434,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045001",
-                "" + (System.currentTimeMillis() - startTime), "" + ind,
-                StringUtils.toJVMIDString(ps)));
+            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045001", "" + (System.currentTimeMillis() - startTime), "" + ind, StringUtils.toJVMIDString(ps)));
         }
 
         return new int[] {ind};
@@ -495,8 +488,7 @@ public class SQLController
         ps.clearBatch();
         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045002",
-                "" + (System.currentTimeMillis() - startTime), StringUtils.toJVMIDString(ps)));
+            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("045002", "" + (System.currentTimeMillis() - startTime), StringUtils.toJVMIDString(ps)));
         }
 
         return flag;
@@ -677,8 +669,7 @@ public class SQLController
 
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("045001",""+(System.currentTimeMillis() - startTime),
-                StringUtils.intArrayToString(ind), StringUtils.toJVMIDString(state.stmt)));
+            NucleusLogger.DATASTORE.debug(Localiser.msg("045001",""+(System.currentTimeMillis() - startTime), StringUtils.intArrayToString(ind), StringUtils.toJVMIDString(state.stmt)));
         }
 
         // Remove the current connection statement

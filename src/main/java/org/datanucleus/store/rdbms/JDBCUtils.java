@@ -38,8 +38,7 @@ public class JDBCUtils
 
     /**
      * Method to return the "subprotocol" for a JDBC URL.
-     * A JDBC URL is made up of
-     * "jdbc:{subprotocol}:...". For example, "jdbc:mysql:..." or "jdbc:hsqldb:...".
+     * A JDBC URL is made up of <cite>jdbc:{subprotocol}:...<.cite>. For example, <cite>jdbc:mysql:...</cite> or <cite>jdbc:hsqldb:...</cite>.
      * @param url The JDBC URL
      * @return The subprotocol
      */

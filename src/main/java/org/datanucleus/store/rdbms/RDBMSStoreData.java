@@ -189,8 +189,7 @@ public class RDBMSStoreData extends StoreData
         MetaData metadata = getMetaData();
         if (metadata instanceof ClassMetaData)
         {
-            ClassMetaData cmd = (ClassMetaData)metadata;
-            return Localiser.msg("035004", name, tableName != null ? tableName : "(none)", cmd.getInheritanceMetaData().getStrategy().toString());
+            return Localiser.msg("035004", name, tableName != null ? tableName : "(none)", ((ClassMetaData)metadata).getInheritanceMetaData().getStrategy().toString());
         }
         else if (metadata instanceof AbstractMemberMetaData)
         {

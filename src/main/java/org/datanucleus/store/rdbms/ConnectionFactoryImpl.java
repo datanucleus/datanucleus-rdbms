@@ -200,9 +200,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             try
             {
                 // Create the ConnectionPool to be used
-                ConnectionPoolFactory connPoolFactory =
-                    (ConnectionPoolFactory)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store.rdbms.connectionpool", "name", poolingType, "class-name", null, null);
+                ConnectionPoolFactory connPoolFactory = (ConnectionPoolFactory)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store.rdbms.connectionpool", "name", poolingType, "class-name", null, null);
                 if (connPoolFactory == null)
                 {
                     // User has specified a pool plugin that has not registered
@@ -282,9 +281,8 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
 
         /**
          * Release this connection.
-         * Releasing this connection will allow this managed connection to be used one or more times
-         * inside the same transaction. If this managed connection is managed by a transaction manager,
-         * release is a no-op, otherwise the physical connection is closed
+         * Releasing this connection will allow this managed connection to be used one or more times inside the same transaction. 
+         * If this managed connection is managed by a transaction manager, release is a no-op, otherwise the physical connection is closed
          */
         @Override
         public void release()

@@ -480,34 +480,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Accessor for whether this value strategy is supported.
-     * Overrides the setting in the superclass for identity/sequence if the adapter doesn't support them.
-     * @param strategy The strategy
-     * @return Whether it is supported.
-     */
-    public boolean supportsValueStrategy(String strategy)
-    {
-        // "identity" doesn't have an explicit entry in plugin since uses datastore capabilities
-        if (strategy.equalsIgnoreCase("IDENTITY") || super.supportsValueStrategy(strategy))
-        {
-            if (strategy.equalsIgnoreCase("IDENTITY") && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
-            {
-                return false; // adapter doesn't support identity so we don't
-            }
-            else if (strategy.equalsIgnoreCase("SEQUENCE") && !dba.supportsOption(DatastoreAdapter.SEQUENCES))
-            {
-                return false; // adapter doesn't support sequences so we don't
-            }
-            else if (strategy.equalsIgnoreCase("uuid-string"))
-            {
-                return dba.supportsOption(DatastoreAdapter.VALUE_GENERATION_UUID_STRING);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Accessor for the factory for creating identifiers (table/column names etc).
      * @return Identifier factory
      */
@@ -2239,6 +2211,34 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         return t;
+    }
+
+    /**
+     * Accessor for whether this value strategy is supported.
+     * Overrides the setting in the superclass for identity/sequence if the adapter doesn't support them.
+     * @param strategy The strategy
+     * @return Whether it is supported.
+     */
+    public boolean supportsValueStrategy(String strategy)
+    {
+        // "identity" doesn't have an explicit entry in plugin since uses datastore capabilities
+        if (strategy.equalsIgnoreCase("IDENTITY") || super.supportsValueStrategy(strategy))
+        {
+            if (strategy.equalsIgnoreCase("IDENTITY") && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
+            {
+                return false; // adapter doesn't support identity so we don't
+            }
+            else if (strategy.equalsIgnoreCase("SEQUENCE") && !dba.supportsOption(DatastoreAdapter.SEQUENCES))
+            {
+                return false; // adapter doesn't support sequences so we don't
+            }
+            else if (strategy.equalsIgnoreCase("uuid-string"))
+            {
+                return dba.supportsOption(DatastoreAdapter.VALUE_GENERATION_UUID_STRING);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**

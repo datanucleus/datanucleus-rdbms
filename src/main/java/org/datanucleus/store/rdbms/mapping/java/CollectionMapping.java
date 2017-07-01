@@ -107,12 +107,12 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 NucleusLogger.PERSISTENCE.debug(Localiser.msg("007006", mmd.getFullFieldName()));
             }
 
-            for (int i=0;i<collElements.length;i++)
+            for (Object collElement : collElements)
             {
-                if (!ec.getApiAdapter().isDetached(collElements[i]) && !ec.getApiAdapter().isPersistent(collElements[i]))
+                if (!ec.getApiAdapter().isDetached(collElement) && !ec.getApiAdapter().isPersistent(collElement))
                 {
                     // Element is not persistent so throw exception
-                    throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElements[i]);
+                    throw new ReachableObjectNotCascadedException(mmd.getFullFieldName(), collElement);
                 }
             }
         }
@@ -128,9 +128,9 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         // Check if some elements need attaching
         // TODO Investigate if we can just use the attachCopy route below and skip off this check
         boolean needsAttaching = false;
-        for (int i=0;i<collElements.length;i++)
+        for (Object collElement : collElements)
         {
-            if (ownerOP.getExecutionContext().getApiAdapter().isDetached(collElements[i]))
+            if (ownerOP.getExecutionContext().getApiAdapter().isDetached(collElement))
             {
                 needsAttaching = true;
                 break;
@@ -196,14 +196,14 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 {
                     // Make sure all persistable elements have ObjectProviders
                     Object[] collElements = value.toArray();
-                    for (Object elem : collElements)
+                    for (Object collElement : collElements)
                     {
-                        if (elem != null)
+                        if (collElement != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(elem);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            ObjectProvider elemOP = ec.findObjectProvider(collElement);
+                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, collElement, false, ownerOP, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
