@@ -59,12 +59,8 @@ import org.datanucleus.util.ConcurrentReferenceHashMap.ReferenceType;
  * We use information in the result set to determine the object type; this can be a discriminator column, or can be a special "NucleusType" column defined just for result processing.
  * @param <T> Type of the persistent object that this creates
  */
-public final class PersistentClassROF<T> implements ResultObjectFactory<T>
+public final class PersistentClassROF<T> extends AbstractROF<T>
 {
-    protected final ExecutionContext ec;
-
-    protected final ResultSet rs;
-
     /** Metadata for the (root) persistable candidate class. */
     protected final AbstractClassMetaData rootCmd;
 
@@ -76,9 +72,6 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
 
     protected ResultSetGetter resultSetGetter = null;
 
-    /** Whether to ignore the cache when locating the persistable object(s). */
-    private final boolean ignoreCache;
-
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
 
@@ -86,18 +79,17 @@ public final class PersistentClassROF<T> implements ResultObjectFactory<T>
      * Constructor.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
+     * @param ignoreCache Whether to ignore the cache
      * @param resultMapping Mapping information for the result set and how it maps to the class
      * @param acmd MetaData for the (root) candidate class
-     * @param ignoreCache Whether to ignore the cache
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(ExecutionContext ec, ResultSet rs, StatementClassMapping resultMapping, AbstractClassMetaData acmd, boolean ignoreCache, Class<T> persistentClass)
+    public PersistentClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, StatementClassMapping resultMapping, AbstractClassMetaData acmd, Class<T> persistentClass)
     {
-        this.ec = ec;
-        this.rs = rs;
+        super(ec, rs, ignoreCache);
+
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
-        this.ignoreCache = ignoreCache;
         this.persistentClass = persistentClass;
     }
 

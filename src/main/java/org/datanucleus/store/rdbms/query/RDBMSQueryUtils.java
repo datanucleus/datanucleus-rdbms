@@ -558,6 +558,6 @@ public class RDBMSQueryUtils extends QueryUtils
             // Do nothing
         }
 
-        return new ResultClassROF(ec, rs, requiredResultClass, resultFieldNames, false);
+        return new ResultClassROF(ec, rs, false, requiredResultClass, resultFieldNames);
     }
 }

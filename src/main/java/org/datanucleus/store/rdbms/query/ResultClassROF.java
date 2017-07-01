@@ -57,14 +57,8 @@ import org.datanucleus.util.StringUtils;
  * The second is where no candidate class is available and so only the field names are available, and the results are taken in ResultSet order.
  * These 2 modes have their own constructor.
  */
-public class ResultClassROF implements ResultObjectFactory
+public class ResultClassROF extends AbstractROF
 {
-    protected final ExecutionContext ec;
-
-    protected final ResultSet rs;
-
-    protected boolean ignoreCache = false;
-
     /** The result class that we should create for each row of results. */
     private final Class resultClass;
 
@@ -86,15 +80,13 @@ public class ResultClassROF implements ResultObjectFactory
      * Constructor for a resultClass object factory where we have a result clause specified.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      * @param cls The result class to use (if any)
      * @param resultDefinition The mapping information for the result expressions
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementResultMapping resultDefinition, boolean ignoreCache)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, StatementResultMapping resultDefinition)
     {
-        this.ec = ec;
-        this.rs = rs;
-        this.ignoreCache = ignoreCache;
+        super(ec, rs, ignoreCache);
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -161,15 +153,13 @@ public class ResultClassROF implements ResultObjectFactory
      * In this case the result will match the candidate class, but may not be the actual candidate class (e.g Object[])
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      * @param cls The result class to use
      * @param classDefinition The mapping information for the (candidate) class
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition, boolean ignoreCache)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, StatementClassMapping classDefinition)
     {
-        this.ec = ec;
-        this.rs = rs;
-        this.ignoreCache = ignoreCache;
+        super(ec, rs, ignoreCache);
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -204,15 +194,13 @@ public class ResultClassROF implements ResultObjectFactory
      * Used for SQL queries.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      * @param cls The result class to use
      * @param resultFieldNames Names for the result fields
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames, boolean ignoreCache)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, String[] resultFieldNames)
     {
-        this.ec = ec;
-        this.rs = rs;
-        this.ignoreCache = ignoreCache;
+        super(ec, rs, ignoreCache);
 
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
@@ -251,15 +239,6 @@ public class ResultClassROF implements ResultObjectFactory
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.query.ResultObjectFactory#getResultSet()
-     */
-    @Override
-    public ResultSet getResultSet()
-    {
-        return rs;
-    }
-
     /**
      * Method to convert the ResultSet row into an Object of the ResultClass type. 
      * We have a special handling for "result" expressions when they include literals or "new Object()" expression due to
@@ -291,7 +270,7 @@ public class ResultClassROF implements ResultObjectFactory
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, ignoreCache, cls);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, ignoreCache, classMap, acmd, cls);
                     fieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)

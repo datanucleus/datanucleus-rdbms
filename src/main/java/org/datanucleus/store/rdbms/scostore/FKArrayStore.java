@@ -653,7 +653,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                             throw new NucleusException("Cannot have FK array with non-persistent objects");
                         }
 
-                        rof = new PersistentClassROF(ec, rs, iteratorMappingDef, elementCmd, false, clr.classForName(elementType));
+                        rof = new PersistentClassROF(ec, rs, false, iteratorMappingDef, elementCmd, clr.classForName(elementType));
                         return new ArrayStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

@@ -86,19 +86,13 @@ import org.datanucleus.util.TypeConversionHelper;
  * Where we have a number of columns forming a persistable object, such as (COL1, COL2, COL8) above we make use of ResultSetGetter
  * to populate the fields of the persistable object from the ResultSet.
  */
-public class ResultMetaDataROF implements ResultObjectFactory
+public class ResultMetaDataROF extends AbstractROF
 {
-    protected ExecutionContext ec;
-
-    protected ResultSet rs;
-
     /** MetaData defining the result from the Query. */
     QueryResultMetaData queryResultMetaData = null;
 
     /** Column names in the ResultSet. */
     String[] columnNames = null;
-
-    protected boolean ignoreCache = false;
 
     /** ResultSetGetter objects used for any persistable objects in the result. Set when processing the first row. */
     protected ResultSetGetter[] persistentTypeResultSetGetters = null;
@@ -107,15 +101,14 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * Constructor.
      * @param ec ExecutionContext
      * @param rs ResultSet
-     * @param qrmd MetaData defining the results from the query.
      * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
+     * @param qrmd MetaData defining the results from the query.
      */
-    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, QueryResultMetaData qrmd, boolean ignoreCache)
+    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, QueryResultMetaData qrmd)
     {
-        this.ec = ec;
-        this.rs = rs;
+        super(ec, rs, ignoreCache);
+
         this.queryResultMetaData = qrmd;
-        this.ignoreCache = ignoreCache;
 
         try
         {

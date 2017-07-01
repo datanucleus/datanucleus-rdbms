@@ -215,7 +215,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, iteratorMappingClass, elementCmd, false, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, iteratorMappingClass, elementCmd, clr.classForName(elementType));
                             return new ArrayStoreIterator(ownerOP, rs, rof, this);
                         }
                     }

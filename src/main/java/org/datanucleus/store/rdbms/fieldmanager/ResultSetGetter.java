@@ -218,7 +218,7 @@ public class ResultSetGetter extends AbstractFieldManager
             }
         }
 
-        ResultObjectFactory relationROF = new PersistentClassROF(ec, rs, relationMappings, relatedCmd, false, fieldType);
+        ResultObjectFactory relationROF = new PersistentClassROF(ec, rs, false, relationMappings, relatedCmd, fieldType);
         return relationROF.getObject();
     }
 }
