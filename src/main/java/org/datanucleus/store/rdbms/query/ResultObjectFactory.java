@@ -31,7 +31,10 @@ import java.sql.ResultSet;
  */
 public interface ResultObjectFactory<T>
 {
-    /** Accessor for the JDBC ResultSet being processed. */
+    /**
+     * Accessor for the JDBC ResultSet being processed.
+     * @return The ResultSet
+     */
     ResultSet getResultSet();
 
     /**
