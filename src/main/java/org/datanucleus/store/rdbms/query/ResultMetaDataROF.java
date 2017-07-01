@@ -108,12 +108,14 @@ public class ResultMetaDataROF implements ResultObjectFactory
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param qrmd MetaData defining the results from the query.
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, QueryResultMetaData qrmd)
+    public ResultMetaDataROF(ExecutionContext ec, ResultSet rs, QueryResultMetaData qrmd, boolean ignoreCache)
     {
         this.ec = ec;
         this.rs = rs;
         this.queryResultMetaData = qrmd;
+        this.ignoreCache = ignoreCache;
 
         try
         {
@@ -279,7 +281,8 @@ public class ResultMetaDataROF implements ResultObjectFactory
                     }
                     ResultSetGetter rsGetter = persistentTypeResultSetGetters[i];
 
-                    id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, acmd, null, false, rsGetter);
+                    // TODO Make use of discriminator like in PersistentClassROF and set the pcClass in this?
+                    id = IdentityUtils.getApplicationIdentityForResultSetRow(ec, acmd, type, false, rsGetter);
 
                     obj = ec.findObject(id, new FieldValues()
                     {

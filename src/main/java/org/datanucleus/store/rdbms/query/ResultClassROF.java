@@ -63,6 +63,8 @@ public class ResultClassROF implements ResultObjectFactory
 
     protected final ResultSet rs;
 
+    protected boolean ignoreCache = false;
+
     /** The result class that we should create for each row of results. */
     private final Class resultClass;
 
@@ -86,11 +88,13 @@ public class ResultClassROF implements ResultObjectFactory
      * @param rs ResultSet being processed
      * @param cls The result class to use (if any)
      * @param resultDefinition The mapping information for the result expressions
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementResultMapping resultDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementResultMapping resultDefinition, boolean ignoreCache)
     {
         this.ec = ec;
         this.rs = rs;
+        this.ignoreCache = ignoreCache;
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -159,11 +163,13 @@ public class ResultClassROF implements ResultObjectFactory
      * @param rs ResultSet being processed
      * @param cls The result class to use
      * @param classDefinition The mapping information for the (candidate) class
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition, boolean ignoreCache)
     {
         this.ec = ec;
         this.rs = rs;
+        this.ignoreCache = ignoreCache;
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -200,11 +206,13 @@ public class ResultClassROF implements ResultObjectFactory
      * @param rs ResultSet being processed
      * @param cls The result class to use
      * @param resultFieldNames Names for the result fields
+     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames, boolean ignoreCache)
     {
         this.ec = ec;
         this.rs = rs;
+        this.ignoreCache = ignoreCache;
 
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
@@ -283,7 +291,7 @@ public class ResultClassROF implements ResultObjectFactory
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, false, cls);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, classMap, acmd, ignoreCache, cls);
                     fieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)

@@ -648,7 +648,7 @@ public final class SQLQuery extends Query
                             if (resultMetaData != null)
                             {
                                 // Each row of the ResultSet is defined by MetaData
-                                rof = new ResultMetaDataROF(ec, rs, resultMetaData);
+                                rof = new ResultMetaDataROF(ec, rs, resultMetaData, ignoreCache);
                             }
                             else if (resultClass != null || candidateClass == null)
                             {

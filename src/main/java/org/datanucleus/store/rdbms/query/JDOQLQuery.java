@@ -660,11 +660,11 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                             if (result != null)
                             {
                                 // Each result row is of a result type
-                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinition());
+                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinition(), ignoreCache);
                             }
                             else if (resultClass != null && resultClass != candidateClass)
                             {
-                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinitionForClass());
+                                rof = new ResultClassROF(ec, rs, resultClass, datastoreCompilation.getResultDefinitionForClass(), ignoreCache);
                             }
                             else
                             {

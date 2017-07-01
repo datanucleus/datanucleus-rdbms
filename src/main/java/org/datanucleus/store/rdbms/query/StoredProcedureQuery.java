@@ -696,7 +696,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         if (resultMetaDatas != null)
         {
             // Each row of the ResultSet is defined by MetaData
-            rof = new ResultMetaDataROF(ec, rs, resultMetaDatas[resultSetNumber]);
+            rof = new ResultMetaDataROF(ec, rs, resultMetaDatas[resultSetNumber], ignoreCache);
         }
         else
         {

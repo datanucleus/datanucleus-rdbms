@@ -1,3 +1,14 @@
 <BODY>
     Package providing the querying mechanism for DataNucleus for RDBMS datastores.
+
+    <H3>Query Generation</H3>
+    Queries are supported on RDBMS datastore using JDOQL, JPQL, SQL, or alternatively StoredProcedures. 
+    JDOQL queries are converted into SQL using a query compilation process, firstly compiling generically, and then converting the generic compilation into SQL using <pre>QueryToSQLMapper</pre>. 
+    JPQL queries are converted into SQL using a query compilation process, firstly compiling generically, and then converting the generic compilation into SQL using <pre>QueryToSQLMapper</pre>. 
+
+    <H3>Query Result Processing</H3>
+    A query is executed and returns a JDBC ResultSet. The ResultSet is then converted into the requisite result format using either of
+    <pre>PersistentClassROF</pre>, <pre>ResultClassROF</pre> or <pre>ResultMetaDataROF</pre>.
+    These "result object factories" convert each row of the ResultSet into the required object(s).
+    Where part of the result is a persistable object, it makes use of ResultSetGetter to populate the fields of the persistable object.
 </BODY>
