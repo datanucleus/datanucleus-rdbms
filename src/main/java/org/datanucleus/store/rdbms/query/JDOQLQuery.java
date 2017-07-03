@@ -601,7 +601,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
         Object results = null;
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             // Execute the query

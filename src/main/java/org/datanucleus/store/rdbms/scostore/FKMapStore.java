@@ -981,7 +981,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         ExecutionContext ec = op.getExecutionContext();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -1034,7 +1034,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         ExecutionContext ec = op.getExecutionContext();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -1114,7 +1114,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         Object value = null;
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

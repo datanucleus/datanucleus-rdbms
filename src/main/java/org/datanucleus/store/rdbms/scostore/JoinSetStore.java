@@ -287,7 +287,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             try
             {
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     // Add a row to the join table
@@ -368,7 +368,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         boolean modified = false;
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 SQLController sqlControl = storeMgr.getSQLController();
@@ -483,7 +483,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -600,7 +600,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -755,7 +755,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         String stmt = getMaxOrderColumnIdStmt();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
 
             try
@@ -885,7 +885,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

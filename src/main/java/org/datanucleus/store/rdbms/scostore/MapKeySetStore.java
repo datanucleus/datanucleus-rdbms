@@ -187,7 +187,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? iteratorStmtLocked : iteratorStmtUnlocked);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

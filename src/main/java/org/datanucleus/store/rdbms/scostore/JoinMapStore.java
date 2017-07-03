@@ -214,7 +214,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             try
             {
                 ExecutionContext ec = op.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     // Loop through all entries
@@ -243,7 +243,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             try
             {
                 ExecutionContext ec = op.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     // Loop through all entries
@@ -298,7 +298,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             try
             {
                 ExecutionContext ec = op.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     if (exists)
@@ -684,7 +684,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         Object value = null;
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -913,7 +913,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         try
         {
             ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -945,7 +945,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         ExecutionContext ec = op.getExecutionContext();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -1091,7 +1091,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

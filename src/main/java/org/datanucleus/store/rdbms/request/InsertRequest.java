@@ -239,7 +239,7 @@ public class InsertRequest extends Request
             op.changeActivityState(ActivityState.INSERTING);
 
             SQLController sqlControl = storeMgr.getSQLController();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,

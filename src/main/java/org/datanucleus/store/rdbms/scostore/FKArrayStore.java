@@ -266,7 +266,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         ExecutionContext ec = ownerOP.getExecutionContext();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -443,7 +443,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 try
                 {
                     ExecutionContext ec = ownerOP.getExecutionContext();
-                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                     SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {
@@ -627,7 +627,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

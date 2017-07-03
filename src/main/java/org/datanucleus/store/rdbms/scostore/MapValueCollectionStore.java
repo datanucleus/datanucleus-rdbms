@@ -200,7 +200,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
 
             try
@@ -305,7 +305,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? iteratorStmtLocked : iteratorStmtUnlocked);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

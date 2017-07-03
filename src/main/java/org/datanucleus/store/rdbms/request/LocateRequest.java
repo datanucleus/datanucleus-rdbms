@@ -198,7 +198,7 @@ public class LocateRequest extends Request
 
             try
             {
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
                 try

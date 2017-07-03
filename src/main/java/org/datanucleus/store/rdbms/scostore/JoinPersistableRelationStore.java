@@ -110,7 +110,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, addStmt, false);
             try
             {
@@ -145,7 +145,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, removeStmt, false);
             try
             {
@@ -179,7 +179,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, updateStmt, false);
             try
             {

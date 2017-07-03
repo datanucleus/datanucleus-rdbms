@@ -266,7 +266,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         {
             ExecutionContext ec = op.getExecutionContext();
 
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -362,7 +362,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? iteratorStmtLocked : iteratorStmtUnlocked);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

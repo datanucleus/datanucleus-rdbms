@@ -368,7 +368,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -445,7 +445,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -518,7 +518,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         ExecutionContext ec = op.getExecutionContext();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

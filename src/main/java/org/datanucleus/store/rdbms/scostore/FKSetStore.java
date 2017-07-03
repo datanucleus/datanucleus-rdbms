@@ -291,7 +291,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         String stmt = getUpdateFkStmt(element);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -920,7 +920,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     String stmt = getClearNullifyStmt(elementInfo[i]);
                     try
                     {
-                        ManagedConnection mconn = storeMgr.getConnection(ec);
+                        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                         SQLController sqlControl = storeMgr.getSQLController();
                         try
                         {
@@ -1139,7 +1139,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

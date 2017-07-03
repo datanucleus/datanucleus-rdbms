@@ -265,7 +265,7 @@ public class DeleteRequest extends Request
         // Process the delete of this object
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
 
             try
@@ -466,7 +466,7 @@ public class DeleteRequest extends Request
 
                 try
                 {
-                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                     SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {

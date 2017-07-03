@@ -297,7 +297,7 @@ public class UpdateRequest extends Request
             // TODO Set the batch flag based on whether we have no other SQL being invoked in here just our UPDATE
             try
             {
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
                 try

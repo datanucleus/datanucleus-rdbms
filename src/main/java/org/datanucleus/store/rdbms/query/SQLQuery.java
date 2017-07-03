@@ -583,7 +583,7 @@ public final class SQLQuery extends Query
             try
             {
                 RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
                 try
@@ -623,7 +623,7 @@ public final class SQLQuery extends Query
             try
             {
                 RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
                 try
@@ -729,7 +729,7 @@ public final class SQLQuery extends Query
             try
             {
                 RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
                 try

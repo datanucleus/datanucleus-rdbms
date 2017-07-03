@@ -252,7 +252,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         String addStmt = getAddStmtForJoinTable();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -347,7 +347,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         String theSetStmt = getSetStmt();
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -490,7 +490,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         {
             // Ordered List - just remove the list item since no indexing present
             ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 int[] rcs = internalRemove(ownerOP, mconn, false, element, true);
@@ -586,7 +586,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         String removeAllStmt = getRemoveAllStmt(elements);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, removeAllStmt, false);
@@ -631,7 +631,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         try
         {
             boolean batched = storeMgr.allowsBatching();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 for (int i = 0; i < currentListSize; i++)
@@ -751,7 +751,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

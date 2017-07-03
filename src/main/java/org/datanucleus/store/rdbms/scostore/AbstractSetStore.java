@@ -98,7 +98,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         String removeStmt = getRemoveStmt(elementToRemove);
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -183,7 +183,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         try
         {
             ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 // Process all waiting batched statements before we start our work

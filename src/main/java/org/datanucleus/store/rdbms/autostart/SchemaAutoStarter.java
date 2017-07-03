@@ -70,7 +70,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
         schemaTable.initialize(clr);
 
         // We need to autocreate the table and validate it being correct.
-        ManagedConnection mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(TransactionIsolation.NONE);
         Connection conn = (Connection) mconn.getConnection();
         try
         {
@@ -190,7 +190,7 @@ public class SchemaAutoStarter extends AbstractAutoStartMechanism
     public void open()
     {
         assertIsClosed();
-        mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+        mconn = storeMgr.getConnectionManager().getConnection(TransactionIsolation.NONE);
     }
     
     /**

@@ -96,7 +96,7 @@ public class RDBMSStoreHelper
         // Perform the query
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             if (ec.getSerializeReadForClass(cmd.getFullClassName()))
             {
@@ -325,7 +325,7 @@ public class RDBMSStoreHelper
         {
             try
             {
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
                 if (sampleCmd != null && ec.getSerializeReadForClass(sampleCmd.getFullClassName()))
                 {

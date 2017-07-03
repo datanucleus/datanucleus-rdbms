@@ -82,7 +82,7 @@ public abstract class AbstractSchemaTransaction
     {
         if (conn == null)
         {
-            mconn = rdbmsMgr.getConnection(isolationLevel);
+            mconn = rdbmsMgr.getConnectionManager().getConnection(isolationLevel);
             conn = (Connection) mconn.getConnection();
             if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
             {

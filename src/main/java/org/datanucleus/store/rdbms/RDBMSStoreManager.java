@@ -110,7 +110,6 @@ import org.datanucleus.store.NucleusSequence;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
-import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
@@ -280,7 +279,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         // Retrieve the Database Adapter for this datastore
         try
         {
-            ManagedConnection mc = getConnection(-1);
+            ManagedConnection mc = connectionMgr.getConnection(-1);
             Connection conn = (Connection)mc.getConnection();
             if (conn == null)
             {
@@ -1269,28 +1268,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public NucleusConnection getNucleusConnection(final ExecutionContext ec)
     {
-        final ManagedConnection mc;
-
-        final boolean enlisted;
-        if (!ec.getTransaction().isActive())
-        {
-            // no active transaction so don't enlist
-            enlisted = false;
-        }
-        else
-        {
-            enlisted = true;
-        }
-        ConnectionFactory cf = null;
-        if (enlisted)
-        {
-            cf = connectionMgr.lookupConnectionFactory(primaryConnectionFactoryName);
-        }
-        else
-        {
-            cf = connectionMgr.lookupConnectionFactory(secondaryConnectionFactoryName);
-        }
-        mc = cf.getConnection(enlisted ? ec : null, ec.getTransaction(), null); // Will throw exception if already locked
+        ManagedConnection mc = connectionMgr.getConnection(ec.getTransaction().isActive(), ec, ec.getTransaction());
 
         // Lock the connection now that it is in use by the user
         mc.lock();
@@ -1301,7 +1279,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 // Unlock the connection now that the user has finished with it
                 mc.unlock();
-                if (!enlisted)
+                if (!ec.getTransaction().isActive())
                 {
                     // Close the (unenlisted) connection (committing its statements)
                     try
@@ -1420,7 +1398,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         // Clear and reinitialise the schemaHandler
         schemaHandler.clear();
-        ManagedConnection mc = getConnection(-1);
+        ManagedConnection mc = connectionMgr.getConnection(-1);
         try
         {
             dba.initialiseTypes(schemaHandler, mc);
@@ -1463,7 +1441,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         ManagedConnection mconn = null;
         try
         {
-            mconn = getConnection(TransactionIsolation.NONE);
+            mconn = connectionMgr.getConnection(TransactionIsolation.NONE);
 
             PreparedStatement ps = null;
             ResultSet rs = null;
@@ -1928,7 +1906,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
 
                 // RDBMS-based generator so set the connection provider
-                final RDBMSStoreManager thisStoreMgr = this;
                 ValueGenerationConnectionProvider connProvider = new ValueGenerationConnectionProvider()
                 {
                     ManagedConnection mconn;
@@ -1936,11 +1913,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         if (newConnection)
                         {
-                            mconn = thisStoreMgr.getConnection(TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION)));
+                            mconn = connectionMgr.getConnection(TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION)));
                         }
                         else
                         {
-                            mconn = thisStoreMgr.getConnection(ec);
+                            mconn = connectionMgr.getConnection(ec);
                         }
                         return mconn;
                     }
@@ -2589,7 +2566,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             ps.println();
             ps.println("TABLES");
 
-            ManagedConnection mc = getConnection(-1);
+            ManagedConnection mc = connectionMgr.getConnection(-1);
             try
             {
                 Connection conn = (Connection)mc.getConnection();
@@ -3973,7 +3950,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         if (!seqTablesGenerated.contains(tableName))
         {
-            ManagedConnection mconn = getConnection(TransactionIsolation.NONE);
+            ManagedConnection mconn = connectionMgr.getConnection(TransactionIsolation.NONE);
             Connection conn = (Connection) mconn.getConnection();
             try
             {
@@ -4060,7 +4037,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             else
             {
                 PreparedStatement ps = null;
-                ManagedConnection mconn = getConnection(TransactionIsolation.NONE);
+                ManagedConnection mconn = connectionMgr.getConnection(TransactionIsolation.NONE);
                 try
                 {
                     ps = sqlController.getStatementForUpdate(mconn, stmt, false);
@@ -4234,7 +4211,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     {
         script = StringUtils.replaceAll(script, "\n", " ");
         script = StringUtils.replaceAll(script, "\t", " ");
-        ManagedConnection mc = getConnection(-1);
+        ManagedConnection mc = connectionMgr.getConnection(-1);
         try
         {
             // Execute the script on this datastore

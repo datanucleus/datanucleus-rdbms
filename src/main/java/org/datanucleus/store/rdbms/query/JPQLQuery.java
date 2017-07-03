@@ -531,7 +531,7 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
 
         Object results = null;
-        ManagedConnection mconn = getStoreManager().getConnection(ec);
+        ManagedConnection mconn = getStoreManager().getConnectionManager().getConnection(ec);
         try
         {
             // Execute the query

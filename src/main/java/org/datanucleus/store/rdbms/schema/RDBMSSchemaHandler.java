@@ -118,7 +118,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             Connection conn = (Connection)connection;
             if (connection == null)
             {
-                mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+                mconn = storeMgr.getConnectionManager().getConnection(TransactionIsolation.NONE);
                 conn = (Connection)mconn.getConnection();
             }
 
@@ -173,7 +173,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             Connection conn = (Connection)connection;
             if (connection == null)
             {
-                mconn = storeMgr.getConnection(TransactionIsolation.NONE);
+                mconn = storeMgr.getConnectionManager().getConnection(TransactionIsolation.NONE);
                 conn = (Connection)mconn.getConnection();
             }
 

@@ -342,7 +342,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             try
             {
                 ExecutionContext ec = ownerOP.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
                 try
                 {
@@ -532,7 +532,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
         try
         {
             ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

@@ -101,7 +101,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                     // The way around this would be to find a way of checking for existence of the sequence
                     Configuration conf = ec.getNucleusContext().getConfiguration();
                     int isolationLevel = TransactionUtils.getTransactionIsolationLevelForName(conf.getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ISOLATION));
-                    this.mconn = ((RDBMSStoreManager)storeManager).getConnection(isolationLevel);
+                    this.mconn = ((RDBMSStoreManager)storeManager).getConnectionManager().getConnection(isolationLevel);
                     return mconn;
                 }
 

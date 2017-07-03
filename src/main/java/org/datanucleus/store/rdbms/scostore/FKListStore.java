@@ -288,7 +288,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         {
             ExecutionContext ec = ownerOP.getExecutionContext();
             SQLController sqlControl = storeMgr.getSQLController();
-            mconn = storeMgr.getConnection(ec);
+            mconn = storeMgr.getConnectionManager().getConnection(ec);
 
             // Unset the existing object from this position
             String theUnsetStmt = getUnsetStmt();
@@ -409,7 +409,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         boolean retval;
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
@@ -572,7 +572,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 int shift = c.size();
 
                 ExecutionContext ec = ownerOP.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     // shift up existing elements after start position by "shift"
@@ -876,7 +876,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 String clearNullifyStmt = getClearNullifyStmt();
                 try
                 {
-                    ManagedConnection mconn = storeMgr.getConnection(ec);
+                    ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                     SQLController sqlControl = storeMgr.getSQLController();
                     try
                     {
@@ -1106,7 +1106,7 @@ public class FKListStore<E> extends AbstractListStore<E>
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {

@@ -167,7 +167,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
         try
         {
             RDBMSStoreManager storeMgr = (RDBMSStoreManager)getStoreManager();
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
 
             try
             {
@@ -621,7 +621,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
             throw new NucleusUserException("Cannot check for update count until the stored procedure has been executed");
         }
 
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             resultSetNumber++;
@@ -645,7 +645,7 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
             throw new NucleusUserException("Cannot check for more results until the stored procedure has been executed");
         }
 
-        ManagedConnection mconn = storeMgr.getConnection(ec);
+        ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
         try
         {
             resultSetNumber++;

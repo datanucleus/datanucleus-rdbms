@@ -264,7 +264,7 @@ public class OracleClobRDBMSMapping extends ClobRDBMSMapping
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
 
             try

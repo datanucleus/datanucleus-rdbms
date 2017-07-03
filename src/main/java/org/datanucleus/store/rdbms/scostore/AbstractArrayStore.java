@@ -132,7 +132,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 processBatchedWrites(mconn);
@@ -205,7 +205,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
         try
         {
-            ManagedConnection mconn = storeMgr.getConnection(ec);
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
 
             try
             {
@@ -242,7 +242,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         try
         {
             ExecutionContext ec = ownerOP.getExecutionContext();
-            ManagedConnection mconn = getStoreManager().getConnection(ec);
+            ManagedConnection mconn = getStoreManager().getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
             {
