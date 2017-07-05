@@ -249,7 +249,6 @@ public abstract class TableImpl extends AbstractTable
                     Column col = entry.getValue();
                     String addColStmt = dba.getAddColumnStatement(this, col);
                     stmts.add(addColStmt);
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057031", col.getIdentifier(), this.toString()));
                 }
 
                 try

@@ -504,11 +504,6 @@ public abstract class AbstractTable implements Table
     {
         assertIsInitialized();
 
-        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057029", this));
-        }
-
         if (storeMgr.getSchemaHandler().isAutoCreateDatabase())
         {
             if (identifier.getSchemaName() != null || identifier.getCatalogName() != null)
@@ -537,11 +532,6 @@ public abstract class AbstractTable implements Table
     throws SQLException
     {
         assertIsInitialized();
-
-        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057030", this));
-        }
 
         executeDdlStatementList(getSQLDropStatements(), conn);
     }
