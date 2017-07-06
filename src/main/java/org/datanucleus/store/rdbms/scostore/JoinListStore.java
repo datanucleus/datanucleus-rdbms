@@ -1083,24 +1083,21 @@ public class JoinListStore<E> extends AbstractListStore<E>
         else
         {
             // Apply ordering defined by <order-by>
-            if (elementInfo != null && elementInfo.length > 0)
+            DatastoreClass elementTbl = elementInfo[0].getDatastoreClass();
+            FieldOrder[] orderComponents = ownerMemberMetaData.getOrderMetaData().getFieldOrders();
+            SQLExpression[] orderExprs = new SQLExpression[orderComponents.length];
+            boolean[] orderDirs = new boolean[orderComponents.length];
+
+            for (int i=0;i<orderComponents.length;i++)
             {
-                DatastoreClass elementTbl = elementInfo[0].getDatastoreClass();
-                FieldOrder[] orderComponents = ownerMemberMetaData.getOrderMetaData().getFieldOrders();
-                SQLExpression[] orderExprs = new SQLExpression[orderComponents.length];
-                boolean[] orderDirs = new boolean[orderComponents.length];
-
-                for (int i=0;i<orderComponents.length;i++)
-                {
-                    String fieldName = orderComponents[i].getFieldName();
-                    JavaTypeMapping fieldMapping = elementTbl.getMemberMapping(elementInfo[0].getAbstractClassMetaData().getMetaDataForMember(fieldName));
-                    orderDirs[i] = !orderComponents[i].isForward();
-                    SQLTable fieldSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), fieldMapping);
-                    orderExprs[i] = exprFactory.newExpression(sqlStmt, fieldSqlTbl, fieldMapping);
-                }
-
-                sqlStmt.setOrdering(orderExprs, orderDirs);
+                String fieldName = orderComponents[i].getFieldName();
+                JavaTypeMapping fieldMapping = elementTbl.getMemberMapping(elementInfo[0].getAbstractClassMetaData().getMetaDataForMember(fieldName));
+                orderDirs[i] = !orderComponents[i].isForward();
+                SQLTable fieldSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), fieldMapping);
+                orderExprs[i] = exprFactory.newExpression(sqlStmt, fieldSqlTbl, fieldMapping);
             }
+
+            sqlStmt.setOrdering(orderExprs, orderDirs);
         }
 
         return new IteratorStatement(this, sqlStmt, stmtClassMapping);
