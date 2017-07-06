@@ -2301,10 +2301,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param strategy The strategy
      * @return Whether it is supported.
      */
-    public boolean supportsValueStrategy(String strategy)
+    public boolean supportsValueGenerationStrategy(String strategy)
     {
         // "identity" doesn't have an explicit entry in plugin since uses datastore capabilities
-        if (strategy.equalsIgnoreCase("IDENTITY") || super.supportsValueStrategy(strategy))
+        if (strategy.equalsIgnoreCase("IDENTITY") || super.supportsValueGenerationStrategy(strategy))
         {
             if (strategy.equalsIgnoreCase("IDENTITY") && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
             {

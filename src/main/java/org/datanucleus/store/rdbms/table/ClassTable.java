@@ -1691,7 +1691,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      */
     public boolean isObjectIdDatastoreAttributed()
     {
-        boolean attributed = storeMgr.isStrategyDatastoreAttributed(cmd, -1);
+        boolean attributed = storeMgr.isValueGenerationStrategyDatastoreAttributed(cmd, -1);
         if (attributed)
         {
             return true;

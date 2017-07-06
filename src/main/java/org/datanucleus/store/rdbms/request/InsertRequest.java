@@ -801,7 +801,7 @@ public class InsertRequest extends Request
                         // Or we are a subclass table.
                         // Or we are not datastore attributed.
                         if (table instanceof SecondaryTable || !table.isBaseDatastoreClass() ||
-                            (!table.getStoreManager().isStrategyDatastoreAttributed(cmd, mmd.getAbsoluteFieldNumber()) && !c.isIdentity()))
+                            (!table.getStoreManager().isValueGenerationStrategyDatastoreAttributed(cmd, mmd.getAbsoluteFieldNumber()) && !c.isIdentity()))
                         {
                             if (!columnExists)
                             {

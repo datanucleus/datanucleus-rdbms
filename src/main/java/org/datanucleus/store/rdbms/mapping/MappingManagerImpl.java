@@ -1991,7 +1991,7 @@ public class MappingManagerImpl implements MappingManager
             }
             else
             {*/
-                if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
+                if (storeMgr.isValueGenerationStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()) && tbl instanceof DatastoreClass)
                 {
                     if ((mmd.isPrimaryKey() && ((DatastoreClass)tbl).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
                     {
@@ -2126,7 +2126,7 @@ public class MappingManagerImpl implements MappingManager
         }
         else
         {
-            if (storeMgr.isStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()))
+            if (storeMgr.isValueGenerationStrategyDatastoreAttributed(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber()))
             {
                 if ((mmd.isPrimaryKey() && ((DatastoreClass)table).isBaseDatastoreClass()) || !mmd.isPrimaryKey())
                 {

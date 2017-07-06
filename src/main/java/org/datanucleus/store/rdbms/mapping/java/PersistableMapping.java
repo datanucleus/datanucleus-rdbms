@@ -421,7 +421,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         if (strategy != null)
                         {
                             //if strategy is null, then it's user attributed value
-                            hasDatastoreAttributedPrimaryKeyValues |= srm.isStrategyDatastoreAttributed(acmd, acmd.getPKMemberPositions()[i]);
+                            hasDatastoreAttributedPrimaryKeyValues |= srm.isValueGenerationStrategyDatastoreAttributed(acmd, acmd.getPKMemberPositions()[i]);
                         }
                     }
                 }
