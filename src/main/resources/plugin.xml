@@ -38,14 +38,6 @@ Contributors:
         <store-manager class-name="org.datanucleus.store.rdbms.RDBMSStoreManager" url-key="jdbc" key="rdbms"/>
     </extension>
 
-    <!-- QUERY LANGUAGES -->
-    <extension point="org.datanucleus.store_query_query">
-        <query class-name="org.datanucleus.store.rdbms.query.JDOQLQuery" datastore="rdbms" name="JDOQL"/>
-        <query class-name="org.datanucleus.store.rdbms.query.JPQLQuery" datastore="rdbms" name="JPQL"/>
-        <query class-name="org.datanucleus.store.rdbms.query.SQLQuery" datastore="rdbms" name="SQL"/>
-        <query class-name="org.datanucleus.store.rdbms.query.StoredProcedureQuery" datastore="rdbms" name="STOREDPROC"/>
-    </extension>
-
     <!-- AUTOSTART MECHANISMS -->
     <extension point="org.datanucleus.autostart">
         <autostart class-name="org.datanucleus.store.rdbms.autostart.SchemaAutoStarter" name="SchemaTable"/>

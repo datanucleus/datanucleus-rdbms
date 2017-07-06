@@ -111,6 +111,7 @@ import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
@@ -127,6 +128,10 @@ import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
+import org.datanucleus.store.rdbms.query.JDOQLQuery;
+import org.datanucleus.store.rdbms.query.JPQLQuery;
+import org.datanucleus.store.rdbms.query.SQLQuery;
+import org.datanucleus.store.rdbms.query.StoredProcedureQuery;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
@@ -1105,6 +1110,106 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public String getNativeQueryLanguage()
     {
         return QueryLanguage.SQL.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.AbstractStoreManager#getSupportedQueryLanguages()
+     */
+    @Override
+    public Collection<String> getSupportedQueryLanguages()
+    {
+        Collection<String> languages = super.getSupportedQueryLanguages();
+        languages.add("SQL");
+        languages.add("STOREDPROC");
+        return languages;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.AbstractStoreManager#supportsQueryLanguage(java.lang.String)
+     */
+    @Override
+    public boolean supportsQueryLanguage(String language)
+    {
+        if (language != null && (language.equalsIgnoreCase("JDOQL") || language.equalsIgnoreCase("JPQL") || language.equals("SQL") || language.equals("STOREDPROC")))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec)
+    {
+        if (language.equalsIgnoreCase("JDOQL"))
+        {
+            return new JDOQLQuery(this, ec);
+        }
+        else if (language.equalsIgnoreCase("JPQL"))
+        {
+            return new JPQLQuery(this, ec);
+        }
+        else if (language.equalsIgnoreCase("SQL"))
+        {
+            return new SQLQuery(this, ec);
+        }
+        else if (language.equalsIgnoreCase("STOREDPROC"))
+        {
+            return new StoredProcedureQuery(this, ec);
+        }
+        throw new NucleusException("Error creating query for language " + language);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext, java.lang.String)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec, String queryString)
+    {
+        if (language.equalsIgnoreCase("JDOQL"))
+        {
+            return new JDOQLQuery(this, ec, queryString);
+        }
+        else if (language.equalsIgnoreCase("JPQL"))
+        {
+            return new JPQLQuery(this, ec, queryString);
+        }
+        else if (language.equalsIgnoreCase("SQL"))
+        {
+            return new SQLQuery(this, ec, queryString);
+        }
+        else if (language.equalsIgnoreCase("STOREDPROC"))
+        {
+            return new StoredProcedureQuery(this, ec, queryString);
+        }
+        throw new NucleusException("Error creating query for language " + language);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.StoreManager#newQuery(java.lang.String, org.datanucleus.ExecutionContext, org.datanucleus.store.query.Query)
+     */
+    @Override
+    public Query newQuery(String language, ExecutionContext ec, Query q)
+    {
+        if (language.equalsIgnoreCase("JDOQL"))
+        {
+            return new JDOQLQuery(this, ec, (JDOQLQuery) q);
+        }
+        else if (language.equalsIgnoreCase("JPQL"))
+        {
+            return new JPQLQuery(this, ec, (JPQLQuery) q);
+        }
+        else if (language.equalsIgnoreCase("SQL"))
+        {
+            return new SQLQuery(this, ec, (SQLQuery) q);
+        }
+        else if (language.equalsIgnoreCase("STOREDPROC"))
+        {
+            return new StoredProcedureQuery(this, ec, (StoredProcedureQuery) q);
+        }
+        throw new NucleusException("Error creating query for language " + language);
     }
 
     /**
