@@ -120,6 +120,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                 }
             };
         Class cls = null;
+        // TODO Move this to ValueGeneratorManager
         ConfigurationElement elem = ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
                 new String[]{"name", "datastore"}, 
                 new String[] {valueGeneratorName, storeManager.getStoreManagerKey()});
@@ -131,7 +132,7 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
         {
             throw new NucleusException("Cannot create ValueGenerator for strategy "+valueGeneratorName);
         }
-        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, storeManager, connProvider);
+        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, connProvider);
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {

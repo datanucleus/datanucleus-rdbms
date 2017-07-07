@@ -376,6 +376,7 @@ public abstract class AbstractClassTable extends TableImpl
         {
             try
             {
+                // TODO Move this to ValueGeneratorManager
                 // Create generator so we can find the generated type
                 // a). Try as unique generator first
                 AbstractGenerator generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
