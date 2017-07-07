@@ -47,8 +47,16 @@ import org.datanucleus.store.connection.AbstractEmulatedXAResource;
 import org.datanucleus.store.connection.AbstractManagedConnection;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.connectionpool.BoneCPConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.C3P0ConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.ConnectionPool;
 import org.datanucleus.store.rdbms.connectionpool.ConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.DBCP2BuiltinConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.DBCP2ConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.DefaultConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.HikariCPConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.ProxoolConnectionPoolFactory;
+import org.datanucleus.store.rdbms.connectionpool.TomcatConnectionPoolFactory;
 import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.Localiser;
@@ -200,12 +208,51 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
             try
             {
                 // Create the ConnectionPool to be used
-                ConnectionPoolFactory connPoolFactory = (ConnectionPoolFactory)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store.rdbms.connectionpool", "name", poolingType, "class-name", null, null);
-                if (connPoolFactory == null)
+                ConnectionPoolFactory connPoolFactory = null;
+
+                // Try built-in pools first
+                if (poolingType.equals("dbcp2-builtin"))
                 {
-                    // User has specified a pool plugin that has not registered
-                    throw new NucleusUserException(Localiser.msg("047003", poolingType)).setFatal();
+                    connPoolFactory = new DBCP2BuiltinConnectionPoolFactory();
+                }
+                else if (poolingType.equals("HikariCP"))
+                {
+                    connPoolFactory = new HikariCPConnectionPoolFactory();
+                }
+                else if (poolingType.equals("BoneCP"))
+                {
+                    connPoolFactory = new BoneCPConnectionPoolFactory();
+                }
+                else if (poolingType.equals("C3P0"))
+                {
+                    connPoolFactory = new C3P0ConnectionPoolFactory();
+                }
+                else if (poolingType.equals("Tomcat"))
+                {
+                    connPoolFactory = new TomcatConnectionPoolFactory();
+                }
+                else if (poolingType.equals("DBCP2"))
+                {
+                    connPoolFactory = new DBCP2ConnectionPoolFactory();
+                }
+                else if (poolingType.equals("Proxool"))
+                {
+                    connPoolFactory = new ProxoolConnectionPoolFactory();
+                }
+                else if (poolingType.equals("None"))
+                {
+                    connPoolFactory = new DefaultConnectionPoolFactory();
+                }
+                else
+                {
+                    // Fallback to the plugin mechanism
+                    connPoolFactory = (ConnectionPoolFactory)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                        "org.datanucleus.store.rdbms.connectionpool", "name", poolingType, "class-name", null, null);
+                    if (connPoolFactory == null)
+                    {
+                        // User has specified a pool plugin that has not registered
+                        throw new NucleusUserException(Localiser.msg("047003", poolingType)).setFatal();
+                    }
                 }
 
                 // Create the ConnectionPool and get the DataSource
