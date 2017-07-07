@@ -613,14 +613,6 @@ Contributors:
         </mapping>
     </extension>
 
-    <!-- IDENTIFIER FACTORIES. TODO Adopt NamingFactory -->
-    <extension point="org.datanucleus.store.rdbms.identifierfactory">
-        <identifierfactory name="datanucleus2" class-name="org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory"/>
-        <identifierfactory name="jpa" class-name="org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory"/>
-        <identifierfactory name="datanucleus1" class-name="org.datanucleus.store.rdbms.identifier.DNIdentifierFactory"/>
-		<identifierfactory name="jpox" class-name="org.datanucleus.store.rdbms.identifier.JPOXIdentifierFactory"/>        
-    </extension>
-
     <!-- SQL EXPRESSIONS -->
     <extension point="org.datanucleus.store.rdbms.sql_expression">
         <sql-expression mapping-class="org.datanucleus.store.rdbms.mapping.java.ArrayMapping" 
@@ -1175,13 +1167,6 @@ Contributors:
         <sql-operation name="numericToString" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation"/>
         <sql-operation name="numericToString" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation"/>
         <sql-operation name="numericToString" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation"/>
-    </extension>
-
-    <!-- SQL TABLE NAMING -->
-    <extension point="org.datanucleus.store.rdbms.sql_tablenamer">
-        <sql-tablenamer name="t-scheme" class="org.datanucleus.store.rdbms.sql.SQLTableTNamer"/>
-        <sql-tablenamer name="alpha-scheme" class="org.datanucleus.store.rdbms.sql.SQLTableAlphaNamer"/>
-        <sql-tablenamer name="table-name" class="org.datanucleus.store.rdbms.sql.SQLTableNameNamer"/>
     </extension>
 
     <!-- DATASTORE ADAPTERS -->

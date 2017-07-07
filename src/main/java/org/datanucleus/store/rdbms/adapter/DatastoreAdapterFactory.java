@@ -133,12 +133,12 @@ public class DatastoreAdapterFactory
         final Object adapter_obj;
         try
         {
-            
             Class adapterClass = getAdapterClass(pluginMgr, adapterClassName, productName, clr);
-            if (adapterClass==null)
+            if (adapterClass == null)
             {
             	return null;
             }
+
             final Object[] ctr_args = new Object[]{metadata};
             final Class[] ctr_args_classes = new Class[]{DatabaseMetaData.class};
 

@@ -869,15 +869,32 @@ public abstract class SQLStatement
         if (namer == null)
         {
             // Instantiate the namer of this schema name (if available)
-            try
+            if (namingSchema.equalsIgnoreCase("t-scheme"))
             {
-                namer = (SQLTableNamer)rdbmsMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store.rdbms.sql_tablenamer", "name", namingSchema, "class", null, null);
+                namer = new SQLTableTNamer();
             }
-            catch (Exception e)
+            else if (namingSchema.equalsIgnoreCase("alpha-scheme"))
             {
-                throw new NucleusException("Attempt to find/instantiate SQL table namer " + namingSchema + " threw an exception", e);
+                namer = new SQLTableAlphaNamer();
             }
+            else if (namingSchema.equalsIgnoreCase("table-name"))
+            {
+                namer = new SQLTableNameNamer();
+            }
+            else
+            {
+                // Fallback to the plugin mechanism
+                try
+                {
+                    namer = (SQLTableNamer)rdbmsMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                        "org.datanucleus.store.rdbms.sql_tablenamer", "name", namingSchema, "class", null, null);
+                }
+                catch (Exception e)
+                {
+                    throw new NucleusException("Attempt to find/instantiate SQL table namer " + namingSchema + " threw an exception", e);
+                }
+            }
+
             tableNamerByName.put(namingSchema, namer);
         }
         return namer;

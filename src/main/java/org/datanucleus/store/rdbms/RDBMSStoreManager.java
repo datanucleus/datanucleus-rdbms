@@ -117,9 +117,13 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.exceptions.UnsupportedDataTypeException;
+import org.datanucleus.store.rdbms.identifier.DN2IdentifierFactory;
+import org.datanucleus.store.rdbms.identifier.DNIdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
+import org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory;
+import org.datanucleus.store.rdbms.identifier.JPOXIdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
@@ -426,13 +430,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         String idFactoryName = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_FACTORY);
-        String idFactoryClassName = nucleusContext.getPluginManager().getAttributeValueForExtension("org.datanucleus.store.rdbms.identifierfactory", 
-            "name", idFactoryName, "class-name");
-        if (idFactoryClassName == null)
-        {
-            throw new NucleusUserException(Localiser.msg("039003", idFactoryName)).setFatal();
-        }
-
         try
         {
             // Create the control properties for identifier generation
@@ -467,19 +464,40 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             props.put("NamingFactory", getNamingFactory());
 
             // Create the IdentifierFactory
-            Class[] argTypes = new Class[] {DatastoreAdapter.class, ClassConstants.CLASS_LOADER_RESOLVER, Map.class};
-            Object[] args = new Object[] {dba, nucleusContext.getClassLoaderResolver(null), props};
-            identifierFactory = (IdentifierFactory)nucleusContext.getPluginManager().createExecutableExtension(
-                "org.datanucleus.store.rdbms.identifierfactory", "name", idFactoryName, "class-name", argTypes, args);
+            ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
+            if ("datanucleus2".equalsIgnoreCase(idFactoryName))
+            {
+                identifierFactory = new DN2IdentifierFactory(dba, clr, props);
+            }
+            else if ("jpa".equalsIgnoreCase(idFactoryName))
+            {
+                identifierFactory = new JPAIdentifierFactory(dba, clr, props);
+            }
+            else if ("datanucleus1".equalsIgnoreCase(idFactoryName))
+            {
+                identifierFactory = new DNIdentifierFactory(dba, clr, props);
+            }
+            else if ("jpox".equalsIgnoreCase(idFactoryName))
+            {
+                identifierFactory = new JPOXIdentifierFactory(dba, clr, props);
+            }
+            else
+            {
+                // Fallback to the plugin mechanism
+                Class[] argTypes = new Class[] {DatastoreAdapter.class, ClassConstants.CLASS_LOADER_RESOLVER, Map.class};
+                Object[] args = new Object[] {dba, nucleusContext.getClassLoaderResolver(null), props};
+                identifierFactory = (IdentifierFactory)nucleusContext.getPluginManager().createExecutableExtension(
+                    "org.datanucleus.store.rdbms.identifierfactory", "name", idFactoryName, "class-name", argTypes, args);
+            }
         }
         catch (ClassNotFoundException cnfe)
         {
-            throw new NucleusUserException(Localiser.msg("039004", idFactoryName, idFactoryClassName), cnfe).setFatal();
+            throw new NucleusUserException(Localiser.msg("039004", idFactoryName), cnfe).setFatal();
         }
         catch (Exception e)
         {
             NucleusLogger.PERSISTENCE.error("Exception creating IdentifierFactory", e);
-            throw new NucleusException(Localiser.msg("039005", idFactoryClassName), e).setFatal();
+            throw new NucleusException(Localiser.msg("039005", idFactoryName), e).setFatal();
         }
     }
 
