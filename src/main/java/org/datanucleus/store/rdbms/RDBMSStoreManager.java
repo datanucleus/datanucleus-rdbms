@@ -2071,13 +2071,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to return the properties to pass to the generator for the specified field.
      * @param cmd MetaData for the class
      * @param absoluteFieldNumber Number of the field (-1 = datastore identity)
-     * @param ec execution context
+     * @param clr ClassLoader resolver
      * @param seqmd Any sequence metadata
      * @param tablegenmd Any table generator metadata
      * @return The properties to use for this field
      */
-    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber,
-            ExecutionContext ec, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
+    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         AbstractMemberMetaData mmd = null;
         IdentityStrategy strategy = null;
@@ -2102,10 +2101,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
 
         // Get base table with the required field
-        DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(), ec.getClassLoaderResolver());
+        DatastoreClass tbl = getDatastoreClass(cmd.getBaseAbstractClassMetaData().getFullClassName(), clr);
         if (tbl == null)
         {
-            tbl = getTableForStrategy(cmd,absoluteFieldNumber,ec.getClassLoaderResolver());
+            tbl = getTableForStrategy(cmd,absoluteFieldNumber, clr);
         }
         JavaTypeMapping m = null;
         if (mmd != null)
@@ -2114,7 +2113,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             if (m == null)
             {
                 // Field not mapped in root table so use passed-in table
-                tbl = getTableForStrategy(cmd,absoluteFieldNumber,ec.getClassLoaderResolver());
+                tbl = getTableForStrategy(cmd,absoluteFieldNumber, clr);
                 m = tbl.getMemberMapping(mmd);
             }
         }

@@ -47,31 +47,25 @@ import org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.valuegenerator.AbstractGenerator;
+import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
  * Abstract representation of a table for a class.
- * Abstracts out the common parts of a primary ClassTable
- * and a SecondaryClassTable.
+ * Abstracts out the common parts of a primary ClassTable and a SecondaryClassTable.
  * 
  * <H3>Mappings</H3>
- * A Table is built from a series of field mappings. Each Java class has a series of
- * fields and each of these has an associated JavaTypeMapping. Each JavaTypeMapping has
- * related DatastoreMapping(s). These are used in mapping the Java class to the table,
- * and are used when populating the table, and when retrieving data from the table back
- * to the object. There are several categories of mappings in this class
+ * A Table is built from a series of field mappings. Each Java class has a series of fields and each of these has an associated JavaTypeMapping. 
+ * Each JavaTypeMapping has related DatastoreMapping(s). These are used in mapping the Java class to the table, and are used when populating the table, 
+ * and when retrieving data from the table back to the object. There are several categories of mappings in this class
  * <UL>
- * <LI><B>memberMappingsMap</B> - the set of mappings relating to the fields in the
- * class. The mappings are keyed by the FieldMetaData of the field. Any embedded field
- * will have a single mapping here of type EmbeddedPCMapping, with a set of datastore
- * mappings attached.</LI>
+ * <LI><B>memberMappingsMap</B> - the set of mappings relating to the fields in the class. The mappings are keyed by the FieldMetaData of the field. Any embedded field
+ * will have a single mapping here of type EmbeddedPCMapping, with a set of datastore mappings attached.</LI>
  * <LI><B>datastoreIdMapping</B> - the Identity mapping when using "datastore identity"</LI>
  * <LI><B>pkMappings</B> - the mappings for the primary key column(s).</LI>
- * <LI><B>discriminatorMapping</B> - mapping for any discriminator column. This is only
- * used where classes share this table and some of them use "superclass-table" strategy</LI>
+ * <LI><B>discriminatorMapping</B> - mapping for any discriminator column. This is only used where classes share this table and some of them use "superclass-table" strategy</LI>
  * <LI><B>versionMapping</B> - mapping for any versioning column</LI>
  * </UL>
  */
@@ -376,21 +370,26 @@ public abstract class AbstractClassTable extends TableImpl
         {
             try
             {
-                // TODO Move this to ValueGeneratorManager
                 // Create generator so we can find the generated type
                 // a). Try as unique generator first
-                AbstractGenerator generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                    "org.datanucleus.store_valuegenerator", 
-                    new String[] {"name", "unique"}, new String[] {strategyName, "true"},
-                    "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+                ValueGenerator generator = storeMgr.getValueGenerationManager().getUniqueValueGeneratorByName(strategyName);
                 if (generator == null)
                 {
-                    // b). Try as datastore-specific generator
-                    generator = (AbstractGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                        "org.datanucleus.store_valuegenerator",
-                        new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
+                    // TODO Move this to ValueGeneratorManager
+                    generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                        "org.datanucleus.store_valuegenerator", 
+                        new String[] {"name", "unique"}, new String[] {strategyName, "true"},
                         "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+                    if (generator == null)
+                    {
+                        // b). Try as datastore-specific generator
+                        generator = (ValueGenerator)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
+                            "org.datanucleus.store_valuegenerator",
+                            new String[] {"name", "datastore"}, new String[] {strategyName, storeMgr.getStoreManagerKey()},
+                            "class-name", new Class[] {String.class, Properties.class}, new Object[] {null, null});
+                    }
                 }
+
                 if (generator != null)
                 {
                     try
