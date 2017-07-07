@@ -117,6 +117,97 @@ public class MappingManagerImpl implements MappingManager
 
         // Load up the mappings of javaType -> JavaTypeMapping
         NucleusContext nucleusCtx = storeMgr.getNucleusContext();
+
+        // a). load built-in mappings
+        addMappedType(boolean.class, org.datanucleus.store.rdbms.mapping.java.BooleanMapping.class);
+        addMappedType(byte.class, org.datanucleus.store.rdbms.mapping.java.ByteMapping.class);
+        addMappedType(char.class, org.datanucleus.store.rdbms.mapping.java.CharacterMapping.class);
+        addMappedType(double.class, org.datanucleus.store.rdbms.mapping.java.DoubleMapping.class);
+        addMappedType(float.class,org.datanucleus.store.rdbms.mapping.java.FloatMapping.class);
+        addMappedType(int.class, org.datanucleus.store.rdbms.mapping.java.IntegerMapping.class);
+        addMappedType(long.class, org.datanucleus.store.rdbms.mapping.java.LongMapping.class);
+        addMappedType(short.class, org.datanucleus.store.rdbms.mapping.java.ShortMapping.class);
+        addMappedType(Boolean.class, org.datanucleus.store.rdbms.mapping.java.BooleanMapping.class);
+        addMappedType(Byte.class, org.datanucleus.store.rdbms.mapping.java.ByteMapping.class);
+        addMappedType(Character.class, org.datanucleus.store.rdbms.mapping.java.CharacterMapping.class);
+        addMappedType(Double.class, org.datanucleus.store.rdbms.mapping.java.DoubleMapping.class);
+        addMappedType(Float.class,org.datanucleus.store.rdbms.mapping.java.FloatMapping.class);
+        addMappedType(Integer.class, org.datanucleus.store.rdbms.mapping.java.IntegerMapping.class);
+        addMappedType(Long.class, org.datanucleus.store.rdbms.mapping.java.LongMapping.class);
+        addMappedType(Short.class, org.datanucleus.store.rdbms.mapping.java.ShortMapping.class);
+
+        addMappedType(Number.class, org.datanucleus.store.rdbms.mapping.java.NumberMapping.class);
+        addMappedType(String.class, org.datanucleus.store.rdbms.mapping.java.StringMapping.class);
+        addMappedType(Enum.class, org.datanucleus.store.rdbms.mapping.java.EnumMapping.class);
+        addMappedType(Object.class, org.datanucleus.store.rdbms.mapping.java.SerialisedMapping.class);
+
+        addMappedType(java.awt.image.BufferedImage.class, org.datanucleus.store.rdbms.mapping.java.BufferedImageMapping.class);
+
+        addMappedType(java.io.File.class, org.datanucleus.store.rdbms.mapping.java.FileMapping.class);
+        addMappedType(java.io.Serializable.class, org.datanucleus.store.rdbms.mapping.java.SerialisedMapping.class);
+
+        addMappedType(java.math.BigDecimal.class, org.datanucleus.store.rdbms.mapping.java.BigDecimalMapping.class);
+        addMappedType(java.math.BigInteger.class, org.datanucleus.store.rdbms.mapping.java.BigIntegerMapping.class);
+
+        addMappedType(java.util.Calendar.class, org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping.class);
+        addMappedType(java.util.GregorianCalendar.class, org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping.class);
+        addMappedType(java.util.Date.class, org.datanucleus.store.rdbms.mapping.java.DateMapping.class);
+        addMappedType(java.util.UUID.class, org.datanucleus.store.rdbms.mapping.java.UUIDMapping.class);
+
+        addMappedType(java.sql.Date.class, org.datanucleus.store.rdbms.mapping.java.SqlDateMapping.class);
+        addMappedType(java.sql.Time.class, org.datanucleus.store.rdbms.mapping.java.SqlTimeMapping.class);
+        addMappedType(java.sql.Timestamp.class, org.datanucleus.store.rdbms.mapping.java.SqlTimestampMapping.class);
+
+        addMappedType(boolean[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(byte[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(char[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(double[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(float[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(int[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(long[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(short[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Boolean[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Byte[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Character[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Double[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Float[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Integer[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Long[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Short[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Number[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(String[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(Enum[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(java.math.BigDecimal[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(java.math.BigInteger[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(java.util.Date[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+        addMappedType(java.util.Locale[].class, org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class);
+
+        addMappedType(java.util.ArrayList.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.BitSet.class, org.datanucleus.store.rdbms.mapping.java.BitSetMapping.class);
+        addMappedType(java.util.Collection.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.HashMap.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.HashSet.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Hashtable.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.LinkedList.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.List.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.LinkedHashMap.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.LinkedHashSet.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Map.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.PriorityQueue.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Properties.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.Queue.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Set.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.SortedMap.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.SortedSet.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Stack.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.TreeMap.class, org.datanucleus.store.rdbms.mapping.java.MapMapping.class);
+        addMappedType(java.util.TreeSet.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Vector.class, org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class);
+        addMappedType(java.util.Optional.class, org.datanucleus.store.rdbms.mapping.java.OptionalMapping.class);
+
+        addMappedType(org.datanucleus.identity.DatastoreId.class, org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class);
+
+        // b). Load any mappings from the plugin mechanism
         PluginManager pluginMgr = nucleusCtx.getPluginManager();
         ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.java_mapping", null, null);
         if (elems != null)
@@ -151,6 +242,11 @@ public class MappingManagerImpl implements MappingManager
                 }
             }
         }
+    }
+
+    protected void addMappedType(Class javaType, Class mappingType)
+    {
+        mappedTypes.put(javaType.getName(), new MappedType(javaType, mappingType));
     }
 
     /**
