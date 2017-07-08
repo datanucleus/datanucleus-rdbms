@@ -1991,13 +1991,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Accessor for the next value from the specified generator.
+     * Accessor for the next value from the specified ValueGenerator.
      * This implementation caters for datastore-specific generators and provides synchronisation on the connection to the datastore.
      * @param generator The generator
      * @param ec execution context
      * @return The next value.
      */
-    protected Object getStrategyValueForGenerator(ValueGenerator generator, final ExecutionContext ec)
+    protected Object getNextValueForValueGenerator(ValueGenerator generator, final ExecutionContext ec)
     {
         Object oid = null;
         synchronized (generator)
@@ -2068,7 +2068,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Method to return the properties to pass to the generator for the specified field.
+     * Method to return the properties to pass to the ValueGenerator for the specified field.
      * @param cmd MetaData for the class
      * @param absoluteFieldNumber Number of the field (-1 = datastore identity)
      * @param clr ClassLoader resolver
@@ -2076,7 +2076,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param tablegenmd Any table generator metadata
      * @return The properties to use for this field
      */
-    protected Properties getPropertiesForGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
+    protected Properties getPropertiesForValueGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         AbstractMemberMetaData mmd = null;
         IdentityStrategy strategy = null;
@@ -2173,7 +2173,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
         if (strategy.equals(IdentityStrategy.NATIVE))
         {
-            String realStrategyName = getStrategyForNative(cmd, absoluteFieldNumber);
+            String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
             strategy = IdentityStrategy.getIdentityStrategy(realStrategyName);
         }
 
@@ -2344,7 +2344,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method defining which value-strategy to use when the user specifies "native".
      * @return Should be overridden by all store managers that have other behaviour.
      */
-    public String getStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
+    public String getValueGenerationStrategyForNative(AbstractClassMetaData cmd, int absFieldNumber)
     {
         // TODO If the user has generated the schema and the column for this field is an autoincrement column then select IDENTITY
         if (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_LEGACY_NATIVE_VALUE_STRATEGY))
@@ -2368,7 +2368,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             }
             return "increment";
         }
-        return super.getStrategyForNative(cmd, absFieldNumber);
+        return super.getValueGenerationStrategyForNative(cmd, absFieldNumber);
     }
 
     /**

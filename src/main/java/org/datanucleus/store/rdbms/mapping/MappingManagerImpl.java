@@ -1897,7 +1897,7 @@ public class MappingManagerImpl implements MappingManager
                     String strategyName = strategy.toString();
                     if (strategy == IdentityStrategy.NATIVE)
                     {
-                        strategyName = storeMgr.getStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
+                        strategyName = storeMgr.getValueGenerationStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
                     }
                     if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
                     {

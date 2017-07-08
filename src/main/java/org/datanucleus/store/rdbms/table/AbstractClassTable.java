@@ -349,7 +349,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
         if (strategyName != null && IdentityStrategy.NATIVE.toString().equals(strategyName))
         {
-            strategyName = storeMgr.getStrategyForNative(cmd, -1);
+            strategyName = storeMgr.getValueGenerationStrategyForNative(cmd, -1);
         }
 
         // Check the value generator type being stored
