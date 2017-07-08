@@ -278,7 +278,7 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
     /**
      * Method to initialise the sequence table used for storing the sequence values.
      */
-    protected void initialiseSequenceTable()
+    protected synchronized void initialiseSequenceTable()
     {
         // Set catalog/schema name (using properties, and if not specified using the values for the table)
         String catalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
