@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -47,6 +48,7 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.method.SQLMethod;
 import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
@@ -1021,9 +1023,18 @@ public interface DatastoreAdapter
     boolean validToIndexMapping(JavaTypeMapping mapping);
 
     /**
-     * Accessor for the SQLOperation for the specified name (if available).
+     * Accessor for the SQLOperation for the specified name (if available for this datastore).
      * @param name operation name
      * @return SQLOperation (or null if none available)
      */
     SQLOperation getSQLOperationForName(String name);
+
+    /**
+     * Accessor for the SQLMethod for the specified class + method name (if available for this datastore).
+     * @param className Name of the class (or null if this is a STATIC method)
+     * @param methodName Method name
+     * @param clr ClassLoader resolver
+     * @return The SQLMethod (or null if not defined for this datastore).
+     */
+    SQLMethod getSQLMethod(String className, String methodName, ClassLoaderResolver clr);
 }
