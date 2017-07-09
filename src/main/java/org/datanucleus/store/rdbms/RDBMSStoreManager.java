@@ -405,8 +405,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             NucleusLogger.DATASTORE_SCHEMA.error(msg, e1);
             throw new NucleusUserException(msg, e1).setFatal();
         }
-
-        expressionFactory = new SQLExpressionFactory(this);
     }
 
     /* (non-Javadoc)
@@ -1435,6 +1433,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public SQLExpressionFactory getSQLExpressionFactory()
     {
+        if (expressionFactory == null)
+        {
+            expressionFactory = new SQLExpressionFactory(this);
+        }
         return expressionFactory;
     }
 

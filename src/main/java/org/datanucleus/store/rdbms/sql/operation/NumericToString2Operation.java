@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -30,13 +31,14 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  * Implementation of a conversion from a NumericExpression to a StringExpression.
  * Results in <pre>CAST(expr AS CHAR(4000))</pre>
  */
-public class NumericToString2Operation extends AbstractSQLOperation
+public class NumericToString2Operation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
      */
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
+        SQLExpressionFactory exprFactory = expr.getSQLStatement().getSQLExpressionFactory();
         JavaTypeMapping m = exprFactory.getMappingForType(String.class, false);
         if (expr instanceof SQLLiteral)
         {

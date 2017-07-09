@@ -22,12 +22,13 @@ import java.util.List;
 
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Implementation of MOD, using SQL MOD function.
  * Results in <pre>MOD(expr1, expr2)</pre> with some casts.
  */
-public class Mod3Operation extends AbstractSQLOperation
+public class Mod3Operation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
@@ -39,14 +40,15 @@ public class Mod3Operation extends AbstractSQLOperation
         List types = new ArrayList();
         types.add("BIGINT");
 
+        SQLExpressionFactory exprFactory = expr.getSQLStatement().getSQLExpressionFactory();
         List argsOp1 = new ArrayList();
         argsOp1.add(expr);
-        args.add(new NumericExpression(expr.getSQLStatement(), getMappingForClass(int.class), "CAST", argsOp1, types));
+        args.add(new NumericExpression(expr.getSQLStatement(), exprFactory.getMappingForType(int.class), "CAST", argsOp1, types));
 
         List argsOp2 = new ArrayList();
         argsOp2.add(expr2);
-        args.add(new NumericExpression(expr.getSQLStatement(), getMappingForClass(int.class), "CAST", argsOp2, types));
+        args.add(new NumericExpression(expr.getSQLStatement(), exprFactory.getMappingForType(int.class), "CAST", argsOp2, types));
 
-        return new NumericExpression(expr.getSQLStatement(), getMappingForClass(int.class), "MOD", args);
+        return new NumericExpression(expr.getSQLStatement(), exprFactory.getMappingForType(int.class), "MOD", args);
     }
 }

@@ -26,7 +26,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
  * Implementation of MOD, using SQL MOD function.
  * Results in <pre>MOD(expr1, expr2)</pre>
  */
-public class Mod2Operation extends AbstractSQLOperation
+public class Mod2Operation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
@@ -36,6 +36,6 @@ public class Mod2Operation extends AbstractSQLOperation
         ArrayList args = new ArrayList();
         args.add(expr);
         args.add(expr2);
-        return new NumericExpression(expr.getSQLStatement(), getMappingForClass(int.class), "MOD", args);
+        return new NumericExpression(expr.getSQLStatement(), expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(int.class), "MOD", args);
     }
 }

@@ -31,6 +31,7 @@ import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -73,8 +74,8 @@ public class SQLExpressionFactory
     /** Names of operations that are supported. */
     Set<String> operationNamesSupported = new HashSet<>();
 
-    /** Cache of already created SQLOperation instances, keyed by their name. */
-    Map<String, SQLOperation> operationByOperationName = new HashMap<>();
+    /** Plugin-generated SQLOperation instances, keyed by their key. */
+    Map<String, SQLOperation> pluginSqlOperationByKey = new HashMap<>();
 
     /** Map of JavaTypeMapping for use in query expressions, keyed by the type being represented. */
     Map<Class, JavaTypeMapping> mappingByClass = new HashMap<>();
@@ -484,60 +485,6 @@ public class SQLExpressionFactory
     }
 
     /**
-     * Accessor for the result of an operation call on the supplied expression with the supplied args.
-     * Throws a NucleusException is the method is not supported.
-     * @param name Operation to be invoked
-     * @param expr The first expression to perform the operation on
-     * @param expr2 The second expression to perform the operation on
-     * @return The result
-     * @throws UnsupportedOperationException if the operation is not specified
-     */
-    public SQLExpression invokeOperation(String name, SQLExpression expr, SQLExpression expr2)
-    {
-        // Try to find an instance of the SQLOperation
-        SQLOperation operation = operationByOperationName.get(name);
-        if (operation != null)
-        {
-            return operation.getExpression(expr, expr2);
-        }
-
-        // No cached instance of the SQLMethod so find and instantiate it
-        // 1). Try datastore-dependent key
-        String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
-        String key = getSQLOperationKey(datastoreId, name);
-        boolean datastoreDependent = true;
-        if (!operationNamesSupported.contains(key))
-        {
-            // 2). No datastore-dependent method, so try a datastore-independent key
-            key = getSQLOperationKey(null, name);
-            datastoreDependent = false;
-            if (!operationNamesSupported.contains(key))
-            {
-                throw new UnsupportedOperationException("Operation " + name + " datastore=" + datastoreId + " not supported");
-            }
-        }
-
-        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        String[] attrNames = (datastoreDependent ? new String[] {"name", "datastore"} : new String[] {"name"});
-        String[] attrValues = (datastoreDependent ? new String[] {name, datastoreId} : new String[] {name});
-        try
-        {
-            // Use SQLOperation().getExpression(SQLExpression, SQLExpression)
-            operation = (SQLOperation)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_operation", attrNames, attrValues, "evaluator", null, null);
-            operation.setExpressionFactory(this);
-            synchronized (operation)
-            {
-                operationByOperationName.put(key, operation);
-                return operation.getExpression(expr, expr2);
-            }
-        }
-        catch (Exception e)
-        {
-            throw new NucleusUserException(Localiser.msg("060011", "operation=" + name), e);
-        }
-    }
-
-    /**
      * Convenience method to return the key for the SQL method.
      * Returns a string like <pre>{datastore}#{class}.{method}</pre> if the class is defined, and
      * <pre>{datastore}#{method}</pre> if the class is not defined (function).
@@ -553,6 +500,67 @@ public class SQLExpressionFactory
         key.methodName = methodName;
         key.datastoreName = (datastoreName != null ? datastoreName.trim() : "ALL");
         return key;
+    }
+
+    /**
+     * Accessor for the result of an operation call on the supplied expression with the supplied args.
+     * Throws a NucleusException is the method is not supported.
+     * @param name Operation to be invoked
+     * @param expr The first expression to perform the operation on
+     * @param expr2 The second expression to perform the operation on
+     * @return The result
+     * @throws UnsupportedOperationException if the operation is not specified
+     */
+    public SQLExpression invokeOperation(String name, SQLExpression expr, SQLExpression expr2)
+    {
+        // Check for instantiated built-in SQLOperation
+        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        SQLOperation operation = dba.getSQLOperationForName(name);
+        if (operation != null)
+        {
+            return operation.getExpression(expr, expr2);
+        }
+
+        // Check for instantiated plugin SQLOperation
+        String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
+        String key = getSQLOperationKey(datastoreId, name);
+        operation = pluginSqlOperationByKey.get(key);
+        if (operation != null)
+        {
+            return operation.getExpression(expr, expr2);
+        }
+
+        // No existing instance of the SQLOperation so find and instantiate it
+
+        // 1). Try datastore-dependent key
+        boolean datastoreDependent = true;
+        if (!operationNamesSupported.contains(key))
+        {
+            // 2). No datastore-dependent method, so try a datastore-independent key
+            key = getSQLOperationKey(null, name);
+            datastoreDependent = false;
+            if (!operationNamesSupported.contains(key))
+            {
+                throw new UnsupportedOperationException("Operation " + name + " on datastore=" + datastoreId + " not supported");
+            }
+        }
+
+        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
+        String[] attrNames = (datastoreDependent ? new String[] {"name", "datastore"} : new String[] {"name"});
+        String[] attrValues = (datastoreDependent ? new String[] {name, datastoreId} : new String[] {name});
+        try
+        {
+            operation = (SQLOperation)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_operation", attrNames, attrValues, "evaluator", null, null);
+            synchronized (operation)
+            {
+                pluginSqlOperationByKey.put(key, operation);
+                return operation.getExpression(expr, expr2);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new NucleusUserException(Localiser.msg("060011", "operation=" + name), e);
+        }
     }
 
     /**

@@ -28,7 +28,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  * Implementation of CONCAT, using SQL CONCAT function.
  * Results in <pre>CONCAT(expr1, expr2)</pre>
  */
-public class Concat2Operation extends AbstractSQLOperation
+public class Concat2Operation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)

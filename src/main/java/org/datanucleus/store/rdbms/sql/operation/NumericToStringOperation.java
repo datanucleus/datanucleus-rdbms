@@ -31,14 +31,14 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  * Results in <pre>CAST(expr AS VARCHAR(4000))</pre>
  * The second expression argument is not used; the first arg is converted to a StringExpression.
  */
-public class NumericToStringOperation extends AbstractSQLOperation
+public class NumericToStringOperation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
      */
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2)
     {
-        JavaTypeMapping m = exprFactory.getMappingForType(String.class, false);
+        JavaTypeMapping m = expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(String.class, false);
         if (expr instanceof SQLLiteral)
         {
             // Just convert the literal value directly

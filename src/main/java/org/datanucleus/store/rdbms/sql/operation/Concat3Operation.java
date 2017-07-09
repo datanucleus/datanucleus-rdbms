@@ -32,7 +32,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  * CAST(expr1 AS VARCHAR(4000)) || CAST(expr2 AS VARCHAR(4000))
  * </pre>
  */
-public class Concat3Operation extends AbstractSQLOperation
+public class Concat3Operation implements SQLOperation
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.operation.SQLOperation#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, org.datanucleus.store.rdbms.sql.expression.SQLExpression)
@@ -60,7 +60,7 @@ public class Concat3Operation extends AbstractSQLOperation
          * If both situations happen,
          * (CAST(CAST( ? AS VARCHAR(4000) ) || CAST( ? AS VARCHAR(4000) ) AS VARCHAR(4000))) = ? 
          */
-        JavaTypeMapping m = exprFactory.getMappingForType(String.class, false);
+        JavaTypeMapping m = expr.getSQLStatement().getSQLExpressionFactory().getMappingForType(String.class, false);
 
         List types = new ArrayList();
         types.add("VARCHAR(4000)");

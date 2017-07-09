@@ -18,7 +18,6 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.operation;
 
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Interface to implement an operation in SQL.
@@ -32,6 +31,4 @@ public interface SQLOperation
      * @return The SQL expression for the operation
      */
     public SQLExpression getExpression(SQLExpression expr, SQLExpression expr2);
-
-    public void setExpressionFactory(SQLExpressionFactory exprFactory);
 }
