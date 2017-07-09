@@ -27,6 +27,7 @@ import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceIdMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.IllegalExpressionOperationException;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
@@ -38,12 +39,12 @@ import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
  * Expression handler to evaluate JDOHelper.getObjectId({expression}).
  * Returns an ObjectExpression or NullLiteral.
  */
-public class JDOHelperGetObjectIdMethod extends AbstractSQLMethod
+public class JDOHelperGetObjectIdMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0)
         {
@@ -65,7 +66,7 @@ public class JDOHelperGetObjectIdMethod extends AbstractSQLMethod
                 return new NullLiteral(stmt, null, null, null);
             }
 
-            JavaTypeMapping m = getMappingForClass(id.getClass());
+            JavaTypeMapping m = stmt.getSQLExpressionFactory().getMappingForType(id.getClass(), true);
             return new ObjectLiteral(stmt, m, id, null);
         }
         else if (ObjectExpression.class.isAssignableFrom(expr.getClass()))

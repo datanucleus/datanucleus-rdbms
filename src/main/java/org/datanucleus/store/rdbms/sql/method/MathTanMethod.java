@@ -22,24 +22,26 @@ import java.math.BigInteger;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ByteLiteral;
 import org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral;
 import org.datanucleus.store.rdbms.sql.expression.IllegalExpressionOperationException;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 
 /**
  * Expression handler to evaluate Math.tan({expression}).
  * Returns a NumericExpression.
  */
-public class MathTanMethod extends AbstractSQLMethod
+public class MathTanMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0)
         {
@@ -76,6 +78,7 @@ public class MathTanMethod extends AbstractSQLMethod
         else
         {
             // Relay to the equivalent "tan(expr)" function
+            SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
             return exprFactory.invokeMethod(stmt, null, "tan", null, args);
         }
     }

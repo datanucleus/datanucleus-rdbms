@@ -22,23 +22,26 @@ import java.util.List;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.EnumLiteral;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.util.Localiser;
 
 /**
  * Expression handler to evaluate {enumExpression}.ordinal().
  * Returns a NumericExpression.
  */
-public class EnumOrdinalMethod extends AbstractSQLMethod
+public class EnumOrdinalMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (expr instanceof EnumLiteral)
         {
             Enum val = (Enum)((EnumLiteral)expr).getValue();

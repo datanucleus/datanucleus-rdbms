@@ -19,15 +19,18 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.AggregateTemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.sql.expression.StringSubqueryExpression;
@@ -43,14 +46,14 @@ import org.datanucleus.util.Localiser;
  * <li>If the compilation component is something else then will generate a subquery expression</li>
  * </ul>
  */
-public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
+public abstract class SimpleOrderableAggregateMethod implements SQLMethod
 {
     protected abstract String getFunctionName();
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr != null)
         {
@@ -80,6 +83,8 @@ public abstract class SimpleOrderableAggregateMethod extends AbstractSQLMethod
         }
 
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         SQLExpression argExpr = args.get(0);
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);

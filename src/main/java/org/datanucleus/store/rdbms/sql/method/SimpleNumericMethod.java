@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.util.Localiser;
@@ -31,19 +32,19 @@ import org.datanucleus.util.Localiser;
  *     <pre>{functionName}({args})</pre> and expr isn't used</li>
  * </ul>
  */
-public abstract class SimpleNumericMethod extends AbstractSQLMethod
+public abstract class SimpleNumericMethod implements SQLMethod
 {
     protected abstract String getFunctionName();
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
             // Assume that we have something like "ABS({expr})"
-            return new NumericExpression(stmt, getMappingForClass(getClassForMapping()), getFunctionName(), args);
+            return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(getClassForMapping(), true), getFunctionName(), args);
         }
 
         throw new NucleusException(Localiser.msg("060002", getFunctionName(), expr));

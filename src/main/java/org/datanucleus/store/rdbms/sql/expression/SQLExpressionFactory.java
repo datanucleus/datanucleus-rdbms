@@ -297,11 +297,7 @@ public class SQLExpressionFactory
         SQLMethod method = getMethod(className, methodName, args);
         if (method != null)
         {
-            synchronized (method) // Only permit sole usage at any time
-            {
-                method.setStatement(stmt);
-                return method.getExpression(expr, args);
-            }
+            return method.getExpression(stmt, expr, args);
         }
         return null;
     }
@@ -474,8 +470,7 @@ public class SQLExpressionFactory
         String[] attrValues = (datastoreDependent ? new String[] {className, methodName, datastoreId} : new String[] {className, methodName});
         try
         {
-            method = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", 
-                attrNames, attrValues, "evaluator", new Class[]{}, new Object[]{});
+            method = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", attrNames, attrValues, "evaluator", new Class[]{}, new Object[]{});
 
             // Register the method
             methodByClassMethodName.put(getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName), method);
@@ -592,5 +587,10 @@ public class SQLExpressionFactory
         mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(cls, false, false, clr);
         mappingByClass.put(cls, mapping);
         return mapping;
+    }
+
+    public JavaTypeMapping getMappingForType(Class cls)
+    {
+        return getMappingForType(cls, true);
     }
 }

@@ -28,6 +28,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.rdbms.sql.operation.Mod2Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
@@ -78,6 +79,9 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         // Create index before FK to avoid duplication since H2 automatically creates index for FK
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
+
+        // Load up SQLOperations applicable to this datastore
+        sqlOperationsByName.put("mod", new Mod2Operation());
     }
 
     /**

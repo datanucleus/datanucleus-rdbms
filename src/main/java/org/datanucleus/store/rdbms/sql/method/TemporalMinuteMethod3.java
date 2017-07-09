@@ -22,8 +22,10 @@ import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating {dateExpr}.getMinute() using PostgreSQL.
@@ -34,17 +36,18 @@ public class TemporalMinuteMethod3 extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MINUTE");
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression day = exprFactory.newLiteral(stmt, mapping, "minute");
 
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(day);
         funcArgs.add(invokedExpr);
-        return new NumericExpression(stmt, getMappingForClass(int.class), "date_part", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
     }
 }

@@ -22,8 +22,10 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.util.Localiser;
 
@@ -32,12 +34,12 @@ import org.datanucleus.util.Localiser;
  * Returns a StringExpression that equates to
  * <pre>TRANSLATE(strExpr, strExp1, strExpr2)</pre>
  */
-public class StringTranslateMethod extends AbstractSQLMethod
+public class StringTranslateMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 2)
         {
@@ -66,6 +68,7 @@ public class StringTranslateMethod extends AbstractSQLMethod
         newArgs.add(expr);
         newArgs.add(strExpr1);
         newArgs.add(strExpr2);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         JavaTypeMapping mapping = exprFactory.getMappingForType(String.class, false);
         return new StringExpression(stmt, mapping, "translate", newArgs);
     }

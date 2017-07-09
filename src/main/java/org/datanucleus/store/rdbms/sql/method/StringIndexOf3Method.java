@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -35,12 +36,12 @@ import org.datanucleus.util.Localiser;
  * Returns a StrignExpression that equates to <pre>LOCATE(strExpr1, strExpr2, numExpr1+1)-1</pre>
  * with some additional casting.
  */
-public class StringIndexOf3Method extends AbstractSQLMethod
+public class StringIndexOf3Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -64,7 +65,7 @@ public class StringIndexOf3Method extends AbstractSQLMethod
 
         List types = new ArrayList();
         types.add("VARCHAR(4000)"); // max 4000 according DB2 docs
-        funcArgs.add(new StringExpression(stmt, getMappingForClass(String.class), "CAST", funcArgs2, types));
+        funcArgs.add(new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class, true), "CAST", funcArgs2, types));
 
         if (args.size() == 2)
         {
@@ -81,9 +82,9 @@ public class StringIndexOf3Method extends AbstractSQLMethod
 
             // Add 1 to the passed in value so that it is of origin 1 to be compatible with LOCATE
             // Make sure argument is typed as BIGINT
-            funcArgs.add(new NumericExpression(stmt, getMappingForClass(int.class), "CAST", funcArgs3, types));
+            funcArgs.add(new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "CAST", funcArgs3, types));
         }
-        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs);
+        NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "LOCATE", funcArgs);
 
         // Subtract 1 from the result of LOCATE to be consistent with Java strings
         return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();

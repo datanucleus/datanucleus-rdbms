@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.query.compiler.CompilationComponent;
@@ -28,10 +29,12 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SubqueryExpression;
 import org.datanucleus.store.rdbms.table.CollectionTable;
@@ -43,12 +46,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {listExpr}.get(idxExpr).
  * Returns an ObjectExpression representing the element
  */
-public class ListGetMethod extends AbstractSQLMethod
+public class ListGetMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -93,13 +96,13 @@ public class ListGetMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            return getAsInnerJoin(listExpr, idxExpr);
+            return getAsInnerJoin(stmt, listExpr, idxExpr);
         }
         else if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.ORDERING ||
                 stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
                 stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
         {
-            return getAsSubquery(listExpr, idxExpr);
+            return getAsSubquery(stmt, listExpr, idxExpr);
         }
 
         throw new NucleusException("List.get() is not supported for " + listExpr +
@@ -107,16 +110,17 @@ public class ListGetMethod extends AbstractSQLMethod
     }
 
     /**
-     * Implementation of Collection.get() using a subquery on the table representing the collection,
-     * adding a condition on the index and returning the element.
+     * Implementation of Collection.get() using a subquery on the table representing the collection, adding a condition on the index and returning the element.
+     * @param stmt SQLStatement
      * @param listExpr The list expression
      * @param idxExpr The index expression
      * @return The element expression
      */
-    protected SQLExpression getAsSubquery(CollectionExpression listExpr, SQLExpression idxExpr)
+    protected SQLExpression getAsSubquery(SQLStatement stmt, CollectionExpression listExpr, SQLExpression idxExpr)
     {
         AbstractMemberMetaData mmd = listExpr.getJavaTypeMapping().getMemberMetaData();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
 
         JavaTypeMapping ownerMapping = null;
         JavaTypeMapping indexMapping = null;
@@ -154,6 +158,7 @@ public class ListGetMethod extends AbstractSQLMethod
             }
         }
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SelectStatement subStmt = new SelectStatement(stmt, storeMgr, listTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
         SQLExpression valExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), elemMapping);
@@ -177,16 +182,18 @@ public class ListGetMethod extends AbstractSQLMethod
     }
 
     /**
-     * Implementation of List.get() using an inner join to the table representing the list,
-     * adding a condition on the index and returning the element.
+     * Implementation of List.get() using an inner join to the table representing the list, adding a condition on the index and returning the element.
+     * @param stmt SQLStatement
      * @param listExpr The list expression
      * @param idxExpr The index expression
      * @return The element expression
      */
-    protected SQLExpression getAsInnerJoin(CollectionExpression listExpr, SQLExpression idxExpr)
+    protected SQLExpression getAsInnerJoin(SQLStatement stmt, CollectionExpression listExpr, SQLExpression idxExpr)
     {
         JavaTypeMapping m = listExpr.getJavaTypeMapping();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
 
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);

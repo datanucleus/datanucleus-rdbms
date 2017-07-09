@@ -19,13 +19,16 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
 
@@ -37,14 +40,14 @@ import org.datanucleus.util.Localiser;
  * <li>If the compilation component is something else then will generate a subquery expression</li>
  * </ul>
  */
-public abstract class SimpleNumericAggregateMethod extends AbstractSQLMethod
+public abstract class SimpleNumericAggregateMethod implements SQLMethod
 {
     protected abstract String getFunctionName();
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr != null)
         {
@@ -65,11 +68,13 @@ public abstract class SimpleNumericAggregateMethod extends AbstractSQLMethod
             return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
         }
 
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
         SQLExpression argExpr = args.get(0);
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
         String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
         SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);

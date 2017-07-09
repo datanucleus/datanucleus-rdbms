@@ -21,6 +21,7 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -29,6 +30,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ArrayExpression;
 import org.datanucleus.store.rdbms.sql.expression.ArrayLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
@@ -38,6 +40,7 @@ import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
@@ -50,18 +53,20 @@ import org.datanucleus.util.NucleusLogger;
  * Method for evaluating {arrExpr}.contains(elemExpr).
  * Returns a BooleanExpression.
  */
-public class ArrayContainsMethod extends AbstractSQLMethod
+public class ArrayContainsMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {
             throw new NucleusException("Incorrect arguments for Array.contains(SQLExpression)");
         }
 
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         ArrayExpression arrExpr = (ArrayExpression)expr;
         SQLExpression elemExpr = args.get(0);
 
@@ -188,7 +193,7 @@ public class ArrayContainsMethod extends AbstractSQLMethod
         else
         {
             // TODO Support inner join variant
-            return containsAsSubquery(arrExpr, elemExpr);
+            return containsAsSubquery(stmt, arrExpr, elemExpr);
         }
     }
 
@@ -211,11 +216,12 @@ public class ArrayContainsMethod extends AbstractSQLMethod
      * </li>
      * </ul>
      * and returns a BooleanSubqueryExpression ("EXISTS (subquery)")
+     * @param stmt SQLStatement
      * @param arrExpr Collection expression
      * @param elemExpr Expression for the element
      * @return Contains expression
      */
-    protected SQLExpression containsAsSubquery(ArrayExpression arrExpr, SQLExpression elemExpr)
+    protected SQLExpression containsAsSubquery(SQLStatement stmt, ArrayExpression arrExpr, SQLExpression elemExpr)
     {
         boolean elemIsUnbound = (elemExpr instanceof UnboundExpression);
         String varName = null;
@@ -227,6 +233,8 @@ public class ArrayContainsMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = arrExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData elemCmd = mmd.getArray().getElementClassMetaData(clr);
         ArrayTable joinTbl = (ArrayTable)storeMgr.getTable(mmd);

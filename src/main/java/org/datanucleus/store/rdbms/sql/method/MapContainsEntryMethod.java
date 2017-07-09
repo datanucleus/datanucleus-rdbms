@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -31,11 +32,13 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
@@ -47,12 +50,12 @@ import org.datanucleus.util.NucleusLogger;
  * Method for evaluating {mapExpr}.containsEntry(keyExpr, valueExpr).
  * Returns a BooleanExpression.
  */
-public class MapContainsEntryMethod extends AbstractSQLMethod
+public class MapContainsEntryMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 2)
         {
@@ -98,26 +101,27 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            boolean needsSubquery = getNeedsSubquery();
+            boolean needsSubquery = getNeedsSubquery(stmt);
 
             // TODO Check if *this* "containsEntry" is negated, not any of them (and remove above check)
             if (needsSubquery)
             {
                 NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using SUBQUERY");
-                return containsAsSubquery(mapExpr, keyExpr, valExpr);
+                return containsAsSubquery(stmt, mapExpr, keyExpr, valExpr);
             }
             NucleusLogger.QUERY.debug("MapContainsEntry on " + mapExpr + "(" + keyExpr + "," + valExpr + ") using INNERJOIN");
-            return containsAsInnerJoin(mapExpr, keyExpr, valExpr);
+            return containsAsInnerJoin(stmt, mapExpr, keyExpr, valExpr);
         }
-        return containsAsSubquery(mapExpr, keyExpr, valExpr);
+        return containsAsSubquery(stmt, mapExpr, keyExpr, valExpr);
     }
 
     /**
      * Convenience method to decide if we handle the contains() by using a subquery, or otherwise
      * via an inner join. If there is an OR or a NOT in the query then uses a subquery.
+     * @param stmt SQLStatement
      * @return Whether to use a subquery
      */
-    protected boolean getNeedsSubquery()
+    protected boolean getNeedsSubquery(SQLStatement stmt)
     {
         // TODO Check if *this* "contains" is negated, not just any of them (and remove above check)
         boolean needsSubquery = false;
@@ -141,12 +145,13 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
      * adding an AND condition on the value (with value of the valueExpr).
      * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the entry is
      * contained of not).
+     * @param stmt SQLStatement
      * @param mapExpr Map expression
      * @param keyExpr Expression for the key
      * @param valExpr Expression for the value
      * @return Contains expression
      */
-    protected SQLExpression containsAsInnerJoin(MapExpression mapExpr, SQLExpression keyExpr, SQLExpression valExpr)
+    protected SQLExpression containsAsInnerJoin(SQLStatement stmt, MapExpression mapExpr, SQLExpression keyExpr, SQLExpression valExpr)
     {
         boolean keyIsUnbound = (keyExpr instanceof UnboundExpression);
         String keyVarName = null;
@@ -166,6 +171,8 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
         AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
@@ -399,12 +406,13 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
      * </li>
      * </ul>
      * and returns a BooleanSubqueryExpression ("EXISTS (subquery)")
+     * @param stmt SQLStatement
      * @param mapExpr Map expression
      * @param keyExpr Expression for the key
      * @param valExpr Expression for the value
      * @return Contains expression
      */
-    protected SQLExpression containsAsSubquery(MapExpression mapExpr, SQLExpression keyExpr, SQLExpression valExpr)
+    protected SQLExpression containsAsSubquery(SQLStatement stmt, MapExpression mapExpr, SQLExpression keyExpr, SQLExpression valExpr)
     {
         boolean keyIsUnbound = (keyExpr instanceof UnboundExpression);
         String keyVarName = null;
@@ -426,6 +434,8 @@ public class MapContainsEntryMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(clr);
         AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);

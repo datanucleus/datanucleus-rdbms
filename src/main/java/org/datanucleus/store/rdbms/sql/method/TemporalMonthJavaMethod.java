@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -34,13 +35,13 @@ public class TemporalMonthJavaMethod extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MONTH_JAVA");
 
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(invokedExpr);
-        NumericExpression monthExpr = new NumericExpression(stmt, getMappingForClass(int.class), "MONTH", funcArgs);
+        NumericExpression monthExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "MONTH", funcArgs);
 
         // Delete one from the SQL "month" (origin=1) to be compatible with Java month (origin=0)
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);

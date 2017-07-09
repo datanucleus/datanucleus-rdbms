@@ -36,6 +36,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
+import org.datanucleus.store.rdbms.sql.operation.Mod2Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -125,6 +126,9 @@ public class HSQLAdapter extends BaseDatastoreAdapter
             }
         }
         supportedOptions.remove(TX_ISOLATION_NONE);
+
+        // Load up SQLOperations applicable to this datastore
+        sqlOperationsByName.put("mod", new Mod2Operation());
     }
 
     /**

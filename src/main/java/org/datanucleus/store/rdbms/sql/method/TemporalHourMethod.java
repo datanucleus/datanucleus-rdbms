@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
@@ -32,12 +33,12 @@ public class TemporalHourMethod extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "HOUR");
 
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(invokedExpr);
-        return new NumericExpression(stmt, getMappingForClass(int.class), "HOUR", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "HOUR", funcArgs);
     }
 }

@@ -29,15 +29,10 @@ public interface SQLMethod
 {
     /**
      * Return the expression for this SQL function.
+     * @param stmt SQLStatement that this expression is for
      * @param expr The expression that it is invoked on
      * @param args Arguments passed in
      * @return The SQL expression using the SQL function
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args);
-
-    /**
-     * Method to set the SQLStatement that we are related to.
-     * @param stmt The statement
-     */
-    public void setStatement(SQLStatement stmt);
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args);
 }

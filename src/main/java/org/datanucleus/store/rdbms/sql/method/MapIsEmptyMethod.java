@@ -22,9 +22,11 @@ import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -34,18 +36,19 @@ import org.datanucleus.util.Localiser;
  * (SELECT COUNT(*) FROM MAPTABLE A0_SUB WHERE A0_SUB.OWNER_ID_OID = A0.OWNER_ID) = 0
  * </PRE>
  */
-public class MapIsEmptyMethod extends AbstractSQLMethod
+public class MapIsEmptyMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 0)
         {
             throw new NucleusException(Localiser.msg("060015", "isEmpty", "MapExpression"));
         }
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (expr instanceof MapLiteral)
         {
             Map map = (Map)((MapLiteral)expr).getValue();

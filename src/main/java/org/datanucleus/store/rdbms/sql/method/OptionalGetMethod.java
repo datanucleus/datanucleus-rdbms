@@ -21,19 +21,21 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.OptionalExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating {optionalExpr1}.get().
  * Returns a XXXExpression representing the stored object.
  */
-public class OptionalGetMethod extends AbstractSQLMethod
+public class OptionalGetMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 0)
         {
@@ -41,6 +43,7 @@ public class OptionalGetMethod extends AbstractSQLMethod
         }
 
         OptionalMapping opMapping = (OptionalMapping) ((OptionalExpression)expr).getJavaTypeMapping();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         return exprFactory.newExpression(stmt, expr.getSQLTable(), opMapping.getWrappedMapping());
     }
 }

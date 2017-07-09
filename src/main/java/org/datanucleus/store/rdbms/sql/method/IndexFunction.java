@@ -23,6 +23,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -35,12 +36,12 @@ import org.datanucleus.util.Localiser;
  * Expression handler for JPQL "INDEX" expression to return the index of an element.
  * Returns a NumericExpression.
  */
-public class IndexFunction extends AbstractSQLMethod
+public class IndexFunction implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List args)
     {
         if (ignore == null)
         {

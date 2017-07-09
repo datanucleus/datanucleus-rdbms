@@ -23,6 +23,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
@@ -30,6 +31,7 @@ import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -40,12 +42,12 @@ import org.datanucleus.util.RegularExpressionConverter;
  * Expression handler to evaluate {stringExpression}.matches(StringExpression).
  * Returns a BooleanExpression using LIKE.
  */
-public class StringMatchesMethod extends AbstractSQLMethod
+public class StringMatchesMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() > 2)
         {
@@ -77,17 +79,17 @@ public class StringMatchesMethod extends AbstractSQLMethod
             stmt.getQueryGenerator().useParameterExpressionAsLiteral((SQLLiteral) likeExpr);
         }
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (expr instanceof StringLiteral && likeExpr instanceof StringLiteral)
         {
             // String.matches(String) so evaluate in-memory
             String primary = (String)((StringLiteral)expr).getValue();
             String pattern = (String)((StringLiteral)likeExpr).getValue();
-            return new BooleanLiteral(stmt,
-                exprFactory.getMappingForType(boolean.class, false), primary.matches(pattern));
+            return new BooleanLiteral(stmt, exprFactory.getMappingForType(boolean.class, false), primary.matches(pattern));
         }
         else if (expr instanceof StringLiteral)
         {
-            return getBooleanLikeExpression(expr, likeExpr, escapeExpr);
+            return getBooleanLikeExpression(stmt, expr, likeExpr, escapeExpr);
         }
         else if (expr instanceof StringExpression && likeExpr instanceof StringLiteral)
         {
@@ -110,23 +112,20 @@ public class StringMatchesMethod extends AbstractSQLMethod
                     dba.getEscapeCharacter().charAt(0));
                 if (caseSensitive)
                 {
-                    SQLExpression patternExpr = exprFactory.newLiteral(stmt,
-                        likeExpr.getJavaTypeMapping(), converter.convert(pattern).toLowerCase());
-                    return getBooleanLikeExpression(expr.invoke("toLowerCase", null), patternExpr, escapeExpr);
+                    SQLExpression patternExpr = exprFactory.newLiteral(stmt, likeExpr.getJavaTypeMapping(), converter.convert(pattern).toLowerCase());
+                    return getBooleanLikeExpression(stmt, expr.invoke("toLowerCase", null), patternExpr, escapeExpr);
                 }
 
-                SQLExpression patternExpr = exprFactory.newLiteral(stmt,
-                    likeExpr.getJavaTypeMapping(), converter.convert(pattern));
-                return getBooleanLikeExpression(expr, patternExpr, escapeExpr);
+                SQLExpression patternExpr = exprFactory.newLiteral(stmt, likeExpr.getJavaTypeMapping(), converter.convert(pattern));
+                return getBooleanLikeExpression(stmt, expr, patternExpr, escapeExpr);
             }
 
-            SQLExpression patternExpr = exprFactory.newLiteral(stmt,
-                likeExpr.getJavaTypeMapping(), pattern);
-            return getBooleanLikeExpression(expr, patternExpr, escapeExpr);
+            SQLExpression patternExpr = exprFactory.newLiteral(stmt, likeExpr.getJavaTypeMapping(), pattern);
+            return getBooleanLikeExpression(stmt, expr, patternExpr, escapeExpr);
         }
         else if (expr instanceof StringExpression)
         {
-            return getExpressionForStringExpressionInput(expr, likeExpr, escapeExpr);
+            return getExpressionForStringExpressionInput(stmt, expr, likeExpr, escapeExpr);
         }
         else
         {
@@ -134,16 +133,15 @@ public class StringMatchesMethod extends AbstractSQLMethod
         }
     }
 
-    protected BooleanExpression getExpressionForStringExpressionInput(SQLExpression expr,
-            SQLExpression regExpr, SQLExpression escapeExpr)
+    protected BooleanExpression getExpressionForStringExpressionInput(SQLStatement stmt, SQLExpression expr, SQLExpression regExpr, SQLExpression escapeExpr)
     {
-        BooleanExpression likeExpr = getBooleanLikeExpression(expr, regExpr, escapeExpr);
+        BooleanExpression likeExpr = getBooleanLikeExpression(stmt, expr, regExpr, escapeExpr);
         return likeExpr;
     }
 
-    protected BooleanExpression getBooleanLikeExpression(SQLExpression expr, SQLExpression regExpr,
-            SQLExpression escapeExpr)
+    protected BooleanExpression getBooleanLikeExpression(SQLStatement stmt, SQLExpression expr, SQLExpression regExpr, SQLExpression escapeExpr)
     {
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         BooleanExpression likeExpr = new BooleanExpression(stmt, exprFactory.getMappingForType(boolean.class, false));
         SQLText sql= likeExpr.toSQLText();
         sql.clearStatement();

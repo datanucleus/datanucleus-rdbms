@@ -47,6 +47,7 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
@@ -1004,7 +1005,7 @@ public interface DatastoreAdapter
      * @return the pattern string.
      **/
     String getPatternExpressionAnyCharacter();
-    
+
     /**
      * The pattern string for representing zero or more characters that is expanded in word searches.
      * Most of databases will use the percent sign character.
@@ -1018,4 +1019,11 @@ public interface DatastoreAdapter
      * @return Whether it is indexable
      */
     boolean validToIndexMapping(JavaTypeMapping mapping);
+
+    /**
+     * Accessor for the SQLOperation for the specified name (if available).
+     * @param name operation name
+     * @return SQLOperation (or null if none available)
+     */
+    SQLOperation getSQLOperationForName(String name);
 }

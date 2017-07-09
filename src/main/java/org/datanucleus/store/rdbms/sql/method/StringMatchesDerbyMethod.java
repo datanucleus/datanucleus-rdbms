@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Expression handler to evaluate {stringExpression}.matches(StringExpression) for Derby.
@@ -35,13 +37,13 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
  */
 public class StringMatchesDerbyMethod extends StringMatchesMethod
 {
-    protected BooleanExpression getExpressionForStringExpressionInput(SQLExpression expr, 
-            SQLExpression argExpr, SQLExpression escapeExpr)
+    protected BooleanExpression getExpressionForStringExpressionInput(SQLStatement stmt, SQLExpression expr, SQLExpression argExpr, SQLExpression escapeExpr)
     {
         // Use Derby "NUCLEUS_MATCHES" function
         List funcArgs = new ArrayList();
         funcArgs.add(expr);
         funcArgs.add(argExpr);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         JavaTypeMapping m = exprFactory.getMappingForType(BigInteger.class, false);
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
         return new NumericExpression(stmt, m, "NUCLEUS_MATCHES", funcArgs).eq(one);

@@ -20,17 +20,18 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
 /**
  * Expression handler to evaluate {objectExpression}.getClass().
  */
-public class ObjectGetClassMethod extends AbstractSQLMethod
+public class ObjectGetClassMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
     {
         // TODO Support this type
         throw new NucleusException("getClass is not yet supported for " + expr);

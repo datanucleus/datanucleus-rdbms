@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -36,12 +37,12 @@ import org.datanucleus.util.Localiser;
  * All args must be of consistent expression types.
  * Returns an SQLExpression "NULLIF({expr})".
  */
-public class NullIfFunction extends AbstractSQLMethod
+public class NullIfFunction implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -119,19 +120,19 @@ public class NullIfFunction extends AbstractSQLMethod
 
             if (exprType == NumericExpression.class)
             {
-                return new NumericExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+                return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(cls, true), "NULLIF", args);
             }
             else if (exprType == StringExpression.class)
             {
-                return new StringExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+                return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(cls, true), "NULLIF", args);
             }
             else if (exprType == TemporalExpression.class)
             {
-                return new TemporalExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+                return new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(cls, true), "NULLIF", args);
             }
             else
             {
-                return new ObjectExpression(stmt, getMappingForClass(cls), "NULLIF", args);
+                return new ObjectExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(cls, true), "NULLIF", args);
             }
         }
 

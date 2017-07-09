@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -34,12 +35,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {strExpr1}.indexOf(strExpr2[,pos]).
  * Returns a StringExpression that equates to <pre>LOCATE(strExpr1, strExpr2, numExpr1+1)-1</pre>
  */
-public class StringIndexOfMethod extends AbstractSQLMethod
+public class StringIndexOfMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -67,7 +68,7 @@ public class StringIndexOfMethod extends AbstractSQLMethod
             }
             funcArgs.add(fromExpr.add(one));
         }
-        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "LOCATE", funcArgs);
+        NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "LOCATE", funcArgs);
         return new NumericExpression(locateExpr, Expression.OP_SUB, one).encloseInParentheses();
     }
 }

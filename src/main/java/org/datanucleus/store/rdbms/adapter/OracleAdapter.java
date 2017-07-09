@@ -51,6 +51,7 @@ import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.operation.Mod2Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -171,6 +172,9 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_CASCADE);
+
+        // Load up SQLOperations applicable to this datastore
+        sqlOperationsByName.put("mod", new Mod2Operation());
     }
 
     /**

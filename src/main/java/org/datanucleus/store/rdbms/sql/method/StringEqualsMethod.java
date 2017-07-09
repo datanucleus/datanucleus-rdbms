@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.util.Localiser;
@@ -28,12 +29,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {strExpr1}.equals(strExpr2).
  * Returns a BooleanExpression that equates to <pre>{strExpr1} = {strExpr2}</pre>
  */
-public class StringEqualsMethod extends AbstractSQLMethod
+public class StringEqualsMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {

@@ -23,9 +23,11 @@ import java.util.List;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating {dateExpr}.getMonth() using SQLite.
@@ -36,19 +38,21 @@ public class TemporalMonthJavaMethod4 extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MONTH_JAVA");
 
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "%m"));
         funcArgs.add(invokedExpr);
 
         // Delete one from the SQL "month" (origin=1) to be compatible with Java month (origin=0)
-        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, getMappingForClass(int.class), "strftime", funcArgs), Expression.OP_SUB, one);
+        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "strftime", funcArgs), 
+            Expression.OP_SUB, one);
         numExpr.encloseInParentheses();
         return numExpr;
     }

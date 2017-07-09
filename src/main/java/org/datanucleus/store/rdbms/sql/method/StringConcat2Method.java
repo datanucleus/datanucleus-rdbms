@@ -22,10 +22,10 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
-import org.datanucleus.store.rdbms.sql.method.AbstractSQLMethod;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -35,12 +35,12 @@ import org.datanucleus.util.Localiser;
  * <li><pre>concat(strExpr, strExpr1)</pre>.</li>
  * </ul>
  */
-public class StringConcat2Method extends AbstractSQLMethod
+public class StringConcat2Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {
@@ -56,6 +56,6 @@ public class StringConcat2Method extends AbstractSQLMethod
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(expr);
         funcArgs.add(otherExpr);
-        return new StringExpression(stmt, getMappingForClass(String.class), "CONCAT", funcArgs);
+        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "CONCAT", funcArgs);
     }	
 }

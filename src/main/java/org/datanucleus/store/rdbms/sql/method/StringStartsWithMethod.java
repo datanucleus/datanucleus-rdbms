@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
@@ -35,12 +36,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {strExpr1}.startsWith(strExpr2[, numExpr]).
  * Returns a StringExpression that equates to <pre>{strExpr1} LIKE {strExpr2}% ESCAPE ...</pre>
  */
-public class StringStartsWithMethod extends AbstractSQLMethod
+public class StringStartsWithMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {

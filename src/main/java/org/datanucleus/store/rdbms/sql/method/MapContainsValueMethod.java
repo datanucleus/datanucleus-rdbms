@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -31,6 +32,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
@@ -41,6 +43,7 @@ import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
@@ -55,12 +58,12 @@ import org.datanucleus.util.NucleusLogger;
  * Method for evaluating {mapExpr}.containsValue(valueExpr).
  * Returns a BooleanExpression.
  */
-public class MapContainsValueMethod extends AbstractSQLMethod
+public class MapContainsValueMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -81,6 +84,8 @@ public class MapContainsValueMethod extends AbstractSQLMethod
             }
         }
 
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (mapExpr instanceof MapLiteral)
         {
             MapLiteral lit = (MapLiteral)mapExpr;
@@ -154,7 +159,7 @@ public class MapContainsValueMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            boolean useSubquery = getNeedsSubquery();
+            boolean useSubquery = getNeedsSubquery(stmt);
             JoinType joinType = JoinType.INNER_JOIN;
             if (valExpr instanceof UnboundExpression)
             {
@@ -182,20 +187,21 @@ public class MapContainsValueMethod extends AbstractSQLMethod
             // TODO Check if *this* "containsValue" is negated, not any of them (and remove above check)
             if (useSubquery)
             {
-                return containsAsSubquery(mapExpr, valExpr);
+                return containsAsSubquery(stmt, mapExpr, valExpr);
             }
 
-            return containsAsJoin(mapExpr, valExpr, joinType);
+            return containsAsJoin(stmt, mapExpr, valExpr, joinType);
         }
-        return containsAsSubquery(mapExpr, valExpr);
+        return containsAsSubquery(stmt, mapExpr, valExpr);
     }
 
     /**
      * Convenience method to decide if we handle the contains() by using a subquery, or otherwise
      * via an inner join. If there is an OR or a NOT in the query then uses a subquery.
+     * @param stmt SQLStatement
      * @return Whether to use a subquery
      */
-    protected boolean getNeedsSubquery()
+    protected boolean getNeedsSubquery(SQLStatement stmt)
     {
         // TODO Check if *this* "contains" is negated, not just any of them (and remove above check)
         boolean needsSubquery = false;
@@ -218,12 +224,13 @@ public class MapContainsValueMethod extends AbstractSQLMethod
      * Creates SQL by adding INNER JOIN to the join table (where it exists), and also to the value table
      * adding an AND condition on the value (with value of the valueExpr).
      * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the value is contained of not).
+     * @param stmt SQLStatement
      * @param mapExpr Map expression
      * @param valExpr Expression for the value
      * @param joinType Type of join
      * @return Contains expression
      */
-    protected SQLExpression containsAsJoin(MapExpression mapExpr, SQLExpression valExpr, JoinType joinType)
+    protected SQLExpression containsAsJoin(SQLStatement stmt, MapExpression mapExpr, SQLExpression valExpr, JoinType joinType)
     {
         boolean valIsUnbound = (valExpr instanceof UnboundExpression);
         String varName = null;
@@ -249,6 +256,8 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
         if (mmd.getMap().getMapType() == MapType.MAP_TYPE_JOIN)
@@ -399,11 +408,12 @@ public class MapContainsValueMethod extends AbstractSQLMethod
      * </li>
      * </ul>
      * and returns a BooleanSubqueryExpression ("EXISTS (subquery)")
+     * @param stmt SQLStatement
      * @param mapExpr Map expression
      * @param valExpr Expression for the value
      * @return Contains expression
      */
-    protected SQLExpression containsAsSubquery(MapExpression mapExpr, SQLExpression valExpr)
+    protected SQLExpression containsAsSubquery(SQLStatement stmt, MapExpression mapExpr, SQLExpression valExpr)
     {
         boolean valIsUnbound = (valExpr instanceof UnboundExpression);
         String varName = null;
@@ -415,6 +425,8 @@ public class MapContainsValueMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(clr);
         MapTable joinTbl = (MapTable)storeMgr.getTable(mmd);

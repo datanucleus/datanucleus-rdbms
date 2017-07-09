@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -32,10 +33,12 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.MapExpression;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.SQLLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
@@ -48,12 +51,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {mapExpr}.get(keyExpr).
  * Returns an ObjectExpression representing the value
  */
-public class MapGetMethod extends AbstractSQLMethod
+public class MapGetMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -88,12 +91,12 @@ public class MapGetMethod extends AbstractSQLMethod
             if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER ||
                 stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.ORDERING)
             {
-                return getAsInnerJoin(mapExpr, keyValExpr);
+                return getAsInnerJoin(stmt, mapExpr, keyValExpr);
             }
             else if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
                     stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
             {
-                return getAsSubquery(mapExpr, keyValExpr);
+                return getAsSubquery(stmt, mapExpr, keyValExpr);
             }
 
             throw new NucleusException("Map.get() is not supported for " + mapExpr +
@@ -104,12 +107,14 @@ public class MapGetMethod extends AbstractSQLMethod
     /**
      * Implementation of Map.get() using a subquery on the table representing the map,
      * adding a condition on the key and returning the value.
+     * @param stmt SQLStatement
      * @param mapExpr The map expression
      * @param keyValExpr The key value expression
      * @return The value expression
      */
-    protected SQLExpression getAsSubquery(MapExpression mapExpr, SQLExpression keyValExpr)
+    protected SQLExpression getAsSubquery(SQLStatement stmt, MapExpression mapExpr, SQLExpression keyValExpr)
     {
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = mapExpr.getJavaTypeMapping().getMemberMetaData();
         MapMetaData mapmd = mmd.getMap();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
@@ -168,6 +173,7 @@ public class MapGetMethod extends AbstractSQLMethod
         }
 
         SelectStatement subStmt = new SelectStatement(stmt, storeMgr, mapTbl, null, null);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         subStmt.setClassLoaderResolver(clr);
         SQLExpression valExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), valMapping);
         subStmt.select(valExpr, null);
@@ -187,14 +193,16 @@ public class MapGetMethod extends AbstractSQLMethod
     }
 
     /**
-     * Implementation of Map.get() using an inner join to the table representing the map,
-     * adding a condition on the key and returning the value.
+     * Implementation of Map.get() using an inner join to the table representing the map, adding a condition on the key and returning the value.
+     * @param stmt SQLStatement
      * @param mapExpr The map expression
      * @param keyValExpr The key value expression
      * @return The value expression
      */
-    protected SQLExpression getAsInnerJoin(MapExpression mapExpr, SQLExpression keyValExpr)
+    protected SQLExpression getAsInnerJoin(SQLStatement stmt, MapExpression mapExpr, SQLExpression keyValExpr)
     {
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         JavaTypeMapping m = mapExpr.getJavaTypeMapping();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
         if (mmd != null)

@@ -22,10 +22,12 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
@@ -34,15 +36,16 @@ import org.datanucleus.util.Localiser;
  * Expression handler to evaluate {stringExpression}.length().
  * Returns a NumericExpression <pre>LEN({stringExpr})</pre>.
  */
-public class StringLength4Method extends AbstractSQLMethod
+public class StringLength4Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (!expr.isParameter() && expr instanceof StringLiteral)
         {
+            SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
             JavaTypeMapping m = exprFactory.getMappingForType(int.class, false);
             String val = (String)((StringLiteral)expr).getValue();
             return new IntegerLiteral(stmt, m, Integer.valueOf(val.length()), null);
@@ -51,7 +54,7 @@ public class StringLength4Method extends AbstractSQLMethod
         {
             ArrayList funcArgs = new ArrayList();
             funcArgs.add(expr);
-            return new NumericExpression(stmt, getMappingForClass(int.class), "LEN", funcArgs);
+            return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "LEN", funcArgs);
         }
         else
         {

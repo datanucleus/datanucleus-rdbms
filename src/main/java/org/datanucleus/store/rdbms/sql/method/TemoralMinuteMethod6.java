@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
@@ -30,12 +31,12 @@ import org.datanucleus.util.Localiser;
  * Method for evaluating {dateExpr}.getMinute() for Firebird.
  * Returns a NumericExpression that equates to <pre>extract(MINUTE FROM expr)</pre>
  */
-public class TemoralMinuteMethod6 extends AbstractSQLMethod
+public class TemoralMinuteMethod6 implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
     {
         if (!(expr instanceof TemporalExpression))
         {
@@ -45,6 +46,6 @@ public class TemoralMinuteMethod6 extends AbstractSQLMethod
         expr.toSQLText().prepend("MINUTE FROM ");
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(expr);
-        return new NumericExpression(stmt, getMappingForClass(int.class), "EXTRACT", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", funcArgs);
     }
 }

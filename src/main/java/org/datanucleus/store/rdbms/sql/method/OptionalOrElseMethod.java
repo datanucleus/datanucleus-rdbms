@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.OptionalMapping;
 import org.datanucleus.store.rdbms.mapping.java.ShortMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CaseExpression;
 import org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression;
@@ -38,17 +39,18 @@ import org.datanucleus.store.rdbms.sql.expression.CaseStringExpression;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.OptionalExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating {optionalExpr1}.orElse().
  * Returns a XXXExpression representing "CASE WHEN col IS NOT NULL THEN col ELSE otherVal END".
  */
-public class OptionalOrElseMethod extends AbstractSQLMethod
+public class OptionalOrElseMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {
@@ -57,6 +59,7 @@ public class OptionalOrElseMethod extends AbstractSQLMethod
 
         SQLExpression elseExpr = args.get(0);
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         OptionalMapping opMapping = (OptionalMapping) ((OptionalExpression)expr).getJavaTypeMapping();
         JavaTypeMapping javaMapping = opMapping.getWrappedMapping();
         SQLExpression getExpr = exprFactory.newExpression(stmt, expr.getSQLTable(),javaMapping);

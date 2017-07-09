@@ -66,6 +66,8 @@ import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.operation.NumericToStringOperation;
+import org.datanucleus.store.rdbms.sql.operation.SQLOperation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
@@ -342,6 +344,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     /** Optional properties controlling the configuration. */
     protected Map<String, Object> properties = null;
+
+    /** SQLOperations, keyed by the name of the operation. */
+    protected Map<String, SQLOperation> sqlOperationsByName = new HashMap<>();
 
     /**
      * Constructs a database adapter based on the given JDBC metadata.
@@ -672,6 +677,173 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(TX_ISOLATION_READ_UNCOMMITTED);
         supportedOptions.add(TX_ISOLATION_REPEATABLE_READ);
         supportedOptions.add(TX_ISOLATION_SERIALIZABLE);
+
+        // Load up SQLMethods applicable to all datastores TODO
+        /*
+        <sql-method method="acos" evaluator="org.datanucleus.store.rdbms.sql.method.AcosFunction"/>
+        <sql-method method="asin" evaluator="org.datanucleus.store.rdbms.sql.method.AsinFunction"/>
+        <sql-method method="atan" evaluator="org.datanucleus.store.rdbms.sql.method.AtanFunction"/>
+        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
+        <sql-method method="ceil" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
+        <sql-method method="cos" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
+        <sql-method method="count" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
+        <sql-method method="exp" evaluator="org.datanucleus.store.rdbms.sql.method.ExpFunction"/>
+        <sql-method method="floor" evaluator="org.datanucleus.store.rdbms.sql.method.FloorFunction"/>
+        <sql-method method="log" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction"/>
+        <sql-method method="max" evaluator="org.datanucleus.store.rdbms.sql.method.MaxFunction"/>
+        <sql-method method="min" evaluator="org.datanucleus.store.rdbms.sql.method.MinFunction"/>
+        <sql-method method="power" evaluator="org.datanucleus.store.rdbms.sql.method.PowerFunction"/>
+        <sql-method method="sin" evaluator="org.datanucleus.store.rdbms.sql.method.SinFunction"/>
+        <sql-method method="sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
+        <sql-method method="sum" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
+        <sql-method method="tan" evaluator="org.datanucleus.store.rdbms.sql.method.TanFunction"/>
+        <sql-method method="degrees" evaluator="org.datanucleus.store.rdbms.sql.method.DegreesFunction"/>
+        <sql-method method="radians" evaluator="org.datanucleus.store.rdbms.sql.method.RadiansFunction"/>
+        <sql-method method="ABS" evaluator="org.datanucleus.store.rdbms.sql.method.AbsFunction"/>
+        <sql-method method="ACOS" evaluator="org.datanucleus.store.rdbms.sql.method.AcosFunction"/>
+        <sql-method method="ASIN" evaluator="org.datanucleus.store.rdbms.sql.method.AsinFunction"/>
+        <sql-method method="ATAN" evaluator="org.datanucleus.store.rdbms.sql.method.AtanFunction"/>
+        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgFunction"/>
+        <sql-method method="CEIL" evaluator="org.datanucleus.store.rdbms.sql.method.CeilFunction"/>
+        <sql-method method="COS" evaluator="org.datanucleus.store.rdbms.sql.method.CosFunction"/>
+        <sql-method method="COUNT" evaluator="org.datanucleus.store.rdbms.sql.method.CountFunction"/>
+        <sql-method method="COUNTSTAR" evaluator="org.datanucleus.store.rdbms.sql.method.CountStarFunction"/>
+        <sql-method method="EXP" evaluator="org.datanucleus.store.rdbms.sql.method.ExpFunction"/>
+        <sql-method method="FLOOR" evaluator="org.datanucleus.store.rdbms.sql.method.FloorFunction"/>
+        <sql-method method="LOG" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction"/>
+        <sql-method method="MAX" evaluator="org.datanucleus.store.rdbms.sql.method.MaxFunction"/>
+        <sql-method method="MIN" evaluator="org.datanucleus.store.rdbms.sql.method.MinFunction"/>
+        <sql-method method="POWER" evaluator="org.datanucleus.store.rdbms.sql.method.PowerFunction"/>
+        <sql-method method="SIN" evaluator="org.datanucleus.store.rdbms.sql.method.SinFunction"/>
+        <sql-method method="SQRT" evaluator="org.datanucleus.store.rdbms.sql.method.SqrtFunction"/>
+        <sql-method method="SUM" evaluator="org.datanucleus.store.rdbms.sql.method.SumFunction"/>
+        <sql-method method="TAN" evaluator="org.datanucleus.store.rdbms.sql.method.TanFunction"/>
+        <sql-method method="RADIANS" evaluator="org.datanucleus.store.rdbms.sql.method.RadiansFunction"/>
+        <sql-method method="DEGREES" evaluator="org.datanucleus.store.rdbms.sql.method.DegreesFunction"/>
+        <sql-method method="COALESCE" evaluator="org.datanucleus.store.rdbms.sql.method.CoalesceFunction"/>
+        <sql-method method="NULLIF" evaluator="org.datanucleus.store.rdbms.sql.method.NullIfFunction"/>
+        <sql-method method="INDEX" evaluator="org.datanucleus.store.rdbms.sql.method.IndexFunction"/>
+        <sql-method method="CURRENT_DATE" evaluator="org.datanucleus.store.rdbms.sql.method.CurrentDateFunction"/>
+        <sql-method method="CURRENT_TIME" evaluator="org.datanucleus.store.rdbms.sql.method.CurrentTimeFunction"/>
+        <sql-method method="CURRENT_TIMESTAMP" evaluator="org.datanucleus.store.rdbms.sql.method.CurrentTimestampFunction"/>
+        <sql-method method="Math.abs" evaluator="org.datanucleus.store.rdbms.sql.method.MathAbsMethod"/>
+        <sql-method method="Math.acos" evaluator="org.datanucleus.store.rdbms.sql.method.MathAcosMethod"/>
+        <sql-method method="Math.asin" evaluator="org.datanucleus.store.rdbms.sql.method.MathAsinMethod"/>
+        <sql-method method="Math.atan" evaluator="org.datanucleus.store.rdbms.sql.method.MathAtanMethod"/>
+        <sql-method method="Math.ceil" evaluator="org.datanucleus.store.rdbms.sql.method.MathCeilMethod"/>
+        <sql-method method="Math.cos" evaluator="org.datanucleus.store.rdbms.sql.method.MathCosMethod"/>
+        <sql-method method="Math.exp" evaluator="org.datanucleus.store.rdbms.sql.method.MathExpMethod"/>
+        <sql-method method="Math.floor" evaluator="org.datanucleus.store.rdbms.sql.method.MathFloorMethod"/>
+        <sql-method method="Math.log" evaluator="org.datanucleus.store.rdbms.sql.method.MathLogMethod"/>
+        <sql-method method="Math.power" evaluator="org.datanucleus.store.rdbms.sql.method.MathPowerMethod"/>
+        <sql-method method="Math.sin" evaluator="org.datanucleus.store.rdbms.sql.method.MathSinMethod"/>
+        <sql-method method="Math.sqrt" evaluator="org.datanucleus.store.rdbms.sql.method.MathSqrtMethod"/>
+        <sql-method method="Math.tan" evaluator="org.datanucleus.store.rdbms.sql.method.MathTanMethod"/>
+        <sql-method method="Math.toRadians" evaluator="org.datanucleus.store.rdbms.sql.method.MathToRadiansMethod"/>
+        <sql-method method="Math.toDegrees" evaluator="org.datanucleus.store.rdbms.sql.method.MathToDegreesMethod"/>
+        <sql-method method="JDOHelper.getObjectId" evaluator="org.datanucleus.store.rdbms.sql.method.JDOHelperGetObjectIdMethod"/>
+        <sql-method method="JDOHelper.getVersion" evaluator="org.datanucleus.store.rdbms.sql.method.JDOHelperGetVersionMethod"/>
+        <sql-method method="SQL_cube" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
+        <sql-method method="SQL_cube" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
+        <sql-method method="SQL_cube" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
+        <sql-method method="SQL_rollup" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
+        <sql-method method="SQL_rollup" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
+        <sql-method method="SQL_rollup" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
+        <sql-method method="SQL_boolean" evaluator="org.datanucleus.store.rdbms.sql.method.SQLBooleanMethod"/>
+        <sql-method method="SQL_numeric" evaluator="org.datanucleus.store.rdbms.sql.method.SQLNumericMethod"/>
+        <sql-method method="SQL_function" evaluator="org.datanucleus.store.rdbms.sql.method.SQLFunctionMethod"/>
+
+        <sql-method class="java.lang.Character" method="toUpperCase" evaluator="org.datanucleus.store.rdbms.sql.method.StringToUpperMethod"/>
+        <sql-method class="java.lang.Character" method="toLowerCase" evaluator="org.datanucleus.store.rdbms.sql.method.StringToLowerMethod"/>
+
+        <sql-method class="java.lang.Enum" method="ordinal" evaluator="org.datanucleus.store.rdbms.sql.method.EnumOrdinalMethod"/>
+        <sql-method class="java.lang.Enum" method="toString" evaluator="org.datanucleus.store.rdbms.sql.method.EnumToStringMethod"/>
+
+        <sql-method class="java.lang.Object" method="getClass" evaluator="org.datanucleus.store.rdbms.sql.method.ObjectGetClassMethod"/>
+
+        <sql-method class="java.lang.String" method="charAt" evaluator="org.datanucleus.store.rdbms.sql.method.StringCharAtMethod"/>
+        <sql-method class="java.lang.String" method="endsWith" evaluator="org.datanucleus.store.rdbms.sql.method.StringEndsWithMethod"/>
+        <sql-method class="java.lang.String" method="equals" evaluator="org.datanucleus.store.rdbms.sql.method.StringEqualsMethod"/>
+        <sql-method class="java.lang.String" method="equalsIgnoreCase" evaluator="org.datanucleus.store.rdbms.sql.method.StringEqualsIgnoreCaseMethod"/>
+        <sql-method class="java.lang.String" method="indexOf" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOfMethod"/>
+        <sql-method class="java.lang.String" method="length" evaluator="org.datanucleus.store.rdbms.sql.method.StringLengthMethod"/>
+        <sql-method class="java.lang.String" method="matches" evaluator="org.datanucleus.store.rdbms.sql.method.StringMatchesMethod"/>
+        <sql-method class="java.lang.String" method="replaceAll" evaluator="org.datanucleus.store.rdbms.sql.method.StringReplaceAllMethod"/>
+        <sql-method class="java.lang.String" method="startsWith" evaluator="org.datanucleus.store.rdbms.sql.method.StringStartsWithMethod"/>
+        <sql-method class="java.lang.String" method="substring" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstringMethod"/>
+        <sql-method class="java.lang.String" method="toUpperCase" evaluator="org.datanucleus.store.rdbms.sql.method.StringToUpperMethod"/>
+        <sql-method class="java.lang.String" method="toLowerCase" evaluator="org.datanucleus.store.rdbms.sql.method.StringToLowerMethod"/>
+        <sql-method class="java.lang.String" method="trim" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimMethod"/>
+        <sql-method class="java.lang.String" method="trimLeft" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimLeftMethod"/>
+        <sql-method class="java.lang.String" method="trimRight" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimRightMethod"/>
+
+        <sql-method class="java.util.Collection" method="contains" evaluator="org.datanucleus.store.rdbms.sql.method.CollectionContainsMethod"/>
+        <sql-method class="java.util.Collection" method="isEmpty" evaluator="org.datanucleus.store.rdbms.sql.method.CollectionIsEmptyMethod"/>
+        <sql-method class="java.util.Collection" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.CollectionSizeMethod"/>
+        <sql-method class="java.util.Collection" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.ListGetMethod"/>
+
+        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod"/>
+        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+
+        <sql-method class="java.util.Map" method="mapKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapKeyMethod"/>
+        <sql-method class="java.util.Map" method="mapValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapValueMethod"/>
+        <sql-method class="java.util.Map" method="containsEntry" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsEntryMethod"/>
+        <sql-method class="java.util.Map" method="containsKey" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsKeyMethod"/>
+        <sql-method class="java.util.Map" method="containsValue" evaluator="org.datanucleus.store.rdbms.sql.method.MapContainsValueMethod"/>
+        <sql-method class="java.util.Map" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.MapGetMethod"/>
+        <sql-method class="java.util.Map" method="isEmpty" evaluator="org.datanucleus.store.rdbms.sql.method.MapIsEmptyMethod"/>
+        <sql-method class="java.util.Map" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.MapSizeMethod"/>
+
+        <sql-method class="ARRAY" method="contains" evaluator="org.datanucleus.store.rdbms.sql.method.ArrayContainsMethod"/>
+        <sql-method class="ARRAY" method="isEmpty" evaluator="org.datanucleus.store.rdbms.sql.method.ArrayIsEmptyMethod"/>
+        <sql-method class="ARRAY" method="size" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
+        <sql-method class="ARRAY" method="length" evaluator="org.datanucleus.store.rdbms.sql.method.ArraySizeMethod"/>
+
+        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod"/>
+        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+
+        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+
+        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+
+        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod"/>
+        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod"/>
+
+        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+
+        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+
+        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
+        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
+
+        <sql-method class="java.util.Optional" method="get" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalGetMethod"/>
+        <sql-method class="java.util.Optional" method="isPresent" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalIsPresentMethod"/>
+        <sql-method class="java.util.Optional" method="orElse" evaluator="org.datanucleus.store.rdbms.sql.method.OptionalOrElseMethod"/>
+ */
+
+        // Load up SQLOperations applicable to all datastores
+        sqlOperationsByName.put("numericToString", new NumericToStringOperation());
     }
 
     /**
@@ -1888,5 +2060,14 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public boolean validToIndexMapping(JavaTypeMapping mapping)
     {
         return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.DatastoreAdapter#getSQLOperationForName(java.lang.String)
+     */
+    @Override
+    public SQLOperation getSQLOperationForName(String name)
+    {
+        return sqlOperationsByName.get(name);
     }
 }

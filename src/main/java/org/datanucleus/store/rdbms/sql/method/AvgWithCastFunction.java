@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
@@ -34,7 +35,7 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  */
 public class AvgWithCastFunction extends AvgFunction
 {
-    protected SQLExpression getAggregateExpression(List args, JavaTypeMapping m)
+    protected SQLExpression getAggregateExpression(SQLStatement stmt, List args, JavaTypeMapping m)
     {
         Class argType = ((SQLExpression) args.get(0)).getJavaTypeMapping().getJavaType();
 

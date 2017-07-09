@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 
@@ -37,7 +38,7 @@ public class StringTrimMethod extends SimpleStringMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
     {
         if (!expr.isParameter() && expr instanceof StringLiteral)
         {
@@ -48,6 +49,6 @@ public class StringTrimMethod extends SimpleStringMethod
             }
             return new StringLiteral(stmt, expr.getJavaTypeMapping(), val, null);
         }
-        return super.getExpression(expr, args);
+        return super.getExpression(stmt, expr, args);
     }
 }

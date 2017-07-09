@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -40,7 +41,7 @@ public class StringToUpperMethod extends SimpleStringMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && !args.isEmpty())
         {
@@ -69,6 +70,6 @@ public class StringToUpperMethod extends SimpleStringMethod
             }
         }
 
-        return super.getExpression(expr, null);
+        return super.getExpression(stmt, expr, null);
     }
 }

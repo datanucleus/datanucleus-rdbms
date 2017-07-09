@@ -24,10 +24,12 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.FirebirdAdapter;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
@@ -37,12 +39,12 @@ import org.datanucleus.util.Localiser;
  * Firebird v1 uses STRLEN, whereas Firebird v2 has CHAR_LENGTH.
  * Returns a NumericExpression <pre>STRLEN({stringExpr})</pre> or NumericExpression <pre>CHAR_LENGTH({stringExpr})</pre>.
  */
-public class StringLength2Method extends AbstractSQLMethod
+public class StringLength2Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         DatastoreAdapter dba = stmt.getDatastoreAdapter();
         if (!(dba instanceof FirebirdAdapter))
@@ -50,6 +52,7 @@ public class StringLength2Method extends AbstractSQLMethod
             throw new NucleusException("StringLength2Method being used for evaluation of String.length yet this is for Firebird ONLY. Please report this");
         }
         FirebirdAdapter fba = (FirebirdAdapter)dba;
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (fba.supportsCharLengthFunction())
         {
             // Firebird v2+ support CHAR_LENGTH
@@ -63,7 +66,7 @@ public class StringLength2Method extends AbstractSQLMethod
             {
                 ArrayList funcArgs = new ArrayList();
                 funcArgs.add(expr);
-                return new NumericExpression(stmt, getMappingForClass(int.class), "CHAR_LENGTH", funcArgs);
+                return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "CHAR_LENGTH", funcArgs);
             }
             else
             {
@@ -82,7 +85,7 @@ public class StringLength2Method extends AbstractSQLMethod
         {
             ArrayList funcArgs = new ArrayList();
             funcArgs.add(expr);
-            return new NumericExpression(stmt, getMappingForClass(int.class), "STRLEN", funcArgs);
+            return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "STRLEN", funcArgs);
         }
         else
         {

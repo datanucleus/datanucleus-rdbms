@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.NullMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
@@ -28,12 +29,12 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
  * Method for evaluating {optionalExpr1}.isPresent().
  * Returns a BooleanExpression that equates to <pre>{optionalExpr1} != NULL</pre>
  */
-public class OptionalIsPresentMethod extends AbstractSQLMethod
+public class OptionalIsPresentMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 0)
         {

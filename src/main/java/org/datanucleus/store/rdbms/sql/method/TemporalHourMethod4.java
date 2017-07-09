@@ -25,8 +25,10 @@ import java.util.List;
 
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 
@@ -39,12 +41,13 @@ public class TemporalHourMethod4 extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "HOUR");
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         SQLExpression hh = exprFactory.newLiteral(stmt, mapping, "hh");
         ((StringLiteral)hh).generateStatementWithoutQuotes();
         ArrayList funcArgs = new ArrayList();
@@ -54,7 +57,7 @@ public class TemporalHourMethod4 extends TemporalBaseMethod
         List castArgs = new ArrayList<>();
         castArgs.add(invokedExpr);
 
-        funcArgs.add(new TemporalExpression(stmt, getMappingForClass(Date.class), "CAST", castArgs, asList("DATETIME")));
-        return new NumericExpression(stmt, getMappingForClass(int.class), "DATEPART", funcArgs);
+        funcArgs.add(new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(Date.class), "CAST", castArgs, asList("DATETIME")));
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "DATEPART", funcArgs);
     }
 }

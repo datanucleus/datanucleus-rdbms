@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -46,6 +47,7 @@ import org.datanucleus.store.rdbms.sql.expression.IllegalExpressionOperationExce
 import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
@@ -59,12 +61,12 @@ import org.datanucleus.util.NucleusLogger;
  * Method for evaluating {collExpr1}.contains({elemExpr}).
  * Returns a BooleanExpression.
  */
-public class CollectionContainsMethod extends AbstractSQLMethod
+public class CollectionContainsMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -74,6 +76,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         CollectionExpression collExpr = (CollectionExpression)expr;
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
         SQLExpression elemExpr = args.get(0);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (elemExpr.isParameter())
         {
             // Element is a parameter so make sure its type is set
@@ -84,6 +87,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
             }
         }
 
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         if (collExpr instanceof CollectionLiteral)
         {
             // Literal collection
@@ -180,7 +184,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            boolean useSubquery = getNeedsSubquery(collExpr, elemExpr);
+            boolean useSubquery = getNeedsSubquery(stmt, collExpr, elemExpr);
             JoinType joinType = JoinType.INNER_JOIN;
             if (elemExpr instanceof UnboundExpression)
             {
@@ -207,23 +211,23 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
             if (useSubquery)
             {
-                return containsAsSubquery(collExpr, elemExpr);
+                return containsAsSubquery(stmt, collExpr, elemExpr);
             }
 
-            return containsAsJoin(collExpr, elemExpr, joinType);
+            return containsAsJoin(stmt, collExpr, elemExpr, joinType);
         }
 
-        return containsAsSubquery(collExpr, elemExpr);
+        return containsAsSubquery(stmt, collExpr, elemExpr);
     }
 
     /**
-     * Convenience method to decide if we handle the contains() by using a subquery, or otherwise
-     * via an inner join. If there is an OR or a NOT in the query then uses a subquery.
+     * Convenience method to decide if we handle the contains() by using a subquery, or otherwise via an inner join. If there is an OR or a NOT in the query then uses a subquery.
+     * @param stmt SQLStatement
      * @param collExpr SQL Expression for the collection
      * @param elemExpr SQL Expression for the element
      * @return Whether to use a subquery
      */
-    protected boolean getNeedsSubquery(SQLExpression collExpr, SQLExpression elemExpr)
+    protected boolean getNeedsSubquery(SQLStatement stmt, SQLExpression collExpr, SQLExpression elemExpr)
     {
         if (elemExpr instanceof UnboundExpression)
         {
@@ -255,12 +259,13 @@ public class CollectionContainsMethod extends AbstractSQLMethod
      * adding an AND condition on the element (with value of the elemExpr).
      * Returns a BooleanExpression "TRUE" (since the INNER JOIN will guarantee if the element is
      * contained of not).
+     * @param stmt SQLStatement
      * @param collExpr Collection expression
      * @param elemExpr Expression for the element
      * @param joinType Join type
      * @return Contains expression
      */
-    protected SQLExpression containsAsJoin(CollectionExpression collExpr, SQLExpression elemExpr, SQLJoin.JoinType joinType)
+    protected SQLExpression containsAsJoin(SQLStatement stmt, CollectionExpression collExpr, SQLExpression elemExpr, SQLJoin.JoinType joinType)
     {
         boolean elemIsUnbound = (elemExpr instanceof UnboundExpression);
         String varName = null;
@@ -283,6 +288,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr);
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
@@ -448,11 +455,12 @@ public class CollectionContainsMethod extends AbstractSQLMethod
      * </li>
      * </ul>
      * and returns a BooleanSubqueryExpression ("EXISTS (subquery)")
+     * @param stmt SQLStatement
      * @param collExpr Collection expression
      * @param elemExpr Expression for the element
      * @return Contains expression
      */
-    protected SQLExpression containsAsSubquery(CollectionExpression collExpr, SQLExpression elemExpr)
+    protected SQLExpression containsAsSubquery(SQLStatement stmt, CollectionExpression collExpr, SQLExpression elemExpr)
     {
         boolean elemIsUnbound = (elemExpr instanceof UnboundExpression);
         String varName = null;
@@ -463,6 +471,8 @@ public class CollectionContainsMethod extends AbstractSQLMethod
         }
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         AbstractMemberMetaData mmd = collExpr.getJavaTypeMapping().getMemberMetaData();
         AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(clr);
         CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
@@ -593,6 +603,7 @@ public class CollectionContainsMethod extends AbstractSQLMethod
 
     protected void addRestrictionOnElement(SQLStatement stmt, SQLExpression elemIdExpr, SQLExpression elemExpr)
     {
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         try
         {
             stmt.whereAnd(elemIdExpr.eq(elemExpr), true);

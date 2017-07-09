@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -28,12 +29,12 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  * Method for trimming a String expression using LTRIM and RTRIM SQL functions.
  * Returns a StringExpression that equates to <pre>LTRIM(RTRIM(str))</pre>
  */
-public class StringTrim2Method extends AbstractSQLMethod
+public class StringTrim2Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr instanceof StringLiteral)
         {
@@ -43,9 +44,9 @@ public class StringTrim2Method extends AbstractSQLMethod
 
         ArrayList funcArgs = new ArrayList();
         funcArgs.add(expr);
-        StringExpression strExpr = new StringExpression(stmt, getMappingForClass(String.class), "RTRIM", funcArgs);
+        StringExpression strExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "RTRIM", funcArgs);
         args.clear();
         args.add(strExpr);
-        return new StringExpression(stmt, getMappingForClass(String.class), "LTRIM", args);
+        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "LTRIM", args);
     }
 }

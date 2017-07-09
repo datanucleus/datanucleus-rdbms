@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.util.Localiser;
@@ -28,7 +29,7 @@ import org.datanucleus.util.Localiser;
  * Expression handler to invoke the SQL COUNT(*) aggregation function.
  * Returns a NumericExpression "COUNT(*)".
  */
-public class CountStarFunction extends AbstractSQLMethod
+public class CountStarFunction implements SQLMethod
 {
     protected String getFunctionName()
     {
@@ -38,7 +39,7 @@ public class CountStarFunction extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -47,7 +48,7 @@ public class CountStarFunction extends AbstractSQLMethod
                 throw new NucleusException("COUNTSTAR takes no argument");
             }
 
-            return new AggregateNumericExpression(stmt, getMappingForClass(long.class), "COUNT(*)");
+            return new AggregateNumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(long.class, true), "COUNT(*)");
         }
 
         throw new NucleusException(Localiser.msg("060002", "COUNT", expr));

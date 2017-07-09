@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.Collection;
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -27,10 +28,12 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
@@ -47,18 +50,19 @@ import org.datanucleus.util.Localiser;
  * where A0 is the candidate table in the outer query, and COLLTABLE is the join table (if using 
  * join collection) or the element table (if using FK collection).
  */
-public class CollectionSizeMethod extends AbstractSQLMethod
+public class CollectionSizeMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 0)
         {
             throw new NucleusException(Localiser.msg("060015", "size", "CollectionExpression"));
         }
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (expr instanceof CollectionLiteral)
         {
             // Just return the collection size since we have the value
@@ -74,6 +78,7 @@ public class CollectionSizeMethod extends AbstractSQLMethod
         }
 
         ApiAdapter api = stmt.getRDBMSManager().getApiAdapter();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         Class elementCls = clr.classForName(mmd.getCollection().getElementType());
         if (!api.isPersistable(elementCls) && mmd.getJoinMetaData() == null)
         {

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
@@ -29,6 +30,7 @@ import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.util.Localiser;
 
@@ -45,12 +47,12 @@ import org.datanucleus.util.Localiser;
  *   -1
  * </pre>
  */
-public class StringIndexOf5Method extends AbstractSQLMethod
+public class StringIndexOf5Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -73,7 +75,7 @@ public class StringIndexOf5Method extends AbstractSQLMethod
             funcArgs.add(expr);
             funcArgs.add(substrExpr);
             SQLExpression oneExpr = ExpressionUtils.getLiteralForOne(stmt);
-            NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
+            NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "STRPOS", funcArgs);
             return new NumericExpression(locateExpr, Expression.OP_SUB, oneExpr);
         }
 
@@ -85,13 +87,14 @@ public class StringIndexOf5Method extends AbstractSQLMethod
         }
 
         // Find the substring starting at this position
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         ArrayList substrArgs = new ArrayList(1);
         substrArgs.add(fromExpr);
         SQLExpression strExpr = exprFactory.invokeMethod(stmt, "java.lang.String", "substring", expr, substrArgs);
 
         funcArgs.add(strExpr);
         funcArgs.add(substrExpr);
-        NumericExpression locateExpr = new NumericExpression(stmt, getMappingForClass(int.class), "STRPOS", funcArgs);
+        NumericExpression locateExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "STRPOS", funcArgs);
 
         SQLExpression[] whenExprs = new SQLExpression[1];
         NumericExpression zeroExpr = new IntegerLiteral(stmt, exprFactory.getMappingForType(Integer.class, false), Integer.valueOf(0), null);

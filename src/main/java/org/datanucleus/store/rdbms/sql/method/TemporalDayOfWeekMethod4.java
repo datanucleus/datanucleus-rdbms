@@ -23,9 +23,11 @@ import java.util.List;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
  * Method for evaluating DAY_OF_WEEK({dateExpr}) using SQLServer.
@@ -36,19 +38,20 @@ public class TemporalDayOfWeekMethod4 extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "DAY");
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
         ArrayList funcArgs = new ArrayList();
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         funcArgs.add(exprFactory.newLiteral(stmt, mapping, "dw"));
         funcArgs.add(invokedExpr);
 
         // Add one to the SQL "dw" (origin=0) to be compatible with Java Calendar day of week (origin=1)
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
-        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, getMappingForClass(int.class), "datepart", funcArgs), Expression.OP_ADD, one);
+        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "datepart", funcArgs), Expression.OP_ADD, one);
         numExpr.encloseInParentheses();
         return numExpr;
     }

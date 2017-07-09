@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -34,7 +35,7 @@ public class TemporalDayOfWeekMethod6 extends TemporalBaseMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "WEEKDAY");
 
@@ -44,7 +45,7 @@ public class TemporalDayOfWeekMethod6 extends TemporalBaseMethod
 
         // Add one to the SQL (origin=0) to be compatible with Java Calendar day of week (origin=1)
         SQLExpression one = ExpressionUtils.getLiteralForOne(stmt);
-        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, getMappingForClass(int.class), "EXTRACT", funcArgs), Expression.OP_ADD, one);
+        NumericExpression numExpr = new NumericExpression(new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", funcArgs), Expression.OP_ADD, one);
         numExpr.encloseInParentheses();
         return numExpr;
     }

@@ -22,6 +22,7 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.util.Localiser;
@@ -41,7 +42,7 @@ public class SumFunction extends SimpleNumericAggregateMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -56,11 +57,11 @@ public class SumFunction extends SimpleNumericAggregateMethod
             Class cls = argExpr.getJavaTypeMapping().getJavaType();
             if (cls == Integer.class || cls == Short.class || cls == Long.class)
             {
-                m = getMappingForClass(Long.class);
+                m = stmt.getSQLExpressionFactory().getMappingForType(Long.class, true);
             }
             else if (Number.class.isAssignableFrom(cls))
             {
-                m = getMappingForClass(argExpr.getJavaTypeMapping().getJavaType());
+                m = stmt.getSQLExpressionFactory().getMappingForType(argExpr.getJavaTypeMapping().getJavaType(), true);
             }
             else
             {

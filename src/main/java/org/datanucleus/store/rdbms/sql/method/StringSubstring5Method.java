@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -36,12 +37,12 @@ import org.datanucleus.util.Localiser;
  * <li><pre>SUBSTRING(strExpr FROM CAST(numExpr1+1 AS INTEGER) FOR CAST(numExpr2-numExpr1 AS INTEGER))</pre> when end position provided.</li>
  * </ul>
  */
-public class StringSubstring5Method extends AbstractSQLMethod
+public class StringSubstring5Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 2)
         {
@@ -59,7 +60,7 @@ public class StringSubstring5Method extends AbstractSQLMethod
             }
 
             // Create a new StringExpression and manually update its SQL
-            StringExpression strExpr = new StringExpression(stmt, null, getMappingForClass(String.class));
+            StringExpression strExpr = new StringExpression(stmt, null, stmt.getSQLExpressionFactory().getMappingForType(String.class));
             SQLText sql = strExpr.toSQLText();
             sql.append("SUBSTRING(").append(expr).append(" FROM CAST(").append(startExpr.add(one)).append(" AS INTEGER))");
             return strExpr;
@@ -81,7 +82,7 @@ public class StringSubstring5Method extends AbstractSQLMethod
             }
 
             // Create a new StringExpression and manually update its SQL
-            StringExpression strExpr = new StringExpression(stmt, null, getMappingForClass(String.class));
+            StringExpression strExpr = new StringExpression(stmt, null, stmt.getSQLExpressionFactory().getMappingForType(String.class));
             SQLText sql = strExpr.toSQLText();
             sql.append("SUBSTRING(").append(expr).append(" FROM CAST(").append(startExpr.add(one)).append(" AS INTEGER) FOR CAST(").append(endExpr.sub(startExpr)).append(" AS INTEGER))");
             return strExpr;

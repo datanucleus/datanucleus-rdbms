@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
@@ -32,12 +33,12 @@ import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
  * which is compiled into
  * <pre>InvokeExpression{STATIC.SQL_numeric(Literal{some sql})</pre>
  */
-public class SQLNumericMethod extends AbstractSQLMethod
+public class SQLNumericMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {
@@ -51,7 +52,7 @@ public class SQLNumericMethod extends AbstractSQLMethod
         }
         String sql = (String)((StringLiteral)expr).getValue();
 
-        JavaTypeMapping m = exprFactory.getMappingForType(boolean.class, false);
+        JavaTypeMapping m = stmt.getSQLExpressionFactory().getMappingForType(boolean.class, false);
         NumericExpression retExpr = new NumericExpression(stmt, m, sql);
         return retExpr;
     }

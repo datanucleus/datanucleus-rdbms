@@ -22,9 +22,11 @@ import java.util.List;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.EnumExpression;
 import org.datanucleus.store.rdbms.sql.expression.EnumLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.util.Localiser;
 
@@ -32,16 +34,17 @@ import org.datanucleus.util.Localiser;
  * Expression handler to evaluate {enumExpression}.toString().
  * Returns a StringExpression.
  */
-public class EnumToStringMethod extends AbstractSQLMethod
+public class EnumToStringMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr instanceof EnumLiteral)
         {
             Enum val = (Enum)((EnumLiteral)expr).getValue();
+            SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
             return new StringLiteral(stmt, exprFactory.getMappingForType(String.class, false), val.toString(), null);
         }
         else if (expr instanceof EnumExpression)

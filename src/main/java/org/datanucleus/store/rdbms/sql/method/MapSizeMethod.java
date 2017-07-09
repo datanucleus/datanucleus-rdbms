@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 import java.util.Map;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -27,10 +28,12 @@ import org.datanucleus.metadata.MapMetaData.MapType;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.MapLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
@@ -47,18 +50,19 @@ import org.datanucleus.util.Localiser;
  * where A0 is the candidate table in the outer query, and MAPTABLE is the join table (if using 
  * join map) or the key/value table (if using FK map).
  */
-public class MapSizeMethod extends AbstractSQLMethod
+public class MapSizeMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 0)
         {
             throw new NucleusException(Localiser.msg("060015", "size", "MapExpression"));
         }
 
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (expr instanceof MapLiteral)
         {
             // Just return the map length since we have the value
@@ -68,6 +72,7 @@ public class MapSizeMethod extends AbstractSQLMethod
 
         AbstractMemberMetaData ownerMmd = expr.getJavaTypeMapping().getMemberMetaData();
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
 
         // TODO Allow for interface keys/values, etc
         JavaTypeMapping ownerMapping = null;

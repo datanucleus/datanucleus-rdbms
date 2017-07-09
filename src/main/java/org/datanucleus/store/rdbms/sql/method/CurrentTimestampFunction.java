@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.util.Localiser;
@@ -30,7 +31,7 @@ import org.datanucleus.util.Localiser;
  * For use in evaluating CURRENT_TIMESTAMP where the RDBMS supports this function.
  * Returns a TemporalExpression "CURRENT_TIMESTAMP".
  */
-public class CurrentTimestampFunction extends AbstractSQLMethod
+public class CurrentTimestampFunction implements SQLMethod
 {
     protected String getFunctionName()
     {
@@ -40,13 +41,13 @@ public class CurrentTimestampFunction extends AbstractSQLMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
     {
         if (expr == null)
         {
             // Assume that we have something like "CURRENT_DATE()"
             SQLExpression dateExpr = 
-                new TemporalExpression(stmt, getMappingForClass(getClassForMapping()), getFunctionName(), args);
+                new TemporalExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(getClassForMapping(), true), getFunctionName(), args);
             // Update the SQL manually since the default is to add brackets after the name
             dateExpr.toSQLText().clearStatement();
             dateExpr.toSQLText().append(getFunctionName());

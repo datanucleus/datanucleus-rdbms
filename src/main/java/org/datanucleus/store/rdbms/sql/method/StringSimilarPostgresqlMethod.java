@@ -19,10 +19,12 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import org.datanucleus.query.expression.Expression.DyadicOperator;
 import org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.method.StringMatchesMethod;
 
 /**
@@ -34,15 +36,14 @@ public class StringSimilarPostgresqlMethod extends StringMatchesMethod
 {
     public static final DyadicOperator OP_SIMILAR_TO = new DyadicOperator("SIMILAR TO", 3, false);
     
-    protected BooleanExpression getExpressionForStringExpressionInput(SQLExpression expr,
-            SQLExpression regExpr, SQLExpression escapeExpr)
+    protected BooleanExpression getExpressionForStringExpressionInput(SQLStatement stmt, SQLExpression expr, SQLExpression regExpr, SQLExpression escapeExpr)
     {
-        return getBooleanLikeExpression(expr, regExpr, escapeExpr);
+        return getBooleanLikeExpression(stmt, expr, regExpr, escapeExpr);
     }
 
-    protected BooleanExpression getBooleanLikeExpression(SQLExpression expr, SQLExpression regExpr,
-            SQLExpression escapeExpr)
+    protected BooleanExpression getBooleanLikeExpression(SQLStatement stmt, SQLExpression expr, SQLExpression regExpr, SQLExpression escapeExpr)
     {
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         BooleanExpression similarToExpr = new BooleanExpression(stmt, exprFactory.getMappingForType(boolean.class, false));
         SQLText sql = similarToExpr.toSQLText();
         sql.clearStatement();

@@ -28,7 +28,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Base for all temporal methods.
  */
-public abstract class TemporalBaseMethod extends AbstractSQLMethod
+public abstract class TemporalBaseMethod implements SQLMethod
 {
     public SQLExpression getInvokedExpression(SQLExpression expr, List<SQLExpression> args, String methodName)
     {

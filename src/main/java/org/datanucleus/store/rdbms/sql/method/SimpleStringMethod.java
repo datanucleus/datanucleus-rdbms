@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.util.Localiser;
@@ -34,19 +35,19 @@ import org.datanucleus.util.Localiser;
  *     <pre>{functionName}({args})</pre> and expr isn't used</li>
  * </ul>
  */
-public abstract class SimpleStringMethod extends AbstractSQLMethod
+public abstract class SimpleStringMethod implements SQLMethod
 {
     protected abstract String getFunctionName();
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
             // We have something like "function({expr})"
-            return new StringExpression(stmt, getMappingForClass(String.class), getFunctionName(), args);
+            return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class, true), getFunctionName(), args);
         }
         else if (expr instanceof StringExpression)
         {
@@ -54,7 +55,7 @@ public abstract class SimpleStringMethod extends AbstractSQLMethod
             // TODO Cater for input args
             ArrayList functionArgs = new ArrayList();
             functionArgs.add(expr);
-            return new StringExpression(stmt, getMappingForClass(String.class), getFunctionName(), functionArgs);
+            return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class, true), getFunctionName(), functionArgs);
         }
         else
         {

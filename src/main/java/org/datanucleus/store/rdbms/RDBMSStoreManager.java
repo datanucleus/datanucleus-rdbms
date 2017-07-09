@@ -283,7 +283,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         persistenceHandler = new RDBMSPersistenceHandler(this);
         flushProcess = new FlushOrdered(); // TODO Change this to FlushReferential when we have it complete
         schemaHandler = new RDBMSSchemaHandler(this);
-        expressionFactory = new SQLExpressionFactory(this);
 
         // Retrieve the Database Adapter for this datastore
         try
@@ -406,6 +405,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             NucleusLogger.DATASTORE_SCHEMA.error(msg, e1);
             throw new NucleusUserException(msg, e1).setFatal();
         }
+
+        expressionFactory = new SQLExpressionFactory(this);
     }
 
     /* (non-Javadoc)

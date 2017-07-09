@@ -21,10 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -35,12 +37,12 @@ import org.datanucleus.util.Localiser;
  * <li><pre>SUBSTRING(strExpr FROM numExpr1+1 FOR numExpr2-numExpr1)</pre> when end position provided.</li>
  * </ul>
  */
-public class StringCharAtMethod extends AbstractSQLMethod
+public class StringCharAtMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0 || args.size() > 1)
         {
@@ -60,6 +62,7 @@ public class StringCharAtMethod extends AbstractSQLMethod
         List<SQLExpression> newArgs = new ArrayList<>(2);
         newArgs.add(startExpr);
         newArgs.add(endExpr);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         return exprFactory.invokeMethod(stmt, String.class.getName(), "substring", expr, newArgs);
     }
 }

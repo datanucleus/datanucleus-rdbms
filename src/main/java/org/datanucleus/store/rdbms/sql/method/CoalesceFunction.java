@@ -23,9 +23,11 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.util.Localiser;
@@ -36,12 +38,12 @@ import org.datanucleus.util.Localiser;
  * All args must be of consistent expression types.
  * Returns an SQLExpression "COALESCE({expr})".
  */
-public class CoalesceFunction extends AbstractSQLMethod
+public class CoalesceFunction implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (expr == null)
         {
@@ -116,21 +118,22 @@ public class CoalesceFunction extends AbstractSQLMethod
                 }
             }
 
+            SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
             if (exprType == NumericExpression.class)
             {
-                return new NumericExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+                return new NumericExpression(stmt, exprFactory.getMappingForType(cls, true), "COALESCE", args);
             }
             else if (exprType == StringExpression.class)
             {
-                return new StringExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+                return new StringExpression(stmt, exprFactory.getMappingForType(cls, true), "COALESCE", args);
             }
             else if (exprType == TemporalExpression.class)
             {
-                return new TemporalExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+                return new TemporalExpression(stmt, exprFactory.getMappingForType(cls, true), "COALESCE", args);
             }
             else
             {
-                return new ObjectExpression(stmt, getMappingForClass(cls), "COALESCE", args);
+                return new ObjectExpression(stmt, exprFactory.getMappingForType(cls, true), "COALESCE", args);
             }
         }
 

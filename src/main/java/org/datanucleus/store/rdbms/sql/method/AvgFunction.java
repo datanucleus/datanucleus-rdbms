@@ -19,13 +19,16 @@ package org.datanucleus.store.rdbms.sql.method;
 
 import java.util.List;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.AggregateNumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.NumericSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -43,7 +46,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
     {
         if (expr != null)
         {
@@ -56,23 +59,25 @@ public class AvgFunction extends SimpleNumericAggregateMethod
 
         // Set the return type (double, for JDOQL and JPQL)
         Class returnType = Double.class;
-        
+
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
             stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
         {
             // FUNC(argExpr)
-            JavaTypeMapping m = getMappingForClass(returnType);
+            JavaTypeMapping m = exprFactory.getMappingForType(returnType, true);
 
-             return getAggregateExpression(args, m);
+             return getAggregateExpression(stmt, args, m);
         }
 
         // Handle as Subquery "SELECT AVG(expr) FROM tbl"
+        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
         SQLExpression argExpr = (SQLExpression)args.get(0);
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
         JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
-        SQLExpression aggExpr = getAggregateExpression(args, mapping);
+        SQLExpression aggExpr = getAggregateExpression(stmt, args, mapping);
         subStmt.select(aggExpr, null);
 
         JavaTypeMapping subqMapping = exprFactory.getMappingForType(returnType, false);
@@ -81,7 +86,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
         return subqExpr;
     }
 
-    protected SQLExpression getAggregateExpression(List args, JavaTypeMapping m)
+    protected SQLExpression getAggregateExpression(SQLStatement stmt, List args, JavaTypeMapping m)
     {
         return new AggregateNumericExpression(stmt, m, getFunctionName(), args);
     }

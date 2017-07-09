@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
@@ -29,12 +30,12 @@ import org.datanucleus.store.rdbms.sql.expression.StringExpression;
  * Method for evaluating {strExpr1}.trim() or "TRIM(BOTH trimChar FROM strExpr1)".
  * Returns a StrignExpression that equates to <pre>TRIM([[BOTH] [{trim_char}] FROM] strExpr)</pre>
  */
-public class StringTrim3Method extends AbstractSQLMethod
+public class StringTrim3Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args != null && args.size() > 1)
         {

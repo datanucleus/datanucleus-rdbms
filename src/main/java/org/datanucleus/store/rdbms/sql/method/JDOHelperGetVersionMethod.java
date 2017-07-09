@@ -25,6 +25,7 @@ import org.datanucleus.metadata.VersionStrategy;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.IllegalExpressionOperationException;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
@@ -40,12 +41,12 @@ import org.datanucleus.store.schema.table.SurrogateColumnType;
  * Expression handler to evaluate JDOHelper.getVersion({expression}).
  * Returns an ObjectLiteral, NullLiteral, NumericExpression or TemporalExpression.
  */
-public class JDOHelperGetVersionMethod extends AbstractSQLMethod
+public class JDOHelperGetVersionMethod implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression ignore, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression ignore, List<SQLExpression> args)
     {
         if (args == null || args.size() == 0)
         {
@@ -68,7 +69,7 @@ public class JDOHelperGetVersionMethod extends AbstractSQLMethod
             }
 
             Object ver = stmt.getRDBMSManager().getApiAdapter().getVersionForObject(obj);
-            JavaTypeMapping m = getMappingForClass(ver.getClass());
+            JavaTypeMapping m = stmt.getSQLExpressionFactory().getMappingForType(ver.getClass(), true);
             return new ObjectLiteral(stmt, m, ver, null);
         }
         else if (ObjectExpression.class.isAssignableFrom(expr.getClass()))

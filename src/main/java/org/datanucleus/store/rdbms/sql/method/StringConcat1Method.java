@@ -23,10 +23,10 @@ import java.util.List;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
+import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.CharacterExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
-import org.datanucleus.store.rdbms.sql.method.AbstractSQLMethod;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -36,12 +36,12 @@ import org.datanucleus.util.Localiser;
  * <li><pre>concat(strExpr, strExpr1)</pre>.</li>
  * </ul>
  */
-public class StringConcat1Method extends AbstractSQLMethod
+public class StringConcat1Method implements SQLMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLExpression expr, List<SQLExpression> args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
         if (args == null || args.size() != 1)
         {
