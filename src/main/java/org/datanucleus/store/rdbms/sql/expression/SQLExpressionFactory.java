@@ -68,14 +68,14 @@ public class SQLExpressionFactory
     /** Keys of SQLMethods that are supported. */
     Set<MethodKey> pluginSqlMethodsKeysSupported = new HashSet<>();
 
-    /** Cache of already created SQLMethod instances, keyed by their class+method[+datastore] name. */
-    Map<MethodKey, SQLMethod> pluginSqlMethodByKey = new HashMap<>();
+    /** Cache of SQLMethod instances, keyed by their class+method[+datastore] name. */
+    Map<MethodKey, SQLMethod> sqlMethodsByKey = new HashMap<>();
 
     /** Keys of SQLOperations that are supported. */
     Set<String> pluginSqlOperationKeysSupported = new HashSet<>();
 
-    /** Plugin-generated SQLOperation instances, keyed by their key. */
-    Map<String, SQLOperation> pluginSqlOperationByKey = new HashMap<>();
+    /** Cache of SQLOperation instances, keyed by their name. */
+    Map<String, SQLOperation> sqlOperationsByName = new HashMap<>();
 
     /** Map of JavaTypeMapping for use in query expressions, keyed by the type being represented. */
     Map<Class, JavaTypeMapping> mappingByClass = new HashMap<>();
@@ -343,7 +343,7 @@ public class SQLExpressionFactory
         }
 
         pluginSqlMethodsKeysSupported.add(methodKey);
-        pluginSqlMethodByKey.put(methodKey, method);
+        sqlMethodsByKey.put(methodKey, method);
     }
 
     /**
@@ -363,12 +363,12 @@ public class SQLExpressionFactory
         // Try to find datastore-dependent evaluator for class+method
         MethodKey methodKey1 = getSQLMethodKey(datastoreId, className, methodName);
         MethodKey methodKey2 = null;
-        SQLMethod method = pluginSqlMethodByKey.get(methodKey1);
+        SQLMethod method = sqlMethodsByKey.get(methodKey1);
         if (method == null)
         {
             // Try to find datastore-independent evaluator for class+method
             methodKey2 = getSQLMethodKey(null, className, methodName);
-            method = pluginSqlMethodByKey.get(methodKey2);
+            method = sqlMethodsByKey.get(methodKey2);
         }
         if (method != null)
         {
@@ -407,9 +407,14 @@ public class SQLExpressionFactory
                             if (methodCls != null && methodCls.isAssignableFrom(cls))
                             {
                                 // This one is usable here, for superclass
-                                method = pluginSqlMethodByKey.get(methodKey);
+                                method = sqlMethodsByKey.get(methodKey);
                                 if (method != null)
                                 {
+                                    MethodKey superMethodKey = new MethodKey();
+                                    superMethodKey.clsName = className;
+                                    superMethodKey.methodName = methodKey.methodName;
+                                    superMethodKey.datastoreName = methodKey.datastoreName;
+                                    sqlMethodsByKey.put(superMethodKey, method); // Cache the same method under this class also
                                     return method;
                                 }
 
@@ -440,9 +445,14 @@ public class SQLExpressionFactory
                                 if (methodCls != null && methodCls.isAssignableFrom(cls))
                                 {
                                     // This one is usable here, for superclass
-                                    method = pluginSqlMethodByKey.get(methodKey);
+                                    method = sqlMethodsByKey.get(methodKey);
                                     if (method != null)
                                     {
+                                        MethodKey superMethodKey = new MethodKey();
+                                        superMethodKey.clsName = className;
+                                        superMethodKey.methodName = methodKey.methodName;
+                                        superMethodKey.datastoreName = methodKey.datastoreName;
+                                        sqlMethodsByKey.put(superMethodKey, method); // Cache the same method under this class also
                                         return method;
                                     }
 
@@ -477,7 +487,7 @@ public class SQLExpressionFactory
             method = (SQLMethod)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_method", attrNames, attrValues, "evaluator", new Class[]{}, new Object[]{});
 
             // Register the method
-            pluginSqlMethodByKey.put(getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName), method);
+            sqlMethodsByKey.put(getSQLMethodKey(datastoreDependent ? datastoreId : null, className, methodName), method);
 
             return method;
         }
@@ -516,26 +526,36 @@ public class SQLExpressionFactory
      */
     public SQLExpression invokeOperation(String name, SQLExpression expr, SQLExpression expr2)
     {
-        // Check for instantiated built-in SQLOperation
-        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
-        SQLOperation operation = dba.getSQLOperationForName(name);
-        if (operation != null)
-        {
-            return operation.getExpression(expr, expr2);
-        }
-
         // Check for instantiated plugin SQLOperation
-        String datastoreId = dba.getVendorID();
-        String key = getSQLOperationKey(datastoreId, name);
-        operation = pluginSqlOperationByKey.get(key);
+        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+        SQLOperation operation = sqlOperationsByName.get(name);
         if (operation != null)
         {
             return operation.getExpression(expr, expr2);
         }
 
-        // No existing instance of the SQLOperation so find and instantiate it
+        // Check for built-in SQLOperation class definition
+        Class sqlOpClass = dba.getSQLOperationClass(name);
+        if (sqlOpClass != null)
+        {
+            try
+            {
+                // Instantiate it
+                operation = (SQLOperation) sqlOpClass.newInstance();
+                sqlOperationsByName.put(name, operation);
+                return operation.getExpression(expr, expr2);
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException("Error creating SQLOperation of type " + sqlOpClass.getName() + " for operation " + name);
+            }
+        }
+
+        // Check for plugin definition of this operation for this datastore
 
         // 1). Try datastore-dependent key
+        String datastoreId = dba.getVendorID();
+        String key = getSQLOperationKey(datastoreId, name);
         boolean datastoreDependent = true;
         if (!pluginSqlOperationKeysSupported.contains(key))
         {
@@ -556,7 +576,7 @@ public class SQLExpressionFactory
             operation = (SQLOperation)pluginMgr.createExecutableExtension("org.datanucleus.store.rdbms.sql_operation", attrNames, attrValues, "evaluator", null, null);
             synchronized (operation)
             {
-                pluginSqlOperationByKey.put(key, operation);
+                sqlOperationsByName.put(key, operation);
                 return operation.getExpression(expr, expr2);
             }
         }

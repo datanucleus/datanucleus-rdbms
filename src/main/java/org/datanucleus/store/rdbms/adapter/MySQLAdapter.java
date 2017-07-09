@@ -34,8 +34,6 @@ import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
-import org.datanucleus.store.rdbms.sql.operation.Concat2Operation;
-import org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
@@ -139,10 +137,6 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(OPERATOR_BITWISE_XOR);
 
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING); // MySQL charsets don't seem to allow this
-
-        // Load up SQLOperations applicable to this datastore
-        sqlOperationsByName.put("concat", new Concat2Operation());
-        sqlOperationsByName.put("numericToString", new NumericToString2Operation());
     }
 
     /**
@@ -437,5 +431,17 @@ public class MySQLAdapter extends BaseDatastoreAdapter
             return false;
         }
         return super.validToIndexMapping(mapping);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
+     */
+    @Override
+    public Class getSQLOperationClass(String operationName)
+    {
+        if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat2Operation.class;
+        else if ("numericToString".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.NumericToString2Operation.class;
+
+        return super.getSQLOperationClass(operationName);
     }
 }

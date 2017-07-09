@@ -38,7 +38,6 @@ import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLText;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.operation.Concat2Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -134,9 +133,6 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
             supportedOptions.add(OPERATOR_BITWISE_OR);
             supportedOptions.add(OPERATOR_BITWISE_XOR);
         }
-
-        // Load up SQLOperations applicable to this datastore
-        sqlOperationsByName.put("concat", new Concat2Operation());
     }
 
     /**
@@ -613,5 +609,16 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         stmt.append("'");
 
         return stmt.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
+     */
+    @Override
+    public Class getSQLOperationClass(String operationName)
+    {
+        if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat2Operation.class;
+
+        return super.getSQLOperationClass(operationName);
     }
 }

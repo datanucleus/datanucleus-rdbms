@@ -32,8 +32,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
-import org.datanucleus.store.rdbms.sql.operation.Concat3Operation;
-import org.datanucleus.store.rdbms.sql.operation.Mod3Operation;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
@@ -100,10 +98,6 @@ public class DB2Adapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_DEFAULT);
         supportedOptions.remove(FK_UPDATE_ACTION_CASCADE);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
-
-        // Load up SQLOperations applicable to this datastore
-        sqlOperationsByName.put("mod", new Mod3Operation());
-        sqlOperationsByName.put("concat", new Concat3Operation());
     }
 
     /**
@@ -376,5 +370,17 @@ public class DB2Adapter extends BaseDatastoreAdapter
         }
 
         return super.isStatementTimeout(sqle);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
+     */
+    @Override
+    public Class getSQLOperationClass(String operationName)
+    {
+        if ("mod".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Mod3Operation.class;
+        else if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat3Operation.class;
+
+        return super.getSQLOperationClass(operationName);
     }
 }

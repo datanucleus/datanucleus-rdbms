@@ -33,9 +33,6 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
-import org.datanucleus.store.rdbms.sql.operation.Concat3Operation;
-import org.datanucleus.store.rdbms.sql.operation.Mod2Operation;
-import org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
@@ -115,11 +112,6 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         {
             supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         }
-
-        // Load up SQLOperations applicable to this datastore
-        sqlOperationsByName.put("mod", new Mod2Operation());
-        sqlOperationsByName.put("concat", new Concat3Operation());
-        sqlOperationsByName.put("numericToString", new NumericToString3Operation());
     }
 
     /**
@@ -476,5 +468,18 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         stmt.append(sequenceName);
         stmt.append(" ");
         return stmt.toString();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
+     */
+    @Override
+    public Class getSQLOperationClass(String operationName)
+    {
+        if ("mod".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Mod2Operation.class;
+        else if ("concat".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Concat3Operation.class;
+        else if ("numericToString".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.NumericToString3Operation.class;
+
+        return super.getSQLOperationClass(operationName);
     }
 }

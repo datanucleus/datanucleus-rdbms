@@ -31,7 +31,6 @@ import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
-import org.datanucleus.store.rdbms.sql.operation.Mod2Operation;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -66,9 +65,6 @@ public class InformixAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.remove(NULLS_KEYWORD_IN_COLUMN_OPTIONS);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
-
-        // Load up SQLOperations applicable to this datastore
-        sqlOperationsByName.put("mod", new Mod2Operation());
     }
 
     /**
@@ -273,5 +269,16 @@ public class InformixAdapter extends BaseDatastoreAdapter
         }
 
         return super.isStatementTimeout(sqle);
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLOperationClass(java.lang.String)
+     */
+    @Override
+    public Class getSQLOperationClass(String operationName)
+    {
+        if ("mod".equals(operationName)) return org.datanucleus.store.rdbms.sql.operation.Mod2Operation.class;
+
+        return super.getSQLOperationClass(operationName);
     }
 }
