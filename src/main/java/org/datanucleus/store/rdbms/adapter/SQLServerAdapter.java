@@ -26,6 +26,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.JdbcType;
@@ -626,7 +628,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -639,26 +641,45 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         }
         else
         {
-            if ("java.lang.String".equals(className) && "concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat2Method.class;
-            else if ("java.lang.String".equals(className) && "indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method.class;
-            else if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength4Method.class;
-            else if ("java.lang.String".equals(className) && "startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith2Method.class;
-            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring4Method.class;
-            else if ("java.lang.String".equals(className) && "trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
-            else if ("java.util.Date".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4.class;
-            else if ("java.util.Date".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
-            else if ("java.util.Date".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
-            else if ("java.util.Date".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
-            else if ("java.time.LocalTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
-            else if ("java.time.LocalTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
-            else if ("java.time.LocalTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            Class cls = null;
+            try
+            {
+                cls = clr.classForName(className);
+            }
+            catch (ClassNotResolvedException cnre) {}
+
+            if ("java.lang.String".equals(className))
+            {
+                if ("concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat2Method.class;
+                else if ("indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method.class;
+                else if ("length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength4Method.class;
+                else if ("startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith2Method.class;
+                else if ("substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring4Method.class;
+                else if ("trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
+            }
+            else if ("java.util.Date".equals(className) || (cls != null && java.util.Date.class.isAssignableFrom(cls)))
+            {
+                if ("getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4.class;
+                else if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            }
+            else if ("java.time.LocalTime".equals(className))
+            {
+                if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            }
             else if ("java.time.LocalDate".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            else if ("java.time.LocalDateTime".equals(className))
+            {
+                if ("getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4.class;
+                else if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            }
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

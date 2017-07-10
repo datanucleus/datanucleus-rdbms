@@ -22,6 +22,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -342,7 +344,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -352,11 +354,21 @@ public class H2Adapter extends BaseDatastoreAdapter
         }
         else
         {
-            if ("java.util.Date".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+            Class cls = null;
+            try
+            {
+                cls = clr.classForName(className);
+            }
+            catch (ClassNotResolvedException cnre) {}
+
+            if ("java.util.Date".equals(className) || (cls != null && java.util.Date.class.isAssignableFrom(cls)))
+            {
+                if ("getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+            }
             else if ("java.time.LocalDate".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
             else if ("java.time.LocalDateTime".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

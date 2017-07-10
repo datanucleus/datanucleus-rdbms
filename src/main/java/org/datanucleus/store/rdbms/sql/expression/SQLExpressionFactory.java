@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -49,21 +50,18 @@ import org.datanucleus.util.StringUtils;
  */
 public class SQLExpressionFactory
 {
+    private static final Class[] EXPR_CREATION_ARG_TYPES = new Class[] {SQLStatement.class, SQLTable.class, JavaTypeMapping.class};
+    private static final Class[] LIT_CREATION_ARG_TYPES = new Class[] {SQLStatement.class, JavaTypeMapping.class, Object.class, String.class};
+
     RDBMSStoreManager storeMgr;
 
     ClassLoaderResolver clr;
 
-    private static final Class[] EXPR_CREATION_ARG_TYPES = 
-        new Class[] {SQLStatement.class, SQLTable.class, JavaTypeMapping.class};
-
-    private static final Class[] LIT_CREATION_ARG_TYPES = 
-        new Class[] {SQLStatement.class, JavaTypeMapping.class, Object.class, String.class};
-
     /** Cache of expression class, keyed by the mapping class name. */
-    Map<String, Class> expressionClassByMappingName = new HashMap();
+    Map<String, Class> expressionClassByMappingName = new ConcurrentHashMap<>();
 
     /** Cache of literal class, keyed by the mapping class name. */
-    Map<String, Class> literalClassByMappingName = new HashMap();
+    Map<String, Class> literalClassByMappingName = new ConcurrentHashMap<>();
 
     /** Keys of SQLMethods that are supported. */
     Set<MethodKey> pluginSqlMethodsKeysSupported = new HashSet<>();
@@ -103,10 +101,8 @@ public class SQLExpressionFactory
 
     /**
      * Constructor for an SQLExpressionFactory.
-     * Also loads up the defined SQL methods
-     * [extension-point: "org.datanucleus.store.rdbms.sql_method"] and caches them.
-     * Also loads up the defined SQL operations
-     * [extension-point: "org.datanucleus.store.rdbms.sql_operation"] and caches them.
+     * Also loads up the defined SQL methods [extension-point: "org.datanucleus.store.rdbms.sql_method"] and caches the keys.
+     * Also loads up the defined SQL operations [extension-point: "org.datanucleus.store.rdbms.sql_operation"] and caches the keys.
      * @param storeMgr RDBMS Manager
      */
     public SQLExpressionFactory(RDBMSStoreManager storeMgr)
@@ -123,10 +119,13 @@ public class SQLExpressionFactory
             for (int i=0;i<methodElems.length;i++)
             {
                 String datastoreName = methodElems[i].getAttribute("datastore");
-                String className = methodElems[i].getAttribute("class");
-                String methodName = methodElems[i].getAttribute("method").trim();
-                MethodKey key = getSQLMethodKey(datastoreName, className, methodName);
-                pluginSqlMethodsKeysSupported.add(key);
+                if (StringUtils.isWhitespace(datastoreName) || storeMgr.getDatastoreAdapter().getVendorID().equals(datastoreName))
+                {
+                    String className = methodElems[i].getAttribute("class");
+                    String methodName = methodElems[i].getAttribute("method").trim();
+                    MethodKey key = getSQLMethodKey(datastoreName, className, methodName);
+                    pluginSqlMethodsKeysSupported.add(key);
+                }
             }
         }
 
@@ -137,9 +136,12 @@ public class SQLExpressionFactory
             for (int i=0;i<operationElems.length;i++)
             {
                 String datastoreName = operationElems[i].getAttribute("datastore");
-                String name = operationElems[i].getAttribute("name").trim();
-                String key = getSQLOperationKey(datastoreName, name);
-                pluginSqlOperationKeysSupported.add(key);
+                if (StringUtils.isWhitespace(datastoreName) || storeMgr.getDatastoreAdapter().getVendorID().equals(datastoreName))
+                {
+                    String name = operationElems[i].getAttribute("name").trim();
+                    String key = getSQLOperationKey(datastoreName, name);
+                    pluginSqlOperationKeysSupported.add(key);
+                }
             }
         }
     }
@@ -161,11 +163,10 @@ public class SQLExpressionFactory
      * @param stmt The statement
      * @param sqlTbl The table
      * @param mapping The mapping
-     * @param parentMapping Optional parent mapping of this mapping (e.g when handling impl of an interface)
+     * @param parentMapping Optional parent mapping of this mapping (e.g when handling an implementation of an interface)
      * @return The expression
      */
-    public SQLExpression newExpression(SQLStatement stmt, SQLTable sqlTbl, JavaTypeMapping mapping,
-            JavaTypeMapping parentMapping)
+    public SQLExpression newExpression(SQLStatement stmt, SQLTable sqlTbl, JavaTypeMapping mapping, JavaTypeMapping parentMapping)
     {
         SQLTable exprSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, sqlTbl, parentMapping == null ? mapping : parentMapping);
         Object[] args = new Object[] {stmt, exprSqlTbl, mapping};
@@ -180,9 +181,8 @@ public class SQLExpressionFactory
         try
         {
             // Use "new SQLExpression(SQLStatement, SQLTable, JavaTypeMapping)"
-            SQLExpression sqlExpr = (SQLExpression)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
-                "expression-class", EXPR_CREATION_ARG_TYPES, args);
+            SQLExpression sqlExpr = (SQLExpression)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression", 
+                "mapping-class", mapping.getClass().getName(), "expression-class", EXPR_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
             {
                 throw new NucleusException(Localiser.msg("060004", mapping.getClass().getName()));
@@ -229,9 +229,8 @@ public class SQLExpressionFactory
                 return (SQLExpression)ClassUtils.newInstance(NullLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
-            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
-                "literal-class", LIT_CREATION_ARG_TYPES, args);
+            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
+                "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
             {
                 throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
@@ -269,9 +268,8 @@ public class SQLExpressionFactory
                 return (SQLExpression)ClassUtils.newInstance(ParameterLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
-            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension(
-                "org.datanucleus.store.rdbms.sql_expression", "mapping-class", mapping.getClass().getName(), 
-                "literal-class", LIT_CREATION_ARG_TYPES, args);
+            SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
+                "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
             {
                 throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
@@ -308,15 +306,21 @@ public class SQLExpressionFactory
 
     public boolean isMethodRegistered(String className, String methodName)
     {
-        // Try to find datastore-dependent evaluator for class+method
-        if (pluginSqlMethodsKeysSupported.contains(getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName)))
+        if (storeMgr.getDatastoreAdapter().getSQLMethodClass(className, methodName, clr) != null)
         {
+            // Built-in SQLMethod available
             return true;
         }
 
-        // Try to find datastore-independent evaluator for class+method
+        if (pluginSqlMethodsKeysSupported.contains(getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName)))
+        {
+            // Plugin mechanism has datastore-dependent SQLMethod
+            return true;
+        }
+
         if (pluginSqlMethodsKeysSupported.contains(getSQLMethodKey(null, className, methodName)))
         {
+            // Plugin mechanism has datastore-independent SQLMethod
             return true;
         }
 
@@ -329,18 +333,16 @@ public class SQLExpressionFactory
      * @param className Class name (or null if "static")
      * @param methodName Name of the method/function
      * @param method The SQLMethod to invoke when this method is encountered
-     * @param datastoreDependent Whether the usage of this method is datastore dependent (true means just for the current datastore, false means for all)
      */
-    public void registerMethod(String className, String methodName, SQLMethod method, boolean datastoreDependent)
+    public void registerMethod(String className, String methodName, SQLMethod method)
     {
-        String datastoreId = storeMgr.getDatastoreAdapter().getVendorID();
-
-        // Try to find datastore-dependent evaluator for class+method
-        MethodKey methodKey = getSQLMethodKey(datastoreDependent ? null : datastoreId, className, methodName);
-        if (pluginSqlMethodsKeysSupported.contains(methodKey))
+        if (isMethodRegistered(className, methodName))
         {
             throw new NucleusUserException("SQLMethod already defined for class=" + className + " method=" + methodName);
         }
+
+        // Try to find datastore-dependent evaluator for class+method
+        MethodKey methodKey = getSQLMethodKey(storeMgr.getDatastoreAdapter().getVendorID(), className, methodName);
 
         pluginSqlMethodsKeysSupported.add(methodKey);
         sqlMethodsByKey.put(methodKey, method);
@@ -349,8 +351,7 @@ public class SQLExpressionFactory
     /**
      * Accessor for the method defined by the class/method names and supplied args.
      * Throws a NucleusException is the method is not supported.
-     * Note that if the class name passed in is not for a listed class with that method defined then
-     * will check all remaining defined methods for a superclass. TODO Make more efficient lookups
+     * Note that if the class name passed in is not for a listed class with that method defined then will check all remaining defined methods for a superclass.
      * @param className Class we are invoking the method on
      * @param methodName Name of the method
      * @param args Any arguments to the method call (ignored currently) TODO Check the arguments
@@ -375,7 +376,25 @@ public class SQLExpressionFactory
             return method;
         }
 
-        // No cached instance of the SQLMethod so find and instantiate it
+        // No existing instance, so check the built-in SQLMethods from DatastoreAdapter
+        Class sqlMethodCls = storeMgr.getDatastoreAdapter().getSQLMethodClass(className, methodName, clr);
+        if (sqlMethodCls != null)
+        {
+            // Built-in SQLMethod found, so instantiate it, cache it and return it
+            try
+            {
+                method = (SQLMethod) sqlMethodCls.newInstance();
+                MethodKey key = getSQLMethodKey(datastoreId, className, methodName);
+                sqlMethodsByKey.put(key, method);
+                return method;
+            }
+            catch (Exception e)
+            {
+                throw new NucleusException("Error creating SQLMethod of type " + sqlMethodCls.getName() + " for class=" + className + " method=" + methodName);
+            }
+        }
+
+        // Check the plugin mechanism
         // 1). Try datastore-dependent key
         boolean datastoreDependent = true;
         if (!pluginSqlMethodsKeysSupported.contains(methodKey1))

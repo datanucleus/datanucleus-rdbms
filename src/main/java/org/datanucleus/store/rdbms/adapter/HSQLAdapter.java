@@ -29,6 +29,8 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -480,7 +482,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -490,13 +492,26 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         }
         else
         {
-            if ("java.lang.String".equals(className) && "startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method.class;
-            else if ("java.lang.String".equals(className) && "trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
-            else if ("java.util.Date".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5.class;
+            Class cls = null;
+            try
+            {
+                cls = clr.classForName(className);
+            }
+            catch (ClassNotResolvedException cnre) {}
+
+            if ("java.lang.String".equals(className))
+            {
+                if ("startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method.class;
+                else if ("trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
+            }
+            else if ("java.util.Date".equals(className) || (cls != null && java.util.Date.class.isAssignableFrom(cls)))
+            {
+                if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5.class;
+            }
             else if ("java.time.LocalTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5.class;
             else if ("java.time.LocalDateTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5.class;
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

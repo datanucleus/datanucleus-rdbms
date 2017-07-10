@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -286,13 +287,13 @@ public class InformixAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className != null)
         {
             if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

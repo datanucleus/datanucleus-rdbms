@@ -23,6 +23,7 @@ package org.datanucleus.store.rdbms.adapter;
 
 import java.sql.DatabaseMetaData;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
@@ -163,14 +164,17 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className != null)
         {
-            if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
-            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+            if ("java.lang.String".equals(className))
+            {
+                if ("length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
+                else if ("substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+            }
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

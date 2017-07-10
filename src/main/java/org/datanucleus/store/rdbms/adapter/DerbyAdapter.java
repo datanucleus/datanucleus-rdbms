@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.JdbcType;
@@ -487,7 +488,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -496,14 +497,17 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         }
         else
         {
-            if ("java.lang.String".equals(className) && "concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
-            else if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
-            else if ("java.lang.String".equals(className) && "matches".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringMatchesDerbyMethod.class;
-            else if ("java.lang.String".equals(className) && "startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method.class;
-            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
-            else if ("java.lang.String".equals(className) && "trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
+            if ("java.lang.String".equals(className))
+            {
+                if ("concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
+                else if ("length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
+                else if ("matches".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringMatchesDerbyMethod.class;
+                else if ("startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method.class;
+                else if ("substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+                else if ("trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
+            }
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

@@ -22,6 +22,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Types;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -165,14 +166,17 @@ public class SybaseAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className != null)
         {
-            if ("java.lang.String".equals(className) && "indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method.class;
-            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring2Method.class;
+            if ("java.lang.String".equals(className))
+            {
+                if ("indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method.class;
+                else if ("substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring2Method.class;
+            }
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

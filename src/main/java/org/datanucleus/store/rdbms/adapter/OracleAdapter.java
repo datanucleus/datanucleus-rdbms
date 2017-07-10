@@ -32,6 +32,8 @@ import java.sql.Types;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -742,7 +744,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
      */
     @Override
-    public Class getSQLMethodClass(String className, String methodName)
+    public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
         if (className == null)
         {
@@ -758,39 +760,70 @@ public class OracleAdapter extends BaseDatastoreAdapter
         }
         else
         {
-            if ("java.lang.String".equals(className) && "concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
-            else if ("java.lang.String".equals(className) && "indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method.class;
-            else if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
-            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
-            else if ("java.lang.String".equals(className) && "translate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTranslateMethod.class;
-            else if ("java.util.Date".equals(className) && "getDay".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
-            else if ("java.util.Date".equals(className) && "getDate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
-            else if ("java.util.Date".equals(className) && "getMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2.class;
-            else if ("java.util.Date".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
-            else if ("java.util.Date".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
-            else if ("java.util.Date".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
-            else if ("java.util.Date".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
-            else if ("java.time.LocalTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
-            else if ("java.time.LocalTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
-            else if ("java.time.LocalTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
-            else if ("java.time.LocalDate".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
-            else if ("java.time.LocalDate".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.LocalDate".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
-            else if ("java.time.LocalDateTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
-            else if ("java.time.MonthDay".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
-            else if ("java.time.MonthDay".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.Period".equals(className) && "getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.Period".equals(className) && "getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.Period".equals(className) && "getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
-            else if ("java.time.YearMonth".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-            else if ("java.time.YearMonth".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            Class cls = null;
+            try
+            {
+                cls = clr.classForName(className);
+            }
+            catch (ClassNotResolvedException cnre) {}
+
+            if ("java.lang.String".equals(className))
+            {
+                if ("concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
+                else if ("indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method.class;
+                else if ("length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
+                else if ("substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+                else if ("translate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTranslateMethod.class;
+            }
+            else if ("java.util.Date".equals(className) || (cls != null && java.util.Date.class.isAssignableFrom(cls)))
+            {
+                if ("getDay".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+                else if ("getDate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+                else if ("getMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2.class;
+                else if ("getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+                else if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            }
+            else if ("java.time.LocalTime".equals(className))
+            {
+                if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            }
+            else if ("java.time.LocalDate".equals(className))
+            {
+                if ("getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+                else if ("getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            }
+            else if ("java.time.LocalDateTime".equals(className))
+            {
+                if ("getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+                else if ("getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+                else if ("getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+                else if ("getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+                else if ("getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            }
+            else if ("java.time.MonthDay".equals(className))
+            {
+                if ("getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+                else if ("getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            }
+            else if ("java.time.Period".equals(className))
+            {
+                if ("getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            }
+            else if ("java.time.YearMonth".equals(className))
+            {
+                if ("getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            }
         }
 
-        return super.getSQLMethodClass(className, methodName);
+        return super.getSQLMethodClass(className, methodName, clr);
     }
 }

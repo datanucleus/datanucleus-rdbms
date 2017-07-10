@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -1030,7 +1031,8 @@ public interface DatastoreAdapter
      * Accessor for the SQLMethod class for the query invocation of specified class + method name (if available for this datastore).
      * @param className Name of the class (or null if this is a STATIC method)
      * @param methodName Method name
+     * @param clr ClassLoader resolver, in case <cite>className</cite> is a subclass of a supported type
      * @return The SQLMethod class (or null if not defined for this datastore).
      */
-    Class getSQLMethodClass(String className, String methodName);
+    Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr);
 }
