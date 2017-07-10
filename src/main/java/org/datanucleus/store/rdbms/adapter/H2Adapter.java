@@ -337,4 +337,26 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         return super.getSQLOperationClass(operationName);
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Class getSQLMethodClass(String className, String methodName)
+    {
+        if (className == null)
+        {
+            if ("avg".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction.class;
+            else if ("AVG".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction.class;
+            else if ("DAY_OF_WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+        }
+        else
+        {
+            if ("java.util.Date".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+            else if ("java.time.LocalDate".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getDayOfWeek".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod.class;
+        }
+
+        return super.getSQLMethodClass(className, methodName);
+    }
 }

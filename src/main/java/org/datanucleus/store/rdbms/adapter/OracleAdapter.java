@@ -744,292 +744,53 @@ public class OracleAdapter extends BaseDatastoreAdapter
     @Override
     public Class getSQLMethodClass(String className, String methodName)
     {
-        /*
-        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
-        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
-        <sql-method method="avg" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="derby"/>
+        if (className == null)
+        {
+            if ("YEAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            else if ("MONTH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("MONTH_JAVA".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2.class;
+            else if ("DAY".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("HOUR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+            else if ("MINUTE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+            else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            else if ("SQL_cube".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLCubeFunction.class;
+            else if ("SQL_rollup".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLRollupFunction.class;
+        }
+        else
+        {
+            if ("java.lang.String".equals(className) && "concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
+            else if ("java.lang.String".equals(className) && "indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method.class;
+            else if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
+            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+            else if ("java.lang.String".equals(className) && "translate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTranslateMethod.class;
+            else if ("java.util.Date".equals(className) && "getDay".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("java.util.Date".equals(className) && "getDate".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("java.util.Date".equals(className) && "getMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2.class;
+            else if ("java.util.Date".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            else if ("java.util.Date".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+            else if ("java.util.Date".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+            else if ("java.util.Date".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            else if ("java.time.LocalTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+            else if ("java.time.LocalTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+            else if ("java.time.LocalTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            else if ("java.time.LocalDate".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("java.time.LocalDate".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.LocalDate".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getHour".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getMinute".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2.class;
+            else if ("java.time.LocalDateTime".equals(className) && "getSecond".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
+            else if ("java.time.MonthDay".equals(className) && "getDayOfMonth".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
+            else if ("java.time.MonthDay".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.Period".equals(className) && "getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.Period".equals(className) && "getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.Period".equals(className) && "getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+            else if ("java.time.YearMonth".equals(className) && "getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+            else if ("java.time.YearMonth".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
+        }
 
-        <sql-method method="log" evaluator="org.datanucleus.store.rdbms.sql.method.LogFunction2" datastore="postgresql"/>
-
-        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="h2"/>
-        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="hsql"/>
-        <sql-method method="AVG" evaluator="org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction" datastore="derby"/>
-
-        <sql-method method="SQL_cube" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
-        <sql-method method="SQL_cube" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
-        <sql-method method="SQL_cube" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.SQLCubeFunction"/>
-        <sql-method method="SQL_rollup" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
-        <sql-method method="SQL_rollup" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
-        <sql-method method="SQL_rollup" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.SQLRollupFunction"/>
-
-        <sql-method class="java.lang.String" method="concat" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat2Method"/>
-        <sql-method class="java.lang.String" method="concat" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat2Method"/>
-        <sql-method class="java.lang.String" method="concat" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat2Method"/>
-        <sql-method class="java.lang.String" method="concat" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat1Method"/>
-        <sql-method class="java.lang.String" method="concat" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat1Method"/>
-        <sql-method class="java.lang.String" method="concat" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringConcat1Method"/>
-
-        <sql-method class="java.lang.String" method="indexOf" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method"/>
-        <sql-method class="java.lang.String" method="indexOf" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf3Method"/>
-        <sql-method class="java.lang.String" method="indexOf" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method"/>
-        <sql-method class="java.lang.String" method="indexOf" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf5Method"/>
-        <sql-method class="java.lang.String" method="indexOf" datastore="sybase" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method"/>
-        <sql-method class="java.lang.String" method="indexOf" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.StringIndexOf2Method"/>
-
-        <sql-method class="java.lang.String" method="length" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="mckoi" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="firebird" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength2Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="sapdb" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength3Method"/>
-        <sql-method class="java.lang.String" method="length" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringLength4Method"/>
-
-        <sql-method class="java.lang.String" method="matches" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringMatchesDerbyMethod"/>
-
-        <sql-method class="java.lang.String" method="similarTo" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringSimilarPostgresqlMethod"/>
-
-        <sql-method class="java.lang.String" method="startsWith" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringStartsWith2Method"/>
-        <sql-method class="java.lang.String" method="startsWith" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method"/>
-        <sql-method class="java.lang.String" method="startsWith" datastore="hsql" evaluator="org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method"/>
-        <sql-method class="java.lang.String" method="startsWith" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method"/>
-
-        <sql-method class="java.lang.String" method="substring" datastore="mckoi" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring2Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring4Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="sybase" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring2Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="sqlite" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="informix" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="oracle" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="sapdb" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring3Method"/>
-        <sql-method class="java.lang.String" method="substring" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringSubstring5Method"/>
-
-        <sql-method class="java.lang.String" method="translate" evaluator="org.datanucleus.store.rdbms.sql.method.StringTranslateMethod" datastore="postgresql"/>
-        <sql-method class="java.lang.String" method="translate" evaluator="org.datanucleus.store.rdbms.sql.method.StringTranslateMethod" datastore="oracle"/>
-        <sql-method class="java.lang.String" method="translate" evaluator="org.datanucleus.store.rdbms.sql.method.StringTranslateMethod" datastore="db2"/>
-
-        <sql-method class="java.lang.String" method="trim" datastore="derby" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim2Method"/>
-        <sql-method class="java.lang.String" method="trim" datastore="db2" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim2Method"/>
-        <sql-method class="java.lang.String" method="trim" datastore="hsql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim2Method"/>
-        <sql-method class="java.lang.String" method="trim" datastore="sqlserver" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim2Method"/>
-        <sql-method class="java.lang.String" method="trim" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim3Method"/>
-        <sql-method class="java.lang.String" method="trim" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrim3Method"/>
-
-        <sql-method class="java.lang.String" method="trimLeft" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimLeft3Method"/>
-        <sql-method class="java.lang.String" method="trimLeft" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimLeft3Method"/>
-
-        <sql-method class="java.lang.String" method="trimRight" datastore="mysql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimRight3Method"/>
-        <sql-method class="java.lang.String" method="trimRight" datastore="postgresql" evaluator="org.datanucleus.store.rdbms.sql.method.StringTrimRight3Method"/>
-
-        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getDay" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getDate" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod4" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod5" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
-
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
-        <sql-method class="java.util.Date" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod7" datastore="firebird"/>
-
-        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method method="YEAR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method method="MONTH" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod2" datastore="oracle"/>
-        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod3" datastore="postgresql"/>
-        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod4" datastore="sqlite"/>
-        <sql-method method="MONTH_JAVA" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod5" datastore="firebird"/>
-
-        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method method="DAY" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
-        <sql-method method="DAY_OF_WEEK" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
-
-        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
-        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
-        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
-        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
-        <sql-method method="HOUR" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
-
-        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
-        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
-        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
-        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
-        <sql-method method="MINUTE" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
-
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
-        <sql-method method="SECOND" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod7" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
-        <sql-method class="java.time.LocalTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDate" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod" datastore="h2"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod2" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod3" datastore="mysql"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getDayOfWeek" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayOfWeekMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getHour" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod5" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getMinute" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2" datastore="oracle"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4" datastore="sqlserver"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod5" datastore="hsql"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="sqlite"/>
-        <sql-method class="java.time.LocalDateTime" method="getSecond" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod6" datastore="firebird"/>
-
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.MonthDay" method="getDayOfMonth" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.MonthDay" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.YearMonth" method="getMonthValue" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.YearMonth" method="getYear" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod5" datastore="firebird"/>
-
-         */
-        // TODO Auto-generated method stub
         return super.getSQLMethodClass(className, methodName);
     }
 }

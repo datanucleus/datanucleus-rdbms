@@ -482,4 +482,28 @@ public class DerbyAdapter extends BaseDatastoreAdapter
 
         return super.getSQLOperationClass(operationName);
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Class getSQLMethodClass(String className, String methodName)
+    {
+        if (className == null)
+        {
+            if ("avg".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction.class;
+            else if ("AVG".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.AvgWithCastFunction.class;
+        }
+        else
+        {
+            if ("java.lang.String".equals(className) && "concat".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringConcat1Method.class;
+            else if ("java.lang.String".equals(className) && "length".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringLength3Method.class;
+            else if ("java.lang.String".equals(className) && "matches".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringMatchesDerbyMethod.class;
+            else if ("java.lang.String".equals(className) && "startsWith".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringStartsWith3Method.class;
+            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring3Method.class;
+            else if ("java.lang.String".equals(className) && "trim".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringTrim2Method.class;
+        }
+
+        return super.getSQLMethodClass(className, methodName);
+    }
 }

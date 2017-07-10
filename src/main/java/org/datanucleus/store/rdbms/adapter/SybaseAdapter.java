@@ -160,4 +160,19 @@ public class SybaseAdapter extends BaseDatastoreAdapter
     {
         return "IDENTITY";
     }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getSQLMethodClass(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Class getSQLMethodClass(String className, String methodName)
+    {
+        if (className != null)
+        {
+            if ("java.lang.String".equals(className) && "indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringIndexOf4Method.class;
+            else if ("java.lang.String".equals(className) && "substring".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.StringSubstring2Method.class;
+        }
+
+        return super.getSQLMethodClass(className, methodName);
+    }
 }
