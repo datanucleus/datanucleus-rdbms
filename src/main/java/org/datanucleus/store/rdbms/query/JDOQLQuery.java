@@ -35,6 +35,7 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.connection.ManagedConnectionResourceListener;
 import org.datanucleus.store.query.AbstractJDOQLQuery;
 import org.datanucleus.store.query.CandidateIdsQueryResult;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryInterruptedException;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryResult;
@@ -249,7 +250,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         {
             // If using an extension that can change the datastore query then evict any existing compilation
             QueryManager qm = getQueryManager();
-            qm.removeQueryCompilation("JDOQL", getQueryCacheKey());
+            qm.removeQueryCompilation(Query.LANGUAGE_JDOQL, getQueryCacheKey());
         }
 
         // Compile the generic query expressions

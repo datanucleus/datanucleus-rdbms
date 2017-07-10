@@ -1147,7 +1147,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public boolean supportsQueryLanguage(String language)
     {
-        if (language != null && (language.equalsIgnoreCase("JDOQL") || language.equalsIgnoreCase("JPQL") || language.equals("SQL") || language.equals("STOREDPROC")))
+        if (language != null && (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL) || language.equalsIgnoreCase(Query.LANGUAGE_JPQL) || language.equals(Query.LANGUAGE_SQL) || 
+            language.equals("STOREDPROC")))
         {
             return true;
         }
@@ -1160,15 +1161,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec)
     {
-        if (language.equalsIgnoreCase("JDOQL"))
+        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
         {
             return new JDOQLQuery(this, ec);
         }
-        else if (language.equalsIgnoreCase("JPQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             return new JPQLQuery(this, ec);
         }
-        else if (language.equalsIgnoreCase("SQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
         {
             return new SQLQuery(this, ec);
         }
@@ -1185,15 +1186,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec, String queryString)
     {
-        if (language.equalsIgnoreCase("JDOQL"))
+        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
         {
             return new JDOQLQuery(this, ec, queryString);
         }
-        else if (language.equalsIgnoreCase("JPQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             return new JPQLQuery(this, ec, queryString);
         }
-        else if (language.equalsIgnoreCase("SQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
         {
             return new SQLQuery(this, ec, queryString);
         }
@@ -1210,15 +1211,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     @Override
     public Query newQuery(String language, ExecutionContext ec, Query q)
     {
-        if (language.equalsIgnoreCase("JDOQL"))
+        if (language.equalsIgnoreCase(Query.LANGUAGE_JDOQL))
         {
             return new JDOQLQuery(this, ec, (JDOQLQuery) q);
         }
-        else if (language.equalsIgnoreCase("JPQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             return new JPQLQuery(this, ec, (JPQLQuery) q);
         }
-        else if (language.equalsIgnoreCase("SQL"))
+        else if (language.equalsIgnoreCase(Query.LANGUAGE_SQL))
         {
             return new SQLQuery(this, ec, (SQLQuery) q);
         }

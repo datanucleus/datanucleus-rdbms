@@ -62,6 +62,7 @@ import org.datanucleus.query.expression.SubqueryExpression;
 import org.datanucleus.query.expression.TypeExpression;
 import org.datanucleus.query.expression.VariableExpression;
 import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryCompilerSyntaxException;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -4223,7 +4224,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         String operation = expr.getOperation();
-        if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equalsIgnoreCase("JPQL"))
+        if (invokedSqlExpr instanceof MapExpression && operation.equals("contains") && compilation.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             // JPQL "MEMBER OF" will be passed through from generic compilation as "contains" since we don't know types at that point
             operation = "containsValue";
@@ -5274,7 +5275,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 cls = importsDefinition.resolveClassDeclaration(className, clr, null);
             }
         }
-        if (cls == null && compilation.getQueryLanguage().equalsIgnoreCase("JPQL"))
+        if (cls == null && compilation.getQueryLanguage().equalsIgnoreCase(Query.LANGUAGE_JPQL))
         {
             // JPQL also allows use of EntityName in queries
             AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForEntityName(className);
