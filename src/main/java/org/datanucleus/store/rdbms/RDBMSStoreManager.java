@@ -2017,15 +2017,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 if (connPref == ConnectionPreference.NONE)
                 {
                     // No preference from the generator so use NEW unless overridden by the persistence property
-                    if (getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("UsePM") || // TODO Deprecated
-                        getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("EXISTING"))
-                    {
-                        newConnection = false;
-                    }
-                    else
-                    {
-                        newConnection = true;
-                    }
+                    newConnection = !getStringProperty(PropertyNames.PROPERTY_VALUEGEN_TXN_ATTRIBUTE).equalsIgnoreCase("EXISTING");
                 }
                 else
                 {
