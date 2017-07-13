@@ -30,12 +30,15 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Abstract representation of a ValueGenerator for RDBMS datastores.
- * Builds on the base AbstractValueGenerator, and providing datastore connection and StoreManager information.
+ * Builds on the AbstractConnectedGenerator, providing the idea of a repository of ids in the datastore.
  */
 public abstract class AbstractRDBMSGenerator<T> extends AbstractConnectedGenerator<T>
 {
     /** Connection to the datastore. */
     protected ManagedConnection connection;
+
+    /** Flag for whether we know that the repository exists. Only applies if repository is required. */
+    protected boolean repositoryExists = false;
 
     /**
      * Constructor.
@@ -55,6 +58,38 @@ public abstract class AbstractRDBMSGenerator<T> extends AbstractConnectedGenerat
      */
     public boolean requiresConnection()
     {
+        return true;
+    }
+
+    /**
+     * Indicator for whether the generator requires its own repository.
+     * AbstractValueGenerator returns false and this should be overridden by all
+     * generators requiring a repository.
+     * @return Whether a repository is required.
+     */
+    protected boolean requiresRepository()
+    {
+        return false;
+    }
+
+    /**
+     * Method to return if the repository already exists.
+     * @return Whether the repository exists
+     */
+    protected boolean repositoryExists()
+    {
+        return true;
+    }
+
+    /**
+     * Method to create any needed repository for the values.
+     * AbstractValueGenerator just returns true and should be overridden by any
+     * implementing generator requiring its own repository.
+     * @return If all is ready for use
+     */
+    protected boolean createRepository()
+    {
+        // Do nothing - to be overridden by generators that want to create a repository for their ids
         return true;
     }
 
