@@ -26,7 +26,6 @@ import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.SequenceMetaData;
-import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
@@ -119,21 +118,8 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
                     }
                 }
             };
-        Class cls = null;
-        // TODO Move this to ValueGeneratorManager
-        ConfigurationElement elem = ec.getNucleusContext().getPluginManager().getConfigurationElementForExtension("org.datanucleus.store_valuegenerator", 
-                new String[]{"name", "datastore"}, 
-                new String[] {valueGeneratorName, storeManager.getStoreManagerKey()});
-        if (elem != null)
-        {
-            cls = ec.getNucleusContext().getPluginManager().loadClass(elem.getExtension().getPlugin().getSymbolicName(), elem.getAttribute("class-name"));
-        }
-        if (cls == null)
-        {
-            throw new NucleusException("Cannot create ValueGenerator for strategy "+valueGeneratorName);
-        }
-        generator = mgr.createValueGenerator(seqMetaData.getName(), cls, props, connProvider);
 
+        generator = mgr.createValueGenerator(valueGeneratorName, seqMetaData.getName(), props, connProvider);
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("017003", seqMetaData.getName(), valueGeneratorName));
