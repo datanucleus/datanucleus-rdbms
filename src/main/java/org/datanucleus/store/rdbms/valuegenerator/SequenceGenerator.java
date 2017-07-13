@@ -34,8 +34,10 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
@@ -44,9 +46,9 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * This generator utilises datastore sequences. 
- * It uses a statement like <pre>"select {sequence}.nextval from dual"</pre> to get the next value in the
- * sequence. It is datastore-dependent since there is no RDBMS-independent statement.
+ * ValueGenerator utilising datastore (RDBMS) sequences. 
+ * It uses a statement like <pre>"select {sequence}.nextval from dual"</pre> to get the next value in the sequence. 
+ * It is datastore-dependent since there is no RDBMS-independent statement.
  * SequenceGenerator works with Longs, so clients using this generator must cast the ID to Long.
  * <P>
  * <B>Optional user properties</B>
@@ -57,12 +59,18 @@ import org.datanucleus.util.StringUtils;
  * <LI><U>key-cache-size</U> - number of unique identifiers to cache</LI>
  * <LI><U>key-min-value</U> - determines the minimum value a sequence can generate</LI>
  * <LI><U>key-max-value</U> - determines the maximum value a sequence can generate</LI>
- * <LI><U>key-database-cache-size</U> - specifies how many sequence numbers are to be
- * preallocated and stored in memory for faster access</LI>
+ * <LI><U>key-database-cache-size</U> - specifies how many sequence numbers are to be preallocated and stored in memory for faster access</LI>
  * </UL>
+ * TODO Change structure to not override obtainGenerationBlock so we can follow the superclass process and commonise more code.
  */
-public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
+public final class SequenceGenerator extends AbstractConnectedGenerator<Long>
 {
+    /** Connection to the datastore. */
+    protected ManagedConnection connection;
+
+    /** Flag for whether we know that the repository exists. */
+    protected boolean repositoryExists = false;
+
     /** Name of the sequence that we are creating values for */
     protected String sequenceName = null;
 
@@ -94,6 +102,49 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
                 throw new ValueGenerationException(Localiser.msg("040007", properties.get(ValueGenerator.PROPERTY_SEQUENCE_NAME)));
             }
         }
+
+        // Set the name of the sequence (including catalog/schema as required)
+        String inputSeqCatalogName = null;
+        String inputSeqSchemaName = null;
+        String inputSeqName = null;
+        if (properties != null)
+        {
+            inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
+            if (inputSeqCatalogName == null)
+            {
+                inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
+            }
+
+            inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
+            if (inputSeqSchemaName == null)
+            {
+                inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
+            }
+
+            inputSeqName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
+        }
+
+        RDBMSStoreManager rdbmsMgr = (RDBMSStoreManager)storeMgr;
+        DatastoreAdapter dba = rdbmsMgr.getDatastoreAdapter();
+        DatastoreIdentifier identifier = rdbmsMgr.getIdentifierFactory().newSequenceIdentifier(inputSeqName);
+        if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS) && inputSeqCatalogName != null)
+        {
+            identifier.setCatalogName(inputSeqCatalogName);
+        }
+        if (dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS) && inputSeqSchemaName != null)
+        {
+            identifier.setSchemaName(inputSeqSchemaName);
+        }
+        this.sequenceName = identifier.getFullyQualifiedName(true);
+    }
+
+    /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case Long.class)
+     */
+    public static Class getStorageClass()
+    {
+        return Long.class;
     }
 
     /**
@@ -118,7 +169,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             // Get next available id
             DatastoreAdapter dba = srm.getDatastoreAdapter();
 
-            String stmt = dba.getSequenceNextStmt(getSequenceName());
+            String stmt = dba.getSequenceNextStmt(sequenceName);
             ps = sqlControl.getStatementForQuery(connection, stmt);
             rs = sqlControl.executeStatementQuery(null, connection, stmt, ps);
  
@@ -163,53 +214,6 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
                 // non-recoverable error
             }
         }
-    }
-
-    /**
-     * Accessor for the sequence name to use (fully qualified with catalog/schema).
-     * @return The sequence name
-     */
-    protected String getSequenceName()
-    {
-        if (sequenceName == null)
-        {
-            // Set the name of the sequence (including catalog/schema as required)
-            String inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_CATALOG);
-            if (inputSeqCatalogName == null)
-            {
-                inputSeqCatalogName = properties.getProperty(ValueGenerator.PROPERTY_CATALOG_NAME);
-            }
-            String inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCETABLE_SCHEMA);
-            if (inputSeqSchemaName == null)
-            {
-                inputSeqSchemaName = properties.getProperty(ValueGenerator.PROPERTY_SCHEMA_NAME);
-            }
-            String inputSeqName = properties.getProperty(ValueGenerator.PROPERTY_SEQUENCE_NAME);
-
-            RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
-            DatastoreAdapter dba = srm.getDatastoreAdapter();
-            DatastoreIdentifier identifier = srm.getIdentifierFactory().newSequenceIdentifier(inputSeqName);
-            if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS) && inputSeqCatalogName != null)
-            {
-                identifier.setCatalogName(inputSeqCatalogName);
-            }
-            if (dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS) && inputSeqSchemaName != null)
-            {
-                identifier.setSchemaName(inputSeqSchemaName);
-            }
-            this.sequenceName = identifier.getFullyQualifiedName(true);
-        }
-        return sequenceName;
-    }
-
-    /**
-     * Indicator for whether the generator requires its own repository.
-     * This class needs a repository so returns true.
-     * @return Whether a repository is required.
-     */
-    protected boolean requiresRepository()
-    {
-        return true;
     }
 
     /**
@@ -259,7 +263,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
 
         if (!srm.getSchemaHandler().isAutoCreateTables())
         {
-            throw new NucleusUserException(Localiser.msg("040010", getSequenceName()));
+            throw new NucleusUserException(Localiser.msg("040010", sequenceName));
         }
 
         Integer min = properties.containsKey(ValueGenerator.PROPERTY_KEY_MIN_VALUE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_MIN_VALUE)) : null;
@@ -267,7 +271,7 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
         Integer start = properties.containsKey(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE)) : null;
         Integer incr = properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_CACHE_SIZE)) : null;
         Integer cacheSize = properties.containsKey(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE) ? Integer.valueOf(properties.getProperty(ValueGenerator.PROPERTY_KEY_DATABASE_CACHE_SIZE)) : null;
-        String stmt = dba.getSequenceCreateStmt(getSequenceName(), min, max, start, incr, cacheSize);
+        String stmt = dba.getSequenceCreateStmt(sequenceName, min, max, start, incr, cacheSize);
         try
         {
             ps = sqlControl.getStatementForUpdate(connection, stmt, false);
@@ -293,5 +297,105 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
             }           
         }
         return true;
+    }
+
+    /**
+     * Get a new PoidBlock with the specified number of ids.
+     * @param number The number of additional ids required
+     * @return the PoidBlock
+     */
+    protected ValueGenerationBlock<Long> obtainGenerationBlock(int number)
+    {
+        ValueGenerationBlock<Long> block = null;
+
+        // Try getting the block
+        boolean repository_exists=true; // TODO Ultimately this can be removed when "repositoryExists()" is implemented
+        try
+        {
+            connection = connectionProvider.retrieveConnection();
+
+            if (!repositoryExists)
+            {
+                // Make sure the repository is present before proceeding
+                repositoryExists = repositoryExists();
+                if (!repositoryExists)
+                {
+                    createRepository();
+                    repositoryExists = true;
+                }
+            }
+
+            try
+            {
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            catch (ValueGenerationException vge)
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", vge.getMessage()));
+                if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+                {
+                    NucleusLogger.VALUEGENERATION.debug("Caught exception", vge);
+                }
+
+                // attempt to obtain the block of unique identifiers is invalid
+                repository_exists = false;
+            }
+            catch (RuntimeException ex)
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", ex.getMessage()));
+                if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+                {
+                    NucleusLogger.VALUEGENERATION.debug("Caught exception", ex);
+                }
+
+                // attempt to obtain the block of unique identifiers is invalid
+                repository_exists = false;
+            }
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                connectionProvider.releaseConnection();
+                connection = null;
+            }
+        }
+
+        // If repository didn't exist, try creating it and then get block
+        if (!repository_exists)
+        {
+            try
+            {
+                connection = connectionProvider.retrieveConnection();
+
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040005"));
+                if (!createRepository())
+                {
+                    throw new ValueGenerationException(Localiser.msg("040002"));
+                }
+
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            finally
+            {
+                connectionProvider.releaseConnection();
+                connection = null;
+            }
+        }
+        return block;
     }
 }

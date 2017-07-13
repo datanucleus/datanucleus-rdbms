@@ -31,8 +31,10 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
@@ -75,9 +77,16 @@ import org.datanucleus.util.NucleusLogger;
  * <li><U>table-name</U> - name of the table whose column we are generating the value for</li>
  * <li><U>column-name</U> - name of the column that we are generating the value for</li>
  * </UL>
+ * TODO Change structure to not override obtainGenerationBlock so we can follow the superclass process and commonise more code.
  */
-public final class TableGenerator extends AbstractRDBMSGenerator<Long>
+public final class TableGenerator extends AbstractConnectedGenerator<Long>
 {
+    /** Connection to the datastore. */
+    protected ManagedConnection connection;
+
+    /** Flag for whether we know that the repository exists. */
+    protected boolean repositoryExists = false;
+
     /** Table where we store the identities for each table. */
     private SequenceTable sequenceTable = null;
 
@@ -153,6 +162,15 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
     }
 
     /**
+     * Accessor for the storage class for values generated with this generator.
+     * @return Storage class (in this case Long.class)
+     */
+    public static Class getStorageClass()
+    {
+        return Long.class;
+    }
+
+    /**
      * Convenience accessor for the table being used.
      * @return The table
      */
@@ -204,16 +222,6 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
         {
             throw new ValueGenerationException(Localiser.msg("061001",e.getMessage()));
         }
-    }
-
-    /**
-     * Indicator for whether the generator requires its own repository.
-     * This class needs a repository so returns true.
-     * @return Whether a repository is required.
-     */
-    protected boolean requiresRepository()
-    {
-        return true;
     }
 
     /**
@@ -331,5 +339,105 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
             sequenceTable = new SequenceTable(identifier, storeMgr, sequenceNameColumnName, nextValColumnName);
             sequenceTable.initialize(storeMgr.getNucleusContext().getClassLoaderResolver(null));
         }
+    }
+
+    /**
+     * Get a new PoidBlock with the specified number of ids.
+     * @param number The number of additional ids required
+     * @return the PoidBlock
+     */
+    protected ValueGenerationBlock<Long> obtainGenerationBlock(int number)
+    {
+        ValueGenerationBlock<Long> block = null;
+
+        // Try getting the block
+        boolean repository_exists=true; // TODO Ultimately this can be removed when "repositoryExists()" is implemented
+        try
+        {
+            connection = connectionProvider.retrieveConnection();
+
+            if (!repositoryExists)
+            {
+                // Make sure the repository is present before proceeding
+                repositoryExists = repositoryExists();
+                if (!repositoryExists)
+                {
+                    createRepository();
+                    repositoryExists = true;
+                }
+            }
+
+            try
+            {
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            catch (ValueGenerationException vge)
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", vge.getMessage()));
+                if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+                {
+                    NucleusLogger.VALUEGENERATION.debug("Caught exception", vge);
+                }
+
+                // attempt to obtain the block of unique identifiers is invalid
+                repository_exists = false;
+            }
+            catch (RuntimeException ex)
+            {
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040003", ex.getMessage()));
+                if (NucleusLogger.VALUEGENERATION.isDebugEnabled())
+                {
+                    NucleusLogger.VALUEGENERATION.debug("Caught exception", ex);
+                }
+
+                // attempt to obtain the block of unique identifiers is invalid
+                repository_exists = false;
+            }
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                connectionProvider.releaseConnection();
+                connection = null;
+            }
+        }
+
+        // If repository didn't exist, try creating it and then get block
+        if (!repository_exists)
+        {
+            try
+            {
+                connection = connectionProvider.retrieveConnection();
+
+                NucleusLogger.VALUEGENERATION.info(Localiser.msg("040005"));
+                if (!createRepository())
+                {
+                    throw new ValueGenerationException(Localiser.msg("040002"));
+                }
+
+                if (number < 0)
+                {
+                    block = reserveBlock();
+                }
+                else
+                {
+                    block = reserveBlock(number);
+                }
+            }
+            finally
+            {
+                connectionProvider.releaseConnection();
+                connection = null;
+            }
+        }
+        return block;
     }
 }

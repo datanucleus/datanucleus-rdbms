@@ -27,18 +27,21 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * This generator for RDBMS uses the "select max(column) from table" strategy. The block size is limited to 1.
- * MaxGenerator works with numbers, so clients using this generator must cast the ID to Long.
+ * ValueGenerator for RDBMS that uses the "SELECT MAX(column) FROM TABLE" strategy. 
+ * The allocation size is limited to 1.
+ * This works with numbers, so clients using this generator must cast the ID to Long.
  */
-public class MaxGenerator extends AbstractRDBMSGenerator<Long>
+public class MaxGenerator extends AbstractConnectedGenerator<Long>
 {
     /**
      * Constructor.
@@ -60,46 +63,53 @@ public class MaxGenerator extends AbstractRDBMSGenerator<Long>
      */
     public ValueGenerationBlock reserveBlock(long size)
     {
-        // search an Id in the database
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        RDBMSStoreManager rdbmsMgr = (RDBMSStoreManager)storeMgr;
-        SQLController sqlControl = rdbmsMgr.getSQLController();
         try
         {
-            String stmt = getStatement();
-            ps = sqlControl.getStatementForUpdate(connection, stmt, false);
-
-            rs = sqlControl.executeStatementQuery(null, connection, stmt, ps);
-            if (!rs.next())
-            {
-                return new ValueGenerationBlock(new Object[] { Long.valueOf(1) });
-            }
-
-            return new ValueGenerationBlock(new Object[] { Long.valueOf(rs.getLong(1) + 1)});
-        }
-        catch (SQLException e)
-        {
-            NucleusLogger.VALUEGENERATION.warn("Exception thrown getting next value for MaxGenerator", e);
-            throw new ValueGenerationException("Exception thrown getting next value for MaxGenerator", e);
-        }
-        finally
-        {
+            // search an Id in the database
+            ManagedConnection mconn = connectionProvider.retrieveConnection();
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            SQLController sqlControl = ((RDBMSStoreManager)storeMgr).getSQLController();
             try
             {
-                if (rs != null)
+                String stmt = getStatement();
+                ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+
+                rs = sqlControl.executeStatementQuery(null, mconn, stmt, ps);
+                if (!rs.next())
                 {
-                    rs.close();
+                    return new ValueGenerationBlock(new Object[] { Long.valueOf(1) });
                 }
-                if (ps != null)
-                {
-                    sqlControl.closeStatement(connection, ps);
-                }
+
+                return new ValueGenerationBlock(new Object[] { Long.valueOf(rs.getLong(1) + 1)});
             }
             catch (SQLException e)
             {
-                // no recoverable error
-            }           
+                NucleusLogger.VALUEGENERATION.warn("Exception thrown getting next value for MaxGenerator", e);
+                throw new ValueGenerationException("Exception thrown getting next value for MaxGenerator", e);
+            }
+            finally
+            {
+                try
+                {
+                    if (rs != null)
+                    {
+                        rs.close();
+                    }
+                    if (ps != null)
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                catch (SQLException e)
+                {
+                    // no recoverable error
+                }           
+            }
+        }
+        finally
+        {
+            connectionProvider.releaseConnection();
         }
     }
 

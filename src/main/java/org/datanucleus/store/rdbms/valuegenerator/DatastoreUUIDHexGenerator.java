@@ -26,18 +26,20 @@ import java.util.List;
 import java.util.Properties;
 
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.util.Localiser;
 
 /**
- * Generator for values using datastore-based UUID generation.
+ * ValueGenerator using DB2 datastore-based DatastoreUUID generation.
  */
-public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<String>
+public final class DatastoreUUIDHexGenerator extends AbstractConnectedGenerator<String>
 {
     /**
      * Constructor.
@@ -66,7 +68,7 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
     }
 
     /**
-     * Accessor for the storage class for POIDs generated with this generator.
+     * Accessor for the storage class for values generated with this generator.
      * @return Storage class (in this case String.class)
      */
     public static Class getStorageClass()
@@ -81,50 +83,65 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
      */
     protected synchronized ValueGenerationBlock<String> reserveBlock(long size)
     {
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        List<String> oid = new ArrayList<>();
-        RDBMSStoreManager srm = (RDBMSStoreManager)storeMgr;
-        SQLController sqlControl = srm.getSQLController();
+        if (size < 1)
+        {
+            return null;
+        }
+
+        List<String> oids = new ArrayList<>();
         try
         {
-            // Find the next ID from the database
-            DatastoreAdapter dba = srm.getDatastoreAdapter();
+            ManagedConnection mconn = connectionProvider.retrieveConnection();
 
-            String stmt = dba.getSelectNewUUIDStmt();
-
-            ps = sqlControl.getStatementForQuery(connection, stmt);
-            for (int i=1; i<size; i++)
-            {
-                rs = sqlControl.executeStatementQuery(null, connection, stmt, ps);
-                if (rs.next())
-                {
-                    oid.add(rs.getString(1));
-                }
-            }
-            return new ValueGenerationBlock<>(oid);
-        }
-        catch (SQLException e)
-        {
-            throw new ValueGenerationException(Localiser.msg("040008",e.getMessage()));
-        }
-        finally
-        {
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            RDBMSStoreManager rdbmsMgr = (RDBMSStoreManager)storeMgr;
+            SQLController sqlControl = rdbmsMgr.getSQLController();
             try
             {
-                if (rs != null)
+                // Find the next ID from the database
+                DatastoreAdapter dba = rdbmsMgr.getDatastoreAdapter();
+
+                String stmt = dba.getSelectNewUUIDStmt();
+
+                ps = sqlControl.getStatementForQuery(mconn, stmt);
+                for (int i=1; i<size; i++)
                 {
-                    rs.close();
-                }
-                if (ps != null)
-                {
-                    sqlControl.closeStatement(connection, ps);
+                    rs = sqlControl.executeStatementQuery(null, mconn, stmt, ps);
+                    if (rs.next())
+                    {
+                        oids.add(rs.getString(1));
+                    }
                 }
             }
             catch (SQLException e)
             {
-                // non-recoverable error
+                throw new ValueGenerationException(Localiser.msg("040008",e.getMessage()));
+            }
+            finally
+            {
+                try
+                {
+                    if (rs != null)
+                    {
+                        rs.close();
+                    }
+                    if (ps != null)
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                catch (SQLException e)
+                {
+                    // non-recoverable error
+                }
             }
         }
+        finally
+        {
+            connectionProvider.releaseConnection();
+        }
+
+        return new ValueGenerationBlock(oids);
     }
 }
