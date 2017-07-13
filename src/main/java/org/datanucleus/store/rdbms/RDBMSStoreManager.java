@@ -173,8 +173,8 @@ import org.datanucleus.store.schema.StoreSchemaData;
 import org.datanucleus.store.types.IncompatibleFieldTypeException;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.store.types.scostore.Store;
-import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
-import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator.ConnectionPreference;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator.ConnectionPreference;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
 import org.datanucleus.store.valuegenerator.ValueGenerator;
 import org.datanucleus.transaction.TransactionIsolation;
@@ -2010,9 +2010,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // Note : this is synchronised since we dont want to risk handing out this generator
             // while its connectionProvider is set to that of a different ExecutionContext
             // It maybe would be good to change ValueGenerator to have a next taking the connectionProvider
-            if (generator instanceof AbstractDatastoreGenerator)
+            if (generator instanceof AbstractConnectedGenerator)
             {
-                ConnectionPreference connPref = ((AbstractDatastoreGenerator)generator).getConnectionPreference();
+                ConnectionPreference connPref = ((AbstractConnectedGenerator)generator).getConnectionPreference();
                 final boolean newConnection;
                 if (connPref == ConnectionPreference.NONE)
                 {
@@ -2064,7 +2064,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         }
                     }
                 };
-                ((AbstractDatastoreGenerator)generator).setConnectionProvider(connProvider);
+                ((AbstractConnectedGenerator)generator).setConnectionProvider(connProvider);
             }
             oid = generator.next();
         }

@@ -33,6 +33,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
@@ -67,12 +68,13 @@ public final class SequenceGenerator extends AbstractRDBMSGenerator<Long>
 
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for the generator
      * @param props Properties controlling the behaviour of the generator
      */
-    public SequenceGenerator(String name, Properties props)
+    public SequenceGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 1;
         if (properties != null)
         {

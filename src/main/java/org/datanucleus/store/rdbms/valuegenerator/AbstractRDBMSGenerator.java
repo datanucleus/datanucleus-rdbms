@@ -20,8 +20,9 @@ package org.datanucleus.store.rdbms.valuegenerator;
 
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.valuegenerator.AbstractDatastoreGenerator;
+import org.datanucleus.store.valuegenerator.AbstractConnectedGenerator;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
 import org.datanucleus.store.valuegenerator.ValueGenerationException;
 import org.datanucleus.util.Localiser;
@@ -31,19 +32,20 @@ import org.datanucleus.util.NucleusLogger;
  * Abstract representation of a ValueGenerator for RDBMS datastores.
  * Builds on the base AbstractValueGenerator, and providing datastore connection and StoreManager information.
  */
-public abstract class AbstractRDBMSGenerator<T> extends AbstractDatastoreGenerator<T>
+public abstract class AbstractRDBMSGenerator<T> extends AbstractConnectedGenerator<T>
 {
     /** Connection to the datastore. */
     protected ManagedConnection connection;
 
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for the generator
      * @param props Properties controlling the behaviour of the generator
      */
-    public AbstractRDBMSGenerator(String name, Properties props)
+    public AbstractRDBMSGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 1;
     }
 

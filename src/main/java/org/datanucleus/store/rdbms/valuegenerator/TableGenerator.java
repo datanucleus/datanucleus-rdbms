@@ -30,6 +30,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.valuegenerator.ValueGenerationBlock;
@@ -94,12 +95,13 @@ public final class TableGenerator extends AbstractRDBMSGenerator<Long>
 
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
      * @param props Properties defining the behaviour of this generator
      */
-    public TableGenerator(String name, Properties props)
+    public TableGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 5;
         initialValue = -1; // So we know if being set
         if (properties != null)

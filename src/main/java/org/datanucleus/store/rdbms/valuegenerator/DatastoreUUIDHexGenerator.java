@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -40,12 +41,13 @@ public final class DatastoreUUIDHexGenerator extends AbstractRDBMSGenerator<Stri
 {
     /**
      * Constructor.
+     * @param storeMgr StoreManager
      * @param name Symbolic name for this generator
      * @param props Properties defining the behaviour of this generator
      */
-    public DatastoreUUIDHexGenerator(String name, Properties props)
+    public DatastoreUUIDHexGenerator(StoreManager storeMgr, String name, Properties props)
     {
-        super(name, props);
+        super(storeMgr, name, props);
         allocationSize = 10;
         if (properties != null)
         {
