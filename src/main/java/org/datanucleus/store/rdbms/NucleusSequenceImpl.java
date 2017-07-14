@@ -26,6 +26,7 @@ import org.datanucleus.Configuration;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.SequenceMetaData;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.valuegenerator.ValueGenerationConnectionProvider;
@@ -62,11 +63,11 @@ public class NucleusSequenceImpl extends org.datanucleus.store.NucleusSequenceIm
         String valueGeneratorName = null;
         if (((RDBMSStoreManager)storeManager).getDatastoreAdapter().supportsOption(DatastoreAdapter.SEQUENCES))
         {
-            valueGeneratorName = "sequence";
+            valueGeneratorName = ValueGenerationStrategy.SEQUENCE.toString();
         }
         else
         {
-            valueGeneratorName = "increment";
+            valueGeneratorName = ValueGenerationStrategy.INCREMENT.toString();
         }
 
         // Create the controlling properties for this sequence

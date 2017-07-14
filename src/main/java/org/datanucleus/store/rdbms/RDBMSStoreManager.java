@@ -2360,9 +2360,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
             if (dba.supportsOption(DatastoreAdapter.SEQUENCES) && sequence != null)
             {
-                return "sequence";
+                return ValueGenerationStrategy.SEQUENCE.toString();
             }
-            return "increment";
+            return ValueGenerationStrategy.INCREMENT.toString();
         }
         return super.getValueGenerationStrategyForNative(cmd, absFieldNumber);
     }
