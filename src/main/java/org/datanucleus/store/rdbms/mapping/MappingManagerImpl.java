@@ -43,7 +43,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.EmbeddedMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
@@ -1891,15 +1891,15 @@ public class MappingManagerImpl implements MappingManager
                 }
 
                 // Special case where we have IDENTITY strategy and the datastore imposes a limitation on the required datastore type
-                IdentityStrategy strategy = mmd.getValueStrategy();
+                ValueGenerationStrategy strategy = mmd.getValueStrategy();
                 if (strategy != null)
                 {
                     String strategyName = strategy.toString();
-                    if (strategy == IdentityStrategy.NATIVE)
+                    if (strategy == ValueGenerationStrategy.NATIVE)
                     {
                         strategyName = storeMgr.getValueGenerationStrategyForNative(mmd.getAbstractClassMetaData(), mmd.getAbsoluteFieldNumber());
                     }
-                    if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
+                    if (strategyName != null && ValueGenerationStrategy.IDENTITY.toString().equals(strategyName))
                     {
                         Class requestedType = clr.classForName(javaType);
                         Class requiredType = storeMgr.getDatastoreAdapter().getAutoIncrementJavaTypeForType(requestedType);

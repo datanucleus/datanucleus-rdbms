@@ -32,7 +32,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ColumnMetaDataContainer;
 import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -343,18 +343,18 @@ public abstract class AbstractClassTable extends TableImpl
 
         // Set the identity column type based on the IdentityStrategy
         String strategyName = cmd.getIdentityMetaData().getValueStrategy().toString();
-        if (cmd.getIdentityMetaData().getValueStrategy().equals(IdentityStrategy.CUSTOM))
+        if (cmd.getIdentityMetaData().getValueStrategy().equals(ValueGenerationStrategy.CUSTOM))
         {
             strategyName = cmd.getIdentityMetaData().getValueStrategy().getCustomName();
         }
-        if (strategyName != null && IdentityStrategy.NATIVE.toString().equals(strategyName))
+        if (strategyName != null && ValueGenerationStrategy.NATIVE.toString().equals(strategyName))
         {
             strategyName = storeMgr.getValueGenerationStrategyForNative(cmd, -1);
         }
 
         // Check the value generator type being stored
         Class valueGeneratedType = Long.class;
-        if (strategyName != null && IdentityStrategy.IDENTITY.toString().equals(strategyName))
+        if (strategyName != null && ValueGenerationStrategy.IDENTITY.toString().equals(strategyName))
         {
             valueGeneratedType = dba.getAutoIncrementJavaTypeForType(valueGeneratedType);
             if (valueGeneratedType != Long.class)

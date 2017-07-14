@@ -57,7 +57,7 @@ import org.datanucleus.metadata.FieldPersistenceModifier;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.ForeignKeyAction;
 import org.datanucleus.metadata.ForeignKeyMetaData;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.IndexMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
@@ -1017,7 +1017,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
-                        if ((mmd.getValueStrategy() == IdentityStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
+                        if ((mmd.getValueStrategy() == ValueGenerationStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
                             throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), mmd.getName())).setFatal();
                         }
@@ -1042,7 +1042,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         }
 
                         // Check if auto-increment and that it is supported by this RDBMS
-                        if ((fmd.getValueStrategy() == IdentityStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
+                        if ((fmd.getValueStrategy() == ValueGenerationStrategy.IDENTITY) && !dba.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS))
                         {
                             throw new NucleusException(Localiser.msg("057020", cmd.getFullClassName(), fmd.getName())).setFatal();
                         }

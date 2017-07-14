@@ -90,7 +90,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
 import org.datanucleus.metadata.IdentityMetaData;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
@@ -2075,7 +2075,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     protected Properties getPropertiesForValueGenerator(AbstractClassMetaData cmd, int absoluteFieldNumber, ClassLoaderResolver clr, SequenceMetaData seqmd, TableGeneratorMetaData tablegenmd)
     {
         AbstractMemberMetaData mmd = null;
-        IdentityStrategy strategy = null;
+        ValueGenerationStrategy strategy = null;
         String sequence = null;
         Map<String, String> extensions = null;
         if (absoluteFieldNumber >= 0)
@@ -2167,13 +2167,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             properties.putAll(extensions);
         }
 
-        if (strategy.equals(IdentityStrategy.NATIVE))
+        if (strategy.equals(ValueGenerationStrategy.NATIVE))
         {
             String realStrategyName = getValueGenerationStrategyForNative(cmd, absoluteFieldNumber);
-            strategy = IdentityStrategy.getIdentityStrategy(realStrategyName);
+            strategy = ValueGenerationStrategy.getIdentityStrategy(realStrategyName);
         }
 
-        if (strategy == IdentityStrategy.INCREMENT && tablegenmd != null)
+        if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd != null)
         {
             // User has specified a TableGenerator (JPA)
             properties.put(ValueGenerator.PROPERTY_KEY_INITIAL_VALUE, "" + tablegenmd.getInitialValue());
@@ -2207,7 +2207,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             properties.remove(ValueGenerator.PROPERTY_TABLE_NAME);
             properties.remove(ValueGenerator.PROPERTY_COLUMN_NAME);
         }
-        else if (strategy == IdentityStrategy.INCREMENT && tablegenmd == null)
+        else if (strategy == ValueGenerationStrategy.INCREMENT && tablegenmd == null)
         {
             if (!properties.containsKey(ValueGenerator.PROPERTY_KEY_CACHE_SIZE))
             {
@@ -2216,7 +2216,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 properties.put(ValueGenerator.PROPERTY_KEY_CACHE_SIZE, "" + allocSize);
             }
         }
-        else if (strategy == IdentityStrategy.SEQUENCE && seqmd != null)
+        else if (strategy == ValueGenerationStrategy.SEQUENCE && seqmd != null)
         {
             // User has specified a SequenceGenerator (JDO/JPA)
             if (seqmd.getSchemaName() != null)
@@ -3996,11 +3996,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
                 if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getValueStrategy() != null)
                 {
-                    if (cmd.getIdentityMetaData().getValueStrategy() == IdentityStrategy.INCREMENT)
+                    if (cmd.getIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.INCREMENT)
                     {
                         addSequenceTableForMetaData(cmd.getIdentityMetaData(), clr, seqTablesGenerated);
                     }
-                    else if (cmd.getIdentityMetaData().getValueStrategy() == IdentityStrategy.SEQUENCE)
+                    else if (cmd.getIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.SEQUENCE)
                     {
                         String seqName = cmd.getIdentityMetaData().getSequence();
                         if (StringUtils.isWhitespace(seqName))
@@ -4016,12 +4016,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
                 for (AbstractMemberMetaData mmd : cmd.getManagedMembers())
                 {
-                    IdentityStrategy str = mmd.getValueStrategy();
-                    if (str == IdentityStrategy.INCREMENT)
+                    ValueGenerationStrategy str = mmd.getValueStrategy();
+                    if (str == ValueGenerationStrategy.INCREMENT)
                     {
                         addSequenceTableForMetaData(mmd, clr, seqTablesGenerated);
                     }
-                    else if (str == IdentityStrategy.SEQUENCE)
+                    else if (str == ValueGenerationStrategy.SEQUENCE)
                     {
                         String seqName = mmd.getSequence();
                         if (StringUtils.isWhitespace(seqName))

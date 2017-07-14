@@ -48,7 +48,7 @@ import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.metadata.IdentityStrategy;
+import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.MetaDataManager;
@@ -416,7 +416,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 {
                     for (int i=0; i<acmd.getPKMemberPositions().length; i++)
                     {
-                        IdentityStrategy strategy = 
+                        ValueGenerationStrategy strategy = 
                             acmd.getMetaDataForManagedMemberAtAbsolutePosition(acmd.getPKMemberPositions()[i]).getValueStrategy();
                         if (strategy != null)
                         {
