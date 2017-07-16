@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -68,6 +69,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.scostore.ListStore;
+import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -280,8 +282,19 @@ public class FKListStore<E> extends AbstractListStore<E>
     public E set(ObjectProvider ownerOP, int index, Object element, boolean allowDependentField)
     {
         validateElementForWriting(ownerOP, element, -1); // Last argument means don't set the position on any INSERT
-        E oldElement = get(ownerOP, index);
-//        return set(op, index, element, allowDependentField, oldElement);
+
+        // Find the original element at this position
+        E oldElement  = null;
+        List fieldVal = (List) ownerOP.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+        if (fieldVal != null && fieldVal instanceof BackedSCO && ((BackedSCO)fieldVal).isLoaded())
+        {
+            // Already loaded in the wrapper
+            oldElement = (E) fieldVal.get(index);
+        }
+        else
+        {
+            oldElement = get(ownerOP, index);
+        }
 
         ManagedConnection mconn = null;
         try

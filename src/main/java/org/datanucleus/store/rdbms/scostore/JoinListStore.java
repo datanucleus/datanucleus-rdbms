@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -65,6 +66,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.CollectionTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.types.scostore.ListStore;
+import org.datanucleus.store.types.wrappers.backed.BackedSCO;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
@@ -329,7 +331,19 @@ public class JoinListStore<E> extends AbstractListStore<E>
     {
         ExecutionContext ec = op.getExecutionContext();
         validateElementForWriting(ec, element, null);
-        E oldElement = get(op, index);
+
+        // Find the original element at this position
+        E oldElement  = null;
+        List fieldVal = (List) op.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+        if (fieldVal != null && fieldVal instanceof BackedSCO && ((BackedSCO)fieldVal).isLoaded())
+        {
+            // Already loaded in the wrapper
+            oldElement = (E) fieldVal.get(index);
+        }
+        else
+        {
+            oldElement = get(op, index);
+        }
 
         // Check for dynamic schema updates prior to update
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
@@ -1009,6 +1023,10 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 // Select the required fields
                 SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
                 SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
+            }
+            else
+            {
+                throw new NucleusException("Unable to create SQL statement to retrieve elements of List");
             }
         }
 
