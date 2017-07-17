@@ -418,15 +418,15 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         {
             type = java.util.List.class;
         }
-        
+
+        ExecutionContext ec = op.getExecutionContext();
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             // The metadata being used here is an embedded form, so swap for the real one
-            ExecutionContext ec = op.getExecutionContext();
             mmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getClassName(true), ec.getClassLoaderResolver()).getMetaDataForMember(mmd.getName());
         }
 
-        return SCOUtils.newSCOInstance(op, mmd, type, value, true);
+        return ec.getTypeManager().createSCOInstance(op, mmd, type, value, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------
