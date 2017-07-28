@@ -232,28 +232,31 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
     {
         if (repositoryExists)
         {
-            return repositoryExists;
+            return true;
         }
         else if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS))
         {
             // Assumed to exist if ignoring DMD.getColumns()
             repositoryExists = true;
-            return repositoryExists;
-        }
-
-        try
-        {
-            if (sequenceTable == null)
-            {
-                initialiseSequenceTable();
-            }
-            sequenceTable.exists((Connection)connection.getConnection(), true);
-            repositoryExists = true;
             return true;
         }
-        catch (SQLException sqle)
+
+        synchronized (this)
         {
-            throw new ValueGenerationException("Exception thrown calling table.exists() for " + sequenceTable, sqle);
+            try
+            {
+                if (sequenceTable == null)
+                {
+                    initialiseSequenceTable();
+                }
+                sequenceTable.exists((Connection)connection.getConnection(), true);
+                repositoryExists = true;
+                return true;
+            }
+            catch (SQLException sqle)
+            {
+                throw new ValueGenerationException("Exception thrown calling table.exists() for " + sequenceTable, sqle);
+            }
         }
     }
 
@@ -261,7 +264,7 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
      * Method to create the repository for ids to be stored.
      * @return Whether it was created successfully.
      */
-    protected boolean createRepository()
+    protected synchronized boolean createRepository()
     {
         RDBMSStoreManager srm = (RDBMSStoreManager) storeMgr;
         if (!srm.getSchemaHandler().isAutoCreateTables())
