@@ -607,7 +607,6 @@ public abstract class BaseGenericObjectPool<T> {
             }
             Object policy = clazz.newInstance();
             if (policy instanceof EvictionPolicy<?>) {
-                @SuppressWarnings("unchecked") // safe, because we just checked the class
                 EvictionPolicy<T> evicPolicy = (EvictionPolicy<T>) policy;
                 this.evictionPolicy = evicPolicy;
             }
@@ -1189,7 +1188,6 @@ public abstract class BaseGenericObjectPool<T> {
         }
 
         @Override
-        @SuppressWarnings("rawtypes")
         public boolean equals(Object other) {
             return ((IdentityWrapper) other).instance == instance;
         }

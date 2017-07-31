@@ -1092,7 +1092,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {
         lock.lock();
@@ -1350,7 +1349,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         last = null;
         // Read in all elements and place in queue
         for (;;) {
-            @SuppressWarnings("unchecked")
             E item = (E)s.readObject();
             if (item == null) {
                 break;

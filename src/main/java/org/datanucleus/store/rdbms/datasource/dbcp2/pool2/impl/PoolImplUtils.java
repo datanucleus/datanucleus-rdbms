@@ -36,7 +36,6 @@ class PoolImplUtils {
      *
      * @return the type of object the factory creates
      */
-    @SuppressWarnings("rawtypes")
     static Class<?> getFactoryType(Class<? extends PooledObjectFactory> factory) {
         return (Class<?>) getGenericType(PooledObjectFactory.class, factory);
     }
@@ -74,7 +73,6 @@ class PoolImplUtils {
         }
 
         // Interface not found on this class. Look at the superclass.
-        @SuppressWarnings("unchecked")
         Class<? extends T> superClazz =
                 (Class<? extends T>) clazz.getSuperclass();
 

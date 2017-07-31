@@ -160,7 +160,6 @@ public class PoolingDriver implements Driver {
     public void invalidateConnection(Connection conn) throws SQLException {
         if (conn instanceof PoolGuardConnectionWrapper) { // normal case
             PoolGuardConnectionWrapper pgconn = (PoolGuardConnectionWrapper) conn;
-            @SuppressWarnings("unchecked")
             ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;
             try {
                 pool.invalidateObject(pgconn.getDelegateInternal());

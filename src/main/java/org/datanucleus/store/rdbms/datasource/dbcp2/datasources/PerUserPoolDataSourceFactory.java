@@ -40,7 +40,6 @@ public class PerUserPoolDataSourceFactory
         return PER_USER_POOL_CLASSNAME.equals(className);
     }
 
-    @SuppressWarnings("unchecked") // Avoid warnings on deserialization
     @Override
     protected InstanceKeyDataSource getNewInstance(Reference ref)
         throws IOException, ClassNotFoundException {
