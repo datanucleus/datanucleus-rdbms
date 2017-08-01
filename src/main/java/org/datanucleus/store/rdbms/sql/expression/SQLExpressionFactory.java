@@ -144,6 +144,118 @@ public class SQLExpressionFactory
                 }
             }
         }
+
+        // Load up built-in expression class names for mapping
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BigDecimalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BigIntegerMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BooleanMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.BooleanExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ByteMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ByteExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.CharacterMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CharacterExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DoubleMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.FloatMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IntegerMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.LongMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ShortMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EnumMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.EnumExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.NumberMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.StringMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OptionalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.OptionalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.UUIDMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlDateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimeMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimestampMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ArrayExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleArrayMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ArrayExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CollectionExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleCollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CollectionExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.SingleCollectionExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.MapMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.MapExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleMapMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.MapExpression.class);
+
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping.DiscriminatorLongMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping.DiscriminatorStringMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionLongMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionTimestampMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ReferenceIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ObjectMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ReferenceMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.InterfaceMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
+
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TypeConverterExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.TypeConverterMultiMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TypeConverterMultiExpression.class);
+
+        // Load up built-in literal class names for mapping
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BigDecimalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BigIntegerMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.BooleanMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.BooleanLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ByteMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ByteLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.CharacterMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CharacterLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DoubleMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.FloatMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IntegerMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.LongMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ShortMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EnumMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.EnumLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.NumberMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.FloatingPointLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.StringMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OptionalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.OptionalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.UUIDMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlDateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimeMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimestampMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.GregorianCalendarMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ArrayMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ArrayLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleArrayMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ArrayLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.CollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CollectionLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleCollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.CollectionLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.SingleCollectionLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.MapMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.MapLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleMapMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.MapLiteral.class);
+
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping.DiscriminatorLongMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping.DiscriminatorStringMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionLongMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionTimestampMapping.class.getName(), 
+            org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ReferenceIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ObjectMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.ReferenceMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.InterfaceMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
+
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TypeConverterLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.TypeConverterMultiMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TypeConverterMultiLiteral.class);
     }
 
     /**
@@ -168,19 +280,20 @@ public class SQLExpressionFactory
      */
     public SQLExpression newExpression(SQLStatement stmt, SQLTable sqlTbl, JavaTypeMapping mapping, JavaTypeMapping parentMapping)
     {
+        // Use "new SQLExpression(SQLStatement, SQLTable, JavaTypeMapping)"
         SQLTable exprSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(stmt, sqlTbl, parentMapping == null ? mapping : parentMapping);
         Object[] args = new Object[] {stmt, exprSqlTbl, mapping};
 
         Class expressionClass = expressionClassByMappingName.get(mapping.getClass().getName());
         if (expressionClass != null)
         {
-            // Use cached expression class
+            // Use built-in expression class
             return (SQLExpression)ClassUtils.newInstance(expressionClass, EXPR_CREATION_ARG_TYPES, new Object[] {stmt, exprSqlTbl, mapping});
         }
 
         try
         {
-            // Use "new SQLExpression(SQLStatement, SQLTable, JavaTypeMapping)"
+            // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression", 
                 "mapping-class", mapping.getClass().getName(), "expression-class", EXPR_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
@@ -209,6 +322,7 @@ public class SQLExpressionFactory
      */
     public SQLExpression newLiteral(SQLStatement stmt, JavaTypeMapping mapping, Object value)
     {
+        // Use "new SQLLiteral(SQLStatement, JavaTypeMapping, Object, String)"
         Object[] args = new Object[] {stmt, mapping, value, null};
 
         if (mapping != null)
@@ -223,12 +337,19 @@ public class SQLExpressionFactory
 
         try
         {
-            // Use "new SQLLiteral(SQLStatement, JavaTypeMapping, Object, String)"
             if (mapping == null)
             {
                 return (SQLExpression)ClassUtils.newInstance(NullLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
+            Class literalClass = literalClassByMappingName.get(mapping.getClass().getName());
+            if (literalClass != null)
+            {
+                // Use built-in literal class
+                return (SQLExpression)ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
+            }
+
+            // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
                 "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
@@ -249,8 +370,7 @@ public class SQLExpressionFactory
 
     /**
      * Factory for a literal as an input parameter.
-     * If the mapping (type of parameter) is not known at this point then put in null and it
-     * will return a ParameterLiteral.
+     * If the mapping (type of parameter) is not known at this point then put in null and it will return a ParameterLiteral.
      * @param stmt The statement
      * @param mapping The mapping
      * @param value Value of the literal (if known)
@@ -259,15 +379,24 @@ public class SQLExpressionFactory
      */
     public SQLExpression newLiteralParameter(SQLStatement stmt, JavaTypeMapping mapping, Object value, String paramName)
     {
+        // Use "new SQLLiteral(SQLStatement, JavaTypeMapping, Object, String)"
+        Object[] args = new Object[] {stmt, mapping, value, paramName};
+
         try
         {
-            // Use "new SQLLiteral(SQLStatement, JavaTypeMapping, Object, String)"
-            Object[] args = new Object[] {stmt, mapping, value, paramName};
             if (mapping == null)
             {
                 return (SQLExpression)ClassUtils.newInstance(ParameterLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
+            Class literalClass = literalClassByMappingName.get(mapping.getClass().getName());
+            if (literalClass != null)
+            {
+                // Use built-in literal class
+                return (SQLExpression)ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
+            }
+
+            // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
                 "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
             if (sqlExpr == null)
