@@ -509,12 +509,7 @@ public abstract class TableImpl extends AbstractTable
             while (i.hasNext())
             {
                 Map.Entry e = (Map.Entry) i.next();
-                String fkName = (String) e.getKey();
                 String stmtText = (String) e.getValue();
-                if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-                {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058100", fkName, getCatalogName(), getSchemaName()));
-                }
 
                 try
                 {
@@ -627,12 +622,7 @@ public abstract class TableImpl extends AbstractTable
             while (i.hasNext())
             {
                 Map.Entry e = (Map.Entry) i.next();
-                String idxName = (String) e.getKey();
                 String stmtText = (String) e.getValue();
-                if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-                {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058000", idxName, getCatalogName(), getSchemaName()));
-                }
 
                 try
                 {
@@ -739,12 +729,7 @@ public abstract class TableImpl extends AbstractTable
             while (i.hasNext())
             {
                 Map.Entry<String, String> e = i.next();
-                String ckName = e.getKey();
                 String stmtText = e.getValue();
-                if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-                {
-                    NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("058200", ckName, getCatalogName(), getSchemaName()));
-                }
 
                 try
                 {
