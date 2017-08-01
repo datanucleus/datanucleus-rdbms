@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
-import org.datanucleus.NucleusContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -116,7 +115,6 @@ public class MappingManagerImpl implements MappingManager
         this.clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         // Load up the mappings of javaType -> JavaTypeMapping
-        NucleusContext nucleusCtx = storeMgr.getNucleusContext();
 
         // a). load built-in mappings
         addMappedType(boolean.class, org.datanucleus.store.rdbms.mapping.java.BooleanMapping.class);
@@ -135,13 +133,10 @@ public class MappingManagerImpl implements MappingManager
         addMappedType(Integer.class, org.datanucleus.store.rdbms.mapping.java.IntegerMapping.class);
         addMappedType(Long.class, org.datanucleus.store.rdbms.mapping.java.LongMapping.class);
         addMappedType(Short.class, org.datanucleus.store.rdbms.mapping.java.ShortMapping.class);
-
         addMappedType(Number.class, org.datanucleus.store.rdbms.mapping.java.NumberMapping.class);
         addMappedType(String.class, org.datanucleus.store.rdbms.mapping.java.StringMapping.class);
         addMappedType(Enum.class, org.datanucleus.store.rdbms.mapping.java.EnumMapping.class);
         addMappedType(Object.class, org.datanucleus.store.rdbms.mapping.java.SerialisedMapping.class);
-
-        addMappedType(java.awt.image.BufferedImage.class, org.datanucleus.store.rdbms.mapping.java.BufferedImageMapping.class);
 
         addMappedType(java.io.File.class, org.datanucleus.store.rdbms.mapping.java.FileMapping.class);
         addMappedType(java.io.Serializable.class, org.datanucleus.store.rdbms.mapping.java.SerialisedMapping.class);
@@ -208,7 +203,7 @@ public class MappingManagerImpl implements MappingManager
         addMappedType(org.datanucleus.identity.DatastoreId.class, org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class);
 
         // b). Load any mappings from the plugin mechanism
-        PluginManager pluginMgr = nucleusCtx.getPluginManager();
+        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
         ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.java_mapping", null, null);
         if (elems != null)
         {
