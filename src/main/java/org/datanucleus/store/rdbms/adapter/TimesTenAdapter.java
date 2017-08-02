@@ -123,9 +123,11 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
         MappingManager mapMgr = storeMgr.getMappingManager();
         if (mapMgr instanceof MappingManagerImpl)
         {
-            MappingManagerImpl rdbmsMapMgr = (MappingManagerImpl)mapMgr;
-            rdbmsMapMgr.deregisterDatastoreMappingsForJDBCType("VARBINARY");
-            rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
+            deregisterDatastoreMappingsForJDBCType("VARBINARY");
+            registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
+//            MappingManagerImpl rdbmsMapMgr = (MappingManagerImpl)mapMgr;
+//            rdbmsMapMgr.deregisterDatastoreMappingsForJDBCType("VARBINARY");
+//            rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
         }
     }
 

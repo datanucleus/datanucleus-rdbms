@@ -1035,4 +1035,9 @@ public interface DatastoreAdapter
      * @return The SQLMethod class (or null if not defined for this datastore).
      */
     Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr);
+
+    void registerDatastoreMapping(String javaTypeName, Class datastoreMappingType, String jdbcType, String sqlType, boolean dflt);
+    void deregisterDatastoreMappingsForJDBCType(String jdbcTypeName);
+    String getDefaultSqlTypeForJavaType(String javaType, String jdbcType);
+    Class getDatastoreMappingClass(String javaType, String jdbcType, String sqlType, ClassLoaderResolver clr, String fieldName);
 }

@@ -23,7 +23,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
@@ -49,14 +48,6 @@ public interface MappingManager
      * @return The JavaTypeMapping class to use
      */
     Class getMappingType(String javaTypeName);
-
-    /**
-     * Initialise the datastore mapping. 
-     * @param mgr the PlyginManager
-     * @param clr the ClassLoaderResolver
-     * @param vendorId the datastore vendor id
-     */
-    void loadDatastoreMapping(PluginManager mgr, ClassLoaderResolver clr, String vendorId);
 
     /**
      * Method to create the datastore mapping for a java type mapping at a particular index.
