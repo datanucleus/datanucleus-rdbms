@@ -45,7 +45,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.JdbcType;
-import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -572,9 +571,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // Initialise the mappings available. Load all possible, and remove unsupported for this datastore
         RDBMSStoreManager storeMgr = (RDBMSStoreManager)handler.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        PluginManager pluginMgr = storeMgr.getNucleusContext().getPluginManager();
-        MappingManager mapMgr = storeMgr.getMappingManager();
-        mapMgr.loadDatastoreMapping(pluginMgr, clr, getVendorID());
+
+        storeMgr.getMappingManager().loadDatastoreMapping(storeMgr.getNucleusContext().getPluginManager(), clr, getVendorID());
 
         // Load the types from plugin(s)
         handler.getSchemaData(mconn.getConnection(), "types", null);

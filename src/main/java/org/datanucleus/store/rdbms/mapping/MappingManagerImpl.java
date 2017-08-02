@@ -2138,14 +2138,28 @@ public class MappingManagerImpl implements MappingManager
 
         // Make sure we don't have a primitive in here
         javaType = ClassUtils.getWrapperTypeNameForPrimitiveTypeName(javaType);
-        RDBMSTypeMapping datastoreMapping = null;
+
         if (sqlType != null)
         {
-            // First look for "sql-type"
-            if (datastoreMappingsBySQLType.get(sqlType.toUpperCase()) == null)
+            // "sql-type" was specified
+            if (datastoreMappingsBySQLType.get(sqlType.toUpperCase()) != null)
+            {
+                // Find if this "sql-type" has been defined for this java-type
+                Iterator sqlTypeIter = ((Collection) datastoreMappingsBySQLType.get(sqlType.toUpperCase())).iterator();
+                while (sqlTypeIter.hasNext())
+                {
+                    RDBMSTypeMapping sqlTypeMapping = (RDBMSTypeMapping)sqlTypeIter.next();
+                    if (sqlTypeMapping.javaType.equals(javaType))
+                    {
+                        return sqlTypeMapping.getMappingType();
+                    }
+                }
+            }
+            else
             {
                 if (jdbcType == null)
                 {
+                    // No JDBC selected, so exit
                     if (fieldName != null)
                     {
                         throw new NucleusException(Localiser.msg("054001", javaType, sqlType, fieldName)).setFatal();
@@ -2162,114 +2176,78 @@ public class MappingManagerImpl implements MappingManager
                     NucleusLogger.DATASTORE_SCHEMA.info(Localiser.msg("054011", javaType, sqlType, jdbcType));
                 }
             }
-            else
+        }
+
+        if (jdbcType != null)
+        {
+            // "jdbc-type" was specified
+            if (datastoreMappingsByJDBCType.get(jdbcType.toUpperCase()) != null)
             {
-                // Find if this sql-type has been defined for this java-type
-                Iterator sqlTypeIter = ((Collection) datastoreMappingsBySQLType.get(sqlType.toUpperCase())).iterator();
-                while (sqlTypeIter.hasNext())
+                // Find if this "jdbc-type" has been defined for this java-type
+                Iterator jdbcTypeIter = ((Collection) datastoreMappingsByJDBCType.get(jdbcType.toUpperCase())).iterator();
+                while (jdbcTypeIter.hasNext())
                 {
-                    RDBMSTypeMapping sqlTypeMapping = (RDBMSTypeMapping)sqlTypeIter.next();
-                    if (sqlTypeMapping.javaType.equals(javaType))
+                    RDBMSTypeMapping jdbcTypeMapping = (RDBMSTypeMapping)jdbcTypeIter.next();
+                    if (jdbcTypeMapping.javaType.equals(javaType))
                     {
-                        datastoreMapping = sqlTypeMapping;
-                        break;
+                        return jdbcTypeMapping.getMappingType();
                     }
                 }
             }
-        }
 
-        if (datastoreMapping == null && jdbcType != null)
-        {
-            // Then look for "jdbc-type"
-            if (datastoreMappingsByJDBCType.get(jdbcType.toUpperCase()) == null)
-            {
-                if (fieldName != null)
-                {
-                    throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
-                }
-                throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
-            }
-
-            // Find if this jdbc-type has been defined for this java-type
-            Iterator jdbcTypeIter = ((Collection) datastoreMappingsByJDBCType.get(jdbcType.toUpperCase())).iterator();
-            while (jdbcTypeIter.hasNext())
-            {
-                RDBMSTypeMapping jdbcTypeMapping = (RDBMSTypeMapping)jdbcTypeIter.next();
-                if (jdbcTypeMapping.javaType.equals(javaType))
-                {
-                    datastoreMapping = jdbcTypeMapping;
-                    break;
-                }
-            }
-            if (datastoreMapping == null)
-            {
-                // This JDBC type is supported but not for persisting this java type
-                if (fieldName != null)
-                {
-                    throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
-                }
-                throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
-            }
-        }
-
-        if (datastoreMapping == null)
-        {
-            // TODO If table exists we should look at sql-type of the column and choose mapping for that
-
-            // No specified type so get the best for this java-type (if primitive then use the wrapper java-type)
-            // Use wrapper type instead of primitive type since primitives have no java-type entries for datastore mappings
-            String type = ClassUtils.getWrapperTypeNameForPrimitiveTypeName(javaType);
-            Collection mappings = (Collection)datastoreMappingsByJavaType.get(type);
-            if (mappings == null)
-            {
-                // This java-type isn't specifically supported so maybe its superclass is
-                Class javaTypeClass = clr.classForName(type);
-                Class superClass = javaTypeClass.getSuperclass();
-                while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && mappings == null)
-                {
-                    mappings = (Collection) datastoreMappingsByJavaType.get(superClass.getName());
-                    superClass = superClass.getSuperclass();
-                }
-            }
-            if (mappings != null)
-            {
-                if (mappings.size() == 1)
-                {
-                    datastoreMapping = (RDBMSTypeMapping) mappings.iterator().next();
-                }
-                else
-                {
-                    // More than 1 so take the default
-                    Iterator mappingsIter = mappings.iterator();
-                    while (mappingsIter.hasNext())
-                    {
-                        RDBMSTypeMapping rdbmsMapping = (RDBMSTypeMapping)mappingsIter.next();
-                        if (rdbmsMapping.isDefault())
-                        {
-                            // default matched so take it
-                            datastoreMapping = rdbmsMapping;
-                            break;
-                        }
-                    }
-
-                    // No default set, so use the first one
-                    if (datastoreMapping == null && mappings.size() > 0)
-                    {
-                        datastoreMapping = (RDBMSTypeMapping) mappings.iterator().next();
-                    }
-                }
-            }
-        }
-
-        if (datastoreMapping == null)
-        {
+            // This JDBC type is supported but not for persisting this java type
             if (fieldName != null)
             {
-                throw new NucleusException(Localiser.msg("054005", javaType, jdbcType, sqlType, fieldName)).setFatal();
+                throw new NucleusException(Localiser.msg("054003", javaType, jdbcType, fieldName)).setFatal();
             }
-            throw new NucleusException(Localiser.msg("054004", javaType, jdbcType, sqlType)).setFatal();
+            throw new NucleusException(Localiser.msg("054002", javaType, jdbcType)).setFatal();
         }
-        return datastoreMapping.getMappingType();
+
+        // TODO If table exists we should look at sql-type of the column and choose mapping for that
+
+        // No specified type so get the best for this java-type (if primitive then use the wrapper java-type)
+        String type = javaType;
+        Collection mappings = (Collection)datastoreMappingsByJavaType.get(type);
+        if (mappings == null)
+        {
+            // This java-type isn't specifically supported so maybe its superclass is
+            Class javaTypeClass = clr.classForName(type);
+            Class superClass = javaTypeClass.getSuperclass();
+            while (superClass != null && !superClass.getName().equals(ClassNameConstants.Object) && mappings == null)
+            {
+                mappings = (Collection) datastoreMappingsByJavaType.get(superClass.getName());
+                superClass = superClass.getSuperclass();
+            }
+        }
+        if (mappings != null && !mappings.isEmpty())
+        {
+            if (mappings.size() == 1)
+            {
+                return ((RDBMSTypeMapping)mappings.iterator().next()).getMappingType();
+            }
+
+            // More than 1 so take the default
+            Iterator mappingsIter = mappings.iterator();
+            while (mappingsIter.hasNext())
+            {
+                RDBMSTypeMapping rdbmsMapping = (RDBMSTypeMapping)mappingsIter.next();
+                if (rdbmsMapping.isDefault())
+                {
+                    // default matched so take it
+                    return rdbmsMapping.getMappingType();
+                }
+            }
+
+            // No default set, so use the first one
+            return ((RDBMSTypeMapping)mappings.iterator().next()).getMappingType();
+        }
+
+        // No mapping found for the java type (+ jdbcType/sqlType)
+        if (fieldName != null)
+        {
+            throw new NucleusException(Localiser.msg("054005", javaType, jdbcType, sqlType, fieldName)).setFatal();
+        }
+        throw new NucleusException(Localiser.msg("054004", javaType, jdbcType, sqlType)).setFatal();
     }
 
     protected class RDBMSTypeMapping
