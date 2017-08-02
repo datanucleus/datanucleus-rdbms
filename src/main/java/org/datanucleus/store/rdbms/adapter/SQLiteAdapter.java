@@ -369,7 +369,7 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
             else if ("java.time.Period".equals(className))
             {
                 if ("getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4.class;
-                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4.class;
+                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4.class;
                 else if ("getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod4.class;
             }
             else if ("java.time.YearMonth".equals(className))

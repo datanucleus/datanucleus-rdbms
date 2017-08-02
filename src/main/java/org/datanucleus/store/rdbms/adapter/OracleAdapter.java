@@ -814,7 +814,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
             else if ("java.time.Period".equals(className))
             {
                 if ("getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
-                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2.class;
+                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2.class;
                 else if ("getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2.class;
             }
             else if ("java.time.YearMonth".equals(className))

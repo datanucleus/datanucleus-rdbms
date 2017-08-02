@@ -720,7 +720,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             else if ("java.time.Period".equals(className))
             {
                 if ("getMonths".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3.class;
-                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3.class;
+                else if ("getDays".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3.class;
                 else if ("getYears".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3.class;
             }
             else if ("java.time.YearMonth".equals(className))
