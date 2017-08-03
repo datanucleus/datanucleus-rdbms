@@ -677,7 +677,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     stmt.append(" AND ").append(containerAlias).append(".");
                     stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
-                    stmt.append("=FALSE");
+                    stmt.append("=FALSE"); // TODO Cater for columns that store the DELETED flag as ("Y","N") or (1,0)
                 }
 
                 if (relationDiscriminatorMapping != null)

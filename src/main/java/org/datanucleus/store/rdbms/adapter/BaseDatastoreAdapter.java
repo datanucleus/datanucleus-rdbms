@@ -1995,6 +1995,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
         Map<String, Class> datastoreMappingByJdbcType = new HashMap<>();
         Map<String, Class> datastoreMappingBySqlType = new HashMap<>();
+        
+        public String toString()
+        {
+            return "jdbc-types=" + StringUtils.collectionToString(datastoreMappingByJdbcType.keySet()) + 
+                   ", sql-types=" + StringUtils.collectionToString(datastoreMappingBySqlType.keySet()) +
+                   " default (jdbc-type=" + defaultJdbcType + ", sql-type=" + defaultSqlType + ")";
+        }
     }
 
     /**
@@ -2116,9 +2123,12 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             }
             if (jdbcTypeName.equals(typeMappings.defaultJdbcType))
             {
+                // We are removing the DataNucleus provided DEFAULT option!!
                 typeMappings.defaultJdbcType = null;
                 typeMappings.defaultSqlType = null;
                 typeMappings.defaultDatastoreMappingType = null;
+                NucleusLogger.DATASTORE.warn("Default type for java type of " + typeMappingEntry.getKey() + " was previously jdbc-type=" + jdbcTypeName + 
+                    " but this is not provided by the JDBC driver! Please report this to the DataNucleus developers");
             }
             // TODO Do we need to try to remove from sql-type entries?
         }

@@ -776,7 +776,7 @@ public class DeleteRequest extends Request
         public String getSoftDeleteStatement()
         {
             org.datanucleus.store.schema.table.Column softDeleteCol = table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE);
-            return "UPDATE " + table.toString() + " SET " + softDeleteCol.getName() + "=TRUE WHERE " + where;
+            return "UPDATE " + table.toString() + " SET " + softDeleteCol.getName() + "=TRUE WHERE " + where; // TODO Cater for columns that store the DELETED flag as ("Y","N") or (1,0)
         }
     }
 }
