@@ -241,22 +241,19 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
             return true;
         }
 
-        synchronized (this)
+        try
         {
-            try
+            if (sequenceTable == null)
             {
-                if (sequenceTable == null)
-                {
-                    initialiseSequenceTable();
-                }
-                sequenceTable.exists((Connection)connection.getConnection(), true);
-                repositoryExists = true;
-                return true;
+                initialiseSequenceTable();
             }
-            catch (SQLException sqle)
-            {
-                throw new ValueGenerationException("Exception thrown calling table.exists() for " + sequenceTable, sqle);
-            }
+            sequenceTable.exists((Connection)connection.getConnection(), true);
+            repositoryExists = true;
+            return true;
+        }
+        catch (SQLException sqle)
+        {
+            throw new ValueGenerationException("Exception thrown calling table.exists() for " + sequenceTable, sqle);
         }
     }
 
@@ -264,7 +261,7 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
      * Method to create the repository for ids to be stored.
      * @return Whether it was created successfully.
      */
-    protected synchronized boolean createRepository()
+    protected boolean createRepository()
     {
         RDBMSStoreManager srm = (RDBMSStoreManager) storeMgr;
         if (!srm.getSchemaHandler().isAutoCreateTables())
@@ -361,12 +358,15 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
 
             if (!repositoryExists)
             {
-                // Make sure the repository is present before proceeding
-                repositoryExists = repositoryExists();
-                if (!repositoryExists)
+                synchronized (this)
                 {
-                    createRepository();
-                    repositoryExists = true;
+                    // Make sure the repository is present before proceeding
+                    repositoryExists = repositoryExists();
+                    if (!repositoryExists)
+                    {
+                        createRepository();
+                        repositoryExists = true;
+                    }
                 }
             }
 
