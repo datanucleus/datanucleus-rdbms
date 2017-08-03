@@ -401,6 +401,13 @@ public interface DatastoreAdapter
     public static final String OPERATOR_BITWISE_XOR = "BitwiseXOrOperator";
 
     /**
+     * Initialise the types for this datastore.
+     * @param handler SchemaHandler that we initialise the types for
+     * @param mconn Managed connection to use
+     */
+    void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn);
+
+    /**
      * Accessor for the options that are supported by this datastore adapter and the underlying datastore.
      * @return The options (Collection&lt;String&gt;)
      */
@@ -441,24 +448,10 @@ public interface DatastoreAdapter
     String getVendorID();
 
     /**
-     * Initialise the types for this datastore.
-     * @param handler SchemaHandler that we initialise the types for
-     * @param mconn Managed connection to use
-     */
-    void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn);
-
-    /**
      * Set any properties controlling how the adapter is configured.
      * @param props The properties
      */
     void setProperties(Map<String, Object> props);
-
-    /**
-     * Remove all mappings from the mapping manager that don't have a datastore type initialised.
-     * @param handler Schema handler
-     * @param mconn Managed connection to use
-     */
-    void removeUnsupportedMappings(StoreSchemaHandler handler, ManagedConnection mconn);
 
     /**
      * Method to check if a word is reserved for this datastore.
