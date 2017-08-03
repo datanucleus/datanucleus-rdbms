@@ -401,6 +401,13 @@ public interface DatastoreAdapter
     public static final String OPERATOR_BITWISE_XOR = "BitwiseXOrOperator";
 
     /**
+     * Initialise the datastore adapter.
+     * @param handler SchemaHandler that we initialise the types for
+     * @param mconn Managed connection to use
+     */
+    void initialise(StoreSchemaHandler handler, ManagedConnection mconn);
+
+    /**
      * Initialise the types for this datastore.
      * @param handler SchemaHandler that we initialise the types for
      * @param mconn Managed connection to use

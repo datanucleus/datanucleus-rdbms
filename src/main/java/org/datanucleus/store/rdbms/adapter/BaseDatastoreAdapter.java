@@ -563,6 +563,15 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(TX_ISOLATION_SERIALIZABLE);
     }
 
+    public void initialise(StoreSchemaHandler handler, ManagedConnection mconn)
+    {
+        initialiseTypes(handler, mconn);
+
+        removeUnsupportedDatastoreMappings(handler, mconn);
+        
+        logDatastoreMappingsSummary();
+    }
+
     /**
      * Initialise the types for this datastore.
      * @param handler SchemaHandler that we initialise the types for
@@ -576,9 +585,38 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         loadDatastoreMappings(storeMgr.getNucleusContext().getPluginManager(), clr);
 
         // Load the types from the schema handler
+        handler.getSchemaData(mconn.getConnection(), "types", null);
+    }
+
+    protected void logDatastoreMappingsSummary()
+    {
+        if (NucleusLogger.DATASTORE.isDebugEnabled())
+        {
+            Iterator<Entry<String, DatastoreTypeMappings>> datastoreTypeMappingEntryIter = datastoreTypeMappingsByJavaType.entrySet().iterator();
+            while (datastoreTypeMappingEntryIter.hasNext())
+            {
+                Map.Entry<String, DatastoreTypeMappings> datastoreTypeMappingEntry = datastoreTypeMappingEntryIter.next();
+                DatastoreTypeMappings datastoreTypeMappings = datastoreTypeMappingEntry.getValue();
+                if (NucleusLogger.DATASTORE.isDebugEnabled())
+                {
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("054009", datastoreTypeMappingEntry.getKey(), 
+                        StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingByJdbcType.keySet()), 
+                        StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingBySqlType.keySet()), 
+                        datastoreTypeMappings.defaultJdbcType, datastoreTypeMappings.defaultSqlType));
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove all datastore mappings that don't have a supported JDBC type.
+     * @param handler Schema handler
+     * @param mconn Managed connection to use
+     */
+    protected void removeUnsupportedDatastoreMappings(StoreSchemaHandler handler, ManagedConnection mconn)
+    {
         RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
 
-        // Remove support for any datastore mappings that the JDBC driver doesn't acknowledge
         Iterator<Map.Entry<Integer, String>> entryIter = supportedJdbcTypesById.entrySet().iterator();
         while (entryIter.hasNext())
         {
@@ -599,23 +637,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             {
                 // JDBC type not supported by adapter so deregister the mapping. TODO Remove any entries from built-in types to avoid this
                 deregisterDatastoreMappingsForJDBCType(entry.getValue());
-            }
-        }
-
-        if (NucleusLogger.DATASTORE.isDebugEnabled())
-        {
-            Iterator<Entry<String, DatastoreTypeMappings>> datastoreTypeMappingEntryIter = datastoreTypeMappingsByJavaType.entrySet().iterator();
-            while (datastoreTypeMappingEntryIter.hasNext())
-            {
-                Map.Entry<String, DatastoreTypeMappings> datastoreTypeMappingEntry = datastoreTypeMappingEntryIter.next();
-                DatastoreTypeMappings datastoreTypeMappings = datastoreTypeMappingEntry.getValue();
-                if (NucleusLogger.DATASTORE.isDebugEnabled())
-                {
-                    NucleusLogger.DATASTORE.debug(Localiser.msg("054009", datastoreTypeMappingEntry.getKey(), 
-                        StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingByJdbcType.keySet()), 
-                        StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingBySqlType.keySet()), 
-                        datastoreTypeMappings.defaultJdbcType, datastoreTypeMappings.defaultSqlType));
-                }
             }
         }
     }

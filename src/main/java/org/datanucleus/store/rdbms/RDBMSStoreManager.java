@@ -301,7 +301,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             {
                 dba = DatastoreAdapterFactory.getInstance().getDatastoreAdapter(clr, conn, 
                     getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME), ctx.getPluginManager());
-                dba.initialiseTypes(schemaHandler, mc);
+                dba.initialise(schemaHandler, mc);
 
                 // User specified default catalog/schema name - check for validity, and store
                 if (hasPropertyNotNull(PropertyNames.PROPERTY_MAPPING_CATALOG))

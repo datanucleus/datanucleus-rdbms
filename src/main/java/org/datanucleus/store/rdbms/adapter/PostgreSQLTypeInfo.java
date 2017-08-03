@@ -38,21 +38,13 @@ public class PostgreSQLTypeInfo extends SQLTypeInfo
     public PostgreSQLTypeInfo(ResultSet rs)
     {
         super(rs);
-        /*
-         * Not really sure what we should do about the precision field.  None of
-         * the drivers that I've tried return a sensible value for it (the 7.2
-         * driver returned -1 for all types, the 7.3 driver returned 9 (!) for
-         * all types, both tried against a 7.2.1 server).  The best I can think
-         * to do for now is make sure it has a decent value for those types
-         * where I know JPOX cares, namely VARCHAR and NUMERIC.
-         */
+
+        // Not really sure what we should do about the precision field.  None of the drivers that I've tried return a sensible value for it 
+        // (the 7.2 driver returned -1 for all types, the 7.3 driver returned 9 (!) for all types, both tried against a 7.2.1 server).
+        // The best I can think to do for now is make sure it has a decent value for those types where I know JPOX cares, namely VARCHAR and NUMERIC.
         if (typeName.equalsIgnoreCase("varchar") || typeName.equalsIgnoreCase("char"))
         {
-            /*
-             * VARCHAR gets an arbitrary maximum precision assigned to it.
-             * Requests fo anything larger than this will be converted to
-             * LONGVARCHAR (i.e. TEXT) in StringMapping.
-             */
+            // VARCHAR gets an arbitrary maximum precision assigned to it. Requests fo anything larger than this will be converted to LONGVARCHAR (i.e. TEXT) in StringMapping.
             precision = MAX_PRECISION;
             // Question : What should the upper limit on CHAR be really ? JDBC driver returns "9" !
         }
