@@ -25,18 +25,12 @@ import java.sql.JDBCType;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.Index;
-import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.MappingManagerImpl;
-import org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -113,28 +107,6 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
     public String getVendorID()
     {
         return "timesten";
-    }
-
-    /**
-     * Initialise the types for this datastore.
-     * @param handler SchemaHandler that we initialise the types for
-     * @param mconn Managed connection to use
-     */
-    public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn)
-    {
-        super.initialiseTypes(handler, mconn);
-
-        // Re-register mapping for this adapter
-        RDBMSStoreManager storeMgr = (RDBMSStoreManager)handler.getStoreManager();
-        MappingManager mapMgr = storeMgr.getMappingManager();
-        if (mapMgr instanceof MappingManagerImpl)
-        {
-            deregisterDatastoreMappingsForJDBCType("VARBINARY");
-            registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
-//            MappingManagerImpl rdbmsMapMgr = (MappingManagerImpl)mapMgr;
-//            rdbmsMapMgr.deregisterDatastoreMappingsForJDBCType("VARBINARY");
-//            rdbmsMapMgr.registerDatastoreMapping("java.io.Serializable", TimesTenVarBinaryRDBMSMapping.class, "VARBINARY", "VARBINARY", true);
-        }
     }
 
     /**
@@ -289,7 +261,6 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
         registerDatastoreMapping(Integer.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.NumericRDBMSMapping.class, JDBCType.NUMERIC, "NUMERIC", false);
         registerDatastoreMapping(Integer.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TinyIntRDBMSMapping.class, JDBCType.TINYINT, "TINYINT", false);
         registerDatastoreMapping(Integer.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.SmallIntRDBMSMapping.class, JDBCType.SMALLINT, "SMALLINT", false);
-        registerDatastoreMapping(Integer.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
         registerDatastoreMapping(Long.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping.class, JDBCType.BIGINT, "BIGINT", true);
         registerDatastoreMapping(Long.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.IntegerRDBMSMapping.class, JDBCType.INTEGER, "INT", false);
@@ -340,13 +311,13 @@ public class TimesTenAdapter extends BaseDatastoreAdapter
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping.class, JDBCType.TIME, "TIME", false);
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
-        registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
-        registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);
         registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping.class, JDBCType.VARBINARY, "VARBINARY", true);
+        registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", false);
+        registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);
 
-        registerDatastoreMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
-        registerDatastoreMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);
         registerDatastoreMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TimesTenVarBinaryRDBMSMapping.class, JDBCType.VARBINARY, "VARBINARY", true);
+        registerDatastoreMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", false);
+        registerDatastoreMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);
 
         registerDatastoreMapping(java.io.File.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BinaryStreamRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
 
