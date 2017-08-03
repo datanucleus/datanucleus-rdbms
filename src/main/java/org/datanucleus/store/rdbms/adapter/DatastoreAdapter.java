@@ -1029,8 +1029,38 @@ public interface DatastoreAdapter
      */
     Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr);
 
+    /**
+     * Method to register a datastore mapping for a specified java type, and against particular JDBC/SQL type.
+     * @param javaTypeName Java type that this is used for
+     * @param datastoreMappingType The datastore mapping class to use
+     * @param jdbcType The JDBC type
+     * @param sqlType The SQL type (optional)
+     * @param dflt Whether this is the default mapping for this java type
+     */
     void registerDatastoreMapping(String javaTypeName, Class datastoreMappingType, String jdbcType, String sqlType, boolean dflt);
+
+    /**
+     * Method to remove all support for the specified JDBC type (since the JDBC driver doesn't know about it)
+     * @param jdbcTypeName The JDBC type
+     */
     void deregisterDatastoreMappingsForJDBCType(String jdbcTypeName);
+
+    /**
+     * Method to return the default sql-type for the specified java type (and JDBC type)
+     * @param javaType The java type
+     * @param jdbcType The JDBC type (optional)
+     * @return The SQL type
+     */
     String getDefaultSqlTypeForJavaType(String javaType, String jdbcType);
+
+    /**
+     * Method to return the datastore mapping class to use for the specified java type (and optional JDBC / SQL types).
+     * @param javaType The java type of the member
+     * @param jdbcType The JDBC type (optional). If provided is used in preference to the java type
+     * @param sqlType The SQL type (optional). If provided is used in preference to JDBC type
+     * @param clr ClassLoader resolver
+     * @param fieldName Name of the field/property (for logging only, can be null).
+     * @return The datastore mapping type to use
+     */
     Class getDatastoreMappingClass(String javaType, String jdbcType, String sqlType, ClassLoaderResolver clr, String fieldName);
 }

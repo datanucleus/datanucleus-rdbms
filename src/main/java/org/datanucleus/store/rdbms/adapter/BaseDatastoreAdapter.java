@@ -2089,30 +2089,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         }
     }
 
-    // Alternative variant taking JDBCType
     public void registerDatastoreMapping(String javaTypeName, Class datastoreMappingType, JDBCType jdbcType, String sqlType, boolean dflt)
     {
-        DatastoreTypeMappings typeMappings = datastoreTypeMappingsByJavaType.get(javaTypeName);
-        if (typeMappings == null)
-        {
-            typeMappings = new DatastoreTypeMappings();
-            datastoreTypeMappingsByJavaType.put(javaTypeName, typeMappings);
-        }
-
-        if (jdbcType != null)
-        {
-            typeMappings.datastoreMappingByJdbcType.put(jdbcType.getName(), datastoreMappingType);
-        }
-        if (!StringUtils.isWhitespace(sqlType))
-        {
-            typeMappings.datastoreMappingBySqlType.put(sqlType, datastoreMappingType);
-        }
-        if (dflt)
-        {
-            typeMappings.defaultJdbcType = (jdbcType != null ? jdbcType.getName() : "");
-            typeMappings.defaultSqlType = sqlType;
-            typeMappings.defaultDatastoreMappingType = datastoreMappingType;
-        }
+        registerDatastoreMapping(javaTypeName, datastoreMappingType, jdbcType != null ? jdbcType.getName() : null, sqlType, dflt);
     }
 
     /**
