@@ -267,14 +267,15 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedJdbcTypesById.put(Integer.valueOf(Types.NCHAR), "NCHAR");
         supportedJdbcTypesById.put(Integer.valueOf(Types.NCLOB), "NCLOB");
         supportedJdbcTypesById.put(Integer.valueOf(Types.OTHER), "OTHER");
-        unsupportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY");
-        unsupportedJdbcTypesById.put(Integer.valueOf(Types.BINARY), "BINARY");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.SQLXML), "SQLXML");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.ARRAY), "ARRAY");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.BINARY), "BINARY");
+
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.DISTINCT), "DISTINCT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.JAVA_OBJECT), "JAVA_OBJECT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.NULL), "NULL");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");
-        unsupportedJdbcTypesById.put(Integer.valueOf(Types.SQLXML), "SQLXML");
 
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQL92_RESERVED_WORDS));
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQL99_RESERVED_WORDS));
