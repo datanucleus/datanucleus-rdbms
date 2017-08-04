@@ -38,10 +38,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
@@ -491,14 +491,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
             // Retrieve the catalog separator string (default = ".")
             catalogSeparator = metadata.getCatalogSeparator();
-            catalogSeparator =
-                ((catalogSeparator == null) || (catalogSeparator.trim().length() < 1)) ? "." : catalogSeparator;
+            catalogSeparator = ((catalogSeparator == null) || (catalogSeparator.trim().length() < 1)) ? "." : catalogSeparator;
 
             // Retrieve the identifier quote string (default = "")
             identifierQuoteString = metadata.getIdentifierQuoteString();
-            identifierQuoteString =
-                ((null == identifierQuoteString) || (identifierQuoteString.trim().length() < 1)) ?
-                "\"" : identifierQuoteString;
+            identifierQuoteString = ((null == identifierQuoteString) || (identifierQuoteString.trim().length() < 1)) ? "\"" : identifierQuoteString;
         }
         catch (SQLException e)
         {
@@ -602,14 +599,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // Log the datastore mapping summary, for each Java type, showing the supported JDBC-types and SQL-types.
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
-            Iterator<Entry<String, DatastoreTypeMappings>> datastoreTypeMappingEntryIter = datastoreTypeMappingsByJavaType.entrySet().iterator();
-            while (datastoreTypeMappingEntryIter.hasNext())
+            Collection<String> javaTypes = new TreeSet<>(datastoreTypeMappingsByJavaType.keySet());
+            for (String javaType : javaTypes)
             {
-                Map.Entry<String, DatastoreTypeMappings> datastoreTypeMappingEntry = datastoreTypeMappingEntryIter.next();
-                DatastoreTypeMappings datastoreTypeMappings = datastoreTypeMappingEntry.getValue();
+                DatastoreTypeMappings datastoreTypeMappings = datastoreTypeMappingsByJavaType.get(javaType);
                 if (NucleusLogger.DATASTORE.isDebugEnabled())
                 {
-                    NucleusLogger.DATASTORE.debug(Localiser.msg("054009", datastoreTypeMappingEntry.getKey(), 
+                    NucleusLogger.DATASTORE.debug(Localiser.msg("054009", javaType, 
                         StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingByJdbcType.keySet()), 
                         StringUtils.collectionToString(datastoreTypeMappings.datastoreMappingBySqlType.keySet()), 
                         datastoreTypeMappings.defaultJdbcType, datastoreTypeMappings.defaultSqlType));
