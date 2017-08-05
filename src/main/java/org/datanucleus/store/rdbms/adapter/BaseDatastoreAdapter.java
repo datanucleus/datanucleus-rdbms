@@ -2015,7 +2015,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param mgr the PluginManager
      * @param clr the ClassLoaderResolver
      */
-    public void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
+    protected void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
     {
         // Load from plugin mechanism
         ConfigurationElement[] elems = mgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastore_mapping", null, null);

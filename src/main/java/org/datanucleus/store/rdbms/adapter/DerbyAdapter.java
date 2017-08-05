@@ -517,19 +517,12 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Load all datastore mappings defined in the associated plugins.
-     * We handle RDBMS datastore mappings so refer to rdbms-mapping-class, jdbc-type, sql-type in particular.
+     * Load all datastore mappings for this RDBMS database.
      * @param mgr the PluginManager
      * @param clr the ClassLoaderResolver
      */
-    public void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
+    protected void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
     {
-        if (datastoreTypeMappingsByJavaType.size() > 0)
-        {
-            // Already loaded
-            return;
-        }
-
         // Load up built-in types for this datastore
         registerDatastoreMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping.class, JDBCType.CHAR, "CHAR", true);
         registerDatastoreMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BooleanRDBMSMapping.class, JDBCType.BOOLEAN, "BOOLEAN", false);

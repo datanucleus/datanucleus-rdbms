@@ -496,14 +496,8 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      * @param mgr the PluginManager
      * @param clr the ClassLoaderResolver
      */
-    public void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
+    protected void loadDatastoreMappings(PluginManager mgr, ClassLoaderResolver clr)
     {
-        if (datastoreTypeMappingsByJavaType.size() > 0)
-        {
-            // Already loaded
-            return;
-        }
-
         // Load up built-in types for this datastore
         registerDatastoreMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BitRDBMSMapping.class, JDBCType.BIT, "BIT", true);
         registerDatastoreMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping.class, JDBCType.CHAR, "CHAR", false);
