@@ -24,6 +24,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -31,12 +32,14 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
@@ -85,6 +88,19 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         // Create index before FK to avoid duplication since H2 automatically creates index for FK
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
+    }
+
+    /**
+     * Initialise the types for this datastore.
+     * @param handler SchemaHandler that we initialise the types for
+     * @param mconn Managed connection to use
+     */
+    public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn)
+    {
+        super.initialiseTypes(handler, mconn);
+
+        SQLTypeInfo sqlType = new H2TypeInfo("UUID", (short)1111, 2147483647, null, null, null, 1, true, (short)3, false, false, false, "UUID", (short)0, (short)0, 0);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.OTHER, sqlType, true);
     }
 
     /**
@@ -458,6 +474,8 @@ public class H2Adapter extends BaseDatastoreAdapter
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping.class, JDBCType.BIGINT, "BIGINT", false);
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping.class, JDBCType.TIME, "TIME", false);
+
+        registerDatastoreMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.OtherRDBMSMapping.class, JDBCType.OTHER, "UUID", false);
 
         registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
         registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);

@@ -37,12 +37,19 @@ public class H2TypeInfo extends SQLTypeInfo
         super(rs);
     }
 
+    public H2TypeInfo(String typeName, short dataType, int precision, String literalPrefix, String literalSuffix, String createParams, 
+            int nullable, boolean caseSensitive, short searchable, boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
+            short minimumScale, short maximumScale, int numPrecRadix)
+    {
+        super(typeName, dataType, precision, literalPrefix, literalSuffix, createParams, nullable, caseSensitive,
+            searchable, unsignedAttribute, fixedPrecScale, autoIncrement, localTypeName, minimumScale, maximumScale, numPrecRadix);
+    }
+
     /**
-     * Utility to check the compatibility of this type with the supplied Column
-     * type.
+     * Utility to check the compatibility of this type with the supplied Column type.
      * @param colInfo The Column type
      * @return Whether they are compatible
-     **/
+     */
     public boolean isCompatibleWith(RDBMSColumnInfo colInfo)
     {
         if (super.isCompatibleWith(colInfo))
@@ -51,8 +58,7 @@ public class H2TypeInfo extends SQLTypeInfo
         }
 
         short colDataType = colInfo.getDataType();
-        if ((dataType == Types.CHAR && colDataType == Types.VARCHAR) ||
-            (dataType == Types.VARCHAR && colDataType == Types.CHAR))
+        if ((dataType == Types.CHAR && colDataType == Types.VARCHAR) || (dataType == Types.VARCHAR && colDataType == Types.CHAR))
         {
             // H2 treats CHAR and VARCHAR the same. At least up to and including Feb 2007
             return true;
