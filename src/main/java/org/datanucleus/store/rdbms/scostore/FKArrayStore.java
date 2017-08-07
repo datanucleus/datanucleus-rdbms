@@ -39,7 +39,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -362,14 +361,14 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     }
                     stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                    stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
                 }
                 for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                 {
                     stmt.append(",");
                     stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                    stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
                 }
                 if (relationDiscriminatorMapping != null)
                 {
@@ -379,7 +378,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                         stmt.append(
                             relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                         stmt.append(" = ");
-                        stmt.append(((AbstractDatastoreMapping) relationDiscriminatorMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getUpdateInputParameter());
                     }
                 }
 

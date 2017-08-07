@@ -32,7 +32,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -325,7 +324,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     }
                     discrimStr.append(".").append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
                     discrimStr.append(" = ");
-                    discrimStr.append(((AbstractDatastoreMapping) elemInfo.getDiscriminatorMapping().getDatastoreMapping(0)).getUpdateInputParameter());
+                    discrimStr.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getUpdateInputParameter());
                 }
             }
             if (discrimStr.length() > 0)
@@ -412,7 +411,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
             }
             stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping) fieldMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -429,7 +428,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     stmt.append(" AND ");
                     stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) m.getDatastoreMapping(j)).getUpdateInputParameter());
+                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
                 }
             }
         }

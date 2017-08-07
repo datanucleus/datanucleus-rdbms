@@ -31,7 +31,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
@@ -231,7 +230,7 @@ public class BackingStoreHelper
     public static int populateKeyInStatement(ExecutionContext ec, PreparedStatement ps, Object key,
             int jdbcPosition, JavaTypeMapping keyMapping)
     {
-        if (!((AbstractDatastoreMapping)keyMapping.getDatastoreMapping(0)).insertValuesOnInsert())
+        if (!keyMapping.getDatastoreMapping(0).insertValuesOnInsert())
         {
             // Dont try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
@@ -253,7 +252,7 @@ public class BackingStoreHelper
     public static int populateValueInStatement(ExecutionContext ec, PreparedStatement ps, Object value,
             int jdbcPosition, JavaTypeMapping valueMapping)
     {
-        if (!((AbstractDatastoreMapping)valueMapping.getDatastoreMapping(0)).insertValuesOnInsert())
+        if (!valueMapping.getDatastoreMapping(0).insertValuesOnInsert())
         {
             // Don't try to insert any mappings with insert parameter that isn't ? (e.g Oracle)
             return jdbcPosition;
@@ -482,7 +481,7 @@ public class BackingStoreHelper
                     {
                         stmt.append("=");
                     }
-                    stmt.append(((AbstractDatastoreMapping) elementMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                    stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
                 }
                 else
                 {
@@ -512,7 +511,7 @@ public class BackingStoreHelper
                 {
                     stmt.append("=");
                 }
-                stmt.append(((AbstractDatastoreMapping) elementMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
     }
@@ -540,7 +539,7 @@ public class BackingStoreHelper
             }
             stmt.append(mapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(((AbstractDatastoreMapping) mapping.getDatastoreMapping(i)).getInsertionInputParameter());
+            stmt.append(mapping.getDatastoreMapping(i).getInsertionInputParameter());
         }
     }
 }

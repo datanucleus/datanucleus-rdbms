@@ -47,7 +47,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -1231,7 +1230,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(((AbstractDatastoreMapping) ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
         if (orderMapping != null)
         {
@@ -1240,7 +1239,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 stmt.append(",");
                 stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
         if (relDiscrimMapping != null)
@@ -1250,7 +1249,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 stmt.append(",");
                 stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping) relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
 
@@ -1382,7 +1381,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping) ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
 
         if (orderMapping != null)
@@ -1392,7 +1391,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 stmt.append(",");
                 stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append(" = ");
-                stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
         if (relDiscrimMapping != null)
@@ -1402,7 +1401,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 stmt.append(",");
                 stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append(" = ");
-                stmt.append(((AbstractDatastoreMapping) relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
 

@@ -54,7 +54,6 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
@@ -588,7 +587,7 @@ public class UpdateRequest extends Request
                         }
                         where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
                         where.append("=");
-                        where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter());
+                        where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
                     }
                     else
                     {
@@ -601,7 +600,7 @@ public class UpdateRequest extends Request
                             }
                             where.append(m.getDatastoreMapping(j).getColumn().getIdentifier());
                             where.append("=");
-                            where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getUpdateInputParameter());
+                            where.append(m.getDatastoreMapping(j).getUpdateInputParameter());
 
                             if (!whereFields.contains(abs_field_num))
                             {
@@ -626,7 +625,7 @@ public class UpdateRequest extends Request
                             parametersIndex[j] = ((Integer)assignedColumns.get(columnId.toString())).intValue();
                         }
 
-                        String param = ((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getUpdateInputParameter();
+                        String param = m.getDatastoreMapping(j).getUpdateInputParameter();
                         if (!columnExists)
                         {
                             if (columnAssignments.length() > 0)
@@ -669,7 +668,7 @@ public class UpdateRequest extends Request
             if (mappingType == MappingType.VERSION)
             {
                 // Surrogate version column
-                String inputParam = ((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter();
+                String inputParam = m.getDatastoreMapping(0).getUpdateInputParameter();
                 if (whereClauseConsumption)
                 {
                     if (where.length() > 0)
@@ -707,7 +706,7 @@ public class UpdateRequest extends Request
                 }
                 where.append(key.getColumns().get(0).getIdentifier());
                 where.append("=");
-                where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter());
+                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex datastoreIdIdx = new StatementMappingIndex(m);
                 datastoreIdIdx.addParameterOccurrence(new int[]{paramIndex++});

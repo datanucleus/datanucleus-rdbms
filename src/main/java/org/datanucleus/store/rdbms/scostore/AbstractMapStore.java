@@ -38,7 +38,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -604,7 +603,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
             }
             stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping)fieldMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -621,7 +620,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
                     stmt.append(" AND ");
                     stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getUpdateInputParameter());
+                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
                 }
             }
         }
@@ -656,7 +655,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
             }
             stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping)fieldMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -673,7 +672,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
                     stmt.append(" AND ");
                     stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getUpdateInputParameter());
+                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
                 }
             }
         }

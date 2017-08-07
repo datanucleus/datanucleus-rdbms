@@ -42,7 +42,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -960,7 +959,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping)ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
         stmt.append(" WHERE ");
         if (keyFieldNumber >= 0)

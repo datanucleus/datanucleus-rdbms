@@ -50,7 +50,6 @@ import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -598,7 +597,7 @@ public class DeleteRequest extends Request
                         }
                         where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
                         where.append("=");
-                        where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter());
+                        where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
                     }
                     else
                     {
@@ -616,7 +615,7 @@ public class DeleteRequest extends Request
                             }
                             where.append(m.getDatastoreMapping(j).getColumn().getIdentifier());
                             where.append("="); 
-                            where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getUpdateInputParameter());
+                            where.append(m.getDatastoreMapping(j).getUpdateInputParameter());
 
                             if (!whereFields.contains(abs_field_num))
                             {
@@ -678,7 +677,7 @@ public class DeleteRequest extends Request
                 }
                 where.append(m.getDatastoreMapping(0).getColumn().getIdentifier().toString());
                 where.append("=");
-                where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter());
+                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(m);
                 mappingStatementIndex.setWhereDatastoreId(datastoreMappingIdx);
@@ -693,7 +692,7 @@ public class DeleteRequest extends Request
                 }
                 where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
                 where.append("=");
-                where.append(((AbstractDatastoreMapping)m.getDatastoreMapping(0)).getUpdateInputParameter());
+                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex versStmtIdx = new StatementMappingIndex(m);
                 mappingStatementIndex.setWhereVersion(versStmtIdx);
@@ -710,7 +709,7 @@ public class DeleteRequest extends Request
                 }
                 where.append(tenantMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
                 where.append("=");
-                where.append(((AbstractDatastoreMapping)tenantMapping.getDatastoreMapping(0)).getUpdateInputParameter());
+                where.append(tenantMapping.getDatastoreMapping(0).getUpdateInputParameter());
 
                 multitenancyStatementMapping = new StatementMappingIndex(tenantMapping);
                 int[] param = { paramIndex++ };

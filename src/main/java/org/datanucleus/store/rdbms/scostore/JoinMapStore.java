@@ -38,7 +38,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -552,26 +551,26 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 stmt.append(",");
             }
-            stmt.append(((AbstractDatastoreMapping)valueMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+            stmt.append(valueMapping.getDatastoreMapping(i).getInsertionInputParameter());
         }
 
         for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(((AbstractDatastoreMapping)ownerMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+            stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
         }
         if (adapterMapping != null)
         {
             for (int i=0; i<adapterMapping.getNumberOfDatastoreMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(((AbstractDatastoreMapping)adapterMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+                stmt.append(adapterMapping.getDatastoreMapping(i).getInsertionInputParameter());
             }
         }
         for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(((AbstractDatastoreMapping)keyMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+            stmt.append(keyMapping.getDatastoreMapping(i).getInsertionInputParameter());
         }
         stmt.append(") ");
 
@@ -602,7 +601,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
             stmt.append(valueMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(((AbstractDatastoreMapping)valueMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(valueMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);

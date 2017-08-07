@@ -43,7 +43,6 @@ import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -1067,7 +1066,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             }
             stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(((AbstractDatastoreMapping)ownerMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
         }
         if (relDiscrimMapping != null)
         {
@@ -1076,7 +1075,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 stmt.append(",");
                 stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping)relDiscrimMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
             }
         }
 

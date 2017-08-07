@@ -125,7 +125,6 @@ import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.JPOXIdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
@@ -3783,7 +3782,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public boolean insertValuesOnInsert(DatastoreMapping datastoreMapping)
     {
-        return ((AbstractDatastoreMapping)datastoreMapping).insertValuesOnInsert();
+        return datastoreMapping.insertValuesOnInsert();
     }
 
     /**

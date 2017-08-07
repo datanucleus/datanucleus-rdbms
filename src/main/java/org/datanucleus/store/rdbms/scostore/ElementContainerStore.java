@@ -36,7 +36,6 @@ import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
@@ -482,26 +481,26 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     {
                         stmt.append(",");
                     }
-                    stmt.append(((AbstractDatastoreMapping) getOwnerMapping().getDatastoreMapping(i)).getInsertionInputParameter());
+                    stmt.append(getOwnerMapping().getDatastoreMapping(i).getInsertionInputParameter());
                 }
 
                 for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
                 {
-                    stmt.append(",").append(((AbstractDatastoreMapping) elementMapping.getDatastoreMapping(0)).getInsertionInputParameter());
+                    stmt.append(",").append(elementMapping.getDatastoreMapping(0).getInsertionInputParameter());
                 }
 
                 if (orderMapping != null)
                 {
                     for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(orderMapping.getDatastoreMapping(0).getInsertionInputParameter());
                     }
                 }
                 if (relationDiscriminatorMapping != null)
                 {
                     for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
                     {
-                        stmt.append(",").append(((AbstractDatastoreMapping) relationDiscriminatorMapping.getDatastoreMapping(0)).getInsertionInputParameter());
+                        stmt.append(",").append(relationDiscriminatorMapping.getDatastoreMapping(0).getInsertionInputParameter());
                     }
                 }
 
@@ -766,7 +765,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                                 discrStmt.append(".");
                                 discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                                 discrStmt.append("=");
-                                discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                                discrStmt.append(discrimMapping.getDatastoreMapping(j).getUpdateInputParameter());
                             }
                         }
                     }
@@ -848,7 +847,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
                                     discrStmt.append(containerAlias).append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
                                     discrStmt.append("=");
-                                    discrStmt.append(((AbstractDatastoreMapping) discrimMapping.getDatastoreMapping(j)).getUpdateInputParameter());
+                                    discrStmt.append(discrimMapping.getDatastoreMapping(j).getUpdateInputParameter());
                                 }
                             }
                         }

@@ -44,7 +44,6 @@ import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
@@ -848,7 +847,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     }
                     stmt.append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) elementMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                    stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
                 }
 
                 stmt.append(" WHERE ");

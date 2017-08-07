@@ -29,7 +29,6 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
@@ -242,13 +241,13 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
                 {
                     stmt.append(",");
                 }
-                stmt.append(((AbstractDatastoreMapping) ownerMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+                stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
             }
 
             for (int i = 0; i < relatedMapping.getNumberOfDatastoreMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(((AbstractDatastoreMapping) relatedMapping.getDatastoreMapping(0)).getInsertionInputParameter());
+                stmt.append(relatedMapping.getDatastoreMapping(0).getInsertionInputParameter());
             }
             stmt.append(") ");
 
@@ -283,7 +282,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
                 }
                 stmt.append(relatedMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(((AbstractDatastoreMapping) ownerMapping.getDatastoreMapping(i)).getInsertionInputParameter());
+                stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
             }
             stmt.append(" WHERE ");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);

@@ -45,6 +45,24 @@ public interface DatastoreMapping
     JavaTypeMapping getJavaTypeMapping();
 
     /**
+     * Accessor for whether this mapping requires values inserting on an INSERT.
+     * @return Whether values are to be inserted into this mapping on an INSERT
+     */
+    boolean insertValuesOnInsert();
+
+    /**
+     * Accessor for the string to put in any retrieval datastore statement for this field. This is typically a ? to be used in JDBC statements.
+     * @return The input parameter
+     */
+    String getInsertionInputParameter();
+
+    /**
+     * Accessor for the string to put in any update datastore statements for this field. This is typically a ? to be used in JDBC statements.
+     * @return The input parameter.
+     */
+    String getUpdateInputParameter();
+
+    /**
      * Accessor for whether the mapping is decimal-based.
      * @return Whether the mapping is decimal based
      */

@@ -56,7 +56,6 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -811,10 +810,10 @@ public class InsertRequest extends Request
                                     columnValues.append(',');
                                 }
                                 columnNames.append(columnId);
-                                columnValues.append(((AbstractDatastoreMapping)m.getDatastoreMapping(j)).getInsertionInputParameter());
+                                columnValues.append(m.getDatastoreMapping(j).getInsertionInputParameter());
                             }
 
-                            if (((AbstractDatastoreMapping)m.getDatastoreMapping(j)).insertValuesOnInsert())
+                            if (m.getDatastoreMapping(j).insertValuesOnInsert())
                             {
                                 // only add fields to be replaced by the real values only if the param value has ?
                                 Integer abs_field_num = Integer.valueOf(mmd.getAbsoluteFieldNumber());
@@ -873,7 +872,7 @@ public class InsertRequest extends Request
                 JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
                 if (versionMapping != null)
                 {
-                    String val = ((AbstractDatastoreMapping)versionMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+                    String val = versionMapping.getDatastoreMapping(0).getUpdateInputParameter();
                     if (columnNames.length() > 0)
                     {
                         columnNames.append(',');
@@ -897,7 +896,7 @@ public class InsertRequest extends Request
                 JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
                 if (discrimMapping != null)
                 {
-                    String val = ((AbstractDatastoreMapping)discrimMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+                    String val = discrimMapping.getDatastoreMapping(0).getUpdateInputParameter();
 
                     if (columnNames.length() > 0)
                     {
@@ -957,7 +956,7 @@ public class InsertRequest extends Request
             {
                 // Multitenancy column
                 JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
-                String val = ((AbstractDatastoreMapping)multitenancyMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+                String val = multitenancyMapping.getDatastoreMapping(0).getUpdateInputParameter();
 
                 if (columnNames.length() > 0)
                 {
@@ -974,7 +973,7 @@ public class InsertRequest extends Request
             {
                 // SoftDelete column
                 JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
-                String val = ((AbstractDatastoreMapping)softDeleteMapping.getDatastoreMapping(0)).getUpdateInputParameter();
+                String val = softDeleteMapping.getDatastoreMapping(0).getUpdateInputParameter();
 
                 if (columnNames.length() > 0)
                 {
@@ -1081,7 +1080,7 @@ public class InsertRequest extends Request
                     columnValues.append(',');
                 }
                 columnNames.append(mapping.getDatastoreMapping(i).getColumn().getIdentifier());
-                columnValues.append(((AbstractDatastoreMapping)mapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                columnValues.append(mapping.getDatastoreMapping(i).getUpdateInputParameter());
                 param[i] = paramIndex++;
             }
             stmtExprIndex[pos].addParameterOccurrence(param);

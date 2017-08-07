@@ -40,7 +40,6 @@ import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
-import org.datanucleus.store.rdbms.mapping.datastore.AbstractDatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.types.scostore.ListStore;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -858,7 +857,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                     }
                     stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(((AbstractDatastoreMapping) orderMapping.getDatastoreMapping(i)).getUpdateInputParameter());
+                    stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
                     stmt.append(" + ");
                     stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
                 }
