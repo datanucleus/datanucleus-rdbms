@@ -101,6 +101,9 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         SQLTypeInfo sqlType = new H2TypeInfo("UUID", (short)1111, 2147483647, null, null, null, 1, true, (short)3, false, false, false, "UUID", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.OTHER, sqlType, true);
+
+        sqlType = new H2TypeInfo("GEOMETRY", (short)1111, 2147483647, null, null, null, 1, true, (short)3, false, false, false, "GEOMETRY", (short)0, (short)0, 0);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.OTHER, sqlType, true);
     }
 
     /**
