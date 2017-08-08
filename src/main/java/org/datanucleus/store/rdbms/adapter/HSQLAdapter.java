@@ -167,6 +167,14 @@ public class HSQLAdapter extends BaseDatastoreAdapter
             "LONGVARCHAR", (short)Types.LONGVARCHAR, 2147483647, "'", "'", null, 1, true, (short)3, false, false, false, "LONGVARCHAR", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARCHAR, sqlType, true);
 
+        if (datastoreMajorVersion >= 2 && datastoreMinorVersion >= 4)
+        {
+            // UUID
+            sqlType = new org.datanucleus.store.rdbms.adapter.HSQLTypeInfo(
+                "UUID", (short)Types.BINARY, 2147483647, "'", "'", null, 1, false, (short)3, false, false, false, "UUID", (short)0, (short)0, 0);
+            addSQLTypeForJDBCType(handler, mconn, (short)Types.BINARY, sqlType, true);
+        }
+
         // Update any types that need extra info relative to the JDBC info
         Collection<SQLTypeInfo> sqlTypes = getSQLTypeInfoForJdbcType(handler, mconn, (short)Types.BLOB);
         if (sqlTypes != null)
@@ -612,6 +620,12 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.VarCharRDBMSMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.TimeRDBMSMapping.class, JDBCType.TIME, "TIME", false);
         registerDatastoreMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BigIntRDBMSMapping.class, JDBCType.BIGINT, "BIGINT", false);
+
+        if (datastoreMajorVersion >= 2 && datastoreMinorVersion >= 4)
+        {
+            // Native UUID supported from v2.4. Seems to need to be specified using stmt.setObject(...), and retrieved using rs.getObject(), so use OTHER
+            registerDatastoreMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.OtherRDBMSMapping.class, JDBCType.OTHER, "UUID", false);
+        }
 
         registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.LongVarBinaryRDBMSMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
         registerDatastoreMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.datastore.BlobRDBMSMapping.class, JDBCType.BLOB, "BLOB", false);
