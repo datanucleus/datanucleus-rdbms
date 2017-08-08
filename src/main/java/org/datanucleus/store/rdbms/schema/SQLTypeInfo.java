@@ -208,8 +208,7 @@ public class SQLTypeInfo implements StoreSchemaData
      */
     public String toString()
     {
-        StringBuilder str = new StringBuilder("SQLTypeInfo : ");
-        str.append("  typeName          = " + getTypeName() + "\n");
+        StringBuilder str = new StringBuilder("SQLTypeInfo : typeName = " + getTypeName() + "\n");
         str.append("  dataType (jdbc)   = " + getDataType() + "\n");
         str.append("  precision         = " + getPrecision() + "\n");
         str.append("  literalPrefix     = " + getLiteralPrefix() + "\n");
@@ -226,6 +225,33 @@ public class SQLTypeInfo implements StoreSchemaData
         str.append("  maximumScale      = " + getMaximumScale() + "\n");
         str.append("  numPrecRadix      = " + getNumPrecRadix() + "\n");
         str.append("  allowsPrecisionSpec = " + isAllowsPrecisionSpec() + "\n");
+        return str.toString();
+    }
+
+    /**
+     * Returns the string representation of this object.
+     * @param indent The indent
+     * @return  string representation of this object.
+     */
+    public String toString(String indent)
+    {
+        StringBuilder str = new StringBuilder(indent).append("SQLTypeInfo : typeName = " + getTypeName() + "\n");
+        str.append(indent).append("  dataType (jdbc)   = " + getDataType() + "\n");
+        str.append(indent).append("  precision         = " + getPrecision() + "\n");
+        str.append(indent).append("  literalPrefix     = " + getLiteralPrefix() + "\n");
+        str.append(indent).append("  literalSuffix     = " + getLiteralSuffix() + "\n");
+        str.append(indent).append("  createParams      = " + getCreateParams() + "\n");
+        str.append(indent).append("  nullable          = " + getNullable() + "\n");
+        str.append(indent).append("  caseSensitive     = " + isCaseSensitive() + "\n");
+        str.append(indent).append("  searchable        = " + getSearchable() + "\n");
+        str.append(indent).append("  unsignedAttribute = " + isUnsignedAttribute() + "\n");
+        str.append(indent).append("  fixedPrecScale    = " + isFixedPrecScale() + "\n");
+        str.append(indent).append("  autoIncrement     = " + isAutoIncrement() + "\n");
+        str.append(indent).append("  localTypeName     = " + getLocalTypeName() + "\n");
+        str.append(indent).append("  minimumScale      = " + getMinimumScale() + "\n");
+        str.append(indent).append("  maximumScale      = " + getMaximumScale() + "\n");
+        str.append(indent).append("  numPrecRadix      = " + getNumPrecRadix() + "\n");
+        str.append(indent).append("  allowsPrecisionSpec = " + isAllowsPrecisionSpec() + "\n");
         return str.toString();
     }
 

@@ -2651,16 +2651,39 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     }
                     catch (NumberFormatException nfe) { }
                     JDBCTypeInfo jdbcType = (JDBCTypeInfo)typesInfo.getChild(jdbcTypeStr);
-                    Collection sqlTypeNames = jdbcType.getChildren().keySet();
+                    Collection<String> sqlTypeNames = jdbcType.getChildren().keySet();
+                    StringBuilder sqlTypesName = new StringBuilder();
+                    String defaultSqlTypeName = null;
+                    for (String sqlTypeName : sqlTypeNames)
+                    {
+                        if (!sqlTypeName.equals("DEFAULT"))
+                        {
+                            if (sqlTypesName.length() > 0)
+                            {
+                                sqlTypesName.append(',');
+                            }
+                            sqlTypesName.append(sqlTypeName);
+                        }
+                        else
+                        {
+                            defaultSqlTypeName = ((SQLTypeInfo)jdbcType.getChild(sqlTypeName)).getTypeName();
+                        }
+                    }
 
                     // SQL type names for JDBC type
-                    String typeStr = "JDBC Type=" + dba.getNameForJDBCType(jdbcTypeNumber) +
-                        " sqlTypes=" + StringUtils.collectionToString(sqlTypeNames);
+                    String typeStr = "JDBC Type=" + dba.getNameForJDBCType(jdbcTypeNumber) + " sqlTypes=" + sqlTypesName + 
+                            (defaultSqlTypeName != null ? (" (default=" + defaultSqlTypeName + ")") : "");
                     ps.println(typeStr);
 
-                    // Default SQL type details
-                    SQLTypeInfo sqlType = (SQLTypeInfo)jdbcType.getChild("DEFAULT");
-                    ps.println(sqlType);
+                    for (String sqlTypeName : sqlTypeNames)
+                    {
+                        // SQL type details
+                        if (!sqlTypeName.equals("DEFAULT"))
+                        {
+                            SQLTypeInfo sqlType = (SQLTypeInfo)jdbcType.getChild(sqlTypeName);
+                            ps.println(sqlType.toString("    "));
+                        }
+                    }
                 }
             }
             ps.println("");
