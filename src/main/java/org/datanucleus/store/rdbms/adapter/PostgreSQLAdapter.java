@@ -136,10 +136,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         SQLTypeInfo sqlType = new PostgreSQLTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
-        sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, "text", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new PostgreSQLTypeInfo("BYTEA", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, null, (short)0, (short)0, 10);
+        sqlType = new PostgreSQLTypeInfo("bytea", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, "bytea", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         // Not present in PSQL 9.2.8 - just mirror what BIT does
@@ -160,7 +160,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     /**
      * Accessor for the vendor id.
      * @return The vendor id.
-     **/
+     */
     public String getVendorID()
     {
         return "postgresql";
@@ -170,10 +170,8 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         SQLTypeInfo info = new PostgreSQLTypeInfo(rs);
 
-        // Since PostgreSQL supports many user defined data types and uses many type aliases the 
-        // default methods have trouble finding the right associations between JDBC and PostgreSQL 
-        // data types.  We filter the returned type info to be sure we use the appropriate base 
-        // PostgreSQL types for the important JDBC types.*/
+        // Since PostgreSQL supports many user defined data types and uses many type aliases the default methods have trouble finding the right associations between 
+        // JDBC and PostgreSQL data types.  We filter the returned type info to be sure we use the appropriate base PostgreSQL types for the important JDBC types.
         if (psqlTypes == null)
         {
             psqlTypes = new ConcurrentHashMap<>();
@@ -199,12 +197,9 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             psqlTypes.put("" + Types.ARRAY, "VARCHAR(255) ARRAY");
             psqlTypes.put("" + Types.ARRAY, "INT ARRAY");
 
-            // PostgreSQL provides 2 types for "char" mappings - "char" and "bpchar". PostgreSQL recommend
-            // bpchar for default usage, but sadly you cannot say "bpchar(200)" in an SQL statement. Due to
-            // this we use "char" since you can say "char(100)" (and internally in PostgreSQL it becomes bpchar)
-            // PostgreSQL 8.1 JDBC driver somehow puts "char" as Types.OTHER rather than Types.CHAR ! so this is
-            // faked in createTypeInfo() above.
-
+            // PostgreSQL provides 2 types for "char" mappings: "char", "bpchar"; PostgreSQL recommend bpchar for default usage, but sadly you cannot say "bpchar(200)" in an SQL statement. 
+            // Due to this we use "char" since you can say "char(100)" (and internally in PostgreSQL it becomes bpchar).
+            // PostgreSQL 8.1 JDBC driver somehow puts "char" as Types.OTHER rather than Types.CHAR ! so this is faked in createTypeInfo() above.
             // PostgreSQL (7.3, 7.4) doesn't provide a SQL type to map to JDBC types FLOAT, DECIMAL, BLOB, BOOLEAN
         }
         Object obj = psqlTypes.get("" + info.getDataType());
@@ -243,16 +238,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             info.setDataType((short)Types.LONGVARBINARY);
         }
 
-        /*
-         * The PostgreSQL drivers sometimes produce some truly funky metadata.
-         * I saw these next two occur during unit testing when
-         * decimal_widget.big_decimal_field reported a columnSize of 65535 and
-         * a decimalDigits of 65534, instead of the correct answers of 18 and 2.
-         *
-         * A -1 for either of these will cause their validation to be bypassed,
-         * which is a shame but it's all we can do.  No one should be surprised
-         * if we end up needing more of these.
-         */
+        // The PostgreSQL drivers sometimes produce some truly funky metadata. 
+        // Observed these next two occur during unit testing when decimal_widget.big_decimal_field reported a columnSize of 65535 and a decimalDigits of 65534, 
+        // instead of the correct answers of 18 and 2. A -1 for either of these will cause their validation to be bypassed, which is a shame but it's all we can do.
+        // No one should be surprised if we end up needing more of these.
         int columnSize = info.getColumnSize();
         if (columnSize > PostgreSQLTypeInfo.MAX_PRECISION)
         {
@@ -360,10 +349,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      * PostgreSQL has supported the DROP TABLE tbl-name CASCADE since 7.3.
      * @param table The table to drop.
      * @return The statement for dropping a table.
-     **/
+     */
     public String getDropTableStatement(Table table)
     {
-        /* DROP TABLE t CASCADE is supported beginning in 7.3 */
+        // DROP TABLE {table} CASCADE is supported beginning in 7.3
         if (datastoreMajorVersion < 7 || (datastoreMajorVersion == 7 && datastoreMinorVersion < 3))
         {
             return "DROP TABLE " + table.toString();
@@ -392,7 +381,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      * @param table Table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
-     **/
+     */
     public String getAutoIncrementStmt(Table table, String columnName)
     {
         StringBuilder stmt=new StringBuilder("SELECT currval('");
@@ -428,7 +417,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
-     **/
+     */
     public String getAutoIncrementKeyword()
     {
         return "SERIAL";

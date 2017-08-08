@@ -44,13 +44,13 @@ public class PostgreSQLTypeInfo extends SQLTypeInfo
         // The best I can think to do for now is make sure it has a decent value for those types where I know JPOX cares, namely VARCHAR and NUMERIC.
         if (typeName.equalsIgnoreCase("varchar") || typeName.equalsIgnoreCase("char"))
         {
-            // VARCHAR gets an arbitrary maximum precision assigned to it. Requests fo anything larger than this will be converted to LONGVARCHAR (i.e. TEXT) in StringMapping.
+            // VARCHAR gets an arbitrary maximum precision assigned to it. Requests for anything larger than this will be converted to LONGVARCHAR (i.e. TEXT) in StringMapping.
+            // What should the upper limit on CHAR be really ? JDBC driver returns "9" !
             precision = MAX_PRECISION;
-            // Question : What should the upper limit on CHAR be really ? JDBC driver returns "9" !
         }
         else if (typeName.equalsIgnoreCase("numeric"))
         {
-            precision = 64;    // pulled from thin air
+            precision = 64; // pulled from thin air
         }
         else if (typeName.equalsIgnoreCase("text"))
         {
@@ -73,9 +73,8 @@ public class PostgreSQLTypeInfo extends SQLTypeInfo
         }
     }
 
-    public PostgreSQLTypeInfo(String typeName, short dataType, int precision, String literalPrefix,
-            String literalSuffix, String createParams, int nullable, boolean caseSensitive, short searchable,
-            boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
+    public PostgreSQLTypeInfo(String typeName, short dataType, int precision, String literalPrefix, String literalSuffix, String createParams, 
+            int nullable, boolean caseSensitive, short searchable, boolean unsignedAttribute, boolean fixedPrecScale, boolean autoIncrement, String localTypeName,
             short minimumScale, short maximumScale, int numPrecRadix)
     {
         super(typeName, dataType, precision, literalPrefix, literalSuffix, createParams, nullable, caseSensitive,
@@ -87,7 +86,7 @@ public class PostgreSQLTypeInfo extends SQLTypeInfo
      * Utility to check the compatibility of this type with the supplied Column type.
      * @param colInfo The Column type
      * @return Whether they are compatible
-     **/
+     */
     public boolean isCompatibleWith(RDBMSColumnInfo colInfo)
     {
         if (super.isCompatibleWith(colInfo))
@@ -96,16 +95,14 @@ public class PostgreSQLTypeInfo extends SQLTypeInfo
         }
 
         short colDataType = colInfo.getDataType();
-        if ((dataType == Types.CLOB && colDataType == Types.LONGVARCHAR) ||
-            (dataType == Types.LONGVARCHAR && colDataType == Types.CLOB))
+        if ((dataType == Types.CLOB && colDataType == Types.LONGVARCHAR) || (dataType == Types.LONGVARCHAR && colDataType == Types.CLOB))
         {
-            // Provide CLOB since Postgresql JDBC is too lazy to.
+            // Provide CLOB when Postgresql JDBC is too lazy to.
             return true;
         }
-        if ((dataType == Types.BLOB && colDataType == Types.LONGVARBINARY) ||
-            (dataType == Types.LONGVARBINARY && colDataType == Types.BLOB))
+        if ((dataType == Types.BLOB && colDataType == Types.LONGVARBINARY) || (dataType == Types.LONGVARBINARY && colDataType == Types.BLOB))
         {
-            // Provide BLOB since Postgresql JDBC is too lazy to.
+            // Provide BLOB when Postgresql JDBC is too lazy to.
             return true;
         }
 
