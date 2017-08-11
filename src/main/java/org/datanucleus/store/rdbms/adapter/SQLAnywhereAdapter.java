@@ -117,25 +117,38 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
                 {
                     String originalUserKeywords = rs.getString(2).trim().toUpperCase();
                     StringTokenizer tokens = new StringTokenizer(originalUserKeywords, ",");
-                    Set<String> userReservedWordSet = new HashSet();
+                    Set<String> userReservedWordSet = new HashSet<>();
                     while (tokens.hasMoreTokens())
                     {
                         userReservedWordSet.add(tokens.nextToken().trim().toUpperCase());
                     }
+
                     // If LIMIT isn't enabled by the customized database keywords, set it to enable LIMIT
                     if (!userReservedWordSet.contains("LIMIT"))
                     {
                         userReservedWordSet.add("LIMIT");
-                        conn.createStatement().executeUpdate("SET OPTION PUBLIC.reserved_keywords = 'LIMIT" +
-                                (originalUserKeywords.length() != 0 ? "," : "") + originalUserKeywords + "'");
+                        Statement setOptionStmt = null;
+                        try
+                        {
+                            setOptionStmt = conn.createStatement();
+                            setOptionStmt.executeUpdate("SET OPTION PUBLIC.reserved_keywords = 'LIMIT" +
+                                    (originalUserKeywords.length() != 0 ? "," : "") + originalUserKeywords + "'");
+                        }
+                        finally
+                        {
+                            if (setOptionStmt != null)
+                            {
+                                setOptionStmt.close();
+                            }
+                        }
                     }
+
                     reservedKeywords.addAll(userReservedWordSet);
                     // Allow the user to override and remove keywords for compatibility, if necessary
                 }
                 else if (rs.getString(1).toLowerCase().equals("non_keywords"))
                 {
-                    reservedKeywords.removeAll(
-                        StringUtils.convertCommaSeparatedStringToSet(rs.getString(2).trim().toUpperCase()));
+                    reservedKeywords.removeAll(StringUtils.convertCommaSeparatedStringToSet(rs.getString(2).trim().toUpperCase()));
                 }
             }
             rs.close();
@@ -606,6 +619,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         {
             stmt.append(" NO CACHE");
         }
+
         // default to NO CYCLE
         return stmt.toString();
     }
