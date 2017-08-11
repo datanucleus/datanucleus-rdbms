@@ -77,7 +77,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
             // TODO Localise this message
             throw new NucleusDataStoreException("PostgreSQL version is " + datastoreMajorVersion + '.' + datastoreMinorVersion + ", 7.0 or later required");
         }
-        else if (datastoreMajorVersion == 7 && datastoreMinorVersion <= 2)
+        if (datastoreMajorVersion == 7 && datastoreMinorVersion <= 2)
         {
             // The driver correctly reports the max table name length as 32.
             // However, constraint names are apparently limited to 31.  In this case we get better looking names by simply treating them all as limited to 31.
@@ -98,7 +98,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
         supportedOptions.remove(DISTINCT_WITH_SELECT_FOR_UPDATE);
         supportedOptions.remove(PERSIST_OF_UNASSIGNED_CHAR);
-        if (datastoreMajorVersion < 7 || (datastoreMajorVersion == 7 && datastoreMinorVersion < 2))
+        if ((datastoreMajorVersion == 7 && datastoreMinorVersion < 2))
         {
             supportedOptions.remove(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         }

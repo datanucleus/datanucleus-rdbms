@@ -208,7 +208,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 }
             }
         }
-        else if (userIdentifierCase == CASE_PRESERVE)
+        else
         {
             if (dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE) ||
                 dba.supportsOption(DatastoreAdapter.IDENTIFIERS_MIXEDCASE_SENSITIVE))
@@ -248,11 +248,6 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                     throw new NucleusUserException(Localiser.msg("039002", "MIXEDCASE")).setFatal();
                 }
             }
-        }
-        else
-        {
-            // Case not supported
-            throw new NucleusUserException(Localiser.msg("039000", userIdentifierCase)).setFatal();
         }
 
         // Save the default catalog/schema - in a valid case (may be user input)

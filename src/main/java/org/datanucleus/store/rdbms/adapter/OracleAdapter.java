@@ -146,7 +146,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
         {
             reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_9_RESERVED_WORDS));
         }
-        else if (datastoreMajorVersion >= 10)
+        else
         {
             reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_10_RESERVED_WORDS));
         }
