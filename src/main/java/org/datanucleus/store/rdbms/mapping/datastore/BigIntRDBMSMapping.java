@@ -199,8 +199,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else if (value instanceof String)
                 {
-                    // User requested to store a String as an INTEGER! Why would anyone do that?
-                    ps.setLong(param, Long.parseLong((String) value));
+                    ps.setLong(param, Long.parseLong((String)value));
                 }
                 else if (value instanceof java.util.Date)
                 {

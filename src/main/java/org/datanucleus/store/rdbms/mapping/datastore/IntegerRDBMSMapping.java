@@ -201,8 +201,7 @@ public class IntegerRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null &&
-                    !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue().toString()))
                 {
                     ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
                 }
@@ -215,16 +214,15 @@ public class IntegerRDBMSMapping extends AbstractDatastoreMapping
             {
                 if (value instanceof Character)
                 {
-                    String s = value.toString();
-                    ps.setInt(param, s.charAt(0));                  
+                    ps.setInt(param, (Character)value);
                 }
                 else if (value instanceof String)
                 {
-                    ps.setInt(param, Integer.valueOf((String)value));                  
+                    ps.setInt(param, Integer.parseInt((String)value));
                 }
                 else if (value instanceof Long)
                 {
-                    ps.setLong(param,((Long)value).longValue());                  
+                    ps.setLong(param, (Long)value);
                 }
                 else
                 {
