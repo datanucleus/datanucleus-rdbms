@@ -216,12 +216,11 @@ public class IntegerRDBMSMapping extends AbstractDatastoreMapping
                 if (value instanceof Character)
                 {
                     String s = value.toString();
-                    ps.setInt(param,s.charAt(0));                  
+                    ps.setInt(param, s.charAt(0));                  
                 }
                 else if (value instanceof String)
                 {
-                    String s = (String)value;
-                    ps.setInt(param,s.charAt(0));                  
+                    ps.setInt(param, Integer.valueOf((String)value));                  
                 }
                 else if (value instanceof Long)
                 {
