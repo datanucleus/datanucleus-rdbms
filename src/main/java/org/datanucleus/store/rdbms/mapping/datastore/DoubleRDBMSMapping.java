@@ -239,6 +239,10 @@ public class DoubleRDBMSMapping extends AbstractDatastoreMapping
             {
                 ps.setDouble(param, ((BigDecimal)value).doubleValue());
             }
+            else if (value instanceof String)
+            {
+                ps.setDouble(param, Double.parseDouble((String)value));
+            }
             else
             {
                 ps.setDouble(param, ((Double)value).doubleValue());

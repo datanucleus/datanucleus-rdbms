@@ -349,6 +349,10 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
                 {
                     ps.setShort(param, ((Long)value).shortValue());
                 }
+                else if (value instanceof String)
+                {
+                    ps.setShort(param, Short.parseShort((String)value));
+                }
                 else
                 {
                     throw new NucleusException("SmallIntRDBMSMapping.setObject called for " + 

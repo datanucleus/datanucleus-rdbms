@@ -125,6 +125,10 @@ public class FloatRDBMSMapping extends DoubleRDBMSMapping
             {
                 ps.setDouble(param, ((Double) value).doubleValue());
             }
+            else if (value instanceof String)
+            {
+                ps.setFloat(param, Float.parseFloat((String)value));
+            }
             else
             {
                 ps.setFloat(param, ((Number) value).floatValue());

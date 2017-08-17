@@ -284,6 +284,10 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
                 {
                     ps.setInt(param, ((BigInteger)value).shortValue());
                 }
+                else if (value instanceof String)
+                {
+                    ps.setInt(param, Integer.parseInt((String)value));
+                }
                 else if (value instanceof Boolean)
                 {
                     ps.setInt(param, ((Boolean)value) ? 1 : 0);
