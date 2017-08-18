@@ -853,7 +853,7 @@ public class MappingManagerImpl implements MappingManager
             while (superClass!=null && !superClass.getName().equals(ClassNameConstants.Object) && (mcd == null || mcd.mappingClass == null))
             {
                 Class[] interfaces = superClass.getInterfaces();
-                for( int i=0; i<interfaces.length && (mcd == null || mcd.mappingClass == null); i++)
+                for (int i=0; i<interfaces.length && (mcd == null || mcd.mappingClass == null); i++)
                 {
                     mcd = getDefaultJavaTypeMapping(interfaces[i], colmds);
                 }
@@ -861,8 +861,18 @@ public class MappingManagerImpl implements MappingManager
             }
             if (mcd == null)
             {
-                //TODO if serialised == false, should we raise an exception?
-                // Treat as serialised
+                if (!serialised)
+                {
+                    TypeConverter converter = storeMgr.getNucleusContext().getTypeManager().getAutoApplyTypeConverterForType(javaType);
+                    if (converter != null)
+                    {
+                        // Fall back to the auto-apply converter for this member type
+                        return new MappingConverterDetails(TypeConverterMapping.class, converter);
+                    }
+                }
+
+                // Treat as serialised TODO If !serialised should we throw an exception?
+                NucleusLogger.PERSISTENCE.warn("Trying to find mapping for type " + javaType.getName() + " but none found, and only serialised available! Falling back to SerialisedMapping");
                 return new MappingConverterDetails(SerialisedMapping.class);
             }
         }
