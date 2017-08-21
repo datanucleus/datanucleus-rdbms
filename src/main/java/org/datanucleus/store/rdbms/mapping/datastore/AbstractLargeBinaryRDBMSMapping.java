@@ -18,7 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.datastore;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,8 +44,7 @@ import org.datanucleus.util.TypeConversionHelper;
  * Mapping of a large binary (e.g BLOB, LONGVARBINARY) RDBMS type.
  * A large binary column can be treated in two ways in terms of storage and retrieval.
  * <ul>
- * <li>Serialise the field into the large binary using ObjectOutputStream, and deserialise
- * it back using ObjectInputStream - i.e Java serialisation</li>
+ * <li>Serialise the field into the large binary using ObjectOutputStream, and deserialise it back using ObjectInputStream - i.e Java serialisation</li>
  * <li>Store the field using a byte[] stream, and retrieve it in the same way.</li>
  * </ul>
  */
@@ -211,7 +209,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
                 else if (value instanceof java.awt.image.BufferedImage)
                 {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
-                    ImageIO.write((BufferedImage) value, "jpg", baos);
+                    ImageIO.write((java.awt.image.BufferedImage) value, "jpg", baos);
                     byte[] buffer = baos.toByteArray();
                     baos.close();
                     ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
@@ -334,12 +332,11 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         {
             return TypeConversionHelper.getBigIntegerArrayFromByteArray(bytes);
         }
-        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals(java.util.BitSet.class.getName()))
+        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals("java.util.BitSet"))
         {
             return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
         }
-        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName()
-                .equals(java.awt.image.BufferedImage.class.getName()))
+        else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals("java.awt.image.BufferedImage"))
         {
             try
             {
@@ -412,7 +409,6 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
      */
     public String getString(ResultSet resultSet, int exprIndex)
     {
-        Object obj = getObject(resultSet, exprIndex);
-        return (String) obj;
+        return (String)getObject(resultSet, exprIndex);
     }
 }
