@@ -3009,6 +3009,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected Object processLiteral(Literal expr)
     {
+        // TODO If the literal value is of a type with a default converter then need to convert here
         SQLExpression sqlExpr = getSQLLiteralForLiteralValue(expr.getLiteral());
         stack.push(sqlExpr);
         return sqlExpr;
