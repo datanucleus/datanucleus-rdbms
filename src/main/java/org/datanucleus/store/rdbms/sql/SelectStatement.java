@@ -1143,13 +1143,13 @@ public class SelectStatement extends SQLStatement
     protected void addOrderComponent(SQLText orderST, String orderString, SQLExpression orderExpr, boolean orderDirection, NullOrderingType orderNullDirective, DatastoreAdapter dba)
     {
         String orderParam = dba.getOrderString(rdbmsMgr, orderString, orderExpr);
+
         if (orderNullDirective != null)
         {
             if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_DIRECTIVES))
             {
                 // Apply "NULLS [FIRST | LAST]" directly since supported by this datastore
-                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
-                orderST.append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " NULLS FIRST" : " NULLS LAST");
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " NULLS FIRST" : " NULLS LAST");
             }
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_CASE_NULL))
             {
@@ -1170,32 +1170,34 @@ public class SelectStatement extends SQLStatement
 						}
 					}
 				}
-                orderST.append("(CASE WHEN " + caseWhenOrderParam + " IS NULL THEN 1 ELSE 0 END)").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " DESC" : " ASC");
-                orderST.append(", " + orderParam).append(orderDirection ? " DESC" : " ASC");
+                orderST.append("(CASE WHEN " + caseWhenOrderParam + " IS NULL THEN 1 ELSE 0 END)").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " DESC" : " ASC").append(",");
+
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
             }
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_COLUMN_IS_NULL))
             {
-                if (orderNullDirective == NullOrderingType.NULLS_LAST && orderExpr.getSQLTable() != null)
+                if (orderExpr.getSQLTable() != null)
                 {
-                    // Datastore requires nulls last using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
-                    orderST.append(orderParam).append(" IS NULL,");
+                    // Datastore requires nulls ordering using "{col} IS NULL" extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                    orderST.append(orderParam).append(" IS NULL").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " DESC" : " ASC").append(",");
                 }
-                orderST.append(orderParam);
-                orderST.append(orderDirection ? " DESC" : "");
+
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
             }
             else if (dba.supportsOption(DatastoreAdapter.ORDERBY_NULLS_USING_ISNULL))
             {
-                if (orderNullDirective == NullOrderingType.NULLS_LAST && orderExpr.getSQLTable() != null)
+                if (orderExpr.getSQLTable() != null)
                 {
-                    // Datastore requires nulls last using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
-                    orderST.append("ISNULL(").append(orderParam).append("),");
+                    // Datastore requires nulls ordering using ISNULL extra ordering clause. Note : don't do this when the ordering component is not a simple column
+                    orderST.append("ISNULL(").append(orderParam).append(")").append(orderNullDirective == NullOrderingType.NULLS_FIRST ? " DESC" : " ASC").append(",");
                 }
-                orderST.append(orderParam);
-                orderST.append(orderDirection ? " DESC" : "");
+
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
             }
             else
             {
                 NucleusLogger.DATASTORE_RETRIEVE.warn("Query contains NULLS directive yet this datastore doesn't provide any support for handling this. Nulls directive will be ignored");
+                orderST.append(orderParam).append(orderDirection ? " DESC" : "");
             }
         }
         else
