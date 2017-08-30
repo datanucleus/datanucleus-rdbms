@@ -73,7 +73,7 @@ public class LongVarcharRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setString(param,column.getDefaultValue().toString().trim());
                 }

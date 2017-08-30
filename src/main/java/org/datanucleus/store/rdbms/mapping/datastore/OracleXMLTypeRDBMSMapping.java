@@ -101,7 +101,7 @@ public class OracleXMLTypeRDBMSMapping extends CharRDBMSMapping
         {
             if (value == null)
             {
-                if (column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setString(param, column.getDefaultValue().toString().trim());
                 }

@@ -197,8 +197,7 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055001","int", 
-                "" + value, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055001","int", "" + value, column, e.getMessage()), e);
         }
     }
 
@@ -216,8 +215,7 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("055002","int", 
-                "" + param, column, e.getMessage()), e);
+            throw new NucleusDataStoreException(Localiser.msg("055002","int", "" + param, column, e.getMessage()), e);
         }
 
         return value;
@@ -264,8 +262,7 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null &&
-                    !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (useDefaultWhenNull())
                 {
                     ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
                 }
@@ -294,8 +291,7 @@ public class TinyIntRDBMSMapping extends AbstractDatastoreMapping
                 }
                 else
                 {
-                    throw new NucleusException("TinyIntRDBMSMapping.setObject called for " + 
-                        StringUtils.toJVMIDString(value) + " but not supported");
+                    throw new NucleusException("TinyIntRDBMSMapping.setObject called for " + StringUtils.toJVMIDString(value) + " but not supported");
                 }
                 //TODO bug with SQL SERVER DRIVER. It doesn't accept Byte -128
                 //ps.setByte(param, ((Byte)value).byteValue());

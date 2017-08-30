@@ -308,8 +308,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null &&
-                    !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (useDefaultWhenNull())
                 {
                     ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
                 }

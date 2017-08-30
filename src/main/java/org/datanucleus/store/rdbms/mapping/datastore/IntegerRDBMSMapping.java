@@ -32,7 +32,6 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Mapping of a INTEGER RDBMS type.
@@ -201,7 +200,7 @@ public class IntegerRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (useDefaultWhenNull())
                 {
                     ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
                 }

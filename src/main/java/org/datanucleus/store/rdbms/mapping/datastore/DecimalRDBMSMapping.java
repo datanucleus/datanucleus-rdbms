@@ -226,7 +226,7 @@ public class DecimalRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column!= null && column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
                 }

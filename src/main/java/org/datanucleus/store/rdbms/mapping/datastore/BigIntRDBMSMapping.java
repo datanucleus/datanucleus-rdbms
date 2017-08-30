@@ -32,7 +32,6 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.StringUtils;
 
 /**
  * Mapping of a Big Integer RDBMS type.
@@ -182,7 +181,7 @@ public class BigIntRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null && !StringUtils.isWhitespace(column.getDefaultValue().toString()))
+                if (useDefaultWhenNull())
                 {
                     ps.setLong(param, Long.parseLong(column.getDefaultValue().toString().trim()));
                 }

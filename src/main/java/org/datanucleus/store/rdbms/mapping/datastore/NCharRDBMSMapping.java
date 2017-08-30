@@ -115,7 +115,7 @@ public class NCharRDBMSMapping extends CharRDBMSMapping
             if (value == null)
             {
                 // Null string
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setNString(param,column.getDefaultValue().toString().trim());
                 }

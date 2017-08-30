@@ -83,7 +83,7 @@ public abstract class AbstractLargeBinaryRDBMSMapping extends AbstractDatastoreM
         {
             try
             {
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setBytes(param, column.getDefaultValue().toString().trim().getBytes());
                 }

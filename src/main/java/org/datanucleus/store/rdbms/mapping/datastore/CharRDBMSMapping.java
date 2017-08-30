@@ -213,7 +213,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             if (value == null)
             {
                 // Null string
-                if (column != null && column.isDefaultable() && column.getDefaultValue() != null)
+                if (useDefaultWhenNull())
                 {
                     ps.setString(param, column.getDefaultValue().toString().trim());
                 }

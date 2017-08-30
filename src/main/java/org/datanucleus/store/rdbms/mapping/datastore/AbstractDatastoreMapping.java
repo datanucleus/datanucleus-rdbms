@@ -213,6 +213,18 @@ public abstract class AbstractDatastoreMapping implements DatastoreMapping
         return storeMgr.hashCode() ^ (column == null ? 0 : column.hashCode());
     }
 
+    protected boolean useDefaultWhenNull()
+    {
+        if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_COLUMN_DEFAULT_WHEN_NULL))
+        {
+            if (column != null && column.isDefaultable() && column.getDefaultValue() != null /*&& !StringUtils.isWhitespace(column.getDefaultValue().toString())*/)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Utility to output any error message.
      * @param method The method that failed.
