@@ -209,7 +209,14 @@ public class DoubleRDBMSMapping extends AbstractDatastoreMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getJDBCType());
+                if (useDefaultWhenNull())
+                {
+                    ps.setDouble(param, Double.valueOf(column.getDefaultValue().toString()).doubleValue());
+                }
+                else
+                {
+                    ps.setNull(param, getJDBCType());
+                }
             }
             else if (value instanceof Integer)
             {
