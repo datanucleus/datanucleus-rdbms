@@ -112,6 +112,7 @@ public class ResultClassROF extends AbstractROF
             tmpClass = cls;
         }
         this.resultClass = tmpClass;
+
         this.resultDefinition = resultDefinition;
         this.stmtMappings = null;
         if (resultDefinition != null)
@@ -228,15 +229,7 @@ public class ResultClassROF extends AbstractROF
 
         this.stmtMappings = null;
         this.resultFieldTypes = null;
-        if (resultFieldNames == null)
-        {
-            // We use the size of the array, so just allocate a 0-length array
-            this.resultFieldNames = new String[0];
-        }
-        else
-        {
-            this.resultFieldNames = resultFieldNames;
-        }
+        this.resultFieldNames = (resultFieldNames != null) ? resultFieldNames : new String[0];
     }
 
     /**
@@ -305,10 +298,13 @@ public class ResultClassROF extends AbstractROF
             // No field mapping info, so allocate our results in the ResultSet parameter order.
             try
             {
-                fieldValues = new Object[resultFieldNames.length];
-                for (int i=0; i<fieldValues.length; i++)
+                if (resultFieldNames != null)
                 {
-                    fieldValues[i] = getResultObject(rs, i+1);
+                    fieldValues = new Object[resultFieldNames.length];
+                    for (int i=0; i<fieldValues.length; i++)
+                    {
+                        fieldValues[i] = getResultObject(rs, i+1);
+                    }
                 }
             }
             catch (SQLException sqe)
@@ -379,16 +375,19 @@ public class ResultClassROF extends AbstractROF
                 else
                 {
                     StringBuilder str = new StringBuilder();
-                    for (int i=0;i<stmtMappings.length;i++)
+                    if (stmtMappings != null)
                     {
-                        if (i > 0)
+                        for (StatementMappingIndex stmtMapping : stmtMappings)
                         {
-                            str.append(",");
+                            if (str.length() > 0)
+                            {
+                                str.append(",");
+                            }
+                            Class javaType = stmtMapping.getMapping().getJavaType();
+                            str.append(javaType.getName());
                         }
-                        Class javaType = stmtMappings[i].getMapping().getJavaType();
-                        str.append(javaType.getName());
+                        NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), str.toString()));
                     }
-                    NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), str.toString()));
                 }
             }
 
@@ -449,14 +448,7 @@ public class ResultClassROF extends AbstractROF
                     ctrArgValues[i] = obj;
                 }
 
-                if (ctrArgValues[i] != null)
-                {
-                    ctrArgTypes[i] = ctrArgValues[i].getClass();
-                }
-                else
-                {
-                    ctrArgTypes[i] = null;
-                }
+                ctrArgTypes[i] = (ctrArgValues[i] != null) ? ctrArgValues[i].getClass() : null;
             }
 
             Constructor ctr = ClassUtils.getConstructorWithArguments(newMap.getObjectClass(), ctrArgTypes);
@@ -496,15 +488,15 @@ public class ResultClassROF extends AbstractROF
     private void populateDeclaredFieldsForUserType(Class cls)
     {
         Field[] declaredFields = cls.getDeclaredFields();
-        for (int i=0;i<declaredFields.length;i++)
+        for (Field field : declaredFields)
         {
-            Field field = declaredFields[i];
             if (!field.isSynthetic() && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null && 
                 !field.getName().startsWith(ec.getMetaDataManager().getEnhancedMethodNamePrefix()))
             {
                 throw new NucleusUserException(Localiser.msg("021210", field.getName()));
             }
         }
+
         if (cls.getSuperclass() != null)
         {
             populateDeclaredFieldsForUserType(cls.getSuperclass());
@@ -531,7 +523,6 @@ public class ResultClassROF extends AbstractROF
                 return Boolean.valueOf(rs.getBoolean(i));
             }
         });
-        
         resultSetGetters.put(Byte.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -539,7 +530,6 @@ public class ResultClassROF extends AbstractROF
                 return Byte.valueOf(rs.getByte(i));
             }
         });
-
         resultSetGetters.put(Short.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -547,7 +537,6 @@ public class ResultClassROF extends AbstractROF
                 return Short.valueOf(rs.getShort(i));
             }
         });
-        
         resultSetGetters.put(Integer.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -555,7 +544,6 @@ public class ResultClassROF extends AbstractROF
                 return Integer.valueOf(rs.getInt(i));
             }
         });
-
         resultSetGetters.put(Long.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -563,7 +551,6 @@ public class ResultClassROF extends AbstractROF
                 return Long.valueOf(rs.getLong(i));
             }
         });
-        
         resultSetGetters.put(Float.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -571,7 +558,6 @@ public class ResultClassROF extends AbstractROF
                 return Float.valueOf(rs.getFloat(i));
             }
         });
-        
         resultSetGetters.put(Double.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -579,7 +565,7 @@ public class ResultClassROF extends AbstractROF
                 return Double.valueOf(rs.getDouble(i));
             }
         });
-        
+
         resultSetGetters.put(BigDecimal.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -587,12 +573,11 @@ public class ResultClassROF extends AbstractROF
                 return rs.getBigDecimal(i);
             }
         });
-
-        resultSetGetters.put(byte[].class, new ResultSetGetter()
+        resultSetGetters.put(String.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
             {
-                return rs.getBytes(i);
+                return rs.getString(i);
             }
         });
 
@@ -606,7 +591,6 @@ public class ResultClassROF extends AbstractROF
         resultSetGetters.put(java.sql.Timestamp.class, timestampGetter);
         // also use Timestamp getter for Date, so it also has time of the day e.g. with Oracle
         resultSetGetters.put(java.util.Date.class, timestampGetter);
-
         resultSetGetters.put(java.sql.Date.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -615,14 +599,13 @@ public class ResultClassROF extends AbstractROF
             }
         });
 
-        resultSetGetters.put(String.class, new ResultSetGetter()
+        resultSetGetters.put(byte[].class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
             {
-                return rs.getString(i);
+                return rs.getBytes(i);
             }
         });
-
         resultSetGetters.put(java.io.Reader.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
@@ -630,7 +613,6 @@ public class ResultClassROF extends AbstractROF
                 return rs.getCharacterStream(i);
             }
         });
-
         resultSetGetters.put(java.sql.Array.class, new ResultSetGetter()
         {
             public Object getValue(ResultSet rs, int i) throws SQLException
