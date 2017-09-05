@@ -266,6 +266,17 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         {
             engineType = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_ENGINETYPE);
         }
+        if (datastoreMajorVersion >= 5 ||
+            (datastoreMajorVersion == 4 && datastoreMinorVersion >= 1 && datastoreRevisionVersion >= 2) ||
+            (datastoreMajorVersion == 4 && datastoreMinorVersion == 0 && datastoreRevisionVersion >= 18))
+        {
+            // "ENGINE=" was introduced in 4.1.2 and 4.0.18 (http://dev.mysql.com/doc/refman/4.1/en/create-table.html)
+            createStmt.append(" ENGINE=" + engineType);
+        }
+        else
+        {
+            createStmt.append(" TYPE=" + engineType);
+        }
 
         // Check for specification of the "collation"
         String collation = null;
@@ -277,6 +288,10 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         {
             collation = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_COLLATION);
         }
+        if (collation != null)
+        {
+            createStmt.append(" COLLATE=").append(collation);
+        }
 
         // Check for specification of the "charset"
         String charset = null;
@@ -287,29 +302,6 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         else if (table.getStoreManager().hasProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_CHARACTERSET))
         {
             charset = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_MYSQL_CHARACTERSET);
-        }
-
-        boolean engineKeywordPresent = false;
-        if (datastoreMajorVersion >= 5 ||
-            (datastoreMajorVersion == 4 && datastoreMinorVersion >= 1 && datastoreRevisionVersion >= 2) ||
-            (datastoreMajorVersion == 4 && datastoreMinorVersion == 0 && datastoreRevisionVersion >= 18))
-        {
-            // "ENGINE=" was introduced in 4.1.2 and 4.0.18 (http://dev.mysql.com/doc/refman/4.1/en/create-table.html)
-            engineKeywordPresent = true;
-        }
-
-        if (engineKeywordPresent)
-        {
-            createStmt.append(" ENGINE=" + engineType);
-        }
-        else
-        {
-            createStmt.append(" TYPE=" + engineType);
-        }
-
-        if (collation != null)
-        {
-            createStmt.append(" COLLATE=").append(collation);
         }
         if (charset != null)
         {
