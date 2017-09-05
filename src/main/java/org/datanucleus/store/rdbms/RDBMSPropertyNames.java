@@ -39,8 +39,6 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_RDBMS_PERSIST_EMPTY_STRING_AS_NULL = "datanucleus.rdbms.persistEmptyStringAsNull";
     public static final String PROPERTY_RDBMS_CHECK_EXISTS_TABLES_VIEWS = "datanucleus.rdbms.checkExistTablesOrViews";
     public static final String PROPERTY_RDBMS_SCHEMA_TABLE_NAME = "datanucleus.rdbms.schemaTable.tableName";
-    public static final String PROPERTY_RDBMS_CONNECTION_PROVIDER_NAME = "datanucleus.rdbms.connectionProviderName";
-    public static final String PROPERTY_RDBMS_CONNECTION_PROVIDER_FAIL_ON_ERROR = "datanucleus.rdbms.connectionProviderFailOnError";
     public static final String PROPERTY_RDBMS_DATASTORE_ADAPTER_CLASS_NAME = "datanucleus.rdbms.datastoreAdapterClassName";
     public static final String PROPERTY_RDBMS_OMIT_DATABASEMETADATA_GETCOLUMNS = "datanucleus.rdbms.omitDatabaseMetaDataGetColumns";
     public static final String PROPERTY_RDBMS_ALLOW_COLUMN_REUSE = "datanucleus.rdbms.allowColumnReuse";

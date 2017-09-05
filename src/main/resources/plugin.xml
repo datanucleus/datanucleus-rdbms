@@ -73,8 +73,7 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.persistEmptyStringAsNull" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.checkExistTablesOrViews" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.schemaTable.tableName" datastore="true"/>
-        <persistence-property name="datanucleus.rdbms.connectionProviderName" datastore="true" value="PriorityList"/>
-        <persistence-property name="datanucleus.rdbms.connectionProviderFailOnError" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+
         <persistence-property name="datanucleus.rdbms.datastoreAdapterClassName" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.omitDatabaseMetaDataGetColumns" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.sqlTableNamingStrategy" datastore="true" value="alpha-scheme"/>
