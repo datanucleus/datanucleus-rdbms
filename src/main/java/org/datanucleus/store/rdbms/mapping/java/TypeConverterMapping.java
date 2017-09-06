@@ -49,7 +49,12 @@ public class TypeConverterMapping extends SingleFieldMapping
         converter = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fieldType);
         if (converter == null)
         {
-            throw new NucleusUserException("Unable to find TypeConverter for converting " + fieldType + " to String");
+            // Fallback to any auto-apply converter for this member type
+            converter = storeMgr.getNucleusContext().getTypeManager().getAutoApplyTypeConverterForType(fieldType);
+            if (converter == null)
+            {
+                throw new NucleusUserException("Unable to find TypeConverter for converting " + fieldType);
+            }
         }
 
         super.initialize(storeMgr, type);
