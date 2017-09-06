@@ -1135,11 +1135,11 @@ Contributors:
         <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
         <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
         <sql-method class="java.time.Period" method="getMonths" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod2" datastore="oracle"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod3" datastore="postgresql"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod4" datastore="sqlite"/>
-        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod5" datastore="firebird"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod2" datastore="oracle"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod3" datastore="postgresql"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod4" datastore="sqlite"/>
+        <sql-method class="java.time.Period" method="getDays" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalDayMethod5" datastore="firebird"/>
         <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod"/>
         <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod2" datastore="oracle"/>
         <sql-method class="java.time.Period" method="getYears" evaluator="org.datanucleus.store.rdbms.sql.method.TemporalYearMethod3" datastore="postgresql"/>
