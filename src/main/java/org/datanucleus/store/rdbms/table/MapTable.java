@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
@@ -489,6 +490,16 @@ public class MapTable extends JoinTable implements DatastoreMap
             // Embedded metadata provided for key
             return true;
         }
+
+        if (mmd.getMap() != null)
+        {
+            AbstractClassMetaData keyCmd = mmd.getMap().getKeyClassMetaData(storeMgr.getNucleusContext().getClassLoaderResolver(null));
+            if (keyCmd != null && keyCmd.isEmbeddedOnly())
+            {
+                // Key is persistable and is embedded only, so it is embedded PC
+                return true;
+            }
+        }
         return false;
     }
 
@@ -558,6 +569,16 @@ public class MapTable extends JoinTable implements DatastoreMap
         {
             // Embedded metadata provided for value
             return true;
+        }
+
+        if (mmd.getMap() != null)
+        {
+            AbstractClassMetaData valCmd = mmd.getMap().getValueClassMetaData(storeMgr.getNucleusContext().getClassLoaderResolver(null));
+            if (valCmd != null && valCmd.isEmbeddedOnly())
+            {
+                // Value is persistable and is embedded only, so it is embedded PC
+                return true;
+            }
         }
         return false;
     }

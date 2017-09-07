@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ElementMetaData;
@@ -345,6 +346,17 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             // Embedded metadata provided for element
             return true;
         }
+
+        if (mmd.getCollection() != null)
+        {
+            AbstractClassMetaData elemCmd = mmd.getCollection().getElementClassMetaData(storeMgr.getNucleusContext().getClassLoaderResolver(null));
+            if (elemCmd != null && elemCmd.isEmbeddedOnly())
+            {
+                // Element is persistable and is embedded only, so it is embedded PC
+                return true;
+            }
+        }
+
         return false;
     }
 
