@@ -524,10 +524,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Process all ClassExpression(s) in the FROM, adding joins to the statement as required
             compileComponent = CompilationComponent.FROM;
             Expression[] fromExprs = compilation.getExprFrom();
-            for (int i=0;i<fromExprs.length;i++)
+            for (Expression fromExpr : fromExprs)
             {
-                ClassExpression clsExpr = (ClassExpression)fromExprs[i];
-                compileFromClassExpression(clsExpr);
+                compileFromClassExpression((ClassExpression)fromExpr);
             }
             compileComponent = null;
         }
@@ -1122,9 +1121,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Apply any grouping to the statement
             compileComponent = CompilationComponent.GROUPING;
             Expression[] groupExprs = compilation.getExprGrouping();
-            for (int i = 0; i < groupExprs.length; i++)
+            for (Expression groupExpr : groupExprs)
             {
-                stmt.addGroupingExpression((SQLExpression)groupExprs[i].evaluate(this));
+                stmt.addGroupingExpression((SQLExpression)groupExpr.evaluate(this));
             }
             compileComponent = null;
         }

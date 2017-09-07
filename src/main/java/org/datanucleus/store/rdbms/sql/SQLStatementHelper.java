@@ -339,9 +339,9 @@ public class SQLStatementHelper
 
         int position = 0;
         int[] pkPositions = cmd.getPKMemberPositions();
-        for (int i=0;i<pkPositions.length;i++)
+        for (int pkPosition : pkPositions)
         {
-            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkPositions[i]);
+            AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkPosition);
             Object memberValue = null;
             if (mmd instanceof FieldMetaData)
             {
@@ -636,9 +636,9 @@ public class SQLStatementHelper
         }
 
         ClassLoaderResolver clr = stmt.getRDBMSManager().getNucleusContext().getClassLoaderResolver(null);
-        for (int i=0;i<fieldNumbers.length;i++)
+        for (int fieldNumber : fieldNumbers)
         {
-            AbstractMemberMetaData mmd = sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+            AbstractMemberMetaData mmd = sourceCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             selectMemberOfSourceInStatement(stmt, mappingDefinition, fetchPlan, sourceSqlTbl, mmd, clr, maxFetchDepth, inputJoinType);
         }
 
@@ -826,9 +826,9 @@ public class SQLStatementHelper
                     {
                         // Related table has a discriminator and the field can store other types
                         List discValueList = null;
-                        for (int i=0;i<clsNames.length;i++)
+                        for (String clsName : clsNames)
                         {
-                            List values = getDiscriminatorValuesForMember(clsNames[i], relatedDiscrimMapping, storeMgr, clr);
+                            List values = getDiscriminatorValuesForMember(clsName, relatedDiscrimMapping, storeMgr, clr);
                             if (discValueList == null)
                             {
                                 discValueList = values;
@@ -1077,13 +1077,13 @@ public class SQLStatementHelper
                         int[] pkFields = relatedCmd.getPKMemberPositions();
                         int[] pkCols = new int[m.getNumberOfDatastoreMappings()];
                         int pkColNo = 0;
-                        for (int i=0;i<pkFields.length;i++)
+                        for (int pkField : pkFields)
                         {
-                            StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(pkFields[i]);
+                            StatementMappingIndex pkIdx = subMappingDefinition.getMappingForMemberPosition(pkField);
                             int[] pkColNumbers = pkIdx.getColumnPositions();
-                            for (int j=0;j<pkColNumbers.length;j++)
+                            for (int pkColNumber : pkColNumbers)
                             {
-                                pkCols[pkColNo] = pkColNumbers[j];
+                                pkCols[pkColNo] = pkColNumber;
                                 pkColNo++;
                             }
                         }

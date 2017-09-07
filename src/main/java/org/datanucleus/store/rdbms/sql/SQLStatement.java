@@ -309,11 +309,11 @@ public abstract class SQLStatement
         for (SQLTableGroup grp : tableGroups.values())
         {
             SQLTable[] tbls = grp.getTables();
-            for (int i=0;i<tbls.length;i++)
+            for (SQLTable tbl : tbls)
             {
-                if (tbls[i].getTable() == table)
+                if (tbl.getTable() == table)
                 {
-                    return tbls[i];
+                    return tbl;
                 }
             }
         }
@@ -339,12 +339,12 @@ public abstract class SQLStatement
         {
             return null;
         }
-        SQLTable[] tables = tableGrp.getTables();
-        for (int i=0;i<tables.length;i++)
+        SQLTable[] sqlTbls = tableGrp.getTables();
+        for (SQLTable sqlTbl : sqlTbls)
         {
-            if (tables[i].getTable() == table)
+            if (sqlTbl.getTable() == table)
             {
-                return tables[i];
+                return sqlTbl;
             }
         }
         return null;
@@ -834,9 +834,9 @@ public abstract class SQLStatement
             {
                 SQLExpression discrimExpr = factory.newExpression(this, targetTable, discrimMapping);
                 BooleanExpression discrimCondition = null;
-                for (int i=0;i<discrimValues.length;i++)
+                for (Object discrimValue : discrimValues)
                 {
-                    SQLExpression discrimVal = factory.newLiteral(this, discrimMapping, discrimValues[i]);
+                    SQLExpression discrimVal = factory.newLiteral(this, discrimMapping, discrimValue);
                     BooleanExpression condition = discrimExpr.eq(discrimVal);
                     if (discrimCondition == null)
                     {
