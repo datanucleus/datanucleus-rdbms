@@ -19,6 +19,7 @@ Contributors:
 package org.datanucleus.store.rdbms.table;
 
 import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.ElementMetaData;
@@ -234,6 +235,17 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             // Embedded metadata provided for element
             return true;
         }
+
+        if (mmd.getArray() != null)
+        {
+            AbstractClassMetaData elemCmd = mmd.getArray().getElementClassMetaData(storeMgr.getNucleusContext().getClassLoaderResolver(null));
+            if (elemCmd != null && elemCmd.isEmbeddedOnly())
+            {
+                // Element is persistable and is embedded only, so it is embedded PC
+                return true;
+            }
+        }
+
         return false;
     }
 }
