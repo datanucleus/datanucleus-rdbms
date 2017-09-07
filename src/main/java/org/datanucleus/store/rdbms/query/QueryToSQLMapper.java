@@ -680,9 +680,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 }
 
                                 // Select the FetchPlan members
-                                for (int j=0;j<membersToSelect.length;j++)
+                                for (int memberToSelect : membersToSelect)
                                 {
-                                    AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(membersToSelect[j]);
+                                    AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(memberToSelect);
                                     SQLStatementHelper.selectMemberOfSourceInStatement(stmt, map, fetchPlan, sqlExpr.getSQLTable(), selMmd, clr, 1, null); // TODO Arbitrary penultimate argument
                                 }
 
@@ -700,16 +700,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
 
                                 // Select the FetchPlan members
-                                for (int j=0;j<membersToSelect.length;j++)
+                                for (int memberToSelect : membersToSelect)
                                 {
-                                    AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(j);
+                                    AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(memberToSelect);
                                     JavaTypeMapping selMapping = embMapping.getJavaTypeMapping(selMmd.getName());
                                     if (selMapping.includeInFetchStatement())
                                     {
                                         int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
                                         StatementMappingIndex idx = new StatementMappingIndex(selMapping);
                                         idx.setColumnPositions(cols);
-                                        map.addMappingForMember(membersToSelect[j], idx);
+                                        map.addMappingForMember(memberToSelect, idx);
                                     }
                                 }
 
