@@ -194,11 +194,20 @@ public class DiscriminatorMapping extends SingleFieldMapping
         {
             return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
         }
-        else if (dismd.getStrategy() == DiscriminatorStrategy.ENTITY_NAME)
+        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
         {
+            ColumnMetaData disColmd = dismd.getColumnMetaData();
+            if (disColmd != null && disColmd.getJdbcType() != null)
+            {
+                if (MetaDataUtils.isJdbcTypeNumeric(disColmd.getJdbcType()))
+                {
+                    return new DiscriminatorLongMapping(table, mapMgr.getMapping(Long.class), dismd);
+                }
+                return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
+            }
             return new DiscriminatorStringMapping(table, mapMgr.getMapping(String.class), dismd);
         }
-        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP)
+        else if (dismd.getStrategy() == DiscriminatorStrategy.VALUE_MAP_ENTITY_NAME)
         {
             ColumnMetaData disColmd = dismd.getColumnMetaData();
             if (disColmd != null && disColmd.getJdbcType() != null)
