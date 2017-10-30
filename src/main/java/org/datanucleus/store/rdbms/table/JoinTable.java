@@ -100,17 +100,25 @@ public abstract class JoinTable extends TableImpl
 
     /**
      * Convenience method for whether a PK is required for the join table.
-     * Makes use of the extension "primary-key" (within &lt;join&gt;) to allow turning off PK generation.
+     * Makes use of the extension "primary-key" (within &lt;field&gt; or &lt;join&gt;) to allow turning off PK generation.
      * @return Whether a PK is required
      */
     protected boolean requiresPrimaryKey()
     {
         boolean pkRequired = true;
+        if (mmd.hasExtension("primary-key") && mmd.getValueForExtension("primary-key").equals("false"))
+        {
+            // User has explicitly defined the field owning this join table to have no primary-key
+            return false;
+        }
+
         if (mmd.getJoinMetaData() != null && mmd.getJoinMetaData().hasExtension("primary-key") &&
             mmd.getJoinMetaData().getValueForExtension("primary-key").equalsIgnoreCase("false"))
         {
+            // User has explicitly define the join table to have no primary-key
             pkRequired = false;
         }
+
         return pkRequired;
     }
 
