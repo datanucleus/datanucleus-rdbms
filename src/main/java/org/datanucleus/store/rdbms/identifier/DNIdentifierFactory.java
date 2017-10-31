@@ -90,28 +90,30 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
 
     /**
      * Method to return a Table identifier for the join table of the specified field.
-     * @param fmd Meta data for the field
+     * @param mmd Meta data for the field
      * @return The identifier for the table
      **/
-    public DatastoreIdentifier newTableIdentifier(AbstractMemberMetaData fmd)
+    public DatastoreIdentifier newTableIdentifier(AbstractMemberMetaData mmd)
     {
         String identifierName = null;
         String schemaName = null;
         String catalogName = null;
 
         AbstractMemberMetaData[] relatedMmds = null;
-        if (fmd.getColumnMetaData().length > 0 && fmd.getColumnMetaData()[0].getName() != null)
+        RelationType relType = mmd.getRelationType(clr);
+
+        if (mmd.getColumnMetaData().length > 0 && mmd.getColumnMetaData()[0].getName() != null)
         {
             // Name the table based on the column
-            identifierName = fmd.getColumnMetaData()[0].getName();
+            identifierName = mmd.getColumnMetaData()[0].getName();
         }
-        else if (fmd.hasContainer())
+        else if (relType == RelationType.MANY_TO_ONE_UNI)
         {
             // Check for a specified join table name
-            if (fmd.getTable() != null)
+            if (mmd.getTable() != null)
             {
                 // Join table name specified at this side
-                String specifiedName = fmd.getTable();
+                String specifiedName = mmd.getTable();
                 String[] parts = getIdentifierNamePartsFromName(specifiedName);
                 if (parts != null)
                 {
@@ -121,16 +123,40 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                 }
                 if (catalogName == null)
                 {
-                    catalogName = fmd.getCatalog();
+                    catalogName = mmd.getCatalog();
                 }
                 if (schemaName == null)
                 {
-                    schemaName = fmd.getSchema();
+                    schemaName = mmd.getSchema();
+                }
+            }
+        }
+        else if (mmd.hasContainer())
+        {
+            // Check for a specified join table name
+            if (mmd.getTable() != null)
+            {
+                // Join table name specified at this side
+                String specifiedName = mmd.getTable();
+                String[] parts = getIdentifierNamePartsFromName(specifiedName);
+                if (parts != null)
+                {
+                    catalogName = parts[0];
+                    schemaName = parts[1];
+                    identifierName = parts[2];
+                }
+                if (catalogName == null)
+                {
+                    catalogName = mmd.getCatalog();
+                }
+                if (schemaName == null)
+                {
+                    schemaName = mmd.getSchema();
                 }
             }
             else
             {
-                relatedMmds = fmd.getRelatedMemberMetaData(clr);
+                relatedMmds = mmd.getRelatedMemberMetaData(clr);
                 if (relatedMmds != null && relatedMmds[0].getTable() != null)
                 {
                     // Join table name specified at other side (1-N or M-N)
@@ -144,11 +170,11 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
                     }
                     if (catalogName == null)
                     {
-                        catalogName = fmd.getCatalog();
+                        catalogName = mmd.getCatalog();
                     }
                     if (schemaName == null)
                     {
-                        schemaName = fmd.getSchema();
+                        schemaName = mmd.getSchema();
                     }
                 }
             }
@@ -159,9 +185,9 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
         if (schemaName == null && catalogName == null)
         {
             // Check the <class schema="..." catalog="..." >
-            if (fmd.getParent() instanceof AbstractClassMetaData)
+            if (mmd.getParent() instanceof AbstractClassMetaData)
             {
-                AbstractClassMetaData ownerCmd = (AbstractClassMetaData)fmd.getParent();
+                AbstractClassMetaData ownerCmd = (AbstractClassMetaData)mmd.getParent();
                 if (dba.supportsOption(DatastoreAdapter.CATALOGS_IN_TABLE_DEFINITIONS))
                 {
                     catalogName = ownerCmd.getCatalog();
@@ -199,7 +225,7 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
         {
             // Use this field as the basis for the fallback name (CLASS_FIELD) unless
             // this is a bidirectional and the other side is the owner (has mapped-by) in which case OTHERCLASS_FIELD
-            String fieldNameBasis = fmd.getFullFieldName();
+            String fieldNameBasis = mmd.getFullFieldName();
             if (relatedMmds != null && relatedMmds[0].getMappedBy() != null)
             {
                 // Other field has mapped-by so use that
