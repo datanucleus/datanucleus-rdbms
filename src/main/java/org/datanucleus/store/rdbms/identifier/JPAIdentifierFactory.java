@@ -81,35 +81,10 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
 
         // SCO table for this field
         AbstractMemberMetaData[] relatedMmds = null;
-        RelationType relType = mmd.getRelationType(clr);
         if (mmd.getColumnMetaData().length > 0 && mmd.getColumnMetaData()[0].getName() != null)
         {
             // Name the table based on the column
             identifierName = mmd.getColumnMetaData()[0].getName();
-        }
-        else if (relType == RelationType.MANY_TO_ONE_UNI)
-        {
-            // Check for a specified join table name
-            if (mmd.getTable() != null)
-            {
-                // Join table name specified at this side
-                String specifiedName = mmd.getTable();
-                String[] parts = getIdentifierNamePartsFromName(specifiedName);
-                if (parts != null)
-                {
-                    catalogName = parts[0];
-                    schemaName = parts[1];
-                    identifierName = parts[2];
-                }
-                if (catalogName == null)
-                {
-                    catalogName = mmd.getCatalog();
-                }
-                if (schemaName == null)
-                {
-                    schemaName = mmd.getSchema();
-                }
-            }
         }
         else if (mmd.hasContainer())
         {
@@ -155,6 +130,30 @@ public class JPAIdentifierFactory extends AbstractIdentifierFactory
                     {
                         schemaName = relatedMmds[0].getSchema();
                     }
+                }
+            }
+        }
+        else
+        {
+            // Check for a specified join table name (1-1/N-1 UNI join table case)
+            if (mmd.getTable() != null)
+            {
+                // Join table name specified at this side
+                String specifiedName = mmd.getTable();
+                String[] parts = getIdentifierNamePartsFromName(specifiedName);
+                if (parts != null)
+                {
+                    catalogName = parts[0];
+                    schemaName = parts[1];
+                    identifierName = parts[2];
+                }
+                if (catalogName == null)
+                {
+                    catalogName = mmd.getCatalog();
+                }
+                if (schemaName == null)
+                {
+                    schemaName = mmd.getSchema();
                 }
             }
         }
