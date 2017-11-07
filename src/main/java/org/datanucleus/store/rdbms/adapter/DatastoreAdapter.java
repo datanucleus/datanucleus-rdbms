@@ -400,6 +400,8 @@ public interface DatastoreAdapter
     public static final String OPERATOR_BITWISE_OR = "BitwiseOrOperator";
     public static final String OPERATOR_BITWISE_XOR = "BitwiseXOrOperator";
 
+    public static final String NATIVE_ENUM_TYPE = "NativeEnumType";
+
     /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for

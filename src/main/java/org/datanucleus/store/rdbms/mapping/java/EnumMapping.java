@@ -29,6 +29,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
+import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -73,8 +74,14 @@ public class EnumMapping extends SingleFieldMapping
                 if (mmd.hasExtension(EXTENSION_ENUM_NATIVE) && mmd.getValueForExtension(EXTENSION_ENUM_NATIVE).equals("true"))
                 {
                     // User has marked this member as storing the Enum as a native "enum" when supported by the datastore.
-                    // TODO Add a supported "option" to DatastoreAdapter for whether they support native enums
-                    nativeEnum = true;
+                    if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.NATIVE_ENUM_TYPE))
+                    {
+                        nativeEnum = true;
+                    }
+                    else
+                    {
+                        NucleusLogger.DATASTORE.warn("Member " + mmd.getFullFieldName() + " specified to use native 'enum' handling, but this datastore doesn't support that");
+                    }
                 }
             }
         }

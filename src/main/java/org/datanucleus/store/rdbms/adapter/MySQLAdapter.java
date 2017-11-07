@@ -143,6 +143,8 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(OPERATOR_BITWISE_OR);
         supportedOptions.add(OPERATOR_BITWISE_XOR);
 
+        supportedOptions.add(NATIVE_ENUM_TYPE);
+
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING); // MySQL charsets don't seem to allow this
     }
 
