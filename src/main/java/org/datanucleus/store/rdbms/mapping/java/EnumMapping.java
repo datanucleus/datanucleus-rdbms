@@ -39,12 +39,15 @@ import org.datanucleus.util.TypeConversionHelper;
  */
 public class EnumMapping extends SingleFieldMapping
 {
-    /** Metadata extension key for specifying that the enum column has a CHECK constraint. Set it to "true" to enable. */
+    /** Metadata extension key for specifying that the enum column has a CHECK constraint in the datastore. Set it to "true" to enable. */
     public static final String EXTENSION_CHECK_CONSTRAINT = "enum-check-constraint";
+
+    /** Metadata extension key for specifying that the enum is represented as a native datastore enum (where possible). Set it to "true" to enable. */
+    public static final String EXTENSION_ENUM_NATIVE = "enum-native";
 
     protected String datastoreJavaType = ClassNameConstants.JAVA_LANG_STRING;
 
-    /** Whether we are storing an ENUM using an "enum" in the database (when supported). */
+    /** Whether we are storing an ENUM using an "enum" in the datastore (when supported). */
     protected boolean nativeEnum = false;
 
     /**
@@ -67,7 +70,7 @@ public class EnumMapping extends SingleFieldMapping
             }
             else
             {
-                if (mmd.hasExtension("enum-native") && mmd.getValueForExtension("enum-native").equals("true"))
+                if (mmd.hasExtension(EXTENSION_ENUM_NATIVE) && mmd.getValueForExtension(EXTENSION_ENUM_NATIVE).equals("true"))
                 {
                     // User has marked this member as storing the Enum as a native "enum" when supported by the datastore.
                     // TODO Add a supported "option" to DatastoreAdapter for whether they support native enums
@@ -86,13 +89,11 @@ public class EnumMapping extends SingleFieldMapping
      */
     public Object[] getValidValues(int index)
     {
-        // this block defines check constraints based on the values of enums
         if (mmd != null)
         {
-            if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0 && 
-                mmd.getColumnMetaData()[0].hasExtension(EXTENSION_CHECK_CONSTRAINT) &&
-                mmd.getColumnMetaData()[0].getValueForExtension(EXTENSION_CHECK_CONSTRAINT).equalsIgnoreCase("true"))
+            if (mmd.hasExtension(EXTENSION_CHECK_CONSTRAINT) && mmd.getValueForExtension(EXTENSION_CHECK_CONSTRAINT).equals("true"))
             {
+                // Add CHECK constraint to the column so that we only get the valid enum values
                 try
                 {
                     Enum[] values = (Enum[])mmd.getType().getMethod("values", (Class[])null).invoke((Object)null, (Object[])null);
