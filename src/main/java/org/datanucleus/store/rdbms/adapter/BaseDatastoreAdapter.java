@@ -83,15 +83,12 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Provides methods for adapting SQL language elements to a specific vendor's
- * database.  A database adapter is primarily used to map generic JDBC data
- * types and SQL identifiers to specific types/identifiers suitable for the
- * database in use.
- *
- * <p>Each database adapter corresponds to a particular combination of database,
- * database version, driver, and driver version, as provided by the driver's
- * own metadata.  Database adapters cannot be constructed directly, but must be
- * obtained using the {@link org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory} class.</p>
+ * Provides methods for adapting SQL language elements to a specific vendor's database.  
+ * A database adapter is primarily used to map generic JDBC data types and SQL identifiers to specific types/identifiers suitable for the database in use.
+ * <p>
+ * Each database adapter corresponds to a particular combination of database, database version, driver, and driver version, as provided by the driver's
+ * own metadata.  Database adapters cannot be constructed directly, but must be obtained using the {@link org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory} class.
+ * </p>
  *
  * @see DatastoreAdapterFactory
  * @see java.sql.DatabaseMetaData
@@ -172,11 +169,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         "RETURNED_LENGTH,RETURNED_OCTET_LENGTH,RETURNED_SQLSTATE,ROW_COUNT,SCALE,SCHEMA_NAME,SERIALIZABLE,SERVER_NAME,SUBCLASS_ORIGIN," +
         "TABLE_NAME,TYPE,UNCOMMITTED,UNNAMED";
 
-    protected Map<Integer, String> supportedJdbcTypesById = new HashMap();
-    protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap();
+    protected Map<Integer, String> supportedJdbcTypesById = new HashMap<>();
+    protected Map<Integer, String> unsupportedJdbcTypesById = new HashMap<>();
 
     /** The set of reserved keywords for this datastore. */
-    protected final HashSet<String> reservedKeywords = new HashSet();
+    protected final HashSet<String> reservedKeywords = new HashSet<>();
 
     /** The product name of the underlying datastore. */
     protected String datastoreProductName;
@@ -197,7 +194,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     protected String identifierQuoteString;
 
     /** Supported option names. */
-    protected Collection<String> supportedOptions = new HashSet();
+    protected Collection<String> supportedOptions = new HashSet<>();
 
     /** the JDBC driver name **/
     protected String driverName;
@@ -671,13 +668,16 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     {
         if (props != null)
         {
-            properties = new HashMap<>();
+            if (properties == null)
+            {
+                properties = new HashMap<>();
+            }
+            properties.putAll(props);
         }
-        properties.putAll(props);
     }
 
     /**
-     * Accessor for a property. Null imples not defined
+     * Accessor for a property. Null implies not defined
      * @param name Name of the property
      * @return Its value
      */
@@ -955,7 +955,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Accessor for the maximum foreign keys by table permitted for this datastore.
      * @return Max number of FKs for a table
-     **/
+     */
     public int getMaxForeignKeys()
     {
         // TODO This is arbitrary. Should be relative to the RDBMS in use
@@ -965,7 +965,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * Accessor for the maximum indexes by schema permitted for this datastore.
      * @return Max number of indexes for a table
-     **/
+     */
     public int getMaxIndexes()
     {
         // TODO This is arbitrary. Should be relative to the RDBMS in use
@@ -1100,9 +1100,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
 
     /**
      * The option to specify in "SELECT ... FROM TABLE ... WITH (option)" to lock instances
-     * Null if not supported.
+     * Returns null if not supported.
      * @return The option to specify with "SELECT ... FROM TABLE ... WITH (option)"
-     **/
+     */
     public String getSelectWithLockOption()
     {
         return null;
@@ -1121,7 +1121,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * The function to creates a unique value of type uniqueidentifier.
      * @return The function. e.g. "SELECT NEWID()"
-     **/
+     */
     public String getSelectNewUUIDStmt()
     {
         return null;
@@ -1130,7 +1130,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /**
      * The function to creates a unique value of type uniqueidentifier.
      * @return The function. e.g. "NEWID()"
-     **/
+     */
     public String getNewUUIDFunction()
     {
         return null;
@@ -1500,11 +1500,12 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        DatastoreIdentifier indexIdentifier = factory.newTableIdentifier(idx.getName());
-        return 
-           "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + indexIdentifier.getFullyQualifiedName(true) + 
-           " ON " + idx.getTable().toString() + ' ' +
-           idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
+        // TODO Support full range of CREATE INDEX syntax in subclass XXXAdapter classes rather than using extendedIndexSettings
+        return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + 
+            factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true) + 
+            " ON " + idx.getTable().toString() + ' ' +
+            idx + 
+            (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
     }
 
     /**
@@ -1979,7 +1980,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             if ("java.time.YearMonth".equals(className))
             {
                 if ("getMonthValue".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod.class;
-                else if ("java.time.YearMonth".equals(className) && "getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod.class;
+                else if ("getYear".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod.class;
             }
             if ("java.util.Optional".equals(className))
             {

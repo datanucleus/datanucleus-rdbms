@@ -54,14 +54,10 @@ import org.datanucleus.util.StringUtils;
 public class MySQLAdapter extends BaseDatastoreAdapter
 {
     /**
-     * A string containing the list of MySQL keywords that are not also SQL/92
-     * <i>reserved words</i>, separated by commas.
-     * This list is normally obtained dynamically from the driver using
-     * DatabaseMetaData.getSQLKeywords(), but MySQL drivers are known to return
-     * an incomplete list.
+     * A string containing the list of MySQL keywords that are not also SQL/92 <i>reserved words</i>, separated by commas.
+     * This list is normally obtained dynamically from the driver using DatabaseMetaData.getSQLKeywords(), but MySQL drivers are known to return an incomplete list.
      * <p>
-     * This list was produced based on the reserved word list in the MySQL
-     * Manual (Version 4.0.10-gamma) at http://www.mysql.com/doc/en/Reserved_words.html.
+     * This list was produced based on the reserved word list in the MySQL Manual (Version 4.0.10-gamma) at http://www.mysql.com/doc/en/Reserved_words.html.
      */
     public static final String NONSQL92_RESERVED_WORDS =
         "ANALYZE,AUTO_INCREMENT,BDB,BERKELEYDB,BIGINT,BINARY,BLOB,BTREE," +
@@ -185,18 +181,17 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         short dataType = info.getDataType();
         String typeName = info.getTypeName();
 
-        //This is a fix to an issue in the MySQL JDBC driver 3.1.13
-        //For columns of type BLOB, the driver returns -4 but should return 2004 
+        // Fix to an issue in the MySQL JDBC driver 3.1.13. For columns of type BLOB, the driver returns -4 but should return 2004 
         if (dataType == Types.LONGVARBINARY && typeName.equalsIgnoreCase("mediumblob"))
         {
-            //change it to BLOB, since it is an BLOB
+            //change it to BLOB, since it is a BLOB
             info.setDataType((short)Types.BLOB);
         }
-        //This is a fix to an issue in the MySQL JDBC driver 3.1.13
-        //For columns of type CLOB, the driver returns -1 but should return 2005 
+
+        // Fix to an issue in the MySQL JDBC driver 3.1.13. For columns of type CLOB, the driver returns -1 but should return 2005 
         if (dataType == Types.LONGVARCHAR && typeName.equalsIgnoreCase("mediumtext"))
         {
-            //change it to CLOB, since it is an CLOB
+            //change it to CLOB, since it is a CLOB
             info.setDataType((short)Types.CLOB);
         }
 
@@ -253,7 +248,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      * @param props Properties for controlling the table creation
      * @param factory Identifier factory
      * @return The creation statement 
-     **/
+     */
     public String getCreateTableStatement(TableImpl table, Column[] columns, Properties props, IdentifierFactory factory)  
     {
         StringBuilder createStmt = new StringBuilder(super.getCreateTableStatement(table, columns, props, factory));
