@@ -166,7 +166,7 @@ public class EnumMapping extends SingleFieldMapping
         else if (nativeEnum)
         {
             // TODO Support this
-            throw new NucleusUserException("Do not currently support native enum storage for member=" + mmd.getFullFieldName());
+            throw new NucleusUserException("Do not currently support native enum storage for member=" + (mmd!=null ? mmd.getFullFieldName() : null));
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
@@ -223,7 +223,7 @@ public class EnumMapping extends SingleFieldMapping
         else if (nativeEnum)
         {
             // TODO Support this
-            throw new NucleusUserException("Do not currently support native enum storage for member=" + mmd.getFullFieldName());
+            throw new NucleusUserException("Do not currently support native enum storage for member=" + (mmd!= null ? mmd.getFullFieldName() : null));
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
