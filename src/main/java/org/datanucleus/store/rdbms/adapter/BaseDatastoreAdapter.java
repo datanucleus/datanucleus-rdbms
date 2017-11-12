@@ -1501,6 +1501,71 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
         // TODO Support full range of CREATE INDEX syntax in subclass XXXAdapter classes rather than using extendedIndexSettings
+/**
+Postgresql
+CREATE [UNIQUE] INDEX [CONCURRENTLY] [name] 
+    ON table [USING method]
+    ({column | (expression)} [COLLATE collation] [opclass] [ASC|DESC] [NULLS {FIRST|LAST}] [, ...] )
+    [WITH (storage_parameter = value [, ... ])]
+    [TABLESPACE tablespace ]
+    [WHERE predicate]
+
+
+MySQL
+CREATE [UNIQUE|FULLTEXT|SPATIAL] INDEX index_name
+    [index_type]
+    ON tbl_name (index_col_name,...)
+    [index_option]
+    [algorithm_option | lock_option] ...
+
+index_col_name:
+    col_name [(length)] [ASC | DESC]
+
+index_option:
+    KEY_BLOCK_SIZE [=] value
+  | index_type
+  | WITH PARSER parser_name
+  | COMMENT 'string'
+
+index_type:
+    USING {BTREE | HASH}
+
+algorithm_option:
+    ALGORITHM [=] {DEFAULT|INPLACE|COPY}
+
+lock_option:
+    LOCK [=] {DEFAULT|NONE|SHARED|EXCLUSIVE}
+
+
+H2
+CREATE [UNIQUE] [HASH | SPATIAL] INDEX [IF NOT EXISTS] indexName
+    ON tableName ( indexColumn, ...     )
+
+
+SQLite
+CREATE [UNIQUE] INDEX [IF NOT EXISTS] {schemaName.idxName}
+    ON tableName (indexedColumn, ...)
+    [WHERE whereExpr]
+
+
+SQLServer
+CREATE [UNIQUE] [CLUSTERED | NONCLUSTERED] INDEX index_name   
+    ON <object> (column [ASC|DESC] [ ,...n ])   
+    [ INCLUDE (column_name [ ,...n ] )]  
+    [ WHERE <filter_predicate> ]  
+    [ WITH ( <relational_index_option> [ ,...n ] ) ]  
+    [ ON { partition_scheme_name ( column_name )   
+         | filegroup_name   
+         | default   
+         }  
+    ]  
+
+
+Oracle
+CREATE [UNIQUE] INDEX schema.indexName
+    ON schema.tableName [tableAlias] (column [ASC|DESC], ...)
+*/
+
         return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + 
             factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true) + 
             " ON " + idx.getTable().toString() + ' ' +
