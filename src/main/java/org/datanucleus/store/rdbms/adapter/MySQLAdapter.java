@@ -168,6 +168,25 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         return "mysql";
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.DatabaseAdapter#isReservedKeyword(java.lang.String)
+     */
+    @Override
+    public boolean isReservedKeyword(String word)
+    {
+        if (super.isReservedKeyword(word))
+        {
+            return true;
+        }
+ 
+        // MySQL also allows identifiers with '-' as well as many other unicode characters, but then they need quoting
+        if (word != null && word.indexOf('-') >= 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Method to create a column info for the current row.
      * Overrides the dataType for BLOB/CLOB as necessary
