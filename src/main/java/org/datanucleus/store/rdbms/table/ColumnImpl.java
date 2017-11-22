@@ -89,8 +89,8 @@ public class ColumnImpl implements Column
     /** SQL Type info for the JDBC type being stored in this column */
     protected SQLTypeInfo typeInfo;
 
-    /** Optional constraints to apply to this column in its SQL specification. */
-    protected String constraints;
+    /** CHECK constraints to apply to this column in its SQL specification (optional). */
+    protected String checkConstraints;
 
     /** Operational flags, for nullability, PK, autoinc, etc. */
     protected byte flags;
@@ -114,7 +114,7 @@ public class ColumnImpl implements Column
         this.storedJavaType = javaType;
 
 		typeInfo = null;
-		constraints = null;
+		checkConstraints = null;
 		flags = 0;
 
         setIdentifier(identifier);
@@ -384,41 +384,34 @@ public class ColumnImpl implements Column
         DatastoreAdapter adapter = getStoreManager().getDatastoreAdapter();
 
         // Add type specification.
-        boolean specifyType = true;
-        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() &&
-            !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION))
+        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION))
         {
-            specifyType = false;
+            // Don't add type
         }
-
-        if (specifyType)
+        // TODO Support things like MySQL ENUM where we want to define the type with its options
+        else
         {
             // Parse and append createParams to the typeName if it looks like it's supposed to be appended,
-            // i.e. if it contains parentheses, and the type name itself doesn't. createParams is mighty
-            // ill-defined by the JDBC spec, but attempt to interpret it.
-            if (typeInfo.getCreateParams() != null && typeInfo.getCreateParams().indexOf('(') >= 0 &&
-                typeInfo.getTypeName().indexOf('(') < 0)
+            // i.e. if it contains parentheses, and the type name itself doesn't. createParams is mighty ill-defined by the JDBC spec, but attempt to interpret it.
+            if (typeInfo.getCreateParams() != null && typeInfo.getCreateParams().indexOf('(') >= 0 && typeInfo.getTypeName().indexOf('(') < 0)
             {
                 StringTokenizer toks = new StringTokenizer(typeInfo.getCreateParams());
                 
                 while (toks.hasMoreTokens())
                 {
                     String tok = toks.nextToken();
-                    
                     if (tok.startsWith("[") && tok.endsWith("]"))
                     {
                         // The brackets look like they indicate an optional param so
                         // skip
                         continue;
                     }
-                    
+
                     typeSpec.append(" " + tok);
                 }
             }
 
-            // Add any precision - note that there is no obvious flag in the JDBC typeinfo to
-            // tell us whether the type allows this specification or not, and many JDBC just
-            // return crap anyway. We use the allowsPrecisionSpec flag for this
+            // Add any precision. We use the "allowsPrecisionSpec" flag for this
             StringBuilder precSpec = new StringBuilder();
             int sqlPrecision = getSQLPrecision();
             if (sqlPrecision > 0 && typeInfo.isAllowsPrecisionSpec())
@@ -472,8 +465,7 @@ public class ColumnImpl implements Column
         }
 
         // Nullability
-        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() &&
-            !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_KEYS_NULL_SPECIFICATION))
+        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_KEYS_NULL_SPECIFICATION))
         {
             // Do nothing since the adapter doesn't allow NULL specifications with autoincrement/identity
         }
@@ -481,8 +473,7 @@ public class ColumnImpl implements Column
         {
             if (!isNullable())
             {
-                if (columnMetaData.getDefaultValue() == null ||
-                    adapter.supportsOption(DatastoreAdapter.DEFAULT_KEYWORD_WITH_NOT_NULL_IN_COLUMN_OPTIONS))
+                if (columnMetaData.getDefaultValue() == null || adapter.supportsOption(DatastoreAdapter.DEFAULT_KEYWORD_WITH_NOT_NULL_IN_COLUMN_OPTIONS))
                 {
                     def.append(" NOT NULL");
                 }
@@ -504,10 +495,10 @@ public class ColumnImpl implements Column
             def.append(" ").append(getDefaultDefinition());
         }
 
-        // Constraints checks
-        if (adapter.supportsOption(DatastoreAdapter.CHECK_IN_CREATE_STATEMENTS) && constraints != null)
+        // CHECK Constraints
+        if (adapter.supportsOption(DatastoreAdapter.CHECK_IN_CREATE_STATEMENTS) && checkConstraints != null)
         {
-            def.append(" " + constraints.toString());
+            def.append(" " + checkConstraints.toString());
         }
 
         // Auto Increment
@@ -701,11 +692,11 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setConstraints(java.lang.String)
+     * @see org.datanucleus.store.rdbms.table.Column#setCheckConstraints(java.lang.String)
      */
-    public final Column setConstraints(String constraints)
+    public final Column setCheckConstraints(String constraints)
     {
-        this.constraints = constraints;
+        this.checkConstraints = constraints;
         return this;
     }
 
@@ -917,11 +908,11 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#getConstraints()
+     * @see org.datanucleus.store.rdbms.table.Column#getCheckConstraints()
      */
-    public String getConstraints()
+    public String getCheckConstraints()
     {
-        return constraints;
+        return checkConstraints;
     }
     
     /* (non-Javadoc)

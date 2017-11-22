@@ -431,10 +431,10 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
             StringBuilder checkConstraintStmt = new StringBuilder();
             for (int i = 0; i < columns.length; ++i)
             {
-                if (columns[i].getConstraints() != null)
+                if (columns[i].getCheckConstraints() != null)
                 {
                     checkConstraintStmt.append(",").append(getContinuationString());
-                    checkConstraintStmt.append(indent).append(columns[i].getConstraints());
+                    checkConstraintStmt.append(indent).append(columns[i].getCheckConstraints());
                 }
             }
             if (checkConstraintStmt.length() > 1)

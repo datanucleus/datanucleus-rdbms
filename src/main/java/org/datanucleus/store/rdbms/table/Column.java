@@ -159,16 +159,17 @@ public interface Column extends org.datanucleus.store.schema.table.Column
     void validate(RDBMSColumnInfo ci);
 
     /**
-     * Mutator for the constraints of the column.
+     * Mutator for the CHECK constraints of the column.
      * @param constraints The constraints
      * @return The column with the updated info
      */
-    Column setConstraints(String constraints);
+    Column setCheckConstraints(String constraints);
 
     /**
-     * @return Returns the constraints.
+     * Accessor for CHECK constraints for this column.
+     * @return Returns any CHECK constraints.
      */
-    String getConstraints();
+    String getCheckConstraints();
 
     /**
      * Checks the column definition as a primitive.

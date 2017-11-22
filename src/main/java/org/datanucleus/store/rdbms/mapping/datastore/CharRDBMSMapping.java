@@ -103,8 +103,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                 Object[] validValues = ((SingleFieldMapping) getJavaTypeMapping()).getValidValues(0);
                 if (validValues != null)
                 {
-                    String constraints = getDatastoreAdapter().getCheckConstraintForValues(column.getIdentifier(), validValues, column.isNullable());
-                    column.setConstraints(constraints);
+                    column.setCheckConstraints(getDatastoreAdapter().getCheckConstraintForValues(column.getIdentifier(), validValues, column.isNullable()));
                 }
             }
 
@@ -118,7 +117,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
                     constraints.append(" OR " + column.getIdentifier() + " IS NULL");
                 }
                 constraints.append(')');
-                column.setConstraints(constraints.toString());
+                column.setCheckConstraints(constraints.toString());
             }
 
             // Check on max length of the type against the length we have set

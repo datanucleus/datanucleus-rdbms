@@ -65,9 +65,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
                 Object[] validValues = ((SingleFieldMapping)m).getValidValues(0);
                 if (validValues != null)
                 {
-                    String constraints = storeMgr.getDatastoreAdapter().getCheckConstraintForValues(
-                            column.getIdentifier(), validValues, column.isNullable());
-                    column.setConstraints(constraints);
+                    column.setCheckConstraints(storeMgr.getDatastoreAdapter().getCheckConstraintForValues(column.getIdentifier(), validValues, column.isNullable()));
                 }
             }
 
@@ -80,7 +78,7 @@ public class SmallIntRDBMSMapping extends AbstractDatastoreMapping
                     constraints.append(" OR " + column.getIdentifier() + " IS NULL");
                 }
                 constraints.append(')');
-                column.setConstraints(constraints.toString());
+                column.setCheckConstraints(constraints.toString());
             }
         }
         initTypeInfo();
