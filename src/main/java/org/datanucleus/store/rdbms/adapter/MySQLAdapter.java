@@ -139,7 +139,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(OPERATOR_BITWISE_OR);
         supportedOptions.add(OPERATOR_BITWISE_XOR);
 
-        supportedOptions.add(NATIVE_ENUM_TYPE);
+//        supportedOptions.add(NATIVE_ENUM_TYPE); // There is no point to supporting this since "CHECK IN(...)" is ANSI standard and does the same
 
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING); // MySQL charsets don't seem to allow this
     }

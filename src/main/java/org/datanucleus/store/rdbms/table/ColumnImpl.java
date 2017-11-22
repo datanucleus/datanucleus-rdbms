@@ -86,6 +86,9 @@ public class ColumnImpl implements Column
     /** Java type that this column is storing. (can we just get this from the mapping above ?) */
     protected final String storedJavaType;
 
+    /** Manual override of the type name for this column (optional). */
+    protected String typeName;
+
     /** SQL Type info for the JDBC type being stored in this column */
     protected SQLTypeInfo typeInfo;
 
@@ -200,7 +203,8 @@ public class ColumnImpl implements Column
     @Override
     public Column setTypeName(String type)
     {
-        throw new UnsupportedOperationException("Not supported on this Column");
+        this.typeName = type;
+        return this;
     }
 
     /* (non-Javadoc)
@@ -209,7 +213,7 @@ public class ColumnImpl implements Column
     @Override
     public String getTypeName()
     {
-        return typeInfo.getTypeName();
+        return (typeName != null) ? typeName : typeInfo.getTypeName();
     }
 
     /* (non-Javadoc)
@@ -387,7 +391,11 @@ public class ColumnImpl implements Column
         {
             // Don't add type
         }
-        // TODO Support things like MySQL ENUM where we want to define the type with its options
+        else if (typeName != null)
+        {
+            // Allow for manual override of "type" for things like MySQL ENUM where we want to define the type with its options
+            def.append(" " + typeName);
+        }
         else
         {
             StringBuilder typeSpec = new StringBuilder(typeInfo.getTypeName());
@@ -607,6 +615,7 @@ public class ColumnImpl implements Column
         {
             return;
         }
+
         if (table instanceof TableImpl)
         {
             // Only validate precision/scale/nullability for tables
@@ -960,6 +969,7 @@ public class ColumnImpl implements Column
     {
         ColumnImpl col = (ColumnImpl) colIn;
         col.typeInfo = this.typeInfo;
+        col.typeName = this.typeName;
         col.flags |= this.flags;
         col.flags &= ~PK;
         col.flags &= ~UNIQUE;
