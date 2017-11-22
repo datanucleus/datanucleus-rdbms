@@ -380,10 +380,9 @@ public class ColumnImpl implements Column
             return def.toString();
         }
 
-        StringBuilder typeSpec = new StringBuilder(typeInfo.getTypeName());
         DatastoreAdapter adapter = getStoreManager().getDatastoreAdapter();
 
-        // Add type specification.
+        // Add any type specification.
         if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION))
         {
             // Don't add type
@@ -391,6 +390,8 @@ public class ColumnImpl implements Column
         // TODO Support things like MySQL ENUM where we want to define the type with its options
         else
         {
+            StringBuilder typeSpec = new StringBuilder(typeInfo.getTypeName());
+
             // Parse and append createParams to the typeName if it looks like it's supposed to be appended,
             // i.e. if it contains parentheses, and the type name itself doesn't. createParams is mighty ill-defined by the JDBC spec, but attempt to interpret it.
             if (typeInfo.getCreateParams() != null && typeInfo.getCreateParams().indexOf('(') >= 0 && typeInfo.getTypeName().indexOf('(') < 0)
