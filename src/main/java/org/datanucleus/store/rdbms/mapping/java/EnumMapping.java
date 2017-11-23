@@ -26,7 +26,6 @@ import java.sql.ResultSet;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -43,13 +42,7 @@ public class EnumMapping extends SingleFieldMapping
     /** Metadata extension key for specifying that the enum column has a CHECK constraint in the datastore. Set it to "true" to enable. */
     public static final String EXTENSION_CHECK_CONSTRAINT = "enum-check-constraint";
 
-    /** Metadata extension key for specifying that the enum is represented as a native datastore enum (where possible). Set it to "true" to enable. */
-    public static final String EXTENSION_ENUM_NATIVE = "enum-native";
-
     protected String datastoreJavaType = ClassNameConstants.JAVA_LANG_STRING;
-
-    /** Whether we are storing an ENUM using an "enum" in the datastore (when supported). */
-    protected boolean nativeEnum = false;
 
     /**
      * Initialize this JavaTypeMapping for the given member MetaData and Table owning it.
@@ -69,24 +62,14 @@ public class EnumMapping extends SingleFieldMapping
             {
                 datastoreJavaType = ClassNameConstants.JAVA_LANG_INTEGER;
             }
-            else
-            {
-                if (mmd.hasExtension(EXTENSION_ENUM_NATIVE) && mmd.getValueForExtension(EXTENSION_ENUM_NATIVE).equals("true"))
-                {
-                    // User has marked this member as storing the Enum as a native "enum" when supported by the datastore.
-                    if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.NATIVE_ENUM_TYPE))
-                    {
-                        nativeEnum = true;
-                    }
-                    else
-                    {
-                        NucleusLogger.DATASTORE.warn("Member " + mmd.getFullFieldName() + " specified to use native 'enum' handling, but this datastore doesn't support that");
-                    }
-                }
-            }
         }
 
         super.initialize(mmd, table, clr);
+
+        if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.NATIVE_ENUM_TYPE))
+        {
+            // TODO When this enum is using native handling then get the enum "type" from the enum, and set it on the column as the sqlType.
+        }
     }
 
     /**
@@ -163,11 +146,6 @@ public class EnumMapping extends SingleFieldMapping
         {
             getDatastoreMapping(0).setObject(ps, exprIndex[0], null);
         }
-        else if (nativeEnum)
-        {
-            // TODO Support this
-            throw new NucleusUserException("Do not currently support native enum storage for member=" + (mmd!=null ? mmd.getFullFieldName() : null));
-        }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
             int intVal = 0;
@@ -219,11 +197,6 @@ public class EnumMapping extends SingleFieldMapping
         if (getDatastoreMapping(0).getObject(resultSet, exprIndex[0]) == null)
         {
             return null;
-        }
-        else if (nativeEnum)
-        {
-            // TODO Support this
-            throw new NucleusUserException("Do not currently support native enum storage for member=" + (mmd!= null ? mmd.getFullFieldName() : null));
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
