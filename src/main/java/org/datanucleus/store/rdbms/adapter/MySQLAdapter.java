@@ -27,6 +27,7 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -180,11 +181,20 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         }
  
         // MySQL also allows identifiers with '-' as well as many other unicode characters, but then they need quoting
-        if (word != null && word.indexOf('-') >= 0)
+        // From the mysql 5.7 spec:
+        // Permitted characters in unquoted identifiers: ASCII: [0-9,a-z,A-Z$_] (basic Latin letters, digits 0-9, dollar, underscore)
+        if (word != null && needsQuoting(word))
         {
             return true;
         }
         return false;
+    }
+    
+    private final static Pattern needsQuoting = 
+    		Pattern.compile("[[^0-9]&&[^a-z]&&[^A-Z]&&[^$_]]+"); 
+
+    private static boolean needsQuoting(String columnName) {
+    	 return needsQuoting.matcher(columnName).find();
     }
 
     /**
