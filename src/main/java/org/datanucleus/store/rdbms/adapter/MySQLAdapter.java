@@ -181,20 +181,19 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         }
  
         // MySQL also allows identifiers with '-' as well as many other unicode characters, but then they need quoting
-        // From the mysql 5.7 spec:
-        // Permitted characters in unquoted identifiers: ASCII: [0-9,a-z,A-Z$_] (basic Latin letters, digits 0-9, dollar, underscore)
+        // From the mysql 5.7 documentation: Permitted characters in unquoted identifiers: ASCII: [0-9,a-z,A-Z$_] (basic Latin letters, digits 0-9, dollar, underscore)
         if (word != null && needsQuoting(word))
         {
             return true;
         }
         return false;
     }
-    
-    private final static Pattern needsQuoting = 
-    		Pattern.compile("[[^0-9]&&[^a-z]&&[^A-Z]&&[^$_]]+"); 
 
-    private static boolean needsQuoting(String columnName) {
-    	 return needsQuoting.matcher(columnName).find();
+    private final static Pattern needsQuoting = Pattern.compile("[[^0-9]&&[^a-z]&&[^A-Z]&&[^$_]]+"); 
+
+    private static boolean needsQuoting(String columnName) 
+    {
+        return needsQuoting.matcher(columnName).find();
     }
 
     /**
