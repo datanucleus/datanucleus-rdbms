@@ -26,6 +26,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Plugin for the creation of a C3P0 connection pool.
@@ -41,16 +42,19 @@ public class C3P0ConnectionPoolFactory extends AbstractConnectionPoolFactory
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbDriver = storeMgr.getConnectionDriverName();
-        String dbURL = storeMgr.getConnectionURL();
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, clr);
+        }
 
         // Check the existence of the necessary pooling classes
         ClassUtils.assertClassForJarExistsInClasspath(clr, "com.mchange.v2.c3p0.DataSources", "c3p0.jar");
 
+        String dbURL = storeMgr.getConnectionURL();
         try
         {
             Properties dbProps = getPropertiesForDriver(storeMgr);

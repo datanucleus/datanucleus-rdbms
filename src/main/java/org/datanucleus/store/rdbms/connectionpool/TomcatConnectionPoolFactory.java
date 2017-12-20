@@ -26,6 +26,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Plugin for the creation of a Tomcat JDBC connection pool. Note that all Tomcat JDBC classes are named
@@ -39,12 +40,8 @@ public class TomcatConnectionPoolFactory extends AbstractConnectionPoolFactory
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbURL = storeMgr.getConnectionURL();
-        String dbDriver = storeMgr.getConnectionDriverName();
-        if (dbDriver == null)
-        {
-            dbDriver = ""; // Tomcat JDBC Connection Pool doesn't like null driver class name
-        }
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
+
         String dbUser = storeMgr.getConnectionUserName();
         if (dbUser == null)
         {
@@ -57,15 +54,19 @@ public class TomcatConnectionPoolFactory extends AbstractConnectionPoolFactory
         }
 
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, clr);
+        }
 
         // Check the existence of the necessary pooling classes
         ClassUtils.assertClassForJarExistsInClasspath(clr, "org.apache.tomcat.jdbc.pool.DataSource", "tomcat-jdbc.jar");
 
         org.apache.tomcat.jdbc.pool.PoolProperties config = new org.apache.tomcat.jdbc.pool.PoolProperties();
+        String dbURL = storeMgr.getConnectionURL();
         config.setUrl(dbURL);
-        config.setDriverClassName(dbDriver);
+        config.setDriverClassName(dbDriver != null ? dbDriver : ""); // Tomcat JDBC Connection Pool doesn't like null driver class name
         config.setUsername(dbUser);
         config.setPassword(dbPassword);
         Properties dbProps = getPropertiesForDriver(storeMgr);

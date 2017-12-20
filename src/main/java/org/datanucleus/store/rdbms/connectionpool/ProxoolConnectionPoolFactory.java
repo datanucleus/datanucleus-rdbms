@@ -25,6 +25,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Plugin for the creation of a Proxool connection pool.
@@ -41,20 +42,21 @@ public class ProxoolConnectionPoolFactory extends AbstractConnectionPoolFactory
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbDriver = storeMgr.getConnectionDriverName();
-        String dbURL = storeMgr.getConnectionURL();
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, clr);
+        }
 
         // Check the presence of commons-logging
-        ClassUtils.assertClassForJarExistsInClasspath(clr, 
-            "org.apache.commons.logging.Log", "commons-logging.jar");
-        ClassUtils.assertClassForJarExistsInClasspath(clr, 
-            "org.logicalcobwebs.proxool.ProxoolDriver", "proxool.jar");
+        ClassUtils.assertClassForJarExistsInClasspath(clr, "org.apache.commons.logging.Log", "commons-logging.jar");
+        ClassUtils.assertClassForJarExistsInClasspath(clr, "org.logicalcobwebs.proxool.ProxoolDriver", "proxool.jar");
 
         // Create a Proxool pool with alias "datanucleus{poolNumber}"
+        String dbURL = storeMgr.getConnectionURL();
         String alias = "datanucleus" + poolNumber;
         String poolURL = null;
         try

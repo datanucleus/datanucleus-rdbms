@@ -23,6 +23,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -60,9 +61,9 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
         }
         config.setPassword(dbPassword);
 
-        if (storeMgr.getConnectionDriverName() != null)
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
         {
-            String dbDriver = storeMgr.getConnectionDriverName();
             loadDriver(dbDriver, clr);
             config.setDriverClassName(dbDriver);
         }

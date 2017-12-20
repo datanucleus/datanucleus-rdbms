@@ -25,6 +25,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Plugin for the creation of a DBCP2 connection pool.
@@ -40,12 +41,14 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbDriver = storeMgr.getConnectionDriverName();
-        String dbURL = storeMgr.getConnectionURL();
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, clr);
+        }
 
         // Check the existence of the necessary pooling classes
         ClassUtils.assertClassForJarExistsInClasspath(clr, "org.apache.commons.pool2.ObjectPool", "commons-pool-2.x.jar");
@@ -53,6 +56,7 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
 
         org.apache.commons.dbcp2.PoolingDataSource ds = null;
         org.apache.commons.pool2.impl.GenericObjectPool<org.apache.commons.dbcp2.PoolableConnection> connectionPool;
+        String dbURL = storeMgr.getConnectionURL();
         try
         {
             // Create a factory to be used by the pool to create the connections

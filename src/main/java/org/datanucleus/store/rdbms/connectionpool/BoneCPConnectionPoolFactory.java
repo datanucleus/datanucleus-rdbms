@@ -25,6 +25,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.util.ClassUtils;
+import org.datanucleus.util.StringUtils;
 
 /**
  * ConnectionFactory for BoneCP pools.
@@ -36,8 +37,6 @@ public class BoneCPConnectionPoolFactory extends AbstractConnectionPoolFactory
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbDriver = storeMgr.getConnectionDriverName();
-        String dbURL = storeMgr.getConnectionURL();
         String dbUser = storeMgr.getConnectionUserName();
         if (dbUser == null)
         {
@@ -48,10 +47,14 @@ public class BoneCPConnectionPoolFactory extends AbstractConnectionPoolFactory
         {
             dbPassword = ""; // Some RDBMS (e.g Postgresql) don't like null passwords
         }
+        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
 
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, clr);
+        }
 
         // Check the existence of the necessary pooling classes
         ClassUtils.assertClassForJarExistsInClasspath(clr, "com.jolbox.bonecp.BoneCPDataSource", "bonecp.jar");
@@ -99,7 +102,7 @@ public class BoneCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             }
         }
 
-        ds.setJdbcUrl(dbURL);
+        ds.setJdbcUrl(storeMgr.getConnectionURL());
         ds.setUsername(dbUser);
         ds.setPassword(dbPassword);
 

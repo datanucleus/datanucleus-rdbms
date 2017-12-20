@@ -21,7 +21,6 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.datasource.dbcp2.ConnectionFactory;
@@ -31,6 +30,7 @@ import org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnectionFactory;
 import org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource;
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.ObjectPool;
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.GenericObjectPool;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Plugin for the creation of a DBCP2 connection pool, using repackaged DBCP2 classes.
@@ -44,13 +44,14 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
      */
     public ConnectionPool createConnectionPool(StoreManager storeMgr)
     {
-        String dbDriver = storeMgr.getConnectionDriverName();
-        String dbURL = storeMgr.getConnectionURL();
-
         // Load the database driver
-        ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-        loadDriver(dbDriver, clr);
+        String dbDriver = storeMgr.getConnectionDriverName();
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            loadDriver(dbDriver, storeMgr.getNucleusContext().getClassLoaderResolver(null));
+        }
 
+        String dbURL = storeMgr.getConnectionURL();
         PoolingDataSource ds = null;
         GenericObjectPool<PoolableConnection> connectionPool;
         try
