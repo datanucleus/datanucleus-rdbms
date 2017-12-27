@@ -102,6 +102,10 @@ public class BoneCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             }
         }
 
+        if (!StringUtils.isWhitespace(dbDriver))
+        {
+            ds.setDriverClass(dbDriver);
+        }
         ds.setJdbcUrl(storeMgr.getConnectionURL());
         ds.setUsername(dbUser);
         ds.setPassword(dbPassword);
