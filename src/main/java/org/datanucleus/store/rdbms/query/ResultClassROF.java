@@ -361,14 +361,7 @@ public class ResultClassROF extends AbstractROF
                     Class[] ctr_arg_types = new Class[resultFieldNames.length];
                     for (int i=0;i<resultFieldNames.length;i++)
                     {
-                        if (fieldValues[i] != null)
-                        {
-                            ctr_arg_types[i] = fieldValues[i].getClass();
-                        }
-                        else
-                        {
-                            ctr_arg_types[i] = null;
-                        }
+                        ctr_arg_types[i] = (fieldValues[i] != null) ? fieldValues[i].getClass() : null;
                     }
                     NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
                 }
@@ -454,10 +447,19 @@ public class ResultClassROF extends AbstractROF
             Constructor ctr = ClassUtils.getConstructorWithArguments(newMap.getObjectClass(), ctrArgTypes);
             if (ctr == null)
             {
+                // Unable to work out which constructor to use, so give an informative message
                 StringBuilder str = new StringBuilder(newMap.getObjectClass().getName() + "(");
                 for (int i=0;i<ctrArgTypes.length;i++)
                 {
-                    str.append(ctrArgTypes[i].getName());
+                    if (ctrArgTypes[i] != null)
+                    {
+                        str.append(ctrArgTypes[i].getName());
+                    }
+                    else
+                    {
+                        str.append("(null)");
+                    }
+
                     if (i != ctrArgTypes.length-1)
                     {
                         str.append(',');
