@@ -289,7 +289,7 @@ public class CharRDBMSMapping extends AbstractDatastoreMapping
             }
             else
             {
-                if (column.getJdbcType() == JdbcType.CHAR && getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
+                if (column != null && column.getJdbcType() == JdbcType.CHAR && getDatastoreAdapter().supportsOption(DatastoreAdapter.CHAR_COLUMNS_PADDED_WITH_SPACES))
                 {
                     // String has likely been padded with spaces at the end by the datastore so trim trailing whitespace
                     int numPaddingChars = 0;
