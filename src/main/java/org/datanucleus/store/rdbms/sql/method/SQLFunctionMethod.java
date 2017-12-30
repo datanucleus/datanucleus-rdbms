@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.SQLFunctionMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.ObjectExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -59,8 +60,10 @@ public class SQLFunctionMethod implements SQLMethod
             funcArgs.addAll(args.subList(1, args.size()));
         }
 
-        // Return as ObjectExpression since we don't know the type
-        JavaTypeMapping m = stmt.getSQLExpressionFactory().getMappingForType(Object.class, false);
+        // Return as ObjectExpression with an underlying SQLFunctionMapping
+        JavaTypeMapping m = new SQLFunctionMapping();
+        m.initialize(stmt.getRDBMSManager(), null);
+
         ObjectExpression retExpr = new ObjectExpression(stmt, m, sql, funcArgs);
         return retExpr;
     }

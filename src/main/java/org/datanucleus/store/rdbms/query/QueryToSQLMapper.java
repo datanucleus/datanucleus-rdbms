@@ -4790,6 +4790,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (args != null)
         {
             Class[] ctrArgTypes = new Class[args.size()];
+            boolean[] ctrArgTypeCheck = new boolean[args.size()];
             ctrArgExprs = new ArrayList<>(args.size());
             Iterator iter = args.iterator();
             int i = 0;
@@ -4797,6 +4798,16 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             {
                 Expression argExpr = (Expression)iter.next();
                 SQLExpression sqlExpr = (SQLExpression)evaluate(argExpr);
+                // TODO Cater for "SQL_function" mapping on to ANY type of constructor argument at that position since we don't know the precise type
+                if (argExpr instanceof InvokeExpression && ((InvokeExpression)argExpr).getOperation().equalsIgnoreCase("SQL_function"))
+                {
+                    ctrArgTypeCheck[i] = false;
+                }
+                else
+                {
+                    ctrArgTypeCheck[i] = true;
+                }
+
                 ctrArgExprs.add(sqlExpr);
                 if (sqlExpr instanceof NewObjectExpression)
                 {
@@ -4814,13 +4825,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             // Check that this class has the required constructor
-            Constructor ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes);
+            Constructor ctr = ClassUtils.getConstructorWithArguments(cls, ctrArgTypes, ctrArgTypeCheck);
             if (ctr == null)
             {
                 throw new NucleusUserException(Localiser.msg("021033", className, StringUtils.objectArrayToString(ctrArgTypes)));
             }
         }
 
+        // TODO Retain the selected constructor (above)
         NewObjectExpression newExpr = new NewObjectExpression(stmt, cls, ctrArgExprs);
         stack.push(newExpr);
         return newExpr;
