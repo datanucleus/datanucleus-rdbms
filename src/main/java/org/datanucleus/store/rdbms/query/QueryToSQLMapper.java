@@ -607,14 +607,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
      */
     protected void compileResult(SelectStatement stmt)
     {
+        compileComponent = CompilationComponent.RESULT;
+
+        boolean unionsPresent = stmt.getNumberOfUnions() > 0;
+
         // Select Statement : select any specified result, or the candidate
+        // TODO Cater for more expression types where we have UNIONs and select each UNION separately
         if (compilation.getExprResult() != null)
         {
-            compileComponent = CompilationComponent.RESULT;
-
-            // TODO We use this to process any Case/Dyadic expressions on a per UNION basis in case they require special processing. Could/should do this for other expression types too
-            boolean unionsPresent = stmt.getNumberOfUnions() > 0;
-
             // Select any result expressions
             Expression[] resultExprs = compilation.getExprResult();
             for (int i=0;i<resultExprs.length;i++)
@@ -625,14 +625,27 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     resultAliases = new HashSet<>();
                 }
 
-                if (resultExprs[i] instanceof InvokeExpression)
+                if (resultExprs[i] instanceof InvokeExpression || resultExprs[i] instanceof ParameterExpression || resultExprs[i] instanceof Literal)
                 {
-                    processInvokeExpression((InvokeExpression)resultExprs[i]);
+                    // Process expressions that need no special treatment
+                    if (resultExprs[i] instanceof InvokeExpression)
+                    {
+                        processInvokeExpression((InvokeExpression)resultExprs[i]);
+                    }
+                    else if (resultExprs[i] instanceof ParameterExpression)
+                    {
+                        processParameterExpression((ParameterExpression)resultExprs[i], true); // Second argument : parameters are literals in result
+                    }
+                    else
+                    {
+                        processLiteral((Literal)resultExprs[i]);
+                    }
+
                     SQLExpression sqlExpr = stack.pop();
                     validateExpressionForResult(sqlExpr);
+                    int[] cols = stmt.select(sqlExpr, alias);
 
                     StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    int[] cols = stmt.select(sqlExpr, alias);
                     idx.setColumnPositions(cols);
                     if (alias != null)
                     {
@@ -655,6 +668,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     {
                         processPrimaryExpression(primExpr);
                         SQLExpression sqlExpr = stack.pop();
+                        validateExpressionForResult(sqlExpr);
+
                         if (primExpr.getId().endsWith("#KEY") || primExpr.getId().endsWith("#VALUE"))
                         {
                             // JPQL KEY(map) or VALUE(map), so select FetchPlan fields where persistable
@@ -671,6 +686,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                 if (selectedCmd.getIdentityType() == IdentityType.DATASTORE)
                                 {
                                     int[] cols = stmt.select(sqlExpr.getSQLTable(), selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false), alias);
+
                                     StatementMappingIndex idx = new StatementMappingIndex(selectedTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false));
                                     idx.setColumnPositions(cols);
                                     map.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), idx);
@@ -690,13 +706,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             {
                                 // Method returns embedded object, so select the FetchPlan
                                 EmbeddedMapping embMapping = (EmbeddedMapping)sqlExpr.getJavaTypeMapping();
-                                String selectedType = embMapping.getType();
-                                AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(selectedType, clr);
-                                FetchPlanForClass fpForCmd = fetchPlan.getFetchPlanForClass(selectedCmd);
-                                int[] membersToSelect = fpForCmd.getMemberNumbers();
-                                StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
+                                AbstractClassMetaData selectedCmd = ec.getMetaDataManager().getMetaDataForClass(embMapping.getType(), clr);
 
                                 // Select the FetchPlan members
+                                StatementClassMapping map = new StatementClassMapping(selectedCmd.getFullClassName(), null);
+                                int[] membersToSelect = fetchPlan.getFetchPlanForClass(selectedCmd).getMemberNumbers();
                                 for (int memberToSelect : membersToSelect)
                                 {
                                     AbstractMemberMetaData selMmd = selectedCmd.getMetaDataForManagedMemberAtAbsolutePosition(memberToSelect);
@@ -704,6 +718,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                                     if (selMapping.includeInFetchStatement())
                                     {
                                         int[] cols = stmt.select(sqlExpr.getSQLTable(), selMapping, alias);
+
                                         StatementMappingIndex idx = new StatementMappingIndex(selMapping);
                                         idx.setColumnPositions(cols);
                                         map.addMappingForMember(memberToSelect, idx);
@@ -716,45 +731,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         }
 
                         // TODO If the user selects an alias here that is joined, should maybe respect FetchPlan for that (like above for candidate)
-                        validateExpressionForResult(sqlExpr);
+
+                        int[] cols = null;
                         if (sqlExpr instanceof SQLLiteral)
                         {
-                            StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                            idx.setColumnPositions(stmt.select(sqlExpr, alias));
-                            if (alias != null)
-                            {
-                                resultAliases.add(alias);
-                                idx.setColumnAlias(alias);
-                            }
-                            resultDefinition.addMappingForResultExpression(i, idx);
+                            cols = stmt.select(sqlExpr, alias);
                         }
                         else
                         {
-                            StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                            idx.setColumnPositions(stmt.select(sqlExpr.getSQLTable(), sqlExpr.getJavaTypeMapping(), alias));
-                            if (alias != null)
-                            {
-                                resultAliases.add(alias);
-                                idx.setColumnAlias(alias);
-                            }
-                            resultDefinition.addMappingForResultExpression(i, idx);
+                            cols = stmt.select(sqlExpr.getSQLTable(), sqlExpr.getJavaTypeMapping(), alias);
                         }
-                    }
-                }
-                else if (resultExprs[i] instanceof ParameterExpression)
-                {
-                    processParameterExpression((ParameterExpression)resultExprs[i], true); // Second argument : parameters are literals in result
-                    SQLExpression sqlExpr = stack.pop();
-                    validateExpressionForResult(sqlExpr);
 
-                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
-                    if (alias != null)
-                    {
-                        resultAliases.add(alias);
-                        idx.setColumnAlias(alias);
+                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                        idx.setColumnPositions(cols);
+                        if (alias != null)
+                        {
+                            resultAliases.add(alias);
+                            idx.setColumnAlias(alias);
+                        }
+                        resultDefinition.addMappingForResultExpression(i, idx);
                     }
-                    resultDefinition.addMappingForResultExpression(i, idx);
                 }
                 else if (resultExprs[i] instanceof VariableExpression)
                 {
@@ -769,24 +765,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         sqlExpr = stack.pop();
                         NucleusLogger.QUERY.debug("QueryToSQL.exprResult variable was still unbound, so binding via cross-join");
                     }
+                    int[] cols = stmt.select(sqlExpr, alias);
 
                     StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
-                    if (alias != null)
-                    {
-                        resultAliases.add(alias);
-                        idx.setColumnAlias(alias);
-                    }
-                    resultDefinition.addMappingForResultExpression(i, idx);
-                }
-                else if (resultExprs[i] instanceof Literal)
-                {
-                    processLiteral((Literal)resultExprs[i]);
-                    SQLExpression sqlExpr = stack.pop();
-                    validateExpressionForResult(sqlExpr);
-
-                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                    idx.setColumnPositions(stmt.select(sqlExpr, alias));
+                    idx.setColumnPositions(cols);
                     if (alias != null)
                     {
                         resultAliases.add(alias);
@@ -809,9 +791,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             // TODO If we have a UNIONED primary expression then it would be possible to just select the DN_TYPE from the particular union
                             throw new NucleusException("Result has call to " + typeExpr + " but contained expression has no discriminator. Not supported");
                         }
+                        int[] cols = stmt.select(sqlExpr.getSQLTable(), discrimMapping, null, true);
 
                         StatementMappingIndex idx = new StatementMappingIndex(discrimMapping);
-                        idx.setColumnPositions(stmt.select(sqlExpr.getSQLTable(), discrimMapping, null, true));
+                        idx.setColumnPositions(cols);
                         resultDefinition.addMappingForResultExpression(i, idx);
                     }
                     else
@@ -830,19 +813,26 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 {
                     if (unionsPresent)
                     {
-                        // Process the first union, followed by each union statement, in case they have TYPE/instanceof
+                        // Process the first union separately (in case they have TYPE/instanceof) and then handle remaining UNIONs below
                         stmt.setAllowUnions(false);
-                        resultExprs[i].evaluate(this);
-                        SQLExpression sqlExpr = stack.pop();
-                        int[] cols = stmt.select(sqlExpr, alias);
-                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                        idx.setColumnPositions(cols);
-                        if (alias != null)
-                        {
-                            resultAliases.add(alias);
-                            idx.setColumnAlias(alias);
-                        }
-                        resultDefinition.addMappingForResultExpression(i, idx);
+                    }
+
+                    resultExprs[i].evaluate(this);
+                    SQLExpression sqlExpr = stack.pop();
+                    int[] cols = stmt.select(sqlExpr, alias);
+
+                    StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
+                    idx.setColumnPositions(cols);
+                    if (alias != null)
+                    {
+                        resultAliases.add(alias);
+                        idx.setColumnAlias(alias);
+                    }
+                    resultDefinition.addMappingForResultExpression(i, idx);
+
+                    if (unionsPresent)
+                    {
+                        // Process remaining UNIONs. Assumed that we have the same result mapping as the first UNION otherwise SQL wouldn't work anyway
                         stmt.setAllowUnions(true);
 
                         List<SelectStatement> unionStmts = stmt.getUnions();
@@ -852,27 +842,15 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             this.stmt = unionStmt;
                             unionStmt.setQueryGenerator(this);
                             unionStmt.setAllowUnions(false);
+
                             resultExprs[i].evaluate(this);
                             sqlExpr = stack.pop();
-                            cols = unionStmt.select(sqlExpr, alias);
+                            unionStmt.select(sqlExpr, alias);
+
                             unionStmt.setQueryGenerator(null);
                             unionStmt.setAllowUnions(true);
                         }
                         this.stmt = originalStmt;
-                    }
-                    else
-                    {
-                        resultExprs[i].evaluate(this);
-                        SQLExpression sqlExpr = stack.pop();
-
-                        StatementMappingIndex idx = new StatementMappingIndex(sqlExpr.getJavaTypeMapping());
-                        idx.setColumnPositions(stmt.select(sqlExpr, alias));
-                        if (alias != null)
-                        {
-                            resultAliases.add(alias);
-                            idx.setColumnAlias(alias);
-                        }
-                        resultDefinition.addMappingForResultExpression(i, idx);
                     }
                 }
                 else
@@ -890,7 +868,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         else
         {
             // Select of the candidate (no result)
-            compileComponent = CompilationComponent.RESULT;
             if (candidateCmd.getIdentityType() == IdentityType.NONDURABLE)
             {
                 // Nondurable identity cases have no "id" for later fetching so get all fields now
@@ -914,33 +891,108 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 maxFetchDepth = 3; // TODO Arbitrary
             }
 
-            if (options.contains(OPTION_SELECT_CANDIDATE_ID_ONLY))
+            // Select the relevant fields for the FetchPlan. Cater for cases where we have UNIONed statements, so select on the individual statement
+            // This means that we then cater for a UNION using a different column name than the primary statement
+            if (unionsPresent)
             {
-                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
+                // Process the first union separately (in case they have TYPE/instanceof) and then handle remaining UNIONs below
+                stmt.setAllowUnions(false);
             }
-            else if (parentMapper != null && resultDefinitionForClass == null)
+
+            selectFetchPlanForCandidate(stmt, resultDefinitionForClass, maxFetchDepth);
+
+            if (unionsPresent)
             {
-                // Subquery, with no result specified, so select id only
-                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
-            }
-            else if (stmt.allUnionsForSamePrimaryTable())
-            {
-                // Select fetch-plan members of the candidate (and optionally the next level of sub-objects)
-                // Don't select next level when we are processing a subquery
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
-            }
-            else if (candidateCmd.getInheritanceMetaData() != null && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
-            {
-                // complete-table should have all fields of superclass present in all unions, so try to select fetch plan
-                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
-            }
-            else
-            {
-                // Select identity of the candidates since use different base tables
-                SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultDefinitionForClass, candidateCmd);
+                // Process remaining UNIONs. Assumed that we have the same result mapping as the first UNION otherwise SQL wouldn't work anyway
+                stmt.setAllowUnions(true);
+
+                List<SelectStatement> unionStmts = stmt.getUnions();
+                SelectStatement originalStmt = stmt;
+                for (SelectStatement unionStmt : unionStmts)
+                {
+                    this.stmt = unionStmt;
+                    unionStmt.setQueryGenerator(this);
+                    unionStmt.setAllowUnions(false);
+
+                    StatementClassMapping dummyResClsMapping = new StatementClassMapping(); // We don't want to overwrite anything in the root StatementClassMapping
+                    selectFetchPlanForCandidate(unionStmt, dummyResClsMapping, maxFetchDepth);
+
+                    unionStmt.setQueryGenerator(null);
+                    unionStmt.setAllowUnions(true);
+                }
+                this.stmt = originalStmt;
             }
         }
+
         compileComponent = null;
+    }
+
+    protected void selectFetchPlanForCandidate(SelectStatement stmt, StatementClassMapping resultClassMapping, int maxFetchDepth)
+    {
+        if (options.contains(OPTION_SELECT_CANDIDATE_ID_ONLY))
+        {
+            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultClassMapping, candidateCmd);
+        }
+        else if (parentMapper != null && resultClassMapping == null)
+        {
+            // Subquery, with no result specified, so select id only
+            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultClassMapping, candidateCmd);
+        }
+        else if (stmt.allUnionsForSamePrimaryTable())
+        {
+            // Select fetch-plan members of the candidate (and optionally the next level of sub-objects)
+            // Don't select next level when we are processing a subquery
+            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultClassMapping, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
+        }
+        else if (candidateCmd.getInheritanceMetaData() != null && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
+        {
+            // complete-table should have all fields of superclass present in all unions, so try to select fetch plan
+            SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, resultClassMapping, candidateCmd, fetchPlan, parentMapper == null ? maxFetchDepth : 0);
+        }
+        else
+        {
+            // Select identity of the candidates since use different base tables
+            SQLStatementHelper.selectIdentityOfCandidateInStatement(stmt, resultClassMapping, candidateCmd);
+        }
+    }
+
+    /**
+     * Convenience method to convert a NewObjectExpression into a StatementNewObjectMapping.
+     * Handles recursive new object calls (where a new object is an argument to a new object construction).
+     * @param expr The NewObjectExpression
+     * @param stmt SelectStatement
+     * @return The mapping for the new object
+     */
+    protected StatementNewObjectMapping getStatementMappingForNewObjectExpression(NewObjectExpression expr, SelectStatement stmt)
+    {
+        List<SQLExpression> argExprs = expr.getConstructorArgExpressions();
+        StatementNewObjectMapping stmtMap = new StatementNewObjectMapping(expr.getNewClass());
+        if (argExprs != null)
+        {
+            Iterator<SQLExpression> argIter = argExprs.iterator();
+            int j = 0;
+            while (argIter.hasNext())
+            {
+                SQLExpression argExpr = argIter.next();
+                if (argExpr instanceof SQLLiteral)
+                {
+                    stmtMap.addConstructorArgMapping(j, ((SQLLiteral)argExpr).getValue());
+                }
+                else if (argExpr instanceof NewObjectExpression)
+                {
+                    stmtMap.addConstructorArgMapping(j, getStatementMappingForNewObjectExpression((NewObjectExpression)argExpr, stmt));
+                }
+                else
+                {
+                    StatementMappingIndex idx = new StatementMappingIndex(argExpr.getJavaTypeMapping());
+                    int[] cols = stmt.select(argExpr, null);
+                    idx.setColumnPositions(cols);
+                    stmtMap.addConstructorArgMapping(j, idx);
+                }
+                j++;
+            }
+        }
+        return stmtMap;
     }
 
     /**
@@ -2476,45 +2528,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
             rSqlTbl = lSqlTbl;
         }
-    }
-
-    /**
-     * Convenience method to convert a NewObjectExpression into a StatementNewObjectMapping.
-     * Handles recursive new object calls (where a new object is an arg to a new object construction).
-     * @param expr The NewObjectExpression
-     * @param stmt SelectStatement
-     * @return The mapping for the new object
-     */
-    protected StatementNewObjectMapping getStatementMappingForNewObjectExpression(NewObjectExpression expr, SelectStatement stmt)
-    {
-        List argExprs = expr.getConstructorArgExpressions();
-        StatementNewObjectMapping stmtMap = new StatementNewObjectMapping(expr.getNewClass());
-        if (argExprs != null)
-        {
-            Iterator<SQLExpression> argIter = argExprs.iterator();
-            int j = 0;
-            while (argIter.hasNext())
-            {
-                SQLExpression argExpr = argIter.next();
-                if (argExpr instanceof SQLLiteral)
-                {
-                    stmtMap.addConstructorArgMapping(j, ((SQLLiteral)argExpr).getValue());
-                }
-                else if (argExpr instanceof NewObjectExpression)
-                {
-                    stmtMap.addConstructorArgMapping(j, getStatementMappingForNewObjectExpression((NewObjectExpression)argExpr, stmt));
-                }
-                else
-                {
-                    StatementMappingIndex idx = new StatementMappingIndex(argExpr.getJavaTypeMapping());
-                    int[] cols = stmt.select(argExpr, null);
-                    idx.setColumnPositions(cols);
-                    stmtMap.addConstructorArgMapping(j, idx);
-                }
-                j++;
-            }
-        }
-        return stmtMap;
     }
 
     /* (non-Javadoc)
