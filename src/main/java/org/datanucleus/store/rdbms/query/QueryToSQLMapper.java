@@ -660,9 +660,37 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     if (primExpr.getId().equals(candidateAlias))
                     {
                         // "this", so select fetch plan fields
+                        if (unionsPresent)
+                        {
+                            // Process the first union separately (in case they have TYPE/instanceof) and then handle remaining UNIONs below
+                            stmt.setAllowUnions(false);
+                        }
+
                         StatementClassMapping map = new StatementClassMapping(candidateCmd.getFullClassName(), null);
                         SQLStatementHelper.selectFetchPlanOfCandidateInStatement(stmt, map, candidateCmd, fetchPlan, 1);
                         resultDefinition.addMappingForResultExpression(i, map);
+
+                        if (unionsPresent)
+                        {
+                            // Process remaining UNIONs. Assumed that we have the same result mapping as the first UNION otherwise SQL wouldn't work anyway
+                            stmt.setAllowUnions(true);
+
+                            List<SelectStatement> unionStmts = stmt.getUnions();
+                            SelectStatement originalStmt = stmt;
+                            for (SelectStatement unionStmt : unionStmts)
+                            {
+                                this.stmt = unionStmt;
+                                unionStmt.setQueryGenerator(this);
+                                unionStmt.setAllowUnions(false);
+
+                                StatementClassMapping dummyClsMapping = new StatementClassMapping(candidateCmd.getFullClassName(), null);
+                                SQLStatementHelper.selectFetchPlanOfCandidateInStatement(unionStmt, dummyClsMapping, candidateCmd, fetchPlan, 1);
+
+                                unionStmt.setQueryGenerator(null);
+                                unionStmt.setAllowUnions(true);
+                            }
+                            this.stmt = originalStmt;
+                        }
                     }
                     else
                     {
