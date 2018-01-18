@@ -760,6 +760,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
                         // TODO If the user selects an alias here that is joined, should maybe respect FetchPlan for that (like above for candidate)
 
+                        // TODO Cater for use of UNIONs (e.g "complete-table" inheritance) where mapping is different in other UNION
+                        // The difficulty here is that processPrimaryExpression makes use of the sqlTableByPrimary lookup, which is based on the primary statement, so
+                        // it still doesn't find the right table/mapping for the UNIONed statements.
+
                         int[] cols = null;
                         if (sqlExpr instanceof SQLLiteral)
                         {
