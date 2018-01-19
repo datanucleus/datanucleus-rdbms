@@ -109,7 +109,7 @@ public abstract class SQLStatement
 
     protected boolean requiresJoinReorder = false;
 
-    /** Map of tables referenced in this statement, keyed by their alias. */
+    /** Map of tables referenced in this statement, keyed by their alias. Note that these aliases are in the input case. */
     protected Map<String, SQLTable> tables;
 
     /** Map of table groups keyed by the group name. */
@@ -283,6 +283,7 @@ public abstract class SQLStatement
 
     /**
      * Accessor for the SQLTable object with the specified alias (if defined for this statement).
+     * Note that this alias should be in the same case as what they were defined to the statement as.
      * @param alias Alias
      * @return The SQLTable
      */
