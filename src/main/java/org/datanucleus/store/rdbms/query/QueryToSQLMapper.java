@@ -152,6 +152,7 @@ import java.util.StringTokenizer;
  * applies if the variable is (finally) bound using the equality operator (e.g var.field == this.field).
  * The extension should be set to "LEFTOUTERJOIN", "INNERJOIN"</li>
  * </ul>
+ * 
  * <p>
  * TODO This class currently takes in an SQLStatement and updates it with filter, result, from etc. If the input statement is a UNION of statements
  * it tries to update the statement by applying the filter, result etc across all UNIONs. This can cause problems in some situations, particularly
@@ -224,7 +225,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     /** Stack of expressions, used for compilation of the query into SQL. */
     Deque<SQLExpression> stack;
 
-    /** Map of SQLTable/mapping keyed by the name of the primary that it relates to. */
+    /** Map of SQLTable/mapping keyed by the name of the primary that it relates to. Note that the SQLTableMapping relates to the primary statement (and not to any UNIONs). */
     Map<String, SQLTableMapping> sqlTableByPrimary = new HashMap<>();
 
     /** Aliases defined in the result, populated during compileResult. */
@@ -1414,7 +1415,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                             cmd = mapKey ? mapmd.getKeyClassMetaData(clr) : mapmd.getValueClassMetaData(clr);
 
                             // Find the table forming the Map. This may be a join table, or the key or value depending on the type
-                            sqlTbl = stmt.getTable(rootComponent + "_MAP");
+                            sqlTbl = stmt.getTable(rootComponent + "_MAP"); // TODO Use OPTION_CASE_INSENSITIVE
                             if (sqlTbl == null)
                             {
                                 sqlTbl = stmt.getTable((rootComponent + "_MAP").toUpperCase());
@@ -3432,7 +3433,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (sqlMapping != null && first.equals(candidateAlias) && candidateCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.COMPLETE_TABLE)
             {
                 // Special case of using COMPLETE_TABLE for candidate and picked wrong table
-                SQLTable firstSqlTbl = stmt.getTable(first.toUpperCase());
+                SQLTable firstSqlTbl = stmt.getTable(first.toUpperCase()); // TODO Use OPTION_CASE_INSENSITIVE
                 if (firstSqlTbl != null && firstSqlTbl.getTable() != sqlMapping.table.getTable())
                 {
                     // Cached the SQLTableMapping for one of the other inherited classes, so create our own
@@ -3484,7 +3485,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             if (mapKey)
             {
                 // Cater for all case possibilities of table name/alias
-                SQLTable mapSqlTbl = stmt.getTable(first + "_MAP");
+                SQLTable mapSqlTbl = stmt.getTable(first + "_MAP"); // TODO Use OPTION_CASE_INSENSITIVE
                 if (mapSqlTbl == null)
                 {
                     mapSqlTbl = stmt.getTable((first + "_MAP").toUpperCase());
