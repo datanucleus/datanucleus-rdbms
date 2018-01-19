@@ -1080,7 +1080,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
      * @param connection Connection to the datastore
      * @param catalog Catalog to refresh
      * @param schema Schema to refresh
-     * @param tables Collection of table names (String) to refresh
+     * @param tableNames Collection of table names (String) to refresh
      */
     private void refreshTableData(Object connection, String catalog, String schema, Collection tableNames)
     {
