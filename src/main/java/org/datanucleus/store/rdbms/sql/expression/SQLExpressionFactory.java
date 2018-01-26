@@ -242,6 +242,8 @@ public class SQLExpressionFactory
             org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
 
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.NullMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NullLiteral.class);
+
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectLiteral.class);
