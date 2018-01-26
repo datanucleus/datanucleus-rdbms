@@ -1332,10 +1332,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             if (typesInfo != null && typesInfo.getNumberOfChildren() > 0)
             {
                 StringBuilder typeStr = new StringBuilder();
-                Iterator jdbcTypesIter = typesInfo.getChildren().keySet().iterator();
+                Iterator<String> jdbcTypesIter = typesInfo.getChildren().keySet().iterator();
                 while (jdbcTypesIter.hasNext())
                 {
-                    String jdbcTypeStr = (String)jdbcTypesIter.next();
+                    String jdbcTypeStr = jdbcTypesIter.next();
                     int jdbcTypeNumber = 0;
                     try
                     {

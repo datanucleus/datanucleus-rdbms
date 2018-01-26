@@ -267,7 +267,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
             return true;
         }
         // MSSQL also allows tables with spaces, and these need escaping.
-        if (word != null && word.indexOf(' ') >= 0)
+        if (word.indexOf(' ') >= 0)
         {
             return true;
         }

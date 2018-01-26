@@ -863,18 +863,16 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     /**
-     * Tests if a given string is a SQL keyword.
+     * Tests if a given string is an SQL keyword.
      * <p>
      * The list of key words tested against is defined to contain all SQL/92 keywords, plus any additional 
      * key words reported by the JDBC driver for this adapter via <code>DatabaseMetaData.getSQLKeywords()</code>.
      * <p>
      * In general, use of a SQL key word as an identifier should be avoided.
-     * SQL/92 key words are divided into reserved and non-reserved words. If a reserved word is used as
-     * an identifier it must be quoted with double quotes. Strictly speaking, the same is not true of 
-     * non-reserved words. However, as C.J. Date writes in <u>A Guide To The SQL Standard </u>:
-     * <blockquote>The rule by which it is determined within the standard that one key word needs to be 
-     * reserved while another need not is not clear to this writer. In practice, it is probably wise to 
-     * treat all key words as reserved.</blockquote>
+     * SQL/92 key words are divided into reserved and non-reserved words. If a reserved word is used as an identifier it must be quoted with double quotes. 
+     * Strictly speaking, the same is not true of non-reserved words. However, as C.J. Date writes in <u>A Guide To The SQL Standard </u>:
+     * <blockquote>The rule by which it is determined within the standard that one key word needs to be reserved while another need not is not clear to this writer. 
+     * In practice, it is probably wise to treat all key words as reserved.</blockquote>
      * @param word The word to test.
      * @return <code>true</code> if <var>word </var> is a SQL key word for this DBMS. The comparison is case-insensitive.
      */
@@ -2058,7 +2056,7 @@ CREATE [UNIQUE] INDEX schema.indexName
         return null;
     }
 
-    protected class DatastoreTypeMappings
+    protected static class DatastoreTypeMappings
     {
         String defaultJdbcType;
         String defaultSqlType;
