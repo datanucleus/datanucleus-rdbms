@@ -248,10 +248,18 @@ public class ObjectExpression extends SQLExpression
         JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
         int subExprStart = 0;
         int subExprEnd = 0;
+
+        String implType = implExpr.mapping.getType();
+        if (implExpr instanceof ObjectLiteral && ((ObjectLiteral)implExpr).getValue() != null)
+        {
+            // Use type of literal directly if available. This caters for the case where we have an interface implementation and it is sharing a table with another implementation
+            implType = ((ObjectLiteral)implExpr).getValue().getClass().getName();
+        }
+
         for (int i=0;i<implMappings.length;i++)
         {
             // TODO Handle case where we have a subclass of the implementation here
-            if (implMappings[i].getType().equals(implExpr.mapping.getType()))
+            if (implMappings[i].getType().equals(implType))
             {
                 subExprEnd = subExprStart + implMappings[i].getNumberOfDatastoreMappings();
                 break;
@@ -270,8 +278,7 @@ public class ObjectExpression extends SQLExpression
 
         if (bExpr == null)
         {
-            // Implementation not found explicitly, so just treat as if ObjectExpression.eq(ObjectExpression)
-            // See e.g JDO2 TCK "companyPMInterface" test
+            // Implementation not found explicitly, so just treat as if "ObjectExpression.eq(ObjectExpression)". See e.g JDO TCK "companyPMInterface" test
             return ExpressionUtils.getEqualityExpressionForObjectExpressions((ObjectExpression) refExpr, (ObjectExpression)implExpr, true);
         }
 
