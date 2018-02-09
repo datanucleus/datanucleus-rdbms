@@ -20,10 +20,13 @@ package org.datanucleus.store.rdbms.key;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
 
 /**
  * Representation of a key that has columns with specified ordering (ascending/descending) for each column (if required).
@@ -41,23 +44,40 @@ public abstract class ColumnOrderedKey extends Key
     /**
      * Class to add a column to the key
      * @param col The column to add
-     * @param ascending Whether this column is ascending
      */
-    public void addColumn(Column col, Boolean ascending)
+    public void addColumn(Column col)
     {
         assertSameDatastoreObject(col);
 
         columns.add(col);
-        columnOrdering.add(ascending);
+        columnOrdering.add(null);
     }
 
-    /**
-     * Class to add a column to the key
-     * @param col The column to add
-     */
-    public void addColumn(Column col)
+    public void setColumnOrdering(String ordering)
     {
-        addColumn(col, null);
+        if (StringUtils.isWhitespace(ordering))
+        {
+            return;
+        }
+
+        StringTokenizer tokeniser = new StringTokenizer(ordering, ",");
+        if (tokeniser.countTokens() != columns.size())
+        {
+            NucleusLogger.DATASTORE_SCHEMA.warn("Attempt to specify orderings of index with name=" + name + 
+                " but incorrect number of orderings (" + tokeniser.countTokens() + ") for columns (" +columns.size() + "). IGNORED");
+            return;
+        }
+
+        Iterator<Column> colIter = columns.iterator();
+        int i = 0;
+        while (tokeniser.hasMoreTokens())
+        {
+            String orderingToken = tokeniser.nextToken();
+            colIter.next();
+            columnOrdering.set(i, orderingToken.equalsIgnoreCase("ASC") ? Boolean.TRUE : orderingToken.equalsIgnoreCase("DESC") ? Boolean.FALSE : null);
+
+            i++;
+        }
     }
 
     /**

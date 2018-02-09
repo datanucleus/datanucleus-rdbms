@@ -2211,8 +2211,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     break;
                 }
 
-                // TODO Support column ordering specification
                 index.addColumn(col);
+            }
+
+            // Apply any user-provided ordering of the columns
+            String idxOrdering = imd.getValueForExtension(Index.EXTENSION_INDEX_COLUMN_ORDERING);
+            if (!StringUtils.isWhitespace(idxOrdering))
+            {
+                index.setColumnOrdering(idxOrdering);
             }
         }
         else if (imd.getNumberOfMembers() > 0)
@@ -2233,8 +2239,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 int countFields = fieldMapping.getNumberOfDatastoreMappings();
                 for (int j=0; j<countFields; j++)
                 {
-                    // TODO Support column ordering specification
                     index.addColumn(fieldMapping.getDatastoreMapping(j).getColumn());
+                }
+
+                // Apply any user-provided ordering of the columns
+                String idxOrdering = imd.getValueForExtension(Index.EXTENSION_INDEX_COLUMN_ORDERING);
+                if (!StringUtils.isWhitespace(idxOrdering))
+                {
+                    index.setColumnOrdering(idxOrdering);
                 }
             }
         }

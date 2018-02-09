@@ -4762,6 +4762,12 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         {
             setNotPrecompilable();
 
+            // Replace parameter with equivalent literal of right type
+            if (right instanceof ParameterLiteral)
+            {
+                right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            }
+
             // Single valued parameter, so use equality
             SQLExpression inExpr = new BooleanExpression(left, Expression.OP_EQ, right);
             stack.push(inExpr);
