@@ -132,13 +132,9 @@ import org.datanucleus.util.StringUtils;
  */
 public class ClassTable extends AbstractClassTable implements DatastoreClass 
 {
-    /** Extension for Index for specifying extended RDBMS DDL settings. */
-    public static final String EXTENSION_INDEX_EXTENDED_SETTING = "extended-setting";
-
     /**
      * MetaData for the principal class being stored here.
-     * In inheritance situations where multiple classes share the same table, this will
-     * be the class which uses "new-table" strategy.
+     * In inheritance situations where multiple classes share the same table, this will be the class which uses "new-table" strategy.
      */
     private final ClassMetaData cmd;
 
@@ -2061,7 +2057,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             IndexMetaData idxmd = getVersionMetaData().getIndexMetaData();
             if (idxmd != null)
             {
-                Index index = new Index(this, idxmd.isUnique(), idxmd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
+                Index index = new Index(this, idxmd.isUnique(), idxmd.getExtensions());
                 if (idxmd.getName() != null)
                 {
                     index.setName(idxmd.getName());
@@ -2082,7 +2078,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             IndexMetaData idxmd = dismd.getIndexMetaData();
             if (idxmd != null)
             {
-                Index index = new Index(this, idxmd.isUnique(), idxmd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
+                Index index = new Index(this, idxmd.isUnique(), idxmd.getExtensions());
                 if (idxmd.getName() != null)
                 {
                     index.setName(idxmd.getName());
@@ -2164,7 +2160,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Verify if a unique index is needed
         boolean unique = imd.isUnique();
 
-        Index index = new Index(this, unique, imd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
+        Index index = new Index(this, unique, imd.getExtensions());
 
         // Set the index name if required
         if (imd.getName() != null)
@@ -2191,7 +2187,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // Verify if a unique index is needed
         boolean unique = imd.isUnique();
 
-        Index index = new Index(this, unique, imd.getValueForExtension(EXTENSION_INDEX_EXTENDED_SETTING));
+        Index index = new Index(this, unique, imd.getExtensions());
 
         // Set the index name if required
         if (imd.getName() != null)

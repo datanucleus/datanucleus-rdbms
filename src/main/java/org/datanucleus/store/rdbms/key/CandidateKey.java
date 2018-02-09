@@ -20,14 +20,13 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.key;
 
-import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Representation of a Candidate key.
- * This represents a UNIQUE key on a column or columns.
+ * This represents a UNIQUE candidate key on a column or columns.
  */
-public class CandidateKey extends Key
+public class CandidateKey extends ColumnOrderedKey
 {
     /**
      * Constructor.
@@ -36,34 +35,6 @@ public class CandidateKey extends Key
     public CandidateKey(Table table)
     {
         super(table);
-    }
-
-    /**
-     * Mutator for the column spec, to add/change a column.
-     * @param seq Sequence number of the column
-     * @param col The column
-     */
-    public void setColumn(int seq, Column col)
-    {
-        assertSameDatastoreObject(col);
-
-        setMinSize(columns, seq + 1);
-
-        if (columns.get(seq) != null)
-        {
-            //throw new JDOFatalInternalException("Key part #" + seq + " for " + table + " already set");
-        }
-
-        columns.set(seq, col);
-    }
-
-    /**
-     * Accessor for the size.
-     * @return The size.
-     **/
-    public int size()
-    {
-        return columns.size();
     }
 
     public boolean equals(Object obj)

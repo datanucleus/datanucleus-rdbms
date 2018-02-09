@@ -36,6 +36,7 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
+import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
@@ -249,7 +250,33 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
     }
 
-	/**
+	/* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getCreateIndexStatement(org.datanucleus.store.rdbms.key.Index, org.datanucleus.store.rdbms.identifier.IdentifierFactory)
+     */
+    @Override
+    public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
+    {
+        /**
+        CREATE [UNIQUE] INDEX index-Name
+            ON table-Name (column [ASC|DESC], ...)
+        */
+
+        // Add support for column ordering
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        stringBuilder.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
+        stringBuilder.append(" ON ").append(idx.getTable().toString());
+        stringBuilder.append(" ").append(idx.getColumnList(true));
+        if (extendedSetting != null)
+        {
+            stringBuilder.append(" ").append(extendedSetting);
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
 	 * Accessor for the auto-increment SQL statement for this datastore.
      * @param table Name of the table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for

@@ -178,10 +178,19 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        String idxIdentifier = factory.getIdentifierInAdapterCase(idx.getName());
-        return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + 
-           " ON " + idx.getTable().toString() + ' ' +
-           idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+
+        // Set index name
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        stringBuilder.append(factory.getIdentifierInAdapterCase(idx.getName()));
+        stringBuilder.append(" ON ").append(idx.getTable().toString());
+        stringBuilder.append(" ").append(idx.getColumnList());
+        if (extendedSetting != null)
+        {
+            stringBuilder.append(" ").append(extendedSetting);
+        }
+        return stringBuilder.toString();
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)

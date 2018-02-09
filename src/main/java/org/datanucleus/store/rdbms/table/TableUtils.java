@@ -162,7 +162,7 @@ public class TableUtils
         // Verify if a unique index is needed
         boolean unique = (imd == null ? false : imd.isUnique());
 
-        Index index = new Index(table, unique, (imd != null ? imd.getValueForExtension(ClassTable.EXTENSION_INDEX_EXTENDED_SETTING) : null));
+        Index index = new Index(table, unique, (imd != null ? imd.getExtensions() : null));
 
         // Set the index name if required
         if (imd != null && imd.getName() != null)

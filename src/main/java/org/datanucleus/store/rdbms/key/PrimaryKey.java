@@ -24,17 +24,25 @@ import org.datanucleus.store.rdbms.table.Table;
 /**
  * Representation of the primary key of a table.
  */
-public class PrimaryKey extends CandidateKey
+public class PrimaryKey extends CandidateKey // TODO Do we need to extend CandidateKey?
 {
     /**
-     * Creates a primary key. A default name of the primary key is created by the
-     * constructor. This name can be overwritten.
+     * Creates a primary key. A default name of the primary key is created by the constructor. This name can be overwritten.
      * @param table Table that this is the PK for
      */
     public PrimaryKey(Table table)
     {
         super(table);
         name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getName();
+    }
+
+    /**
+     * Accessor for the size.
+     * @return The size.
+     */
+    public int size()
+    {
+        return columns.size();
     }
 
     public boolean equals(Object obj)
@@ -59,13 +67,11 @@ public class PrimaryKey extends CandidateKey
     /**
      * Stringifier method.
      * Generates a form of the PK ready to be used in a DDL statement.
-     * e.g PRIMARY KEY (col1,col2)
+     * e.g <pre>PRIMARY KEY (col1,col2)</pre>
      * @return The string form of this object. Ready to be used in a DDL statement.
      */
     public String toString()
     {
-        StringBuilder s = new StringBuilder("PRIMARY KEY ").append(getColumnList(columns));
-
-        return s.toString();
+        return new StringBuilder("PRIMARY KEY ").append(getColumnList(columns)).toString();
     }
 }

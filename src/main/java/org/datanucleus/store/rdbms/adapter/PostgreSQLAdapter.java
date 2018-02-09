@@ -371,9 +371,27 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        String idxIdentifier = factory.getIdentifierInAdapterCase(idx.getName());
-        return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + " ON " + idx.getTable().toString() + ' ' +
-           idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
+        /**
+        CREATE [UNIQUE] INDEX [CONCURRENTLY] [name] 
+            ON tableName [USING method] ( {column | (expression)} [COLLATE collation] [opclass] [ASC|DESC] [NULLS {FIRST|LAST}] [, ...] )
+            [WITH (storage_parameter = value [, ... ])]
+            [TABLESPACE tablespace ]
+            [WHERE predicate]
+        */
+
+        // Add support for column ordering, and different index name
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        stringBuilder.append(factory.getIdentifierInAdapterCase(idx.getName()));
+        stringBuilder.append(" ON ").append(idx.getTable().toString());
+        stringBuilder.append(" ").append(idx.getColumnList(true));
+        if (extendedSetting != null)
+        {
+            stringBuilder.append(" ").append(extendedSetting);
+        }
+        return stringBuilder.toString();
     }
 
     // ---------------------------- Identity Support ---------------------------

@@ -288,9 +288,34 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        String idxIdentifier = factory.getIdentifierInAdapterCase(idx.getName());
-        return "CREATE " + (idx.getUnique() ? "UNIQUE " : "") + "INDEX " + idxIdentifier + " ON " + idx.getTable().toString() + ' ' +
-           idx + (idx.getExtendedIndexSettings() == null ? "" : " " + idx.getExtendedIndexSettings());
+        /**
+        CREATE [UNIQUE] [CLUSTERED | NONCLUSTERED] INDEX index_name
+            ON tableName (column [ASC|DESC] [ ,...n ])
+            [ INCLUDE (column [ ,...n ] )]
+            [ WHERE <filter_predicate> ]
+            [ WITH ( <relational_index_option> [ ,...n ] ) ]
+            [ ON { partition_scheme_name (column_name) | filegroup_name | default }]  
+        */
+
+        // Add support for column ordering, and different index name
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+        String indexType = idx.getValueForExtension(Index.EXTENSION_INDEX_TYPE);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE").append((idx.getUnique() ? " UNIQUE" : ""));
+        if (indexType != null)
+        {
+            stringBuilder.append(indexType.equalsIgnoreCase("CLUSTERED") ? " CLUSTERED" : indexType.equalsIgnoreCase("NONCLUSTERED") ? " NONCLUSTERED" : "");
+        }
+        stringBuilder.append(" INDEX ");
+        stringBuilder.append(factory.getIdentifierInAdapterCase(idx.getName()));
+        stringBuilder.append(" ON ").append(idx.getTable().toString());
+        stringBuilder.append(" ").append(idx.getColumnList(true));
+        if (extendedSetting != null)
+        {
+            stringBuilder.append(" ").append(extendedSetting);
+        }
+        return stringBuilder.toString();
     }
 
     /**

@@ -20,37 +20,38 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.key;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.table.Column;
+import java.util.Map;
+
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Representation of an index.
- * TODO Add concept of column order (ASC|DESC)
  */
-public class Index extends Key
+public class Index extends ColumnOrderedKey
 {
+    public static final String EXTENSION_INDEX_EXTENDED_SETTING = "extended-setting";
+    public static final String EXTENSION_INDEX_TYPE = "index-type";
+
     private final boolean isUnique;
 
-    /** extended index settings, mostly datastore proprietary settings. */
-    private final String extendedIndexSettings;
+    private Map<String,String> extensions = null;
 
     /**
      * Constructor.
      * @param table The table
      * @param isUnique Whether the index is unique
-     * @param extendedIndexSettings extended index settings
+     * @param extensions Any extensions for the index
      */
-    public Index(Table table, boolean isUnique, String extendedIndexSettings)
+    public Index(Table table, boolean isUnique, Map<String, String> extensions)
     {
         super(table);
 
         this.isUnique = isUnique;
-        this.extendedIndexSettings = extendedIndexSettings;
+        this.extensions = extensions;
     }
 
     /**
-     * Constructor.
+     * Constructor for an index for the specified candidate key.
      * @param ck Candidate key to use as a basis
      */
     public Index(CandidateKey ck)
@@ -58,12 +59,17 @@ public class Index extends Key
         super(ck.getTable());
 
         isUnique = true;
-        extendedIndexSettings = null;
+
         columns.addAll(ck.getColumns());
+        int numCols = columns.size();
+        for (int i = 0; i < numCols; i++)
+        {
+            columnOrdering.add(Boolean.TRUE);
+        }
     }
 
     /**
-     * Constructor.
+     * Constructor for an index for the specified foreign key.
      * @param fk Foreign key to use as a basis
      */
     public Index(ForeignKey fk)
@@ -71,8 +77,18 @@ public class Index extends Key
         super(fk.getTable());
 
         isUnique = false;
-        extendedIndexSettings = null;
+
         columns.addAll(fk.getColumns());
+        int numCols = columns.size();
+        for (int i = 0; i < numCols; i++)
+        {
+            columnOrdering.add(Boolean.TRUE);
+        }
+    }
+
+    public String getValueForExtension(String key)
+    {
+        return extensions != null ? extensions.get(key) : null;
     }
 
     /**
@@ -82,34 +98,6 @@ public class Index extends Key
     public boolean getUnique()
     {
         return isUnique;
-    }
-
-    /**
-     * Sets a column for in a specified position <code>seq</code>
-     * @param seq the specified position for the <code>col</code>
-     * @param col the Column
-     */
-    public void setColumn(int seq, Column col)
-    {
-        assertSameDatastoreObject(col);
-
-        setMinSize(columns, seq + 1);
-
-        if (columns.get(seq) != null)
-        {
-            throw new NucleusException("Index part #" + seq + " for " + table + " already set").setFatal();
-        }
-
-        columns.set(seq, col);
-    }
-
-    /**
-     * Accessor for the size.
-     * @return The size.
-     */
-    public int size()
-    {
-        return columns.size();
     }
 
     /**
@@ -147,20 +135,12 @@ public class Index extends Key
     }
 
     /**
-     * Extended index settings, mostly datastore proprietary settings
-     * @return the extended settings
-     */
-    public String getExtendedIndexSettings()
-    {
-        return extendedIndexSettings;
-    }
-    
-    /**
      * Stringify method.
      * @return String version of this object.
      */
     public String toString()
     {
+        // TODO Change this to return "INDEX (...)"
         return getColumnList();
     }
 }

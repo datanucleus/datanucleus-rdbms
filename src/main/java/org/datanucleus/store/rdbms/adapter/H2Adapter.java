@@ -35,6 +35,7 @@ import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
+import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.table.Column;
@@ -181,6 +182,38 @@ public class H2Adapter extends BaseDatastoreAdapter
     public String getAddColumnStatement(Table table, Column col)
     {
         return "ALTER TABLE " + table.toString() + " ADD COLUMN " + col.getSQLDefinition();
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getCreateIndexStatement(org.datanucleus.store.rdbms.key.Index, org.datanucleus.store.rdbms.identifier.IdentifierFactory)
+     */
+    @Override
+    public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
+    {
+        /**
+        CREATE [UNIQUE] [HASH | SPATIAL] INDEX [IF NOT EXISTS] indexName
+            ON tableName (column [ASC|DESC] [NULLS {FIRST|LAST}], ...)
+        */
+
+        // Add support for column ordering
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+        String indexType = idx.getValueForExtension(Index.EXTENSION_INDEX_TYPE);
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("CREATE").append((idx.getUnique() ? " UNIQUE" : ""));
+        if (indexType != null)
+        {
+            stringBuilder.append(indexType.equalsIgnoreCase("HASH") ? " HASH" : indexType.equalsIgnoreCase("SPATIAL") ? " SPATIAL" : "");
+        }
+        stringBuilder.append(" INDEX ");
+        stringBuilder.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
+        stringBuilder.append(" ON ").append(idx.getTable().toString());
+        stringBuilder.append(" ").append(idx.getColumnList(true));
+        if (extendedSetting != null)
+        {
+            stringBuilder.append(" ").append(extendedSetting);
+        }
+        return stringBuilder.toString();
     }
 
     /**

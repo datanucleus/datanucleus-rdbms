@@ -20,7 +20,6 @@ Contributors:
 package org.datanucleus.store.rdbms.key;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +49,15 @@ abstract class Key
     protected Key(Table table)
     {
         this.table = table;
+    }
+
+    /**
+     * Mutator for the key name.
+     * @param name The key name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     /**
@@ -97,27 +105,6 @@ abstract class Key
         assertSameDatastoreObject(col);
 
         columns.add(col);
-    }
-
-    /**
-     * Check if this starts with the same columns specified in <code>key</code>.
-     * @param key the Key (may be multiple number of columns)
-     * @return true if this columns starts with columns specified in <code>key</code>
-     */
-    public boolean startsWith(Key key)
-    {
-        int kSize = key.columns.size();
-
-        return kSize <= columns.size() && key.columns.equals(columns.subList(0, kSize));
-    }
-
-    /**
-     * Mutator for the key name.
-     * @param name The key name
-     */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     /**
@@ -181,13 +168,13 @@ abstract class Key
      * @param cols The columns.
      * @return The column list.
      */
-    public static String getColumnList(Collection cols)
+    public static String getColumnList(List<Column> cols)
     {
         StringBuilder s = new StringBuilder("(");
-        Iterator i = cols.iterator();
+        Iterator<Column> i = cols.iterator();
         while (i.hasNext())
         {
-            Column col = (Column)i.next();
+            Column col = i.next();
 
             if (col == null)
             {
