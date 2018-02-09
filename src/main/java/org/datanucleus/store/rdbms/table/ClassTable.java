@@ -2215,6 +2215,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     break;
                 }
 
+                // TODO Support column ordering specification
                 index.addColumn(col);
             }
         }
@@ -2236,6 +2237,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 int countFields = fieldMapping.getNumberOfDatastoreMappings();
                 for (int j=0; j<countFields; j++)
                 {
+                    // TODO Support column ordering specification
                     index.addColumn(fieldMapping.getDatastoreMapping(j).getColumn());
                 }
             }
