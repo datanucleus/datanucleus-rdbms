@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.key;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.datanucleus.exceptions.NucleusException;
@@ -36,9 +37,17 @@ public abstract class ColumnOrderedKey extends Key
     /** Column ordering. True implies ascending order. */
     protected List<Boolean> columnOrdering = new ArrayList<>();
 
-    public ColumnOrderedKey(Table table)
+    protected Map<String,String> extensions = null;
+
+    public ColumnOrderedKey(Table table, Map<String, String> extensions)
     {
         super(table);
+        this.extensions = extensions;
+    }
+
+    public String getValueForExtension(String key)
+    {
+        return extensions != null ? extensions.get(key) : null;
     }
 
     /**

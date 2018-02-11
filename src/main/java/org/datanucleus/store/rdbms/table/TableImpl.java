@@ -1083,7 +1083,7 @@ public abstract class TableImpl extends AbstractTable
                     CandidateKey key = candidateKeysByName.get(idxName);
                     if (key == null)
                     {
-                        key = new CandidateKey(this);
+                        key = new CandidateKey(this, null);
                         key.setName(keyName);
                         candidateKeysByName.put(idxName, key);
                     }

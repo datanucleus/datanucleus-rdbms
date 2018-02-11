@@ -205,8 +205,8 @@ public class InformixAdapter extends BaseDatastoreAdapter
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
      * <pre>
-     * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
-     * ALTER TABLE FOO ADD UNIQUE (BAZ)
+     * ALTER TABLE FOO ADD CONSTRAINT FOO_CK CONSTRAINT UNIQUE (BAZ)
+     * ALTER TABLE FOO ADD CONSTRAINT UNIQUE (BAZ)
      * </pre>
      *
      * @param ck An object describing the candidate key.
@@ -218,9 +218,9 @@ public class InformixAdapter extends BaseDatastoreAdapter
         if (ck.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
-            return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT" + ' ' + ck + ' ' + "CONSTRAINT" + ' ' + identifier;
+            return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT " + ck + " CONSTRAINT " + identifier;
         }
-        return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
+        return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT " + ck;
     }
 
     /**

@@ -1443,13 +1443,24 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getAddCandidateKeyStatement(CandidateKey ck, IdentifierFactory factory)
     {
+        StringBuilder str = new StringBuilder("ALTER TABLE ").append(ck.getTable().toString());
         if (ck.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
-            return "ALTER TABLE " + ck.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + ck;
+            str.append(" ADD CONSTRAINT ").append(identifier).append(" UNIQUE ").append(ck.getColumnList());
+        }
+        else
+        {
+            str.append(" ADD UNIQUE ").append(ck.getColumnList());
         }
 
-        return "ALTER TABLE " + ck.getTable().toString() + " ADD " + ck;
+        String extendedSetting = ck.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+        if (extendedSetting != null)
+        {
+            str.append(" ").append(extendedSetting);
+        }
+
+        return str.toString();
     }
 
     /**
@@ -1499,17 +1510,19 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
         // Note : we do not support column ordering by default; override in the datastore adapter to add this. Similarly for datastore-specifics
+        StringBuilder str = new StringBuilder();
+        str.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        str.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
+        str.append(" ON ").append(idx.getTable().toString());
+        str.append(" ").append(idx.getColumnList());
+
         String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
-        stringBuilder.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
-        stringBuilder.append(" ON ").append(idx.getTable().toString());
-        stringBuilder.append(" ").append(idx.getColumnList());
         if (extendedSetting != null)
         {
-            stringBuilder.append(" ").append(extendedSetting);
+            str.append(" ").append(extendedSetting);
         }
-        return stringBuilder.toString();
+
+        return str.toString();
     }
 
     /**

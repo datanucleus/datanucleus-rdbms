@@ -214,7 +214,7 @@ public class PersistableJoinTable extends JoinTable
             if (unimd.getNumberOfColumns() > 0)
             {
                 String[] columnNames = unimd.getColumnNames();
-                CandidateKey uniKey = new CandidateKey(this);
+                CandidateKey uniKey = new CandidateKey(this, null);
                 IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
                 for (String columnName : columnNames)
                 {

@@ -2664,7 +2664,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      */
     private CandidateKey getCandidateKeyForUniqueMetaData(UniqueMetaData umd)
     {
-        CandidateKey ck = new CandidateKey(this);
+        CandidateKey ck = new CandidateKey(this, umd.getExtensions());
 
         // Set the key name if required
         if (umd.getName() != null)
@@ -2893,10 +2893,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         // If the owner and key fields are represented in this table then we can impose
                         // a unique constraint on them. If the key field is in a superclass then we
                         // cannot do this so just omit it.
-                        if (keyMapping.getTable() == this &&
-                                ownerMapping.getTable() == this)
+                        if (keyMapping.getTable() == this && ownerMapping.getTable() == this)
                         {
-                            CandidateKey ck = new CandidateKey(this);
+                            CandidateKey ck = new CandidateKey(this, null);
 
                             // This HashSet is to avoid duplicate adding of columns.
                             HashSet addedColumns = new HashSet();
@@ -2960,13 +2959,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         // If the owner and value fields are represented in this table then we can impose
                         // a unique constraint on them. If the value field is in a superclass then we
                         // cannot do this so just omit it.
-                        if (valueMapping.getTable() == this &&
-                                ownerMapping.getTable() == this)
+                        if (valueMapping.getTable() == this && ownerMapping.getTable() == this)
                         {
-                            CandidateKey ck = new CandidateKey(this);
+                            CandidateKey ck = new CandidateKey(this, null);
 
                             // This HashSet is to avoid duplicate adding of columns.
-                            HashSet addedColumns = new HashSet();
+                            Set<Column> addedColumns = new HashSet<>();
 
                             // Add columns for the owner field
                             int countOwnerFields = ownerMapping.getNumberOfDatastoreMappings();

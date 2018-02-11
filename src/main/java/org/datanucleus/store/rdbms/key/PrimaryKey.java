@@ -32,7 +32,7 @@ public class PrimaryKey extends CandidateKey // TODO Do we need to extend Candid
      */
     public PrimaryKey(Table table)
     {
-        super(table);
+        super(table, null);
         name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getName();
     }
 

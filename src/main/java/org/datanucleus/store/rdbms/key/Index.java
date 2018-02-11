@@ -35,8 +35,6 @@ public class Index extends ColumnOrderedKey
 
     private final boolean isUnique;
 
-    private Map<String,String> extensions = null;
-
     /**
      * Constructor.
      * @param table The table
@@ -45,10 +43,9 @@ public class Index extends ColumnOrderedKey
      */
     public Index(Table table, boolean isUnique, Map<String, String> extensions)
     {
-        super(table);
+        super(table, extensions);
 
         this.isUnique = isUnique;
-        this.extensions = extensions;
     }
 
     /**
@@ -57,7 +54,7 @@ public class Index extends ColumnOrderedKey
      */
     public Index(CandidateKey ck)
     {
-        super(ck.getTable());
+        super(ck.getTable(), null);
 
         isUnique = true;
 
@@ -75,7 +72,7 @@ public class Index extends ColumnOrderedKey
      */
     public Index(ForeignKey fk)
     {
-        super(fk.getTable());
+        super(fk.getTable(), null);
 
         isUnique = false;
 
@@ -85,11 +82,6 @@ public class Index extends ColumnOrderedKey
         {
             columnOrdering.add(Boolean.TRUE);
         }
-    }
-
-    public String getValueForExtension(String key)
-    {
-        return extensions != null ? extensions.get(key) : null;
     }
 
     /**

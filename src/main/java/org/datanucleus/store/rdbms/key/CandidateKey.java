@@ -20,6 +20,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.key;
 
+import java.util.Map;
+
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
@@ -31,10 +33,11 @@ public class CandidateKey extends ColumnOrderedKey
     /**
      * Constructor.
      * @param table Table to apply this key to
+     * @param extensions Any extensions for this unique constraint
      */
-    public CandidateKey(Table table)
+    public CandidateKey(Table table, Map<String, String> extensions)
     {
-        super(table);
+        super(table, extensions);
     }
 
     public boolean equals(Object obj)
@@ -57,9 +60,9 @@ public class CandidateKey extends ColumnOrderedKey
     }
 
     /**
-     * Stringify method.
+     * Stringify method. Returns <pre>UNIQUE (col1, ...)</pre>.
      * @return String version of this object.
-     **/
+     */
     public String toString()
     {
         StringBuilder s = new StringBuilder("UNIQUE ").append(getColumnList(columns));

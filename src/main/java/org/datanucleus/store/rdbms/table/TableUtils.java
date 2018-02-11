@@ -191,7 +191,7 @@ public class TableUtils
      */
     public static CandidateKey getCandidateKeyForField(Table table, UniqueMetaData umd, JavaTypeMapping fieldMapping)
     {
-        CandidateKey ck = new CandidateKey(table);
+        CandidateKey ck = new CandidateKey(table, umd != null ? umd.getExtensions() : null);
 
         // Set the key name if required
         if (umd.getName() != null)

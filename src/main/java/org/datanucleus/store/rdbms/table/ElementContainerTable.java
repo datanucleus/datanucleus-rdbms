@@ -586,7 +586,7 @@ public abstract class ElementContainerTable extends JoinTable
             if (unimd.getNumberOfColumns() > 0)
             {
                 String[] columnNames = unimd.getColumnNames();
-                CandidateKey uniKey = new CandidateKey(this);
+                CandidateKey uniKey = new CandidateKey(this, null);
                 String unimdName = unimd.getName();
                 if (!StringUtils.isWhitespace(unimdName))
                 {

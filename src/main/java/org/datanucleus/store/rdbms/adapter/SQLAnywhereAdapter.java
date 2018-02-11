@@ -39,7 +39,6 @@ import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
-import org.datanucleus.store.rdbms.key.CandidateKey;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -266,22 +265,6 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.NULL), "NULL");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT"); // Maybe ROW would work here?
-    }
-
-    /**
-     * Returns the appropriate SQL to add a candidate key to its table. It should return something like:
-     * 
-     * <pre>
-     * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
-     * ALTER TABLE FOO ADD UNIQUE (BAZ)
-     * </pre>
-     * @param ck An object describing the candidate key.
-     * @param factory Identifier factory
-     * @return The text of the SQL statement.
-     */
-    public String getAddCandidateKeyStatement(CandidateKey ck, IdentifierFactory factory)
-    {
-        return super.getAddCandidateKeyStatement(ck, factory);
     }
 
     public String getVendorID()

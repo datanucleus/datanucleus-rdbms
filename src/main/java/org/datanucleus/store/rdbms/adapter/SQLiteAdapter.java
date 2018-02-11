@@ -205,7 +205,7 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     @Override
     public String getAddPrimaryKeyStatement(PrimaryKey pk, IdentifierFactory factory)
     {
-        // ALTER TABLE ADD CONSTRAINT Syntax not supported
+        // ALTER TABLE ADD PRIMARY KEY Syntax not supported
         return null;
     }
 
@@ -219,7 +219,7 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     @Override
     public String getAddForeignKeyStatement(ForeignKey fk, IdentifierFactory factory)
     {
-        // ALTER TABLE ADD CONSTRAINT Syntax not supported
+        // ALTER TABLE ADD FOREIGN KEY Syntax not supported
         return null;
     }
 

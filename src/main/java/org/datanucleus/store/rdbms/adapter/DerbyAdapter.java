@@ -256,10 +256,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
     @Override
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        /**
-        CREATE [UNIQUE] INDEX index-Name
-            ON table-Name (column [ASC|DESC], ...)
-        */
+        // CREATE [UNIQUE] INDEX index-Name ON table-Name (column [ASC|DESC], ...)
 
         // Add support for column ordering
         String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
