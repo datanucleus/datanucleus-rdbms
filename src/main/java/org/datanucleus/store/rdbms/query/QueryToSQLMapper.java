@@ -4758,14 +4758,19 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             stack.push(sqlExpr);
             return sqlExpr;
         }
-        else if (right.getParameterName() != null)
+        else if (right.getParameterName() != null || left.getParameterName() != null)
         {
+            // "expr IN (:param)" or ":param IN (expr)" or ":param1 IN (:param2)"
             setNotPrecompilable();
 
-            // Replace parameter with equivalent literal of right type
+            // Replace parameter(s) with equivalent literal of correct type
             if (right instanceof ParameterLiteral)
             {
                 right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            }
+            if (left instanceof ParameterLiteral && !Collection.class.isAssignableFrom(right.getJavaTypeMapping().getJavaType()))
+            {
+                left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
             }
 
             // Single valued parameter, so use equality
