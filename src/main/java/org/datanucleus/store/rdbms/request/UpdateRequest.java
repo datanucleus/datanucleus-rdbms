@@ -553,7 +553,7 @@ public class UpdateRequest extends Request
                 {
                     for (int i=0;i<colmds.length;i++)
                     {
-                        if (!colmds[i].getUpdateable())
+                        if (!colmds[i].getUpdateable() && !whereClauseConsumption)
                         {
                             // Not to be updated
                             return;
