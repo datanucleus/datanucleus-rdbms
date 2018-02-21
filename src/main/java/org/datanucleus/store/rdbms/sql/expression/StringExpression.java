@@ -105,7 +105,7 @@ public class StringExpression extends SQLExpression
         }
         else if (expr instanceof EnumLiteral)
         {
-            return new BooleanExpression(this, Expression.OP_EQ, expr);   
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof EnumExpression)
         {
@@ -114,11 +114,11 @@ public class StringExpression extends SQLExpression
         }
         else if (expr instanceof CharacterLiteral)
         {
-            return new BooleanExpression(this, Expression.OP_EQ, expr);            
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof StringExpression)
         {
-            return new BooleanExpression(this, Expression.OP_EQ, expr);   
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof ByteLiteral)
         {
@@ -143,6 +143,10 @@ public class StringExpression extends SQLExpression
             return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
         else if (expr instanceof TemporalExpression)
+        {
+            return new BooleanExpression(this, Expression.OP_EQ, expr);
+        }
+        else if (expr instanceof CaseExpression)
         {
             return new BooleanExpression(this, Expression.OP_EQ, expr);
         }
@@ -207,6 +211,10 @@ public class StringExpression extends SQLExpression
             return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
         else if (expr instanceof TemporalExpression)
+        {
+            return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
+        }
+        else if (expr instanceof CaseExpression)
         {
             return new BooleanExpression(this, Expression.OP_NOTEQ, expr);
         }
