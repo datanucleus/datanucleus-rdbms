@@ -25,9 +25,17 @@ import org.datanucleus.query.expression.Expression;
  */
 public class CaseExpression extends SQLExpression
 {
+    SQLExpression[] whenExprs;
+    SQLExpression[] actionExprs;
+    SQLExpression elseExpr;
+
     public CaseExpression(SQLExpression[] whenExprs, SQLExpression[] actionExprs, SQLExpression elseExpr)
     {
         super(whenExprs[0].getSQLStatement(), null, null);
+
+        this.whenExprs = whenExprs;
+        this.actionExprs = actionExprs;
+        this.elseExpr = elseExpr;
 
         st.clearStatement();
         st.append("CASE");
@@ -36,7 +44,7 @@ public class CaseExpression extends SQLExpression
             throw new IllegalArgumentException("CaseExpression must have equal number of WHEN and THEN expressions");
         }
 
-        mapping = actionExprs[0].getJavaTypeMapping();
+        mapping = null;
         for (int i=0;i<whenExprs.length;i++)
         {
             st.append(" WHEN ").append(whenExprs[i]).append(" THEN ").append(actionExprs[i]);

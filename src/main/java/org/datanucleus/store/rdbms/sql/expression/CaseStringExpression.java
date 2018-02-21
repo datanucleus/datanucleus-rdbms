@@ -38,15 +38,31 @@ public class CaseStringExpression extends StringExpression
             throw new IllegalArgumentException("CaseExpression must have equal number of WHEN and THEN expressions");
         }
 
-        mapping = actionExprs[0].getJavaTypeMapping();
+        mapping = stmt.getSQLExpressionFactory().getMappingForType(String.class);
         for (int i=0;i<whenExprs.length;i++)
         {
-            st.append(" WHEN ").append(whenExprs[i]).append(" THEN ").append(actionExprs[i]);
+            SQLExpression actionExpr = actionExprs[i];
+            if (actionExprs[i] instanceof ParameterLiteral)
+            {
+                // Swap for a StringExpression that is a parameter
+                ParameterLiteral paramLit = (ParameterLiteral)actionExprs[i];
+                actionExpr = stmt.getSQLExpressionFactory().newLiteralParameter(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), 
+                    paramLit.getValue(), paramLit.getParameterName());
+            }
+            st.append(" WHEN ").append(whenExprs[i]).append(" THEN ").append(actionExpr);
         }
 
         if (elseExpr != null)
         {
-            st.append(" ELSE ").append(elseExpr);
+            SQLExpression actionExpr = elseExpr;
+            if (elseExpr instanceof ParameterLiteral)
+            {
+                // Swap for a StringExpression that is a parameter
+                ParameterLiteral paramLit = (ParameterLiteral)elseExpr;
+                actionExpr = stmt.getSQLExpressionFactory().newLiteralParameter(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), 
+                    paramLit.getValue(), paramLit.getParameterName());
+            }
+            st.append(" ELSE ").append(actionExpr);
         }
         st.append(" END");
         st.encloseInParentheses();

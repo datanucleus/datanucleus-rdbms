@@ -41,12 +41,28 @@ public class CaseNumericExpression extends NumericExpression
         mapping = actionExprs[0].getJavaTypeMapping();
         for (int i=0;i<whenExprs.length;i++)
         {
-            st.append(" WHEN ").append(whenExprs[i]).append(" THEN ").append(actionExprs[i]);
+            SQLExpression actionExpr = actionExprs[i];
+            if (actionExpr instanceof ParameterLiteral)
+            {
+                // Swap for a NumericExpression that is a parameter
+                ParameterLiteral paramLit = (ParameterLiteral)actionExpr;
+                actionExpr = stmt.getSQLExpressionFactory().newLiteralParameter(stmt, stmt.getSQLExpressionFactory().getMappingForType(Number.class), 
+                    paramLit.getValue(), paramLit.getParameterName());
+            }
+            st.append(" WHEN ").append(whenExprs[i]).append(" THEN ").append(actionExpr);
         }
 
         if (elseExpr != null)
         {
-            st.append(" ELSE ").append(elseExpr);
+            SQLExpression actionExpr = elseExpr;
+            if (actionExpr instanceof ParameterLiteral)
+            {
+                // Swap for a NumericExpression that is a parameter
+                ParameterLiteral paramLit = (ParameterLiteral)actionExpr;
+                actionExpr = stmt.getSQLExpressionFactory().newLiteralParameter(stmt, stmt.getSQLExpressionFactory().getMappingForType(Number.class), 
+                    paramLit.getValue(), paramLit.getParameterName());
+            }
+            st.append(" ELSE ").append(actionExpr);
         }
         st.append(" END");
         st.encloseInParentheses();

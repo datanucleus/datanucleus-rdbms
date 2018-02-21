@@ -1077,7 +1077,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     performingUpdate = true;
 
-                    // Right-side can be Literal, or Parameter, or PrimaryExpression
                     SQLExpression rightSqlExpr = null;
                     if (updateExpr.getRight() instanceof Literal)
                     {
@@ -1103,7 +1102,8 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                     }
                     else if (updateExpr.getRight() instanceof CaseExpression)
                     {
-                        updateExpr.getRight().evaluate(this);
+                        CaseExpression caseExpr = (CaseExpression)updateExpr.getRight();
+                        processCaseExpression(caseExpr, leftSqlExpr);
                         rightSqlExpr = stack.pop();
                     }
                     else if (updateExpr.getRight() instanceof VariableExpression)
@@ -3981,8 +3981,13 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     {
         if (compileComponent == CompilationComponent.ORDERING || compileComponent == CompilationComponent.RESULT)
         {
-            // All JDBC drivers I know don't allow parameters in the order-by clause
+            // All JDBC drivers I know don't allow parameters in the order-by, or update clause
             // Note that we also don't allow parameters in result clause since SQLStatement squashes all SELECT expression to a String so losing info about params
+            asLiteral = true;
+        }
+        if (compileComponent == CompilationComponent.UPDATE && !storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.PARAMETER_IN_UPDATE_CLAUSE))
+        {
+            // This database doesn't support parameters in the UPDATE clause, so process as a literal
             asLiteral = true;
         }
 
@@ -4606,13 +4611,40 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     @Override
     protected Object processCaseExpression(CaseExpression expr)
     {
-        boolean numericCase = false;
-        boolean booleanCase = false;
-        boolean stringCase = false;
+        return processCaseExpression(expr, null);
+    }
+
+    protected Object processCaseExpression(CaseExpression expr, SQLExpression typeExpr)
+    {
         List<ExpressionPair> conditions = expr.getConditions();
         Iterator<ExpressionPair> whenExprIter = conditions.iterator();
         SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
         SQLExpression[] actionSqlExprs = new SQLExpression[conditions.size()];
+
+        boolean numericCase = false;
+        boolean booleanCase = false;
+        boolean stringCase = false;
+
+        boolean typeSet = false;
+        if (typeExpr != null)
+        {
+            if (typeExpr instanceof NumericExpression)
+            {
+                numericCase = true;
+                typeSet = true;
+            }
+            else if (typeExpr instanceof BooleanExpression)
+            {
+                booleanCase = true;
+                typeSet = true;
+            }
+            else if (typeExpr instanceof StringExpression)
+            {
+                stringCase = true;
+                typeSet = true;
+            }
+        }
+
         int i = 0;
         while (whenExprIter.hasNext())
         {
@@ -4628,17 +4660,24 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Expression actionExpr = pair.getActionExpression();
             actionExpr.evaluate(this);
             actionSqlExprs[i] = stack.pop();
-            if (actionSqlExprs[i] instanceof NumericExpression)
+
+            if (!typeSet)
             {
-                numericCase = true;
-            }
-            else if (actionSqlExprs[i] instanceof BooleanExpression)
-            {
-                booleanCase = true;
-            }
-            else if (actionSqlExprs[i] instanceof StringExpression)
-            {
-                stringCase = true;
+                if (actionSqlExprs[i] instanceof NumericExpression)
+                {
+                    numericCase = true;
+                    typeSet = true;
+                }
+                else if (actionSqlExprs[i] instanceof BooleanExpression)
+                {
+                    booleanCase = true;
+                    typeSet = true;
+                }
+                else if (actionSqlExprs[i] instanceof StringExpression)
+                {
+                    stringCase = true;
+                    typeSet = true;
+                }
             }
 
             i++;
@@ -4698,6 +4737,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
         else if (expr1 instanceof TemporalExpression && expr2 instanceof TemporalExpression)
         {
+            return true;
+        }
+        else if (expr1 instanceof ParameterLiteral || expr2 instanceof ParameterLiteral)
+        {
+            // Could be consistent for all we know, since using a parameter that maybe is not yet set
             return true;
         }
 

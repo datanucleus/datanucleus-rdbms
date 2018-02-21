@@ -94,6 +94,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
+        supportedOptions.add(PARAMETER_IN_UPDATE_CLAUSE);
         supportedOptions.remove(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
         supportedOptions.remove(DISTINCT_WITH_SELECT_FOR_UPDATE);
