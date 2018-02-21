@@ -1176,6 +1176,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                 stmtCountFlags.add(bulkTable.useInCount);
 
                 datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+                datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
             }
         }
 
@@ -1298,7 +1299,9 @@ public class JPQLQuery extends AbstractJPQLQuery
 
             stmts.add(stmt);
             stmtCountFlags.add(bulkTable.useInCount);
+
             datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+            datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
         }
 
         datastoreCompilation.clearStatements();

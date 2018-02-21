@@ -1191,7 +1191,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 stmts.add(stmt);
                 stmtCountFlags.add(bulkTable.useInCount);
+
                 datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+                datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
             }
         }
 
@@ -1312,7 +1314,9 @@ public class JDOQLQuery extends AbstractJDOQLQuery
 
             stmts.add(stmt);
             stmtCountFlags.add(bulkTable.useInCount);
+
             datastoreCompilation.setStatementParameters(stmt.getSQLText().getParametersForStatement());
+            datastoreCompilation.setPrecompilable(sqlMapper.isPrecompilable());
         }
 
         datastoreCompilation.clearStatements();
