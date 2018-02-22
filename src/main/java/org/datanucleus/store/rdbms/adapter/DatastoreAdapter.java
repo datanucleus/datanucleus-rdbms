@@ -401,8 +401,8 @@ public interface DatastoreAdapter
     public static final String OPERATOR_BITWISE_XOR = "BitwiseXOrOperator";
 
     public static final String NATIVE_ENUM_TYPE = "NativeEnumType";
-    
-    public static final String PARAMETER_IN_UPDATE_CLAUSE = "ParameterInUpdateClause";
+
+    public static final String PARAMETER_IN_CASE_IN_UPDATE_CLAUSE = "ParameterInCaseInUpdateClause";
 
     /**
      * Initialise the datastore adapter.

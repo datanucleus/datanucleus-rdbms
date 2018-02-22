@@ -3985,10 +3985,9 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Note that we also don't allow parameters in result clause since SQLStatement squashes all SELECT expression to a String so losing info about params
             asLiteral = true;
         }
-        if (compileComponent == CompilationComponent.UPDATE && !storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.PARAMETER_IN_UPDATE_CLAUSE))
+        else if (compileComponent == CompilationComponent.UPDATE && processingCase && !storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.PARAMETER_IN_CASE_IN_UPDATE_CLAUSE))
         {
-            // This database doesn't support parameters in the UPDATE clause, so process as a literal
-            // TODO This is most often that the database doesn't support parameters in a CASE statement when in UPDATE clause, so add a check on CASE
+            // This database doesn't support parameters within a CASE expression in the UPDATE clause, so process as a literal
             asLiteral = true;
         }
 
@@ -4615,111 +4614,121 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         return processCaseExpression(expr, null);
     }
 
+    protected boolean processingCase = false;
+
     protected Object processCaseExpression(CaseExpression expr, SQLExpression typeExpr)
     {
-        List<ExpressionPair> conditions = expr.getConditions();
-        Iterator<ExpressionPair> whenExprIter = conditions.iterator();
-        SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
-        SQLExpression[] actionSqlExprs = new SQLExpression[conditions.size()];
-
-        boolean numericCase = false;
-        boolean booleanCase = false;
-        boolean stringCase = false;
-
-        boolean typeSet = false;
-        if (typeExpr != null)
+        processingCase = true;
+        try
         {
-            if (typeExpr instanceof NumericExpression)
-            {
-                numericCase = true;
-                typeSet = true;
-            }
-            else if (typeExpr instanceof BooleanExpression)
-            {
-                booleanCase = true;
-                typeSet = true;
-            }
-            else if (typeExpr instanceof StringExpression)
-            {
-                stringCase = true;
-                typeSet = true;
-            }
-        }
+            List<ExpressionPair> conditions = expr.getConditions();
+            Iterator<ExpressionPair> whenExprIter = conditions.iterator();
+            SQLExpression[] whenSqlExprs = new SQLExpression[conditions.size()];
+            SQLExpression[] actionSqlExprs = new SQLExpression[conditions.size()];
 
-        int i = 0;
-        while (whenExprIter.hasNext())
-        {
-            ExpressionPair pair = whenExprIter.next();
-            Expression whenExpr = pair.getWhenExpression();
-            whenExpr.evaluate(this);
-            whenSqlExprs[i] = stack.pop();
-            if (!(whenSqlExprs[i] instanceof BooleanExpression))
-            {
-                throw new QueryCompilerSyntaxException("IF/ELSE conditional expression should return boolean but doesn't : " + expr);
-            }
+            boolean numericCase = false;
+            boolean booleanCase = false;
+            boolean stringCase = false;
 
-            Expression actionExpr = pair.getActionExpression();
-            actionExpr.evaluate(this);
-            actionSqlExprs[i] = stack.pop();
-
-            if (!typeSet)
+            boolean typeSet = false;
+            if (typeExpr != null)
             {
-                if (actionSqlExprs[i] instanceof NumericExpression)
+                if (typeExpr instanceof NumericExpression)
                 {
                     numericCase = true;
                     typeSet = true;
                 }
-                else if (actionSqlExprs[i] instanceof BooleanExpression)
+                else if (typeExpr instanceof BooleanExpression)
                 {
                     booleanCase = true;
                     typeSet = true;
                 }
-                else if (actionSqlExprs[i] instanceof StringExpression)
+                else if (typeExpr instanceof StringExpression)
                 {
                     stringCase = true;
                     typeSet = true;
                 }
             }
 
-            i++;
-        }
-
-        Expression elseExpr = expr.getElseExpression();
-        elseExpr.evaluate(this);
-        SQLExpression elseActionSqlExpr = stack.pop();
-
-        // Check that all action sql expressions are consistent
-        for (int j=1;j<actionSqlExprs.length;j++)
-        {
-            if (!checkCaseExpressionsConsistent(actionSqlExprs[0], actionSqlExprs[j]))
+            int i = 0;
+            while (whenExprIter.hasNext())
             {
-                throw new QueryCompilerSyntaxException("IF/ELSE action expression " + actionSqlExprs[j] + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
-            }
-        }
-        if (!checkCaseExpressionsConsistent(actionSqlExprs[0], elseActionSqlExpr))
-        {
-            throw new QueryCompilerSyntaxException("IF/ELSE action expression " + elseActionSqlExpr + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
-        }
+                ExpressionPair pair = whenExprIter.next();
+                Expression whenExpr = pair.getWhenExpression();
+                whenExpr.evaluate(this);
+                whenSqlExprs[i] = stack.pop();
+                if (!(whenSqlExprs[i] instanceof BooleanExpression))
+                {
+                    throw new QueryCompilerSyntaxException("IF/ELSE conditional expression should return boolean but doesn't : " + expr);
+                }
 
-        SQLExpression caseSqlExpr = null;
-        if (numericCase)
-        {
-            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+                Expression actionExpr = pair.getActionExpression();
+                actionExpr.evaluate(this);
+                actionSqlExprs[i] = stack.pop();
+
+                if (!typeSet)
+                {
+                    if (actionSqlExprs[i] instanceof NumericExpression)
+                    {
+                        numericCase = true;
+                        typeSet = true;
+                    }
+                    else if (actionSqlExprs[i] instanceof BooleanExpression)
+                    {
+                        booleanCase = true;
+                        typeSet = true;
+                    }
+                    else if (actionSqlExprs[i] instanceof StringExpression)
+                    {
+                        stringCase = true;
+                        typeSet = true;
+                    }
+                }
+
+                i++;
+            }
+
+            Expression elseExpr = expr.getElseExpression();
+            elseExpr.evaluate(this);
+            SQLExpression elseActionSqlExpr = stack.pop();
+
+            // Check that all action sql expressions are consistent
+            for (int j=1;j<actionSqlExprs.length;j++)
+            {
+                if (!checkCaseExpressionsConsistent(actionSqlExprs[0], actionSqlExprs[j]))
+                {
+                    throw new QueryCompilerSyntaxException("IF/ELSE action expression " + actionSqlExprs[j] + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
+                }
+            }
+            if (!checkCaseExpressionsConsistent(actionSqlExprs[0], elseActionSqlExpr))
+            {
+                throw new QueryCompilerSyntaxException("IF/ELSE action expression " + elseActionSqlExpr + " is of different type to first action " + actionSqlExprs[0] + " - must be consistent");
+            }
+
+            SQLExpression caseSqlExpr = null;
+            if (numericCase)
+            {
+                caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseNumericExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+            }
+            else if (booleanCase)
+            {
+                caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+            }
+            else if (stringCase)
+            {
+                caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseStringExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+            }
+            else
+            {
+                caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+            }
+            stack.push(caseSqlExpr);
+            return caseSqlExpr;
         }
-        else if (booleanCase)
+        finally
         {
-            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseBooleanExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
+            processingCase = false;
         }
-        else if (stringCase)
-        {
-            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseStringExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
-        }
-        else
-        {
-            caseSqlExpr = new org.datanucleus.store.rdbms.sql.expression.CaseExpression(whenSqlExprs, actionSqlExprs, elseActionSqlExpr);
-        }
-        stack.push(caseSqlExpr);
-        return caseSqlExpr;
     }
 
     private boolean checkCaseExpressionsConsistent(SQLExpression expr1, SQLExpression expr2)
