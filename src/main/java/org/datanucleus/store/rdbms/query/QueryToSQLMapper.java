@@ -3988,6 +3988,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         if (compileComponent == CompilationComponent.UPDATE && !storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.PARAMETER_IN_UPDATE_CLAUSE))
         {
             // This database doesn't support parameters in the UPDATE clause, so process as a literal
+            // TODO This is most often that the database doesn't support parameters in a CASE statement when in UPDATE clause, so add a check on CASE
             asLiteral = true;
         }
 
