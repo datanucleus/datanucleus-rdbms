@@ -129,15 +129,21 @@ public class ArrayRDBMSMapping extends AbstractDatastoreMapping
             Array arr = rs.getArray(param);
             if (!rs.wasNull())
             {
+                Object javaArray = arr.getArray();
+                int length = java.lang.reflect.Array.getLength(javaArray);
+
                 AbstractMemberMetaData mmd = mapping.getMemberMetaData();
                 if (mmd.getType().isArray())
                 {
-                    value = arr.getArray();
+                    // Copy in to an array of the same type as the member
+                    value = java.lang.reflect.Array.newInstance(mmd.getType().getComponentType(), length);
+                    for (int i=0;i<length;i++)
+                    {
+                        java.lang.reflect.Array.set(value, i, java.lang.reflect.Array.get(javaArray, i));
+                    }
                 }
                 else if (Collection.class.isAssignableFrom(mmd.getType()))
                 {
-                    Object javaArray = arr.getArray();
-
                     Collection<Object> coll;
                     try
                     {
@@ -149,7 +155,7 @@ public class ArrayRDBMSMapping extends AbstractDatastoreMapping
                         throw new NucleusDataStoreException(e.getMessage(), e);
                     }
 
-                    for (int i=0;i<java.lang.reflect.Array.getLength(javaArray);i++)
+                    for (int i=0;i<length;i++)
                     {
                         coll.add(java.lang.reflect.Array.get(javaArray, i));
                     }
