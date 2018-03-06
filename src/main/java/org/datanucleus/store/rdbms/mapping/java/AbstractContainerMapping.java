@@ -136,13 +136,18 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             if (mmd.hasCollection() || mmd.hasArray())
             {
                 ColumnMetaData[] colmds = (mmd.getElementMetaData() != null ? mmd.getElementMetaData().getColumnMetaData() : null);
-                if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null)
+                if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null && colmds[0].getJdbcType().equals(JdbcType.ARRAY))
                 {
-                    // Check for using JDBC ARRAY type
-                    if (colmds[0].getJdbcType().equals(JdbcType.ARRAY))
-                    {
-                        return Collection.class.getName();
-                    }
+                    // Element column using JDBC ARRAY type
+                    return Collection.class.getName();
+                }
+
+                // Check if they specified just @Column since storing in single column in owner table
+                colmds = mmd.getColumnMetaData();
+                if (colmds != null && colmds.length == 1 && colmds[0].getJdbcType() != null && colmds[0].getJdbcType().equals(JdbcType.ARRAY))
+                {
+                    // Column using JDBC ARRAY type
+                    return Collection.class.getName();
                 }
             }
 
