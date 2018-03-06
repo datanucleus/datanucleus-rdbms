@@ -39,21 +39,24 @@ import org.datanucleus.util.Localiser;
  */
 public class ArrayRDBMSMapping extends AbstractDatastoreMapping
 {
-    String arrayElemType = null;
+    /** SQL type for the element. */
+    String arrayElemSqlType = null;
 
     public ArrayRDBMSMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column column)
     {
 		super(storeMgr, mapping);
 		this.column = column;
 		initialize();
+
+		// PostgreSQL will have a type like "INT ARRAY" or "TEXT ARRAY", so this finds the element SQL type
 		String arrayTypeName = column.getTypeName();
 		if (arrayTypeName.indexOf("array") > 0)
 		{
-		    arrayElemType = arrayTypeName.substring(0, arrayTypeName.indexOf("array")).trim();
+		    arrayElemSqlType = arrayTypeName.substring(0, arrayTypeName.indexOf("array")).trim();
 		}
 		else if (arrayTypeName.indexOf("ARRAY") > 0)
 		{
-            arrayElemType = arrayTypeName.substring(0, arrayTypeName.indexOf("ARRAY")).trim();
+            arrayElemSqlType = arrayTypeName.substring(0, arrayTypeName.indexOf("ARRAY")).trim();
 		}
 		else
 		{
@@ -91,7 +94,7 @@ public class ArrayRDBMSMapping extends AbstractDatastoreMapping
                     {
                         elems[i] = java.lang.reflect.Array.get(value, i);
                     }
-                    array = ps.getConnection().createArrayOf(arrayElemType, elems);
+                    array = ps.getConnection().createArrayOf(arrayElemSqlType, elems);
                 }
                 else if (value instanceof Collection)
                 {
@@ -103,7 +106,7 @@ public class ArrayRDBMSMapping extends AbstractDatastoreMapping
                     {
                         elems[i++] = elem;
                     }
-                    array = ps.getConnection().createArrayOf(arrayElemType, elems);
+                    array = ps.getConnection().createArrayOf(arrayElemSqlType, elems);
                 }
                 else
                 {
