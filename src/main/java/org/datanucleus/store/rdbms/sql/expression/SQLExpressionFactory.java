@@ -184,7 +184,7 @@ public class SQLExpressionFactory
             org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionTimestampMapping.class.getName(), 
             org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
-        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
+        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OrderIndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NumericExpression.class);
 
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DatastoreIdMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.PersistableMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.ObjectExpression.class);
@@ -240,7 +240,7 @@ public class SQLExpressionFactory
             org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.VersionMapping.VersionTimestampMapping.class.getName(), 
             org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
-        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.IndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
+        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OrderIndexMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.IntegerLiteral.class);
 
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.NullMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.NullLiteral.class);
 

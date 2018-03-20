@@ -95,7 +95,7 @@ import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
 import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
 import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
-import org.datanucleus.store.rdbms.mapping.java.IndexMapping;
+import org.datanucleus.store.rdbms.mapping.java.OrderIndexMapping;
 import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.LongMapping;
@@ -3402,10 +3402,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     private JavaTypeMapping addOrderColumn(AbstractMemberMetaData mmd, ClassLoaderResolver clr)
     {
         Class indexType = Integer.class;
-        JavaTypeMapping indexMapping = new IndexMapping();
-        indexMapping.initialize(storeMgr, indexType.getName());
-        indexMapping.setMemberMetaData(mmd);
-        indexMapping.setTable(this);
+        JavaTypeMapping orderIndexMapping = new OrderIndexMapping();
+        orderIndexMapping.initialize(storeMgr, indexType.getName());
+        orderIndexMapping.setMemberMetaData(mmd);
+        orderIndexMapping.setTable(this);
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         DatastoreIdentifier indexColumnName = null;
         ColumnMetaData colmd = null;
@@ -3442,16 +3442,16 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(indexType), FieldRole.ROLE_INDEX);
         }
 
-        Column column = addColumn(indexType.getName(), indexColumnName, indexMapping, colmd);
+        Column column = addColumn(indexType.getName(), indexColumnName, orderIndexMapping, colmd);
         if (colmd == null || (colmd.getAllowsNull() == null) || (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
         {
             // User either wants it nullable, or havent specified anything, so make it nullable
             column.setNullable(true);
         }
 
-        storeMgr.getMappingManager().createDatastoreMapping(indexMapping, column, indexType.getName());
+        storeMgr.getMappingManager().createDatastoreMapping(orderIndexMapping, column, indexType.getName());
 
-        return indexMapping;
+        return orderIndexMapping;
     }
 
     /**

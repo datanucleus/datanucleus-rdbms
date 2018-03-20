@@ -19,10 +19,9 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 /**
- * Mapping for Index Columns.
- * This class is for internal use only. It should not be used in user mappings nor extended. 
+ * Mapping for the ordering of an "indexed" list.
  */
-public final class IndexMapping extends SingleFieldMapping
+public final class OrderIndexMapping extends SingleFieldMapping
 {
     /**
      * Accessor for whether to include this column in any fetch statement
@@ -30,6 +29,7 @@ public final class IndexMapping extends SingleFieldMapping
      */
     public boolean includeInFetchStatement()
     {
+        // We will have an order by in the fetch statement, but no need to pull back this value
         return false;
     }
 
