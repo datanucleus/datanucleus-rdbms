@@ -43,6 +43,8 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.scostore.SetStore;
+import org.datanucleus.store.types.scostore.Store;
 import org.datanucleus.util.Localiser;
 
 /**
@@ -422,6 +424,12 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         else if (mmd.getOrderMetaData() != null && type.isAssignableFrom(java.util.List.class))
         {
             type = java.util.List.class;
+            Store backingStore = storeMgr.getExistingBackingStoreForMember(mmd);
+            if (backingStore != null && (backingStore instanceof SetStore))
+            {
+                // Member has already been instantiated as Set-based, so don't use List
+                type = mmd.getType();
+            }
         }
 
         ExecutionContext ec = op.getExecutionContext();

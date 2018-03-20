@@ -887,6 +887,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
+    public Store getExistingBackingStoreForMember(AbstractMemberMetaData mmd)
+    {
+        return backingStoreByMemberName.get(mmd.getFullFieldName());
+    }
+
     /**
      * Accessor for the backing store for the specified member.
      * Note : if we have an embedded object that is embedded into some other type and the object has a member that requires a join table (backing store), this method
