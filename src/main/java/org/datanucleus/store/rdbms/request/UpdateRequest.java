@@ -253,7 +253,7 @@ public class UpdateRequest extends Request
             {
                 if (mmds[i].isUpdateTimestamp()) // TODO Make this accessible from cmd
                 {
-                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getBeginTime()));
+                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
                 }
                 else if (mmds[i].isUpdateUser()) // TODO Make this accessible from cmd
                 {
