@@ -305,7 +305,15 @@ public final class ColumnCreator
                     {
                     	throw new NucleusUserException("Cannot create column for field "+mmd.getFullFieldName()+" column metadata "+colmd,ex);
                     }
-                    ((PersistableMapping) container).addJavaTypeMapping(refDatastoreMapping);
+
+                    try
+                    {
+                        ((PersistableMapping) container).addJavaTypeMapping(refDatastoreMapping);
+                    }
+                    catch (ClassCastException e)
+                    {
+                        throw new NucleusUserException("Failed to create column for field "+mmd.getFullFieldName()+". Cannot cast mapping to PersistableMapping.",e);
+                    }
                 }
             }
         }
