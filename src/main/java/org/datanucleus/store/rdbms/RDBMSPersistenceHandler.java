@@ -661,6 +661,12 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      */
     private void checkForSchemaUpdatesForFieldsOfObject(ObjectProvider sm, int[] fieldNumbers)
     {
+        if (fieldNumbers == null || fieldNumbers.length == 0)
+        {
+            // Nothing to do for a class with no fields/attributes
+            return;
+        }
+
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
         {
             DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager((RDBMSStoreManager)storeMgr, sm);
