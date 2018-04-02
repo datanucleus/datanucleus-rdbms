@@ -17,6 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
+import java.util.List;
+
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.SingleCollectionMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -41,5 +43,16 @@ public class SingleCollectionExpression extends DelegatedExpression
         {
             delegate = stmt.getSQLExpressionFactory().newExpression(stmt, table, wrappedMapping);
         }
+    }
+
+    /**
+     * Allow the methods to be invoked directly in the wrapped type.
+     */
+    @Override
+    public SQLExpression invoke(String methodName, List args)
+    {
+        return stmt.getRDBMSManager()
+                   .getSQLExpressionFactory()
+                   .invokeMethod(stmt,  mapping.getJavaType().getName(), methodName, this.getDelegate(), args);
     }
 }
