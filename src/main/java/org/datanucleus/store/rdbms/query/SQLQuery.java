@@ -444,111 +444,119 @@ public final class SQLQuery extends Query
             }
             if (cmd.getPersistableSuperclass() != null)
             {
-               // throw new PersistentSuperclassNotAllowedException(candidateClass.getName());
+                // throw new PersistentSuperclassNotAllowedException(candidateClass.getName());
             }
 
             if (getResultClass() == null)
             {
-                // Check the presence of the required columns (id, version, discriminator) in the candidate class
-                String selections = stripComments(compiledSQL.trim()).substring(7); // Skip "SELECT "
-                int fromStart = selections.indexOf("FROM");
-                if (fromStart == -1)
+                if (getBooleanExtensionProperty(EXTENSION_SQL_SYNTAX_CHECKS, true))
                 {
-                    fromStart = selections.indexOf("from");
-                }
-                selections = selections.substring(0, fromStart).trim();
-
-                String[] selectedColumns = StringUtils.split(selections, ",");
-                if (selectedColumns == null || selectedColumns.length == 0)
-                {
-                    throw new NucleusUserException(Localiser.msg("059003", compiledSQL));
-                }
-
-                if (selectedColumns.length == 1 && selectedColumns[0].trim().equals("*"))
-                {
-                    // SQL Query using * so just end the checking since all possible columns will be selected
-                }
-                else
-                {
-                    // Generate id column field information for later checking the id is present
-                    DatastoreClass table = storeMgr.getDatastoreClass(candidateClass.getName(), clr);
-                    PersistableMapping idMapping = (PersistableMapping)table.getIdMapping();
-                    String[] idColNames = new String[idMapping.getNumberOfDatastoreMappings()];
-                    boolean[] idColMissing = new boolean[idMapping.getNumberOfDatastoreMappings()];
-                    for (int i=0;i<idMapping.getNumberOfDatastoreMappings();i++)
+                    // Check syntax for the presence of the required columns (id, version, discriminator) in the candidate class
+                    String selections = stripComments(compiledSQL.trim()).substring(7); // Skip "SELECT "
+                    int fromStart = selections.indexOf("FROM");
+                    if (fromStart == -1)
                     {
-                        idColNames[i] = idMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString();
-                        idColMissing[i] = true;
+                        fromStart = selections.indexOf("from");
+                    }
+                    selections = selections.substring(0, fromStart).trim();
+
+                    String[] selectedColumns = StringUtils.split(selections, ",");
+                    if (selectedColumns == null || selectedColumns.length == 0)
+                    {
+                        throw new NucleusUserException(Localiser.msg("059003", compiledSQL));
                     }
 
-                    // Generate discriminator/version information for later checking they are present
-                    JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
-                    String discriminatorColName = (discrimMapping != null) ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
-                    JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
-                    String versionColName = (versionMapping != null) ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
-                    boolean discrimMissing = (discriminatorColName != null);
-                    boolean versionMissing = (versionColName != null);
-
-                    // Go through the selected fields and check the existence of id, version, discriminator cols
-                    DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
-                    final AbstractClassMetaData candidateCmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
-                    for (int i = 0; i < selectedColumns.length; i++)
+                    if (selectedColumns.length == 1 && selectedColumns[0].trim().equals("*"))
                     {
-                        String colName = selectedColumns[i].trim();
-                        if (colName.indexOf(" AS ") > 0)
+                        // SQL Query using * so just end the checking since all possible columns will be selected
+                    }
+                    else
+                    {
+                        // Generate id column field information for later checking the id is present
+                        DatastoreClass table = storeMgr.getDatastoreClass(candidateClass.getName(), clr);
+                        PersistableMapping idMapping = (PersistableMapping)table.getIdMapping();
+                        String[] idColNames = new String[idMapping.getNumberOfDatastoreMappings()];
+                        boolean[] idColMissing = new boolean[idMapping.getNumberOfDatastoreMappings()];
+                        for (int i=0;i<idMapping.getNumberOfDatastoreMappings();i++)
                         {
-                            // Allow for user specification of "XX.YY AS ZZ"
-                            colName = colName.substring(colName.indexOf(" AS ")+4).trim();
-                        }
-                        else if (colName.indexOf(" as ") > 0)
-                        {
-                            // Allow for user specification of "XX.YY as ZZ"
-                            colName = colName.substring(colName.indexOf(" as ")+4).trim();
+                            idColNames[i] = idMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString();
+                            idColMissing[i] = true;
                         }
 
-                        if (candidateCmd.getIdentityType() == IdentityType.DATASTORE)
+                        // Generate discriminator/version information for later checking they are present
+                        JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
+                        String discriminatorColName = (discrimMapping != null) ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                        JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
+                        String versionColName = (versionMapping != null) ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                        boolean discrimMissing = (discriminatorColName != null);
+                        boolean versionMissing = (versionColName != null);
+
+                        // Go through the selected fields and check the existence of id, version, discriminator cols
+                        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+                        final AbstractClassMetaData candidateCmd = ec.getMetaDataManager().getMetaDataForClass(candidateClass, clr);
+                        for (int i = 0; i < selectedColumns.length; i++)
                         {
-                            // Check for existence of id column, allowing for any RDBMS using quoted identifiers
-                            if (SQLQuery.columnNamesAreTheSame(dba, idColNames[0], colName))
+                            String colName = selectedColumns[i].trim();
+                            if (colName.indexOf(" AS ") > 0)
                             {
-                                idColMissing[0] = false;
+                                // Allow for user specification of "XX.YY AS ZZ"
+                                colName = colName.substring(colName.indexOf(" AS ")+4).trim();
                             }
-                        }
-                        else if (candidateCmd.getIdentityType() == IdentityType.APPLICATION)
-                        {
-                            for (int j=0; j<idColNames.length; j++)
+                            else if (colName.indexOf(" as ") > 0)
+                            {
+                                // Allow for user specification of "XX.YY as ZZ"
+                                colName = colName.substring(colName.indexOf(" as ")+4).trim();
+                            }
+                            else if (colName.indexOf(".") > 0)
+                            {
+                                // Note that this assumes the alias is the candidate table
+                                colName = colName.substring(colName.indexOf(".")+1);
+                            }
+
+                            if (candidateCmd.getIdentityType() == IdentityType.DATASTORE)
                             {
                                 // Check for existence of id column, allowing for any RDBMS using quoted identifiers
-                                if (SQLQuery.columnNamesAreTheSame(dba, idColNames[j], colName))
+                                if (SQLQuery.columnNamesAreTheSame(dba, idColNames[0], colName))
                                 {
-                                    idColMissing[j] = false;
+                                    idColMissing[0] = false;
                                 }
+                            }
+                            else if (candidateCmd.getIdentityType() == IdentityType.APPLICATION)
+                            {
+                                for (int j=0; j<idColNames.length; j++)
+                                {
+                                    // Check for existence of id column, allowing for any RDBMS using quoted identifiers
+                                    if (SQLQuery.columnNamesAreTheSame(dba, idColNames[j], colName))
+                                    {
+                                        idColMissing[j] = false;
+                                    }
+                                }
+                            }
+
+                            if (discrimMissing && SQLQuery.columnNamesAreTheSame(dba, discriminatorColName, colName))
+                            {
+                                discrimMissing = false;
+                            }
+                            else if (versionMissing && SQLQuery.columnNamesAreTheSame(dba, versionColName, colName))
+                            {
+                                versionMissing = false;
                             }
                         }
 
-                        if (discrimMissing && SQLQuery.columnNamesAreTheSame(dba, discriminatorColName, colName))
+                        if (discrimMissing)
                         {
-                            discrimMissing = false;
+                            throw new NucleusUserException(Localiser.msg("059014", compiledSQL, candidateClass.getName(), discriminatorColName));
                         }
-                        else if (versionMissing && SQLQuery.columnNamesAreTheSame(dba, versionColName, colName))
+                        if (versionMissing)
                         {
-                            versionMissing = false;
+                            throw new NucleusUserException(Localiser.msg("059015", compiledSQL, candidateClass.getName(), versionColName));
                         }
-                    }
-
-                    if (discrimMissing)
-                    {
-                        throw new NucleusUserException(Localiser.msg("059014", compiledSQL, candidateClass.getName(), discriminatorColName));
-                    }
-                    if (versionMissing)
-                    {
-                        throw new NucleusUserException(Localiser.msg("059015", compiledSQL, candidateClass.getName(), versionColName));
-                    }
-                    for (int i = 0; i < idColMissing.length; i++)
-                    {
-                        if (idColMissing[i])
+                        for (int i = 0; i < idColMissing.length; i++)
                         {
-                            throw new NucleusUserException(Localiser.msg("059013", compiledSQL, candidateClass.getName(), idColNames[i]));
+                            if (idColMissing[i])
+                            {
+                                throw new NucleusUserException(Localiser.msg("059013", compiledSQL, candidateClass.getName(), idColNames[i]));
+                            }
                         }
                     }
                 }
