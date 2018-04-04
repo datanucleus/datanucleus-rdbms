@@ -1017,17 +1017,22 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
             }
         }
 
-        // Refresh all existing tables plus this requested one
+        // Refresh the necessary table(s)
         boolean insensitiveIdentifiers = identifiersCaseInsensitive();
-        Collection tableNames = new HashSet();
-        Collection tables = rdbmsStoreMgr.getManagedTables(catalogName, schemaName);
-        if (tables.size() > 0)
+        Collection<String> tableNames = new HashSet<>();
+
+        if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_REFRESH_ALL_TABLES_ON_REFRESH_COLUMNS))
         {
-            Iterator iter = tables.iterator();
-            while (iter.hasNext())
+            // User requested to refresh all existing tables as well
+            Collection tables = rdbmsStoreMgr.getManagedTables(catalogName, schemaName);
+            if (tables.size() > 0)
             {
-                Table tbl = (Table)iter.next();
-                tableNames.add(insensitiveIdentifiers ? tbl.getIdentifier().getName().toLowerCase() : tbl.getIdentifier().getName());
+                Iterator iter = tables.iterator();
+                while (iter.hasNext())
+                {
+                    Table tbl = (Table)iter.next();
+                    tableNames.add(insensitiveIdentifiers ? tbl.getIdentifier().getName().toLowerCase() : tbl.getIdentifier().getName());
+                }
             }
         }
         tableNames.add(insensitiveIdentifiers ? tableName.toLowerCase() : tableName);
