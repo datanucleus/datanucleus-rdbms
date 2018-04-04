@@ -157,7 +157,7 @@ public abstract class TableImpl extends AbstractTable
         {
             throw new MissingTableException(getCatalogName(), getSchemaName(), this.toString());
         }
-        else if (!tableType.equals("TABLE"))
+        else if (!tableType.equals("TABLE") && !tableType.equals("BASE TABLE"))
         {
             throw new NotATableException(this.toString(), tableType);
         }
