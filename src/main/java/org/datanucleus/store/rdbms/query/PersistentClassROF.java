@@ -236,6 +236,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 	                String warnMsgSuffix;
 	                if (hasDiscrimValue && !foundClassByDiscrim)
 	                	warnMsgSuffix = "No persistent class could be found that matches the discriminator value '" + discrimValue +
+				                "'. Has the metadata for all persistent concrete subclasses been added?";
 	                else
 	                	warnMsgSuffix = "Really you need a discriminator to help identifying the type.";
 
