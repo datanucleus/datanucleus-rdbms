@@ -111,22 +111,33 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         // Find the class of the returned object in this row of the ResultSet
         String className = null;
         boolean requiresInheritanceCheck = true;
+        String discrimValue = null;
+
+        // Used for reporting details of a failed class lookup by discriminator
+        boolean hasDiscrimValue = false;
+	    boolean foundClassByDiscrim = false;
+
         StatementMappingIndex discrimMapIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.DISCRIMINATOR.getFieldNumber());
         if (discrimMapIdx != null)
         {
             // Discriminator mapping registered so use that
             try
             {
-                String discrimValue = rs.getString(discrimMapIdx.getColumnPositions()[0]);
+                discrimValue = rs.getString(discrimMapIdx.getColumnPositions()[0]);
                 if (discrimValue == null)
                 {
                     // Discriminator has no value so return null object
                     NucleusLogger.DATASTORE_RETRIEVE.debug("Value of discriminator is null so assuming object is null");
                     return null;
                 }
+                hasDiscrimValue = true;
                 JavaTypeMapping discrimMapping = discrimMapIdx.getMapping();
                 DiscriminatorMetaData dismd = (discrimMapping != null ? discrimMapping.getTable().getDiscriminatorMetaData() : null);
                 className = ec.getMetaDataManager().getClassNameFromDiscriminatorValue(discrimValue, dismd);
+                if (className != null)
+                {
+                	foundClassByDiscrim = true;
+                }
                 requiresInheritanceCheck = false;
             }
             catch (SQLException sqle)
@@ -222,8 +233,14 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 else
                 {
                     // More than 1 possible so notify the user. Really should return the abstract
-                    warnMsg = "Found type=" + pcClassForObject + " but abstract and more than 1 concrete subclass (" +
-                        StringUtils.objectArrayToString(subclasses) + "). Really you need a discriminator to help identifying the type. Choosing " + concreteSubclass;
+	                String warnMsgSuffix;
+	                if (hasDiscrimValue && !foundClassByDiscrim)
+	                	warnMsgSuffix = "No persistent class could be found that matches the discriminator value '" + discrimValue +
+	                else
+	                	warnMsgSuffix = "Really you need a discriminator to help identifying the type.";
+
+	                warnMsg = "Found type=" + pcClassForObject + " but abstract and more than 1 concrete subclass (" +
+                        StringUtils.objectArrayToString(subclasses) + ") when searching immediate subclasses. Choosing " + concreteSubclass + ". " + warnMsgSuffix;
                     pcClassForObject = concreteSubclass;
                     requiresInheritanceCheck = true;
                 }
