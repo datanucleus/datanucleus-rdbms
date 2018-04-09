@@ -298,13 +298,10 @@ public class ResultClassROF extends AbstractROF
             // No field mapping info, so allocate our results in the ResultSet parameter order.
             try
             {
-                if (resultFieldNames != null)
+                fieldValues = new Object[resultFieldNames != null ? resultFieldNames.length : 0];
+                for (int i=0; i<fieldValues.length; i++)
                 {
-                    fieldValues = new Object[resultFieldNames.length];
-                    for (int i=0; i<fieldValues.length; i++)
-                    {
-                        fieldValues[i] = getResultObject(rs, i+1);
-                    }
+                    fieldValues[i] = getResultObject(rs, i+1);
                 }
             }
             catch (SQLException sqe)
