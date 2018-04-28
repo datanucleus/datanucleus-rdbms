@@ -211,35 +211,35 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 ConnectionPoolFactory connPoolFactory = null;
 
                 // Try built-in pools first
-                if (poolingType.equals("dbcp2-builtin"))
+                if (poolingType.equalsIgnoreCase("dbcp2-builtin"))
                 {
                     connPoolFactory = new DBCP2BuiltinConnectionPoolFactory();
                 }
-                else if (poolingType.equals("HikariCP"))
+                else if (poolingType.equalsIgnoreCase("HikariCP"))
                 {
                     connPoolFactory = new HikariCPConnectionPoolFactory();
                 }
-                else if (poolingType.equals("BoneCP"))
+                else if (poolingType.equalsIgnoreCase("BoneCP"))
                 {
                     connPoolFactory = new BoneCPConnectionPoolFactory();
                 }
-                else if (poolingType.equals("C3P0"))
+                else if (poolingType.equalsIgnoreCase("C3P0"))
                 {
                     connPoolFactory = new C3P0ConnectionPoolFactory();
                 }
-                else if (poolingType.equals("Tomcat"))
+                else if (poolingType.equalsIgnoreCase("Tomcat"))
                 {
                     connPoolFactory = new TomcatConnectionPoolFactory();
                 }
-                else if (poolingType.equals("DBCP2"))
+                else if (poolingType.equalsIgnoreCase("DBCP2"))
                 {
                     connPoolFactory = new DBCP2ConnectionPoolFactory();
                 }
-                else if (poolingType.equals("Proxool"))
+                else if (poolingType.equalsIgnoreCase("Proxool"))
                 {
                     connPoolFactory = new ProxoolConnectionPoolFactory();
                 }
-                else if (poolingType.equals("None"))
+                else if (poolingType.equalsIgnoreCase("None"))
                 {
                     connPoolFactory = new DefaultConnectionPoolFactory();
                 }
