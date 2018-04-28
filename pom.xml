@@ -62,7 +62,6 @@
                             com.informix.jdbc;resolution:=optional,
                             com.jolbox.bonecp;resolution:=optional,
                             com.mchange.v2.c3p0;resolution:=optional,
-                            com.mckoi;resolution:=optional,
                             com.microsoft.sqlserver.jdbc;resolution:=optional,
                             com.mysql.jdbc;resolution:=optional,
                             com.sap.dbtech.jdbc;resolution:=optional,
@@ -157,7 +156,7 @@
         <dependency>
             <groupId>com.jolbox</groupId>
             <artifactId>bonecp</artifactId>
-            <version>0.7.1.RELEASE</version>
+            <version>0.8.0.RELEASE</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -177,7 +176,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.3.5</version>
+            <version>3.0.0</version>
             <optional>true</optional>
         </dependency>
 
