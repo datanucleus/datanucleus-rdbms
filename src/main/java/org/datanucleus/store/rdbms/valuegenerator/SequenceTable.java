@@ -103,14 +103,12 @@ public class SequenceTable extends TableImpl
 		getStoreManager().getMappingManager().createDatastoreMapping(nextValMapping, colNextVal, Long.class.getName());
 
         // Set up JDBC statements for supported operations
-        insertStmt = "INSERT INTO " + identifier.getFullyQualifiedName(false) + " (" + colSequenceName.getIdentifier() + "," + colNextVal.getIdentifier() + 
-            ") VALUES (?,?)";
+        insertStmt = "INSERT INTO " + identifier.getFullyQualifiedName(false) + " (" + colSequenceName.getIdentifier() + "," + colNextVal.getIdentifier() + ") VALUES (?,?)";
         incrementByStmt = "UPDATE " + identifier.getFullyQualifiedName(false) + " SET " + colNextVal.getIdentifier() + "=(" + 
             colNextVal.getIdentifier() + "+?) WHERE " + colSequenceName.getIdentifier() + "=?";
         deleteStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + colSequenceName.getIdentifier() + "=?";
         deleteAllStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false);
-        fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + 
-            colSequenceName.getIdentifier() + "=?";
+        fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + colSequenceName.getIdentifier() + "=?";
         if (dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE))
         {
             fetchStmt += " FOR UPDATE";

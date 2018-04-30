@@ -342,9 +342,9 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
     }
 
     /**
-     * Get a new PoidBlock with the specified number of ids.
+     * Get a new ValueGenerationBlock with the specified number of ids.
      * @param number The number of additional ids required
-     * @return the PoidBlock
+     * @return the ValueGenerationBlock
      */
     protected ValueGenerationBlock<Long> obtainGenerationBlock(int number)
     {
@@ -372,14 +372,7 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
 
             try
             {
-                if (number < 0)
-                {
-                    block = reserveBlock();
-                }
-                else
-                {
-                    block = reserveBlock(number);
-                }
+                block = (number < 0) ? reserveBlock() : reserveBlock(number);
             }
             catch (ValueGenerationException vge)
             {
@@ -426,14 +419,7 @@ public final class TableGenerator extends AbstractConnectedGenerator<Long>
                     throw new ValueGenerationException(Localiser.msg("040002"));
                 }
 
-                if (number < 0)
-                {
-                    block = reserveBlock();
-                }
-                else
-                {
-                    block = reserveBlock(number);
-                }
+                block = (number < 0) ? reserveBlock() : reserveBlock(number);
             }
             finally
             {

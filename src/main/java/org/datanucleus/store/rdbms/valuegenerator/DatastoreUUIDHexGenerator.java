@@ -103,7 +103,6 @@ public final class DatastoreUUIDHexGenerator extends AbstractConnectedGenerator<
                 DatastoreAdapter dba = rdbmsMgr.getDatastoreAdapter();
 
                 String stmt = dba.getSelectNewUUIDStmt();
-
                 ps = sqlControl.getStatementForQuery(mconn, stmt);
                 for (int i=1; i<size; i++)
                 {

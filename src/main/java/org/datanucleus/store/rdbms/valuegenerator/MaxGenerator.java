@@ -74,7 +74,6 @@ public class MaxGenerator extends AbstractConnectedGenerator<Long>
             {
                 String stmt = getStatement();
                 ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
-
                 rs = sqlControl.executeStatementQuery(null, mconn, stmt, ps);
                 if (!rs.next())
                 {
