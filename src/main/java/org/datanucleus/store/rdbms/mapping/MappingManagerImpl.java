@@ -1723,17 +1723,17 @@ public class MappingManagerImpl implements MappingManager
             /*}*/
         }
 
-        if (mmd.getValueForExtension("select-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_SELECT_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("select-function"),Column.WRAPPER_FUNCTION_SELECT);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_SELECT_FUNCTION),Column.WRAPPER_FUNCTION_SELECT);
         }
-        if (mmd.getValueForExtension("insert-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_INSERT_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("insert-function"),Column.WRAPPER_FUNCTION_INSERT);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_INSERT_FUNCTION),Column.WRAPPER_FUNCTION_INSERT);
         }
-        if (mmd.getValueForExtension("update-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_UPDATE_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("update-function"),Column.WRAPPER_FUNCTION_UPDATE);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_UPDATE_FUNCTION),Column.WRAPPER_FUNCTION_UPDATE);
         }
 
         setColumnNullability(mmd, colmd, col);
@@ -1857,17 +1857,17 @@ public class MappingManagerImpl implements MappingManager
             }
         }
 
-        if (mmd.getValueForExtension("select-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_SELECT_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("select-function"),Column.WRAPPER_FUNCTION_SELECT);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_SELECT_FUNCTION),Column.WRAPPER_FUNCTION_SELECT);
         }
-        if (mmd.getValueForExtension("insert-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_INSERT_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("insert-function"),Column.WRAPPER_FUNCTION_INSERT);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_INSERT_FUNCTION),Column.WRAPPER_FUNCTION_INSERT);
         }
-        if (mmd.getValueForExtension("update-function") != null)
+        if (mmd.getValueForExtension(METADATA_EXTENSION_UPDATE_FUNCTION) != null)
         {
-            col.setWrapperFunction(mmd.getValueForExtension("update-function"),Column.WRAPPER_FUNCTION_UPDATE);
+            col.setWrapperFunction(mmd.getValueForExtension(METADATA_EXTENSION_UPDATE_FUNCTION),Column.WRAPPER_FUNCTION_UPDATE);
         }
 
         setColumnNullability(mmd, colmd, col);

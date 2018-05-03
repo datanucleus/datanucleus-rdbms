@@ -19,6 +19,7 @@ package org.datanucleus.store.rdbms.mapping.datastore;
 
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DB2TypeInfo;
+import org.datanucleus.store.rdbms.mapping.MappingManagerImpl;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 
@@ -42,7 +43,7 @@ public class DB2DatalinkRDBMSMapping extends CharRDBMSMapping
     {
         if (column != null)
         {
-            if (mapping.getMemberMetaData().getValueForExtension("select-function") == null)
+            if (mapping.getMemberMetaData().getValueForExtension(MappingManagerImpl.METADATA_EXTENSION_SELECT_FUNCTION) == null)
             {
                 column.setWrapperFunction("DLURLCOMPLETEONLY(?)", Column.WRAPPER_FUNCTION_SELECT);
             }

@@ -825,22 +825,6 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#applySelectFunction(java.lang.String)
-     */
-    public String applySelectFunction(String replacementValue)
-    {
-        if (replacementValue == null)
-        {
-            return wrapperFunction[WRAPPER_FUNCTION_SELECT];
-        }
-        if (wrapperFunction[WRAPPER_FUNCTION_SELECT] != null)
-        {
-            return wrapperFunction[WRAPPER_FUNCTION_SELECT].replace("?", replacementValue);
-        }
-        return replacementValue;
-    }    
-
-    /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getDefaultValue()
      */
     public Object getDefaultValue()
@@ -999,13 +983,29 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.table.Column#applySelectFunction(java.lang.String)
+     */
+    public String applySelectFunction(String replacementValue)
+    {
+        if (replacementValue == null)
+        {
+            return wrapperFunction[WRAPPER_FUNCTION_SELECT];
+        }
+        if (wrapperFunction[WRAPPER_FUNCTION_SELECT] != null)
+        {
+            return wrapperFunction[WRAPPER_FUNCTION_SELECT].replace("?", replacementValue);
+        }
+        return replacementValue;
+    }    
+
+    /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#setWrapperFunction(java.lang.String, int)
      */
     public void setWrapperFunction(String wrapperFunction, int wrapperMode)
     {
         if (wrapperFunction != null && wrapperMode == WRAPPER_FUNCTION_SELECT && wrapperFunction.indexOf("?") < 0)
         {
-            throw new NucleusUserException("Wrapping function must have one ? (question mark). e.g. SQRT(?)");
+            throw new NucleusUserException("Wrapping function must have one '?'. e.g. SQRT(?)");
         }
         this.wrapperFunction[wrapperMode] = wrapperFunction;
     }

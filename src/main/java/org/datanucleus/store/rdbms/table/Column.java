@@ -99,14 +99,6 @@ public interface Column extends org.datanucleus.store.schema.table.Column
     JavaTypeMapping getJavaTypeMapping();
 
     /**
-     * Wraps the column name with a FUNCTION.
-     * <PRE>example: SQRT(?) generates: SQRT(columnName)</PRE>
-     * @param replacementValue the replacement to ?. Probably it's a column name, that may be fully qualified name or not
-     * @return a String with function taking as parameter the replacementValue
-     */
-    String applySelectFunction(String replacementValue);
-
-    /**
      * Copy the configuration of this field to another field
      * @param col the column to copy
      */
@@ -194,6 +186,14 @@ public interface Column extends org.datanucleus.store.schema.table.Column
      * @throws ColumnDefinitionException if an error occurs
      */
     void checkString() throws ColumnDefinitionException;
+
+    /**
+     * Wraps the column name with a FUNCTION.
+     * <PRE>example: SQRT(?) generates: SQRT(columnName)</PRE>
+     * @param replacementValue the replacement to ?. Probably it's a column name, that may be fully qualified name or not
+     * @return a String with function taking as parameter the replacementValue
+     */
+    String applySelectFunction(String replacementValue);
 
     /**
      * Sets a function to wrap the column. 

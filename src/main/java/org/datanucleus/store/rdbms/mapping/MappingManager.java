@@ -35,6 +35,10 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public interface MappingManager
 {
+    public static final String METADATA_EXTENSION_INSERT_FUNCTION = "insert-function";
+    public static final String METADATA_EXTENSION_UPDATE_FUNCTION = "update-function";
+    public static final String METADATA_EXTENSION_SELECT_FUNCTION = "select-function";
+
     /**
      * Accessor for whether a java type is supported as being mappable.
      * @param javaTypeName The java type name
