@@ -33,7 +33,8 @@ import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for fields of type java.util.UUID.
- * Makes use of a TypeConverter (converting to String) as default, but if the user provides sqlType then attempts to find a native sqlType
+ * Makes use of a TypeConverter (converting to String) as default, but if the user provides sqlType then attempts to find a native sqlType and avoids using a TypeConverter.
+ * TODO If an sqlType is specified but wanted to use a String conversion then this process will likely fail, so needs improving.
  */
 public class UUIDMapping extends SingleFieldMapping
 {
@@ -45,29 +46,12 @@ public class UUIDMapping extends SingleFieldMapping
     @Override
     public void initialize(RDBMSStoreManager storeMgr, String type)
     {
-        boolean useConverter = true;
-        if (mmd != null)
+        // We don't have access to any field info yet, so have no idea whether we need a TypeConverter, so just create one
+        Class fieldType = storeMgr.getNucleusContext().getClassLoaderResolver(null).classForName(type);
+        converter = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fieldType);
+        if (converter == null)
         {
-            ColumnMetaData[] colmds = mmd.getColumnMetaData();
-            if (colmds != null && colmds.length == 1)
-            {
-                ColumnMetaData colmd = colmds[0];
-                if (colmd.getSqlType() != null)
-                {
-                    useConverter = false;
-                }
-            }
-        }
-
-        if (useConverter)
-        {
-            ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
-            Class fieldType = clr.classForName(type);
-            converter = storeMgr.getNucleusContext().getTypeManager().getDefaultTypeConverterForType(fieldType);
-            if (converter == null)
-            {
-                throw new NucleusUserException("Unable to find TypeConverter for converting " + fieldType + " to String");
-            }
+            throw new NucleusUserException("Unable to find TypeConverter for converting " + fieldType + " to String");
         }
 
         super.initialize(storeMgr, type);
@@ -79,9 +63,9 @@ public class UUIDMapping extends SingleFieldMapping
     @Override
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        boolean useConverter = true;
         if (mmd != null)
         {
+            boolean useConverter = true;
             ColumnMetaData[] colmds = mmd.getColumnMetaData();
             if (colmds != null && colmds.length == 1)
             {
@@ -152,6 +136,15 @@ public class UUIDMapping extends SingleFieldMapping
         }
         else
         {
+            if (datastoreMappings.length > 0)
+            {
+                ColumnMetaData colmd = datastoreMappings[0].getColumn().getColumnMetaData();
+                if (colmd.getSqlType() != null)
+                {
+                    super.setObject(ec, ps, exprIndex, value);
+                    return;
+                }
+            }
             getDatastoreMapping(0).setObject(ps, exprIndex[0], converter.toDatastoreType(value));
         }
     }
@@ -172,6 +165,14 @@ public class UUIDMapping extends SingleFieldMapping
             return super.getObject(ec, resultSet, exprIndex);
         }
 
+        if (datastoreMappings.length > 0)
+        {
+            ColumnMetaData colmd = datastoreMappings[0].getColumn().getColumnMetaData();
+            if (colmd.getSqlType() != null)
+            {
+                return super.getObject(ec, resultSet, exprIndex);
+            }
+        }
         Object datastoreValue = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
         return (datastoreValue != null ? converter.toMemberType(datastoreValue) : null);
     }
