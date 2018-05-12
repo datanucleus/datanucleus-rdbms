@@ -18,6 +18,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.query;
 
+import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -213,24 +214,47 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
         Map<Integer, Object> fieldValuesForOwner = bulkLoadedValueByMemberNumber.get(ownerId);
         if (fieldValuesForOwner == null)
         {
-            fieldValuesForOwner = new HashMap<Integer, Object>();
+            fieldValuesForOwner = new HashMap<>();
             bulkLoadedValueByMemberNumber.put(ownerId, fieldValuesForOwner);
         }
-        Collection coll = (Collection) fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());
-        if (coll == null)
+
+        if (mmd.hasCollection())
         {
-            try
+            Collection coll = (Collection) fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());
+            if (coll == null)
             {
-                Class instanceType = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
-                coll = (Collection<Object>) instanceType.newInstance();
-                fieldValuesForOwner.put(mmd.getAbsoluteFieldNumber(), coll);
+                try
+                {
+                    Class instanceType = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
+                    coll = (Collection<Object>) instanceType.newInstance();
+                    fieldValuesForOwner.put(mmd.getAbsoluteFieldNumber(), coll);
+                }
+                catch (Exception e)
+                {
+                    throw new NucleusDataStoreException(e.getMessage(), e);
+                }
             }
-            catch (Exception e)
+            coll.add(element);
+        }
+        else if (mmd.hasArray())
+        {
+            Object arr = fieldValuesForOwner.get(mmd.getAbsoluteFieldNumber());
+            if (arr == null)
             {
-                throw new NucleusDataStoreException(e.getMessage(), e);
+                arr = Array.newInstance(mmd.getType().getComponentType(), 1);
+                Array.set(arr, 0, element);
+            }
+            else
+            {
+                int currentSize = Array.getLength(arr);
+                Object array = Array.newInstance(mmd.getType().getComponentType(), currentSize+1);
+                for (int i=0;i<currentSize;i++)
+                {
+                    Array.set(array, i, Array.get(arr, i));
+                }
+                Array.set(array, currentSize, element);
             }
         }
-        coll.add(element);
     }
 
     /**
