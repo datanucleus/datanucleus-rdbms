@@ -123,6 +123,7 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.datastoreAdapterClassName" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.omitDatabaseMetaDataGetColumns" datastore="true" value="false"
             validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.refreshAllTablesOnRefreshColumns" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.sqlTableNamingStrategy" datastore="true" value="alpha-scheme"/>
         <persistence-property name="datanucleus.rdbms.allowColumnReuse" datastore="true" value="false"/>
         <persistence-property name="datanucleus.rdbms.useColumnDefaultWhenNull" datastore="true" value="true"/>
