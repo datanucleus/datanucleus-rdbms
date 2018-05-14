@@ -49,12 +49,12 @@ import org.datanucleus.store.schema.StoreSchemaHandler;
 import org.datanucleus.util.Localiser;
 
 /**
- * Provides methods for adapting SQL language elements to the Hypersonic SQL Server database.
+ * Provides methods for adapting SQL language elements to the HSQLDB database.
  */
 public class HSQLAdapter extends BaseDatastoreAdapter
 {
     /**
-     * Constructs a Hypersonic SQL adapter based on the given JDBC metadata.
+     * Constructs a HSQLDB adapter based on the given JDBC metadata.
      * @param metadata the database metadata.
      */
     public HSQLAdapter(DatabaseMetaData metadata)
@@ -67,7 +67,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(UNIQUE_IN_END_CREATE_STATEMENTS);
         if (datastoreMajorVersion < 2)
         {
-            // HSQL 2.0 introduced support for batching and use of getGeneratedKeys
+            // HSQLDB 2.0 introduced support for batching and use of getGeneratedKeys
             supportedOptions.remove(STATEMENT_BATCHING);
             supportedOptions.remove(GET_GENERATED_KEYS_STATEMENT);
         }
@@ -76,15 +76,13 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
         if (datastoreMajorVersion >= 2)
         {
-            // HSQL 2.0 introduced SELECT ... FOR UPDATE
+            // HSQLDB 2.0 introduced SELECT ... FOR UPDATE
             supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
             supportedOptions.add(ORDERBY_NULLS_DIRECTIVES); // Likely came in at 2.0
         }
 
-        // HSQL Introduced in v 1.7.2 the use of CHECK, but ONLY as statements
-        // at the end of the CREATE TABLE statement. We currently don't support
-        // anything there other than primary key.
-        // This was introduced in version 1.7.2
+        // HSQLDB Introduced CHECK in v1.7.2, but ONLY as statements at the end of the CREATE TABLE statement. 
+        // We currently don't support anything there other than primary key.
         if (datastoreMajorVersion < 1 ||
             (datastoreMajorVersion == 1 && datastoreMinorVersion < 7) ||
             (datastoreMajorVersion == 1 && datastoreMinorVersion == 7 && datastoreRevisionVersion < 2))
@@ -103,7 +101,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
 
         if (datastoreMajorVersion < 1 || (datastoreMajorVersion == 1 && datastoreMinorVersion < 7))
         {
-            // HSQL before 1.7.* doesn't support foreign keys
+            // HSQLDB before 1.7.* doesn't support foreign keys
             supportedOptions.remove(FK_DELETE_ACTION_CASCADE);
             supportedOptions.remove(FK_DELETE_ACTION_RESTRICT);
             supportedOptions.remove(FK_DELETE_ACTION_DEFAULT);
@@ -115,18 +113,18 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         }
         else if (datastoreMajorVersion < 2)
         {
-            // HSQL 2.0 introduced RESTRICT on FKs
+            // HSQLDB 2.0 introduced RESTRICT on FKs
             supportedOptions.remove(FK_DELETE_ACTION_RESTRICT);
             supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         }
 
         if (datastoreMajorVersion < 2)
         {
-            // HSQL 2.0 introduced support for REPEATABLE_READ
+            // HSQLDB 2.0 introduced support for REPEATABLE_READ
             supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
             if (datastoreMinorVersion <= 7)
             {
-                // 1.8 introduced support for READ_UNCOMMITTED, SERIALIZABLE
+                // v1.8 introduced support for READ_UNCOMMITTED, SERIALIZABLE
                 supportedOptions.remove(TX_ISOLATION_READ_COMMITTED);
                 supportedOptions.remove(TX_ISOLATION_SERIALIZABLE);
             }
@@ -323,7 +321,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the Schema Name for this datastore. HSQL 1.7.0 does not support schemas (catalog).
+     * Accessor for the Schema Name for this datastore. HSQLDB 1.7.0 does not support schemas (catalog).
      * @param conn Connection to the datastore
      * @return The schema name
      * @throws SQLException Thrown if error occurs in determining the schema name.
@@ -335,7 +333,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * HSQL 1.7.0 does not support ALTER TABLE to define a primary key
+     * Add a primary key using ALTER TABLE. We use CREATE TABLE for this.
      * @param pk An object describing the primary key.
      * @param factory Identifier factory
      * @return The PK statement
@@ -384,9 +382,8 @@ public class HSQLAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Method to retutn the INSERT statement to use when inserting into a table that has no
-     * columns specified. This is the case when we have a single column in the table and that column
-     * is autoincrement/identity (and so is assigned automatically in the datastore).
+     * Method to return the INSERT statement to use when inserting into a table that has no columns specified. 
+     * This is the case when we have a single column in the table and that column is autoincrement/identity (and so is assigned automatically in the datastore).
      * @param table The table
      * @return The INSERT statement
      */

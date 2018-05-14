@@ -258,7 +258,7 @@ public class H2Adapter extends BaseDatastoreAdapter
     }
 
     /**
-     * HSQL 1.7.0 does not support ALTER TABLE to define a primary key
+     * Use of ALTER TABLE ADD CONSTRAINT to add a PK. We don't do it this way, instead via CREATE TABLE.
      * @param pk An object describing the primary key.
      * @param factory Identifier factory
      * @return The PK statement
