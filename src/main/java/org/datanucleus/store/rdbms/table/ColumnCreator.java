@@ -208,7 +208,7 @@ public final class ColumnCreator
                     AbstractClassMetaData[] ownerCmds = storeMgr.getClassesManagingTableForClass(ownerCmd, clr);
                     if (ownerCmds == null || ownerCmds.length == 0)
                     {
-                        throw new NucleusUserException(Localiser.msg("057023", javaType.getName())).setFatal();
+                        throw new NucleusUserException(Localiser.msg("056076", javaType.getName())).setFatal();
                     }
                     // Use the first one since they should all have the same id column(s)
                     destinationTable = storeMgr.getDatastoreClass(ownerCmds[0].getFullClassName(), clr);
