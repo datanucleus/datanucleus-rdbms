@@ -61,7 +61,7 @@ import org.datanucleus.store.types.scostore.SetStore;
  */
 class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.Entry<K, V>>
 {
-    /** Table containing the key and value forming the entry. */
+    /** Table containing the key and value forming the entry. This may be a join table, or key table (with value "FK"), or value table (with key "FK"). */
     protected Table mapTable;
 
     /** The backing store for the Map. */
@@ -75,15 +75,11 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     private String sizeStmt;
 
-    /** JDBC statement to use for retrieving keys of the map (locking). */
-    private String iteratorStmtLocked = null;
-
-    /** JDBC statement to use for retrieving keys of the map (not locking). */
-    private String iteratorStmtUnlocked = null;
-
-    private StatementParameterMapping iteratorMappingParams = null;
+    private SelectStatement iteratorSelectStmt = null;
     private int[] iteratorKeyResultCols = null;
     private int[] iteratorValueResultCols = null;
+
+    private StatementParameterMapping iteratorMappingParams = null;
 
     /**
      * Constructor for a store of the entries in a map when represented in a join table.
@@ -148,13 +144,13 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to update an embedded element.
-     * @param sm ObjectProvider of the owner
+     * @param op ObjectProvider of the owner
      * @param element The element to update
      * @param fieldNumber The number of the field to update
      * @param value The value
      * @return Whether the element was modified
      */
-    public boolean updateEmbeddedElement(ObjectProvider sm, Map.Entry<K, V> element, int fieldNumber, Object value)
+    public boolean updateEmbeddedElement(ObjectProvider op, Map.Entry<K, V> element, int fieldNumber, Object value)
     {
         // Do nothing since of no use here
         return false;
@@ -194,7 +190,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         throw new UnsupportedOperationException("Cannot add to a map through its entry set");
     }
 
-    public boolean addAll(ObjectProvider sm, Collection entries, int size)
+    public boolean addAll(ObjectProvider op, Collection entries, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its entry set");
     }
@@ -346,20 +342,49 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     public Iterator<Map.Entry<K, V>> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
-        if (iteratorStmtLocked == null)
+        SelectStatement selectStmt = iteratorSelectStmt;
+        if (selectStmt == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
-                // Generate the statement, and statement mapping/parameter information
-                SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
-                iteratorStmtUnlocked = sqlStmt.getSQLText().toSQL();
-                sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                iteratorStmtLocked = sqlStmt.getSQLText().toSQL();
+                // Generate the statement
+                selectStmt = getSQLStatementForIterator(ownerOP, true);
+                iteratorSelectStmt = selectStmt;
+
+                // Input parameter(s) - the owner
+                int inputParamNum = 1;
+                StatementMappingIndex ownerIdx = new StatementMappingIndex(ownerMapping);
+                if (selectStmt.getNumberOfUnions() > 0)
+                {
+                    // Add parameter occurrence for each union of statement
+                    for (int j=0;j<selectStmt.getNumberOfUnions()+1;j++)
+                    {
+                        int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                        for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                        {
+                            paramPositions[k] = inputParamNum++;
+                        }
+                        ownerIdx.addParameterOccurrence(paramPositions);
+                    }
+                }
+                else
+                {
+                    int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                    for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                    {
+                        paramPositions[k] = inputParamNum++;
+                    }
+                    ownerIdx.addParameterOccurrence(paramPositions);
+                }
+                iteratorMappingParams = new StatementParameterMapping();
+                iteratorMappingParams.addMappingForParameter("owner", ownerIdx);
             }
         }
 
         Transaction tx = ec.getTransaction();
-        String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? iteratorStmtLocked : iteratorStmtUnlocked);
+        selectStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, (tx.getSerializeRead() != null && tx.getSerializeRead()));
+
+        String stmt = selectStmt.getSQLText().toSQL();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -421,7 +446,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     }
 
     /**
-     * Method to generate an SQLStatement for iterating through entries of the map.
+     * Method to generate a SelectStatement for iterating through entries of the map.
      * Creates a statement that selects the table holding the map definition (key/value mappings).
      * Adds a restriction on the ownerMapping of the containerTable so we can restrict to the owner object.
      * Adds a restriction on the keyMapping not being null.
@@ -429,10 +454,13 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * SELECT KEY, VALUE FROM MAP_TABLE WHERE OWNER_ID=? AND KEY IS NOT NULL
      * </pre>
      * @param ownerOP ObjectProvider for the owner object
-     * @return The SQLStatement
+     * @param addRestrictionOnOwner Whether to add a restriction on the owner object for this map
+     * @return The SelectStatement
      */
-    protected SQLStatement getSQLStatementForIterator(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP, boolean addRestrictionOnOwner)
     {
+        SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
+
         SelectStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
 
@@ -448,6 +476,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 entrySqlTblForKey = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
                     keyMapping.getTable(), null, keyMapping.getTable().getIdMapping(), null, null, true);
             }
+            // TODO Select FetchPlan of the key?
         }
         iteratorKeyResultCols = sqlStmt.select(entrySqlTblForKey, keyMapping, null);
 
@@ -459,52 +488,27 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             entrySqlTblForVal = sqlStmt.getTableForDatastoreContainer(valueMapping.getTable());
             if (entrySqlTblForVal == null)
             {
-                // Add join to key table
+                // Add join to value table
                 entrySqlTblForVal = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
                     valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null, true);
             }
+            // TODO Select FetchPlan of the value?
         }
         iteratorValueResultCols = sqlStmt.select(entrySqlTblForVal, valueMapping, null);
 
-        // Apply condition on owner field to filter by owner
-        SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
-        SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
-        SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
-        sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
+        if (addRestrictionOnOwner)
+        {
+            // Apply condition on owner field to filter by owner
+            SQLTable ownerSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), ownerMapping);
+            SQLExpression ownerExpr = exprFactory.newExpression(sqlStmt, ownerSqlTbl, ownerMapping);
+            SQLExpression ownerVal = exprFactory.newLiteralParameter(sqlStmt, ownerMapping, null, "OWNER");
+            sqlStmt.whereAnd(ownerExpr.eq(ownerVal), true);
+        }
 
         // Apply condition that key is not null
         SQLExpression keyExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), keyMapping);
         SQLExpression nullExpr = exprFactory.newLiteral(sqlStmt, null, null);
         sqlStmt.whereAnd(keyExpr.ne(nullExpr), true);
-
-        // Input parameter(s) - the owner
-        int inputParamNum = 1;
-        StatementMappingIndex ownerIdx = new StatementMappingIndex(ownerMapping);
-        if (sqlStmt.getNumberOfUnions() > 0)
-        {
-            // Add parameter occurrence for each union of statement
-            for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
-            {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
-                {
-                    paramPositions[k] = inputParamNum++;
-                }
-                ownerIdx.addParameterOccurrence(paramPositions);
-            }
-        }
-        else
-        {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
-            {
-                paramPositions[k] = inputParamNum++;
-            }
-            ownerIdx.addParameterOccurrence(paramPositions);
-        }
-        iteratorMappingParams = new StatementParameterMapping();
-        iteratorMappingParams.addMappingForParameter("owner", ownerIdx);
 
         return sqlStmt;
     }
