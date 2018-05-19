@@ -1080,9 +1080,9 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
-        IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
-        StatementClassMapping resultMapping = iterStmt.getStatementClassMapping();
+        StatementClassMapping resultMapping = iterStmt.getElementClassMapping();
 
         // Input parameter(s) - the owner
         int inputParamNum = 1;
@@ -1560,7 +1560,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      * @param endIdx End index for the iterator (or -1)
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
+    public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
     {
         SelectStatement sqlStmt = null;
         StatementClassMapping stmtClassMapping = new StatementClassMapping();
@@ -1734,6 +1734,6 @@ public class FKListStore<E> extends AbstractListStore<E>
             sqlStmt.setOrdering(orderExprs, orderDirs);
         }
 
-        return new IteratorStatement(this, sqlStmt, stmtClassMapping);
+        return new ElementIteratorStatement(this, sqlStmt, stmtClassMapping);
     }
 }

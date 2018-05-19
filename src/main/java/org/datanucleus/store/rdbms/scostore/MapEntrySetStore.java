@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
@@ -348,7 +349,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement
-                selectStmt = getSQLStatementForIterator(ownerOP, true);
+                selectStmt = getSQLStatementForIterator(ownerOP, ec.getFetchPlan(), true);
                 iteratorSelectStmt = selectStmt;
 
                 // Input parameter(s) - the owner
@@ -454,10 +455,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * SELECT KEY, VALUE FROM MAP_TABLE WHERE OWNER_ID=? AND KEY IS NOT NULL
      * </pre>
      * @param ownerOP ObjectProvider for the owner object
+     * @param fp Fetch Plan to observe when selecting key/value
      * @param addRestrictionOnOwner Whether to add a restriction on the owner object for this map
      * @return The SelectStatement
+     * TODO Change this to return KeyValueIteratorStatement
      */
-    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP, boolean addRestrictionOnOwner)
+    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 

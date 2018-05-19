@@ -1100,9 +1100,9 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
-        StatementClassMapping iteratorMappingClass = iterStmt.getStatementClassMapping();
+        StatementClassMapping iteratorMappingClass = iterStmt.getElementClassMapping();
 
         // Input parameter(s) - the owner
         int inputParamNum = 1;
@@ -1204,7 +1204,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
+    public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -1327,6 +1327,6 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new IteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
     }
 }

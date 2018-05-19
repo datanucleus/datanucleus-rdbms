@@ -585,9 +585,9 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ownerOP.getExecutionContext().getFetchPlan(), true);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ownerOP.getExecutionContext().getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
-        StatementClassMapping iteratorMappingDef = iterStmt.getStatementClassMapping();
+        StatementClassMapping iteratorMappingDef = iterStmt.getElementClassMapping();
 
         // Input parameter(s) - the owner
         int inputParamNum = 1;
@@ -692,7 +692,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
+    public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -799,6 +799,6 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new IteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
     }
 }

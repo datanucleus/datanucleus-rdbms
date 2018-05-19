@@ -36,6 +36,7 @@ import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedReferenceMapping;
 import org.datanucleus.store.rdbms.scostore.ElementContainerStore;
+import org.datanucleus.store.rdbms.scostore.ElementIteratorStatement;
 import org.datanucleus.store.rdbms.scostore.IteratorStatement;
 import org.datanucleus.store.types.SCOUtils;
 import org.datanucleus.util.Localiser;
@@ -97,6 +98,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
             AbstractMemberMetaData mmd = iterStmt.getBackingStore().getOwnerMemberMetaData();
             if (mmd.hasCollection() || mmd.hasArray())
             {
+                ElementIteratorStatement elemIterStmt = (ElementIteratorStatement)iterStmt;
                 ElementContainerStore backingStore = (ElementContainerStore) iterStmt.getBackingStore();
                 if (backingStore.isElementsAreEmbedded() || backingStore.isElementsAreSerialised())
                 {
@@ -116,7 +118,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                             Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
                             Object element = backingStore.getElementMapping().getObject(ec, rs, param, ec.findObjectProvider(owner), 
                                 backingStore.getOwnerMemberMetaData().getAbsoluteFieldNumber());
-                            addOwnerMemberValue(mmd, owner, element);
+                            addOwnerMemberCollectionElement(mmd, owner, element);
                         }
                     }
                     else
@@ -126,7 +128,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                         {
                             Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
                             Object element = backingStore.getElementMapping().getObject(ec, rs, param);
-                            addOwnerMemberValue(mmd, owner, element);
+                            addOwnerMemberCollectionElement(mmd, owner, element);
                         }
                     }
                 }
@@ -142,7 +144,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                     {
                         Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
                         Object element = backingStore.getElementMapping().getObject(ec, rs, param);
-                        addOwnerMemberValue(mmd, owner, element);
+                        addOwnerMemberCollectionElement(mmd, owner, element);
                     }
                 }
                 else
@@ -150,12 +152,12 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                     String elementType = mmd.hasCollection() ? 
                             backingStore.getOwnerMemberMetaData().getCollection().getElementType() : backingStore.getOwnerMemberMetaData().getArray().getElementType();
                     ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, query.getIgnoreCache(),
-                        iterStmt.getStatementClassMapping(), backingStore.getElementClassMetaData(), ec.getClassLoaderResolver().classForName(elementType));
+                        elemIterStmt.getElementClassMapping(), backingStore.getElementClassMetaData(), ec.getClassLoaderResolver().classForName(elementType));
                     while (rs.next())
                     {
                         Object owner = iterStmt.getOwnerMapIndex().getMapping().getObject(ec, rs, iterStmt.getOwnerMapIndex().getColumnPositions());
                         Object element = scoROF.getObject();
-                        addOwnerMemberValue(mmd, owner, element);
+                        addOwnerMemberCollectionElement(mmd, owner, element);
                     }
                 }
             }
@@ -211,7 +213,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     public abstract void initialise()
     throws SQLException;
 
-    private void addOwnerMemberValue(AbstractMemberMetaData mmd, Object owner, Object element)
+    private void addOwnerMemberCollectionElement(AbstractMemberMetaData mmd, Object owner, Object element)
     {
         Object ownerId = api.getIdForObject(owner);
         Map<Integer, Object> fieldValuesForOwner = bulkLoadedValueByMemberNumber.get(ownerId);

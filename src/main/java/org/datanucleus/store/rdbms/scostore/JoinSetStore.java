@@ -847,9 +847,9 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         ExecutionContext ec = ownerOP.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
-        IteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.sqlStmt;
-        StatementClassMapping iteratorMappingClass = iterStmt.stmtClassMapping;
+        StatementClassMapping iteratorMappingClass = iterStmt.elementClassMapping;
 
         // Input parameter(s) - the owner
         int inputParamNum = 1;
@@ -959,7 +959,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param addRestrictionOnOwner Whether to restrict to a particular owner (otherwise functions as bulk fetch for many owners).
      * @return The SQLStatement and its associated StatementClassMapping
      */
-    public IteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
+    public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -1088,6 +1088,6 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new IteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
     }
 }

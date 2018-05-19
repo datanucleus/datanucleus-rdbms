@@ -17,35 +17,32 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.scostore;
 
-import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.types.scostore.Store;
 
 /**
- * Representation of the SQLStatement for an iterator of a container, together with the class mapping for the element.
+ * Representation of the SQLStatement for an iterator of a container (map, collection, or array).
  * An iterator statement can be an iterator for a single owner, or a bulk iterator for multiple owners (in which case
- * the <cite>ownerMapIndex</cite> will be set so we can check the owner for the element.
+ * the <cite>ownerMapIndex</cite> will be set so we can check the owner for the element/key/value.
+ * This will be extended for a collection/array element or map key/value dependent on which type we represent.
  */
-public class IteratorStatement
+public abstract class IteratorStatement
 {
     Store backingStore;
 
     /** The SQL Statement for the iterator. */
     SelectStatement sqlStmt = null;
 
-    /** The class mapping for the element of the iterator. */
-    StatementClassMapping stmtClassMapping = null;
-
     /** Mapping index for the owner in the statement (only specified on bulk fetch iterators). */
     StatementMappingIndex ownerMapIndex = null;
 
-    public IteratorStatement(Store store, SelectStatement stmt, StatementClassMapping stmtClassMapping)
+    public IteratorStatement(Store store, SelectStatement stmt)
     {
         this.backingStore = store;
         this.sqlStmt = stmt;
-        this.stmtClassMapping = stmtClassMapping;
     }
+
     public Store getBackingStore()
     {
         return backingStore;
@@ -54,10 +51,7 @@ public class IteratorStatement
     {
         return sqlStmt;
     }
-    public StatementClassMapping getStatementClassMapping()
-    {
-        return stmtClassMapping;
-    }
+
     public StatementMappingIndex getOwnerMapIndex()
     {
         return ownerMapIndex;
