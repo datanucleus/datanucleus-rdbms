@@ -1208,7 +1208,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        StatementClassMapping iteratorMappingClass = new StatementClassMapping();
+        StatementClassMapping elementClsMapping = new StatementClassMapping();
         if (elementInfo[0].getDatastoreClass().getDiscriminatorMetaData() != null &&
             elementInfo[0].getDatastoreClass().getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
         {
@@ -1235,7 +1235,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 //            NucleusLogger.GENERAL.info(">> FKSetStore.iter iterMapDef=" + iteratorMappingDef + " table=" + sqlStmt.getPrimaryTable() +
 //                " emd=" + emd.getFullClassName() + " elem.subclasses=" + StringUtils.objectArrayToString(elemSubclasses));
             // Select the required fields (of the element class)
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, elementClsMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
         }
         else
         {
@@ -1253,7 +1253,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
                 stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
-                iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                elementClsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 SelectStatement subStmt = stmtGen.getStatement(ec);
 
                 if (selectFetchPlan)
@@ -1261,7 +1261,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     // Select the FetchPlan fields (of the element class)
                     if (sqlStmt == null)
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, iteratorMappingClass,
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, elementClsMapping,
                             fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(), fp.getMaxFetchDepth());
                     }
                     else
@@ -1275,7 +1275,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     // Select the candidate id of the element class only
                     if (sqlStmt == null)
                     {
-                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, iteratorMappingClass, elementInfo[i].getAbstractClassMetaData());
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, elementClsMapping, elementInfo[i].getAbstractClassMetaData());
                     }
                     else
                     {
@@ -1327,6 +1327,6 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, elementClsMapping);
     }
 }

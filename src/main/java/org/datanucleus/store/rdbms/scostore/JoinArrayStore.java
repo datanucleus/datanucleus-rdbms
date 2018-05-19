@@ -261,7 +261,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        StatementClassMapping iteratorMappingClass = null;
+        StatementClassMapping elementClsMapping = null;
 
         if (elementsAreEmbedded || elementsAreSerialised)
         {
@@ -288,7 +288,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
         {
             // Element = PC
             // Join to the element table(s)
-            iteratorMappingClass = new StatementClassMapping();
+            elementClsMapping = new StatementClassMapping();
             for (int i = 0; i < elementInfo.length; i++)
             {
                 // TODO This will only work if all element types have a discriminator
@@ -336,7 +336,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                     {
                         stmtGen.setOption(SelectStatementGenerator.OPTION_ALLOW_NULLS);
                     }
-                    iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                    elementClsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement(ec);
                 }
 
@@ -356,7 +356,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
 
             // Select the required fields
             SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, elementClsMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
         }
 
         if (addRestrictionOnOwner)
@@ -387,6 +387,6 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, elementClsMapping);
     }
 }

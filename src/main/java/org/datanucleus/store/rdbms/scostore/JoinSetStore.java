@@ -963,7 +963,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
     {
         SelectStatement sqlStmt = null;
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
-        StatementClassMapping iteratorMappingClass = null;
+        StatementClassMapping elementClsMapping = null;
         if (elementsAreEmbedded || elementsAreSerialised)
         {
             // Element = embedded, serialised (maybe Non-PC)
@@ -989,7 +989,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // Element = PC
             // Join to the element table(s)
-            iteratorMappingClass = new StatementClassMapping();
+            elementClsMapping = new StatementClassMapping();
             for (int i = 0; i < elementInfo.length; i++)
             {
                 final int elementNo = i;
@@ -1031,7 +1031,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     // No discriminator, but subclasses so use UNIONs
                     SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
-                    iteratorMappingClass.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                    elementClsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                     elementStmt = stmtGen.getStatement(ec);
                 }
 
@@ -1042,13 +1042,13 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
                     // Select the required fields
                     SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[i].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, elementClsMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
                 }
                 else
                 {
                     // Select the required fields
                     SQLTable elementSqlTbl = elementStmt.getTable(elementInfo[i].getDatastoreClass(), elementStmt.getPrimaryTable().getGroupName());
-                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(elementStmt, iteratorMappingClass, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
+                    SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(elementStmt, elementClsMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
 
                     sqlStmt.union(elementStmt);
                 }
@@ -1088,6 +1088,6 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }
 
-        return new ElementIteratorStatement(this, sqlStmt, iteratorMappingClass);
+        return new ElementIteratorStatement(this, sqlStmt, elementClsMapping);
     }
 }

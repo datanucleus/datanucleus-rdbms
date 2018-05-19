@@ -929,7 +929,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
     public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
     {
         SelectStatement sqlStmt = null;
-        StatementClassMapping stmtClassMapping = new StatementClassMapping();
+        StatementClassMapping elementClsMapping = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         if (elementsAreEmbedded || elementsAreSerialised)
         {
@@ -1000,7 +1000,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         // No discriminator, but subclasses so use UNIONs
                         SelectStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null, containerTable, null, elementMapping);
                         stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
-                        stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                        elementClsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                         elementStmt = stmtGen.getStatement(ec);
                     }
 
@@ -1021,7 +1021,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
                 // Select the required fields
                 SQLTable elementSqlTbl = sqlStmt.getTable(elementInfo[0].getDatastoreClass(), sqlStmt.getPrimaryTable().getGroupName());
-                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
+                SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, elementClsMapping, fp, elementSqlTbl, elementCmd, fp.getMaxFetchDepth());
             }
             else
             {
@@ -1124,6 +1124,6 @@ public class JoinListStore<E> extends AbstractListStore<E>
             }
         }
 
-        return new ElementIteratorStatement(this, sqlStmt, stmtClassMapping);
+        return new ElementIteratorStatement(this, sqlStmt, elementClsMapping);
     }
 }

@@ -1563,7 +1563,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     public ElementIteratorStatement getIteratorStatement(ExecutionContext ec, FetchPlan fp, boolean addRestrictionOnOwner, int startIdx, int endIdx)
     {
         SelectStatement sqlStmt = null;
-        StatementClassMapping stmtClassMapping = new StatementClassMapping();
+        StatementClassMapping elementClsMapping = new StatementClassMapping();
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
         if (elementInfo.length == 1 &&
@@ -1588,7 +1588,7 @@ public class FKListStore<E> extends AbstractListStore<E>
             iterateUsingDiscriminator = true;
 
             // Select the required fields
-            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, stmtClassMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
+            SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(sqlStmt, elementClsMapping, fp, sqlStmt.getPrimaryTable(), elementCmd, fp.getMaxFetchDepth());
         }
         else
         {
@@ -1597,7 +1597,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                 final Class elementCls = clr.classForName(this.elementInfo[i].getClassName());
                 UnionStatementGenerator stmtGen = new UnionStatementGenerator(storeMgr, clr, elementCls, true, null, null);
                 stmtGen.setOption(SelectStatementGenerator.OPTION_SELECT_DN_TYPE);
-                stmtClassMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
+                elementClsMapping.setNucleusTypeColumnName(UnionStatementGenerator.DN_TYPE_COLUMN);
                 SelectStatement subStmt = stmtGen.getStatement(ec);
 
                 // Select the required fields (of the element class)
@@ -1605,11 +1605,11 @@ public class FKListStore<E> extends AbstractListStore<E>
                 {
                     if (elementInfo.length > 1)
                     {
-                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, stmtClassMapping, elementInfo[i].getAbstractClassMetaData());
+                        SQLStatementHelper.selectIdentityOfCandidateInStatement(subStmt, elementClsMapping, elementInfo[i].getAbstractClassMetaData());
                     }
                     else
                     {
-                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, stmtClassMapping, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(),
+                        SQLStatementHelper.selectFetchPlanOfSourceClassInStatement(subStmt, elementClsMapping, fp, subStmt.getPrimaryTable(), elementInfo[i].getAbstractClassMetaData(),
                             fp.getMaxFetchDepth());
                     }
                 }
@@ -1734,6 +1734,6 @@ public class FKListStore<E> extends AbstractListStore<E>
             sqlStmt.setOrdering(orderExprs, orderDirs);
         }
 
-        return new ElementIteratorStatement(this, sqlStmt, stmtClassMapping);
+        return new ElementIteratorStatement(this, sqlStmt, elementClsMapping);
     }
 }
