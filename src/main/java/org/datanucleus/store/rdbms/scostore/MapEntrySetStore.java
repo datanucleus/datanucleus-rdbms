@@ -466,11 +466,86 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
         SelectStatement sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
         sqlStmt.setClassLoaderResolver(clr);
+      //  MapMetaData mapmd = ownerMemberMetaData.getMap();
 
-        // Select the key mapping
+        // Select key and value
+        /*if (mapmd.getMapType() == MapType.MAP_TYPE_JOIN)
+        {
+            JoinMapStore joinMapStore = (JoinMapStore)mapStore;
+            if (mapmd.isEmbeddedKey() || mapmd.isSerializedKey() || !mapmd.keyIsPersistent())
+            {
+                // Key stored wholely in join table
+            }
+            else if (joinMapStore.keyMapping instanceof ReferenceMapping)
+            {
+                // Key = Reference type (interface/Object)
+                // Just select the key here since we're going to return the implementation id columns only
+            }
+            else
+            {
+                // Key stored in own table, so join to table and select requisite fields
+            }
+
+            if (mapmd.isEmbeddedValue() || mapmd.isSerializedValue() || !mapmd.valueIsPersistent())
+            {
+                // Value stored wholely in join table
+            }
+            else if (joinMapStore.valueMapping instanceof ReferenceMapping)
+            {
+                // Value = Reference type (interface/Object)
+                // Just select the value here since we're going to return the implementation id columns only
+            }
+            else
+            {
+                // Value stored in own table, so join to table and select requisite fields
+            }
+        }
+        else if (mapmd.getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
+        {
+            FKMapStore fkMapStore = (FKMapStore)mapStore;
+
+            // Select key
+            if (mapmd.isEmbeddedKey() || mapmd.isSerializedKey() || !mapmd.keyIsPersistent())
+            {
+                // Key stored wholely in value table
+            }
+            else if (fkMapStore.keyMapping instanceof ReferenceMapping)
+            {
+                // Key = Reference type (interface/Object)
+                // Just select the key here since we're going to return the implementation id columns only
+            }
+            else
+            {
+                // Key stored in own table, so join to table and select requisite fields
+            }
+
+            // Select the requisite fields of the value from this table
+        }
+        else
+        {
+            FKMapStore fkMapStore = (FKMapStore)mapStore;
+
+            // Select the requisite fields of the key from this table
+
+            // Select value
+            if (mapmd.isEmbeddedValue() || mapmd.isSerializedValue() || !mapmd.valueIsPersistent())
+            {
+                // Value stored wholely in value table
+            }
+            else if (fkMapStore.valueMapping instanceof ReferenceMapping)
+            {
+                // Value = Reference type (interface/Object)
+                // Just select the value here since we're going to return the implementation id columns only
+            }
+            else
+            {
+                // Value stored in own table, so join to table and select requisite fields
+            }
+        }*/
+
         // TODO If key is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForKey = sqlStmt.getPrimaryTable();
-        if (keyMapping.getTable() != mapTable)
+        if (keyMapping.getTable() != mapTable) // TODO This will not join since these tables are the same
         {
             entrySqlTblForKey = sqlStmt.getTableForDatastoreContainer(keyMapping.getTable());
             if (entrySqlTblForKey == null)
@@ -483,15 +558,15 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         }
         iteratorKeyResultCols = sqlStmt.select(entrySqlTblForKey, keyMapping, null);
 
-        // Select the value mapping
         // TODO If value is persistable and has inheritance also select a discriminator to get the type
         SQLTable entrySqlTblForVal = sqlStmt.getPrimaryTable();
-        if (valueMapping.getTable() != mapTable)
+        if (valueMapping.getTable() != mapTable) // TODO This will not join since these tables are the same
         {
             entrySqlTblForVal = sqlStmt.getTableForDatastoreContainer(valueMapping.getTable());
             if (entrySqlTblForVal == null)
             {
                 // Add join to value table
+                // TODO If this map allows null values, we should do left outer join
                 entrySqlTblForVal = sqlStmt.join(JoinType.INNER_JOIN, sqlStmt.getPrimaryTable(), sqlStmt.getPrimaryTable().getTable().getIdMapping(), 
                     valueMapping.getTable(), null, valueMapping.getTable().getIdMapping(), null, null, true);
             }
