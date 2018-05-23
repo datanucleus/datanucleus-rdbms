@@ -903,7 +903,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                                 }
                                 else
                                 {
-                                    NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                                    NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not (bulk) fetched by this query");
                                 }
                             }
                             else if ("join".equalsIgnoreCase(multifetchType))
@@ -917,14 +917,13 @@ public class JPQLQuery extends AbstractJPQLQuery
                                 }
                                 else
                                 {
-                                    NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not fetched by this query");
+                                    NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is currently not (bulk) fetched by this query");
                                 }
                             }
                             else
                             {
-                                NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not fetched by this query; unsupported bulk-fetch type.");
+                                NucleusLogger.GENERAL.debug("Query has field " + fpMmd.getFullFieldName() + " marked in the FetchPlan, yet this is not (bulk) fetched by this query; unsupported bulk-fetch type.");
                             }
-                            // TODO Continue this bulk fetch process to fields of fields that are fetched
                         }
                     }
                 }
