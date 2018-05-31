@@ -58,8 +58,14 @@ public class ListGetMethod implements SQLMethod
             throw new NucleusException(Localiser.msg("060016", "get", "CollectionExpression", 1));
         }
 
-        CollectionExpression listExpr = (CollectionExpression)expr;
-        AbstractMemberMetaData mmd = listExpr.getJavaTypeMapping().getMemberMetaData();
+        CollectionExpression listSqlExpr = (CollectionExpression)expr;
+        AbstractMemberMetaData mmd = listSqlExpr.getJavaTypeMapping().getMemberMetaData();
+        if (mmd == null)
+        {
+            // TODO Cater for the List being an input parameter
+            throw new NucleusException(Localiser.msg("060020", "indexOf", listSqlExpr.getClass().getName()));
+        }
+
         if (!List.class.isAssignableFrom(mmd.getType()))
         {
             throw new UnsupportedOperationException("Query contains " + expr + ".get(int) yet the field is not a List!");
@@ -83,7 +89,7 @@ public class ListGetMethod implements SQLMethod
             throw new UnsupportedOperationException("Query contains " + expr + ".get(int) yet the index is not a numeric literal so not yet supported");
         }
 
-        if (listExpr instanceof CollectionLiteral && idxExpr instanceof SQLLiteral)
+        if (listSqlExpr instanceof CollectionLiteral && idxExpr instanceof SQLLiteral)
         {
             CollectionLiteral lit = (CollectionLiteral)expr;
             if (lit.getValue() == null)
@@ -96,16 +102,16 @@ public class ListGetMethod implements SQLMethod
 
         if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.FILTER)
         {
-            return getAsInnerJoin(stmt, listExpr, idxExpr);
+            return getAsInnerJoin(stmt, listSqlExpr, idxExpr);
         }
         else if (stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.ORDERING ||
                 stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.RESULT ||
                 stmt.getQueryGenerator().getCompilationComponent() == CompilationComponent.HAVING)
         {
-            return getAsSubquery(stmt, listExpr, idxExpr);
+            return getAsSubquery(stmt, listSqlExpr, idxExpr);
         }
 
-        throw new NucleusException("List.get() is not supported for " + listExpr +
+        throw new NucleusException("List.get() is not supported for " + listSqlExpr +
             " with argument " + idxExpr + " for query component " + stmt.getQueryGenerator().getCompilationComponent());
     }
 
@@ -165,10 +171,8 @@ public class ListGetMethod implements SQLMethod
         subStmt.select(valExpr, null);
 
         // Link to primary statement
-        SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(),
-            ownerMapping);
-        SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, listExpr.getSQLTable(),
-            listExpr.getSQLTable().getTable().getIdMapping());
+        SQLExpression elementOwnerExpr = exprFactory.newExpression(subStmt, subStmt.getPrimaryTable(), ownerMapping);
+        SQLExpression ownerIdExpr = exprFactory.newExpression(stmt, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping());
         subStmt.whereAnd(elementOwnerExpr.eq(ownerIdExpr), true);
 
         // Condition on key
@@ -203,8 +207,7 @@ public class ListGetMethod implements SQLMethod
             CollectionTable joinTbl = (CollectionTable)storeMgr.getTable(mmd);
 
             // Add join to join table
-            SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), 
-                joinTbl, null, joinTbl.getOwnerMapping(), null, null);
+            SQLTable joinSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), joinTbl, null, joinTbl.getOwnerMapping(), null, null);
 
             // Add condition on index
             SQLExpression idxSqlExpr = exprFactory.newExpression(stmt, joinSqlTbl, joinTbl.getOrderMapping());
@@ -231,8 +234,7 @@ public class ListGetMethod implements SQLMethod
             targetMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
             orderMapping = elementTbl.getExternalMapping(mmd, MappingType.EXTERNAL_INDEX);
         }
-        SQLTable elemSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), 
-            elementTbl, null, targetMapping, null, null);
+        SQLTable elemSqlTbl = stmt.join(JoinType.INNER_JOIN, listExpr.getSQLTable(), listExpr.getSQLTable().getTable().getIdMapping(), elementTbl, null, targetMapping, null, null);
 
         // Add condition on index
         SQLExpression idxSqlExpr = exprFactory.newExpression(stmt, elemSqlTbl, orderMapping);

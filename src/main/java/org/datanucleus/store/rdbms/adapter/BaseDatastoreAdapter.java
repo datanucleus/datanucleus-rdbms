@@ -1932,6 +1932,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                 else if ("isEmpty".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CollectionIsEmptyMethod.class;
                 else if ("size".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.CollectionSizeMethod.class;
                 else if ("get".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ListGetMethod.class;
+                else if ("indexOf".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.ListIndexOfMethod.class;
             }
             if ("java.util.Date".equals(className) || (cls != null && java.util.Date.class.isAssignableFrom(cls)))
             {

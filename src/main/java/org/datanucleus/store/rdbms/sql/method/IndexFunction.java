@@ -25,6 +25,7 @@ import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
+import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.ClassTable;
@@ -35,6 +36,7 @@ import org.datanucleus.util.Localiser;
 /**
  * Expression handler for JPQL "INDEX" expression to return the index of an element.
  * Returns a NumericExpression.
+ * TODO Drop this class and map across to ListIndexOfMethod.
  */
 public class IndexFunction implements SQLMethod
 {
@@ -56,13 +58,11 @@ public class IndexFunction implements SQLMethod
             AbstractMemberMetaData mmd = collSqlExpr.getJavaTypeMapping().getMemberMetaData();
             if (!mmd.hasCollection())
             {
-                throw new NucleusException("INDEX expression for field " + mmd.getFullFieldName() +
-                    " does not represent a collection!");
+                throw new NucleusException("INDEX expression for field " + mmd.getFullFieldName() + " does not represent a collection!");
             }
             else if (!mmd.getOrderMetaData().isIndexedList())
             {
-                throw new NucleusException("INDEX expression for field " + mmd.getFullFieldName() + 
-                    " does not represent an indexed list!");
+                throw new NucleusException("INDEX expression for field " + mmd.getFullFieldName() + " does not represent an indexed list!");
             }
 
             JavaTypeMapping orderMapping = null;
@@ -73,7 +73,12 @@ public class IndexFunction implements SQLMethod
                 // 1-N via join table
                 CollectionTable collTable = (CollectionTable)joinTbl;
                 orderTable = stmt.getTableForDatastoreContainer(collTable);
-                // TODO If the join table is not yet referenced, or referenced multiple times then fix this
+                if (orderTable == null)
+                {
+                    // TODO Allow control over the join type? the alias?
+                    orderTable = stmt.join(JoinType.LEFT_OUTER_JOIN, collSqlExpr.getSQLTable(), collSqlExpr.getSQLTable().getTable().getIdMapping(), 
+                        collTable, null, collTable.getOwnerMapping(), null, null);
+                }
                 orderMapping = collTable.getOrderMapping();
             }
             else
