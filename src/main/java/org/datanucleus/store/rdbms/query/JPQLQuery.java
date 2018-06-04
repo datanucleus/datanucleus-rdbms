@@ -46,6 +46,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
+import org.datanucleus.metadata.RelationType;
 import org.datanucleus.query.QueryUtils;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.query.inmemory.JPQLInMemoryEvaluator;
@@ -876,7 +877,8 @@ public class JPQLQuery extends AbstractJPQLQuery
                         multifetchType = "exists";
                     }
 
-                    if (fpMmd.hasCollection() || fpMmd.hasArray() || fpMmd.hasMap())
+                    RelationType relType = fpMmd.getRelationType(clr);
+                    if (RelationType.isRelationMultiValued(relType))
                     {
                         if (fpMmd.hasCollection() && SCOUtils.collectionHasSerialisedElements(fpMmd))
                         {
