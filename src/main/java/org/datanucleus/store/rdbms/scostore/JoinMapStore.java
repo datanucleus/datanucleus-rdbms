@@ -515,62 +515,62 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         StringBuilder stmt = new StringBuilder("INSERT INTO ");
         stmt.append(mapTable.toString());
         stmt.append(" (");
-        for (int i=0; i<valueMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<valueMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(valueMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(valueMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
 
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         if (adapterMapping != null)
         {
-            for (int i=0; i<adapterMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i=0; i<adapterMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(adapterMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(adapterMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             }
         }
 
-        for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<keyMapping.getNumberOfColumnMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(keyMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(keyMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
 
         stmt.append(") VALUES (");
-        for (int i=0; i<valueMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<valueMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(valueMapping.getDatastoreMapping(i).getInsertionInputParameter());
+            stmt.append(valueMapping.getColumnMapping(i).getInsertionInputParameter());
         }
 
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
+            stmt.append(ownerMapping.getColumnMapping(i).getInsertionInputParameter());
         }
         if (adapterMapping != null)
         {
-            for (int i=0; i<adapterMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i=0; i<adapterMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(adapterMapping.getDatastoreMapping(i).getInsertionInputParameter());
+                stmt.append(adapterMapping.getColumnMapping(i).getInsertionInputParameter());
             }
         }
-        for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<keyMapping.getNumberOfColumnMappings(); i++)
         {
             stmt.append(",");
-            stmt.append(keyMapping.getDatastoreMapping(i).getInsertionInputParameter());
+            stmt.append(keyMapping.getColumnMapping(i).getInsertionInputParameter());
         }
         stmt.append(") ");
 
@@ -593,15 +593,15 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
-        for (int i=0; i<valueMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<valueMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(valueMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(valueMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(valueMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(valueMapping.getColumnMapping(i).getUpdateInputParameter());
         }
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -715,7 +715,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
                         if (valuesAreEmbedded || valuesAreSerialised)
                         {
-                            int param[] = new int[valueMapping.getNumberOfDatastoreMappings()];
+                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -738,7 +738,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else if (valueMapping instanceof ReferenceMapping)
                         {
                             // Value = Reference (Interface/Object)
-                            int param[] = new int[valueMapping.getNumberOfDatastoreMappings()];
+                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -869,14 +869,14 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] ownerPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<ownerPositions.length;k++)
                 {
                     ownerPositions[k] = inputParamNum++;
                 }
                 ownerIdx.addParameterOccurrence(ownerPositions);
 
-                int[] keyPositions = new int[keyMapping.getNumberOfDatastoreMappings()];
+                int[] keyPositions = new int[keyMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<keyPositions.length;k++)
                 {
                     keyPositions[k] = inputParamNum++;
@@ -886,14 +886,14 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         else
         {
-            int[] ownerPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<ownerPositions.length;k++)
             {
                 ownerPositions[k] = inputParamNum++;
             }
             ownerIdx.addParameterOccurrence(ownerPositions);
 
-            int[] keyPositions = new int[keyMapping.getNumberOfDatastoreMappings()];
+            int[] keyPositions = new int[keyMapping.getNumberOfColumnMappings()];
             for (int k=0;k<keyPositions.length;k++)
             {
                 keyPositions[k] = inputParamNum++;
@@ -1060,7 +1060,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                     // Only set the adapter mapping if we have a new object
                     long nextIDAdapter = getNextIDForAdapterColumn(ownerOP);
                     adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(nextIDAdapter));
-                    jdbcPosition += adapterMapping.getNumberOfDatastoreMappings();
+                    jdbcPosition += adapterMapping.getNumberOfColumnMappings();
                 }
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
@@ -1147,7 +1147,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      */
     private String getMaxAdapterColumnIdStmt()
     {
-        StringBuilder stmt = new StringBuilder("SELECT MAX(" + adapterMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
+        StringBuilder stmt = new StringBuilder("SELECT MAX(" + adapterMapping.getColumnMapping(0).getColumn().getIdentifier().toString() + ")");
         stmt.append(" FROM ");
         stmt.append(mapTable.toString());
         stmt.append(" WHERE ");

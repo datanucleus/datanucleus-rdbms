@@ -24,8 +24,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMappingFactory;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMappingFactory;
 
 /**
  * Mapping to represent the return value of an SQL function invocation.
@@ -60,7 +60,7 @@ public class SQLFunctionMapping extends SingleFieldMapping
             return null;
         }
 
-        if (datastoreMappings == null || datastoreMappings.length == 0)
+        if (columnMappings == null || columnMappings.length == 0)
         {
             // Set the datastoreMapping and javaType the first time this is used. Get the type from the ResultSetMetaData.
             try
@@ -107,44 +107,44 @@ public class SQLFunctionMapping extends SingleFieldMapping
             }
 
             Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType.getName(), null, null, ec.getClassLoaderResolver(), null);
-            DatastoreMapping datastoreMapping = DatastoreMappingFactory.createMapping(datastoreMappingClass, this, storeMgr, null);
-            datastoreMappings = new DatastoreMapping[1];
-            datastoreMappings[0] = datastoreMapping;
+            ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, this, storeMgr, null);
+            columnMappings = new ColumnMapping[1];
+            columnMappings[0] = datastoreMapping;
         }
 
         if (javaType == Double.class)
         {
-            return getDatastoreMapping(0).getDouble(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getDouble(resultSet, exprIndex[0]);
         }
         else if (javaType == Float.class)
         {
-            return getDatastoreMapping(0).getFloat(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getFloat(resultSet, exprIndex[0]);
         }
         else if (javaType == Integer.class)
         {
-            return getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getInt(resultSet, exprIndex[0]);
         }
         else if (javaType == Long.class)
         {
-            return getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getLong(resultSet, exprIndex[0]);
         }
         else if (javaType == Short.class)
         {
-            return getDatastoreMapping(0).getShort(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getShort(resultSet, exprIndex[0]);
         }
         else if (javaType == BigInteger.class)
         {
-            return getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getLong(resultSet, exprIndex[0]);
         }
         else if (javaType == Boolean.class)
         {
-            return getDatastoreMapping(0).getBoolean(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getBoolean(resultSet, exprIndex[0]);
         }
         else if (javaType == String.class)
         {
-            return getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
+            return getColumnMapping(0).getString(resultSet, exprIndex[0]);
         }
 
-        return getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getObject(resultSet, exprIndex[0]);
     }
 }

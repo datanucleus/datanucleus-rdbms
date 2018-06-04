@@ -140,7 +140,7 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         {
             for (int i=0;i<exprIndex.length;i++)
             {
-                getDatastoreMapping(i).setObject(ps, exprIndex[i], null);
+                getColumnMapping(i).setObject(ps, exprIndex[i], null);
             }
         }
         else
@@ -150,35 +150,35 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
                 Object colValue = Array.get(colArray, i);
                 if (colValue == null)
                 {
-                    getDatastoreMapping(i).setObject(ps, exprIndex[i], null);
+                    getColumnMapping(i).setObject(ps, exprIndex[i], null);
                 }
                 else
                 {
                     Class colValCls = colValue.getClass();
                     if (colValCls == int.class || colValCls == Integer.class)
                     {
-                        getDatastoreMapping(i).setInt(ps, exprIndex[i], (Integer)colValue);
+                        getColumnMapping(i).setInt(ps, exprIndex[i], (Integer)colValue);
                     }
                     else if (colValCls == long.class || colValCls == Long.class)
                     {
-                        getDatastoreMapping(i).setLong(ps, exprIndex[i], (Long)colValue);
+                        getColumnMapping(i).setLong(ps, exprIndex[i], (Long)colValue);
                     }
                     else if (colValCls == double.class || colValCls == Double.class)
                     {
-                        getDatastoreMapping(i).setDouble(ps, exprIndex[i], (Double)colValue);
+                        getColumnMapping(i).setDouble(ps, exprIndex[i], (Double)colValue);
                     }
                     else if (colValCls == float.class || colValCls == Float.class)
                     {
-                        getDatastoreMapping(i).setFloat(ps, exprIndex[i], (Float)colValue);
+                        getColumnMapping(i).setFloat(ps, exprIndex[i], (Float)colValue);
                     }
                     // TODO Support other types
                     else if (colValCls == String.class)
                     {
-                        getDatastoreMapping(i).setString(ps, exprIndex[i], (String)colValue);
+                        getColumnMapping(i).setString(ps, exprIndex[i], (String)colValue);
                     }
                     else
                     {
-                        getDatastoreMapping(i).setObject(ps, exprIndex[i], colValue);
+                        getColumnMapping(i).setObject(ps, exprIndex[i], colValue);
                     }
                 }
             }
@@ -226,31 +226,31 @@ public class TypeConverterMultiMapping extends SingleFieldMultiMapping
         boolean isNull = true;
         for (int i=0;i<exprIndex.length;i++)
         {
-            String colJavaType = getJavaTypeForDatastoreMapping(i);
+            String colJavaType = getJavaTypeForColumnMapping(i);
             if (colJavaType.equals("int") || colJavaType.equals("java.lang.Integer"))
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getInt(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getInt(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("long") || colJavaType.equals("java.lang.Long"))
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getLong(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getLong(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("double") || colJavaType.equals("java.lang.Double"))
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getDouble(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getDouble(resultSet, exprIndex[i]));
             }
             else if (colJavaType.equals("float") || colJavaType.equals("java.lang.Float"))
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getFloat(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getFloat(resultSet, exprIndex[i]));
             }
             // TODO Support other types
             else if (colJavaType.equals("java.lang.String"))
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getString(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getString(resultSet, exprIndex[i]));
             }
             else
             {
-                Array.set(valuesArr, i, getDatastoreMapping(i).getObject(resultSet, exprIndex[i]));
+                Array.set(valuesArr, i, getColumnMapping(i).getObject(resultSet, exprIndex[i]));
             }
             if (isNull && Array.get(valuesArr, i) != null)
             {

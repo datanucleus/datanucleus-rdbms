@@ -201,7 +201,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
             String stmt = getContainsStatementString(element);
             if (usingJoinTable())
             {
-                if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+                if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
                 {
                     // The statement is based on the element passed in so don't cache
                     return stmt;
@@ -257,13 +257,13 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         StringBuilder stmt = new StringBuilder("SELECT ");
         String containerAlias = "THIS";
         String joinedElementAlias = "ELEM";
-        for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ").append(selectTable.toString()).append(" ").append(containerAlias);
         // TODO Add join to owner if ownerMapping is for supertable
@@ -322,9 +322,9 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                     {
                         discrimStr.append(containerAlias);
                     }
-                    discrimStr.append(".").append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    discrimStr.append(".").append(elemInfo.getDiscriminatorMapping().getColumnMapping(0).getColumn().getIdentifier().toString());
                     discrimStr.append(" = ");
-                    discrimStr.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getUpdateInputParameter());
+                    discrimStr.append(elemInfo.getDiscriminatorMapping().getColumnMapping(0).getUpdateInputParameter());
                 }
             }
             if (discrimStr.length() > 0)
@@ -359,7 +359,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                 {
                     int jdbcPosition = 1;
                     fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
-                    jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
+                    jdbcPosition += fieldMapping.getNumberOfColumnMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
                         ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, elementCmd, this);
@@ -403,15 +403,15 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         JavaTypeMapping ownerMapping = getOwnerMapping();
 
         StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
-        for (int i = 0; i < fieldMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < fieldMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -423,12 +423,12 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
             JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
             if (m != null)
             {
-                for (int j = 0; j < m.getNumberOfDatastoreMappings(); j++)
+                for (int j = 0; j < m.getNumberOfColumnMappings(); j++)
                 {
                     stmt.append(" AND ");
-                    stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
                 }
             }
         }
@@ -445,7 +445,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      */
     protected String getRemoveStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // The statement is based on the element passed in so don't cache
             return getRemoveStatementString(element);

@@ -24,7 +24,7 @@ import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
 
 /**
  * Oracle variant of the CollectionMapping for cases where we are serialising the field into a single column. 
@@ -82,7 +82,7 @@ public class OracleCollectionMapping extends CollectionMapping
             }
 
             // Update the BLOB
-            OracleBlobRDBMSMapping.updateBlobColumn(ownerOP, getTable(), getDatastoreMapping(0), bytes);
+            OracleBlobColumnMapping.updateBlobColumn(ownerOP, getTable(), getColumnMapping(0), bytes);
         }
         else
         {

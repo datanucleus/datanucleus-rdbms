@@ -443,23 +443,23 @@ public class DeleteRequest extends Request
             {
                 // Create a statement to clear the link from the previous related object
                 StringBuilder clearLinkStmt = new StringBuilder("UPDATE " + refTable.toString() + " SET ");
-                for (int j=0;j<refMapping.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<refMapping.getNumberOfColumnMappings();j++)
                 {
                     if (j > 0)
                     {
                         clearLinkStmt.append(",");
                     }
-                    clearLinkStmt.append(refMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                    clearLinkStmt.append(refMapping.getColumnMapping(j).getColumn().getIdentifier());
                     clearLinkStmt.append("=NULL");
                 }
                 clearLinkStmt.append(" WHERE ");
-                for (int j=0;j<refMapping.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<refMapping.getNumberOfColumnMappings();j++)
                 {
                     if (j > 0)
                     {
                         clearLinkStmt.append(" AND ");
                     }
-                    clearLinkStmt.append(refMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                    clearLinkStmt.append(refMapping.getColumnMapping(j).getColumn().getIdentifier());
                     clearLinkStmt.append("=?");
                 }
 
@@ -595,14 +595,14 @@ public class DeleteRequest extends Request
                         {
                             where.append(" AND ");
                         }
-                        where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
+                        where.append(m.getColumnMapping(0).getColumn().getIdentifier());
                         where.append("=");
-                        where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
+                        where.append(m.getColumnMapping(0).getUpdateInputParameter());
                     }
                     else
                     {
                         Integer abs_field_num = Integer.valueOf(mmd.getAbsoluteFieldNumber());
-                        int parametersIndex[] = new int[m.getNumberOfDatastoreMappings()];
+                        int parametersIndex[] = new int[m.getNumberOfColumnMappings()];
                         StatementMappingIndex sei = new StatementMappingIndex(m);
                         sei.addParameterOccurrence(parametersIndex);
 
@@ -613,9 +613,9 @@ public class DeleteRequest extends Request
                             {
                                 where.append(" AND ");
                             }
-                            where.append(m.getDatastoreMapping(j).getColumn().getIdentifier());
+                            where.append(m.getColumnMapping(j).getColumn().getIdentifier());
                             where.append("="); 
-                            where.append(m.getDatastoreMapping(j).getUpdateInputParameter());
+                            where.append(m.getColumnMapping(j).getUpdateInputParameter());
 
                             if (!whereFields.contains(abs_field_num))
                             {
@@ -628,7 +628,7 @@ public class DeleteRequest extends Request
 
                 if (m instanceof PersistableMapping || m instanceof ReferenceMapping)
                 {
-                    if (m.getNumberOfDatastoreMappings() == 0)
+                    if (m.getNumberOfColumnMappings() == 0)
                     {
                         // Field storing a PC object with FK at other side
                         RelationType relationType = mmd.getRelationType(clr);
@@ -675,9 +675,9 @@ public class DeleteRequest extends Request
                 {
                     where.append(" AND ");
                 }
-                where.append(m.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                where.append(m.getColumnMapping(0).getColumn().getIdentifier().toString());
                 where.append("=");
-                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
+                where.append(m.getColumnMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex datastoreMappingIdx = new StatementMappingIndex(m);
                 mappingStatementIndex.setWhereDatastoreId(datastoreMappingIdx);
@@ -690,9 +690,9 @@ public class DeleteRequest extends Request
                 {
                     where.append(" AND ");
                 }
-                where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
+                where.append(m.getColumnMapping(0).getColumn().getIdentifier());
                 where.append("=");
-                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
+                where.append(m.getColumnMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex versStmtIdx = new StatementMappingIndex(m);
                 mappingStatementIndex.setWhereVersion(versStmtIdx);
@@ -707,9 +707,9 @@ public class DeleteRequest extends Request
                 {
                     where.append(" AND ");
                 }
-                where.append(tenantMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                where.append(tenantMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
                 where.append("=");
-                where.append(tenantMapping.getDatastoreMapping(0).getUpdateInputParameter());
+                where.append(tenantMapping.getColumnMapping(0).getUpdateInputParameter());
 
                 multitenancyStatementMapping = new StatementMappingIndex(tenantMapping);
                 int[] param = { paramIndex++ };

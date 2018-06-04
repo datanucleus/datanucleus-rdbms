@@ -125,7 +125,7 @@ import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.JPOXIdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -2121,13 +2121,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             m = tbl.getIdMapping();
         }
         StringBuilder columnsName = new StringBuilder();
-        for (int i = 0; i < m.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < m.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 columnsName.append(",");
             }
-            columnsName.append(m.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            columnsName.append(m.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
 
         Properties properties = new Properties();
@@ -2619,7 +2619,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
             }
         }
-        im.value = m.getDatastoreMapping(0).getColumn().getIdentifier().toString();
+        im.value = m.getColumnMapping(0).getColumn().getIdentifier().toString();
     }
 
     /**
@@ -3808,7 +3808,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param datastoreMapping The datastore mapping
      * @return Whether values are to be inserted into this mapping on an INSERT
      */
-    public boolean insertValuesOnInsert(DatastoreMapping datastoreMapping)
+    public boolean insertValuesOnInsert(ColumnMapping datastoreMapping)
     {
         return datastoreMapping.insertValuesOnInsert();
     }

@@ -711,7 +711,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     private synchronized String getLocateStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // The statement is based on the element passed in so don't cache
             return getLocateStatementString(element);
@@ -822,7 +822,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             synchronized (this)
             {
-                StringBuilder stmt = new StringBuilder("SELECT MAX(" + orderMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() + ")");
+                StringBuilder stmt = new StringBuilder("SELECT MAX(" + orderMapping.getColumnMapping(0).getColumn().getIdentifier().toString() + ")");
                 stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
                 BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
                 if (relationDiscriminatorMapping != null)
@@ -859,7 +859,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<paramPositions.length;k++)
                 {
                     paramPositions[k] = inputParamNum++;
@@ -869,7 +869,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<paramPositions.length;k++)
             {
                 paramPositions[k] = inputParamNum++;
@@ -1082,8 +1082,8 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             // TODO If we have multiple roots then cannot allow this
             // Order by the ordering column, when present
             SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }

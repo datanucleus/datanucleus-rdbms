@@ -51,7 +51,7 @@ public class EnumToStringMethod implements SQLMethod
         {
             EnumExpression enumExpr = (EnumExpression)expr;
             JavaTypeMapping m = enumExpr.getJavaTypeMapping();
-            if (m.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+            if (m.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
             {
                 return enumExpr.getDelegate();
             }

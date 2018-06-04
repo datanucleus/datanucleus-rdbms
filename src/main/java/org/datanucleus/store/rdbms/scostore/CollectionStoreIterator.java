@@ -60,7 +60,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
                 Object nextElement;
                 if (collStore.elementsAreEmbedded || collStore.elementsAreSerialised)
                 {
-                    int param[] = new int[collStore.elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[collStore.elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
@@ -87,7 +87,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
                 else if (collStore.elementMapping instanceof ReferenceMapping)
                 {
                     // Element = Reference (Interface/Object)
-                    int param[] = new int[collStore.elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[collStore.elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;

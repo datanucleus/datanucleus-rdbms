@@ -375,7 +375,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                                 AbstractMemberMetaData mmd = idx.getMapping().getMemberMetaData();
                                 if (mmd != null)
                                 {
-                                    if (idx.getMapping() instanceof AbstractContainerMapping && idx.getMapping().getNumberOfDatastoreMappings() != 1)
+                                    if (idx.getMapping() instanceof AbstractContainerMapping && idx.getMapping().getNumberOfColumnMappings() != 1)
                                     {
                                         throw new NucleusUserException(Localiser.msg("021213"));
                                     }

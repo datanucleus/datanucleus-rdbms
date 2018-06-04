@@ -120,7 +120,7 @@ public class EnumMapping extends SingleFieldMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         return datastoreJavaType;
     }
@@ -144,7 +144,7 @@ public class EnumMapping extends SingleFieldMapping
     {
         if (value == null)
         {
-            getDatastoreMapping(0).setObject(ps, exprIndex[0], null);
+            getColumnMapping(0).setObject(ps, exprIndex[0], null);
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
@@ -158,7 +158,7 @@ public class EnumMapping extends SingleFieldMapping
                 // ordinal value passed in directly (e.g ENUM_FIELD == ? in query)
                 intVal = ((BigInteger)value).intValue();
             }
-            getDatastoreMapping(0).setInt(ps, exprIndex[0], intVal);
+            getColumnMapping(0).setInt(ps, exprIndex[0], intVal);
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
@@ -172,7 +172,7 @@ public class EnumMapping extends SingleFieldMapping
                 //it may be String when there is a compare between Enums values and Strings in the JDOQL query (for example)
                 stringVal = (String)value;
             }
-            getDatastoreMapping(0).setString(ps, exprIndex[0], stringVal);
+            getColumnMapping(0).setString(ps, exprIndex[0], stringVal);
         }
         else
         {
@@ -194,13 +194,13 @@ public class EnumMapping extends SingleFieldMapping
             return null;
         }
 
-        if (getDatastoreMapping(0).getObject(resultSet, exprIndex[0]) == null)
+        if (getColumnMapping(0).getObject(resultSet, exprIndex[0]) == null)
         {
             return null;
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_INTEGER))
         {
-            int intVal = getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
+            int intVal = getColumnMapping(0).getInt(resultSet, exprIndex[0]);
             Class enumType = null;
             if (mmd == null)
             {
@@ -211,7 +211,7 @@ public class EnumMapping extends SingleFieldMapping
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
-            String stringVal = getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
+            String stringVal = getColumnMapping(0).getString(resultSet, exprIndex[0]);
             if (mmd == null)
             {
                 Class enumType = ec.getClassLoaderResolver().classForName(type);

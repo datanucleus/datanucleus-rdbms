@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 
 /**
  * Mapping to represent multiple mappings within the single overall java type mapping.
@@ -64,36 +64,36 @@ public abstract class MultiMapping extends JavaTypeMapping
      * Accessor for the number of datastore mappings.
      * @return The number of datastore mappings.
      */
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
         if (numberOfDatastoreMappings == 0)
         {
             int numDatastoreTmp = 0;
             for (int i=0; i<javaTypeMappings.length; i++)
             {
-                numDatastoreTmp += javaTypeMappings[i].getNumberOfDatastoreMappings();
+                numDatastoreTmp += javaTypeMappings[i].getNumberOfColumnMappings();
             }
             this.numberOfDatastoreMappings = numDatastoreTmp;
         }
         return numberOfDatastoreMappings;
     }
 
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
-        if (datastoreMappings.length == 0)
+        if (columnMappings.length == 0)
         {
-            DatastoreMapping[] colMappings = new DatastoreMapping[getNumberOfDatastoreMappings()];
+            ColumnMapping[] colMappings = new ColumnMapping[getNumberOfColumnMappings()];
             int num = 0;
             for (int i=0; i<javaTypeMappings.length; i++)
             {
-                for (int j=0;j<javaTypeMappings[i].getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<javaTypeMappings[i].getNumberOfColumnMappings();j++)
                 {
-                    colMappings[num++] = javaTypeMappings[i].getDatastoreMapping(j);
+                    colMappings[num++] = javaTypeMappings[i].getColumnMapping(j);
                 }
             }
-            datastoreMappings = colMappings;
+            columnMappings = colMappings;
         }
-        return super.getDatastoreMappings();
+        return super.getColumnMappings();
     }
 
     /**
@@ -101,9 +101,9 @@ public abstract class MultiMapping extends JavaTypeMapping
      * @param index The position of the mapping to return
      * @return The datastore mapping
      */
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
-        if (index >= getNumberOfDatastoreMappings())
+        if (index >= getNumberOfColumnMappings())
         {
             throw new NucleusException("Attempt to get DatastoreMapping with index " + index + 
                 " when total number of mappings is " + numberOfDatastoreMappings + " for field=" + mmd).setFatal();
@@ -113,18 +113,18 @@ public abstract class MultiMapping extends JavaTypeMapping
         int numberJavaMappings = javaTypeMappings.length;
         for (int i=0; i<numberJavaMappings; i++)
         {
-            int numberDatastoreMappings = javaTypeMappings[i].getNumberOfDatastoreMappings();
+            int numberDatastoreMappings = javaTypeMappings[i].getNumberOfColumnMappings();
             for (int j=0; j<numberDatastoreMappings; j++)
             {
                 if (currentIndex == index)
                 {
-                    return javaTypeMappings[i].getDatastoreMapping(j);
+                    return javaTypeMappings[i].getColumnMapping(j);
                 }
                 currentIndex++;
             }
         }
 
         // TODO Should never happen
-        throw new NucleusException("Invalid index " + index + " for DatastoreMapping (numColumns=" + getNumberOfDatastoreMappings() + "), for field=" + mmd).setFatal();
+        throw new NucleusException("Invalid index " + index + " for DatastoreMapping (numColumns=" + getNumberOfColumnMappings() + "), for field=" + mmd).setFatal();
     }
 }

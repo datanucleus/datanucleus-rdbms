@@ -154,7 +154,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<paramPositions.length;k++)
                 {
                     paramPositions[k] = inputParamNum++;
@@ -164,7 +164,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<paramPositions.length;k++)
             {
                 paramPositions[k] = inputParamNum++;
@@ -381,8 +381,8 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
         {
             // Order by the ordering column, when present
             SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }

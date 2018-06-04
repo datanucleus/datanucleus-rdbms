@@ -41,6 +41,6 @@ public class SerialisedKeyPCMapping extends SerialisedPCMapping
             colmd = mmd.getKeyMetaData().getColumnMetaData()[0];
         }
         Column col = mmgr.createColumn(this, getType(), colmd);
-        mmgr.createDatastoreMapping(this, mmd, 0, col);
+        mmgr.createColumnMapping(this, mmd, 0, col);
     }
 }

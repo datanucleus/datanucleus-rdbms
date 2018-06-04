@@ -310,7 +310,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                     {
                         ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), ownerOP.getObject(), ownerOP, ownerMemberMetaData.getAbsoluteFieldNumber());
                     }
-                    jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
+                    jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     if (relationDiscriminatorMapping != null)
                     {
                         jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -980,23 +980,23 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         stmt.append(" SET ");
 
         JavaTypeMapping ownerMapping = info.getOwnerMapping();
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(", ");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=NULL");
         }
 
         JavaTypeMapping relDiscrimMapping = info.getDatastoreClass().getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         if (relDiscrimMapping != null)
         {
-            for (int i=0; i<relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i=0; i<relDiscrimMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(", ");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=NULL");
             }
         }
@@ -1058,24 +1058,24 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
 
         StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(ownerMapping.getColumnMapping(i).getUpdateInputParameter());
         }
         if (relDiscrimMapping != null)
         {
-            for (int i=0; i<relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i=0; i<relDiscrimMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
 
@@ -1112,8 +1112,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -1122,8 +1122,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
             {
                 paramPositions[k] = inputParamNum++;
             }
@@ -1321,8 +1321,8 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         {
             // Order by the ordering column, when present
             SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }

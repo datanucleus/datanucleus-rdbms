@@ -323,10 +323,10 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             if (keyMapping != null)
             {
                 // We don't accept null keys
-                for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i=0; i<keyMapping.getNumberOfColumnMappings(); i++)
                 {
                     stmt.append(" AND ");
-                    stmt.append(keyMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(keyMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" IS NOT NULL");
                 }
             }
@@ -360,8 +360,8 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                     // Add parameter occurrence for each union of statement
                     for (int j=0;j<selectStmt.getNumberOfUnions()+1;j++)
                     {
-                        int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                        for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                        int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                        for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                         {
                             paramPositions[k] = inputParamNum++;
                         }
@@ -370,8 +370,8 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 }
                 else
                 {
-                    int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                    for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                    int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                    for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                     {
                         paramPositions[k] = inputParamNum++;
                     }

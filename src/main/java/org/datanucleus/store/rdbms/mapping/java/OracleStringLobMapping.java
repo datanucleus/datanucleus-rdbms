@@ -28,8 +28,8 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleClobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleClobColumnMapping;
 
 /**
  * Mapping for a String type for Oracle when stored in a BLOB or CLOB column.
@@ -65,11 +65,11 @@ public class OracleStringLobMapping extends StringMapping implements MappingCall
         // Update BLOB/CLOB value
         if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.BLOB)
         {
-            OracleBlobRDBMSMapping.updateBlobColumn(op, getTable(), getDatastoreMapping(0), value.getBytes());
+            OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), value.getBytes());
         }
         else if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.CLOB)
         {
-            OracleClobRDBMSMapping.updateClobColumn(op, getTable(), getDatastoreMapping(0), value);
+            OracleClobColumnMapping.updateClobColumn(op, getTable(), getColumnMapping(0), value);
         }
         else
         {

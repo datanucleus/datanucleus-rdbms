@@ -33,7 +33,7 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
@@ -245,7 +245,7 @@ public class ExpressionUtils
             {
                 //if a simple value, we simply apply the equals
                 SQLExpression source = expr.subExprs.getExpression(index);
-                JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(value.getClass(), false, false, clr);
+                JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithColumnMapping(value.getClass(), false, false, clr);
                 SQLExpression target = expr.getSQLStatement().getSQLExpressionFactory().newLiteral(expr.getSQLStatement(), mapping, value);
                 if (bExpr == null)
                 {
@@ -535,7 +535,7 @@ public class ExpressionUtils
     {
         JavaTypeMapping litMapping = ((SQLExpression)lit).getJavaTypeMapping();
         JavaTypeMapping exprMapping = expr.getJavaTypeMapping();
-        if (exprMapping == null || exprMapping.getNumberOfDatastoreMappings() == 0)
+        if (exprMapping == null || exprMapping.getNumberOfColumnMappings() == 0)
         {
             return;
         }
@@ -550,16 +550,16 @@ public class ExpressionUtils
         }
 
         boolean needsUpdating = false;
-        if (litMapping.getNumberOfDatastoreMappings() != exprMapping.getNumberOfDatastoreMappings())
+        if (litMapping.getNumberOfColumnMappings() != exprMapping.getNumberOfColumnMappings())
         {
             needsUpdating = true;
         }
         else
         {
-            for (int i=0;i<litMapping.getNumberOfDatastoreMappings();i++)
+            for (int i=0;i<litMapping.getNumberOfColumnMappings();i++)
             {
-                DatastoreMapping colMapping = litMapping.getDatastoreMapping(i);
-                if (colMapping == null || colMapping.getClass() != exprMapping.getDatastoreMapping(i).getClass())
+                ColumnMapping colMapping = litMapping.getColumnMapping(i);
+                if (colMapping == null || colMapping.getClass() != exprMapping.getColumnMapping(i).getClass())
                 {
                     needsUpdating = true;
                     break;

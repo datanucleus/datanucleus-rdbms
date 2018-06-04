@@ -56,7 +56,7 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
             throw new NucleusException("Cannot create " + this.getClass().getName() + " for value of type " + value.getClass().getName());
         }
 
-        if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+        if (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             delegate = new StringLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
@@ -72,7 +72,7 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
         super.setJavaTypeMapping(mapping);
 
         // Reset the delegate in case it has changed
-        if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+        if (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             delegate = new StringLiteral(stmt, mapping, getStoredValueForEnum(mapping), parameterName);
         }
@@ -122,7 +122,7 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
                 }
                 else
                 {
-                    return (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING)) ? this.value.name() : this.value.ordinal();
+                    return (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING)) ? this.value.name() : this.value.ordinal();
                 }
             }
         }

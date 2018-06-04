@@ -96,7 +96,7 @@ public class BackingStoreHelper
             embedded = true;
         }
 
-        if (!bcs.getStoreManager().insertValuesOnInsert(bcs.getOwnerMapping().getDatastoreMapping(0)))
+        if (!bcs.getStoreManager().insertValuesOnInsert(bcs.getOwnerMapping().getColumnMapping(0)))
         {
             // Don't try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
@@ -112,7 +112,7 @@ public class BackingStoreHelper
             // Either we have no member info, or we are setting the owner when the provided owner is embedded, so are navigating back to the real owner
             bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerOP.getObject());
         }
-        return jdbcPosition + bcs.getOwnerMapping().getNumberOfDatastoreMappings();
+        return jdbcPosition + bcs.getOwnerMapping().getNumberOfColumnMappings();
     }
 
     /**
@@ -128,7 +128,7 @@ public class BackingStoreHelper
     {
         ecs.getRelationDiscriminatorMapping().setObject(ec, ps, 
             MappingHelper.getMappingIndices(jdbcPosition, ecs.getRelationDiscriminatorMapping()), ecs.getRelationDiscriminatorValue());
-        return jdbcPosition + ecs.getRelationDiscriminatorMapping().getNumberOfDatastoreMappings();
+        return jdbcPosition + ecs.getRelationDiscriminatorMapping().getNumberOfColumnMappings();
     }
 
     /**
@@ -144,7 +144,7 @@ public class BackingStoreHelper
             JavaTypeMapping orderMapping)
     {
         orderMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, orderMapping), Integer.valueOf(idx));
-        return jdbcPosition + orderMapping.getNumberOfDatastoreMappings();
+        return jdbcPosition + orderMapping.getNumberOfColumnMappings();
     }
 
     /**
@@ -160,13 +160,13 @@ public class BackingStoreHelper
     public static int populateElementInStatement(ExecutionContext ec, PreparedStatement ps, Object element, 
             int jdbcPosition, JavaTypeMapping elementMapping)
     {
-        if (!elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getDatastoreMapping(0)))
+        if (!elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getColumnMapping(0)))
         {
             // Don't try to insert any mappings with insert parameter that isn't ? (e.g Oracle)
             return jdbcPosition;
         }
         elementMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, elementMapping), element);
-        return jdbcPosition + elementMapping.getNumberOfDatastoreMappings();
+        return jdbcPosition + elementMapping.getNumberOfColumnMappings();
     }
 
     /**
@@ -183,9 +183,9 @@ public class BackingStoreHelper
      */
     public static int populateElementForWhereClauseInStatement(ExecutionContext ec, PreparedStatement ps, Object element, int jdbcPosition, JavaTypeMapping elementMapping)
     {
-        if (elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getDatastoreMapping(0)))
+        if (elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getColumnMapping(0)))
         {
-            if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+            if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
             {
                 ReferenceMapping elemRefMapping = (ReferenceMapping)elementMapping;
                 JavaTypeMapping[] elemFkMappings = elemRefMapping.getJavaTypeMapping();
@@ -195,7 +195,7 @@ public class BackingStoreHelper
                     if (elemFkMappings[i].getType().equals(element.getClass().getName()))
                     {
                         // The FK for the element in question, so populate this
-                        positions = new int[elemFkMappings[i].getNumberOfDatastoreMappings()];
+                        positions = new int[elemFkMappings[i].getNumberOfColumnMappings()];
                         for (int j=0;j<positions.length;j++)
                         {
                             positions[j] = jdbcPosition++;
@@ -211,7 +211,7 @@ public class BackingStoreHelper
             else
             {
                 elementMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, elementMapping), element);
-                jdbcPosition = jdbcPosition + elementMapping.getNumberOfDatastoreMappings();
+                jdbcPosition = jdbcPosition + elementMapping.getNumberOfColumnMappings();
             }
         }
         return jdbcPosition;
@@ -230,13 +230,13 @@ public class BackingStoreHelper
     public static int populateKeyInStatement(ExecutionContext ec, PreparedStatement ps, Object key,
             int jdbcPosition, JavaTypeMapping keyMapping)
     {
-        if (!keyMapping.getDatastoreMapping(0).insertValuesOnInsert())
+        if (!keyMapping.getColumnMapping(0).insertValuesOnInsert())
         {
             // Dont try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
         }
         keyMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, keyMapping), key);
-        return jdbcPosition + keyMapping.getNumberOfDatastoreMappings();
+        return jdbcPosition + keyMapping.getNumberOfColumnMappings();
     }
 
     /**
@@ -252,13 +252,13 @@ public class BackingStoreHelper
     public static int populateValueInStatement(ExecutionContext ec, PreparedStatement ps, Object value,
             int jdbcPosition, JavaTypeMapping valueMapping)
     {
-        if (!valueMapping.getDatastoreMapping(0).insertValuesOnInsert())
+        if (!valueMapping.getColumnMapping(0).insertValuesOnInsert())
         {
             // Don't try to insert any mappings with insert parameter that isn't ? (e.g Oracle)
             return jdbcPosition;
         }
         valueMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, valueMapping), value);
-        return jdbcPosition + valueMapping.getNumberOfDatastoreMappings();
+        return jdbcPosition + valueMapping.getNumberOfColumnMappings();
     }
 
     /**
@@ -286,7 +286,7 @@ public class BackingStoreHelper
             if (discVal != null)
             {
                 discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), discVal);
-                jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+                jdbcPosition += discrimMapping.getNumberOfColumnMappings();
             }
         }
 
@@ -309,7 +309,7 @@ public class BackingStoreHelper
                         if (strategy != DiscriminatorStrategy.NONE)
                         {
                             discrimMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, discrimMapping), discVal);
-                            jdbcPosition += discrimMapping.getNumberOfDatastoreMappings();
+                            jdbcPosition += discrimMapping.getNumberOfColumnMappings();
                         }
                     }
                 }
@@ -344,8 +344,8 @@ public class BackingStoreHelper
             int absFieldNum = emd.getAbsolutePositionOfMember(fieldMapping.getMemberMetaData().getName());
             elementFieldNumbers[i] = absFieldNum;
             StatementMappingIndex stmtMapping = new StatementMappingIndex(fieldMapping);
-            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfDatastoreMappings()];
-            for (int j = 0; j < fieldMapping.getNumberOfDatastoreMappings(); j++)
+            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfColumnMappings()];
+            for (int j = 0; j < fieldMapping.getNumberOfColumnMappings(); j++)
             {
                 jdbcParamPositions[j] = jdbcPosition++;
             }
@@ -383,8 +383,8 @@ public class BackingStoreHelper
             int absFieldNum = kmd.getAbsolutePositionOfMember(fieldMapping.getMemberMetaData().getName());
             elementFieldNumbers[i] = absFieldNum;
             StatementMappingIndex stmtMapping = new StatementMappingIndex(fieldMapping);
-            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfDatastoreMappings()];
-            for (int j=0;j<fieldMapping.getNumberOfDatastoreMappings();j++)
+            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfColumnMappings()];
+            for (int j=0;j<fieldMapping.getNumberOfColumnMappings();j++)
             {
                 jdbcParamPositions[j] = jdbcPosition++;
             }
@@ -422,8 +422,8 @@ public class BackingStoreHelper
             int absFieldNum = vmd.getAbsolutePositionOfMember(fieldMapping.getMemberMetaData().getName());
             elementFieldNumbers[i] = absFieldNum;
             StatementMappingIndex stmtMapping = new StatementMappingIndex(fieldMapping);
-            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfDatastoreMappings()];
-            for (int j=0;j<fieldMapping.getNumberOfDatastoreMappings();j++)
+            int[] jdbcParamPositions = new int[fieldMapping.getNumberOfColumnMappings()];
+            for (int j=0;j<fieldMapping.getNumberOfColumnMappings();j++)
             {
                 jdbcParamPositions[j] = jdbcPosition++;
             }
@@ -456,10 +456,10 @@ public class BackingStoreHelper
         {
             stmt.append(" AND ");
         }
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // Mapping with multiple FK, with element only matching one
-            for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < elementMapping.getNumberOfColumnMappings(); i++)
             {
                 if (i > 0)
                 {
@@ -470,7 +470,7 @@ public class BackingStoreHelper
                 {
                     stmt.append(containerAlias).append(".");
                 }
-                stmt.append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(elementMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 if (((ReferenceMapping)elementMapping).getJavaTypeMapping()[i].getType().equals(element.getClass().getName()))
                 {
                     if (elementsSerialised)
@@ -481,7 +481,7 @@ public class BackingStoreHelper
                     {
                         stmt.append("=");
                     }
-                    stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                    stmt.append(elementMapping.getColumnMapping(i).getUpdateInputParameter());
                 }
                 else
                 {
@@ -491,7 +491,7 @@ public class BackingStoreHelper
         }
         else
         {
-            for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < elementMapping.getNumberOfColumnMappings(); i++)
             {
                 if (i > 0)
                 {
@@ -502,7 +502,7 @@ public class BackingStoreHelper
                 {
                     stmt.append(containerAlias).append(".");
                 }
-                stmt.append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(elementMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 if (elementsSerialised)
                 {
                     stmt.append(" LIKE ");
@@ -511,7 +511,7 @@ public class BackingStoreHelper
                 {
                     stmt.append("=");
                 }
-                stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(elementMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
     }
@@ -527,7 +527,7 @@ public class BackingStoreHelper
     public static void appendWhereClauseForMapping(StringBuilder stmt, JavaTypeMapping mapping, String containerAlias,
             boolean firstWhereClause)
     {
-        for (int i = 0; i < mapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < mapping.getNumberOfColumnMappings(); i++)
         {
             if (!firstWhereClause || (firstWhereClause && i > 0))
             {
@@ -537,9 +537,9 @@ public class BackingStoreHelper
             {
                 stmt.append(containerAlias).append(".");
             }
-            stmt.append(mapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(mapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(mapping.getDatastoreMapping(i).getInsertionInputParameter());
+            stmt.append(mapping.getColumnMapping(i).getInsertionInputParameter());
         }
     }
 }

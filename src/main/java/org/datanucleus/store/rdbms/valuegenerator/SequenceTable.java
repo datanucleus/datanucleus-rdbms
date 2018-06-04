@@ -95,12 +95,12 @@ public class SequenceTable extends TableImpl
         colSequenceName.setPrimaryKey();
         colSequenceName.getColumnMetaData().setLength(Integer.valueOf("255"));
         colSequenceName.getColumnMetaData().setJdbcType(JdbcType.VARCHAR);
-		getStoreManager().getMappingManager().createDatastoreMapping(sequenceNameMapping, colSequenceName, String.class.getName());
+		getStoreManager().getMappingManager().createColumnMapping(sequenceNameMapping, colSequenceName, String.class.getName());
 
         // "NEXT_VAL" column
         nextValMapping = storeMgr.getMappingManager().getMapping(Long.class);
         Column colNextVal = addColumn(Long.class.getName(), idFactory.newColumnIdentifier(nextValColumnName), nextValMapping, null);
-		getStoreManager().getMappingManager().createDatastoreMapping(nextValMapping, colNextVal, Long.class.getName());
+		getStoreManager().getMappingManager().createColumnMapping(nextValMapping, colNextVal, Long.class.getName());
 
         // Set up JDBC statements for supported operations
         insertStmt = "INSERT INTO " + identifier.getFullyQualifiedName(false) + " (" + colSequenceName.getIdentifier() + "," + colNextVal.getIdentifier() + ") VALUES (?,?)";

@@ -57,7 +57,7 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
                 // Note : not added anything to the "st" since this will be used in comparison
                 // and the comparison defines the SQL to use.
             }
-            if (mapping.getNumberOfDatastoreMappings() == 1)
+            if (mapping.getNumberOfColumnMappings() == 1)
             {
                 st.appendParameter(parameterName, mapping, this.value);
             }
@@ -98,14 +98,14 @@ public class ObjectLiteral extends ObjectExpression implements SQLLiteral
         if (cmd != null)
         {
             // Literal representing a persistable object (or its identity)
-            int numCols = mapping.getNumberOfDatastoreMappings();
+            int numCols = mapping.getNumberOfColumnMappings();
             for (int i=0;i<numCols;i++)
             {
                 ColumnExpression colExpr = null;
                 if (parameterName == null && mapping instanceof PersistableMapping)
                 {
                     // Literal is a persistable object
-                    Object colValue = ((PersistableMapping)mapping).getValueForDatastoreMapping(stmt.getRDBMSManager().getNucleusContext(), i, value);
+                    Object colValue = ((PersistableMapping)mapping).getValueForColumnMapping(stmt.getRDBMSManager().getNucleusContext(), i, value);
                     colExpr = new ColumnExpression(stmt, colValue);
                 }
                 else

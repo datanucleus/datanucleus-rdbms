@@ -38,7 +38,7 @@ public class StringTemporalExpression extends DelegatedExpression
     public StringTemporalExpression(SQLStatement stmt, SQLTable table, JavaTypeMapping mapping)
     {
         super(stmt, table, mapping);
-        if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+        if (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             delegate = new StringExpression(stmt, table, mapping);
         }

@@ -848,9 +848,9 @@ public abstract class TableImpl extends AbstractTable
                     DatastoreClass referencedTable = storeMgr.getDatastoreClass(col.getStoredJavaType(), clr);
                     if (referencedTable != null)
                     {
-                        for (int j = 0; j < col.getJavaTypeMapping().getNumberOfDatastoreMappings(); j++)
+                        for (int j = 0; j < col.getJavaTypeMapping().getNumberOfColumnMappings(); j++)
                         {
-                            colsInFKs.add(col.getJavaTypeMapping().getDatastoreMapping(j).getColumn());
+                            colsInFKs.add(col.getJavaTypeMapping().getColumnMapping(j).getColumn());
                         }
                         ForeignKey fk = new ForeignKey(col.getJavaTypeMapping(), dba, referencedTable, true);
                         foreignKeys.add(fk);
@@ -1428,26 +1428,26 @@ public abstract class TableImpl extends AbstractTable
         {
             // Provide field->column mapping debug message
             StringBuilder columnsStr = new StringBuilder();
-            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
+            for (int i=0;i<mapping.getNumberOfColumnMappings();i++)
             {
                 if (i > 0)
                 {
                     columnsStr.append(",");
                 }
-                columnsStr.append(mapping.getDatastoreMapping(i).getColumn());
+                columnsStr.append(mapping.getColumnMapping(i).getColumn());
             }
-            if (mapping.getNumberOfDatastoreMappings() == 0)
+            if (mapping.getNumberOfColumnMappings() == 0)
             {
                 columnsStr.append("[none]");
             }
             StringBuilder datastoreMappingTypes = new StringBuilder();
-            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
+            for (int i=0;i<mapping.getNumberOfColumnMappings();i++)
             {
                 if (i > 0)
                 {
                     datastoreMappingTypes.append(',');
                 }
-                datastoreMappingTypes.append(mapping.getDatastoreMapping(i).getClass().getName());
+                datastoreMappingTypes.append(mapping.getColumnMapping(i).getClass().getName());
             }
             NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010", memberName, columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
         }

@@ -232,8 +232,8 @@ public class LocateBulkRequest extends BulkRequest
 
                     StatementMappingIndex pkIdx = new StatementMappingIndex(pkMapping);
                     mappingDefinitions[i].addMappingForMember(mmd.getAbsoluteFieldNumber(), pkIdx);
-                    int[] inputParams = new int[pkMapping.getNumberOfDatastoreMappings()];
-                    for (int k=0;k<pkMapping.getNumberOfDatastoreMappings();k++)
+                    int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
+                    for (int k=0;k<pkMapping.getNumberOfColumnMappings();k++)
                     {
                         inputParams[k] = inputParamNum++;
                     }

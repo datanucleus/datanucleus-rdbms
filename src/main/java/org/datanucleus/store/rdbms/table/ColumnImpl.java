@@ -48,7 +48,7 @@ import org.datanucleus.store.rdbms.exceptions.IncompatibleDataTypeException;
 import org.datanucleus.store.rdbms.exceptions.WrongPrecisionException;
 import org.datanucleus.store.rdbms.exceptions.WrongScaleException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -81,7 +81,7 @@ public class ColumnImpl implements Column
     protected final Table table;
 
     /** Datastore mapping for this column. */
-    protected DatastoreMapping datastoreMapping = null;
+    protected ColumnMapping datastoreMapping = null;
 
     /** Java type that this column is storing. (can we just get this from the mapping above ?) */
     protected final String storedJavaType;
@@ -282,7 +282,7 @@ public class ColumnImpl implements Column
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#getDatastoreMapping()
      */
-    public DatastoreMapping getDatastoreMapping()
+    public ColumnMapping getDatastoreMapping()
     {
         return datastoreMapping;
     }
@@ -290,7 +290,7 @@ public class ColumnImpl implements Column
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.table.Column#setDatastoreMapping(org.datanucleus.store.rdbms.mapping.DatastoreMapping)
      */
-    public void setDatastoreMapping(DatastoreMapping mapping)
+    public void setDatastoreMapping(ColumnMapping mapping)
     {
         datastoreMapping = mapping;
     }

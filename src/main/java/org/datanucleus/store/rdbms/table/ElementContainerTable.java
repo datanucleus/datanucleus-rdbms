@@ -199,22 +199,22 @@ public abstract class ElementContainerTable extends JoinTable
         {
             String colName = pkCols[i].getName();
             boolean found = false;
-            for (int j=0;j<ownerMapping.getNumberOfDatastoreMappings();j++)
+            for (int j=0;j<ownerMapping.getNumberOfColumnMappings();j++)
             {
-                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
+                if (ownerMapping.getColumnMapping(j).getColumn().getIdentifier().getName().equals(colName))
                 {
-                    ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
+                    ownerMapping.getColumnMapping(j).getColumn().setPrimaryKey();
                     found = true;
                 }
             }
 
             if (!found)
             {
-                for (int j=0;j<elementMapping.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<elementMapping.getNumberOfColumnMappings();j++)
                 {
-                    if (elementMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
+                    if (elementMapping.getColumnMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
-                        elementMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
+                        elementMapping.getColumnMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }
@@ -393,7 +393,7 @@ public abstract class ElementContainerTable extends JoinTable
                         foreignKeys.addAll(fks);
                     }
                     else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                            embFieldMapping.getNumberOfDatastoreMappings() > 0 &&
+                            embFieldMapping.getNumberOfColumnMappings() > 0 &&
                             embFieldMapping instanceof PersistableMapping)
                     {
                         // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
@@ -411,7 +411,7 @@ public abstract class ElementContainerTable extends JoinTable
                 for (int i=0;i<implJavaTypeMappings.length;i++)
                 {
                     JavaTypeMapping implMapping = implJavaTypeMappings[i];
-                    if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implMapping.getType(), clr) != null && implMapping.getNumberOfDatastoreMappings() > 0)
+                    if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implMapping.getType(), clr) != null && implMapping.getNumberOfColumnMappings() > 0)
                     {
                         referencedTable = storeMgr.getDatastoreClass(implMapping.getType(), clr);
                         if (referencedTable != null)

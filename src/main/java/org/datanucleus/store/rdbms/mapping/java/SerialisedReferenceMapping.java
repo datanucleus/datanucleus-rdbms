@@ -86,7 +86,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
         {
             sm.setStoringPC();
         }
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
+        getColumnMapping(0).setObject(ps, exprIndex[0], value);
         if (sm != null)
         {
             sm.unsetStoringPC();
@@ -120,7 +120,7 @@ public class SerialisedReferenceMapping extends SerialisedMapping
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, ObjectProvider ownerOP, int fieldNumber)
     {
-        Object obj = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        Object obj = getColumnMapping(0).getObject(resultSet, exprIndex[0]);
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(obj))
         {

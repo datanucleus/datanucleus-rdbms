@@ -1189,7 +1189,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     protected void validateExpressionForResult(SQLExpression sqlExpr)
     {
         JavaTypeMapping m = sqlExpr.getJavaTypeMapping();
-        if (m != null && m instanceof AbstractContainerMapping && m.getNumberOfDatastoreMappings() != 1)
+        if (m != null && m instanceof AbstractContainerMapping && m.getNumberOfColumnMappings() != 1)
         {
             throw new NucleusUserException(Localiser.msg("021213"));
         }

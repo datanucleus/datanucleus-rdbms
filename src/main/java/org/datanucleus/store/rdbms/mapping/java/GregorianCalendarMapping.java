@@ -108,9 +108,9 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
-        if (getNumberOfDatastoreMappings() == 1)
+        if (getNumberOfColumnMappings() == 1)
         {
             // (Timestamp) implementation
             return ClassNameConstants.JAVA_SQL_TIMESTAMP;
@@ -135,9 +135,9 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
      * @param value The overall value for this java type
      * @return The value for this datastore index
      */
-    public Object getValueForDatastoreMapping(NucleusContext nucleusCtx, int index, Object value)
+    public Object getValueForColumnMapping(NucleusContext nucleusCtx, int index, Object value)
     {
-        if (getNumberOfDatastoreMappings() == 1)
+        if (getNumberOfColumnMappings() == 1)
         {
             return value;
         }
@@ -160,7 +160,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
         GregorianCalendar cal = (GregorianCalendar) value;
-        if (getNumberOfDatastoreMappings() == 1)
+        if (getNumberOfColumnMappings() == 1)
         {
             // (Timestamp) implementation
             Timestamp ts = null;
@@ -168,21 +168,21 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             {
                 ts = new Timestamp(cal.getTimeInMillis());
             }
-            // Server timezone will be applied in the RDBMSMapping at persistence
-            getDatastoreMapping(0).setObject(ps, exprIndex[0], ts);
+            // Server timezone will be applied in the ColumnMapping at persistence
+            getColumnMapping(0).setObject(ps, exprIndex[0], ts);
         }
         else
         {
             // (Timestamp millisecs, Timezone) implementation
             if (cal == null)
             {
-                getDatastoreMapping(0).setObject(ps, exprIndex[0], null);
-                getDatastoreMapping(1).setObject(ps, exprIndex[1], null);
+                getColumnMapping(0).setObject(ps, exprIndex[0], null);
+                getColumnMapping(1).setObject(ps, exprIndex[1], null);
             }
             else
             {
-                getDatastoreMapping(0).setLong(ps, exprIndex[0], cal.getTime().getTime());
-                getDatastoreMapping(1).setString(ps, exprIndex[1], cal.getTimeZone().getID());
+                getColumnMapping(0).setLong(ps, exprIndex[0], cal.getTime().getTime());
+                getColumnMapping(1).setString(ps, exprIndex[1], cal.getTimeZone().getID());
             }
         }
     }
@@ -196,7 +196,7 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
         try
         {
             // Check for null entries
-            if (getDatastoreMapping(0).getObject(resultSet, exprIndex[0]) == null)
+            if (getColumnMapping(0).getObject(resultSet, exprIndex[0]) == null)
             {
                 return null;
             }
@@ -206,9 +206,9 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
             // Do nothing
         }
 
-        if (getNumberOfDatastoreMappings() == 1)
+        if (getNumberOfColumnMappings() == 1)
         {
-            Date date = (Date)getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+            Date date = (Date)getColumnMapping(0).getObject(resultSet, exprIndex[0]);
             GregorianCalendar cal = new GregorianCalendar();
             cal.setTimeInMillis(date.getTime());
 
@@ -222,11 +222,11 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
         }
 
         // (Timestamp millisecs, Timezone) implementation
-        long millisecs = getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+        long millisecs = getColumnMapping(0).getLong(resultSet, exprIndex[0]);
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(new Date(millisecs));
-        String timezoneId = getDatastoreMapping(1).getString(resultSet, exprIndex[1]);
+        String timezoneId = getColumnMapping(1).getString(resultSet, exprIndex[1]);
         if (timezoneId != null)
         {
             cal.setTimeZone(TimeZone.getTimeZone(timezoneId));

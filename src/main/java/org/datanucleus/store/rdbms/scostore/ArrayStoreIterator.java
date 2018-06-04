@@ -61,7 +61,7 @@ public class ArrayStoreIterator implements Iterator
                 Object nextElement;
                 if (backingStore.isElementsAreEmbedded() || backingStore.isElementsAreSerialised())
                 {
-                    int param[] = new int[elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
@@ -86,7 +86,7 @@ public class ArrayStoreIterator implements Iterator
                 else if (elementMapping instanceof ReferenceMapping)
                 {
                     // Element = Reference (Interface/Object)
-                    int param[] = new int[elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;

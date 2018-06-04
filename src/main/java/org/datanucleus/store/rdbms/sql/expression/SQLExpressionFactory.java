@@ -765,7 +765,7 @@ public class SQLExpressionFactory
                 return mapping;
             }
         }
-        mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(cls, false, false, clr);
+        mapping = storeMgr.getMappingManager().getMappingWithColumnMapping(cls, false, false, clr);
         mappingByClass.put(cls, mapping);
         return mapping;
     }

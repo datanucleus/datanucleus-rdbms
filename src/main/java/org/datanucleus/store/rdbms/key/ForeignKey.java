@@ -98,9 +98,9 @@ public class ForeignKey extends Key
             throw new NucleusException("ForeignKey ID mapping is not initilized for "+mapping+". Table referenced: " + refTable.toString()).setFatal();
         }
 
-        for (int i=0; i<refTable.getIdMapping().getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<refTable.getIdMapping().getNumberOfColumnMappings(); i++)
         {
-        	setColumn(i, mapping.getDatastoreMapping(i).getColumn(), refTable.getIdMapping().getDatastoreMapping(i).getColumn()); 
+        	setColumn(i, mapping.getColumnMapping(i).getColumn(), refTable.getIdMapping().getColumnMapping(i).getColumn()); 
         }
     }
 

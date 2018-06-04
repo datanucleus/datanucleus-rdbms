@@ -75,7 +75,7 @@ public abstract class SimpleNumericAggregateMethod implements SQLMethod
         subStmt.setClassLoaderResolver(clr);
 
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
-        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithColumnMapping(String.class, false, false, clr);
         String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
         SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
         ((StringLiteral)aggExpr).generateStatementWithoutQuotes();

@@ -182,7 +182,7 @@ public class ResultMetaDataROF extends AbstractROF
                     if (acmd.getIdentityType() == IdentityType.DATASTORE)
                     {
                         JavaTypeMapping datastoreIdMapping = dc.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
-                        Column df = datastoreIdMapping.getDatastoreMapping(0).getColumn();
+                        Column df = datastoreIdMapping.getColumnMapping(0).getColumn();
                         if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                         {
                             //add +1 because result sets in jdbc starts with 1
@@ -207,9 +207,9 @@ public class ResultMetaDataROF extends AbstractROF
                         else
                         {
                             JavaTypeMapping mapping = dc.getMemberMapping(apmd);
-                            for(int l=0; l<mapping.getDatastoreMappings().length && !found; l++)
+                            for(int l=0; l<mapping.getColumnMappings().length && !found; l++)
                             {
-                                Column df = mapping.getDatastoreMapping(l).getColumn();
+                                Column df = mapping.getColumnMapping(l).getColumn();
                                 if (df.getIdentifier().getName().equalsIgnoreCase(columnNames[j]))
                                 {
                                     fieldColumns.put(columnNames[j], apmd);

@@ -288,7 +288,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     if (owner == null)
                     {
                         ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null);
-                        jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
+                        jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     }
                     else
                     {
@@ -353,32 +353,32 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     stmt.append(elementInfo[0].getDatastoreClass().toString());
                 }
                 stmt.append(" SET ");
-                for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                    stmt.append(ownerMapping.getColumnMapping(i).getUpdateInputParameter());
                 }
-                for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                 {
                     stmt.append(",");
-                    stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                    stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(",");
                         stmt.append(
-                            relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                            relationDiscriminatorMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append(" = ");
-                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                        stmt.append(relationDiscriminatorMapping.getColumnMapping(i).getUpdateInputParameter());
                     }
                 }
 
@@ -505,25 +505,25 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     stmt.append(elementInfo[0].getDatastoreClass().toString());
                 }
                 stmt.append(" SET ");
-                for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(", ");
                     }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + " = NULL");
+                    stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString() + " = NULL");
                 }
-                for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                 {
                     stmt.append(", ");
-                    stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + " = NULL");
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString() + " = NULL");
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(", ");
-                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + " = NULL");
+                        stmt.append(relationDiscriminatorMapping.getColumnMapping(i).getColumn().getIdentifier().toString() + " = NULL");
                     }
                 }
 
@@ -597,8 +597,8 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -607,8 +607,8 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
             {
                 paramPositions[k] = inputParamNum++;
             }
@@ -793,8 +793,8 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         {
             // Order by the ordering column, when present
             SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+            SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+            boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
             orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
             sqlStmt.setOrdering(orderExprs, descendingOrder);
         }

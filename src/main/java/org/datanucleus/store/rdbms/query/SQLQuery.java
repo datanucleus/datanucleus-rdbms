@@ -475,19 +475,19 @@ public final class SQLQuery extends Query
                         // Generate id column field information for later checking the id is present
                         DatastoreClass table = storeMgr.getDatastoreClass(candidateClass.getName(), clr);
                         PersistableMapping idMapping = (PersistableMapping)table.getIdMapping();
-                        String[] idColNames = new String[idMapping.getNumberOfDatastoreMappings()];
-                        boolean[] idColMissing = new boolean[idMapping.getNumberOfDatastoreMappings()];
-                        for (int i=0;i<idMapping.getNumberOfDatastoreMappings();i++)
+                        String[] idColNames = new String[idMapping.getNumberOfColumnMappings()];
+                        boolean[] idColMissing = new boolean[idMapping.getNumberOfColumnMappings()];
+                        for (int i=0;i<idMapping.getNumberOfColumnMappings();i++)
                         {
-                            idColNames[i] = idMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString();
+                            idColNames[i] = idMapping.getColumnMapping(i).getColumn().getIdentifier().toString();
                             idColMissing[i] = true;
                         }
 
                         // Generate discriminator/version information for later checking they are present
                         JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
-                        String discriminatorColName = (discrimMapping != null) ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                        String discriminatorColName = (discrimMapping != null) ? discrimMapping.getColumnMapping(0).getColumn().getIdentifier().toString() : null;
                         JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
-                        String versionColName = (versionMapping != null) ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+                        String versionColName = (versionMapping != null) ? versionMapping.getColumnMapping(0).getColumn().getIdentifier().toString() : null;
                         boolean discrimMissing = (discriminatorColName != null);
                         boolean versionMissing = (versionColName != null);
 
@@ -1050,7 +1050,7 @@ public final class SQLQuery extends Query
                 else
                 {
                     // Fall back to generating a mapping for this type - does this ever happen?
-                    m = storeMgr.getMappingManager().getMappingWithDatastoreMapping(fieldType, false, false, clr);
+                    m = storeMgr.getMappingManager().getMappingWithColumnMapping(fieldType, false, false, clr);
                 }
                 if (m.includeInFetchStatement())
                 {
@@ -1105,19 +1105,19 @@ public final class SQLQuery extends Query
         }
 
         PersistableMapping idMapping = (PersistableMapping)table.getIdMapping();
-        String[] idColNames = new String[idMapping.getNumberOfDatastoreMappings()];
-        for (int i=0;i<idMapping.getNumberOfDatastoreMappings();i++)
+        String[] idColNames = new String[idMapping.getNumberOfColumnMappings()];
+        for (int i=0;i<idMapping.getNumberOfColumnMappings();i++)
         {
-            idColNames[i] = idMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString();
+            idColNames[i] = idMapping.getColumnMapping(i).getColumn().getIdentifier().toString();
         }
 
         // Generate discriminator information for later checking it is present
         JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
-        String discrimColName = discrimMapping != null ? discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        String discrimColName = discrimMapping != null ? discrimMapping.getColumnMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Generate version information for later checking it is present
         JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
-        String versionColName = versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString() : null;
+        String versionColName = versionMapping != null ? versionMapping.getColumnMapping(0).getColumn().getIdentifier().toString() : null;
 
         // Go through the fields of the ResultSet and map to the required fields in the candidate
         ResultSetMetaData rsmd = rs.getMetaData();

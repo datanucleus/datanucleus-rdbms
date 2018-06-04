@@ -444,7 +444,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, ownerMapping), null);
                         }
-                        jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
+                        jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     }
                     else
                     {
@@ -1092,8 +1092,8 @@ public class FKListStore<E> extends AbstractListStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -1102,8 +1102,8 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
             {
                 paramPositions[k] = inputParamNum++;
             }
@@ -1185,7 +1185,7 @@ public class FKListStore<E> extends AbstractListStore<E>
      */
     private String getUpdateFkStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // Don't cache since depends on the element
             return getUpdateFkStatementString(element);
@@ -1222,34 +1222,34 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
-        for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append("=");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(ownerMapping.getColumnMapping(i).getUpdateInputParameter());
         }
         if (orderMapping != null)
         {
-            for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
         if (relDiscrimMapping != null)
         {
-            for (int i = 0; i < relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relDiscrimMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
 
@@ -1291,28 +1291,28 @@ public class FKListStore<E> extends AbstractListStore<E>
                     stmt.append(containerTable.toString());
                 }
                 stmt.append(" SET ");
-                for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(", ");
                     }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + "=NULL");
+                    stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString() + "=NULL");
                 }
                 if (orderMapping != null)
                 {
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(", ");
-                        stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString() + "=-1");
+                        stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString() + "=-1");
                     }
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(", ");
-                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(relationDiscriminatorMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append("=NULL");
                     }
                 }
@@ -1373,35 +1373,35 @@ public class FKListStore<E> extends AbstractListStore<E>
 
         // TODO If ownerMapping is not for containerTable then use owner table for the UPDATE
         StringBuilder stmt = new StringBuilder("UPDATE ").append(table.toString()).append(" SET ");
-        for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(ownerMapping.getColumnMapping(i).getUpdateInputParameter());
         }
 
         if (orderMapping != null)
         {
-            for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append(" = ");
-                stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
         if (relDiscrimMapping != null)
         {
-            for (int i = 0; i < relDiscrimMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relDiscrimMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append(" = ");
-                stmt.append(relDiscrimMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                stmt.append(relDiscrimMapping.getColumnMapping(i).getUpdateInputParameter());
             }
         }
 
@@ -1430,31 +1430,31 @@ public class FKListStore<E> extends AbstractListStore<E>
                 // TODO Allow for multiple element tables
                 stmt.append(containerTable.toString());
                 stmt.append(" SET ");
-                for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append("=NULL");
                 }
 
                 if (orderMapping != null)
                 {
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(",");
-                        stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append("=-1");
                     }
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(",");
-                        stmt.append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(relationDiscriminatorMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append(" = NULL");
                     }
                 }
@@ -1509,21 +1509,21 @@ public class FKListStore<E> extends AbstractListStore<E>
                     stmt.append(containerTable.toString());
                 }
                 stmt.append(" SET ");
-                for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(", ");
                     }
-                    stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append("=NULL");
                 }
                 if (orderMapping != null)
                 {
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(", ");
-                        stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append("=-1");
                     }
                 }
@@ -1708,8 +1708,8 @@ public class FKListStore<E> extends AbstractListStore<E>
             {
                 // Order by the ordering column
                 SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-                SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-                boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+                SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+                boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
                 orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
                 sqlStmt.setOrdering(orderExprs, descendingOrder);
             }

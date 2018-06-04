@@ -28,7 +28,7 @@ import org.datanucleus.query.NullOrderingType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.AggregateExpression;
@@ -306,7 +306,7 @@ public class SelectStatement extends SQLStatement
 
         invalidateStatement();
 
-        DatastoreMapping[] mappings = mapping.getDatastoreMappings();
+        ColumnMapping[] mappings = mapping.getColumnMappings();
         int[] selected = new int[mappings.length];
         for (int i=0;i<selected.length;i++)
         {
@@ -1107,7 +1107,7 @@ public class SelectStatement extends SQLStatement
                             }
                             else
                             {
-                                DatastoreMapping[] mappings = orderExpr.getJavaTypeMapping().getDatastoreMappings();
+                                ColumnMapping[] mappings = orderExpr.getJavaTypeMapping().getColumnMappings();
                                 for (int j=0;j<mappings.length;j++)
                                 {
                                     String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderString + "_" + j);
@@ -1264,7 +1264,7 @@ public class SelectStatement extends SQLStatement
                     {
                         JavaTypeMapping m = orderingExpressions[i].getJavaTypeMapping();
 
-                        DatastoreMapping[] mappings = m.getDatastoreMappings();
+                        ColumnMapping[] mappings = m.getColumnMappings();
                         for (int j=0;j<mappings.length;j++)
                         {
                             String alias = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase("NUCORDER" + i + "_" + j);

@@ -69,7 +69,7 @@ public class TableUtils
             // If the implementation is of a PC class, look to add a FK to the PC class table
             final JavaTypeMapping implMapping = refJavaTypeMappings[i];
             if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(implMapping.getType(), clr) != null &&
-                implMapping.getNumberOfDatastoreMappings() > 0)
+                implMapping.getNumberOfColumnMappings() > 0)
             {
                 DatastoreClass referencedTable = storeMgr.getDatastoreClass(implMapping.getType(), clr);
                 if (referencedTable != null)
@@ -149,7 +149,7 @@ public class TableUtils
      */
     public static Index getIndexForField(Table table, IndexMetaData imd, JavaTypeMapping fieldMapping)
     {
-        if (fieldMapping.getNumberOfDatastoreMappings() == 0)
+        if (fieldMapping.getNumberOfColumnMappings() == 0)
         {
             // No columns in this mapping so we can hardly index it!
             return null;
@@ -173,10 +173,10 @@ public class TableUtils
         }
 
         // Field-level index so use all columns for the field
-        int countFields = fieldMapping.getNumberOfDatastoreMappings();
+        int countFields = fieldMapping.getNumberOfColumnMappings();
         for (int j=0; j<countFields; j++)
         {
-            index.addColumn(fieldMapping.getDatastoreMapping(j).getColumn());
+            index.addColumn(fieldMapping.getColumnMapping(j).getColumn());
         }
 
         return index;
@@ -202,10 +202,10 @@ public class TableUtils
         }
 
         // Field-level index so use all columns for the field
-        int countFields = fieldMapping.getNumberOfDatastoreMappings();
+        int countFields = fieldMapping.getNumberOfColumnMappings();
         for (int j=0; j<countFields; j++)
         {
-            ck.addColumn(fieldMapping.getDatastoreMapping(j).getColumn());
+            ck.addColumn(fieldMapping.getColumnMapping(j).getColumn());
         }
 
         return ck;

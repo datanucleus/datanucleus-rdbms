@@ -86,7 +86,7 @@ public class RDBMSQueryUtils extends QueryUtils
         {
             try
             {
-                String discriminatorColName = discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier().getName();
+                String discriminatorColName = discrimMapping.getColumnMapping(0).getColumn().getIdentifier().getName();
                 String discriminatorValue = rs.getString(discriminatorColName);
                 rowClassName = ec.getMetaDataManager().getClassNameFromDiscriminatorValue(discriminatorValue, dismd);
             }

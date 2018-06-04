@@ -28,7 +28,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -181,7 +181,7 @@ public class OracleArrayMapping extends ArrayMapping
             }
 
             // Update the BLOB
-            OracleBlobRDBMSMapping.updateBlobColumn(ownerOP, getTable(), getDatastoreMapping(0), bytes);
+            OracleBlobColumnMapping.updateBlobColumn(ownerOP, getTable(), getColumnMapping(0), bytes);
         }
         else
         {

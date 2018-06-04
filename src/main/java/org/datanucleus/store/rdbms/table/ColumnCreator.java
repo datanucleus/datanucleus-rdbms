@@ -82,7 +82,7 @@ public final class ColumnCreator
         }
 
         Column column = table.addColumn(mapping.getType(), identifier, mapping, colmd);
-        storeMgr.getMappingManager().createDatastoreMapping(mapping, column, mapping.getJavaType().getName());
+        storeMgr.getMappingManager().createColumnMapping(mapping, column, mapping.getJavaType().getName());
         if (pk)
         {
             column.setPrimaryKey();
@@ -227,10 +227,10 @@ public final class ColumnCreator
                     columnContainer = (ColumnMetaDataContainer)columnMetaData[0].getParent();
                 }
                 CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(columnContainer, table, columnMetaData, m, true);
-                for (int i=0; i<m.getNumberOfDatastoreMappings(); i++)
+                for (int i=0; i<m.getNumberOfColumnMappings(); i++)
                 {
-                    JavaTypeMapping refDatastoreMapping = storeMgr.getMappingManager().getMapping(m.getDatastoreMapping(i).getJavaTypeMapping().getJavaType());
-                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(m.getDatastoreMapping(i).getColumn().getIdentifier());
+                    JavaTypeMapping refDatastoreMapping = storeMgr.getMappingManager().getMapping(m.getColumnMapping(i).getJavaTypeMapping().getJavaType());
+                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(m.getColumnMapping(i).getColumn().getIdentifier());
                     try
                     {
                         DatastoreIdentifier identifier = null;
@@ -242,7 +242,7 @@ public final class ColumnCreator
                             {
                                 // Create reference identifier
                                 identifier = idFactory.newReferenceFieldIdentifier(mmd, storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr),
-                                    m.getDatastoreMapping(i).getColumn().getIdentifier(),
+                                    m.getColumnMapping(i).getColumn().getIdentifier(),
                                     storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                             }
                             else
@@ -252,7 +252,7 @@ public final class ColumnCreator
                                 // TODO If the mmd is an "embedded" type this can create invalid identifiers
                                 // TODO Cater for more than 1 related field
                                 identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
-                                        m.getDatastoreMapping(i).getColumn().getIdentifier(), 
+                                        m.getColumnMapping(i).getColumn().getIdentifier(), 
                                         storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                             }
                         }
@@ -265,7 +265,7 @@ public final class ColumnCreator
                                 {
                                     // Create reference identifier
                                     identifier = idFactory.newReferenceFieldIdentifier(mmd, storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(javaType, clr),
-                                        m.getDatastoreMapping(i).getColumn().getIdentifier(),
+                                        m.getColumnMapping(i).getColumn().getIdentifier(),
                                         storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                                 }
                                 else
@@ -275,7 +275,7 @@ public final class ColumnCreator
                                     // TODO If the mmd is an "embedded" type this can create invalid identifiers
                                     // TODO Cater for more than 1 related field
                                     identifier = idFactory.newJoinTableFieldIdentifier(mmd, relatedMmds != null ? relatedMmds[0] : null,
-                                            m.getDatastoreMapping(i).getColumn().getIdentifier(), 
+                                            m.getColumnMapping(i).getColumn().getIdentifier(), 
                                             storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
                                 }
                             }
@@ -288,7 +288,7 @@ public final class ColumnCreator
 
                         // Only add the column if not currently present
                         Column column = table.addColumn(javaType.getName(), identifier, refDatastoreMapping, colmd);
-                        m.getDatastoreMapping(i).getColumn().copyConfigurationTo(column);
+                        m.getColumnMapping(i).getColumn().copyConfigurationTo(column);
                         if (isPrimaryKey)
                         {
                             column.setPrimaryKey();
@@ -298,8 +298,8 @@ public final class ColumnCreator
                             column.setNullable(true);
                         }
 
-                        storeMgr.getMappingManager().createDatastoreMapping(refDatastoreMapping, column, 
-                            m.getDatastoreMapping(i).getJavaTypeMapping().getJavaTypeForDatastoreMapping(i));
+                        storeMgr.getMappingManager().createColumnMapping(refDatastoreMapping, column, 
+                            m.getColumnMapping(i).getJavaTypeMapping().getJavaTypeForColumnMapping(i));
                     }
                     catch (DuplicateColumnException ex)
                     {
@@ -340,7 +340,7 @@ public final class ColumnCreator
                 identifier = idFactory.newJoinTableFieldIdentifier(mmd, null, null, storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(javaType), fieldRole);
             }
             column = table.addColumn(javaType.getName(), identifier, mapping, colmd);
-            storeMgr.getMappingManager().createDatastoreMapping(mapping, column, mapping.getJavaTypeForDatastoreMapping(0));
+            storeMgr.getMappingManager().createColumnMapping(mapping, column, mapping.getJavaTypeForColumnMapping(0));
 
             if (isNullable)
             {

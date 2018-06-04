@@ -582,9 +582,9 @@ public class InsertRequest extends Request
             JavaTypeMapping idMapping = table.getIdMapping();
             if (idMapping != null)
             {
-                for (int i=0;i<idMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<idMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column col = idMapping.getDatastoreMapping(i).getColumn();
+                    Column col = idMapping.getColumnMapping(i).getColumn();
                     if (col.isIdentity())
                     {
                         columnName = col.getIdentifier().toString();
@@ -716,7 +716,7 @@ public class InsertRequest extends Request
             }
             if (m.includeInInsertStatement())
             {
-                if (m.getNumberOfDatastoreMappings() == 0 &&
+                if (m.getNumberOfColumnMappings() == 0 &&
                     (m instanceof PersistableMapping || m instanceof ReferenceMapping))
                 {
                     // Reachable Fields (that relate to this object but have no column in the table)
@@ -784,11 +784,11 @@ public class InsertRequest extends Request
                     statementMappings[mmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
 
                     // create the expressions index (columns index)
-                    int parametersIndex[] = new int[m.getNumberOfDatastoreMappings()];
+                    int parametersIndex[] = new int[m.getNumberOfColumnMappings()];
                     for (int j = 0; j < parametersIndex.length; j++)
                     {
                         // check if the column was not already assigned
-                        Column c = m.getDatastoreMapping(j).getColumn();
+                        Column c = m.getColumnMapping(j).getColumn();
                         DatastoreIdentifier columnId = c.getIdentifier();
                         boolean columnExists = assignedColumns.containsKey(columnId.toString());
                         if (columnExists)
@@ -810,10 +810,10 @@ public class InsertRequest extends Request
                                     columnValues.append(',');
                                 }
                                 columnNames.append(columnId);
-                                columnValues.append(m.getDatastoreMapping(j).getInsertionInputParameter());
+                                columnValues.append(m.getColumnMapping(j).getInsertionInputParameter());
                             }
 
-                            if (m.getDatastoreMapping(j).insertValuesOnInsert())
+                            if (m.getColumnMapping(j).insertValuesOnInsert())
                             {
                                 // only add fields to be replaced by the real values only if the param value has ?
                                 Integer abs_field_num = Integer.valueOf(mmd.getAbsoluteFieldNumber());
@@ -872,13 +872,13 @@ public class InsertRequest extends Request
                 JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
                 if (versionMapping != null)
                 {
-                    String val = versionMapping.getDatastoreMapping(0).getUpdateInputParameter();
+                    String val = versionMapping.getColumnMapping(0).getUpdateInputParameter();
                     if (columnNames.length() > 0)
                     {
                         columnNames.append(',');
                         columnValues.append(',');
                     }
-                    columnNames.append(versionMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                    columnNames.append(versionMapping.getColumnMapping(0).getColumn().getIdentifier());
                     columnValues.append(val);
 
                     versionStatementMapping = new StatementMappingIndex(versionMapping);
@@ -896,14 +896,14 @@ public class InsertRequest extends Request
                 JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
                 if (discrimMapping != null)
                 {
-                    String val = discrimMapping.getDatastoreMapping(0).getUpdateInputParameter();
+                    String val = discrimMapping.getColumnMapping(0).getUpdateInputParameter();
 
                     if (columnNames.length() > 0)
                     {
                         columnNames.append(',');
                         columnValues.append(',');
                     }
-                    columnNames.append(discrimMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                    columnNames.append(discrimMapping.getColumnMapping(0).getColumn().getIdentifier());
                     columnValues.append(val);
                     discriminatorStatementMapping = new StatementMappingIndex(discrimMapping);
                     int[] param = { paramIndex++ };
@@ -956,14 +956,14 @@ public class InsertRequest extends Request
             {
                 // Multitenancy column
                 JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
-                String val = multitenancyMapping.getDatastoreMapping(0).getUpdateInputParameter();
+                String val = multitenancyMapping.getColumnMapping(0).getUpdateInputParameter();
 
                 if (columnNames.length() > 0)
                 {
                     columnNames.append(',');
                     columnValues.append(',');
                 }
-                columnNames.append(multitenancyMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                columnNames.append(multitenancyMapping.getColumnMapping(0).getColumn().getIdentifier());
                 columnValues.append(val);
                 multitenancyStatementMapping = new StatementMappingIndex(multitenancyMapping);
                 int[] param = { paramIndex++ };
@@ -973,14 +973,14 @@ public class InsertRequest extends Request
             {
                 // SoftDelete column
                 JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
-                String val = softDeleteMapping.getDatastoreMapping(0).getUpdateInputParameter();
+                String val = softDeleteMapping.getColumnMapping(0).getUpdateInputParameter();
 
                 if (columnNames.length() > 0)
                 {
                     columnNames.append(',');
                     columnValues.append(',');
                 }
-                columnNames.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier());
+                columnNames.append(softDeleteMapping.getColumnMapping(0).getColumn().getIdentifier());
                 columnValues.append(val);
                 softDeleteStatementMapping = new StatementMappingIndex(softDeleteMapping);
                 int[] param = { paramIndex++ };
@@ -1071,16 +1071,16 @@ public class InsertRequest extends Request
                 pos = tmpStmtExprIndex.length;
             }
             stmtExprIndex[pos] = new StatementMappingIndex(mapping);
-            int[] param = new int[mapping.getNumberOfDatastoreMappings()];
-            for (int i=0;i<mapping.getNumberOfDatastoreMappings();i++)
+            int[] param = new int[mapping.getNumberOfColumnMappings()];
+            for (int i=0;i<mapping.getNumberOfColumnMappings();i++)
             {
                 if (columnNames.length() > 0)
                 {
                     columnNames.append(',');
                     columnValues.append(',');
                 }
-                columnNames.append(mapping.getDatastoreMapping(i).getColumn().getIdentifier());
-                columnValues.append(mapping.getDatastoreMapping(i).getUpdateInputParameter());
+                columnNames.append(mapping.getColumnMapping(i).getColumn().getIdentifier());
+                columnValues.append(mapping.getColumnMapping(i).getUpdateInputParameter());
                 param[i] = paramIndex++;
             }
             stmtExprIndex[pos].addParameterOccurrence(param);

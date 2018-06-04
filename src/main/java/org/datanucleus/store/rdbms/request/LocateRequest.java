@@ -124,8 +124,8 @@ public class LocateRequest extends Request
                     pkIdx = new StatementMappingIndex(pkMapping);
                     mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
                 }
-                int[] inputParams = new int[pkMapping.getNumberOfDatastoreMappings()];
-                for (int j=0;j<pkMapping.getNumberOfDatastoreMappings();j++)
+                int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
+                for (int j=0;j<pkMapping.getNumberOfColumnMappings();j++)
                 {
                     inputParams[j] = inputParamNum++;
                 }

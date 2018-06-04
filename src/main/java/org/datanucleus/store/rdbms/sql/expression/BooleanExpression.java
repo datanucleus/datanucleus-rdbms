@@ -22,7 +22,7 @@ import java.util.List;
 import org.datanucleus.query.compiler.CompilationComponent;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -233,7 +233,7 @@ public class BooleanExpression extends SQLExpression
         }
         else if (expr instanceof BooleanExpression)
         {
-            DatastoreMapping datastoreMapping = mapping.getDatastoreMapping(0);
+            ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
             if (datastoreMapping.isStringBased())
             {
                 // Persisted using "Y", "N"
@@ -277,7 +277,7 @@ public class BooleanExpression extends SQLExpression
         }
         else if (expr instanceof BooleanExpression)
         {
-            DatastoreMapping datastoreMapping = mapping.getDatastoreMapping(0);
+            ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
             if (datastoreMapping.isStringBased())
             {
                 // Persisted using "Y", "N"
@@ -310,7 +310,7 @@ public class BooleanExpression extends SQLExpression
 
     public BooleanExpression in(SQLExpression expr, boolean not)
     {
-        DatastoreMapping datastoreMapping = mapping.getDatastoreMapping(0);
+        ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
         if (datastoreMapping.isStringBased())
         {
             return new BooleanExpression(new CharacterExpression(stmt, table, mapping), 

@@ -107,12 +107,12 @@ public class SubclassPCMapping extends MultiPersistableMapping
                 ColumnMetaData[] columnMetaDataForType = null;
                 if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > 0)
                 {
-                    if (mmd.getColumnMetaData().length < colPos+m.getNumberOfDatastoreMappings())
+                    if (mmd.getColumnMetaData().length < colPos+m.getNumberOfColumnMappings())
                     {
                         throw new NucleusUserException(Localiser.msg("020186", mmd.getFullFieldName(), "" + mmd.getColumnMetaData().length, 
-                            "" + (colPos + m.getNumberOfDatastoreMappings())));
+                            "" + (colPos + m.getNumberOfColumnMappings())));
                     }
-                    columnMetaDataForType = new ColumnMetaData[m.getNumberOfDatastoreMappings()];
+                    columnMetaDataForType = new ColumnMetaData[m.getNumberOfColumnMappings()];
                     System.arraycopy(mmd.getColumnMetaData(), colPos, columnMetaDataForType, 0, columnMetaDataForType.length);
                     colPos += columnMetaDataForType.length;
                 }

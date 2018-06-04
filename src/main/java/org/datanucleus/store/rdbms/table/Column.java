@@ -21,7 +21,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -84,13 +84,13 @@ public interface Column extends org.datanucleus.store.schema.table.Column
      * Method to associate this datastore field with its mapping.
      * @param mapping The mapping for this datastore field
      */
-    void setDatastoreMapping(DatastoreMapping mapping);
+    void setDatastoreMapping(ColumnMapping mapping);
 
     /**
      * Accessor for the datastore mapping that this datastore field relates to.
      * @return The datastore mapping
      */
-    DatastoreMapping getDatastoreMapping();
+    ColumnMapping getDatastoreMapping();
 
     /**
      * Accessor for the JavaTypeMapping for the field/property that owns this column.

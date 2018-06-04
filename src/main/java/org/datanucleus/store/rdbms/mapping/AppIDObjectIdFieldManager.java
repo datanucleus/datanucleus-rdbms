@@ -111,7 +111,7 @@ public class AppIDObjectIdFieldManager extends AbstractFieldManager
             return params;
         }
 
-        int numCols = mapping.getNumberOfDatastoreMappings();
+        int numCols = mapping.getNumberOfColumnMappings();
         int[] fieldParams = new int[numCols];
         for (int i=0;i<numCols;i++)
         {

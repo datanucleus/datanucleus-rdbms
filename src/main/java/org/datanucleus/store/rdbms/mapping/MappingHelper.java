@@ -58,12 +58,12 @@ public class MappingHelper
      */
     public static int[] getMappingIndices(int initialPosition, JavaTypeMapping mapping)
     {
-        if (mapping.getNumberOfDatastoreMappings() < 1)
+        if (mapping.getNumberOfColumnMappings() < 1)
         {
             return new int[]{initialPosition};
         }
 
-        int parameter[] = new int[mapping.getNumberOfDatastoreMappings()];
+        int parameter[] = new int[mapping.getNumberOfColumnMappings()];
         for (int i=0; i<parameter.length; i++)
         {
             parameter[i] = initialPosition+i;
@@ -88,9 +88,9 @@ public class MappingHelper
         // and the id stored in the FK. The real OID for the object may be of a different class.
         // For that reason we get the object by checking the inheritance (final param in getObjectById())
         Object oid = null;
-        if (mapping.getNumberOfDatastoreMappings() > 0)
+        if (mapping.getNumberOfColumnMappings() > 0)
         {
-            oid = mapping.getDatastoreMapping(0).getObject(rs, resultIndexes[0]);
+            oid = mapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
         }
         else
         {
@@ -102,7 +102,7 @@ public class MappingHelper
 
             Class fieldType = mapping.getMemberMetaData().getType();
             JavaTypeMapping referenceMapping = mapping.getStoreManager().getDatastoreClass(fieldType.getName(), ec.getClassLoaderResolver()).getIdMapping();
-            oid = referenceMapping.getDatastoreMapping(0).getObject(rs, resultIndexes[0]);
+            oid = referenceMapping.getColumnMapping(0).getObject(rs, resultIndexes[0]);
         }
 
         if (oid != null)
@@ -154,7 +154,7 @@ public class MappingHelper
             AbstractMemberMetaData fmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkFieldNumbers[i]);
             JavaTypeMapping m = datastoreClass.getMemberMapping(fmd);
             statementExpressionIndex[fmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
-            int expressionsIndex[] = new int[m.getNumberOfDatastoreMappings()];
+            int expressionsIndex[] = new int[m.getNumberOfColumnMappings()];
             for (int j = 0; j < expressionsIndex.length; j++)
             {
                 expressionsIndex[j] = resultIndexes[paramIndex++];
@@ -255,7 +255,7 @@ public class MappingHelper
 
                 JavaTypeMapping m = mapping.getStoreManager().getDatastoreClass(cmd.getFullClassName(), ec.getClassLoaderResolver()).getMemberMapping(fmd);
                 // NOTE This assumes that each field has one datastore column.
-                for (int j = 0; j < m.getNumberOfDatastoreMappings(); j++)
+                for (int j = 0; j < m.getNumberOfColumnMappings(); j++)
                 {
                     Object obj = mapping.getStoreManager().getResultValueAtPosition(rs, mapping, param[paramIndex++]);
                     if ((obj instanceof BigDecimal))

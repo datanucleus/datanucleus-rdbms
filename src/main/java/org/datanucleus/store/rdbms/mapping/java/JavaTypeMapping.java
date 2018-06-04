@@ -30,18 +30,16 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
- * Representation of the mapping of a Java type.
- * The java type maps to one or more datastore mappings. This means that a field/property
- * in a java class can be mapped to many columns in a table (in an RDBMS).
+ * Representation of the mapping of a Java type. The java type maps to one or more column mappings. 
+ * This means that a field/property in a java class can be mapped to many columns in a table.
  * A JavaTypeMapping can exist in 2 forms
  * <ul>
- * <li>Constructed for a field/property managed by a datastore container, and so has metadata/container 
- * information</li>
+ * <li>Constructed for a field/property managed by a datastore container, and so has metadata/container information</li>
  * <li>Constructed to represent a parameter in a query, so has no metadata and container information.</li>
  * </ul>
  */
@@ -51,13 +49,12 @@ public abstract class JavaTypeMapping
     protected AbstractMemberMetaData mmd;
 
     /**
-     * Role of the mapping for the field. Whether it is for the field as a whole, or element of
-     * a collection field (in a join table), or key/value of a map field (in a join table).
+     * Role of the mapping for the field. Whether it is for the field as a whole, or element of a collection field (in a join table), or key/value of a map field (in a join table).
      */
     protected FieldRole roleForMember = FieldRole.ROLE_NONE;
 
-    /** The Datastore mappings for this Java type. */
-    protected DatastoreMapping[] datastoreMappings = new DatastoreMapping[0];
+    /** The Column mappings for this Java type. */
+    protected ColumnMapping[] columnMappings = new ColumnMapping[0];
 
     /** The Table storing this mapping. Null when it applies to a query parameter. */
     protected Table table;
@@ -70,7 +67,7 @@ public abstract class JavaTypeMapping
 
     /**
      * Mapping of the reference on the end of a bidirectional association.
-     * Only used when this mapping doesn't have datastore fields, but the other side has.
+     * Only used when this mapping doesn't have columns, but the other side has.
      */
     protected JavaTypeMapping referenceMapping;
 
@@ -292,9 +289,9 @@ public abstract class JavaTypeMapping
      */
     public boolean isNullable()
     {
-        for (int i=0; i<datastoreMappings.length; i++)
+        for (int i=0; i<columnMappings.length; i++)
         {
-            if (!datastoreMappings[i].isNullable())
+            if (!columnMappings[i].isNullable())
             {
                 return false;
             }
@@ -325,56 +322,54 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Accessor for the datastore mappings for this java type
-     * @return The datastore mapping(s)
+     * Accessor for the column mappings for this java type
+     * @return The column mapping(s)
      */
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
-        return datastoreMappings;
+        return columnMappings;
     }
 
     /**
-     * Accessor for a datastore mapping
-     * @param index The id of the mapping
-     * @return The datastore mapping
+     * Accessor for a column mapping
+     * @param index The id of the column
+     * @return The column mapping
      */
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
-        return datastoreMappings[index];
+        return columnMappings[index];
     }
 
     /**
-     * Method to add a datastore mapping
-     * @param datastoreMapping The datastore mapping
+     * Method to add a column mapping
+     * @param cm The column mapping
      */
-    public void addDatastoreMapping(DatastoreMapping datastoreMapping)
+    public void addColumnMapping(ColumnMapping cm)
     {
-        DatastoreMapping[] dm = datastoreMappings;
-        datastoreMappings = new DatastoreMapping[datastoreMappings.length+1];
-        System.arraycopy(dm, 0, datastoreMappings, 0, dm.length);
-        datastoreMappings[dm.length] = datastoreMapping;
+        ColumnMapping[] dm = columnMappings;
+        columnMappings = new ColumnMapping[columnMappings.length+1];
+        System.arraycopy(dm, 0, columnMappings, 0, dm.length);
+        columnMappings[dm.length] = cm;
     }
 
     /**
-     * Accessor for the number of datastore mappings.
-     * This typically equates to the number of columns
-     * @return the number of datastore mappings
+     * Accessor for the number of column mappings.
+     * @return the number of column mappings
      */
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
-        return datastoreMappings.length;
+        return columnMappings.length;
     }
 
     /**
-     * Method to return the value to be stored in the specified datastore index given the overall
-     * value for this java type.
+     * Method to return the value to be stored in the specified column index given the overall value for this java type.
      * All multi-column mappings must override this.
      * @param nucleusCtx Context
      * @param index The datastore index
      * @param value The overall value for this java type
      * @return The value for this datastore index
      */
-    public Object getValueForDatastoreMapping(NucleusContext nucleusCtx, int index, Object value)
+    public Object getValueForColumnMapping(NucleusContext nucleusCtx, int index, Object value)
     {
         return value;
     }
@@ -414,14 +409,13 @@ public abstract class JavaTypeMapping
     public abstract Class getJavaType();
 
     /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore
-     * field. This java-type must have an entry in the datastore mappings.
+     * Accessor for the name of the java-type actually used when mapping the particular column. 
+     * This java-type must have an entry in the column mappings.
      * The default implementation throws an UnsupportedOperationException.
-     *
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         throw new UnsupportedOperationException("Datastore type mapping is not supported by: "+getClass());
     }
@@ -430,10 +424,8 @@ public abstract class JavaTypeMapping
      * Accessor for the class name of the object that is being mapped here.
      * There are mainly two situations: 
      * <ul>
-     * <li>For a JavaTypeMapping that maps a PersistentCapable class field, this will return
-     * the type of the field. For example with a field of type "MyClass" this will return "MyClass"</li>
-     * <li>For a JavaTypeMapping that maps a variable or parameter in a query, this will return
-     * the type declared in the query.</li>
+     * <li>For a JavaTypeMapping that maps a persistable class field, this will return the type of the field. For example with a field of type "MyClass" this will return "MyClass"</li>
+     * <li>For a JavaTypeMapping that maps a variable or parameter in a query, this will return the type declared in the query.</li>
      * </ul>
      * @return The actual type that this Mapping maps.
      */
@@ -482,8 +474,7 @@ public abstract class JavaTypeMapping
     // ------------------- Accessors & Mutators for datastore access -----------------------
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -495,8 +486,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -508,8 +498,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -521,8 +510,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -534,8 +522,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -547,8 +534,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -560,8 +546,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec execution context
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -573,8 +558,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -586,8 +570,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -599,8 +582,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -612,8 +594,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -625,8 +606,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -638,8 +618,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -651,8 +630,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -664,8 +642,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -677,8 +654,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -690,8 +666,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -703,8 +678,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result
@@ -716,8 +690,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -731,8 +704,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Sets a <code>value</code> into <code>datastoreStatement</code> 
-     * at position specified by <code>exprIndex</code>.
+     * Sets a <code>value</code> into <code>datastoreStatement</code> at position specified by <code>exprIndex</code>.
      * @param ec ExecutionContext
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
@@ -744,8 +716,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs an object returned from the datastore with values 
      * @param exprIndex the position of the value in the result
@@ -759,8 +730,7 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Obtains a value from <code>datastoreResults</code> 
-     * at position specified by <code>exprIndex</code>. 
+     * Obtains a value from <code>datastoreResults</code> at position specified by <code>exprIndex</code>. 
      * @param ec ExecutionContext
      * @param rs ResultSet
      * @param exprIndex the position of the value in the result

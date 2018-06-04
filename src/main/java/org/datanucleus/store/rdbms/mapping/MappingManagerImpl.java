@@ -53,8 +53,8 @@ import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMappingFactory;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMappingFactory;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
@@ -413,7 +413,7 @@ public class MappingManagerImpl implements MappingManager
      * @param clr ClassLoader resolver
      * @return The mapping for the class.
      */
-    public JavaTypeMapping getMappingWithDatastoreMapping(Class javaType, boolean serialised, boolean embedded, ClassLoaderResolver clr)
+    public JavaTypeMapping getMappingWithColumnMapping(Class javaType, boolean serialised, boolean embedded, ClassLoaderResolver clr)
     {
         try
         {
@@ -437,7 +437,7 @@ public class MappingManagerImpl implements MappingManager
                 if (m.hasSimpleDatastoreRepresentation())
                 {
                     // Create the datastore mapping (NOT the column)
-                    createDatastoreMapping(m, null, m.getJavaTypeForDatastoreMapping(0));
+                    createColumnMapping(m, null, m.getJavaTypeForColumnMapping(0));
                     // TODO How to handle SingleFieldMultiMapping cases ?
                 }
                 return m;
@@ -1433,14 +1433,14 @@ public class MappingManagerImpl implements MappingManager
     }
 
     /**
-     * Method to create the datastore mapping for a java type mapping at a particular index.
+     * Method to create the column mapping for a java type mapping at a particular index.
      * @param mapping The java mapping
      * @param mmd MetaData for the field/property
      * @param index Index of the column
      * @param column The column
-     * @return The datastore mapping
+     * @return The column mapping
      */
-    public DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, Column column)
+    public ColumnMapping createColumnMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, Column column)
     {
         Class datastoreMappingClass = null;
 
@@ -1454,7 +1454,7 @@ public class MappingManagerImpl implements MappingManager
         }
         if (datastoreMappingClass == null)
         {
-            String javaType = mapping.getJavaTypeForDatastoreMapping(index);
+            String javaType = mapping.getJavaTypeForColumnMapping(index);
             String jdbcType = null;
             String sqlType = null;
             if (mapping.getRoleForMember() == FieldRole.ROLE_ARRAY_ELEMENT || mapping.getRoleForMember() == FieldRole.ROLE_COLLECTION_ELEMENT)
@@ -1544,7 +1544,7 @@ public class MappingManagerImpl implements MappingManager
             datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType, jdbcType, sqlType, clr, mmd.getFullFieldName());
         }
 
-        DatastoreMapping datastoreMapping = DatastoreMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
+        ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
             column.setDatastoreMapping(datastoreMapping);
@@ -1553,14 +1553,14 @@ public class MappingManagerImpl implements MappingManager
     }
 
     /**
-     * Method to create the datastore mapping for a particular column and java type.
-     * If the column is specified it is linked to the created datastore mapping.
+     * Method to create the column mapping for a particular column and java type.
+     * If the column is specified it is linked to the created column mapping.
      * @param mapping The java mapping
      * @param column The column (can be null)
      * @param javaType The java type
-     * @return The datastore mapping
+     * @return The column mapping
      */
-    public DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, Column column, String javaType)
+    public ColumnMapping createColumnMapping(JavaTypeMapping mapping, Column column, String javaType)
     {
         Column col = column;
         String jdbcType = null;
@@ -1574,7 +1574,7 @@ public class MappingManagerImpl implements MappingManager
 
         Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType, jdbcType, sqlType, clr, null);
 
-        DatastoreMapping datastoreMapping = DatastoreMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
+        ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
             column.setDatastoreMapping(datastoreMapping);

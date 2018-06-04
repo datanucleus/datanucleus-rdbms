@@ -38,7 +38,7 @@ public class EnumExpression extends DelegatedExpression
     public EnumExpression(SQLStatement stmt, SQLTable table, JavaTypeMapping mapping)
     {
         super(stmt, table, mapping);
-        if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+        if (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             delegate = new StringExpression(stmt, table, mapping);
         }
@@ -54,7 +54,7 @@ public class EnumExpression extends DelegatedExpression
         super.setJavaTypeMapping(mapping);
 
         // Reset the delegate in case it has changed
-        if (mapping.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+        if (mapping.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
         {
             delegate = new StringExpression(stmt, table, mapping);
         }

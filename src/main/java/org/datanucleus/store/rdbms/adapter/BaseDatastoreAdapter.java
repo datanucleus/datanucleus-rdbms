@@ -2043,7 +2043,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             for (ConfigurationElement elem : elems)
             {
                 String javaName = elem.getAttribute("java-type").trim();
-                String rdbmsMappingClassName = elem.getAttribute("rdbms-mapping-class");
+                String columnMappingClassName = elem.getAttribute("rdbms-mapping-class");
                 String jdbcType = elem.getAttribute("jdbc-type");
                 String sqlType = elem.getAttribute("sql-type");
                 String defaultJava = elem.getAttribute("default");
@@ -2058,15 +2058,15 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
                 }
 
                 Class mappingType = null;
-                if (!StringUtils.isWhitespace(rdbmsMappingClassName))
+                if (!StringUtils.isWhitespace(columnMappingClassName))
                 {
                     try
                     {
-                        mappingType = mgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), rdbmsMappingClassName);
+                        mappingType = mgr.loadClass(elem.getExtension().getPlugin().getSymbolicName(), columnMappingClassName);
                     }
                     catch (NucleusException ne)
                     {
-                        NucleusLogger.DATASTORE.error(Localiser.msg("041013", rdbmsMappingClassName));
+                        NucleusLogger.DATASTORE.error(Localiser.msg("041013", columnMappingClassName));
                     }
 
                     Set includes = new HashSet();

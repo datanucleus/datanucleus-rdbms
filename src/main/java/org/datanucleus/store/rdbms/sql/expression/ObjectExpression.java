@@ -117,7 +117,7 @@ public class ObjectExpression extends SQLExpression
      */
     public void useFirstColumnOnly()
     {
-        if (mapping.getNumberOfDatastoreMappings() <= 1)
+        if (mapping.getNumberOfColumnMappings() <= 1)
         {
             // Do nothing
             return;
@@ -125,7 +125,7 @@ public class ObjectExpression extends SQLExpression
 
         // Replace the expressionList and SQL as if starting from scratch
         subExprs = new ColumnExpressionList();
-        ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getDatastoreMapping(0).getColumn());
+        ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getColumnMapping(0).getColumn());
         subExprs.addExpression(colExpr);
         st.clearStatement();
         st.append(subExprs.toString());
@@ -261,11 +261,11 @@ public class ObjectExpression extends SQLExpression
             // TODO Handle case where we have a subclass of the implementation here
             if (implMappings[i].getType().equals(implType))
             {
-                subExprEnd = subExprStart + implMappings[i].getNumberOfDatastoreMappings();
+                subExprEnd = subExprStart + implMappings[i].getNumberOfColumnMappings();
                 break;
             }
 
-            subExprStart += implMappings[i].getNumberOfDatastoreMappings();
+            subExprStart += implMappings[i].getNumberOfColumnMappings();
         }
 
         BooleanExpression bExpr = null;

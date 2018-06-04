@@ -118,9 +118,9 @@ public class InterfaceMapping extends ReferenceMapping
                     // all mappings stored to the same column(s), so same FK
                     PersistableMapping m = ((PersistableMapping) javaTypeMappings[0]);
                     mapping = storeMgr.getMappingManager().getMapping(ec.getClassLoaderResolver().classForName(implTypes[i]));
-                    for (int j = 0; j < m.getDatastoreMappings().length; j++)
+                    for (int j = 0; j < m.getColumnMappings().length; j++)
                     {
-                        mapping.addDatastoreMapping(m.getDatastoreMappings()[j]);
+                        mapping.addColumnMapping(m.getColumnMappings()[j]);
                     }
                     for (int j = 0; j < m.getJavaTypeMapping().length; j++)
                     {
@@ -141,11 +141,11 @@ public class InterfaceMapping extends ReferenceMapping
                 }
                 if (mapping.getReferenceMapping() != null)
                 {
-                    posMapping = new int[mapping.getReferenceMapping().getNumberOfDatastoreMappings()];
+                    posMapping = new int[mapping.getReferenceMapping().getNumberOfColumnMappings()];
                 }
                 else
                 {
-                    posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                    posMapping = new int[mapping.getNumberOfColumnMappings()];
                 }
                 for (int j = 0; j < posMapping.length; j++)
                 {
@@ -174,11 +174,11 @@ public class InterfaceMapping extends ReferenceMapping
                         String className;
                         if (mapping.getReferenceMapping() != null)
                         { 
-                            className = mapping.getReferenceMapping().getDatastoreMapping(0).getColumn().getStoredJavaType();
+                            className = mapping.getReferenceMapping().getColumnMapping(0).getColumn().getStoredJavaType();
                         }
                         else
                         {
-                            className = mapping.getDatastoreMapping(0).getColumn().getStoredJavaType();
+                            className = mapping.getColumnMapping(0).getColumn().getStoredJavaType();
                         }
                         value = ec.getNucleusContext().getIdentityManager().getDatastoreId(className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));
                         return ec.findObject(value, false, true, null);

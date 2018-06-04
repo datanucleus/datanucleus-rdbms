@@ -110,7 +110,7 @@ public class UUIDMapping extends SingleFieldMapping
      * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getJavaTypeForDatastoreMapping(int)
      */
     @Override
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         if (converter == null)
         {
@@ -136,16 +136,16 @@ public class UUIDMapping extends SingleFieldMapping
         }
         else
         {
-            if (datastoreMappings.length > 0)
+            if (columnMappings.length > 0)
             {
-                ColumnMetaData colmd = datastoreMappings[0].getColumn().getColumnMetaData();
+                ColumnMetaData colmd = columnMappings[0].getColumn().getColumnMetaData();
                 if (colmd.getSqlType() != null)
                 {
                     super.setObject(ec, ps, exprIndex, value);
                     return;
                 }
             }
-            getDatastoreMapping(0).setObject(ps, exprIndex[0], converter.toDatastoreType(value));
+            getColumnMapping(0).setObject(ps, exprIndex[0], converter.toDatastoreType(value));
         }
     }
 
@@ -165,15 +165,15 @@ public class UUIDMapping extends SingleFieldMapping
             return super.getObject(ec, resultSet, exprIndex);
         }
 
-        if (datastoreMappings.length > 0)
+        if (columnMappings.length > 0)
         {
-            ColumnMetaData colmd = datastoreMappings[0].getColumn().getColumnMetaData();
+            ColumnMetaData colmd = columnMappings[0].getColumn().getColumnMetaData();
             if (colmd.getSqlType() != null)
             {
                 return super.getObject(ec, resultSet, exprIndex);
             }
         }
-        Object datastoreValue = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        Object datastoreValue = getColumnMapping(0).getObject(resultSet, exprIndex[0]);
         return (datastoreValue != null ? converter.toMemberType(datastoreValue) : null);
     }
 }

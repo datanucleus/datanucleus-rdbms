@@ -155,9 +155,9 @@ public class MapTable extends JoinTable implements DatastoreMap
             if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()))
             {
                 // Make all key col(s) nullable so we can store null elements
-                for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<keyMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = keyMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = keyMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -187,9 +187,9 @@ public class MapTable extends JoinTable implements DatastoreMap
             if (mmd.getContainer().allowNulls() == Boolean.TRUE)
             {
                 // Make all key col(s) nullable so we can store null elements
-                for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<keyMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = keyMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = keyMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -213,9 +213,9 @@ public class MapTable extends JoinTable implements DatastoreMap
             if (mmd.getContainer().allowNulls() == Boolean.TRUE)
             {
                 // Make all value col(s) nullable so we can store null elements
-                for (int i=0;i<valueMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<valueMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = valueMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = valueMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -244,9 +244,9 @@ public class MapTable extends JoinTable implements DatastoreMap
             if (mmd.getContainer().allowNulls() == Boolean.TRUE)
             {
                 // Make all value col(s) nullable so we can store null elements
-                for (int i=0;i<valueMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<valueMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = valueMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = valueMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -298,7 +298,7 @@ public class MapTable extends JoinTable implements DatastoreMap
             {
                 // Non-PC, so depends if the key column can be used as part of a PK
                 // TODO This assumes the keyMapping has a single column but what if it is Color with 4 cols?
-                Column elementCol = keyMapping.getDatastoreMapping(0).getColumn();
+                Column elementCol = keyMapping.getColumnMapping(0).getColumn();
                 if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
@@ -351,14 +351,14 @@ public class MapTable extends JoinTable implements DatastoreMap
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK
-                    orderMapping.getDatastoreMapping(0).getColumn().setPrimaryKey();
+                    orderMapping.getColumnMapping(0).getColumn().setPrimaryKey();
                 }
                 else
                 {
                     // No order column specified so owner+key are the PK
-                    for (int i=0;i<keyMapping.getNumberOfDatastoreMappings();i++)
+                    for (int i=0;i<keyMapping.getNumberOfColumnMappings();i++)
                     {
-                        keyMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                        keyMapping.getColumnMapping(i).getColumn().setPrimaryKey();
                     }
                 }
             }
@@ -383,22 +383,22 @@ public class MapTable extends JoinTable implements DatastoreMap
         {
             String colName = pkCols[i].getName();
             boolean found = false;
-            for (int j=0;j<ownerMapping.getNumberOfDatastoreMappings();j++)
+            for (int j=0;j<ownerMapping.getNumberOfColumnMappings();j++)
             {
-                if (ownerMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
+                if (ownerMapping.getColumnMapping(j).getColumn().getIdentifier().getName().equals(colName))
                 {
-                    ownerMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
+                    ownerMapping.getColumnMapping(j).getColumn().setPrimaryKey();
                     found = true;
                 }
             }
             
             if (!found)
             {
-                for (int j=0;j<keyMapping.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<keyMapping.getNumberOfColumnMappings();j++)
                 {
-                    if (keyMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
+                    if (keyMapping.getColumnMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
-                        keyMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
+                        keyMapping.getColumnMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }
@@ -406,11 +406,11 @@ public class MapTable extends JoinTable implements DatastoreMap
             
             if (!found)
             {
-                for (int j=0;j<valueMapping.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<valueMapping.getNumberOfColumnMappings();j++)
                 {
-                    if (valueMapping.getDatastoreMapping(j).getColumn().getIdentifier().getName().equals(colName))
+                    if (valueMapping.getColumnMapping(j).getColumn().getIdentifier().getName().equals(colName))
                     {
-                        valueMapping.getDatastoreMapping(j).getColumn().setPrimaryKey();
+                        valueMapping.getColumnMapping(j).getColumn().setPrimaryKey();
                         found = true;
                     }
                 }
@@ -687,7 +687,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                             foreignKeys.addAll(fks);
                         }
                         else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                                embFieldMapping.getNumberOfDatastoreMappings() > 0 &&
+                                embFieldMapping.getNumberOfColumnMappings() > 0 &&
                                 embFieldMapping instanceof PersistableMapping)
                         {
                             // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
@@ -739,7 +739,7 @@ public class MapTable extends JoinTable implements DatastoreMap
                             foreignKeys.addAll(fks);
                         }
                         else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                                embFieldMapping.getNumberOfDatastoreMappings() > 0 && embFieldMapping instanceof PersistableMapping)
+                                embFieldMapping.getNumberOfColumnMappings() > 0 && embFieldMapping instanceof PersistableMapping)
                         {
                             // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
                             ForeignKey fk = TableUtils.getForeignKeyForPCField(embFieldMapping, embFmd, autoMode, storeMgr, clr);

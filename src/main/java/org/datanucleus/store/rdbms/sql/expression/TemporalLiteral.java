@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.mapping.datastore.CharRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.CharColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.types.converters.TypeConverter;
@@ -243,16 +243,16 @@ public class TemporalLiteral extends TemporalExpression implements SQLLiteral
                 // Use native format of the type
                 formatted = value.toString();
             }
-            else if (mapping.getDatastoreMapping(0) instanceof CharRDBMSMapping)
+            else if (mapping.getColumnMapping(0) instanceof CharColumnMapping)
             {
                 // Stored as String so use same formatting
-                SimpleDateFormat fmt = ((CharRDBMSMapping)mapping.getDatastoreMapping(0)).getJavaUtilDateFormat();
+                SimpleDateFormat fmt = ((CharColumnMapping)mapping.getColumnMapping(0)).getJavaUtilDateFormat();
                 formatted = fmt.format(value);
             }
             else
             {
                 // TODO Include more variations of inputting a Date into JDBC
-                // TODO Cater for timezone storage options see TimestampRDBMSMapping
+                // TODO Cater for timezone storage options see TimestampColumnMapping
                 formatted = new Timestamp(value.getTime()).toString();
             }
             st.append('\'').append(formatted).append('\'');

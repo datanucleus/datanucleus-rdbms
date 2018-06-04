@@ -91,7 +91,7 @@ import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.MappingType;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
 import org.datanucleus.store.rdbms.mapping.java.DiscriminatorMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
@@ -176,7 +176,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
     Map<AbstractMemberMetaData, CandidateKey> candidateKeysByMapField = new HashMap();
 
-    /** Set of unmapped "Column" objects that have no associated field (and hence RDBMSMapping). */
+    /** Set of unmapped "Column" objects that have no associated field (and hence ColumnMapping). */
     Set<Column> unmappedColumns = null;
 
     /**
@@ -349,7 +349,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             multitenancyMapping.setTable(this);
             multitenancyMapping.initialize(storeMgr, typeName);
             Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), multitenancyMapping, colmd);
-            storeMgr.getMappingManager().createDatastoreMapping(multitenancyMapping, tenantColumn, typeName);
+            storeMgr.getMappingManager().createColumnMapping(multitenancyMapping, tenantColumn, typeName);
             logMapping("MULTITENANCY", multitenancyMapping);
         }
 
@@ -369,7 +369,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             softDeleteMapping.setTable(this);
             softDeleteMapping.initialize(storeMgr, typeName);
             Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), softDeleteMapping, colmd);
-            storeMgr.getMappingManager().createDatastoreMapping(softDeleteMapping, tenantColumn, typeName);
+            storeMgr.getMappingManager().createColumnMapping(softDeleteMapping, tenantColumn, typeName);
             logMapping("SOFTDELETE", softDeleteMapping);
         }
 
@@ -507,9 +507,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             // Apply this set of ColumnMetaData to the existing mapping
                             int colnum = 0;
                             IdentifierFactory idFactory = getStoreManager().getIdentifierFactory();
-                            for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                            for (int i=0;i<fieldMapping.getNumberOfColumnMappings();i++)
                             {
-                                Column col = fieldMapping.getDatastoreMapping(i).getColumn();
+                                Column col = fieldMapping.getColumnMapping(i).getColumn();
                                 col.setIdentifier(idFactory.newColumnIdentifier(colmds[colnum].getName()));
                                 col.setColumnMetaData(colmds[colnum]);
 
@@ -545,13 +545,13 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             JavaTypeMapping fieldMapping = storeMgr.getMappingManager().getMapping(this, mmd, clr, FieldRole.ROLE_FIELD);
                             if (theCmd != cmd && 
                                 theCmd.getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUPERCLASS_TABLE &&
-                                fieldMapping.getNumberOfDatastoreMappings() > 0)
+                                fieldMapping.getNumberOfColumnMappings() > 0)
                             {
                                 // Field is for a subclass and so column(s) has to either allow nulls, or have default
-                                int numCols = fieldMapping.getNumberOfDatastoreMappings();
+                                int numCols = fieldMapping.getNumberOfColumnMappings();
                                 for (int colNum = 0;colNum < numCols; colNum++)
                                 {
-                                    Column col = fieldMapping.getDatastoreMapping(colNum).getColumn();
+                                    Column col = fieldMapping.getColumnMapping(colNum).getColumn();
                                     if (col.getDefaultValue() == null && !col.isNullable())
                                     {
                                         // Column needs to be nullable
@@ -1378,7 +1378,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 {
                                     Map.Entry entry = (Map.Entry)discrimMappingIter.next();
                                     JavaTypeMapping discrimMapping = (JavaTypeMapping)entry.getValue();
-                                    String discrimColName = (discrimMapping.getDatastoreMapping(0).getColumn().getColumnMetaData()).getName();
+                                    String discrimColName = (discrimMapping.getColumnMapping(0).getColumn().getColumnMetaData()).getName();
                                     if (discrimColName.equalsIgnoreCase(colName))
                                     {
                                         duplicate = true;
@@ -1458,10 +1458,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     colmdContainer = ownerFmd.getKeyMetaData();
                                 }
                                 CorrespondentColumnsMapper correspondentColumnsMapping = new CorrespondentColumnsMapper(colmdContainer, this, ownerIdMapping, true);
-                                int countIdFields = ownerIdMapping.getNumberOfDatastoreMappings();
+                                int countIdFields = ownerIdMapping.getNumberOfColumnMappings();
                                 for (int i=0; i<countIdFields; i++)
                                 {
-                                    DatastoreMapping refDatastoreMapping = ownerIdMapping.getDatastoreMapping(i);
+                                    ColumnMapping refDatastoreMapping = ownerIdMapping.getColumnMapping(i);
                                     JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refDatastoreMapping.getJavaTypeMapping().getJavaType());
                                     ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refDatastoreMapping.getColumn().getIdentifier());
                                     if (colmd == null)
@@ -1491,7 +1491,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         refColumn.setNullable(true);
                                     }
 
-                                    fkMapping.addDatastoreMapping(getStoreManager().getMappingManager().createDatastoreMapping(mapping, refColumn, refDatastoreMapping.getJavaTypeMapping().getJavaType().getName()));
+                                    fkMapping.addColumnMapping(getStoreManager().getMappingManager().createColumnMapping(mapping, refColumn, refDatastoreMapping.getJavaTypeMapping().getJavaType().getName()));
                                     ((PersistableMapping)fkMapping).addJavaTypeMapping(mapping);
                                 }
                             }
@@ -1510,9 +1510,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 {
                                     Map.Entry entry = (Map.Entry)fkIter.next();
                                     JavaTypeMapping existingFkMapping = (JavaTypeMapping)entry.getValue();
-                                    for (int j=0;j<existingFkMapping.getNumberOfDatastoreMappings();j++)
+                                    for (int j=0;j<existingFkMapping.getNumberOfColumnMappings();j++)
                                     {
-                                        if (existingFkMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString().equals(dce.getConflictingColumn().getIdentifier().toString()))
+                                        if (existingFkMapping.getColumnMapping(j).getColumn().getIdentifier().toString().equals(dce.getConflictingColumn().getIdentifier().toString()))
                                         {
                                             // The FK is shared (and so if it is a List we also share the index)
                                             fkMapping = existingFkMapping;
@@ -1991,11 +1991,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                             JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
                                             for (int i=0;i<implMappings.length;i++)
                                             {
-                                                int numColsInImpl = implMappings[i].getNumberOfDatastoreMappings();
+                                                int numColsInImpl = implMappings[i].getNumberOfColumnMappings();
                                                 Index index = new Index(this, false, null);
                                                 for (int j=0;j<numColsInImpl;j++)
                                                 {
-                                                    index.setColumn(j, fieldMapping.getDatastoreMapping(colNum++).getColumn());
+                                                    index.setColumn(j, fieldMapping.getColumnMapping(colNum++).getColumn());
                                                 }
                                                 indices.add(index);
                                             }
@@ -2005,9 +2005,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 else
                                 {
                                     Index index = new Index(this, false, null);
-                                    for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                                    for (int i=0;i<fieldMapping.getNumberOfColumnMappings();i++)
                                     {
-                                        index.setColumn(i, fieldMapping.getDatastoreMapping(i).getColumn());
+                                        index.setColumn(i, fieldMapping.getColumnMapping(i).getColumn());
                                     }
                                     indices.add(index);
                                 }
@@ -2016,9 +2016,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             {
                                 // 1-1 with FK at this side so index the FK
                                 Index index = new Index(this, false, null);
-                                for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                                for (int i=0;i<fieldMapping.getNumberOfColumnMappings();i++)
                                 {
-                                    index.setColumn(i, fieldMapping.getDatastoreMapping(i).getColumn());
+                                    index.setColumn(i, fieldMapping.getColumnMapping(i).getColumn());
                                 }
                                 indices.add(index);
                             }
@@ -2028,12 +2028,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 AbstractMemberMetaData relMmd = fmd.getRelatedMemberMetaData(clr)[0];
                                 if (relMmd.getJoinMetaData() == null && fmd.getJoinMetaData() == null)
                                 {
-                                    if (fieldMapping.getNumberOfDatastoreMappings() > 0)
+                                    if (fieldMapping.getNumberOfColumnMappings() > 0)
                                     {
                                         Index index = new Index(this, false, null);
-                                        for (int i=0;i<fieldMapping.getNumberOfDatastoreMappings();i++)
+                                        for (int i=0;i<fieldMapping.getNumberOfColumnMappings();i++)
                                         {
-                                            index.setColumn(i, fieldMapping.getDatastoreMapping(i).getColumn());
+                                            index.setColumn(i, fieldMapping.getColumnMapping(i).getColumn());
                                         }
                                         indices.add(index);
                                     }
@@ -2062,10 +2062,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 {
                     index.setName(idxmd.getName());
                 }
-                int countVersionFields = versionMapping.getNumberOfDatastoreMappings();
+                int countVersionFields = versionMapping.getNumberOfColumnMappings();
                 for (int i=0; i<countVersionFields; i++)
                 {
-                    index.addColumn(versionMapping.getDatastoreMapping(i).getColumn());
+                    index.addColumn(versionMapping.getColumnMapping(i).getColumn());
                 }
                 indices.add(index);
             }
@@ -2083,10 +2083,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 {
                     index.setName(idxmd.getName());
                 }
-                int countDiscrimFields = discriminatorMapping.getNumberOfDatastoreMappings();
+                int countDiscrimFields = discriminatorMapping.getNumberOfColumnMappings();
                 for (int i=0; i<countDiscrimFields; i++)
                 {
-                    index.addColumn(discriminatorMapping.getDatastoreMapping(i).getColumn());
+                    index.addColumn(discriminatorMapping.getColumnMapping(i).getColumn());
                 }
                 indices.add(index);
             }
@@ -2168,10 +2168,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             index.setName(imd.getName());
         }
 
-        int numCols = mapping.getNumberOfDatastoreMappings();
+        int numCols = mapping.getNumberOfColumnMappings();
         for (int i=0;i<numCols;i++)
         {
-            index.addColumn(mapping.getDatastoreMapping(i).getColumn());
+            index.addColumn(mapping.getColumnMapping(i).getColumn());
         }
 
         return index;
@@ -2236,10 +2236,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
 
                 JavaTypeMapping fieldMapping = memberMappingsMap.get(realMmd);
-                int countFields = fieldMapping.getNumberOfDatastoreMappings();
+                int countFields = fieldMapping.getNumberOfColumnMappings();
                 for (int j=0; j<countFields; j++)
                 {
-                    index.addColumn(fieldMapping.getDatastoreMapping(j).getColumn());
+                    index.addColumn(fieldMapping.getColumnMapping(j).getColumn());
                 }
 
                 // Apply any user-provided ordering of the columns
@@ -2301,7 +2301,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(mmd.getType(), clr) != null &&
-                        memberMapping.getNumberOfDatastoreMappings() > 0 && memberMapping instanceof PersistableMapping)
+                        memberMapping.getNumberOfColumnMappings() > 0 && memberMapping instanceof PersistableMapping)
                 {
                     // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
                     ForeignKey fk = TableUtils.getForeignKeyForPCField(memberMapping, mmd, autoMode, storeMgr, clr);
@@ -2425,7 +2425,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                     foreignKeys.addAll(fks);
                 }
                 else if (storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(embFmd.getType(), clr) != null &&
-                        embFieldMapping.getNumberOfDatastoreMappings() > 0 && embFieldMapping instanceof PersistableMapping)
+                        embFieldMapping.getNumberOfColumnMappings() > 0 && embFieldMapping instanceof PersistableMapping)
                 {
                     // Field is for a PC class with the FK at this side, so add a FK to the table of this PC
                     ForeignKey fk = TableUtils.getForeignKeyForPCField(embFieldMapping, embFmd, autoMode, storeMgr, clr);
@@ -2515,11 +2515,11 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
 
                 JavaTypeMapping fieldMapping = memberMappingsMap.get(realMmd);
-                int countCols = fieldMapping.getNumberOfDatastoreMappings();
+                int countCols = fieldMapping.getNumberOfColumnMappings();
                 for (int j=0; j<countCols; j++)
                 {
                     // Add each column of this field to the FK definition
-                    sourceCols.add(fieldMapping.getDatastoreMapping(j).getColumn());
+                    sourceCols.add(fieldMapping.getColumnMapping(j).getColumn());
                 }
             }
         }
@@ -2705,10 +2705,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
 
                 JavaTypeMapping memberMapping = memberMappingsMap.get(realMmd);
-                int countFields = memberMapping.getNumberOfDatastoreMappings();
+                int countFields = memberMapping.getNumberOfColumnMappings();
                 for (int j=0; j<countFields; j++)
                 {
-                    ck.addColumn(memberMapping.getDatastoreMapping(j).getColumn());
+                    ck.addColumn(memberMapping.getColumnMapping(j).getColumn());
                 }
             }
         }
@@ -2901,19 +2901,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             HashSet addedColumns = new HashSet();
 
                             // Add columns for the owner field
-                            int countOwnerFields = ownerMapping.getNumberOfDatastoreMappings();
+                            int countOwnerFields = ownerMapping.getNumberOfColumnMappings();
                             for (int i = 0; i < countOwnerFields; i++)
                             {
-                                Column col = ownerMapping.getDatastoreMapping(i).getColumn();
+                                Column col = ownerMapping.getColumnMapping(i).getColumn();
                                 addedColumns.add(col);
                                 ck.addColumn(col);
                             }
 
                             // Add columns for the key field
-                            int countKeyFields = keyMapping.getNumberOfDatastoreMappings();
+                            int countKeyFields = keyMapping.getNumberOfColumnMappings();
                             for (int i = 0; i < countKeyFields; i++)
                             {
-                                Column col = keyMapping.getDatastoreMapping(i).getColumn();
+                                Column col = keyMapping.getColumnMapping(i).getColumn();
                                 if (!addedColumns.contains(col))
                                 {
                                     addedColumns.add(col);
@@ -2967,19 +2967,19 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                             Set<Column> addedColumns = new HashSet<>();
 
                             // Add columns for the owner field
-                            int countOwnerFields = ownerMapping.getNumberOfDatastoreMappings();
+                            int countOwnerFields = ownerMapping.getNumberOfColumnMappings();
                             for (int i = 0; i < countOwnerFields; i++)
                             {
-                                Column col = ownerMapping.getDatastoreMapping(i).getColumn();
+                                Column col = ownerMapping.getColumnMapping(i).getColumn();
                                 addedColumns.add(col);
                                 ck.addColumn(col);
                             }
 
                             // Add columns for the value field
-                            int countValueFields = valueMapping.getNumberOfDatastoreMappings();
+                            int countValueFields = valueMapping.getNumberOfColumnMappings();
                             for (int i = 0; i < countValueFields; i++)
                             {
-                                Column col = valueMapping.getDatastoreMapping(i).getColumn();
+                                Column col = valueMapping.getColumnMapping(i).getColumn();
                                 if (!addedColumns.contains(col))
                                 {
                                     addedColumns.add(col);
@@ -3449,7 +3449,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             column.setNullable(true);
         }
 
-        storeMgr.getMappingManager().createDatastoreMapping(orderIndexMapping, column, indexType.getName());
+        storeMgr.getMappingManager().createColumnMapping(orderIndexMapping, column, indexType.getName());
 
         return orderIndexMapping;
     }

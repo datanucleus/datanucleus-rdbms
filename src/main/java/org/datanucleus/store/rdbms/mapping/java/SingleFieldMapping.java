@@ -55,8 +55,8 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
     protected void prepareDatastoreMapping()
     {
         MappingManager mmgr = storeMgr.getMappingManager();
-        Column col = mmgr.createColumn(this, getJavaTypeForDatastoreMapping(0), 0);
-        mmgr.createDatastoreMapping(this, mmd, 0, col);
+        Column col = mmgr.createColumn(this, getJavaTypeForColumnMapping(0), 0);
+        mmgr.createColumnMapping(this, mmd, 0, col);
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         if (getJavaType() == null)
         {
@@ -97,97 +97,97 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
 
     public void setBoolean(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, boolean value)
     {
-        getDatastoreMapping(0).setBoolean(ps, exprIndex[0], value);
+        getColumnMapping(0).setBoolean(ps, exprIndex[0], value);
     }
 
     public boolean getBoolean(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getBoolean(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getBoolean(resultSet, exprIndex[0]);
     }
 
     public void setChar(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, char value)
     {
-        getDatastoreMapping(0).setChar(ps, exprIndex[0], value);
+        getColumnMapping(0).setChar(ps, exprIndex[0], value);
     }
 
     public char getChar(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getChar(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getChar(resultSet, exprIndex[0]);
     }
 
     public void setByte(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, byte value)
     {
-        getDatastoreMapping(0).setByte(ps, exprIndex[0], value);
+        getColumnMapping(0).setByte(ps, exprIndex[0], value);
     }
 
     public byte getByte(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getByte(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getByte(resultSet, exprIndex[0]);
     }
 
     public void setShort(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, short value)
     {
-        getDatastoreMapping(0).setShort(ps, exprIndex[0], value);
+        getColumnMapping(0).setShort(ps, exprIndex[0], value);
     }
 
     public short getShort(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getShort(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getShort(resultSet, exprIndex[0]);
     }
 
     public void setInt(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, int value)
     {
-        getDatastoreMapping(0).setInt(ps, exprIndex[0], value);
+        getColumnMapping(0).setInt(ps, exprIndex[0], value);
     }
 
     public int getInt(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getInt(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getInt(resultSet, exprIndex[0]);
     }
 
     public void setLong(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, long value)
     {
-        getDatastoreMapping(0).setLong(ps, exprIndex[0], value);
+        getColumnMapping(0).setLong(ps, exprIndex[0], value);
     }
 
     public long getLong(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getLong(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getLong(resultSet, exprIndex[0]);
     }
 
     public void setFloat(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, float value)
     {
-        getDatastoreMapping(0).setFloat(ps, exprIndex[0], value);
+        getColumnMapping(0).setFloat(ps, exprIndex[0], value);
     }
 
     public float getFloat(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getFloat(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getFloat(resultSet, exprIndex[0]);
     }
 
     public void setDouble(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, double value)
     {
-        getDatastoreMapping(0).setDouble(ps, exprIndex[0], value);
+        getColumnMapping(0).setDouble(ps, exprIndex[0], value);
     }
 
     public double getDouble(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getDouble(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getDouble(resultSet, exprIndex[0]);
     }
 
     public void setString(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, String value)
     {
-        getDatastoreMapping(0).setString(ps, exprIndex[0], value);
+        getColumnMapping(0).setString(ps, exprIndex[0], value);
     }
 
     public String getString(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
     {
-        return getDatastoreMapping(0).getString(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getString(resultSet, exprIndex[0]);
     }
 
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value)
     {
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
+        getColumnMapping(0).setObject(ps, exprIndex[0], value);
     }
 
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
@@ -196,6 +196,6 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
         {
             return null;
         }
-        return getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getObject(resultSet, exprIndex[0]);
     }
 }

@@ -274,7 +274,7 @@ public class SQLText
                             RDBMSStoreManager storeMgr = mapping.getStoreManager();
                             if (cmd.getIdentityType() == IdentityType.DATASTORE)
                             {
-                                colValue = mapping.getValueForDatastoreMapping(ec.getNucleusContext(), 
+                                colValue = mapping.getValueForColumnMapping(ec.getNucleusContext(), 
                                     param.getColumnNumber(), value);
                             }
                             else if (cmd.getIdentityType() == IdentityType.APPLICATION)
@@ -283,15 +283,15 @@ public class SQLText
                                     value, param.getColumnNumber(), cmd, storeMgr, clr);
                             }
                         }
-                        mapping.getDatastoreMapping(param.getColumnNumber()).setObject(ps, num, colValue);
+                        mapping.getColumnMapping(param.getColumnNumber()).setObject(ps, num, colValue);
                         num++;
                     }
                     else
                     {
                         mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), value);
-                        if (mapping.getNumberOfDatastoreMappings() > 0)
+                        if (mapping.getNumberOfColumnMappings() > 0)
                         {
-                            num += mapping.getNumberOfDatastoreMappings();
+                            num += mapping.getNumberOfColumnMappings();
                         }
                         else
                         {

@@ -111,7 +111,7 @@ public class ArraySizeMethod implements SQLMethod
 
         SelectStatement subStmt = new SelectStatement(stmt, storeMgr, arrayTbl, null, null);
         subStmt.setClassLoaderResolver(clr);
-        JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        JavaTypeMapping mapping = storeMgr.getMappingManager().getMappingWithColumnMapping(String.class, false, false, clr);
         SQLExpression countExpr = exprFactory.newLiteral(subStmt, mapping, "COUNT(*)");
         ((StringLiteral)countExpr).generateStatementWithoutQuotes();
         subStmt.select(countExpr, null);

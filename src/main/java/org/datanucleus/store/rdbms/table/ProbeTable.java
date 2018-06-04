@@ -63,7 +63,7 @@ public class ProbeTable extends TableImpl
 
 		JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(int.class);
 		Column column = addColumn(int.class.getName(), storeMgr.getIdentifierFactory().newColumnIdentifier("UNUSED"), mapping, null);
-		getStoreManager().getMappingManager().createDatastoreMapping(mapping, column, int.class.getName());
+		getStoreManager().getMappingManager().createColumnMapping(mapping, column, int.class.getName());
 
         state = TABLE_STATE_INITIALIZED;
     }

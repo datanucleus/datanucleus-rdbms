@@ -234,10 +234,10 @@ public abstract class AbstractClassTable extends TableImpl
 
             // Loop through each id column in the reference table and add the same here
             // applying the required names from the columnContainer
-            for (int j=0; j<mapping.getNumberOfDatastoreMappings(); j++)
+            for (int j=0; j<mapping.getNumberOfColumnMappings(); j++)
             {
                 JavaTypeMapping m = masterMapping;
-                Column refColumn = mapping.getDatastoreMapping(j).getColumn();
+                Column refColumn = mapping.getColumnMapping(j).getColumn();
                 if (mapping instanceof PersistableMapping)
                 {
                     m = storeMgr.getMappingManager().getMapping(clr.classForName(refColumn.getJavaTypeMapping().getType()));
@@ -276,14 +276,14 @@ public abstract class AbstractClassTable extends TableImpl
                     // No name provided so take same as superclass
                     idColumn = addColumn(refColumn.getStoredJavaType(), refColumn.getIdentifier(), m, refColumn.getColumnMetaData());
                 }
-                if (mapping.getDatastoreMapping(j).getColumn().getColumnMetaData() != null)
+                if (mapping.getColumnMapping(j).getColumn().getColumnMetaData() != null)
                 {
                     refColumn.copyConfigurationTo(idColumn);
                 }
                 idColumn.setPrimaryKey();
 
                 // Set the column type based on the field.getType()
-                getStoreManager().getMappingManager().createDatastoreMapping(m, idColumn, refColumn.getJavaTypeMapping().getType());
+                getStoreManager().getMappingManager().createColumnMapping(m, idColumn, refColumn.getJavaTypeMapping().getType());
             }
 
             // Update highest field number if this is higher
@@ -369,7 +369,7 @@ public abstract class AbstractClassTable extends TableImpl
             valueGeneratedType = storeMgr.getValueGenerationManager().getTypeForValueGeneratorForMember(strategyName, storeMgr.getValueGenerationManager().getMemberKey(cmd, -1));
         }
 
-        storeMgr.getMappingManager().createDatastoreMapping(datastoreIdMapping, idColumn, valueGeneratedType.getName());
+        storeMgr.getMappingManager().createColumnMapping(datastoreIdMapping, idColumn, valueGeneratedType.getName());
         logMapping("DATASTORE_ID", datastoreIdMapping);
 
         // Handle any auto-increment requirement
@@ -431,23 +431,23 @@ public abstract class AbstractClassTable extends TableImpl
         assertIsInitialized();
         if (colType == SurrogateColumnType.DATASTORE_ID)
         {
-            return datastoreIdMapping != null ? datastoreIdMapping.getDatastoreMapping(0).getColumn() : null;
+            return datastoreIdMapping != null ? datastoreIdMapping.getColumnMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.DISCRIMINATOR)
         {
-            return discriminatorMapping != null ? discriminatorMapping.getDatastoreMapping(0).getColumn() : null;
+            return discriminatorMapping != null ? discriminatorMapping.getColumnMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.MULTITENANCY)
         {
-            return multitenancyMapping != null ? multitenancyMapping.getDatastoreMapping(0).getColumn() : null;
+            return multitenancyMapping != null ? multitenancyMapping.getColumnMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.VERSION)
         {
-            return versionMapping != null ? versionMapping.getDatastoreMapping(0).getColumn() : null;
+            return versionMapping != null ? versionMapping.getColumnMapping(0).getColumn() : null;
         }
         else if (colType == SurrogateColumnType.SOFTDELETE)
         {
-            return softDeleteMapping != null ? softDeleteMapping.getDatastoreMapping(0).getColumn() : null;
+            return softDeleteMapping != null ? softDeleteMapping.getColumnMapping(0).getColumn() : null;
         }
         // TODO Support other column types
         return null;

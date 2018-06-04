@@ -517,13 +517,13 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
     private String getContainsValueStmt(JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, Table mapTable)
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ");
         stmt.append(mapTable.toString());
@@ -551,7 +551,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
                 {
                     int jdbcPosition = 1;
                     fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), newValue);
-                    jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
+                    jdbcPosition += fieldMapping.getNumberOfColumnMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(op, value, ps, jdbcPosition, (JoinTable)getMapTable(), this);
                     sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
@@ -595,15 +595,15 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
-        for (int i=0; i<fieldMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<fieldMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -615,12 +615,12 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
             JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
             if (m != null)
             {
-                for (int j=0;j<m.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<m.getNumberOfColumnMappings();j++)
                 {
                     stmt.append(" AND ");
-                    stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
                 }
             }
         }
@@ -647,15 +647,15 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(mapTable.toString());
         stmt.append(" SET ");
-        for (int i=0; i<fieldMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<fieldMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(fieldMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(fieldMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
         }
 
         stmt.append(" WHERE ");
@@ -667,12 +667,12 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
             JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
             if (m != null)
             {
-                for (int j=0;j<m.getNumberOfDatastoreMappings();j++)
+                for (int j=0;j<m.getNumberOfColumnMappings();j++)
                 {
                     stmt.append(" AND ");
-                    stmt.append(m.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(m.getDatastoreMapping(j).getUpdateInputParameter());
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
                 }
             }
         }
@@ -696,7 +696,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
                 {
                     int jdbcPosition = 1;
                     fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), key);
-                    jdbcPosition += fieldMapping.getNumberOfDatastoreMappings();
+                    jdbcPosition += fieldMapping.getNumberOfColumnMappings();
                     jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(op, key, ps, jdbcPosition, (JoinTable)getMapTable(), this);
 

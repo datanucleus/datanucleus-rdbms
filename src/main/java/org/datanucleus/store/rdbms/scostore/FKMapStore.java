@@ -951,15 +951,15 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         StringBuilder stmt = new StringBuilder("UPDATE ");
         stmt.append(getMapTable().toString());
         stmt.append(" SET ");
-        for (int i=0; i<ownerMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" = ");
-            stmt.append(ownerMapping.getDatastoreMapping(i).getUpdateInputParameter());
+            stmt.append(ownerMapping.getColumnMapping(i).getUpdateInputParameter());
         }
         stmt.append(" WHERE ");
         if (keyFieldNumber >= 0)
@@ -998,7 +998,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null);
                         }
-                        jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
+                        jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     }
                     else
                     {
@@ -1051,7 +1051,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         {
                             ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null);
                         }
-                        jdbcPosition += ownerMapping.getNumberOfDatastoreMappings();
+                        jdbcPosition += ownerMapping.getNumberOfColumnMappings();
                     }
                     else
                     {
@@ -1145,7 +1145,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
                         if (valuesAreEmbedded || valuesAreSerialised)
                         {
-                            int param[] = new int[valueMapping.getNumberOfDatastoreMappings()];
+                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -1167,7 +1167,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else if (valueMapping instanceof ReferenceMapping)
                         {
                             // Value = Reference (Interface/Object)
-                            int param[] = new int[valueMapping.getNumberOfDatastoreMappings()];
+                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -1308,14 +1308,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] ownerPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<ownerPositions.length;k++)
                 {
                     ownerPositions[k] = inputParamNum++;
                 }
                 ownerIdx.addParameterOccurrence(ownerPositions);
 
-                int[] keyPositions = new int[keyMapping.getNumberOfDatastoreMappings()];
+                int[] keyPositions = new int[keyMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<keyPositions.length;k++)
                 {
                     keyPositions[k] = inputParamNum++;
@@ -1325,14 +1325,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         }
         else
         {
-            int[] ownerPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<ownerPositions.length;k++)
             {
                 ownerPositions[k] = inputParamNum++;
             }
             ownerIdx.addParameterOccurrence(ownerPositions);
 
-            int[] keyPositions = new int[keyMapping.getNumberOfDatastoreMappings()];
+            int[] keyPositions = new int[keyMapping.getNumberOfColumnMappings()];
             for (int k=0;k<keyPositions.length;k++)
             {
                 keyPositions[k] = inputParamNum++;

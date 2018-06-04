@@ -41,6 +41,6 @@ public class SerialisedValuePCMapping extends SerialisedPCMapping
             colmd = mmd.getValueMetaData().getColumnMetaData()[0];
         }
         Column col = mmgr.createColumn(this,getType(), colmd);
-        mmgr.createDatastoreMapping(this, mmd, 0, col);
+        mmgr.createColumnMapping(this, mmd, 0, col);
     }
 }

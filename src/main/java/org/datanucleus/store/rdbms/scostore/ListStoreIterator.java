@@ -70,7 +70,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
                 Object nextElement;
                 if (elementsAreEmbedded || elementsAreSerialised)
                 {
-                    int param[] = new int[elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
@@ -98,7 +98,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
                 else if (elementMapping instanceof ReferenceMapping)
                 {
                     // Element = Reference (Interface/Object)
-                    int param[] = new int[elementMapping.getNumberOfDatastoreMappings()];
+                    int param[] = new int[elementMapping.getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;

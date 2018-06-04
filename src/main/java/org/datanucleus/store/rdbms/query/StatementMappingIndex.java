@@ -133,9 +133,9 @@ public class StatementMappingIndex
         {
             paramPositions = new ArrayList<>();
         }
-        if (mapping != null && positions.length != mapping.getNumberOfDatastoreMappings())
+        if (mapping != null && positions.length != mapping.getNumberOfColumnMappings())
         {
-            throw new NucleusException("Mapping " + mapping + " cannot be " + positions.length + " parameters since it has " + mapping.getNumberOfDatastoreMappings() + " columns");
+            throw new NucleusException("Mapping " + mapping + " cannot be " + positions.length + " parameters since it has " + mapping.getNumberOfColumnMappings() + " columns");
         }
         paramPositions.add(positions);
     }

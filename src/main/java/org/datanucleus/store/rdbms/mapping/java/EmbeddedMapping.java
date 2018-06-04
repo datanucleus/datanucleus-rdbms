@@ -42,7 +42,7 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
@@ -202,7 +202,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 discrimMetaData.setColumnMetaData(disColmd);
 
                 discrimMapping = DiscriminatorMapping.createDiscriminatorMapping(table, discrimMetaData);
-                addDatastoreMapping(discrimMapping.getDatastoreMapping(0));
+                addColumnMapping(discrimMapping.getColumnMapping(0));
             }
             else
             {
@@ -302,11 +302,11 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             embMmdMapping.setAbsFieldNumber(embMmd.getAbsoluteFieldNumber());
             this.addJavaTypeMapping(embMmdMapping);
 
-            for (int j=0; j<embMmdMapping.getNumberOfDatastoreMappings(); j++)
+            for (int j=0; j<embMmdMapping.getNumberOfColumnMappings(); j++)
             {
                 // Register column with mapping
-                DatastoreMapping datastoreMapping = embMmdMapping.getDatastoreMapping(j);
-                this.addDatastoreMapping(datastoreMapping);
+                ColumnMapping datastoreMapping = embMmdMapping.getColumnMapping(j);
+                this.addColumnMapping(datastoreMapping);
 
                 if (this.mmd.isPrimaryKey())
                 {
@@ -440,7 +440,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             for (int i=0; i<javaTypeMappings.size(); i++)
             {
                 JavaTypeMapping mapping = javaTypeMappings.get(i);
-                int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
                 for (int j=0; j<posMapping.length; j++)
                 {
                     posMapping[j] = param[n++];
@@ -482,7 +482,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 }
                 else
                 {
-                    if (mapping.getNumberOfDatastoreMappings() > 0)
+                    if (mapping.getNumberOfColumnMappings() > 0)
                     {
                         mapping.setObject(ec, ps, posMapping, null);
                     }
@@ -519,7 +519,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             for (int i=0; i<javaTypeMappings.size(); i++)
             {
                 JavaTypeMapping mapping = javaTypeMappings.get(i);
-                int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
                 for (int j=0; j<posMapping.length; j++)
                 {
                     posMapping[j] = param[n++];
@@ -537,7 +537,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                     }
                     else
                     {
-                        if (mapping.getNumberOfDatastoreMappings() > 0)
+                        if (mapping.getNumberOfColumnMappings() > 0)
                         {
                             mapping.setObject(ec, ps, posMapping, fieldValue);
                         }
@@ -618,7 +618,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 if (mapping instanceof EmbeddedPCMapping)
                 {
                     // We have a nested embedded
-                    int numSubParams = mapping.getNumberOfDatastoreMappings();
+                    int numSubParams = mapping.getNumberOfColumnMappings();
                     int[] subParam = new int[numSubParams];
                     int k = 0;
                     for (int j=n;j<n+numSubParams;j++)
@@ -638,10 +638,10 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
                 }
                 else
                 {
-                    if (mapping.getNumberOfDatastoreMappings() > 0)
+                    if (mapping.getNumberOfColumnMappings() > 0)
                     {
                         // Extract the value(s) for this field and update the PC if it is not null
-                        int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                        int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
                         for (int j=0; j<posMapping.length; j++)
                         {
                             posMapping[j] = param[n++];
@@ -678,7 +678,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             else
             {
                 // Mapping not present in this embedded type so maybe subclass, so just omit the positions
-                int numSubParams = mapping.getNumberOfDatastoreMappings();
+                int numSubParams = mapping.getNumberOfColumnMappings();
                 n += numSubParams;
             }
         }

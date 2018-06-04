@@ -76,7 +76,7 @@ public class AvgFunction extends SimpleNumericAggregateMethod
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
-        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithColumnMapping(String.class, false, false, clr);
         SQLExpression aggExpr = getAggregateExpression(stmt, args, mapping);
         subStmt.select(aggExpr, null);
 

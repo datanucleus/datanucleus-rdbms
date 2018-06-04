@@ -40,9 +40,9 @@ public abstract class SingleFieldMultiMapping extends JavaTypeMapping
         if (table != null)
         {
             // Full mapping, so add column to back the datastore mapping
-            column = mgr.createColumn(this, typeName, getNumberOfDatastoreMappings());
+            column = mgr.createColumn(this, typeName, getNumberOfColumnMappings());
         }
-        mgr.createDatastoreMapping(this, column, typeName);
+        mgr.createColumnMapping(this, column, typeName);
     }
 
     /**
@@ -51,9 +51,9 @@ public abstract class SingleFieldMultiMapping extends JavaTypeMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
-        return datastoreMappings[index].getColumn().getStoredJavaType();
+        return columnMappings[index].getColumn().getStoredJavaType();
     }
 
     /**

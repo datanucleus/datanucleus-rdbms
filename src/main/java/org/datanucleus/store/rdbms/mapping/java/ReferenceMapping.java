@@ -280,7 +280,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             mapping.setTable(table);
             mapping.setRoleForMember(roleForMember);
             Column col = mapMgr.createColumn(mapping, String.class.getName(), 0);
-            mapMgr.createDatastoreMapping(mapping, mmd, 0, col);
+            mapMgr.createColumnMapping(mapping, mmd, 0, col);
             this.addJavaTypeMapping(mapping);
         }
     }
@@ -475,11 +475,11 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 ColumnMetaData[] columnMetaDataForType = null;
                 if (columnMetaData != null && columnMetaData.length > 0)
                 {
-                    if (columnMetaData.length < colPos+m.getNumberOfDatastoreMappings())
+                    if (columnMetaData.length < colPos+m.getNumberOfColumnMappings())
                     {
-                        throw new NucleusUserException(Localiser.msg("020186", mmd.getFullFieldName(), "" + columnMetaData.length, "" + (colPos + m.getNumberOfDatastoreMappings())));
+                        throw new NucleusUserException(Localiser.msg("020186", mmd.getFullFieldName(), "" + columnMetaData.length, "" + (colPos + m.getNumberOfColumnMappings())));
                     }
-                    columnMetaDataForType = new ColumnMetaData[m.getNumberOfDatastoreMappings()];
+                    columnMetaDataForType = new ColumnMetaData[m.getNumberOfColumnMappings()];
                     System.arraycopy(columnMetaData, colPos, columnMetaDataForType, 0, columnMetaDataForType.length);
                     colPos += columnMetaDataForType.length;
                 }
@@ -502,13 +502,13 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         if ((mappingStrategy == ID_MAPPING || mappingStrategy == XCALIA_MAPPING) && index == 0)
         {
             return String.class.getName();
         }
-        return super.getJavaTypeForDatastoreMapping(index);
+        return super.getJavaTypeForColumnMapping(index);
     }
 
     /**

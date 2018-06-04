@@ -27,7 +27,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
@@ -87,7 +87,7 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
         }
 
         // Update the BLOB
-        OracleBlobRDBMSMapping.updateBlobColumn(op, getTable(), getDatastoreMapping(0), bytes);
+        OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), bytes);
     }
 
     /**

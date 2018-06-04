@@ -41,7 +41,7 @@ public class SerialisedMapping extends SingleFieldMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         return ClassNameConstants.JAVA_IO_SERIALIZABLE;
     }

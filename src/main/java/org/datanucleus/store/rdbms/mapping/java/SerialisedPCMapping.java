@@ -76,7 +76,7 @@ public class SerialisedPCMapping extends SerialisedMapping
         {
             sm.setStoringPC();
         }
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
+        getColumnMapping(0).setObject(ps, exprIndex[0], value);
         if (sm != null)
         {
             sm.unsetStoringPC();
@@ -106,7 +106,7 @@ public class SerialisedPCMapping extends SerialisedMapping
      */
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, ObjectProvider ownerOP, int fieldNumber)
     {
-        Object obj = getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        Object obj = getColumnMapping(0).getObject(resultSet, exprIndex[0]);
         if (obj != null)
         {
             // Assign a StateManager to the serialised object if none present

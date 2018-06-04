@@ -102,7 +102,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 ElementContainerStore backingStore = (ElementContainerStore) iterStmt.getBackingStore();
                 if (backingStore.isElementsAreEmbedded() || backingStore.isElementsAreSerialised())
                 {
-                    int param[] = new int[backingStore.getElementMapping().getNumberOfDatastoreMappings()];
+                    int param[] = new int[backingStore.getElementMapping().getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;
@@ -135,7 +135,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 else if (backingStore.getElementMapping() instanceof ReferenceMapping)
                 {
                     // Element is Reference (interface/Object) so just use elementMapping
-                    int param[] = new int[backingStore.getElementMapping().getNumberOfDatastoreMappings()];
+                    int param[] = new int[backingStore.getElementMapping().getNumberOfColumnMappings()];
                     for (int i = 0; i < param.length; ++i)
                     {
                         param[i] = i + 1;

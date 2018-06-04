@@ -264,13 +264,13 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
     private String getFindKeyStmt()
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
-        for (int i=0; i<keyMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i=0; i<keyMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(keyMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(keyMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ");
         stmt.append(containerTable.toString());
@@ -519,8 +519,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -529,8 +529,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
             {
                 paramPositions[k] = inputParamNum++;
             }

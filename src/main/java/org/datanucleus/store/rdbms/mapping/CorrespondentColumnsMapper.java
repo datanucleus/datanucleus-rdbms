@@ -83,18 +83,18 @@ public class CorrespondentColumnsMapper
             columnsName = str.toString();
 
             // Check if too many columns have been defined
-            if (noOfUserColumns > mappingSideB.getNumberOfDatastoreMappings())
+            if (noOfUserColumns > mappingSideB.getNumberOfColumnMappings())
             {
                 throw new NucleusUserException(Localiser.msg("020003", 
-                    columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfDatastoreMappings())).setFatal();
+                    columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfColumnMappings())).setFatal();
             }
 
             // Retrieve sideB column names
-            DatastoreIdentifier[] sideBidentifiers = new DatastoreIdentifier[mappingSideB.getNumberOfDatastoreMappings()];
-            boolean[] sideButilised = new boolean[mappingSideB.getNumberOfDatastoreMappings()];
-            for (int i = 0; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            DatastoreIdentifier[] sideBidentifiers = new DatastoreIdentifier[mappingSideB.getNumberOfColumnMappings()];
+            boolean[] sideButilised = new boolean[mappingSideB.getNumberOfColumnMappings()];
+            for (int i = 0; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
-                sideBidentifiers[i] = mappingSideB.getDatastoreMapping(i).getColumn().getIdentifier();
+                sideBidentifiers[i] = mappingSideB.getColumnMapping(i).getColumn().getIdentifier();
                 sideButilised[i] = false;
             }
 
@@ -114,7 +114,7 @@ public class CorrespondentColumnsMapper
                         {
                             if (sideBidMappings[j].getMemberMetaData().getName().equals(targetFieldName))
                             {
-                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getName();
+                                targetColumnName = sideBidMappings[j].getColumnMapping(0).getColumn().getIdentifier().getName();
                                 break;
                             }
                         }
@@ -164,7 +164,7 @@ public class CorrespondentColumnsMapper
             }
 
             // Allocate any missing columns
-            for (int i = colmds.length; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            for (int i = colmds.length; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
                 // Find next unallocated sideB column
                 DatastoreIdentifier sideBidentifier = null;
@@ -194,10 +194,10 @@ public class CorrespondentColumnsMapper
         else
         {
             columnsName = null;
-            for (int i = 0; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
                 final DatastoreIdentifier sideBidentifier;
-                sideBidentifier = mappingSideB.getDatastoreMapping(i).getColumn().getIdentifier();
+                sideBidentifier = mappingSideB.getColumnMapping(i).getColumn().getIdentifier();
 
                 // Create a new ColumnMetaData since user hasn't provided enough
                 ColumnMetaData colmd = new ColumnMetaData();
@@ -237,18 +237,18 @@ public class CorrespondentColumnsMapper
             columnsName = str.toString();
 
             // Check if too many columns have been defined
-            if (noOfUserColumns > mappingSideB.getNumberOfDatastoreMappings())
+            if (noOfUserColumns > mappingSideB.getNumberOfColumnMappings())
             {
                 throw new NucleusUserException(Localiser.msg("020003", 
-                    columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfDatastoreMappings())).setFatal();
+                    columnsName, "" + noOfUserColumns, "" + mappingSideB.getNumberOfColumnMappings())).setFatal();
             }
 
             // Retrieve sideB column names
-            DatastoreIdentifier[] sideBidentifiers = new DatastoreIdentifier[mappingSideB.getNumberOfDatastoreMappings()];
-            boolean[] sideButilised = new boolean[mappingSideB.getNumberOfDatastoreMappings()];
-            for (int i = 0; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            DatastoreIdentifier[] sideBidentifiers = new DatastoreIdentifier[mappingSideB.getNumberOfColumnMappings()];
+            boolean[] sideButilised = new boolean[mappingSideB.getNumberOfColumnMappings()];
+            for (int i = 0; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
-                sideBidentifiers[i] = mappingSideB.getDatastoreMapping(i).getColumn().getIdentifier();
+                sideBidentifiers[i] = mappingSideB.getColumnMapping(i).getColumn().getIdentifier();
                 sideButilised[i] = false;
             }
             JavaTypeMapping[] sideBidMappings = ((MultiMapping)mappingSideB).getJavaTypeMapping();
@@ -267,7 +267,7 @@ public class CorrespondentColumnsMapper
                         {
                             if (sideBidMappings[j].getMemberMetaData().getName().equals(targetFieldName))
                             {
-                                targetColumnName = sideBidMappings[j].getDatastoreMapping(0).getColumn().getIdentifier().getName();
+                                targetColumnName = sideBidMappings[j].getColumnMapping(0).getColumn().getIdentifier().getName();
                                 break;
                             }
                         }
@@ -317,7 +317,7 @@ public class CorrespondentColumnsMapper
             }
 
             // Allocate any missing columns
-            for (int i = colmds.length; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            for (int i = colmds.length; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
                 // Find next unallocated sideB column
                 DatastoreIdentifier sideBidentifier = null;
@@ -347,10 +347,10 @@ public class CorrespondentColumnsMapper
         else
         {
             columnsName = null;
-            for (int i = 0; i < mappingSideB.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < mappingSideB.getNumberOfColumnMappings(); i++)
             {
                 final DatastoreIdentifier sideBidentifier;
-                sideBidentifier = mappingSideB.getDatastoreMapping(i).getColumn().getIdentifier();
+                sideBidentifier = mappingSideB.getColumnMapping(i).getColumn().getIdentifier();
 
                 // Create a new ColumnMetaData since user hasn't provided enough
                 ColumnMetaData colmd = new ColumnMetaData();

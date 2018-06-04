@@ -65,7 +65,7 @@ import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
@@ -247,9 +247,9 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             else
             {
                 // Loop through the datastore fields in the referenced class and create a datastore field for each
-                for (int i=0; i<referenceMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i=0; i<referenceMapping.getNumberOfColumnMappings(); i++)
                 {
-                    DatastoreMapping refDatastoreMapping = referenceMapping.getDatastoreMapping(i);
+                    ColumnMapping refDatastoreMapping = referenceMapping.getColumnMapping(i);
                     JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refDatastoreMapping.getJavaTypeMapping().getJavaType());
                     this.addJavaTypeMapping(mapping);
 
@@ -268,8 +268,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         Column col = mmgr.createColumn(mmd, table, mapping, colmd, refDatastoreMapping.getColumn(), clr);
 
                         // Add its datastore mapping
-                        DatastoreMapping datastoreMapping = mmgr.createDatastoreMapping(mapping, col, refDatastoreMapping.getJavaTypeMapping().getJavaTypeForDatastoreMapping(i));
-                        this.addDatastoreMapping(datastoreMapping);
+                        ColumnMapping datastoreMapping = mmgr.createColumnMapping(mapping, col, refDatastoreMapping.getJavaTypeMapping().getJavaTypeForColumnMapping(i));
+                        this.addColumnMapping(datastoreMapping);
                     }
                     else
                     {
@@ -287,7 +287,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
      * @param value The overall value for this java type
      * @return The value for this datastore index
      */
-    public Object getValueForDatastoreMapping(NucleusContext nucleusCtx, int index, Object value)
+    public Object getValueForColumnMapping(NucleusContext nucleusCtx, int index, Object value)
     {
         ExecutionContext ec = nucleusCtx.getApiAdapter().getExecutionContext(value);
         if (cmd == null)
@@ -380,10 +380,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         for (int i=0; i<javaTypeMappings.length; i++)
         {
             JavaTypeMapping mapping = javaTypeMappings[i];
-            if (mapping.getNumberOfDatastoreMappings() > 0)
+            if (mapping.getNumberOfColumnMappings() > 0)
             {
                 // Only populate the PreparedStatement for the object if it has any datastore mappings
-                int[] posMapping = new int[mapping.getNumberOfDatastoreMappings()];
+                int[] posMapping = new int[mapping.getNumberOfColumnMappings()];
                 for (int j=0; j<posMapping.length; j++)
                 {
                     posMapping[j] = param[n++];
@@ -656,7 +656,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 }
 
                 // If the field doesn't map to any datastore fields (e.g remote FK), omit the set process
-                if (getNumberOfDatastoreMappings() > 0)
+                if (getNumberOfColumnMappings() > 0)
                 {
                     if (IdentityUtils.isDatastoreIdentity(id))
                     {
@@ -664,12 +664,12 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         try
                         {
                             // Try as a Long
-                            getDatastoreMapping(0).setObject(ps, param[0], idKey);
+                            getColumnMapping(0).setObject(ps, param[0], idKey);
                         }
                         catch (Exception e)
                         {
                             // Must be a String
-                            getDatastoreMapping(0).setObject(ps, param[0], idKey.toString());
+                            getColumnMapping(0).setObject(ps, param[0], idKey.toString());
                         }
                     }
                     else
@@ -710,7 +710,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     valueOP.setStoringPC();
                 }
 
-                if (getNumberOfDatastoreMappings() > 0)
+                if (getNumberOfColumnMappings() > 0)
                 {
                     // Object is in the process of being inserted so we cant use its id currently and we need to store
                     // a foreign key to it (which we cant yet do). Just put "null" in and throw "NotYetFlushedException",

@@ -369,8 +369,8 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-                for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+                for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
                 {
                     paramPositions[k] = inputParamNum++;
                 }
@@ -379,8 +379,8 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
-            for (int k=0;k<ownerMapping.getNumberOfDatastoreMappings();k++)
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
+            for (int k=0;k<ownerMapping.getNumberOfColumnMappings();k++)
             {
                 paramPositions[k] = inputParamNum++;
             }

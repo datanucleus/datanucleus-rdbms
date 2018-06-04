@@ -25,7 +25,7 @@ import java.io.ObjectOutputStream;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobRDBMSMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
 
 /**
  * Mapping for a serialised persistable object for Oracle.
@@ -75,7 +75,7 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping implements Ma
         }
 
         // Update the BLOB
-        OracleBlobRDBMSMapping.updateBlobColumn(op, getTable(), getDatastoreMapping(0), bytes);
+        OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), bytes);
 
         if (sm != null)
         {

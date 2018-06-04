@@ -51,7 +51,7 @@ public class EnumOrdinalMethod implements SQLMethod
         {
             EnumExpression enumExpr = (EnumExpression)expr;
             JavaTypeMapping m = enumExpr.getJavaTypeMapping();
-            if (m.getJavaTypeForDatastoreMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
+            if (m.getJavaTypeForColumnMapping(0).equals(ClassNameConstants.JAVA_LANG_STRING))
             {
                 throw new NucleusException("EnumExpression.ordinal is not supported when the enum is stored as a string");
             }

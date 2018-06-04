@@ -31,7 +31,7 @@ public abstract class TemporalMapping extends SingleFieldMapping
      */
     public int getDefaultLength(int index)
     {
-        if (datastoreMappings != null && datastoreMappings.length > 0 && datastoreMappings[0].isStringBased())
+        if (columnMappings != null && columnMappings.length > 0 && columnMappings[0].isStringBased())
         {
             return getDefaultLengthAsString();
         }
@@ -46,13 +46,13 @@ public abstract class TemporalMapping extends SingleFieldMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
-        if (datastoreMappings != null && datastoreMappings.length > 0 && datastoreMappings[0].isStringBased())
+        if (columnMappings != null && columnMappings.length > 0 && columnMappings[0].isStringBased())
         {
             // Use String as our java type
             return ClassNameConstants.JAVA_LANG_STRING;
         }
-        return super.getJavaTypeForDatastoreMapping(index);
+        return super.getJavaTypeForColumnMapping(index);
     }
 }

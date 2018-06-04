@@ -220,34 +220,34 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             StringBuilder stmt = new StringBuilder("INSERT INTO ");
             stmt.append(joinTable.toString());
             stmt.append(" (");
-            for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
             {
                 if (i > 0)
                 {
                     stmt.append(",");
                 }
-                stmt.append(ownerMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(ownerMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             }
-            for (int i = 0; i < relatedMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relatedMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relatedMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relatedMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             }
 
             stmt.append(") VALUES (");
-            for (int i = 0; i < ownerMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < ownerMapping.getNumberOfColumnMappings(); i++)
             {
                 if (i > 0)
                 {
                     stmt.append(",");
                 }
-                stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
+                stmt.append(ownerMapping.getColumnMapping(i).getInsertionInputParameter());
             }
 
-            for (int i = 0; i < relatedMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relatedMapping.getNumberOfColumnMappings(); i++)
             {
                 stmt.append(",");
-                stmt.append(relatedMapping.getDatastoreMapping(0).getInsertionInputParameter());
+                stmt.append(relatedMapping.getColumnMapping(0).getInsertionInputParameter());
             }
             stmt.append(") ");
 
@@ -274,15 +274,15 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             StringBuilder stmt = new StringBuilder("UPDATE ");
             stmt.append(joinTable.toString());
             stmt.append(" SET ");
-            for (int i = 0; i < relatedMapping.getNumberOfDatastoreMappings(); i++)
+            for (int i = 0; i < relatedMapping.getNumberOfColumnMappings(); i++)
             {
                 if (i > 0)
                 {
                     stmt.append(",");
                 }
-                stmt.append(relatedMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                stmt.append(relatedMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 stmt.append("=");
-                stmt.append(ownerMapping.getDatastoreMapping(i).getInsertionInputParameter());
+                stmt.append(ownerMapping.getColumnMapping(i).getInsertionInputParameter());
             }
             stmt.append(" WHERE ");
             BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -328,7 +328,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      */
     public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
     {
-        if (!joinTable.getStoreManager().insertValuesOnInsert(joinTable.getOwnerMapping().getDatastoreMapping(0)))
+        if (!joinTable.getStoreManager().insertValuesOnInsert(joinTable.getOwnerMapping().getColumnMapping(0)))
         {
             // Don't try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
@@ -343,6 +343,6 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         {
             joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()), op.getObject());
         }
-        return jdbcPosition + joinTable.getOwnerMapping().getNumberOfDatastoreMappings();
+        return jdbcPosition + joinTable.getOwnerMapping().getNumberOfColumnMappings();
     }
 }

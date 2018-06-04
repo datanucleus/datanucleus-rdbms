@@ -445,62 +445,62 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 StringBuilder stmt = new StringBuilder("INSERT INTO ");
                 stmt.append(containerTable.toString());
                 stmt.append(" (");
-                for (int i = 0; i < getOwnerMapping().getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < getOwnerMapping().getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(getOwnerMapping().getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(getOwnerMapping().getColumnMapping(i).getColumn().getIdentifier().toString());
                 }
 
-                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < elementMapping.getNumberOfColumnMappings(); i++)
                 {
-                    stmt.append(",").append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(",").append(elementMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 }
 
                 if (orderMapping != null)
                 {
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
-                        stmt.append(",").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
-                        stmt.append(",").append(relationDiscriminatorMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(",").append(relationDiscriminatorMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     }
                 }
 
                 stmt.append(") VALUES (");
-                for (int i = 0; i < getOwnerMapping().getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < getOwnerMapping().getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(getOwnerMapping().getDatastoreMapping(i).getInsertionInputParameter());
+                    stmt.append(getOwnerMapping().getColumnMapping(i).getInsertionInputParameter());
                 }
 
-                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < elementMapping.getNumberOfColumnMappings(); i++)
                 {
-                    stmt.append(",").append(elementMapping.getDatastoreMapping(0).getInsertionInputParameter());
+                    stmt.append(",").append(elementMapping.getColumnMapping(0).getInsertionInputParameter());
                 }
 
                 if (orderMapping != null)
                 {
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
-                        stmt.append(",").append(orderMapping.getDatastoreMapping(0).getInsertionInputParameter());
+                        stmt.append(",").append(orderMapping.getColumnMapping(0).getInsertionInputParameter());
                     }
                 }
                 if (relationDiscriminatorMapping != null)
                 {
-                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < relationDiscriminatorMapping.getNumberOfColumnMappings(); i++)
                     {
-                        stmt.append(",").append(relationDiscriminatorMapping.getDatastoreMapping(0).getInsertionInputParameter());
+                        stmt.append(",").append(relationDiscriminatorMapping.getColumnMapping(0).getInsertionInputParameter());
                     }
                 }
 
@@ -663,10 +663,10 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     // If an ordering is present, restrict to items where the index is not null to
                     // eliminate records that are added but may not be positioned yet.
-                    for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                    for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                     {
                         stmt.append(" AND ");
-                        stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                        stmt.append(containerAlias).append(".").append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                         stmt.append(">=0");
                     }
                 }
@@ -675,7 +675,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 if (softDeleteMapping != null)
                 {
                     stmt.append(" AND ").append(containerAlias).append(".");
-                    stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    stmt.append(softDeleteMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
                     stmt.append("=FALSE"); // TODO Cater for columns that store the DELETED flag as ("Y","N") or (1,0)
                 }
 
@@ -705,15 +705,15 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     JavaTypeMapping elemIdMapping = elemInfo.getDatastoreClass().getIdMapping();
                     stmt.append(allowNulls ? " LEFT OUTER JOIN " : " INNER JOIN ");
                     stmt.append(elemInfo.getDatastoreClass().toString()).append(" ").append(joinedElementAlias).append(" ON ");
-                    for (int j = 0; j < elementMapping.getNumberOfDatastoreMappings(); j++)
+                    for (int j = 0; j < elementMapping.getNumberOfColumnMappings(); j++)
                     {
                         if (j > 0)
                         {
                             stmt.append(" AND ");
                         }
-                        stmt.append(containerAlias).append(".").append(elementMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                        stmt.append(containerAlias).append(".").append(elementMapping.getColumnMapping(j).getColumn().getIdentifier());
                         stmt.append("=");
-                        stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDatastoreMapping(j).getColumn().getIdentifier());
+                        stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getColumnMapping(j).getColumn().getIdentifier());
                     }
                 }
                 // TODO Add join to owner if ownerMapping is for supertable
@@ -724,10 +724,10 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 {
                     // If an ordering is present, restrict to items where the index is not null to
                     // eliminate records that are added but may not be positioned yet.
-                    for (int j = 0; j < orderMapping.getNumberOfDatastoreMappings(); j++)
+                    for (int j = 0; j < orderMapping.getNumberOfColumnMappings(); j++)
                     {
                         stmt.append(" AND ");
-                        stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                        stmt.append(containerAlias).append(".").append(orderMapping.getColumnMapping(j).getColumn().getIdentifier().toString());
                         stmt.append(">=0");
                     }
                 }
@@ -736,7 +736,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                 if (softDeleteMapping != null)
                 {
                     stmt.append(" AND ").append(containerAlias).append(".");
-                    stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                    stmt.append(softDeleteMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
                     stmt.append("=FALSE");
                 }
 
@@ -754,7 +754,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         Class cls = clr.classForName(className);
                         if (!Modifier.isAbstract(cls.getModifiers()))
                         {
-                            for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
+                            for (int j = 0; j < discrimMapping.getNumberOfColumnMappings(); j++)
                             {
                                 if (discrStmt.length() > 0)
                                 {
@@ -763,9 +763,9 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
                                 discrStmt.append(joinedDiscrim ? joinedElementAlias : containerAlias);
                                 discrStmt.append(".");
-                                discrStmt.append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                                discrStmt.append(discrimMapping.getColumnMapping(j).getColumn().getIdentifier().toString());
                                 discrStmt.append("=");
-                                discrStmt.append(discrimMapping.getDatastoreMapping(j).getUpdateInputParameter());
+                                discrStmt.append(discrimMapping.getColumnMapping(j).getUpdateInputParameter());
                             }
                         }
                     }
@@ -778,7 +778,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     if (allowNulls)
                     {
                         stmt.append(" OR ");
-                        stmt.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                        stmt.append(elemInfo.getDiscriminatorMapping().getColumnMapping(0).getColumn().getIdentifier().toString());
                         stmt.append(" IS NULL");
                     }
                     stmt.append(")");
@@ -808,10 +808,10 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     {
                         // If an ordering is present, restrict to items where the index is not null to
                         // eliminate records that are added but may not be positioned yet.
-                        for (int j = 0; j < orderMapping.getNumberOfDatastoreMappings(); j++)
+                        for (int j = 0; j < orderMapping.getNumberOfColumnMappings(); j++)
                         {
                             stmt.append(" AND ");
-                            stmt.append(containerAlias).append(".").append(orderMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                            stmt.append(containerAlias).append(".").append(orderMapping.getColumnMapping(j).getColumn().getIdentifier().toString());
                             stmt.append(">=0");
                         }
                     }
@@ -820,7 +820,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     if (softDeleteMapping != null)
                     {
                         stmt.append(" AND ").append(containerAlias).append(".");
-                        stmt.append(softDeleteMapping.getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                        stmt.append(softDeleteMapping.getColumnMapping(0).getColumn().getIdentifier().toString());
                         stmt.append("=FALSE");
                     }
 
@@ -838,16 +838,16 @@ public abstract class ElementContainerStore extends BaseContainerStore
                             Class cls = clr.classForName(className);
                             if (!Modifier.isAbstract(cls.getModifiers()))
                             {
-                                for (int j = 0; j < discrimMapping.getNumberOfDatastoreMappings(); j++)
+                                for (int j = 0; j < discrimMapping.getNumberOfColumnMappings(); j++)
                                 {
                                     if (discrStmt.length() > 0)
                                     {
                                         discrStmt.append(" OR ");
                                     }
 
-                                    discrStmt.append(containerAlias).append(".").append(discrimMapping.getDatastoreMapping(j).getColumn().getIdentifier().toString());
+                                    discrStmt.append(containerAlias).append(".").append(discrimMapping.getColumnMapping(j).getColumn().getIdentifier().toString());
                                     discrStmt.append("=");
-                                    discrStmt.append(discrimMapping.getDatastoreMapping(j).getUpdateInputParameter());
+                                    discrStmt.append(discrimMapping.getColumnMapping(j).getUpdateInputParameter());
                                 }
                             }
                         }
@@ -860,7 +860,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         if (allowNulls)
                         {
                             stmt.append(" OR ");
-                            stmt.append(elemInfo.getDiscriminatorMapping().getDatastoreMapping(0).getColumn().getIdentifier().toString());
+                            stmt.append(elemInfo.getDiscriminatorMapping().getColumnMapping(0).getColumn().getIdentifier().toString());
                             stmt.append(" IS NULL");
                         }
                         stmt.append(")");

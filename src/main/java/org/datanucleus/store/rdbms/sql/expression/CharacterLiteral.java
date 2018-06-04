@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 
@@ -310,7 +310,7 @@ public class CharacterLiteral extends CharacterExpression implements SQLLiteral
     protected void setStatement()
     {
         st.clearStatement();
-        DatastoreMapping colMapping = mapping.getDatastoreMapping(0);
+        ColumnMapping colMapping = mapping.getColumnMapping(0);
         if (colMapping.isIntegerBased())
         {
             st.append("" + (int)this.value.charAt(0));

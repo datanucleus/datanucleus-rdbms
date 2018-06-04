@@ -31,7 +31,7 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -88,7 +88,7 @@ public class DiscriminatorMapping extends SingleFieldMapping
         }
 
         Column column = table.addColumn(getType(), id, this, dismd.getColumnMetaData());
-        table.getStoreManager().getMappingManager().createDatastoreMapping(delegate, column, getType());
+        table.getStoreManager().getMappingManager().createColumnMapping(delegate, column, getType());
     }
 
     /**
@@ -145,9 +145,9 @@ public class DiscriminatorMapping extends SingleFieldMapping
      * Accessor for the number of datastore fields.
      * @return Number of datastore fields
      */
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
-        return delegate.getNumberOfDatastoreMappings();
+        return delegate.getNumberOfColumnMappings();
     }
 
     /**
@@ -155,27 +155,27 @@ public class DiscriminatorMapping extends SingleFieldMapping
      * @param index Index of the mapping
      * @return The datastore mapping.
      */
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
-        return delegate.getDatastoreMapping(index);
+        return delegate.getColumnMapping(index);
     }
 
     /**
      * Accessor for the datastore mappings for this java type.
      * @return The datastore mapping(s)
      */
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
-        return delegate.getDatastoreMappings();
+        return delegate.getColumnMappings();
     }
 
     /**
      * Mutator to add a datastore mapping
      * @param datastoreMapping Datastore mapping
      */
-    public void addDatastoreMapping(DatastoreMapping datastoreMapping)
+    public void addColumnMapping(ColumnMapping datastoreMapping)
     {
-        delegate.addDatastoreMapping(datastoreMapping);
+        delegate.addColumnMapping(datastoreMapping);
     }
 
     /**

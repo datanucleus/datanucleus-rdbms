@@ -127,31 +127,31 @@ public class PersistableIdMapping extends PersistableMapping
                 Object pkMemberValue = ClassUtils.getValueForIdentityField(value, pkMemberNames[i]);
                 if (pkMemberValue instanceof Byte)
                 {
-                    getDatastoreMapping(i).setByte(ps, param[i], (Byte)pkMemberValue);
+                    getColumnMapping(i).setByte(ps, param[i], (Byte)pkMemberValue);
                 }
                 else if (pkMemberValue instanceof Character)
                 {
-                    getDatastoreMapping(i).setChar(ps, param[i], (Character)pkMemberValue);
+                    getColumnMapping(i).setChar(ps, param[i], (Character)pkMemberValue);
                 }
                 else if (pkMemberValue instanceof Integer)
                 {
-                    getDatastoreMapping(i).setInt(ps, param[i], (Integer)pkMemberValue);
+                    getColumnMapping(i).setInt(ps, param[i], (Integer)pkMemberValue);
                 }
                 else if (pkMemberValue instanceof Long)
                 {
-                    getDatastoreMapping(i).setLong(ps, param[i], (Long)pkMemberValue);
+                    getColumnMapping(i).setLong(ps, param[i], (Long)pkMemberValue);
                 }
                 else if (pkMemberValue instanceof Short)
                 {
-                    getDatastoreMapping(i).setShort(ps, param[i], (Short)pkMemberValue);
+                    getColumnMapping(i).setShort(ps, param[i], (Short)pkMemberValue);
                 }
                 else if (pkMemberValue instanceof String)
                 {
-                    getDatastoreMapping(i).setString(ps, param[i], (String)pkMemberValue);
+                    getColumnMapping(i).setString(ps, param[i], (String)pkMemberValue);
                 }
                 else
                 {
-                    getDatastoreMapping(i).setObject(ps, param[i], pkMemberValue);
+                    getColumnMapping(i).setObject(ps, param[i], pkMemberValue);
                 }
             }
         }

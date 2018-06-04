@@ -81,9 +81,9 @@ public abstract class SQLExpression
             this.subExprs = new ColumnExpressionList();
             if (mapping != null)
             {
-                for (int i=0; i<mapping.getNumberOfDatastoreMappings(); i++)
+                for (int i=0; i<mapping.getNumberOfColumnMappings(); i++)
                 {
-                    ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getDatastoreMapping(i).getColumn());
+                    ColumnExpression colExpr = new ColumnExpression(stmt, table, mapping.getColumnMapping(i).getColumn());
                     subExprs.addExpression(colExpr);
                 }
             }

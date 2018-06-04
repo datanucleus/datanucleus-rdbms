@@ -799,7 +799,7 @@ public abstract class SQLStatement
         if (sourceMapping != null && targetMapping != null)
         {
             // Join condition(s) - INNER, LEFT OUTER, RIGHT OUTER joins
-            if (sourceMapping.getNumberOfDatastoreMappings() != targetMapping.getNumberOfDatastoreMappings())
+            if (sourceMapping.getNumberOfColumnMappings() != targetMapping.getNumberOfColumnMappings())
             {
                 throw new NucleusException("Cannot join from " + sourceMapping + " to " + targetMapping + " since they have different numbers of datastore columns!");
             }

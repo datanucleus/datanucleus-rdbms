@@ -118,9 +118,9 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()) && relationType != RelationType.MANY_TO_MANY_BI)
             {
                 // 1-N : Make all element col(s) nullable so we can store null elements
-                for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<elementMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = elementMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = elementMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -185,7 +185,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             {
                 // Non-PC, so depends if the element column can be used as part of a PK
                 // TODO This assumes the elementMapping has a single column but what if it is Color with 4 cols?
-                Column elementCol = elementMapping.getDatastoreMapping(0).getColumn();
+                Column elementCol = elementMapping.getColumnMapping(0).getColumn();
                 if (!storeMgr.getDatastoreAdapter().isValidPrimaryKeyType(elementCol.getJdbcType()))
                 {
                     // Not possible to use this Non-PC type as part of the PK
@@ -237,22 +237,22 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
             else
             {
                 // Define PK
-                for (int i=0;i<ownerMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<ownerMapping.getNumberOfColumnMappings();i++)
                 {
-                    ownerMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                    ownerMapping.getColumnMapping(i).getColumn().setPrimaryKey();
                 }
 
                 if (orderRequired)
                 {
                     // Order column specified so owner+order are the PK
-                    orderMapping.getDatastoreMapping(0).getColumn().setPrimaryKey();
+                    orderMapping.getColumnMapping(0).getColumn().setPrimaryKey();
                 }
                 else
                 {
                     // No order column specified so owner+element are the PK
-                    for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
+                    for (int i=0;i<elementMapping.getNumberOfColumnMappings();i++)
                     {
-                        elementMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                        elementMapping.getColumnMapping(i).getColumn().setPrimaryKey();
                     }
                 }
             }
@@ -367,7 +367,7 @@ public class CollectionTable extends ElementContainerTable implements DatastoreE
      */
     protected boolean requiresPrimaryKey()
     {
-        if (elementMapping != null && elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping != null && elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // Cannot apply PK when we have multiple interface implementations
             return false;

@@ -50,7 +50,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
     {
         if (value == null)
         {
-            getDatastoreMapping(0).setObject(ps, param[0], null);
+            getColumnMapping(0).setObject(ps, param[0], null);
         }
         else
         {
@@ -65,7 +65,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
                     {
                         // Object is in the process of being inserted, but has no id yet so provide a null for now
                         // The "NotYetFlushedException" is caught by ParameterSetter and processed as an update being required.
-                        getDatastoreMapping(0).setObject(ps, param[0], null);
+                        getColumnMapping(0).setObject(ps, param[0], null);
                         throw new NotYetFlushedException(value);
                     }
 
@@ -84,12 +84,12 @@ public class DatastoreIdMapping extends SingleFieldMapping
             try
             {
                 // Try as a Long
-                getDatastoreMapping(0).setObject(ps,param[0], idKey);
+                getColumnMapping(0).setObject(ps,param[0], idKey);
             }
             catch (Exception e)
             {
                 // Must be a String
-                getDatastoreMapping(0).setObject(ps,param[0], idKey.toString());
+                getColumnMapping(0).setObject(ps,param[0], idKey.toString());
             }
         }
     }
@@ -104,9 +104,9 @@ public class DatastoreIdMapping extends SingleFieldMapping
     public Object getObject(ExecutionContext ec, ResultSet rs, int[] param)
     {
         Object value;
-        if (getNumberOfDatastoreMappings() > 0)
+        if (getNumberOfColumnMappings() > 0)
         {
-            value = getDatastoreMapping(0).getObject(rs,param[0]);
+            value = getColumnMapping(0).getObject(rs,param[0]);
         }
         else
         {
@@ -118,7 +118,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
 
             Class fieldType = mmd.getType();
             JavaTypeMapping referenceMapping = storeMgr.getDatastoreClass(fieldType.getName(), ec.getClassLoaderResolver()).getIdMapping();
-            value = referenceMapping.getDatastoreMapping(0).getObject(rs, param[0]);
+            value = referenceMapping.getColumnMapping(0).getObject(rs, param[0]);
         }
 
         if (value != null)

@@ -562,7 +562,7 @@ public class UpdateRequest extends Request
                 }
 
                 Integer abs_field_num = Integer.valueOf(fmd.getAbsoluteFieldNumber());
-                int parametersIndex[] = new int[m.getNumberOfDatastoreMappings()];
+                int parametersIndex[] = new int[m.getNumberOfColumnMappings()];
                 StatementMappingIndex sei = new StatementMappingIndex(m);
                 sei.addParameterOccurrence(parametersIndex);
 
@@ -585,9 +585,9 @@ public class UpdateRequest extends Request
                         {
                             where.append(" AND ");
                         }
-                        where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
+                        where.append(m.getColumnMapping(0).getColumn().getIdentifier());
                         where.append("=");
-                        where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
+                        where.append(m.getColumnMapping(0).getUpdateInputParameter());
                     }
                     else
                     {
@@ -598,9 +598,9 @@ public class UpdateRequest extends Request
                             {
                                 where.append(" AND ");
                             }
-                            where.append(m.getDatastoreMapping(j).getColumn().getIdentifier());
+                            where.append(m.getColumnMapping(j).getColumn().getIdentifier());
                             where.append("=");
-                            where.append(m.getDatastoreMapping(j).getUpdateInputParameter());
+                            where.append(m.getColumnMapping(j).getUpdateInputParameter());
 
                             if (!whereFields.contains(abs_field_num))
                             {
@@ -617,7 +617,7 @@ public class UpdateRequest extends Request
                     for (int j = 0; j < parametersIndex.length; j++)
                     {
                         // check if the column was not already assigned
-                        Column c = m.getDatastoreMapping(j).getColumn();
+                        Column c = m.getColumnMapping(j).getColumn();
                         DatastoreIdentifier columnId = c.getIdentifier();
                         boolean columnExists = assignedColumns.containsKey(columnId.toString());
                         if (columnExists)
@@ -625,7 +625,7 @@ public class UpdateRequest extends Request
                             parametersIndex[j] = ((Integer)assignedColumns.get(columnId.toString())).intValue();
                         }
 
-                        String param = m.getDatastoreMapping(j).getUpdateInputParameter();
+                        String param = m.getColumnMapping(j).getUpdateInputParameter();
                         if (!columnExists)
                         {
                             if (columnAssignments.length() > 0)
@@ -668,14 +668,14 @@ public class UpdateRequest extends Request
             if (mappingType == MappingType.VERSION)
             {
                 // Surrogate version column
-                String inputParam = m.getDatastoreMapping(0).getUpdateInputParameter();
+                String inputParam = m.getColumnMapping(0).getUpdateInputParameter();
                 if (whereClauseConsumption)
                 {
                     if (where.length() > 0)
                     {
                         where.append(" AND ");
                     }
-                    where.append(m.getDatastoreMapping(0).getColumn().getIdentifier());
+                    where.append(m.getColumnMapping(0).getColumn().getIdentifier());
                     where.append("=");
                     where.append(inputParam);
 
@@ -685,7 +685,7 @@ public class UpdateRequest extends Request
                 }
                 else
                 {
-                    String condition = m.getDatastoreMapping(0).getColumn().getIdentifier() + "=" + inputParam;
+                    String condition = m.getColumnMapping(0).getColumn().getIdentifier() + "=" + inputParam;
                     if (columnAssignments.length() > 0)
                     {
                         columnAssignments.append(", ");
@@ -706,7 +706,7 @@ public class UpdateRequest extends Request
                 }
                 where.append(key.getColumns().get(0).getIdentifier());
                 where.append("=");
-                where.append(m.getDatastoreMapping(0).getUpdateInputParameter());
+                where.append(m.getColumnMapping(0).getUpdateInputParameter());
 
                 StatementMappingIndex datastoreIdIdx = new StatementMappingIndex(m);
                 datastoreIdIdx.addParameterOccurrence(new int[]{paramIndex++});

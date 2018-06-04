@@ -738,7 +738,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
             // Add parameter occurrence for each union of statement
             for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
             {
-                int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+                int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
                 for (int k=0;k<paramPositions.length;k++)
                 {
                     paramPositions[k] = inputParamNum++;
@@ -748,7 +748,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            int[] paramPositions = new int[ownerMapping.getNumberOfDatastoreMappings()];
+            int[] paramPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<paramPositions.length;k++)
             {
                 paramPositions[k] = inputParamNum++;
@@ -839,15 +839,15 @@ public class JoinListStore<E> extends AbstractListStore<E>
             synchronized (this)
             {
                 StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
-                for (int i = 0; i < elementMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < elementMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(elementMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(elementMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(elementMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                    stmt.append(elementMapping.getColumnMapping(i).getUpdateInputParameter());
                 }
 
                 stmt.append(" WHERE ");
@@ -1095,8 +1095,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
             {
                 // Order by the ordering column, when present
                 SQLTable orderSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), orderMapping);
-                SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfDatastoreMappings()];
-                boolean descendingOrder[] = new boolean[orderMapping.getNumberOfDatastoreMappings()];
+                SQLExpression[] orderExprs = new SQLExpression[orderMapping.getNumberOfColumnMappings()];
+                boolean descendingOrder[] = new boolean[orderMapping.getNumberOfColumnMappings()];
                 orderExprs[0] = exprFactory.newExpression(sqlStmt, orderSqlTbl, orderMapping);
                 sqlStmt.setOrdering(orderExprs, descendingOrder);
             }

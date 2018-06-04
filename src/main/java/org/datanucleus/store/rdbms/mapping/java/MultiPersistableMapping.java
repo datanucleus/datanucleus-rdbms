@@ -129,7 +129,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
     {
         boolean setValueFKOnly = false;
-        if (pos != null && pos.length < getNumberOfDatastoreMappings())
+        if (pos != null && pos.length < getNumberOfColumnMappings())
         {
             setValueFKOnly = true;
         }
@@ -208,7 +208,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
                     }
                 }
 
-                if (getNumberOfDatastoreMappings() <= 0)
+                if (getNumberOfColumnMappings() <= 0)
                 {
                     // If the field doesn't map to any datastore fields, omit the set process
                     return;
@@ -246,11 +246,11 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 }
                 if (javaTypeMappings[i].getReferenceMapping() != null)
                 {
-                    posMapping = new int[javaTypeMappings[i].getReferenceMapping().getNumberOfDatastoreMappings()];
+                    posMapping = new int[javaTypeMappings[i].getReferenceMapping().getNumberOfColumnMappings()];
                 }
                 else
                 {
-                    posMapping = new int[javaTypeMappings[i].getNumberOfDatastoreMappings()];
+                    posMapping = new int[javaTypeMappings[i].getNumberOfColumnMappings()];
                 }
                 for (int j=0; j<posMapping.length; j++)
                 {
@@ -311,11 +311,11 @@ public abstract class MultiPersistableMapping extends MultiMapping
 
             if (javaTypeMappings[i].getReferenceMapping() != null)
             {
-                posMapping = new int[javaTypeMappings[i].getReferenceMapping().getNumberOfDatastoreMappings()];
+                posMapping = new int[javaTypeMappings[i].getReferenceMapping().getNumberOfColumnMappings()];
             }
             else
             {
-                posMapping = new int[javaTypeMappings[i].getNumberOfDatastoreMappings()];
+                posMapping = new int[javaTypeMappings[i].getNumberOfColumnMappings()];
             }
             for (int j=0; j<posMapping.length; j++)
             {
@@ -335,11 +335,11 @@ public abstract class MultiPersistableMapping extends MultiMapping
                         Column col = null;
                         if (javaTypeMappings[i].getReferenceMapping() != null)
                         {
-                            col = javaTypeMappings[i].getReferenceMapping().getDatastoreMapping(0).getColumn();
+                            col = javaTypeMappings[i].getReferenceMapping().getColumnMapping(0).getColumn();
                         }
                         else
                         {
-                            col = javaTypeMappings[i].getDatastoreMapping(0).getColumn();
+                            col = javaTypeMappings[i].getColumnMapping(0).getColumn();
                         }
                         String className = col.getStoredJavaType();
                         value = ec.getNucleusContext().getIdentityManager().getDatastoreId(className, IdentityUtils.getTargetKeyForDatastoreIdentity(value));

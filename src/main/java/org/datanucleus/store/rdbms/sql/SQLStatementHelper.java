@@ -212,14 +212,14 @@ public class SQLStatementHelper
                     {
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            colValue = mapping.getValueForDatastoreMapping(ec.getNucleusContext(), param.getColumnNumber(), value);
+                            colValue = mapping.getValueForColumnMapping(ec.getNucleusContext(), param.getColumnNumber(), value);
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
                             colValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(value, param.getColumnNumber(), cmd, storeMgr, ec.getClassLoaderResolver());
                         }
                     }
-                    mapping.getDatastoreMapping(param.getColumnNumber()).setObject(ps, num, colValue);
+                    mapping.getColumnMapping(param.getColumnNumber()).setObject(ps, num, colValue);
                 }
                 else
                 {
@@ -304,15 +304,15 @@ public class SQLStatementHelper
                     }
                     else
                     {
-                        if (mapping.getNumberOfDatastoreMappings() == 1)
+                        if (mapping.getNumberOfColumnMappings() == 1)
                         {
                             // Set whole object and only 1 column
                             mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num, mapping), value);
                         }
-                        else if (mapping.getNumberOfDatastoreMappings() > 1 && param.getColumnNumber() == (mapping.getNumberOfDatastoreMappings()-1))
+                        else if (mapping.getNumberOfColumnMappings() > 1 && param.getColumnNumber() == (mapping.getNumberOfColumnMappings()-1))
                         {
                             // Set whole object and this is the last parameter entry for it, so set now
-                            mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num - mapping.getNumberOfDatastoreMappings() + 1, mapping), value);
+                            mapping.setObject(ec, ps, MappingHelper.getMappingIndices(num - mapping.getNumberOfColumnMappings() + 1, mapping), value);
                         }
                     }
                 }
@@ -360,11 +360,11 @@ public class SQLStatementHelper
                 DatastoreClass subTable = storeMgr.getDatastoreClass(mmd.getTypeName(), clr);
                 JavaTypeMapping subMapping = subTable.getIdMapping();
                 Object subValue = getValueForPrimaryKeyIndexOfObjectUsingReflection(memberValue, index-position, subCmd, storeMgr, clr);
-                if (index < position + subMapping.getNumberOfDatastoreMappings())
+                if (index < position + subMapping.getNumberOfColumnMappings())
                 {
                     return subValue;
                 }
-                position = position + subMapping.getNumberOfDatastoreMappings();
+                position = position + subMapping.getNumberOfColumnMappings();
             }
             else
             {
@@ -722,7 +722,7 @@ public class SQLStatementHelper
 
             MetaDataManager mmgr = storeMgr.getMetaDataManager();
             StatementMappingIndex stmtMapping = new StatementMappingIndex(m);
-            if (m.getNumberOfDatastoreMappings() > 0)
+            if (m.getNumberOfColumnMappings() > 0)
             {
                 // Select of fields with columns in source table(s)
                 // Adds inner/outer join to any required superclass/secondary tables
@@ -1075,7 +1075,7 @@ public class SQLStatementHelper
                     if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
                     {
                         int[] pkFields = relatedCmd.getPKMemberPositions();
-                        int[] pkCols = new int[m.getNumberOfDatastoreMappings()];
+                        int[] pkCols = new int[m.getNumberOfColumnMappings()];
                         int pkColNo = 0;
                         for (int pkField : pkFields)
                         {

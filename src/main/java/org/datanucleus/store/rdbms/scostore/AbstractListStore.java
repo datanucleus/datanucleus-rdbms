@@ -628,7 +628,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected String getIndexOfStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             // Don't cache since depends on the element
             return getIndexOfStatementString(element);
@@ -647,13 +647,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     private String getIndexOfStatementString(Object element)
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -664,13 +664,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
 
         stmt.append(" ORDER BY ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
 
         return stmt.toString();
@@ -692,7 +692,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      */
     protected String getLastIndexOfStmt(Object element)
     {
-        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfDatastoreMappings() > 1)
+        if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
         {
             return getLastIndexOfStatementString(element);
         }
@@ -710,13 +710,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     private String getLastIndexOfStatementString(Object element)
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
@@ -727,13 +727,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
 
         stmt.append(" ORDER BY ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
             stmt.append(" DESC ");
         }
 
@@ -757,13 +757,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     protected String getIndicesOfStmt(Collection elements)
     {
         StringBuilder stmt = new StringBuilder("SELECT ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
         }
         stmt.append(" FROM ").append(containerTable.toString()).append(" WHERE ");
         Iterator iter = elements.iterator();
@@ -785,13 +785,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
 
         stmt.append(" ORDER BY ");
-        for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+        for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
         {
             if (i > 0)
             {
                 stmt.append(",");
             }
-            stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString()).append(" DESC");
+            stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString()).append(" DESC");
         }
 
         return stmt.toString();
@@ -849,17 +849,17 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             {
                 StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
 
-                for (int i = 0; i < orderMapping.getNumberOfDatastoreMappings(); i++)
+                for (int i = 0; i < orderMapping.getNumberOfColumnMappings(); i++)
                 {
                     if (i > 0)
                     {
                         stmt.append(",");
                     }
-                    stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                     stmt.append(" = ");
-                    stmt.append(orderMapping.getDatastoreMapping(i).getUpdateInputParameter());
+                    stmt.append(orderMapping.getColumnMapping(i).getUpdateInputParameter());
                     stmt.append(" + ");
-                    stmt.append(orderMapping.getDatastoreMapping(i).getColumn().getIdentifier().toString());
+                    stmt.append(orderMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
                 }
 
                 stmt.append(" WHERE ");

@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 
@@ -167,7 +167,7 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         }
         else if (expr instanceof BooleanExpression)
         {
-            DatastoreMapping datastoreMapping = expr.mapping.getDatastoreMapping(0);
+            ColumnMapping datastoreMapping = expr.mapping.getColumnMapping(0);
             if (datastoreMapping.isStringBased())
             {
                 // Expression uses "Y", "N"
@@ -211,7 +211,7 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         }
         else if (expr instanceof BooleanExpression)
         {
-            DatastoreMapping datastoreMapping = expr.mapping.getDatastoreMapping(0);
+            ColumnMapping datastoreMapping = expr.mapping.getColumnMapping(0);
             if (datastoreMapping.isStringBased())
             {
                 // Expression uses "Y", "N"
@@ -262,7 +262,7 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         else
         {
             // Provide SQL representing the boolean component only
-            DatastoreMapping datastoreMapping = mapping.getDatastoreMapping(0);
+            ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
             if (datastoreMapping.isStringBased())
             {
                 // Persisted using "Y", "N"

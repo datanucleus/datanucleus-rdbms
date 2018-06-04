@@ -89,7 +89,7 @@ public abstract class SimpleOrderableAggregateMethod implements SQLMethod
         SelectStatement subStmt = new SelectStatement(stmt, stmt.getRDBMSManager(), argExpr.getSQLTable().getTable(), argExpr.getSQLTable().getAlias(), null);
         subStmt.setClassLoaderResolver(clr);
 
-        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithDatastoreMapping(String.class, false, false, clr);
+        JavaTypeMapping mapping = stmt.getRDBMSManager().getMappingManager().getMappingWithColumnMapping(String.class, false, false, clr);
         String aggregateString = getFunctionName() + "(" + argExpr.toSQLText() + ")";
         SQLExpression aggExpr = exprFactory.newLiteral(subStmt, mapping, aggregateString);
         ((StringLiteral)aggExpr).generateStatementWithoutQuotes();

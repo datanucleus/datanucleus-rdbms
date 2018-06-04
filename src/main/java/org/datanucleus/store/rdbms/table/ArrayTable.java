@@ -77,9 +77,9 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             if (Boolean.TRUE.equals(mmd.getContainer().allowNulls()))
             {
                 // Make all element col(s) nullable so we can store null elements
-                for (int i=0;i<elementMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<elementMapping.getNumberOfColumnMappings();i++)
                 {
-                    Column elementCol = elementMapping.getDatastoreMapping(i).getColumn();
+                    Column elementCol = elementMapping.getColumnMapping(i).getColumn();
                     elementCol.setNullable(true);
                 }
             }
@@ -144,9 +144,9 @@ public class ArrayTable extends ElementContainerTable implements DatastoreElemen
             else
             {
                 // Define PK
-                for (int i=0;i<ownerMapping.getNumberOfDatastoreMappings();i++)
+                for (int i=0;i<ownerMapping.getNumberOfColumnMappings();i++)
                 {
-                    ownerMapping.getDatastoreMapping(i).getColumn().setPrimaryKey();
+                    ownerMapping.getColumnMapping(i).getColumn().setPrimaryKey();
                 }
             }
         }

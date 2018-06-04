@@ -38,7 +38,7 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.exceptions.NoDatastoreMappingException;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.SCO;
@@ -121,8 +121,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                 }
             }
 
-            Column col = mmgr.createColumn(this, getJavaTypeForDatastoreMapping(0), colmd);
-            mmgr.createDatastoreMapping(this, mmd, 0, col);
+            Column col = mmgr.createColumn(this, getJavaTypeForColumnMapping(0), colmd);
+            mmgr.createColumnMapping(this, mmd, 0, col);
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param index requested datastore field index.
      * @return the name of java-type for the requested datastore field.
      */
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -156,7 +156,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             // Serialised container so just return serialised
             return ClassNameConstants.JAVA_IO_SERIALIZABLE;
         }
-        return super.getJavaTypeForDatastoreMapping(index);
+        return super.getJavaTypeForColumnMapping(index);
     }
 
     /**
@@ -247,7 +247,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                 sms[i].setStoringPC();
             }
         }
-        getDatastoreMapping(0).setObject(ps, exprIndex[0], value);
+        getColumnMapping(0).setObject(ps, exprIndex[0], value);
         if (sms != null)
         {
             // Unset all PC objects now they are stored
@@ -272,7 +272,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
         {
             throw new NucleusException(failureMessage("getObject")).setFatal();
         }
-        return getDatastoreMapping(0).getObject(resultSet, exprIndex[0]);
+        return getColumnMapping(0).getObject(resultSet, exprIndex[0]);
     }
 
     /**
@@ -294,12 +294,12 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Accessor for the number of datastore fields
      * @return The number of datastore fields
      */
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
         if (containerIsStoredInSingleColumn())
         {
             // Serialised into owner table
-            return super.getNumberOfDatastoreMappings();
+            return super.getNumberOfColumnMappings();
         }
 
         // By default, we have no columns as such for the container
@@ -311,12 +311,12 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param index The id of the mapping
      * @return The datastore mapping
      */
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
         if (containerIsStoredInSingleColumn())
         {
             // Serialised into owner table
-            return super.getDatastoreMapping(index);
+            return super.getColumnMapping(index);
         }
 
         throw new NoDatastoreMappingException(mmd.getName());
@@ -326,12 +326,12 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Accessor for the datastore mappings for this java type
      * @return The datastore mapping(s)
      */
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
         if (containerIsStoredInSingleColumn())
         {
             // Serialised into owner table
-            return super.getDatastoreMappings();
+            return super.getColumnMappings();
         }
 
         throw new NoDatastoreMappingException(mmd.getName());

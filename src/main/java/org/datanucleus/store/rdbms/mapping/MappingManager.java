@@ -23,15 +23,15 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Representation of a MappingManager, mapping a java mapping type to a datastore mapping type.
- * Allows a java mapping type to map to multiple datastore mapping types.
- * Allows a default datastore mapping type be assigned to each java mapping type.
+ * Representation of a MappingManager, mapping a java mapping type to a column mapping type.
+ * Allows a java mapping type to map to multiple column mapping types.
+ * Allows a default column mapping type be assigned to each java mapping type.
  */
 public interface MappingManager
 {
@@ -54,25 +54,23 @@ public interface MappingManager
     Class getMappingType(String javaTypeName);
 
     /**
-     * Method to create the datastore mapping for a java type mapping at a particular index.
+     * Method to create the column mapping for a java type mapping at a particular index.
      * @param mapping The java mapping
      * @param fmd MetaData for the field
-     * @param index Index of the datastore field
+     * @param index Index of the column
      * @param column The column
-     * @return The datastore mapping
+     * @return The column mapping
      */
-    DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, AbstractMemberMetaData fmd, int index, Column column);
+    ColumnMapping createColumnMapping(JavaTypeMapping mapping, AbstractMemberMetaData fmd, int index, Column column);
 
     /**
-     * Method to create the datastore mapping for a particular column and java type.
+     * Method to create the column mapping for a particular column and java type.
      * @param mapping The java mapping
      * @param column The column
-     * @param javaType The java type (isnt this stored in the java mapping ?)
-     * @return The datastore mapping
+     * @param javaType The java type (isn't this stored in the java mapping ?)
+     * @return The column mapping
      */
-    DatastoreMapping createDatastoreMapping(JavaTypeMapping mapping, Column column, String javaType);
-
-    // --------------------------------------------- Java Types ---------------------------------------------
+    ColumnMapping createColumnMapping(JavaTypeMapping mapping, Column column, String javaType);
 
     /**
      * Accessor for a mapping, for a java type.
@@ -93,20 +91,19 @@ public interface MappingManager
     JavaTypeMapping getMapping(Class c, boolean serialised, boolean embedded, String fieldName);
 
     /**
-     * Accessor for a mapping, for a java type complete with the datastore mapping.
+     * Accessor for a mapping, for a java type complete with the column mapping.
      * @param c The java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
      * @param clr ClassLoader resolver
      * @return The mapping
      */
-    JavaTypeMapping getMappingWithDatastoreMapping(Class c, boolean serialised, boolean embedded, ClassLoaderResolver clr);
+    JavaTypeMapping getMappingWithColumnMapping(Class c, boolean serialised, boolean embedded, ClassLoaderResolver clr);
 
     /**
      * Accessor for the mapping for the field of the specified table.
-     * Can be used for fields of a class, elements of a collection of a class, elements of an array of
-     * a class, keys of a map of a class, values of a map of a class. This is controlled by the final
-     * argument "roleForMember".
+     * Can be used for fields of a class, elements of a collection of a class, elements of an array of a class, keys of a map of a class, values of a map of a class. 
+     * This is controlled by the final argument "roleForMember".
      * @param table Table to add the mapping to
      * @param mmd MetaData for the field/property to map
      * @param clr The ClassLoaderResolver
@@ -114,8 +111,6 @@ public interface MappingManager
      * @return The mapping for the field.
      */
     JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, FieldRole fieldRole);
-
-    // ----------------------------------------- Datastore Types ---------------------------------------------
 
     /**
      * Method to create a datastore field (column) in a container (table).

@@ -29,7 +29,7 @@ import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;
@@ -115,27 +115,27 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
     }
 
     @Override
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
-        return wrappedMapping.getNumberOfDatastoreMappings();
+        return wrappedMapping.getNumberOfColumnMappings();
     }
 
     @Override
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
-        return wrappedMapping.getDatastoreMappings();
+        return wrappedMapping.getColumnMappings();
     }
 
     @Override
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
-        return wrappedMapping.getDatastoreMapping(index);
+        return wrappedMapping.getColumnMapping(index);
     }
 
     @Override
-    public String getJavaTypeForDatastoreMapping(int index)
+    public String getJavaTypeForColumnMapping(int index)
     {
-        return wrappedMapping.getJavaTypeForDatastoreMapping(index);
+        return wrappedMapping.getJavaTypeForColumnMapping(index);
     }
 
     public void insertPostProcessing(ObjectProvider op)

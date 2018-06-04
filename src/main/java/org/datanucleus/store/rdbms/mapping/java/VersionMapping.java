@@ -28,7 +28,7 @@ import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
-import org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping;
+import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 
@@ -81,7 +81,7 @@ public class VersionMapping extends SingleFieldMapping
             }
         }
         Column column = table.addColumn(getType(), id, this, colmd);
-        table.getStoreManager().getMappingManager().createDatastoreMapping(delegate, column, getType());
+        table.getStoreManager().getMappingManager().createColumnMapping(delegate, column, getType());
     }
 
     /**
@@ -97,9 +97,9 @@ public class VersionMapping extends SingleFieldMapping
      * Accessor for the number of datastore fields.
      * @return Number of datastore fields.
      */
-    public int getNumberOfDatastoreMappings()
+    public int getNumberOfColumnMappings()
     {
-        return delegate.getNumberOfDatastoreMappings();
+        return delegate.getNumberOfColumnMappings();
     }
 
     /**
@@ -107,27 +107,27 @@ public class VersionMapping extends SingleFieldMapping
      * @param index The mapping index
      * @return the datastore mapping
      */
-    public DatastoreMapping getDatastoreMapping(int index)
+    public ColumnMapping getColumnMapping(int index)
     {
-        return delegate.getDatastoreMapping(index);
+        return delegate.getColumnMapping(index);
     }
 
     /**
      * Accessor for the datastore mappings for this java type.
      * @return The datastore mapping(s)
      */
-    public DatastoreMapping[] getDatastoreMappings()
+    public ColumnMapping[] getColumnMappings()
     {
-        return delegate.getDatastoreMappings();
+        return delegate.getColumnMappings();
     }
 
     /**
      * Method to add a datastore mapping.
      * @param datastoreMapping The mapping
      */
-    public void addDatastoreMapping(DatastoreMapping datastoreMapping)
+    public void addColumnMapping(ColumnMapping datastoreMapping)
     {
-        delegate.addDatastoreMapping(datastoreMapping);
+        delegate.addColumnMapping(datastoreMapping);
     }
 
     /**
