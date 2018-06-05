@@ -9,7 +9,7 @@ This project is built using Maven, by executing `mvn clean install` which instal
 
 __License__ : Apache 2 licensed  
 __Issue Tracker__ : http://github.com/datanucleus/datanucleus-rdbms/issues  
-__Javadocs__ : [5.1](http://www.datanucleus.org/javadocs/store.rdbms/5.1/), [5.0](http://www.datanucleus.org/javadocs/store.rdbms/5.0/), [4.1](http://www.datanucleus.org/javadocs/store.rdbms/4.1/), [4.0](http://www.datanucleus.org/javadocs/store.rdbms/4.0/)  
+__Javadocs__ : [5.2](http://www.datanucleus.org/javadocs/store.rdbms/5.2/), [5.1](http://www.datanucleus.org/javadocs/store.rdbms/5.1/), [5.0](http://www.datanucleus.org/javadocs/store.rdbms/5.0/), [4.1](http://www.datanucleus.org/javadocs/store.rdbms/4.1/), [4.0](http://www.datanucleus.org/javadocs/store.rdbms/4.0/)  
 __Download(Releases)__ : [Maven Central](http://central.maven.org/maven2/org/datanucleus/datanucleus-rdbms)  
 __Download(Nightly)__ : [Nightly Builds](http://www.datanucleus.org/downloads/maven2-nightly/org/datanucleus/datanucleus-rdbms)  
 __Dependencies__ : See file [pom.xml](pom.xml)  
