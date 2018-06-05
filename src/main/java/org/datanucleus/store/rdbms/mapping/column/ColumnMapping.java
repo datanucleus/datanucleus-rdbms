@@ -42,7 +42,7 @@ public interface ColumnMapping
 
     /**
      * The mapping for the java type that this column mapping is used by.
-     * This will return null if this simply maps a datastore field in the datastore and has no associated java type in a class.
+     * This will return null if this simply maps a column in the datastore and has no associated java type in a class.
      * @return the JavaTypeMapping
      */
     JavaTypeMapping getJavaTypeMapping();

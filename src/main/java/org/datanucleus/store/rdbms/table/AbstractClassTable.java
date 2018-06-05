@@ -55,7 +55,7 @@ import org.datanucleus.util.StringUtils;
  * 
  * <H3>Mappings</H3>
  * A Table is built from a series of field mappings. Each Java class has a series of fields and each of these has an associated JavaTypeMapping. 
- * Each JavaTypeMapping has related DatastoreMapping(s). These are used in mapping the Java class to the table, and are used when populating the table, 
+ * Each JavaTypeMapping has related ColumnMapping(s). These are used in mapping the Java class to the table, and are used when populating the table, 
  * and when retrieving data from the table back to the object. There are several categories of mappings in this class
  * <UL>
  * <LI><B>memberMappingsMap</B> - the set of mappings relating to the fields in the class. The mappings are keyed by the FieldMetaData of the field. Any embedded field

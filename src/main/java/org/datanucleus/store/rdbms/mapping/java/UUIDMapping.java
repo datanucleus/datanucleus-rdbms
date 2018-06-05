@@ -107,7 +107,7 @@ public class UUIDMapping extends SingleFieldMapping
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getJavaTypeForDatastoreMapping(int)
+     * @see org.datanucleus.store.rdbms.mapping.java.SingleFieldMapping#getJavaTypeForColumnMapping(int)
      */
     @Override
     public String getJavaTypeForColumnMapping(int index)

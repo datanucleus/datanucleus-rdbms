@@ -1440,16 +1440,16 @@ public abstract class TableImpl extends AbstractTable
             {
                 columnsStr.append("[none]");
             }
-            StringBuilder datastoreMappingTypes = new StringBuilder();
+            StringBuilder columnMappingTypes = new StringBuilder();
             for (int i=0;i<mapping.getNumberOfColumnMappings();i++)
             {
                 if (i > 0)
                 {
-                    datastoreMappingTypes.append(',');
+                    columnMappingTypes.append(',');
                 }
-                datastoreMappingTypes.append(mapping.getColumnMapping(i).getClass().getName());
+                columnMappingTypes.append(mapping.getColumnMapping(i).getClass().getName());
             }
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010", memberName, columnsStr.toString(), mapping.getClass().getName(), datastoreMappingTypes.toString()));
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057010", memberName, columnsStr.toString(), mapping.getClass().getName(), columnMappingTypes.toString()));
         }
     }
 }

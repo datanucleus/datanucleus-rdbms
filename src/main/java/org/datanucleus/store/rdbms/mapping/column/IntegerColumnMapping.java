@@ -92,7 +92,7 @@ public class IntegerColumnMapping extends AbstractColumnMapping
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.mapping.column.AbstractDatastoreMapping#getJDBCType()
+     * @see org.datanucleus.store.rdbms.mapping.column.AbstractColumnMapping#getJDBCType()
      */
     @Override
     public int getJDBCType()

@@ -142,8 +142,8 @@ public class DiscriminatorMapping extends SingleFieldMapping
     }
 
     /**
-     * Accessor for the number of datastore fields.
-     * @return Number of datastore fields
+     * Accessor for the number of columns.
+     * @return Number of columns
      */
     public int getNumberOfColumnMappings()
     {
@@ -170,12 +170,12 @@ public class DiscriminatorMapping extends SingleFieldMapping
     }
 
     /**
-     * Mutator to add a datastore mapping
-     * @param datastoreMapping Datastore mapping
+     * Mutator to add a column mapping
+     * @param colMapping Column mapping
      */
-    public void addColumnMapping(ColumnMapping datastoreMapping)
+    public void addColumnMapping(ColumnMapping colMapping)
     {
-        delegate.addColumnMapping(datastoreMapping);
+        delegate.addColumnMapping(colMapping);
     }
 
     /**

@@ -28,10 +28,10 @@ import org.datanucleus.store.rdbms.table.Column;
 public class SerialisedKeyPCMapping extends SerialisedPCMapping
 {
     /**
-     * Method to prepare a field mapping for use in the datastore.
+     * Method to prepare a column mapping for use in the datastore.
      * This creates the column in the table.
      */
-    protected void prepareDatastoreMapping()
+    protected void prepareColumnMapping()
     {
         MappingManager mmgr = storeMgr.getMappingManager();
         ColumnMetaData colmd = null;

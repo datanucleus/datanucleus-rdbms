@@ -105,7 +105,7 @@ public interface Column extends org.datanucleus.store.schema.table.Column
     void copyConfigurationTo(Column col);
 
     /**
-     * Accessor for the MetaData of the field/property that this is the datastore field for.
+     * Accessor for the MetaData of the field/property that this is the column for.
      * @return MetaData of the field/property (if representing a field/property of a class).
      */
     AbstractMemberMetaData getMemberMetaData();

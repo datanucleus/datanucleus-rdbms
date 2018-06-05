@@ -38,8 +38,7 @@ import org.datanucleus.util.NucleusLogger;
 public class SubclassPCMapping extends MultiPersistableMapping
 {
     /**
-     * Initialize this JavaTypeMapping with the given DatastoreAdapter for
-     * the given FieldMetaData.
+     * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given member MetaData.
      * @param table The datastore container storing this mapping (if any)
      * @param clr the ClassLoaderResolver
      * @param fmd FieldMetaData for the field to be mapped (if any)
@@ -48,14 +47,14 @@ public class SubclassPCMapping extends MultiPersistableMapping
     {
 		super.initialize(fmd, table, clr);
 
-		prepareDatastoreMapping(clr);
+		prepareColumnMapping(clr);
     }
 
     /**
      * Convenience method to create a column for each implementation type of this reference.
      * @param clr The ClassLoaderResolver
      */
-    protected void prepareDatastoreMapping(ClassLoaderResolver clr)
+    protected void prepareColumnMapping(ClassLoaderResolver clr)
     {
         if (roleForMember == FieldRole.ROLE_ARRAY_ELEMENT)
         {

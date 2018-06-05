@@ -233,15 +233,15 @@ public class BooleanExpression extends SQLExpression
         }
         else if (expr instanceof BooleanExpression)
         {
-            ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
-            if (datastoreMapping.isStringBased())
+            ColumnMapping colMapping = mapping.getColumnMapping(0);
+            if (colMapping.isStringBased())
             {
                 // Persisted using "Y", "N"
                 return new BooleanExpression(new CharacterExpression(stmt, table, mapping),
                     Expression.OP_EQ,
                     new CharacterExpression(stmt, expr.table, expr.mapping));
             }
-            else if (datastoreMapping.isIntegerBased() || (datastoreMapping.isBitBased() &&
+            else if (colMapping.isIntegerBased() || (colMapping.isBitBased() &&
                     !stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BIT_IS_REALLY_BOOLEAN)))
             {
                 // Persisted using "1", "0"
@@ -277,15 +277,15 @@ public class BooleanExpression extends SQLExpression
         }
         else if (expr instanceof BooleanExpression)
         {
-            ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
-            if (datastoreMapping.isStringBased())
+            ColumnMapping colMapping = mapping.getColumnMapping(0);
+            if (colMapping.isStringBased())
             {
                 // Persisted using "Y", "N"
                 return new BooleanExpression(new CharacterExpression(stmt, table, mapping), 
                     Expression.OP_NOTEQ,
                     new CharacterExpression(stmt, expr.table, expr.mapping));
             }
-            else if (datastoreMapping.isIntegerBased() || (datastoreMapping.isBitBased() &&
+            else if (colMapping.isIntegerBased() || (colMapping.isBitBased() &&
                     !stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BIT_IS_REALLY_BOOLEAN)))
             {
                 // Persisted using "1", "0"
@@ -310,8 +310,8 @@ public class BooleanExpression extends SQLExpression
 
     public BooleanExpression in(SQLExpression expr, boolean not)
     {
-        ColumnMapping datastoreMapping = mapping.getColumnMapping(0);
-        if (datastoreMapping.isStringBased())
+        ColumnMapping colMapping = mapping.getColumnMapping(0);
+        if (colMapping.isStringBased())
         {
             return new BooleanExpression(new CharacterExpression(stmt, table, mapping), 
                 (not ? Expression.OP_NOTIN : Expression.OP_IN), expr);

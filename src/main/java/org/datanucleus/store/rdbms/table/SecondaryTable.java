@@ -449,7 +449,7 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
     }
 
     /**
-     * Method to provide all unmapped datastore fields (columns) to the consumer.
+     * Method to provide all unmapped columns to the consumer.
      * @param consumer Consumer of information
      */
     public void provideUnmappedColumns(MappingConsumer consumer)

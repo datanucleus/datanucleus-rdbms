@@ -113,16 +113,16 @@ public interface MappingManager
     JavaTypeMapping getMapping(Table table, AbstractMemberMetaData mmd, ClassLoaderResolver clr, FieldRole fieldRole);
 
     /**
-     * Method to create a datastore field (column) in a container (table).
+     * Method to create a column in a container (table).
      * @param mapping The java mapping
      * @param javaType The java type
-     * @param datastoreFieldIndex The index of the datastore field to create
-     * @return The datastore field
+     * @param datastoreFieldIndex The index of the column to create
+     * @return The column
      */
     Column createColumn(JavaTypeMapping mapping, String javaType, int datastoreFieldIndex);
 
     /**
-     * Method to create a datastore field (column) in a container (table).
+     * Method to create a column in a container (table).
      * To be used for serialised PC element/key/value in a join table.
      * @param mapping The java mapping
      * @param javaType The java type

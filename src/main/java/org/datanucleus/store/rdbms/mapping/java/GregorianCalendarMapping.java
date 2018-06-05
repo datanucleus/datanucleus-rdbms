@@ -103,10 +103,10 @@ public class GregorianCalendarMapping extends SingleFieldMultiMapping
     }
 
     /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore field.
+     * Accessor for the name of the java-type actually used when mapping the particular column.
      * This java-type must have an entry in the datastore mappings.
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
     public String getJavaTypeForColumnMapping(int index)
     {

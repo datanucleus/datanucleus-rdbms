@@ -35,8 +35,8 @@ public abstract class MultiMapping extends JavaTypeMapping
     /** The Java mappings represented by this mapping. */
     protected JavaTypeMapping[] javaTypeMappings = new JavaTypeMapping[0];
 
-    /** Number of datastore mappings - for convenience to improve performance **/
-    protected int numberOfDatastoreMappings = 0;
+    /** Number of column mappings - for convenience to improve performance **/
+    protected int numberOfColumnMappings = 0;
 
     /**
      * Method to add a Java type mapping for a field
@@ -66,16 +66,16 @@ public abstract class MultiMapping extends JavaTypeMapping
      */
     public int getNumberOfColumnMappings()
     {
-        if (numberOfDatastoreMappings == 0)
+        if (numberOfColumnMappings == 0)
         {
             int numDatastoreTmp = 0;
             for (int i=0; i<javaTypeMappings.length; i++)
             {
                 numDatastoreTmp += javaTypeMappings[i].getNumberOfColumnMappings();
             }
-            this.numberOfDatastoreMappings = numDatastoreTmp;
+            this.numberOfColumnMappings = numDatastoreTmp;
         }
-        return numberOfDatastoreMappings;
+        return numberOfColumnMappings;
     }
 
     public ColumnMapping[] getColumnMappings()
@@ -105,16 +105,16 @@ public abstract class MultiMapping extends JavaTypeMapping
     {
         if (index >= getNumberOfColumnMappings())
         {
-            throw new NucleusException("Attempt to get DatastoreMapping with index " + index + 
-                " when total number of mappings is " + numberOfDatastoreMappings + " for field=" + mmd).setFatal();
+            throw new NucleusException("Attempt to get ColumnMapping with index " + index + 
+                " when total number of mappings is " + numberOfColumnMappings + " for field=" + mmd).setFatal();
         }
 
         int currentIndex = 0;
         int numberJavaMappings = javaTypeMappings.length;
         for (int i=0; i<numberJavaMappings; i++)
         {
-            int numberDatastoreMappings = javaTypeMappings[i].getNumberOfColumnMappings();
-            for (int j=0; j<numberDatastoreMappings; j++)
+            int numberColumnMappings = javaTypeMappings[i].getNumberOfColumnMappings();
+            for (int j=0; j<numberColumnMappings; j++)
             {
                 if (currentIndex == index)
                 {
@@ -125,6 +125,6 @@ public abstract class MultiMapping extends JavaTypeMapping
         }
 
         // TODO Should never happen
-        throw new NucleusException("Invalid index " + index + " for DatastoreMapping (numColumns=" + getNumberOfColumnMappings() + "), for field=" + mmd).setFatal();
+        throw new NucleusException("Invalid index " + index + " for ColumnMapping (numColumns=" + getNumberOfColumnMappings() + "), for field=" + mmd).setFatal();
     }
 }

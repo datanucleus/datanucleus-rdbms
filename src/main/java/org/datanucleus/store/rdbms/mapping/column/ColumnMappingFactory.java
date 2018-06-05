@@ -48,12 +48,12 @@ public final class ColumnMappingFactory
     private static final Class[] DATASTORE_MAPPING_CTR_ARG_CLASSES = new Class[] {JavaTypeMapping.class, RDBMSStoreManager.class, Column.class};
 
     /**
-     * Get a new instance of the DatastoreMapping using the mapping, StoreManager and column.
+     * Get a new instance of the ColumnMapping using the mapping, StoreManager and column.
      * @param mappingClass the Mapping class to be created
      * @param mapping The java mapping type
      * @param storeMgr The Store Manager
      * @param column The column to map
-     * @return The DatastoreMapping
+     * @return The ColumnMapping
      */
     public static ColumnMapping createMapping(Class mappingClass, JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column column)
     {

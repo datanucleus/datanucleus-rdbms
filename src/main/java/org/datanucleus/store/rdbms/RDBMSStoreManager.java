@@ -3805,12 +3805,12 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for whether this mapping requires values inserting on an INSERT.
-     * @param datastoreMapping The datastore mapping
+     * @param columnMapping The datastore mapping
      * @return Whether values are to be inserted into this mapping on an INSERT
      */
-    public boolean insertValuesOnInsert(ColumnMapping datastoreMapping)
+    public boolean insertValuesOnInsert(ColumnMapping columnMapping)
     {
-        return datastoreMapping.insertValuesOnInsert();
+        return columnMapping.insertValuesOnInsert();
     }
 
     /**

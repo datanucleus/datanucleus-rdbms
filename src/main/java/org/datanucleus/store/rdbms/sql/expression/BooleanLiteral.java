@@ -167,19 +167,17 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         }
         else if (expr instanceof BooleanExpression)
         {
-            ColumnMapping datastoreMapping = expr.mapping.getColumnMapping(0);
-            if (datastoreMapping.isStringBased())
+            ColumnMapping columnMapping = expr.mapping.getColumnMapping(0);
+            if (columnMapping.isStringBased())
             {
                 // Expression uses "Y", "N"
-                return new BooleanExpression(expr, Expression.OP_EQ,
-                    new CharacterLiteral(stmt, mapping, value ? "Y" : "N", null));
+                return new BooleanExpression(expr, Expression.OP_EQ, new CharacterLiteral(stmt, mapping, value ? "Y" : "N", null));
             }
-            else if (datastoreMapping.isIntegerBased() || (datastoreMapping.isBitBased() &&
+            else if (columnMapping.isIntegerBased() || (columnMapping.isBitBased() &&
                     !stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BIT_IS_REALLY_BOOLEAN)))
             {
                 // Expression uses "1", "0"
-                return new BooleanExpression(expr, Expression.OP_EQ,
-                    new IntegerLiteral(stmt, mapping, value ? 1 : 0, null));
+                return new BooleanExpression(expr, Expression.OP_EQ, new IntegerLiteral(stmt, mapping, value ? 1 : 0, null));
             }
             else if (stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BOOLEAN_COMPARISON))
             {
@@ -211,19 +209,17 @@ public class BooleanLiteral extends BooleanExpression implements SQLLiteral
         }
         else if (expr instanceof BooleanExpression)
         {
-            ColumnMapping datastoreMapping = expr.mapping.getColumnMapping(0);
-            if (datastoreMapping.isStringBased())
+            ColumnMapping columnMapping = expr.mapping.getColumnMapping(0);
+            if (columnMapping.isStringBased())
             {
                 // Expression uses "Y", "N"
-                return new BooleanExpression(expr, Expression.OP_NOTEQ,
-                    new CharacterLiteral(stmt, mapping, value ? "Y" : "N", null));
+                return new BooleanExpression(expr, Expression.OP_NOTEQ, new CharacterLiteral(stmt, mapping, value ? "Y" : "N", null));
             }
-            else if (datastoreMapping.isIntegerBased() || (datastoreMapping.isBitBased() &&
+            else if (columnMapping.isIntegerBased() || (columnMapping.isBitBased() &&
                     !stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BIT_IS_REALLY_BOOLEAN)))
             {
                 // Expression uses "1", "0"
-                return new BooleanExpression(expr, Expression.OP_NOTEQ,
-                    new IntegerLiteral(stmt, mapping, value ? 1 : 0, null));
+                return new BooleanExpression(expr, Expression.OP_NOTEQ, new IntegerLiteral(stmt, mapping, value ? 1 : 0, null));
             }
             else if (stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.BOOLEAN_COMPARISON))
             {

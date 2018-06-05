@@ -45,12 +45,12 @@ public class SQLFunctionMapping extends SingleFieldMapping
     }
 
     /**
-     * Method to prepare a field mapping for use in the datastore.
+     * Method to prepare a column mapping for use in the datastore.
      * This creates the column in the table.
      */
-    protected void prepareDatastoreMapping()
+    protected void prepareColumnMapping()
     {
-        // No datastore mapping created at this point; created on first result processing
+        // No column mapping created at this point; created on first result processing
     }
 
     public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex)
@@ -62,7 +62,7 @@ public class SQLFunctionMapping extends SingleFieldMapping
 
         if (columnMappings == null || columnMappings.length == 0)
         {
-            // Set the datastoreMapping and javaType the first time this is used. Get the type from the ResultSetMetaData.
+            // Set the columnMappings and javaType the first time this is used. Get the type from the ResultSetMetaData.
             try
             {
                 ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -106,10 +106,10 @@ public class SQLFunctionMapping extends SingleFieldMapping
                 e.printStackTrace();
             }
 
-            Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType.getName(), null, null, ec.getClassLoaderResolver(), null);
-            ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, this, storeMgr, null);
+            Class columnMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType.getName(), null, null, ec.getClassLoaderResolver(), null);
+            ColumnMapping columnMapping = ColumnMappingFactory.createMapping(columnMappingClass, this, storeMgr, null);
             columnMappings = new ColumnMapping[1];
-            columnMappings[0] = datastoreMapping;
+            columnMappings[0] = columnMapping;
         }
 
         if (javaType == Double.class)

@@ -284,9 +284,9 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                 {
                     stmt.append(" AND ");
                 }
-                stmt.append(containerAlias).append(".").append(elementMapping.getDataStoreMapping(i).getDatastoreField().getIdentifier());
+                stmt.append(containerAlias).append(".").append(elementMapping.getColumnMapping(i).getColumn().getIdentifier());
                 stmt.append("=");
-                stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getDataStoreMapping(0).getDatastoreField().getIdentifier());
+                stmt.append(joinedElementAlias).append(".").append(elemIdMapping.getColumnMapping(0).getColumn().getIdentifier());
             }
         }*/
 

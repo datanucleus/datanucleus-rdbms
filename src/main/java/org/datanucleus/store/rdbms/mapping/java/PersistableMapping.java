@@ -116,14 +116,14 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     {
         super.initialize(mmd, table, clr);
 
-        prepareDatastoreMapping(clr);
+        prepareColumnMapping(clr);
     }
 
     /**
-     * Method to prepare the PC mapping and add its associated datastore mappings.
+     * Method to prepare the PC mapping and add its associated column mappings.
      * @param clr The ClassLoaderResolver
      */
-    protected void prepareDatastoreMapping(ClassLoaderResolver clr)
+    protected void prepareColumnMapping(ClassLoaderResolver clr)
     {
         if (roleForMember == FieldRole.ROLE_COLLECTION_ELEMENT)
         {
@@ -222,17 +222,17 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
             // Find any related field where this is part of a bidirectional relation
             RelationType relationType = mmd.getRelationType(clr);
-            boolean createDatastoreMappings = true;
+            boolean createColumnMappings = true;
             if (relationType == RelationType.MANY_TO_ONE_BI)
             {
                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                 // TODO Cater for more than 1 related field
-                createDatastoreMappings = (relatedMmds[0].getJoinMetaData() == null);
+                createColumnMappings = (relatedMmds[0].getJoinMetaData() == null);
             }
             else if (relationType == RelationType.ONE_TO_ONE_BI) // TODO If join table then don't need this
             {
                 // Put the FK at the end without "mapped-by"
-                createDatastoreMappings = (mmd.getMappedBy() == null);
+                createColumnMappings = (mmd.getMappedBy() == null);
             }
 
             if (mmd.getJoinMetaData() != null && (relationType == RelationType.MANY_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_UNI || relationType == RelationType.ONE_TO_ONE_BI))
@@ -246,30 +246,30 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             }
             else
             {
-                // Loop through the datastore fields in the referenced class and create a datastore field for each
+                // Loop through the columns in the referenced class and create a column for each
                 for (int i=0; i<referenceMapping.getNumberOfColumnMappings(); i++)
                 {
-                    ColumnMapping refDatastoreMapping = referenceMapping.getColumnMapping(i);
-                    JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refDatastoreMapping.getJavaTypeMapping().getJavaType());
+                    ColumnMapping refColumnMapping = referenceMapping.getColumnMapping(i);
+                    JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refColumnMapping.getJavaTypeMapping().getJavaType());
                     this.addJavaTypeMapping(mapping);
 
                     // Create physical datastore columns where we require a FK link to the related table.
-                    if (createDatastoreMappings)
+                    if (createColumnMappings)
                     {
-                        // Find the Column MetaData that maps to the referenced datastore field
-                        ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refDatastoreMapping.getColumn().getIdentifier());
+                        // Find the Column MetaData that maps to the referenced columncolumn
+                        ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refColumnMapping.getColumn().getIdentifier());
                         if (colmd == null)
                         {
-                            throw new NucleusUserException(Localiser.msg("041038", refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
+                            throw new NucleusUserException(Localiser.msg("041038", refColumnMapping.getColumn().getIdentifier(), toString())).setFatal();
                         }
 
-                        // Create a Datastore field to equate to the referenced classes datastore field
+                        // Create a column to equate to the referenced classes column
                         MappingManager mmgr = storeMgr.getMappingManager();
-                        Column col = mmgr.createColumn(mmd, table, mapping, colmd, refDatastoreMapping.getColumn(), clr);
+                        Column col = mmgr.createColumn(mmd, table, mapping, colmd, refColumnMapping.getColumn(), clr);
 
-                        // Add its datastore mapping
-                        ColumnMapping datastoreMapping = mmgr.createColumnMapping(mapping, col, refDatastoreMapping.getJavaTypeMapping().getJavaTypeForColumnMapping(i));
-                        this.addColumnMapping(datastoreMapping);
+                        // Add its column mapping
+                        ColumnMapping colMapping = mmgr.createColumnMapping(mapping, col, refColumnMapping.getJavaTypeMapping().getJavaTypeForColumnMapping(i));
+                        this.addColumnMapping(colMapping);
                     }
                     else
                     {
@@ -655,7 +655,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     valueOP.setStoringPC();
                 }
 
-                // If the field doesn't map to any datastore fields (e.g remote FK), omit the set process
+                // If the field doesn't map to any columns (e.g remote FK), omit the set process
                 if (getNumberOfColumnMappings() > 0)
                 {
                     if (IdentityUtils.isDatastoreIdentity(id))

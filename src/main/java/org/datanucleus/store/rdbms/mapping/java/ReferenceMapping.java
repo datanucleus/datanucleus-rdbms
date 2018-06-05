@@ -99,9 +99,9 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             }
         }
 
-        numberOfDatastoreMappings = 0; // Reset indicator for datastore fields
+        numberOfColumnMappings = 0; // Reset indicator for columns
         super.initialize(mmd, table, clr);
-        prepareDatastoreMapping(clr);
+        prepareColumnMapping(clr);
     }
 
     /**
@@ -144,7 +144,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * With "identity"/"xcalia" will create a single column to store a reference to the implementation value.
      * @param clr The ClassLoaderResolver
      */
-    protected void prepareDatastoreMapping(ClassLoaderResolver clr)
+    protected void prepareColumnMapping(ClassLoaderResolver clr)
     {
         // TODO NUCRDBMS-19 will need this block enabling to generate the correct schema. All tests pass with it enabled but
         // left commented out until we can do getObject/setObject 
@@ -497,10 +497,9 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
     /**
      * Accessor for the java type represented by a particular datastore mapping.
-     * This implementation relays to the superclass implementation except in the case of 
-     * "identity" mapping strategy, in which case it returns "java.lang.String".
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * This implementation relays to the superclass implementation except in the case of "identity" mapping strategy, in which case it returns "java.lang.String".
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
     public String getJavaTypeForColumnMapping(int index)
     {
@@ -547,7 +546,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
     {
         // TODO Cater for case where this mapping has no datastore columns (N-1 join table)
-      /*if (getNumberOfDatastoreMappings() == 0)
+      /*if (getNumberOfColumnMappings() == 0)
         {
             if (value == null)
             {
@@ -588,7 +587,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     public Object getObject(ExecutionContext ec, final ResultSet rs, int[] pos)
     {
         // TODO Cater for case where this mapping has no datastore columns (N-1 join table)
-      /*if (getNumberOfDatastoreMappings() == 0)
+      /*if (getNumberOfColumnMappings() == 0)
         {
             NucleusLogger.PERSISTENCE.debug("ReferenceMapping.getObject to extract related object from join table mapping at " + mmd.getFullFieldName() + " not yet supported");
         }*/

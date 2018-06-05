@@ -305,13 +305,13 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
             for (int j=0; j<embMmdMapping.getNumberOfColumnMappings(); j++)
             {
                 // Register column with mapping
-                ColumnMapping datastoreMapping = embMmdMapping.getColumnMapping(j);
-                this.addColumnMapping(datastoreMapping);
+                ColumnMapping colMapping = embMmdMapping.getColumnMapping(j);
+                this.addColumnMapping(colMapping);
 
                 if (this.mmd.isPrimaryKey())
                 {
-                    // Overall embedded field should be part of PK, so make all datastore fields part of it
-                    Column col = datastoreMapping.getColumn();
+                    // Overall embedded field should be part of PK, so make all columns part of it
+                    Column col = colMapping.getColumn();
                     if (col != null)
                     {
                         col.setPrimaryKey();
@@ -325,7 +325,7 @@ public abstract class EmbeddedMapping extends SingleFieldMapping
      * Method to prepare a field mapping for use in the datastore.
      * Overridden so it does nothing
      */
-    protected void prepareDatastoreMapping()
+    protected void prepareColumnMapping()
     {
     }
 

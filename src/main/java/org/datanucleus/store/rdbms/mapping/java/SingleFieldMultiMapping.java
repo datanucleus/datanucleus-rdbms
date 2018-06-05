@@ -27,10 +27,10 @@ import org.datanucleus.store.rdbms.table.Column;
 public abstract class SingleFieldMultiMapping extends JavaTypeMapping
 {
     /**
-     * Convenience method to add a datastore field for this mapping.
+     * Convenience method to add a column for this mapping.
      * If this mapping is a "full" mapping (for a field in a table) then a Column will be added,
      * otherwise (mapping representing a parameter in a query) will just add a datastore mapping.
-     * The datastore mapping is added to the end of the datastoreMappings.
+     * The column mapping is added to the end of the columnMappings.
      * @param typeName Java type of the field to add the column for.
      */
     protected void addColumns(String typeName)
@@ -48,8 +48,8 @@ public abstract class SingleFieldMultiMapping extends JavaTypeMapping
     /**
      * Accessor for the name of the java-type actually used when mapping the particular datastore
      * field. This java-type must have an entry in the datastore mappings.
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
     public String getJavaTypeForColumnMapping(int index)
     {

@@ -151,8 +151,8 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
     }
 
     /**
-     * Method to return an identifier for a version datastore field.
-     * @return The version datastore field identifier
+     * Method to return an identifier for a version column.
+     * @return The version column identifier
      */
     public DatastoreIdentifier newVersionFieldIdentifier()
     {
@@ -167,9 +167,9 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
     }
 
     /**
-     * Method to return an identifier for an index (ordering) datastore field.
+     * Method to return an identifier for an index (ordering) column.
      * @param mmd MetaData for the field/property - not used here
-     * @return The index datastore field identifier
+     * @return The index column identifier
      */
     public DatastoreIdentifier newIndexFieldIdentifier(AbstractMemberMetaData mmd)
     {
@@ -184,10 +184,10 @@ public class DN2IdentifierFactory extends DNIdentifierFactory
     }
 
     /**
-     * Method to return an identifier for an adapter index datastore field.
+     * Method to return an identifier for an adapter index column.
      * An "adapter index" is a column added to be part of a primary key when some other
      * column cant perform that role.
-     * @return The index datastore field identifier
+     * @return The index column identifier
      */
     public DatastoreIdentifier newAdapterIndexFieldIdentifier()
     {

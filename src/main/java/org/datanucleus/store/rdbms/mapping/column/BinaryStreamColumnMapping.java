@@ -59,7 +59,7 @@ public class BinaryStreamColumnMapping extends AbstractColumnMapping
     /*
      * (non-Javadoc)
      * @see
-     * org.datanucleus.store.rdbms.mapping.column.AbstractDatastoreMapping#setObject(java.sql.PreparedStatement, int, java.lang.Object)
+     * org.datanucleus.store.rdbms.mapping.column.AbstractColumnMapping#setObject(java.sql.PreparedStatement, int, java.lang.Object)
      */
     @Override
     public void setObject(PreparedStatement ps, int param, Object value)
@@ -94,7 +94,7 @@ public class BinaryStreamColumnMapping extends AbstractColumnMapping
     /*
      * (non-Javadoc)
      * @see
-     * org.datanucleus.store.rdbms.mapping.column.AbstractDatastoreMapping#getObject(java.sql.ResultSet, int)
+     * org.datanucleus.store.rdbms.mapping.column.AbstractColumnMapping#getObject(java.sql.ResultSet, int)
      */
     @Override
     public Object getObject(ResultSet resultSet, int param)

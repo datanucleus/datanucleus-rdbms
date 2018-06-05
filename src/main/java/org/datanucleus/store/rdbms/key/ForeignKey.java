@@ -220,10 +220,10 @@ public class ForeignKey extends Key
     }
 
     /**
-     * Set the datastore field for the specified position <code>seq</code>
+     * Set the column for the specified position <code>seq</code>
      * @param seq the specified position
-     * @param col the datastore field
-     * @param refCol the foreign (refered) datastore field
+     * @param col the column
+     * @param refCol the foreign (refered) column
      */
     public void setColumn(int seq, Column col, Column refCol)
     {

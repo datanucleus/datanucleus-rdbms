@@ -1461,12 +1461,12 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                 int countIdFields = ownerIdMapping.getNumberOfColumnMappings();
                                 for (int i=0; i<countIdFields; i++)
                                 {
-                                    ColumnMapping refDatastoreMapping = ownerIdMapping.getColumnMapping(i);
-                                    JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refDatastoreMapping.getJavaTypeMapping().getJavaType());
-                                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refDatastoreMapping.getColumn().getIdentifier());
+                                    ColumnMapping refColumnMapping = ownerIdMapping.getColumnMapping(i);
+                                    JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(refColumnMapping.getJavaTypeMapping().getJavaType());
+                                    ColumnMetaData colmd = correspondentColumnsMapping.getColumnMetaDataByIdentifier(refColumnMapping.getColumn().getIdentifier());
                                     if (colmd == null)
                                     {
-                                        throw new NucleusUserException(Localiser.msg("057035", refDatastoreMapping.getColumn().getIdentifier(), toString())).setFatal();
+                                        throw new NucleusUserException(Localiser.msg("057035", refColumnMapping.getColumn().getIdentifier(), toString())).setFatal();
                                     }
 
                                     DatastoreIdentifier identifier = null;
@@ -1474,7 +1474,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                     if (colmd.getName() == null || colmd.getName().length() < 1)
                                     {
                                         // No user provided name so generate one
-                                        identifier = idFactory.newForeignKeyFieldIdentifier(ownerFmd, null, refDatastoreMapping.getColumn().getIdentifier(), 
+                                        identifier = idFactory.newForeignKeyFieldIdentifier(ownerFmd, null, refColumnMapping.getColumn().getIdentifier(), 
                                             storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mapping.getJavaType()), FieldRole.ROLE_OWNER);
                                     }
                                     else
@@ -1483,7 +1483,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         identifier = idFactory.newColumnIdentifier(colmd.getName());
                                     }
                                     Column refColumn = addColumn(mapping.getJavaType().getName(), identifier, mapping, colmd);
-                                    refDatastoreMapping.getColumn().copyConfigurationTo(refColumn);
+                                    refColumnMapping.getColumn().copyConfigurationTo(refColumn);
 
                                     if ((colmd.getAllowsNull() == null) || (colmd.getAllowsNull() != null && colmd.isAllowsNull()))
                                     {
@@ -1491,7 +1491,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                                         refColumn.setNullable(true);
                                     }
 
-                                    fkMapping.addColumnMapping(getStoreManager().getMappingManager().createColumnMapping(mapping, refColumn, refDatastoreMapping.getJavaTypeMapping().getJavaType().getName()));
+                                    fkMapping.addColumnMapping(getStoreManager().getMappingManager().createColumnMapping(mapping, refColumn, refColumnMapping.getJavaTypeMapping().getJavaType().getName()));
                                     ((PersistableMapping)fkMapping).addJavaTypeMapping(mapping);
                                 }
                             }

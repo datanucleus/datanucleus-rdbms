@@ -79,7 +79,7 @@ public interface Table extends org.datanucleus.store.schema.table.Table
     boolean hasColumn(DatastoreIdentifier identifier);    
 
     /**
-     * Accessor for the Datastore field with the specified identifier.
+     * Accessor for the column with the specified identifier.
      * Returns null if has no column of this name.
      * @param identifier The name of the column
      * @return The column

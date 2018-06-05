@@ -95,10 +95,10 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     }
 
     /**
-     * Method to prepare a field mapping for use in the datastore.
+     * Method to prepare a column mapping for use in the datastore.
      * This creates the column in the table.
      */
-    protected void prepareDatastoreMapping()
+    protected void prepareColumnMapping()
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -127,9 +127,9 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     }
 
     /**
-     * Accessor for the name of the java-type actually used when mapping the particular datastore field. This java-type must have an entry in the datastore mappings.
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * Accessor for the name of the java-type actually used when mapping the particular column. This java-type must have an entry in the datastore mappings.
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
     public String getJavaTypeForColumnMapping(int index)
     {
@@ -291,8 +291,8 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     }
 
     /**
-     * Accessor for the number of datastore fields
-     * @return The number of datastore fields
+     * Accessor for the number of columns
+     * @return The number of columns
      */
     public int getNumberOfColumnMappings()
     {

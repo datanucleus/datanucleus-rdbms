@@ -278,7 +278,7 @@ public class SQLStatementHelper
                                         // Apply the field values one-by-one
                                         int[] posns = MappingHelper.getMappingIndices(position, pkMappings[j]);
                                         pkMappings[j].setObject(ec, ps, posns, pkVals[j]);
-                                        position += pkMappings[j].getNumberOfDatastoreMappings();
+                                        position += pkMappings[j].getNumberOfColumnMappings();
                                     }
                                 }
                             }*/

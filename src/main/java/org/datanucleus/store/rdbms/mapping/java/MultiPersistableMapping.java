@@ -210,7 +210,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
 
                 if (getNumberOfColumnMappings() <= 0)
                 {
-                    // If the field doesn't map to any datastore fields, omit the set process
+                    // If the field doesn't map to any columns, omit the set process
                     return;
                 }
             }

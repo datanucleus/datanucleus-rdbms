@@ -32,7 +32,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Simple mapping for a java field mapping to a single datastore field.
+ * Simple mapping for a java field mapping to a single column.
  */
 public abstract class SingleFieldMapping extends JavaTypeMapping
 {
@@ -45,14 +45,14 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
     public void initialize(AbstractMemberMetaData fmd, Table table, ClassLoaderResolver clr)
     {
 		super.initialize(fmd, table, clr);
-		prepareDatastoreMapping();
+		prepareColumnMapping();
     }
 
     /**
-     * Method to prepare a field mapping for use in the datastore.
+     * Method to prepare a column mapping for use in the datastore.
      * This creates the column in the table.
      */
-    protected void prepareDatastoreMapping()
+    protected void prepareColumnMapping()
     {
         MappingManager mmgr = storeMgr.getMappingManager();
         Column col = mmgr.createColumn(this, getJavaTypeForColumnMapping(0), 0);
@@ -61,7 +61,7 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
 
     /**
      * Accessor for the default length for this type in the datastore (if applicable).
-     * @param index requested datastore field index.
+     * @param index requested column index.
      * @return Default length
      */
     public int getDefaultLength(int index)
@@ -72,7 +72,7 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
     /**
      * Accessor for an array of valid values that this type can take.
      * This can be used at the datastore side for restricting the values to be inserted.
-     * @param index requested datastore field index.
+     * @param index requested column index.
      * @return The valid values
      */
     public Object[] getValidValues(int index)
@@ -83,8 +83,8 @@ public abstract class SingleFieldMapping extends JavaTypeMapping
     /**
      * Accessor for the name of the java-type actually used when mapping the particular datastore
      * field. This java-type must have an entry in the datastore mappings.
-     * @param index requested datastore field index.
-     * @return the name of java-type for the requested datastore field.
+     * @param index requested column index.
+     * @return the name of java-type for the requested column.
      */
     public String getJavaTypeForColumnMapping(int index)
     {

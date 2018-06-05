@@ -95,16 +95,16 @@ public interface IdentifierFactory
     DatastoreIdentifier newTableIdentifier(AbstractMemberMetaData fmd);
 
     /**
-     * Method to use to generate an identifier for a datastore field with the supplied name.
+     * Method to use to generate an identifier for a column with the supplied name.
      * The passed name will not be changed (other than in its case) although it may
-     * be truncated to fit the maximum length permitted for a datastore field identifier.
+     * be truncated to fit the maximum length permitted for a column identifier.
      * @param identifierName The identifier name
      * @return The DatastoreIdentifier
      */
     DatastoreIdentifier newColumnIdentifier(String identifierName);
 
     /**
-     * Method to create an identifier for a datastore field where we want the
+     * Method to create an identifier for a column where we want the
      * name based on the supplied java name, and the field has a particular
      * role (and so could have its naming set according to the role).
      * @param javaName The java field name
@@ -129,14 +129,14 @@ public interface IdentifierFactory
             AbstractClassMetaData implMetaData, DatastoreIdentifier implIdentifier, boolean embedded, FieldRole fieldRole);
 
     /**
-     * Method to return an identifier for a discriminator datastore field.
-     * @return The discriminator datastore field identifier
+     * Method to return an identifier for a discriminator column.
+     * @return The discriminator column identifier
      */
     DatastoreIdentifier newDiscriminatorFieldIdentifier();
 
     /**
-     * Method to return an identifier for a version datastore field.
-     * @return The version datastore field identifier
+     * Method to return an identifier for a version column.
+     * @return The version column identifier
      */
     DatastoreIdentifier newVersionFieldIdentifier();
 
@@ -178,17 +178,17 @@ public interface IdentifierFactory
             DatastoreIdentifier destinationId, boolean embedded, FieldRole fieldRole);
 
     /**
-     * Method to return an identifier for an index (ordering) datastore field.
+     * Method to return an identifier for an index (ordering) column.
      * @param mmd Metadata for the field/property that we require to add an index(order) column for
-     * @return The index datastore field identifier
+     * @return The index column identifier
      */
     DatastoreIdentifier newIndexFieldIdentifier(AbstractMemberMetaData mmd);
 
     /**
-     * Method to return an identifier for an adapter index datastore field.
+     * Method to return an identifier for an adapter index column.
      * An "adapter index" is a column added to be part of a primary key when some other
      * column cant perform that role.
-     * @return The index datastore field identifier
+     * @return The index column identifier
      */
     DatastoreIdentifier newAdapterIndexFieldIdentifier();
 

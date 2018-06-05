@@ -538,9 +538,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Method to use to generate an identifier for a datastore field in the default catalog/schema.
+     * Method to use to generate an identifier for a column in the default catalog/schema.
      * The passed name will not be changed (other than in its case) although it may
-     * be truncated to fit the maximum length permitted for a datastore field identifier.
+     * be truncated to fit the maximum length permitted for a column identifier.
      * @param identifierName The identifier name
      * @return The DatastoreIdentifier for the table
      */
@@ -559,9 +559,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Method to use to generate an identifier for a datastore field.
+     * Method to use to generate an identifier for a column.
      * The passed name will not be changed (other than in its case) although it may
-     * be truncated to fit the maximum length permitted for a datastore field identifier.
+     * be truncated to fit the maximum length permitted for a column identifier.
      * @param identifierName The identifier name for the table
      * @param catalogName Optional catalog name (null means not set)
      * @param schemaName Optional schema name (null means not set)
@@ -598,9 +598,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Method to use to generate an identifier for a datastore field.
+     * Method to use to generate an identifier for a column.
      * The passed name will not be changed (other than in its case) although it may
-     * be truncated to fit the maximum length permitted for a datastore field identifier.
+     * be truncated to fit the maximum length permitted for a column identifier.
      * @param identifierName The identifier name
      * @return The DatastoreIdentifier
      */
@@ -618,7 +618,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Method to create an identifier for a datastore field where we want the
+     * Method to create an identifier for a column where we want the
      * name based on the supplied java name, and the field has a particular
      * role (and so could have its naming set according to the role).
      * @param javaName The java field name
@@ -780,7 +780,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
 
     /**
      * Accessor for the suffix to add to any column identifier, based on the role type.
-     * @param role Datastore field role
+     * @param role column role
      * @param embedded Whether the column is stored embedded
      * @return The suffix (e.g _ID for id columns).
      **/

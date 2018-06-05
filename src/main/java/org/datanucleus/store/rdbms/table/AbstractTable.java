@@ -346,7 +346,7 @@ public abstract class AbstractTable implements Table
      * "superclass-table" inheritance strategy. One of the columns has to come from a subclass - cant have
      * both from the same class.</li>
      * </ul>
-     * @param storedJavaType the java type of the datastore field
+     * @param storedJavaType the java type of the column
      * @param name the SQL identifier for the column to be added
      * @param mapping the mapping for the column to be added
      * @param colmd ColumnMetaData for the column to be added to the table
@@ -483,7 +483,7 @@ public abstract class AbstractTable implements Table
 	}
 
 	/**
-	 * Accessor for the Datastore field with the specified identifier.
+	 * Accessor for the column with the specified identifier.
 	 * Returns null if has no column of this name.
 	 * @param identifier The name of the column
 	 * @return The column

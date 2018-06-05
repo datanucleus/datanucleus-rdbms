@@ -1442,17 +1442,17 @@ public class MappingManagerImpl implements MappingManager
      */
     public ColumnMapping createColumnMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, Column column)
     {
-        Class datastoreMappingClass = null;
+        Class columnMappingClass = null;
 
         if (mmd.getColumnMetaData().length > 0)
         {
-            // Use "datastore-mapping-class" extension if provided
-            if (mmd.getColumnMetaData()[index].hasExtension("datastore-mapping-class"))
+            // Use "column-mapping-class" extension if provided
+            if (mmd.getColumnMetaData()[index].hasExtension("column-mapping-class"))
             {
-                datastoreMappingClass = clr.classForName(mmd.getColumnMetaData()[index].getValueForExtension("datastore-mapping-class"));
+                columnMappingClass = clr.classForName(mmd.getColumnMetaData()[index].getValueForExtension("column-mapping-class"));
             }
         }
-        if (datastoreMappingClass == null)
+        if (columnMappingClass == null)
         {
             String javaType = mapping.getJavaTypeForColumnMapping(index);
             String jdbcType = null;
@@ -1541,15 +1541,15 @@ public class MappingManagerImpl implements MappingManager
                 }
             }
 
-            datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, mmd.getFullFieldName());
+            columnMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, mmd.getFullFieldName());
         }
 
-        ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
+        ColumnMapping columnMapping = ColumnMappingFactory.createMapping(columnMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
-            column.setColumnMapping(datastoreMapping);
+            column.setColumnMapping(columnMapping);
         }
-        return datastoreMapping;
+        return columnMapping;
     }
 
     /**
@@ -1572,14 +1572,14 @@ public class MappingManagerImpl implements MappingManager
             sqlType = col.getColumnMetaData().getSqlType();
         }
 
-        Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, null);
+        Class columnMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, null);
 
-        ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
+        ColumnMapping columnMapping = ColumnMappingFactory.createMapping(columnMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
-            column.setColumnMapping(datastoreMapping);
+            column.setColumnMapping(columnMapping);
         }
-        return datastoreMapping;
+        return columnMapping;
     }
 
     /**
@@ -1587,8 +1587,8 @@ public class MappingManagerImpl implements MappingManager
      * This is NOT used for persistable mappings - see method below.
      * @param mapping Java type mapping for the field
      * @param javaType The type of field being stored in this column
-     * @param datastoreFieldIndex Index of the datastore field to use
-     * @return The datastore field
+     * @param datastoreFieldIndex Index of the column to use
+     * @return The column
      */
     public Column createColumn(JavaTypeMapping mapping, String javaType, int datastoreFieldIndex)
     {
@@ -1747,7 +1747,7 @@ public class MappingManagerImpl implements MappingManager
     }
 
     /**
-     * Method to create a datastore field for a Java type mapping.
+     * Method to create a column for a Java type mapping.
      * This is used for serialised PC elements/keys/values in a join table.
      * TODO Merge this with the method above.
      * @param mapping Java type mapping for the field
@@ -1805,12 +1805,12 @@ public class MappingManagerImpl implements MappingManager
     }
 
     /**
-     * Method to create a datastore field for a persistable mapping.
+     * Method to create a column for a persistable mapping.
      * @param mmd MetaData for the field whose mapping it is
-     * @param table Datastore class where we create the datastore field
+     * @param table Datastore class where we create the column
      * @param mapping The Java type for this field
-     * @param colmd The columnMetaData for this datastore field
-     * @param reference The datastore field we are referencing
+     * @param colmd The columnMetaData for this column
+     * @param reference The column we are referencing
      * @param clr ClassLoader resolver
      * @return The column
      */
