@@ -1541,7 +1541,7 @@ public class MappingManagerImpl implements MappingManager
                 }
             }
 
-            datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType, jdbcType, sqlType, clr, mmd.getFullFieldName());
+            datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, mmd.getFullFieldName());
         }
 
         ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
@@ -1572,7 +1572,7 @@ public class MappingManagerImpl implements MappingManager
             sqlType = col.getColumnMetaData().getSqlType();
         }
 
-        Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType, jdbcType, sqlType, clr, null);
+        Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, null);
 
         ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
         if (column != null)

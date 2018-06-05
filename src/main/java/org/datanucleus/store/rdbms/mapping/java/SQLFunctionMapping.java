@@ -106,7 +106,7 @@ public class SQLFunctionMapping extends SingleFieldMapping
                 e.printStackTrace();
             }
 
-            Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getDatastoreMappingClass(javaType.getName(), null, null, ec.getClassLoaderResolver(), null);
+            Class datastoreMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType.getName(), null, null, ec.getClassLoaderResolver(), null);
             ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, this, storeMgr, null);
             columnMappings = new ColumnMapping[1];
             columnMappings[0] = datastoreMapping;
