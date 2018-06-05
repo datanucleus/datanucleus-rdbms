@@ -51,7 +51,7 @@ public interface MappingManager
      * @param javaTypeName The java type name
      * @return The JavaTypeMapping class to use
      */
-    Class getMappingType(String javaTypeName);
+    Class<? extends JavaTypeMapping> getMappingType(String javaTypeName);
 
     /**
      * Method to create the column mapping for a java type mapping at a particular index.
@@ -75,30 +75,30 @@ public interface MappingManager
     /**
      * Accessor for a mapping, for a java type.
      * Same as calling "getMapping(c, false, false, (String)null);"
-     * @param c The java type
+     * @param javaType The java type
      * @return The mapping
      */
-    JavaTypeMapping getMapping(Class c);
+    JavaTypeMapping getMapping(Class javaType);
 
     /**
      * Accessor for a mapping, for a java type.
-     * @param c The java type
+     * @param javaType The java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
      * @param fieldName Name of the field (for logging only)
      * @return The mapping
      */
-    JavaTypeMapping getMapping(Class c, boolean serialised, boolean embedded, String fieldName);
+    JavaTypeMapping getMapping(Class javaType, boolean serialised, boolean embedded, String fieldName);
 
     /**
      * Accessor for a mapping, for a java type complete with the column mapping.
-     * @param c The java type
+     * @param javaType The java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
      * @param clr ClassLoader resolver
      * @return The mapping
      */
-    JavaTypeMapping getMappingWithColumnMapping(Class c, boolean serialised, boolean embedded, ClassLoaderResolver clr);
+    JavaTypeMapping getMappingWithColumnMapping(Class javaType, boolean serialised, boolean embedded, ClassLoaderResolver clr);
 
     /**
      * Accessor for the mapping for the field of the specified table.

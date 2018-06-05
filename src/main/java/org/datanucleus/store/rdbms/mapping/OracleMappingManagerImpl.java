@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.BitSetMapping;
 import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
+import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.MapMapping;
 import org.datanucleus.store.rdbms.mapping.java.OracleArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.OracleBitSetMapping;
@@ -66,7 +67,7 @@ public class OracleMappingManagerImpl extends MappingManagerImpl
      * @return The mapping class to use
      */
     @Override
-    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
+    protected Class<? extends JavaTypeMapping> getOverrideMappingClass(Class<? extends JavaTypeMapping> mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
     {
         // Override some mappings with Oracle-specific mappings
         if (mappingClass.equals(BitSetMapping.class))

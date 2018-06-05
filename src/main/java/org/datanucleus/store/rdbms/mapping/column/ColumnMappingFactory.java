@@ -55,7 +55,7 @@ public final class ColumnMappingFactory
      * @param column The column to map
      * @return The ColumnMapping
      */
-    public static ColumnMapping createMapping(Class mappingClass, JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column column)
+    public static ColumnMapping createMapping(Class<? extends ColumnMapping> mappingClass, JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column column)
     {
         Object obj = null;
         try

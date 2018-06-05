@@ -210,13 +210,13 @@ public class MappingManagerImpl implements MappingManager
                 {
                     try
                     {
-                        Class mappingType = pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), mappingClassName);
+                        Class<? extends JavaTypeMapping> mappingType = pluginMgr.loadClass(elems[i].getExtension().getPlugin().getSymbolicName(), mappingClassName);
                         try
                         {
-                            Class cls = clr.classForName(javaName);
-                            if (cls != null)
+                            Class javaType = clr.classForName(javaName);
+                            if (javaType != null)
                             {
-                                mappedTypes.put(javaName, new MappedType(cls, mappingType));
+                                mappedTypes.put(javaName, new MappedType(javaType, mappingType));
                             }
                         }
                         catch (Exception e)
@@ -233,7 +233,7 @@ public class MappingManagerImpl implements MappingManager
         }
     }
 
-    protected void addMappedType(Class javaType, Class mappingType)
+    protected void addMappedType(Class javaType, Class<? extends JavaTypeMapping> mappingType)
     {
         mappedTypes.put(javaType.getName(), new MappedType(javaType, mappingType));
     }
@@ -273,7 +273,7 @@ public class MappingManagerImpl implements MappingManager
      * @param javaTypeName The java type name
      * @return The Java mapping type
      */
-    public Class getMappingType(String javaTypeName)
+    public Class<? extends JavaTypeMapping> getMappingType(String javaTypeName)
     {
         if (javaTypeName == null)
         {
@@ -327,25 +327,25 @@ public class MappingManagerImpl implements MappingManager
     static class MappedType
     {
         /** Supported java type. */
-        final Class cls;
+        final Class javaType;
 
         /** Mapping class to use. An extension of {@link org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping}*/
-        final Class javaMappingType;
+        final Class<? extends JavaTypeMapping> javaMappingType;
 
         /**
          * Constructor.
-         * @param cls the java type class being supported
-         * @param mappingType the mapping class. An extension of {@link org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping}
+         * @param javaType the java type class being supported
+         * @param mappingType the java mapping class. An extension of {@link org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping}
          */
-        public MappedType(Class cls, Class mappingType)
+        public MappedType(Class javaType, Class<? extends JavaTypeMapping> mappingType)
         {
-            this.cls = cls;
+            this.javaType = javaType;
             this.javaMappingType = mappingType;
         }
 
         public String toString()
         {
-            StringBuilder str = new StringBuilder("MappedType " + cls.getName() + " [");
+            StringBuilder str = new StringBuilder("MappedType " + javaType.getName() + " [");
             if (javaMappingType != null)
             {
                 str.append(" mapping=" + javaMappingType);
@@ -355,43 +355,43 @@ public class MappingManagerImpl implements MappingManager
         }
     }
 
-    protected MappedType findMappedTypeForClass(Class cls)
+    protected MappedType findMappedTypeForClass(Class javaType)
     {
-        MappedType type = mappedTypes.get(cls.getName());
+        MappedType type = mappedTypes.get(javaType.getName());
         if (type != null)
         {
             return type;
         }
 
         // Not supported so try to find one that is supported that this class derives from
-        Class componentCls = cls.isArray() ? cls.getComponentType() : null;
+        Class componentCls = javaType.isArray() ? javaType.getComponentType() : null;
         Collection<MappedType> supportedTypes = new HashSet<>(mappedTypes.values());
         Iterator<MappedType> iter = supportedTypes.iterator();
         while (iter.hasNext())
         {
             type = iter.next();
-            if (type.cls == cls)
+            if (type.javaType == javaType)
             {
                 return type;
             }
 
-            if (!type.cls.getName().equals("java.lang.Object") && !type.cls.getName().equals("java.io.Serializable"))
+            if (!type.javaType.getName().equals("java.lang.Object") && !type.javaType.getName().equals("java.io.Serializable"))
             {
                 if (componentCls != null)
                 {
                     // Array type
-                    if (type.cls.isArray() && type.cls.getComponentType().isAssignableFrom(componentCls))
+                    if (type.javaType.isArray() && type.javaType.getComponentType().isAssignableFrom(componentCls))
                     {
-                        mappedTypes.put(cls.getName(), type);
+                        mappedTypes.put(javaType.getName(), type);
                         return type;
                     }
                 }
                 else
                 {
                     // Basic type
-                    if (type.cls.isAssignableFrom(cls))
+                    if (type.javaType.isAssignableFrom(javaType))
                     {
-                        mappedTypes.put(cls.getName(), type);
+                        mappedTypes.put(javaType.getName(), type);
                         return type;
                     }
                 }
@@ -405,8 +405,8 @@ public class MappingManagerImpl implements MappingManager
     /**
      * Accessor for the mapping for the specified class. Usually only called by JDOQL query expressions.
      * If the type has its own table returns the id mapping of the table.
-     * If the type doesn't have its own table then creates the mapping and, if it has a simple
-     * datastore representation, creates the datastore mapping. The JavaTypeMapping has no metadata/table associated.
+     * If the type doesn't have its own table then creates the mapping and, if it has a simple datastore representation, creates the column mapping. 
+     * The JavaTypeMapping has no metadata/table associated.
      * @param javaType Java type
      * @param serialised Whether the type is serialised
      * @param embedded Whether the type is embedded
@@ -582,7 +582,7 @@ public class MappingManagerImpl implements MappingManager
         AbstractMemberMetaData overrideMmd = null;
 
         MappingConverterDetails mcd = null;
-        Class mc = null;
+        Class<? extends JavaTypeMapping> mc = null;
         String userMappingClassName = mmd.getValueForExtension("mapping-class");
         if (userMappingClassName != null)
         {
@@ -662,7 +662,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+                JavaTypeMapping m = mc.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_FIELD);
                 m.initialize(mmd, table, clr);
                 if (overrideMmd != null)
@@ -681,7 +681,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_FIELD);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -714,20 +714,20 @@ public class MappingManagerImpl implements MappingManager
      * @param fieldRole Role for the field (e.g collection element)
      * @return The mapping class to use
      */
-    protected Class getOverrideMappingClass(Class mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
+    protected Class<? extends JavaTypeMapping> getOverrideMappingClass(Class<? extends JavaTypeMapping> mappingClass, AbstractMemberMetaData mmd, FieldRole fieldRole)
     {
         return mappingClass;
     }
 
     public class MappingConverterDetails
     {
-        Class mappingClass;
+        Class<? extends JavaTypeMapping> mappingClass;
         TypeConverter typeConverter;
-        public MappingConverterDetails(Class mappingCls)
+        public MappingConverterDetails(Class<? extends JavaTypeMapping> mappingCls)
         {
             this.mappingClass = mappingCls;
         }
-        public MappingConverterDetails(Class mappingCls, TypeConverter typeConv)
+        public MappingConverterDetails(Class<? extends JavaTypeMapping> mappingCls, TypeConverter typeConv)
         {
             this.mappingClass = mappingCls;
             this.typeConverter = typeConv;
@@ -816,8 +816,7 @@ public class MappingManagerImpl implements MappingManager
                 // Array of PC objects
                 return new MappingConverterDetails(ArrayMapping.class);
             }
-            else if (javaType.getComponentType().isInterface() &&
-                !storeMgr.getMappingManager().isSupportedMappedType(javaType.getComponentType().getName()))
+            else if (javaType.getComponentType().isInterface() && !storeMgr.getMappingManager().isSupportedMappedType(javaType.getComponentType().getName()))
             {
                 // Array of interface objects
                 return new MappingConverterDetails(ArrayMapping.class);
@@ -913,7 +912,7 @@ public class MappingManagerImpl implements MappingManager
         }
 
         MappingConverterDetails mcd = null;
-        Class mc = null;
+        Class<? extends JavaTypeMapping> mc = null;
         String userMappingClassName = null;
         String userTypeConverterName = null;
         if (mmd.getElementMetaData() != null)
@@ -1025,7 +1024,7 @@ public class MappingManagerImpl implements MappingManager
             JavaTypeMapping m = null;
             try
             {
-                m = (JavaTypeMapping)mc.newInstance();
+                m = mc.newInstance();
                 m.setRoleForMember(fieldRole);
                 m.initialize(mmd, table, clr);
                 return m;
@@ -1039,7 +1038,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.newInstance();
                 m.setRoleForMember(fieldRole);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1076,7 +1075,7 @@ public class MappingManagerImpl implements MappingManager
         }
 
         MappingConverterDetails mcd = null;
-        Class mc = null;
+        Class<? extends JavaTypeMapping> mc = null;
         String userTypeConverterName = null;
         String userMappingClassName = null;
         if (mmd.getKeyMetaData() != null)
@@ -1168,7 +1167,7 @@ public class MappingManagerImpl implements MappingManager
             JavaTypeMapping m = null;
             try
             {
-                m = (JavaTypeMapping)mc.newInstance();
+                m = mc.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
                 m.initialize(mmd, table, clr);
                 return m;
@@ -1182,7 +1181,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1325,7 +1324,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_VALUE);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1355,7 +1354,7 @@ public class MappingManagerImpl implements MappingManager
     protected MappingConverterDetails getDefaultJavaTypeMapping(Class javaType, ColumnMetaData[] colmds)
     {
         // Check for an explicit mapping
-        Class cls = storeMgr.getMappingManager().getMappingType(javaType.getName());
+        Class<? extends JavaTypeMapping> cls = storeMgr.getMappingManager().getMappingType(javaType.getName());
         if (cls == null)
         {
             // No explicit mapping for this java type, so fall back to TypeConverter if available
@@ -1442,7 +1441,7 @@ public class MappingManagerImpl implements MappingManager
      */
     public ColumnMapping createColumnMapping(JavaTypeMapping mapping, AbstractMemberMetaData mmd, int index, Column column)
     {
-        Class columnMappingClass = null;
+        Class<? extends ColumnMapping> columnMappingClass = null;
 
         if (mmd.getColumnMetaData().length > 0)
         {
@@ -1572,7 +1571,7 @@ public class MappingManagerImpl implements MappingManager
             sqlType = col.getColumnMetaData().getSqlType();
         }
 
-        Class columnMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, null);
+        Class<? extends ColumnMapping> columnMappingClass = storeMgr.getDatastoreAdapter().getColumnMappingClass(javaType, jdbcType, sqlType, clr, null);
 
         ColumnMapping columnMapping = ColumnMappingFactory.createMapping(columnMappingClass, mapping, storeMgr, column);
         if (column != null)
@@ -1587,10 +1586,10 @@ public class MappingManagerImpl implements MappingManager
      * This is NOT used for persistable mappings - see method below.
      * @param mapping Java type mapping for the field
      * @param javaType The type of field being stored in this column
-     * @param datastoreFieldIndex Index of the column to use
+     * @param columnIndex Index of the column to use
      * @return The column
      */
-    public Column createColumn(JavaTypeMapping mapping, String javaType, int datastoreFieldIndex)
+    public Column createColumn(JavaTypeMapping mapping, String javaType, int columnIndex)
     {
         AbstractMemberMetaData mmd = mapping.getMemberMetaData();
         FieldRole roleForField = mapping.getRoleForMember();
@@ -1614,18 +1613,18 @@ public class MappingManagerImpl implements MappingManager
 
         Column col;
         ColumnMetaData[] colmds;
-        if (columnContainer != null && columnContainer.getColumnMetaData().length > datastoreFieldIndex)
+        if (columnContainer != null && columnContainer.getColumnMetaData().length > columnIndex)
         {
-            colmd = columnContainer.getColumnMetaData()[datastoreFieldIndex];
+            colmd = columnContainer.getColumnMetaData()[columnIndex];
             colmds = columnContainer.getColumnMetaData();
         }
         else
         {
             // If column specified add one (use any column name specified on field element)
             colmd = new ColumnMetaData();
-            if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > datastoreFieldIndex)
+            if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > columnIndex)
             {
-                colmd.setName(mmd.getColumnMetaData()[datastoreFieldIndex].getName());
+                colmd.setName(mmd.getColumnMetaData()[columnIndex].getName());
             }
             if (columnContainer != null)
             {
@@ -1681,7 +1680,7 @@ public class MappingManagerImpl implements MappingManager
         else
         {
             // User has specified a name, so try to keep this unmodified
-            identifier = idFactory.newColumnIdentifier(colmds[datastoreFieldIndex].getName(), 
+            identifier = idFactory.newColumnIdentifier(colmds[columnIndex].getName(), 
                 storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true);
         }
 
