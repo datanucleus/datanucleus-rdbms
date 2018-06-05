@@ -1,12 +1,13 @@
 <HTML>
 <BODY>
-    <P>Package containing mappings for datastore (JDBC) types. These mappings will be mapped via the RDBMSMappingManager to 
+    <P>Package containing mappings for column (JDBC) types. These mappings will be mapped via the MappingManager to 
         the various java type mappings in org.datanucleus.store.rdbms.mapping.java</P>
-    <P>These are datastore (JDBC) types, and probably most of them are atomic types mapping to atomic java types</P>
-    <P>Mappings map persistent java fields in persistable classes to columns in RDBMS tables. Mappings are also 
-        used to map "non-fields" in persistable classes to columns in RDBMS tables. A class using datastore identity 
-        does not have java fields representing primary-keys in RDBMS tables, but as said ealier a Mapping is also applied to 
-        "non-fields". Therefore, a Mapping is applied to:
+    <P>These are column (JDBC) types, and probably most of them are atomic types mapping to atomic java types</P>
+    <P>
+        Mappings map persistent java fields in persistable classes to columns in RDBMS tables. 
+        Mappings are also used to map "non-fields" in persistable classes to columns in RDBMS tables. 
+        A class using datastore identity does not have java fields representing primary-keys in RDBMS tables, but as said earlier a Mapping is also applied to "non-fields". 
+        Therefore, a Mapping is applied to:
     </P>
     <UL>
         <LI>persistent java fields</LI>
@@ -14,12 +15,10 @@
         <LI>optimistic columns (columns with version numbers)</LI>
         <LI>index columns (columns indexing an ordered list)</LI>
         <LI>owner columns in unidirectional inverse relationships</LI>
-        <LI>adapter columns (additional column added as primary key when the existing columns have datatype not allowed, 
-            by database limitation, to be part of the primary key)</LI>
+        <LI>adapter columns (additional column added as primary key when the existing columns have datatype not allowed, by database limitation, to be part of the primary key)</LI>
     </UL>
     <P>
-        In addition to the representation of columns in tables for persistable classes, Mappings are also used for representing
-        fields in queries.
+        In addition to the representation of columns in tables for persistable classes, column mappings are also used for representing columns in queries.
     </P>
 </BODY>
 </HTML>
