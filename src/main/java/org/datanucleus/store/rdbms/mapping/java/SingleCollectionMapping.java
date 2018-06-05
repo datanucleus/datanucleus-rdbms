@@ -29,7 +29,7 @@ import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.ElementContainerHandler;

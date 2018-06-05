@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.mapping.java;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 
 /**
  * Mapping to represent multiple mappings within the single overall java type mapping.

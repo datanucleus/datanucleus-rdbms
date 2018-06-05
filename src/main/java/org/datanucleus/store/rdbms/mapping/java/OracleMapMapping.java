@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
 
 /**
  * Oracle variant of the MapMapping for cases where we are serialising the field into a single column.

@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.store.rdbms.mapping.datastore.CharColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.CharColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.types.converters.TypeConverter;

@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
 
 /**
  * Mapping for Object and Serializable types.

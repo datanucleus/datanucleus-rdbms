@@ -28,8 +28,8 @@ import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleClobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.OracleClobColumnMapping;
 
 /**
  * Mapping for a String type for Oracle when stored in a BLOB or CLOB column.

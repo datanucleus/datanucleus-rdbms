@@ -24,8 +24,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMappingFactory;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingFactory;
 
 /**
  * Mapping to represent the return value of an SQL function invocation.

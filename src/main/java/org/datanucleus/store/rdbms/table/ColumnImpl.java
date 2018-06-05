@@ -48,7 +48,7 @@ import org.datanucleus.store.rdbms.exceptions.IncompatibleDataTypeException;
 import org.datanucleus.store.rdbms.exceptions.WrongPrecisionException;
 import org.datanucleus.store.rdbms.exceptions.WrongScaleException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -60,8 +60,8 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Implementation of a Column in an RDBMS datastore. 
- * Contains the full definition of the column, its type, size, whether it is identity, 
- * nullable, part of the PK etc. The SQL column definition is generated here.
+ * Contains the full definition of the column, its type, size, whether it is identity, nullable, part of the PK etc. 
+ * The SQL column definition is generated here.
  */ 
 public class ColumnImpl implements Column
 {
@@ -80,8 +80,8 @@ public class ColumnImpl implements Column
     /** Table containing this column in the datastore. */
     protected final Table table;
 
-    /** Datastore mapping for this column. */
-    protected ColumnMapping datastoreMapping = null;
+    /** Mapping for this column. */
+    protected ColumnMapping columnMapping = null;
 
     /** Java type that this column is storing. (can we just get this from the mapping above ?) */
     protected final String storedJavaType;
@@ -280,19 +280,19 @@ public class ColumnImpl implements Column
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#getDatastoreMapping()
+     * @see org.datanucleus.store.rdbms.table.Column#getColumnMapping()
      */
-    public ColumnMapping getDatastoreMapping()
+    public ColumnMapping getColumnMapping()
     {
-        return datastoreMapping;
+        return columnMapping;
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.table.Column#setDatastoreMapping(org.datanucleus.store.rdbms.mapping.DatastoreMapping)
+     * @see org.datanucleus.store.rdbms.table.Column#setColumnMapping(org.datanucleus.store.rdbms.mapping.column.ColumnMapping)
      */
-    public void setDatastoreMapping(ColumnMapping mapping)
+    public void setColumnMapping(ColumnMapping mapping)
     {
-        datastoreMapping = mapping;
+        columnMapping = mapping;
     }
 
     /* (non-Javadoc)
@@ -300,7 +300,7 @@ public class ColumnImpl implements Column
      */
     public JavaTypeMapping getJavaTypeMapping()
     {
-        return datastoreMapping.getJavaTypeMapping();
+        return columnMapping.getJavaTypeMapping();
     }
 
     /* (non-Javadoc)

@@ -53,8 +53,8 @@ import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping;
-import org.datanucleus.store.rdbms.mapping.datastore.ColumnMappingFactory;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingFactory;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
@@ -88,7 +88,7 @@ import org.datanucleus.util.StringUtils;
 /**
  * Default Mapping manager implementation.
  * Provides mappings from standard Java types (defined in org.datanucleus.store.rdbms.mapping.java) to
- * datastore mappings for JDBC types (defined in org.datanucleus.store.rdbms.mapping.datastore).
+ * datastore mappings for JDBC types (defined in org.datanucleus.store.rdbms.mapping.column).
  */
 public class MappingManagerImpl implements MappingManager
 {
@@ -1547,7 +1547,7 @@ public class MappingManagerImpl implements MappingManager
         ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
-            column.setDatastoreMapping(datastoreMapping);
+            column.setColumnMapping(datastoreMapping);
         }
         return datastoreMapping;
     }
@@ -1577,7 +1577,7 @@ public class MappingManagerImpl implements MappingManager
         ColumnMapping datastoreMapping = ColumnMappingFactory.createMapping(datastoreMappingClass, mapping, storeMgr, column);
         if (column != null)
         {
-            column.setDatastoreMapping(datastoreMapping);
+            column.setColumnMapping(datastoreMapping);
         }
         return datastoreMapping;
     }

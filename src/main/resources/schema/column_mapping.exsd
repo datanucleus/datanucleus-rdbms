@@ -69,7 +69,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.mapping.column.ColumnMapping"/>
                </appinfo>
             </annotation>
          </attribute>

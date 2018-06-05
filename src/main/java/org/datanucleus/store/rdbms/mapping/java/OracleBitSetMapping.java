@@ -26,8 +26,8 @@ import java.sql.SQLException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.datastore.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.datastore.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
+import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.TypeConversionHelper;
 
