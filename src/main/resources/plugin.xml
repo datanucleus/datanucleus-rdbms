@@ -30,7 +30,7 @@ Contributors:
     <extension-point id="sql_operation" name="SQL Expressions" schema="schema/sql_operation.exsd"/>
     <extension-point id="sql_tablenamer" name="SQL Table Namer" schema="schema/sql_tablenamer.exsd"/>
     <extension-point id="java_mapping" name="Types Mapping" schema="schema/java_mapping.exsd"/>
-    <extension-point id="datastore_mapping" name="Datastore Mapping" schema="schema/datastore_mapping.exsd"/>
+    <extension-point id="column_mapping" name="Datastore Mapping" schema="schema/column_mapping.exsd"/>
     <extension-point id="identifierfactory" name="Identifier Factory" schema="schema/identifierfactory.exsd"/>
 
     <!-- STORE MANAGER -->

@@ -3,7 +3,7 @@
 <schema targetNamespace="org.datanucleus.store.rdbms" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.datanucleus.store.rdbms" id="datastore_mapping" name="RDBMS Datastore Mapping"/>
+         <meta.schema plugin="org.datanucleus.store.rdbms" id="column_mapping" name="RDBMS Column Mapping"/>
       </appinfo>
       <documentation>
          [Enter description of this extension point.]
@@ -63,13 +63,13 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="rdbms-mapping-class" type="string" use="required">
+         <attribute name="column-mapping-class" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.mapping.datastore.DatastoreMapping"/>
+                  <meta.attribute kind="java" basedOn=":org.datanucleus.store.rdbms.mapping.datastore.ColumnMapping"/>
                </appinfo>
             </annotation>
          </attribute>

@@ -2038,13 +2038,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     protected void loadColumnMappings(PluginManager pluginMgr, ClassLoaderResolver clr)
     {
         // Load from plugin mechanism
-        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.datastore_mapping", null, null); // TODO Change plugin point name
+        ConfigurationElement[] elems = pluginMgr.getConfigurationElementsForExtension("org.datanucleus.store.rdbms.column_mapping", null, null);
         if (elems != null)
         {
             for (ConfigurationElement elem : elems)
             {
                 String javaName = elem.getAttribute("java-type").trim();
-                String columnMappingClassName = elem.getAttribute("rdbms-mapping-class");
+                String columnMappingClassName = elem.getAttribute("column-mapping-class");
                 String jdbcType = elem.getAttribute("jdbc-type");
                 String sqlType = elem.getAttribute("sql-type");
                 String defaultJava = elem.getAttribute("default");
