@@ -92,7 +92,7 @@ public class ListIndexOfMethod implements SQLMethod
             if (orderTable == null)
             {
                 // TODO Allow control over the join type? the alias?
-                orderTable = stmt.join(JoinType.LEFT_OUTER_JOIN, expr.getSQLTable(), expr.getSQLTable().getTable().getIdMapping(), 
+                orderTable = stmt.join(JoinType.LEFT_OUTER_JOIN, collSqlExpr.getSQLTable(), collSqlExpr.getSQLTable().getTable().getIdMapping(), 
                     collTable, null, collTable.getOwnerMapping(), null, null);
             }
             orderMapping = collTable.getOrderMapping();
