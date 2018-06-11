@@ -80,7 +80,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     private String clearStmt;
 
     /** JDBC statement to use for retrieving keys of the map (locking). */
-    private String getStmtLocked = null;
+    private volatile String getStmtLocked = null;
 
     /** JDBC statement to use for retrieving keys of the map (not locking). */
     private String getStmtUnlocked = null;
@@ -670,11 +670,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
-                // Generate the statement, and statement mapping/parameter information
-                SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
-                getStmtUnlocked = sqlStmt.getSQLText().toSQL();
-                sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                getStmtLocked = sqlStmt.getSQLText().toSQL();
+                if (getStmtLocked == null) {
+                    // Generate the statement, and statement mapping/parameter information
+                    SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
+                    getStmtUnlocked = sqlStmt.getSQLText().toSQL();
+                    sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
+                    getStmtLocked = sqlStmt.getSQLText().toSQL();
+                }
             }
         }
 
