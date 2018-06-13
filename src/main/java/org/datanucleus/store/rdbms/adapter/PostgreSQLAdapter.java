@@ -36,6 +36,7 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
@@ -167,54 +168,80 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         return "postgresql";
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getPreferredDefaultSQLTypeForJDBCType(org.datanucleus.metadata.JdbcType)
+     */
+    @Override
+    public String getPreferredDefaultSQLTypeForJDBCType(JdbcType jdbcType)
+    {
+        if (jdbcType == JdbcType.BIGINT)
+        {
+            return "int8";
+        }
+        else if (jdbcType == JdbcType.BIT)
+        {
+            return "bool";
+        }
+        else if (jdbcType == JdbcType.BLOB)
+        {
+            return "bytea";
+        }
+        else if (jdbcType == JdbcType.CHAR)
+        {
+            return "char";
+        }
+        else if (jdbcType == JdbcType.CLOB)
+        {
+            return "text";
+        }
+        else if (jdbcType == JdbcType.DATE)
+        {
+            return "date";
+        }
+        else if (jdbcType == JdbcType.DOUBLE)
+        {
+            return "float8";
+        }
+        else if (jdbcType == JdbcType.INTEGER)
+        {
+            return "int4";
+        }
+        else if (jdbcType == JdbcType.LONGVARCHAR)
+        {
+            return "text";
+        }
+        else if (jdbcType == JdbcType.NUMERIC)
+        {
+            return "numeric";
+        }
+        else if (jdbcType == JdbcType.REAL)
+        {
+            return "float4";
+        }
+        else if (jdbcType == JdbcType.SMALLINT)
+        {
+            return "int2";
+        }
+        else if (jdbcType == JdbcType.TIME)
+        {
+            return "time";
+        }
+        else if (jdbcType == JdbcType.TIMESTAMP)
+        {
+            return "timestamptz";
+        }
+        else if (jdbcType == JdbcType.VARCHAR)
+        {
+            return "varchar";
+        }
+
+        return super.getPreferredDefaultSQLTypeForJDBCType(jdbcType);
+    }
+
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
     {
         SQLTypeInfo info = new PostgreSQLTypeInfo(rs);
 
-        // This was from TJDO (2003) presumably trying to restrict the available types to sensible ones. Commented out as we try to allow any type.
-        // Since PostgreSQL supports many user defined data types and uses many type aliases the default methods have trouble finding the right associations between 
-        // JDBC and PostgreSQL data types.  We filter the returned type info to be sure we use the appropriate base PostgreSQL types for the important JDBC types.
-        /*if (psqlTypes == null)
-        {
-            psqlTypes = new ConcurrentHashMap<>();
-            psqlTypes.put("" + Types.BIT, "bool");
-            psqlTypes.put("" + Types.TIMESTAMP, "timestamptz");
-            psqlTypes.put("" + Types.BIGINT, "int8");
-            psqlTypes.put("" + Types.CHAR, "char");
-            psqlTypes.put("" + Types.DATE, "date");
-            psqlTypes.put("" + Types.DOUBLE, "float8");
-            psqlTypes.put("" + Types.INTEGER, "int4");
-            psqlTypes.put("" + Types.LONGVARCHAR, "text");
-            psqlTypes.put("" + Types.CLOB, "text");
-            psqlTypes.put("" + Types.BLOB, "bytea");
-            psqlTypes.put("" + Types.NUMERIC, "numeric");
-            psqlTypes.put("" + Types.REAL, "float4");
-            psqlTypes.put("" + Types.SMALLINT, "int2");
-            psqlTypes.put("" + Types.TIME, "time");
-            psqlTypes.put("" + Types.VARCHAR, "varchar");
-
-            // TODO Enable alternative OTHER types
-            psqlTypes.put("" + Types.OTHER, "uuid");
-
-            psqlTypes.put("" + Types.ARRAY, "VARCHAR(255) ARRAY");
-            psqlTypes.put("" + Types.ARRAY, "INT ARRAY");
-
-            // PostgreSQL provides 2 types for "char" mappings: "char", "bpchar"; PostgreSQL recommend bpchar for default usage, but sadly you cannot say "bpchar(200)" in an SQL statement. 
-            // Due to this we use "char" since you can say "char(100)" (and internally in PostgreSQL it becomes bpchar).
-            // PostgreSQL 8.1 JDBC driver somehow puts "char" as Types.OTHER rather than Types.CHAR ! so this is faked in createTypeInfo() above.
-            // PostgreSQL (7.3, 7.4) doesn't provide a SQL type to map to JDBC types FLOAT, DECIMAL, BLOB, BOOLEAN
-        }
-        Object obj = psqlTypes.get("" + info.getDataType());
-        if (obj != null)
-        {
-            String  psql_type_name = (String)obj;
-            if (!info.getTypeName().equalsIgnoreCase(psql_type_name))
-            {
-                // We don't support this JDBC type using *this* PostgreSQL SQL type
-                NucleusLogger.DATASTORE.debug(Localiser.msg("051007", info.getTypeName(), getNameForJDBCType(info.getDataType())));
-                return null;
-            }
-        }*/
         return info;
     }
 
@@ -755,7 +782,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     protected void loadColumnMappings(PluginManager mgr, ClassLoaderResolver clr)
     {
         // Load up built-in types for this datastore
-        registerColumnMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.column.BitColumnMapping.class, JDBCType.BIT, "BIT", true);
+        registerColumnMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.column.BitColumnMapping.class, JDBCType.BIT, "BOOL", true);
         registerColumnMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.column.BooleanColumnMapping.class, JDBCType.BOOLEAN, "BOOLEAN", false);
         registerColumnMapping(Boolean.class.getName(), org.datanucleus.store.rdbms.mapping.column.BooleanColumnMapping.class, JDBCType.TINYINT, "TINYINT", false);
@@ -804,28 +831,35 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         registerColumnMapping(BigInteger.class.getName(), org.datanucleus.store.rdbms.mapping.column.NumericColumnMapping.class, JDBCType.NUMERIC, "NUMERIC", true);
 
         registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.DateColumnMapping.class, JDBCType.DATE, "DATE", true);
+        registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMPTZ", false);
         registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", false);
         registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerColumnMapping(java.sql.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
         registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIME", true);
+        registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIMETZ", false);
+        registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMPTZ", false);
         registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", false);
         registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerColumnMapping(java.sql.Time.class.getName(), org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
-        registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", true);
+        registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMPTZ", true);
+        registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", false);
         registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.DateColumnMapping.class, JDBCType.DATE, "DATE", false);
         registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIME", false);
+        registerColumnMapping(java.sql.Timestamp.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIMETZ", false);
 
-        registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", true);
+        registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMPTZ", true);
+        registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimestampColumnMapping.class, JDBCType.TIMESTAMP, "TIMESTAMP", false);
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.DateColumnMapping.class, JDBCType.DATE, "DATE", false);
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIME", false);
+        registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.TimeColumnMapping.class, JDBCType.TIME, "TIMETZ", false);
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
         registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.OtherColumnMapping.class, JDBCType.OTHER, "UUID", false);
