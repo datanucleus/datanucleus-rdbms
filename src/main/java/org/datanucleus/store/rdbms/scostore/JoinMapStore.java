@@ -670,7 +670,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
-                if (getStmtLocked == null) {
+                if (getStmtLocked == null) 
+                {
                     // Generate the statement, and statement mapping/parameter information
                     SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
                     getStmtUnlocked = sqlStmt.getSQLText().toSQL();
