@@ -30,8 +30,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
@@ -62,7 +60,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     public static final String POSTGRESQL_RESERVED_WORDS =
         "ALL,ANALYSE,ANALYZE,DO,FREEZE,ILIKE,ISNULL,OFFSET,PLACING,VERBOSE";
         
-    protected Map<String, String> psqlTypes;
+//    protected Map<String, String> psqlTypes;
 
     /**
      * Constructor.
@@ -173,9 +171,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     {
         SQLTypeInfo info = new PostgreSQLTypeInfo(rs);
 
+        // This was from TJDO (2003) presumably trying to restrict the available types to sensible ones. Commented out as we try to allow any type.
         // Since PostgreSQL supports many user defined data types and uses many type aliases the default methods have trouble finding the right associations between 
         // JDBC and PostgreSQL data types.  We filter the returned type info to be sure we use the appropriate base PostgreSQL types for the important JDBC types.
-        if (psqlTypes == null)
+        /*if (psqlTypes == null)
         {
             psqlTypes = new ConcurrentHashMap<>();
             psqlTypes.put("" + Types.BIT, "bool");
@@ -215,7 +214,7 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
                 NucleusLogger.DATASTORE.debug(Localiser.msg("051007", info.getTypeName(), getNameForJDBCType(info.getDataType())));
                 return null;
             }
-        }
+        }*/
         return info;
     }
 
