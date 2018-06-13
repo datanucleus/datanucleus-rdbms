@@ -632,6 +632,16 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.adapter.DatastoreAdapter#getPreferredDefaultSQLTypeForJDBCType(org.datanucleus.metadata.JdbcType)
+     */
+    @Override
+    public String getPreferredDefaultSQLTypeForJDBCType(JdbcType jdbcType)
+    {
+        // Override if you want to specify a preference
+        return null;
+    }
+
     public String getNameForJDBCType(int jdbcType)
     {
         String typeName = supportedJdbcTypesById.get(Integer.valueOf(jdbcType));

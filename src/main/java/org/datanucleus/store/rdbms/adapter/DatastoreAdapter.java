@@ -433,6 +433,13 @@ public interface DatastoreAdapter
     boolean supportsOption(String option);
 
     /**
+     * Way for a DatastoreAdapter to specify a preferred default SQL type for a JDBC type (when there are multiple).
+     * @param jdbcType The JDBC type
+     * @return The SQL type preferred
+     */
+    String getPreferredDefaultSQLTypeForJDBCType(JdbcType jdbcType);
+
+    /**
      * Return a name for a JDBC Types value.
      * @param jdbcType The jdbc type
      * @return The name

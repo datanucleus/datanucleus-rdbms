@@ -98,6 +98,24 @@ public class JDBCTypeInfo implements MapStoreSchemaData
     }
 
     /**
+     * Set the default child to be used. If this child is not a current value then it will be ignored.
+     * @param sqlTypeName SQL Type to use as the default for this JDBC type
+     */
+    public void setDefaultChild(String sqlTypeName)
+    {
+        Iterator<Map.Entry<String, StoreSchemaData>> sqlTypesEntryIter = sqlTypes.entrySet().iterator();
+        while (sqlTypesEntryIter.hasNext())
+        {
+            Map.Entry<String, StoreSchemaData> sqlTypesEntry = sqlTypesEntryIter.next();
+            SQLTypeInfo sqlType = (SQLTypeInfo) sqlTypesEntry.getValue();
+            if (sqlType.getTypeName().equalsIgnoreCase(sqlTypeName))
+            {
+                sqlTypes.put("DEFAULT", sqlType);
+            }
+        }
+    }
+
+    /**
      * Method to remove all children.
      */
     public void clearChildren()

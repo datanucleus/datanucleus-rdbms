@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -492,6 +493,16 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                         {
                             // New SQL type for existing JDBC type
                             jdbcType.addChild(sqlType);
+                        }
+
+                        // Make sure any default of the DatastoreAdapter is respected
+                        String preferredDefaultSql = dba.getPreferredDefaultSQLTypeForJDBCType(JdbcType.getEnumByValue(sqlType.getDataType()));
+                        if (preferredDefaultSql != null)
+                        {
+                            if (preferredDefaultSql.equalsIgnoreCase(sqlType.getTypeName()))
+                            {
+                                jdbcType.setDefaultChild(sqlType.getTypeName());
+                            }
                         }
                     }
                 }
