@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
+import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -47,6 +48,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.schema.StoreSchemaHandler;
+import org.datanucleus.util.Localiser;
 import org.datanucleus.util.StringUtils;
 
 /**
@@ -79,8 +81,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
 
     /**
      * Constructor.
-     * Overridden so we can add on our own list of NON SQL92 reserved words
-     * which is returned incorrectly with the JDBC driver.
+     * Overridden so we can add on our own list of NON SQL92 reserved words which is returned incorrectly with the JDBC driver.
      * @param metadata MetaData for the DB
      **/
     public MySQLAdapter(DatabaseMetaData metadata)
@@ -132,10 +133,15 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
         // TODO Actually this is no longer true ... MariaDB 5.3+, MySQL 5.7+ but can have problems storing nanos
         supportedOptions.remove(DATETIME_STORES_MILLISECS);
-//      if (driverName.equalsIgnoreCase("mariadb-jdbc"))
-//      {
-//          // TODO Do this different for MariaDB if it handles it right
-//      }
+
+        if (driverName.equalsIgnoreCase("mariadb-jdbc"))
+        {
+            if (datastoreMajorVersion > 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion >= 3))
+            {
+                // Sequences added to MariaDB v10.3
+                supportedOptions.add(SEQUENCES);
+            }
+        }
 
         supportedOptions.add(OPERATOR_BITWISE_AND);
         supportedOptions.add(OPERATOR_BITWISE_OR);
@@ -491,6 +497,72 @@ public class MySQLAdapter extends BaseDatastoreAdapter
             return false;
         }
         return super.validToIndexMapping(mapping);
+    }
+
+    /**
+     * Accessor for the sequence statement to create the sequence.
+     * @param sequenceName Name of the sequence 
+     * @param min Minimum value for the sequence
+     * @param max Maximum value for the sequence
+     * @param start Start value for the sequence
+     * @param increment Increment value for the sequence
+     * @param cacheSize Cache size for the sequence
+     * @return The statement for getting the next id from the sequence
+     */
+    public String getSequenceCreateStmt(String sequenceName, Integer min, Integer max, Integer start, Integer increment, Integer cacheSize)
+    {
+        if (sequenceName == null)
+        {
+            throw new NucleusUserException(Localiser.msg("051028"));
+        }
+
+        StringBuilder stmt = new StringBuilder("CREATE SEQUENCE ");
+        stmt.append(sequenceName);
+        if (increment != null)
+        {
+            stmt.append(" INCREMENT BY " + increment);
+        }
+        if (min != null)
+        {
+            stmt.append(" MINVALUE " + min);
+        }
+        if (max != null)
+        {
+            stmt.append(" MAXVALUE " + max);
+        }
+        if (start != null)
+        {
+            stmt.append(" START WITH " + start);
+        }
+        if (cacheSize != null)
+        {
+            stmt.append(" CACHE " + cacheSize);
+        }
+        else
+        {
+            stmt.append(" NOCACHE");
+        }
+
+        return stmt.toString();
+    }
+
+    /**
+     * Accessor for the statement for getting the next id from the sequence for this datastore.
+     * @param sequenceName Name of the sequence 
+     * @return The statement for getting the next id for the sequence
+     **/
+    public String getSequenceNextStmt(String sequenceName)
+    {
+        if (sequenceName == null)
+        {
+            throw new NucleusUserException(Localiser.msg("051028"));
+        }
+
+        StringBuilder stmt=new StringBuilder("SELECT nextval('");
+        stmt.append(sequenceName);
+        stmt.append("')");
+
+        return stmt.toString();
     }
 
     /* (non-Javadoc)
