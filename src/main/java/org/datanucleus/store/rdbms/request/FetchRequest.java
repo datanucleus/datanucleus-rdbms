@@ -400,8 +400,8 @@ public class FetchRequest extends Request
                             // Copy the results into the object
                             ResultSetGetter rsGetter = new ResultSetGetter(ec, rs, mappingDef, op.getClassMetaData());
                             rsGetter.setObjectProvider(op);
-                            op.replaceFields(memberNumbersToFetch, rsGetter);
 
+                            // Make sure the version is set first
                             if (op.getTransactionalVersion() == null)
                             {
                                 // Object has no version set so update it from this fetch
@@ -414,11 +414,16 @@ public class FetchRequest extends Request
                                 }
                                 else if (versionFieldName != null)
                                 {
-                                    // Version field - now populated in the field in the object from the results
-                                    datastoreVersion = op.provideField(cmd.getAbsolutePositionOfMember(versionFieldName));
+                                    // Version field - populate it in the object and access it from the field
+                                    int verAbsFieldNum = cmd.getAbsolutePositionOfMember(versionFieldName);
+                                    op.replaceFields(new int[] {verAbsFieldNum}, rsGetter);
+                                    datastoreVersion = op.provideField(verAbsFieldNum);
                                 }
                                 op.setVersion(datastoreVersion);
                             }
+
+                            // Update all fields
+                            op.replaceFields(memberNumbersToFetch, rsGetter);
                         }
                         finally
                         {
