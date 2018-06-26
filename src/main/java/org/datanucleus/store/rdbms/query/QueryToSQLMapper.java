@@ -917,6 +917,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             }
 
             int maxFetchDepth = fetchPlan.getMaxFetchDepth();
+            if (extensionsByName.containsKey(PropertyNames.PROPERTY_MAX_FETCH_DEPTH))
+            {
+                maxFetchDepth = (Integer)extensionsByName.get(PropertyNames.PROPERTY_MAX_FETCH_DEPTH);
+            }
             if (maxFetchDepth < 0)
             {
                 NucleusLogger.QUERY.debug("No limit specified on query fetch so limiting to 3 levels from candidate. " + 
