@@ -1881,6 +1881,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("Math.floor".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathFloorMethod.class;
             else if ("Math.log".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathLogMethod.class;
             else if ("Math.power".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathPowerMethod.class;
+            else if ("Math.round".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
             else if ("Math.sin".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathSinMethod.class;
             else if ("Math.sqrt".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathSqrtMethod.class;
             else if ("Math.tan".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.MathTanMethod.class;
