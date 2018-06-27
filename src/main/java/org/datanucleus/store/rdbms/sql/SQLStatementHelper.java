@@ -852,14 +852,18 @@ public class SQLStatementHelper
                     SQLTable relatedSqlTbl = null;
                     if (relatedTypeMapping == null)
                     {
-                        // Join the 1-1 relation
-                        JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
-                        if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                        // Join the 1-1 relation, if not already joined
+                        relatedSqlTbl = stmt.getTable(relatedTbl, tableGroupName);
+                        if (relatedSqlTbl == null)
                         {
-                            inputJoinType = joinType;
+                            JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
+                            if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                            {
+                                inputJoinType = joinType;
+                            }
+                            relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
+                                relatedMapping, relatedTbl, null, discrimValues, tableGroupName, joinType);
                         }
-                        relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
-                            relatedMapping, relatedTbl, null, discrimValues, tableGroupName, joinType);
 
                         // Select the id mapping in the related table
                         int[] colNumbers = stmt.select(relatedSqlTbl, relatedTbl.getIdMapping(), null);
@@ -893,14 +897,18 @@ public class SQLStatementHelper
                         }
                         else
                         {
-                            // Join the 1-1 relation
-                            JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
-                            if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                            // Join the 1-1 relation, if not already joined
+                            relatedSqlTbl = stmt.getTable(relatedTbl, tableGroupName);
+                            if (relatedSqlTbl == null)
                             {
-                                inputJoinType = joinType;
+                                JoinType joinType = getJoinTypeForOneToOneRelationJoin(sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl, inputJoinType);
+                                if (joinType == JoinType.LEFT_OUTER_JOIN || joinType == JoinType.RIGHT_OUTER_JOIN)
+                                {
+                                    inputJoinType = joinType;
+                                }
+                                relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
+                                    relatedMapping, relationTbl, null, null, tableGroupName, joinType);
                             }
-                            relatedSqlTbl = addJoinForOneToOneRelation(stmt, sourceSqlTbl.getTable().getIdMapping(), sourceSqlTbl,
-                                relatedMapping, relationTbl, null, null, tableGroupName, joinType);
                         }
 
                         // Select the id mapping in the subclass of the related table
