@@ -84,7 +84,6 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
      * @param mapTable Join table used by the map
      * @param mapStore Backing store for the map
      * @param clr The ClassLoaderResolver
-     * @param storeMgr Manager for the datastore
      */
     MapValueCollectionStore(MapTable mapTable, JoinMapStore<?, V> mapStore, ClassLoaderResolver clr)
     {

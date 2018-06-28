@@ -376,7 +376,7 @@ public class DeleteRequest extends Request
      * @param op ObjectProvider of this object
      * @param mmd MetaData for field that has related (owner) objects
      */
-    private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider op, AbstractMemberMetaData fmd)
+    private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider op, AbstractMemberMetaData mmd)
     {
         if (softDeleteStmt != null)
         {
@@ -386,13 +386,13 @@ public class DeleteRequest extends Request
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", op.getObjectAsPrintable(), fmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", op.getObjectAsPrintable(), mmd.getFullFieldName()));
         }
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
         ExecutionContext ec = op.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
-        AbstractMemberMetaData[] relatedMmds = fmd.getRelatedMemberMetaData(clr);
+        AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
 
         // Check if we should null here, or leave to the datastore FK handler
         boolean checkFK = true;
@@ -438,7 +438,7 @@ public class DeleteRequest extends Request
         while (it.hasNext())
         {
             DatastoreClass refTable = it.next();
-            JavaTypeMapping refMapping = refTable.getMemberMapping(fmd.getMappedBy());
+            JavaTypeMapping refMapping = refTable.getMemberMapping(mmd.getMappedBy());
             if (refMapping.isNullable()) // Only clear the references that can be cleared
             {
                 // Create a statement to clear the link from the previous related object

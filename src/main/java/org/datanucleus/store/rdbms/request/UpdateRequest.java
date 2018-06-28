@@ -507,7 +507,7 @@ public class UpdateRequest extends Request
 
         /**
          * Constructor
-         * @param clr the ClassLoaderResolver
+         * @param cmd metadata for the class
          */
         public UpdateMappingConsumer(AbstractClassMetaData cmd)
         {
@@ -535,20 +535,20 @@ public class UpdateRequest extends Request
          * @param m The mapping.
          * @param mmd MetaData for the field
          */
-        public void consumeMapping(JavaTypeMapping m, AbstractMemberMetaData fmd)
+        public void consumeMapping(JavaTypeMapping m, AbstractMemberMetaData mmd)
         {
-            if (!fmd.getAbstractClassMetaData().isSameOrAncestorOf(cmd))
+            if (!mmd.getAbstractClassMetaData().isSameOrAncestorOf(cmd))
             {
                 return;
             }
             if (m.includeInUpdateStatement())
             {
                 // Check if the field is "updatable" (either using JPA column, or JDO extension)
-                if (fmd.hasExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE) && fmd.getValueForExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE).equalsIgnoreCase("false"))
+                if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE) && mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_UPDATEABLE).equalsIgnoreCase("false"))
                 {
                     return;
                 }
-                ColumnMetaData[] colmds = fmd.getColumnMetaData();
+                ColumnMetaData[] colmds = mmd.getColumnMetaData();
                 if (colmds != null && colmds.length > 0)
                 {
                     for (int i=0;i<colmds.length;i++)
@@ -561,7 +561,7 @@ public class UpdateRequest extends Request
                     }
                 }
 
-                Integer abs_field_num = Integer.valueOf(fmd.getAbsoluteFieldNumber());
+                Integer abs_field_num = Integer.valueOf(mmd.getAbsoluteFieldNumber());
                 int parametersIndex[] = new int[m.getNumberOfColumnMappings()];
                 StatementMappingIndex sei = new StatementMappingIndex(m);
                 sei.addParameterOccurrence(parametersIndex);
@@ -575,7 +575,7 @@ public class UpdateRequest extends Request
                         // The candidate being updated isn't in this table, so go to base for metadata for this mapping
                         vermd = cmd.getBaseAbstractClassMetaData().getVersionMetaDataForClass();
                     }
-                    if (vermd != null && vermd.getFieldName() != null && fmd.getName().equals(vermd.getFieldName()))
+                    if (vermd != null && vermd.getFieldName() != null && mmd.getName().equals(vermd.getFieldName()))
                     {
                         // Version field to be put in WHERE clause (only non-PK field that will come here)
                         stmtMappingDefinition.setWhereVersion(sei);
@@ -591,7 +591,7 @@ public class UpdateRequest extends Request
                     }
                     else
                     {
-                        stmtMappingDefinition.getWhereFields()[fmd.getAbsoluteFieldNumber()] = sei; 
+                        stmtMappingDefinition.getWhereFields()[mmd.getAbsoluteFieldNumber()] = sei; 
                         for (int j=0; j<parametersIndex.length; j++)
                         {
                             if (where.length() > 0)
@@ -613,7 +613,7 @@ public class UpdateRequest extends Request
                 else
                 {
                     // Update fields
-                    stmtMappingDefinition.getUpdateFields()[fmd.getAbsoluteFieldNumber()] = sei;
+                    stmtMappingDefinition.getUpdateFields()[mmd.getAbsoluteFieldNumber()] = sei;
                     for (int j = 0; j < parametersIndex.length; j++)
                     {
                         // check if the column was not already assigned
@@ -646,7 +646,7 @@ public class UpdateRequest extends Request
                         }
                         if (!columnExists)
                         {
-                            assignedColumns.put(columnId.toString(), Integer.valueOf(fmd.getAbsoluteFieldNumber()));
+                            assignedColumns.put(columnId.toString(), Integer.valueOf(mmd.getAbsoluteFieldNumber()));
                         }
                     }
                 }
