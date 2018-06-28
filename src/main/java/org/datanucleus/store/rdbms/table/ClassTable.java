@@ -1570,16 +1570,16 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
      * @param clr ClassLoader resolver
      * @return The order mapping (if updated)
      */
-    private JavaTypeMapping addOrderMapping(AbstractMemberMetaData fmd, JavaTypeMapping orderMapping, ClassLoaderResolver clr)
+    private JavaTypeMapping addOrderMapping(AbstractMemberMetaData mmd, JavaTypeMapping orderMapping, ClassLoaderResolver clr)
     {
         boolean needsOrderMapping = false;
-        OrderMetaData omd = fmd.getOrderMetaData();
-        if (fmd.hasArray())
+        OrderMetaData omd = mmd.getOrderMetaData();
+        if (mmd.hasArray())
         {
             // Array field always has the index mapping
             needsOrderMapping = true;
         }
-        else if (List.class.isAssignableFrom(fmd.getType()))
+        else if (List.class.isAssignableFrom(mmd.getType()))
         {
             // List field
             needsOrderMapping = true;
@@ -1589,7 +1589,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 needsOrderMapping = false;
             }
         }
-        else if (java.util.Collection.class.isAssignableFrom(fmd.getType()) && omd != null && omd.isIndexedList())
+        else if (java.util.Collection.class.isAssignableFrom(mmd.getType()) && omd != null && omd.isIndexedList())
         {
             // Collection field with <order> and is indexed list so needs order mapping
             needsOrderMapping = true;
@@ -1607,9 +1607,9 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             if (orderMapping == null)
             {
                 // Create new order mapping since we need one and we aren't using a shared FK
-                orderMapping = this.addOrderColumn(fmd, clr);
+                orderMapping = this.addOrderColumn(mmd, clr);
             }
-            getExternalOrderMappings().put(fmd, orderMapping);
+            getExternalOrderMappings().put(mmd, orderMapping);
             state = TABLE_STATE_INITIALIZED;
         }
 
