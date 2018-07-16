@@ -292,6 +292,15 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         return wordSeparator;
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.rdbms.identifier.IdentifierFactory#getIdentifierTruncatedToAdapterColumnLength(java.lang.String)
+     */
+    @Override
+    public String getIdentifierTruncatedToAdapterColumnLength(String identifier)
+    {
+        return truncate(identifier, dba.getDatastoreIdentifierMaxLength(IdentifierType.COLUMN));
+    }
+
     /**
      * Method to truncate an identifier to fit within the specified identifier length.
      * If truncation is necessary will use a 4 char hashcode (defined by {@link #HASH_LENGTH}) (at the end) to attempt to create uniqueness.
@@ -301,7 +310,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      */
     protected String truncate(String identifier, int length)
     {
-        // return namingFactory.truncate(identifier, length);
+        // TODO return namingFactory.truncate(identifier, length);
         if (length < 0) // Special case of no truncation
         {
             return identifier;
@@ -309,7 +318,12 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         if (identifier.length() > length)
         {
             if (length < HASH_LENGTH)
+            {
                 throw new IllegalArgumentException("The length argument (=" + length + ") is less than HASH_LENGTH(=" + HASH_LENGTH + ")!");
+            }
+
+            // Always use lowercase form as basis for truncation (in case we are using JPQL and an alias was artificially stored in lower, and referenced in upper).
+            identifier = identifier.toLowerCase();
 
             // Truncation is necessary so cut down to "maxlength-HASH_LENGTH" and add HASH_LENGTH chars hashcode
             int tailIndex = length - HASH_LENGTH;
@@ -317,14 +331,18 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
 
             // We have to scale down the hash anyway, so we can simply ignore the sign
             if (tailHash < 0)
+            {
                 tailHash *= -1;
+            }
 
             // Scale the hash code down to the range 0 ... (HASH_RANGE - 1)
             tailHash %= HASH_RANGE;
 
             String suffix = Integer.toString(tailHash, Character.MAX_RADIX);
             if (suffix.length() > HASH_LENGTH)
+            {
                 throw new IllegalStateException("Calculated hash \"" + suffix + "\" has more characters than defined by HASH_LENGTH (=" + HASH_LENGTH + ")! This should never happen!");
+            }
 
             // we add prefix "0", if it's necessary
             if (suffix.length() < HASH_LENGTH)
@@ -332,7 +350,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
                 StringBuilder sb = new StringBuilder(HASH_LENGTH);
                 sb.append(suffix);
                 while (sb.length() < HASH_LENGTH)
+                {
                     sb.insert(0, '0');
+                }
 
                 suffix = sb.toString();
             }
@@ -352,7 +372,7 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
      */
     public String getIdentifierInAdapterCase(String identifier)
     {
-        // return namingFactory.getNameInRequiredCase(identifier);
+        // TODO return namingFactory.getNameInRequiredCase(identifier);
         if (identifier == null)
         {
             return null;
@@ -817,9 +837,8 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     }
 
     /**
-     * Convenience method to split a fully-specified identifier name (inc catalog/schema)
-     * into its constituent parts. Returns a String array with 3 elements. The first is the
-     * catalog, second the schema, and third the identifier.
+     * Convenience method to split a fully-specified identifier name (inc catalog/schema) into its constituent parts. 
+     * Returns a String array with 3 elements. The first is the catalog, second the schema, and third the identifier.
      * @param name Name
      * @return The parts
      */

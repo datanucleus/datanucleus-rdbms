@@ -1069,7 +1069,6 @@ public class SelectStatement extends SQLStatement
             }
             else
             {
-                // TODO Cater for ResultAliasExpression, so we just put the order aliasName
                 // Order using column aliases "NUCORDER{i}"
                 orderStmt = new SQLText();
                 boolean needsSelect = dba.supportsOption(DatastoreAdapter.INCLUDE_ORDERBY_COLS_IN_SELECT);
@@ -1078,6 +1077,7 @@ public class SelectStatement extends SQLStatement
                     // Don't select ordering columns with subqueries, since we will select just the required column(s)
                     needsSelect = false;
                 }
+
                 for (int i=0; i<orderingExpressions.length; ++i)
                 {
                     SQLExpression orderExpr = orderingExpressions[i];
@@ -1093,7 +1093,9 @@ public class SelectStatement extends SQLStatement
                     {
                         if (orderExpr instanceof ResultAliasExpression)
                         {
-                            String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(((ResultAliasExpression)orderExpr).getResultAlias());
+                            String orderStr = ((ResultAliasExpression)orderExpr).getResultAlias();
+                            orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierTruncatedToAdapterColumnLength(orderStr); // make sure it is truncated for the datastore limits
+                            orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderStr); // put it in the case of the datastore
                             addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
                         }
                         else
@@ -1125,7 +1127,9 @@ public class SelectStatement extends SQLStatement
                     {
                         if (orderExpr instanceof ResultAliasExpression)
                         {
-                            String orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(((ResultAliasExpression)orderExpr).getResultAlias());
+                            String orderStr = ((ResultAliasExpression)orderExpr).getResultAlias();
+                            orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierTruncatedToAdapterColumnLength(orderStr); // make sure it is truncated for the datastore limits
+                            orderStr = rdbmsMgr.getIdentifierFactory().getIdentifierInAdapterCase(orderStr); // put it in the case of the datastore
                             addOrderComponent(orderStmt, orderStr, orderExpr, orderDirection, orderNullDirective, dba);
                         }
                         else

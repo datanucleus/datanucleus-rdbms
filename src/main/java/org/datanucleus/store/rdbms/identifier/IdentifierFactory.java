@@ -52,6 +52,13 @@ public interface IdentifierFactory
     String getIdentifierInAdapterCase(String identifier);
 
     /**
+     * Method to truncate the provided identifier as required to the datastore adapter column length (if required)
+     * @param identifier The identifier
+     * @return The truncated variant (if the length was longer than the max column identifier length);
+     */
+    String getIdentifierTruncatedToAdapterColumnLength(String identifier);
+
+    /**
      * To be called when we want an identifier name creating based on the
      * identifier. Creates identifier for COLUMN, FOREIGN KEY, INDEX and TABLE
      * @param identifierType the type of identifier to be created
