@@ -1469,8 +1469,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     {
                         if (!getBooleanProperty(PropertyNames.PROPERTY_DATASTORE_READONLY) && getSchemaHandler().isAutoCreateTables())
                         {
-                            // If we aren't a read-only datastore, try to create a table and then 
-                            // retrieve its details, so as to obtain the catalog, schema. 
+                            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("020026"));
+
+                            // If we aren't a read-only datastore, try to create a table and then retrieve its details, so as to obtain the catalog, schema. 
                             ProbeTable pt = new ProbeTable(this);
                             pt.initialize(clr);
                             pt.create(conn);

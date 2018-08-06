@@ -691,11 +691,6 @@ public abstract class AbstractTable implements Table
 
         columns.add(col);
         columnsByIdentifier.put(colName, col);
-
-        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057034", col));
-        }
     }
     
     /**
