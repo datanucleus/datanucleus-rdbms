@@ -57,6 +57,7 @@ import org.datanucleus.store.rdbms.mapping.java.AbstractContainerMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.query.AbstractJPQLQuery;
 import org.datanucleus.store.query.CandidateIdsQueryResult;
+import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryInterruptedException;
 import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.query.QueryResult;
@@ -74,6 +75,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.SelectStatementGenerator;
 import org.datanucleus.store.rdbms.sql.UpdateStatement;
 import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
@@ -114,6 +116,8 @@ public class JPQLQuery extends AbstractJPQLQuery
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
+
+    boolean statementReturnsEmpty = false;
 
     /**
      * Constructs a new query instance that uses the given object manager.
@@ -229,6 +233,13 @@ public class JPQLQuery extends AbstractJPQLQuery
         if (isCompiled())
         {
             return;
+        }
+
+        if (getExtension("include-soft-deletes") != null)
+        {
+            // If using an extension that can change the datastore query then evict any existing compilation
+            QueryManager qm = getQueryManager();
+            qm.removeQueryCompilation(Query.LANGUAGE_JPQL, getQueryCacheKey());
         }
 
         // Compile the generic query expressions
@@ -486,7 +497,7 @@ public class JPQLQuery extends AbstractJPQLQuery
             }
             else
             {
-                if (useCaching() && queryCacheKey != null)
+                if (!statementReturnsEmpty && useCaching() && queryCacheKey != null)
                 {
                 	qm.addDatastoreQueryCompilation(datastoreKey, getLanguage(), queryCacheKey, datastoreCompilation);
                 }
@@ -509,6 +520,11 @@ public class JPQLQuery extends AbstractJPQLQuery
 
     protected Object performExecute(Map parameters)
     {
+        if (statementReturnsEmpty)
+        {
+            return Collections.EMPTY_LIST;
+        }
+
         if (candidateCollection != null)
         {
             // Supplied collection of instances, so evaluate in-memory
@@ -799,9 +815,37 @@ public class JPQLQuery extends AbstractJPQLQuery
         }
 
         // Generate statement for candidate(s)
-        SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-            datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, 
-            compilation.getCandidateAlias(), compilation.getCandidateAlias(), null);
+        SelectStatement stmt = null;
+        try
+        {
+            boolean includeSoftDeletes = getBooleanExtensionProperty("include-soft-deletes", false);
+            boolean dontRestrictDiscrim = getBooleanExtensionProperty("dont-restrict-discriminator", false);
+            Set<String> options = null;
+            if (includeSoftDeletes)
+            {
+                options = new HashSet<>();
+                options.add(SelectStatementGenerator.OPTION_INCLUDE_SOFT_DELETES);
+            }
+            if (dontRestrictDiscrim)
+            {
+                if (options == null)
+                {
+                    options = new HashSet<>();
+                }
+                options.add(SelectStatementGenerator.OPTION_DONT_RESTRICT_DISCRIM);
+            }
+            stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, 
+                compilation.getCandidateAlias(), compilation.getCandidateAlias(), options);
+        }
+        catch (NucleusException ne)
+        {
+            // Statement would result in no results, so just catch it and avoid generating the statement
+            NucleusLogger.QUERY.warn("Query for candidates of " + candidateClass.getName() +
+                (subclasses ? " and subclasses" : "") + " resulted in no possible candidates : " + StringUtils.getMessageFromRootCauseOfThrowable(ne));
+            statementReturnsEmpty = true;
+            return;
+        }
 
         // Update the SQLStatement with filter, ordering, result etc
         Set<String> options = new HashSet<>();
@@ -960,8 +1004,19 @@ public class JPQLQuery extends AbstractJPQLQuery
         datastoreCompilation.setResultDefinitionForClass(resultsDef);
 
         // Generate statement for candidate(s)
-        SelectStatement stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
-            datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, null);
+        SelectStatement stmt = null;
+        try
+        {
+            stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
+                datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, null);
+        }
+        catch (NucleusException ne)
+        {
+            // Statement would result in no results, so just catch it and avoid generating the statement
+            NucleusLogger.QUERY.warn("Query for candidates of " + candidateClass.getName() + (subclasses ? " and subclasses" : "") + " resulted in no possible candidates", ne);
+            statementReturnsEmpty = true;
+            return;
+        }
 
         if (stmt.allUnionsForSamePrimaryTable())
         {

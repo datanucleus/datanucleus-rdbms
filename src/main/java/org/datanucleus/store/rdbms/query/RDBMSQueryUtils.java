@@ -463,11 +463,15 @@ public class RDBMSQueryUtils extends QueryUtils
                 if (tbl.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, true) != null || QueryUtils.resultHasOnlyAggregates(result))
                 {
                     // Either has a discriminator, or only selecting aggregates so need single select
-                    // TODO Add option to omit discriminator restriction
                     stmtGen = new DiscriminatorStatementGenerator(storeMgr, clr, cls, subclasses, candidateAliasId, candidateTableGroupName);
                     stmtGen.setOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
                     if (options != null)
                     {
+                        if (options.contains(SelectStatementGenerator.OPTION_DONT_RESTRICT_DISCRIM))
+                        {
+                            // User explicitly requested no restriction on the discriminator
+                            stmtGen.unsetOption(SelectStatementGenerator.OPTION_RESTRICT_DISCRIM);
+                        }
                         for (String option : options)
                         {
                             stmtGen.setOption(option);

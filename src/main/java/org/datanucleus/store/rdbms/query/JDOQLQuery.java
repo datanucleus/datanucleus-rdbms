@@ -867,11 +867,20 @@ public class JDOQLQuery extends AbstractJDOQLQuery
         try
         {
             boolean includeSoftDeletes = getBooleanExtensionProperty("include-soft-deletes", false);
+            boolean dontRestrictDiscrim = getBooleanExtensionProperty("dont-restrict-discriminator", false);
             Set<String> options = null;
             if (includeSoftDeletes)
             {
                 options = new HashSet<>();
                 options.add(SelectStatementGenerator.OPTION_INCLUDE_SOFT_DELETES);
+            }
+            if (dontRestrictDiscrim)
+            {
+                if (options == null)
+                {
+                    options = new HashSet<>();
+                }
+                options.add(SelectStatementGenerator.OPTION_DONT_RESTRICT_DISCRIM);
             }
             stmt = RDBMSQueryUtils.getStatementForCandidates((RDBMSStoreManager) getStoreManager(), null, candidateCmd,
                 datastoreCompilation.getResultDefinitionForClass(), ec, candidateClass, subclasses, result, null, null, options);

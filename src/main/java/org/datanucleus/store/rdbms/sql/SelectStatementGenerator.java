@@ -33,6 +33,9 @@ public interface SelectStatementGenerator
     /** Option to add a WHERE clause to restrict to the discriminator value. */
     static final String OPTION_RESTRICT_DISCRIM = "restrictDiscriminator";
 
+    /** Option to not add a WHERE clause to restrict to the discriminator value. */
+    static final String OPTION_DONT_RESTRICT_DISCRIM = "dontRestrictDiscriminator";
+
     /** Option to omit a WHERE clause restricting to non-soft-deleted objects (only relevant if the candidate has soft-delete enabled. */
     static final String OPTION_INCLUDE_SOFT_DELETES = "includeSoftDeletes";
 
