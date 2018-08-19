@@ -121,7 +121,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         {
             throw new NucleusUserException(Localiser.msg("056075", ownerMemberMetaData.getFullFieldName(), elementType));
         }
-        if (elementInfo != null && elementInfo.length > 1)
+        if (elementInfo.length > 1)
         {
             throw new NucleusUserException(Localiser.msg("056045", ownerMemberMetaData.getFullFieldName()));
         }
