@@ -104,8 +104,6 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.AbstractStoreManager;
 import org.datanucleus.store.BackedSCOStoreManager;
-import org.datanucleus.store.NucleusConnection;
-import org.datanucleus.store.NucleusConnectionImpl;
 import org.datanucleus.store.NucleusSequence;
 import org.datanucleus.store.StoreData;
 import org.datanucleus.store.StoreManager;
@@ -1385,41 +1383,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public NucleusSequence getNucleusSequence(ExecutionContext ec, SequenceMetaData seqmd)
     {
         return new NucleusSequenceImpl(ec, this, seqmd);
-    }
-
-    /**
-     * Method to return a NucleusConnection for the ExecutionContext.
-     * @param ec execution context
-     * @return The NucleusConnection
-     */
-    public NucleusConnection getNucleusConnection(final ExecutionContext ec)
-    {
-        ManagedConnection mc = connectionMgr.getConnection(ec.getTransaction().isActive(), ec, ec.getTransaction());
-
-        // Lock the connection now that it is in use by the user
-        mc.lock();
-
-        Runnable closeRunnable = new Runnable()
-        {
-            public void run()
-            {
-                // Unlock the connection now that the user has finished with it
-                mc.unlock();
-                if (!ec.getTransaction().isActive())
-                {
-                    // Close the (unenlisted) connection (committing its statements)
-                    try
-                    {
-                        ((Connection)mc.getConnection()).close();
-                    }
-                    catch (SQLException sqle)
-                    {
-                        throw new NucleusDataStoreException(sqle.getMessage());
-                    }
-                }
-            }
-        };
-        return new NucleusConnectionImpl(mc.getConnection(), closeRunnable);
     }
 
     /**
