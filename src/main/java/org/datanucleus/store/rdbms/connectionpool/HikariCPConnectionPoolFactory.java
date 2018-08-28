@@ -86,12 +86,12 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             }
         }
 
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE))
+        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_IDLE_TIMEOUT))
         {
-            long idle = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_IDLE);
-            if (idle >= 0 )
+            long timeout = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_IDLE_TIMEOUT);
+            if (timeout >= 0 )
             {
-                config.setIdleTimeout(idle);
+                config.setIdleTimeout(timeout);
             }
         }
 
@@ -126,12 +126,6 @@ public class HikariCPConnectionPoolFactory extends AbstractConnectionPoolFactory
             {
                 config.setConnectionTimeout(connectionTimeout);
             }
-        }
-
-        if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL))
-        {
-            String connectionTestQuery = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_TEST_SQL);
-            config.setConnectionTestQuery(connectionTestQuery);
         }
 
         if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_NAME))
