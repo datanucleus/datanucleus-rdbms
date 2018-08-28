@@ -74,6 +74,15 @@ public class DBCP2ConnectionPoolFactory extends AbstractConnectionPoolFactory
                 poolableCF.setValidationQuery(testSQL);
             }
 
+            if (storeMgr.hasProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_VALIDATION_TIMEOUT))
+            {
+                int validationTimeout = storeMgr.getIntProperty(RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_VALIDATION_TIMEOUT);
+                if (validationTimeout >= 0)
+                {
+                    poolableCF.setValidationQueryTimeout(validationTimeout);
+                }
+            }
+
             // Create the actual pool of connections, and apply any properties
             connectionPool = new org.apache.commons.pool2.impl.GenericObjectPool(poolableCF);
             poolableCF.setPool(connectionPool);

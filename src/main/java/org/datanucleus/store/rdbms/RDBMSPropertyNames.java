@@ -71,6 +71,8 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_CONNECTION_POOL_DRIVER_PROPS = "datanucleus.connectionPool.driverProps";
     public static final String PROPERTY_CONNECTION_POOL_LEAK_DETECTION_THRESHOLD = "datanucleus.connectionPool.leakThreshold";
     public static final String PROPERTY_CONNECTION_POOL_MAX_LIFETIME = "datanucleus.connectionPool.maxLifetime";
+    public static final String PROPERTY_CONNECTION_POOL_IDLE_TIMEOUT = "datanucleus.connectionPool.idleTimeout";
+    public static final String PROPERTY_CONNECTION_POOL_VALIDATION_TIMEOUT = "datanucleus.connectionPool.validationTimeout";
 
     // TODO These are HikariCP specific, so maybe ought to be named as such
     public static final String PROPERTY_CONNECTION_POOL_AUTO_COMMIT = "datanucleus.connectionPool.autoCommit";
@@ -78,7 +80,6 @@ public class RDBMSPropertyNames
     public static final String PROPERTY_CONNECTION_POOL_NAME = "datanucleus.connectionPool.name";
     public static final String PROPERTY_CONNECTION_POOL_ALLOW_POOL_SUPSENSION= "datanucleus.connectionPool.allowPoolSuspension";
     public static final String PROPERTY_CONNECTION_POOL_READ_ONLY = "datanucleus.connectionPool.readOnly";
-    public static final String PROPERTY_CONNECTION_POOL_VALIDATION_TIMEOUT = "datanucleus.connectionPool.validationTimeout";
     public static final String PROPERTY_CONNECTION_POOL_TRANSACTION_ISOLATION = "datanucleus.connectionPool.transactionIsolation";
     public static final String PROPERTY_CONNECTION_POOL_CATALOG = "datanucleus.connectionPool.catalog";
 
