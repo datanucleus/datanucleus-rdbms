@@ -1593,7 +1593,6 @@ public class MappingManagerImpl implements MappingManager
     {
         AbstractMemberMetaData mmd = mapping.getMemberMetaData();
         FieldRole roleForField = mapping.getRoleForMember();
-        Table tbl = mapping.getTable();
 
         // Take the column MetaData from the component that this mappings role relates to
         ColumnMetaData colmd = null;
@@ -1608,19 +1607,17 @@ public class MappingManagerImpl implements MappingManager
         }
         else if (roleForField == FieldRole.ROLE_MAP_VALUE)
         {
-            columnContainer= mmd.getValueMetaData();
+            columnContainer = mmd.getValueMetaData();
         }
 
         Column col;
-        ColumnMetaData[] colmds;
         if (columnContainer != null && columnContainer.getColumnMetaData().length > columnIndex)
         {
             colmd = columnContainer.getColumnMetaData()[columnIndex];
-            colmds = columnContainer.getColumnMetaData();
         }
         else
         {
-            // If column specified add one (use any column name specified on field element)
+            // This column index is not present, so add one to represent it
             colmd = new ColumnMetaData();
             if (mmd.getColumnMetaData() != null && mmd.getColumnMetaData().length > columnIndex)
             {
@@ -1629,18 +1626,13 @@ public class MappingManagerImpl implements MappingManager
             if (columnContainer != null)
             {
                 columnContainer.addColumn(colmd);
-                colmds = columnContainer.getColumnMetaData();
-            }
-            else
-            {
-                colmds = new ColumnMetaData[1];
-                colmds[0] = colmd;
             }
         }
 
         // Generate the column identifier
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
         DatastoreIdentifier identifier = null;
+        Table tbl = mapping.getTable();
         if (colmd.getName() == null)
         {
             // No name specified, so generate the identifier from the field name
@@ -1680,12 +1672,12 @@ public class MappingManagerImpl implements MappingManager
         else
         {
             // User has specified a name, so try to keep this unmodified
-            identifier = idFactory.newColumnIdentifier(colmds[columnIndex].getName(), 
-                storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true);
+            identifier = idFactory.newColumnIdentifier(colmd.getName(), storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true);
         }
 
         // Create the column
         col = tbl.addColumn(javaType, identifier, mapping, colmd);
+
         if (mmd.isPrimaryKey())
         {
             col.setPrimaryKey();
@@ -1772,10 +1764,11 @@ public class MappingManagerImpl implements MappingManager
 
         Column col;
         IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
+        DatastoreIdentifier identifier = null;
         if (colmd.getName() == null)
         {
             // No name specified, so generate the identifier from the field name
-            DatastoreIdentifier identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName());
+            identifier = idFactory.newIdentifier(IdentifierType.COLUMN, mmd.getName());
             int i=0;
             while (tbl.hasColumn(identifier))
             {
@@ -1784,14 +1777,15 @@ public class MappingManagerImpl implements MappingManager
             }
 
             colmd.setName(identifier.getName());
-            col = tbl.addColumn(javaType, identifier, mapping, colmd);
         }
         else
         {
             // User has specified a name, so try to keep this unmodified
-            col = tbl.addColumn(javaType, idFactory.newColumnIdentifier(colmd.getName(), 
-                    storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true), mapping, colmd);
+            identifier = idFactory.newColumnIdentifier(colmd.getName(), storeMgr.getNucleusContext().getTypeManager().isDefaultEmbeddedType(mmd.getType()), null, true);
         }
+
+        // Create the column
+        col = tbl.addColumn(javaType, identifier, mapping, colmd);
 
         setColumnNullability(mmd, colmd, col);
         if (mmd.getNullValue() == NullValue.DEFAULT)
