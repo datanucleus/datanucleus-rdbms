@@ -74,19 +74,20 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Class to provide a means of insertion of records to a data store. Extends basic request class 
- * implementing the execute method to do a JDBC insert operation.
+ * Class to provide a means of insertion of records to RDBMS. 
+ * Extends basic request class implementing the execute method to do a JDBC insert operation.
+ * The SQL will be of the form
+ * <pre>
+ * INSERT INTO TBL_NAME (col1, col2, col3, ...) VALUES (?, ?, ?, ...)
+ * </pre>
  * <p>
- * When inserting an object with inheritance this will involve 1 InsertRequest
- * for each table involved. So if we have a class B that extends class A and they
- * both use "new-table" inheritance strategy, we will have 2 InsertRequests, one for
- * table A, and one for table B.
+ * When inserting an object with inheritance this will involve 1 InsertRequest for each table involved. 
+ * So if we have a class B that extends class A and they both use "new-table" inheritance strategy, we will have 2 InsertRequests, one for table A, and one for table B.
  * </p>
  * <p>
- * When the InsertRequest starts to populate its statement and it has a PC field, this calls 
- * PersistableMapping.setObject(). This then checks if the other PC object is yet persistent 
- * and, if not, will persist it before processing this objects INSERT. This forms the key to 
- * "persistence-by-reachability".
+ * When the InsertRequest starts to populate its statement and it has a PC field, this calls PersistableMapping.setObject(). 
+ * This then checks if the other PC object is yet persistent and, if not, will persist it before processing this objects INSERT. 
+ * This forms the key to "persistence-by-reachability".
  * </p>
  */
 public class InsertRequest extends Request
@@ -360,8 +361,7 @@ public class InsertRequest extends Request
                             if (fkValue != null)
                             {
                                 // Need to provide the owner field number so PCMapping can work out if it is inserted yet
-                                AbstractMemberMetaData ownerFmd = 
-                                    table.getMetaDataForExternalMapping(externalFKStmtMappings[i].getMapping(), MappingType.EXTERNAL_FK);
+                                AbstractMemberMetaData ownerFmd = table.getMetaDataForExternalMapping(externalFKStmtMappings[i].getMapping(), MappingType.EXTERNAL_FK);
                                 for (int k=0;k<externalFKStmtMappings[i].getNumberOfParameterOccurrences();k++)
                                 {
                                     externalFKStmtMappings[i].getMapping().setObject(ec, ps,
@@ -374,8 +374,7 @@ public class InsertRequest extends Request
                                 // We're inserting a null so don't need the owner field
                                 for (int k=0;k<externalFKStmtMappings[i].getNumberOfParameterOccurrences();k++)
                                 {
-                                    externalFKStmtMappings[i].getMapping().setObject(ec, ps,
-                                        externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), null);
+                                    externalFKStmtMappings[i].getMapping().setObject(ec, ps, externalFKStmtMappings[i].getParameterPositionsForOccurrence(k), null);
                                 }
                             }
                         }
@@ -389,8 +388,7 @@ public class InsertRequest extends Request
                             Object discrimValue = op.getAssociatedValue(externalFKDiscrimStmtMappings[i].getMapping());
                             for (int k=0;k<externalFKDiscrimStmtMappings[i].getNumberOfParameterOccurrences();k++)
                             {
-                                externalFKDiscrimStmtMappings[i].getMapping().setObject(ec, ps, 
-                                    externalFKDiscrimStmtMappings[i].getParameterPositionsForOccurrence(k), discrimValue);
+                                externalFKDiscrimStmtMappings[i].getMapping().setObject(ec, ps, externalFKDiscrimStmtMappings[i].getParameterPositionsForOccurrence(k), discrimValue);
                             }
                         }
                     }
@@ -408,8 +406,7 @@ public class InsertRequest extends Request
                             }
                             for (int k=0;k<externalOrderStmtMappings[i].getNumberOfParameterOccurrences();k++)
                             {
-                                externalOrderStmtMappings[i].getMapping().setObject(ec, ps, 
-                                    externalOrderStmtMappings[i].getParameterPositionsForOccurrence(k), orderValue);
+                                externalOrderStmtMappings[i].getMapping().setObject(ec, ps, externalOrderStmtMappings[i].getParameterPositionsForOccurrence(k), orderValue);
                             }
                         }
                     }
@@ -421,8 +418,7 @@ public class InsertRequest extends Request
                         Object newId = getInsertedDatastoreIdentity(ec, sqlControl, op, mconn, ps);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206",
-                                op.getObjectAsPrintable(), newId));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", op.getObjectAsPrintable(), newId));
                         }
                         op.setPostStoreNewObjectId(newId);
                     }
@@ -432,8 +428,7 @@ public class InsertRequest extends Request
                     {
                         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222",
-                                op.getObjectAsPrintable(),
+                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(),
                                 ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                         }
                         callbacks[i].insertPostProcessing(op);
@@ -503,13 +498,13 @@ public class InsertRequest extends Request
         {
             String msg = Localiser.msg("052208", op.getObjectAsPrintable(), insertStmt, e.getMessage());
             NucleusLogger.DATASTORE_PERSIST.warn(msg);
-            List exceptions = new ArrayList();
+            List<Exception> exceptions = new ArrayList<>();
             exceptions.add(e);
             while ((e = e.getNextException()) != null)
             {
                 exceptions.add(e);
             }
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+            throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
         }
 
         // Execute any mapping actions now that we have inserted the element
@@ -520,15 +515,13 @@ public class InsertRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", op.getObjectAsPrintable(),
-                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postInsert(op);
             }
             catch (NotYetFlushedException e)
             {
-                op.updateFieldAfterInsert(e.getPersistable(), 
-                    ((JavaTypeMapping) callbacks[i]).getMemberMetaData().getAbsoluteFieldNumber());
+                op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping) callbacks[i]).getMemberMetaData().getAbsoluteFieldNumber());
             }
         }
     }
@@ -543,8 +536,7 @@ public class InsertRequest extends Request
      * @return The identity
      * @throws SQLException Thrown if an error occurs retrieving the identity
      */
-    private Object getInsertedDatastoreIdentity(ExecutionContext ec, SQLController sqlControl, ObjectProvider op, 
-            ManagedConnection mconn, PreparedStatement ps)
+    private Object getInsertedDatastoreIdentity(ExecutionContext ec, SQLController sqlControl, ObjectProvider op, ManagedConnection mconn, PreparedStatement ps)
     throws SQLException
     {
         Object datastoreId = null;

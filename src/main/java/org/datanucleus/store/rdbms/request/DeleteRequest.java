@@ -65,9 +65,17 @@ import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
 /**
- * Class to provide a means of deletion of records from a data store.
+ * Class to provide a means of deletion of records from an RDBMS.
  * Extends basic request class implementing the execute method to do a JDBC delete operation.
  * Provides a version check for optimistic handling.
+ * The SQL will be of the form
+ * <pre>
+ * DELETE FROM TBL_NAME WHERE id1=? AND id2=?
+ * </pre>
+ * or, if "soft delete" is being used for this type, then
+ * <pre>
+ * UPDATE TBL_NAME SET DELETE_COL=TRUE WHERE id1=? AND id2=?
+ * </pre>
  */
 public class DeleteRequest extends Request
 {

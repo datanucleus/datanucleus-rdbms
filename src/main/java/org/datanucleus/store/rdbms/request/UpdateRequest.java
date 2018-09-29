@@ -65,8 +65,16 @@ import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
 
 /**
- * Class to provide a means of update of records in a data store.
- * Extends basic request class implementing the execute method to do a JDBC update operation.
+ * Class to provide a means of update of particular fields of a particular type in an RDBMS. 
+ * Extends basic request class implementing the execute method to do a JDBC update operation. 
+ * The SQL will be of the form
+ * <pre>
+ * UPDATE table-name SET param1=?, param2=?[, version=?] WHERE id1=? AND id2=?
+ * </pre>
+ * or (when also performing version checks)
+ * <pre>
+ * UPDATE table-name SET param1=?, param2=?, version={newvers} WHERE id1=? AND id2=? AND version={oldvers}
+ * </pre>
  */
 public class UpdateRequest extends Request
 {
@@ -98,15 +106,7 @@ public class UpdateRequest extends Request
     protected boolean versionChecks = false;
 
     /**
-     * Constructor, taking the table. Uses the structure of the datastore
-     * table to build a basic query. The query will be of the form
-     * <PRE>
-     * UPDATE table-name SET param1=?,param2=? WHERE id1=? AND id2=?
-     * </PRE>
-     * or (when also performing version checks)
-     * <PRE>
-     * UPDATE table-name SET param1=?,param2=?,version={newvers} WHERE id1=? AND id2=? AND version={oldvers}
-     * </PRE>
+     * Constructor, taking the table. Uses the structure of the datastore table to build a basic query. 
      * @param table The Class Table representing the datastore table to update
      * @param reqFieldMetaData MetaData of the fields to update
      * @param cmd ClassMetaData of objects being updated
@@ -404,12 +404,12 @@ public class UpdateRequest extends Request
                                 NucleusLogger.PERSISTENCE.error(msg);
                                 throw new NucleusException(msg);
                             }
+
                             // WHERE clause - current version discriminator
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getWhereVersion();
                             for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                mapIdx.getMapping().setObject(ec, ps,
-                                    mapIdx.getParameterPositionsForOccurrence(i), currentVersion);
+                                mapIdx.getMapping().setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), currentVersion);
                             }
                         }
 
@@ -435,13 +435,13 @@ public class UpdateRequest extends Request
             {
                 String msg = Localiser.msg("052215", op.getObjectAsPrintable(), stmt, StringUtils.getStringFromStackTrace(e));
                 NucleusLogger.DATASTORE_PERSIST.error(msg);
-                List exceptions = new ArrayList();
+                List<Exception> exceptions = new ArrayList<>();
                 exceptions.add(e);
                 while((e = e.getNextException())!=null)
                 {
                     exceptions.add(e);
                 }
-                throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]));
+                throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
             }
         }
 
@@ -452,8 +452,7 @@ public class UpdateRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", op.getObjectAsPrintable(),
-                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postUpdate(op);
             }
