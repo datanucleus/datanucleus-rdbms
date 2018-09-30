@@ -4324,6 +4324,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             // Execute the script on this datastore
             // Note that we simply split the script at line delimiter (";")
+            // TODO Process out any comments from the SQL
             Connection conn = (Connection) mc.getConnection();
             Statement stmt = conn.createStatement();
             try
