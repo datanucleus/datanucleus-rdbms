@@ -115,9 +115,9 @@ public class NCharColumnMapping extends CharColumnMapping
             if (value == null)
             {
                 // Null string
-                if (useDefaultWhenNull())
+                if (useDefaultWhenNull() && column != null)
                 {
-                    ps.setNString(param,column.getDefaultValue().toString().trim());
+                    ps.setNString(param, column.getDefaultValue().toString().trim());
                 }
                 else
                 {

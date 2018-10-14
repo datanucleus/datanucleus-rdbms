@@ -212,7 +212,7 @@ public class CharColumnMapping extends AbstractColumnMapping
             if (value == null)
             {
                 // Null string
-                if (useDefaultWhenNull())
+                if (useDefaultWhenNull() && column != null)
                 {
                     ps.setString(param, column.getDefaultValue().toString().trim());
                 }
