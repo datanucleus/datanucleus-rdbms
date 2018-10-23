@@ -1763,11 +1763,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // Basic error checking
             if (IdentityUtils.isDatastoreIdentity(id) && cmd.getIdentityType() != IdentityType.DATASTORE)
             {
-                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("002004", id, cmd.getFullClassName()));
             }
             if (IdentityUtils.isSingleFieldIdentity(id) && (cmd.getIdentityType() != IdentityType.APPLICATION || !cmd.getObjectidClass().equals(id.getClass().getName())))
             {
-                throw new NucleusUserException(Localiser.msg("038001", id, cmd.getFullClassName()));
+                throw new NucleusUserException(Localiser.msg("002004", id, cmd.getFullClassName()));
             }
 
             rootCmds.add(cmd);
