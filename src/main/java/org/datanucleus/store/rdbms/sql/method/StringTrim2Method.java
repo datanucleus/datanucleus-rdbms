@@ -20,10 +20,12 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 import org.datanucleus.store.rdbms.sql.expression.StringLiteral;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Method for trimming a String expression using LTRIM and RTRIM SQL functions.
@@ -36,17 +38,27 @@ public class StringTrim2Method implements SQLMethod
      */
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
+        if (args != null && args.size() > 1)
+        {
+            throw new NucleusException("TRIM has incorrect number of args");
+        }
+        if (args != null && args.size() == 1)
+        {
+            NucleusLogger.QUERY.warn("This database does not support use of the trimSpec argument to trim(). Ignoring.");
+        }
+
         if (expr instanceof StringLiteral)
         {
             String val = (String)((StringLiteral)expr).getValue();
             return new StringLiteral(stmt, expr.getJavaTypeMapping(), val.trim(), null);
         }
 
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(expr);
-        StringExpression strExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "RTRIM", funcArgs);
-        args.clear();
-        args.add(strExpr);
-        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "LTRIM", args);
+        ArrayList rtrimArgs = new ArrayList();
+        rtrimArgs.add(expr);
+        StringExpression strExpr = new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "RTRIM", rtrimArgs);
+
+        List<SQLExpression> ltrimArgs = new ArrayList<>();
+        ltrimArgs.add(strExpr);
+        return new StringExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(String.class), "LTRIM", ltrimArgs);
     }
 }
