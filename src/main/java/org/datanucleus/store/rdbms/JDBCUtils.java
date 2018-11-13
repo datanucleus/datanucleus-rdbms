@@ -70,7 +70,10 @@ public class JDBCUtils
     {
         try
         {
-            logWarnings(conn.getWarnings());
+            if (conn != null)
+            {
+                logWarnings(conn.getWarnings());
+            }
         }
         catch (SQLException e)
         {
@@ -86,7 +89,10 @@ public class JDBCUtils
     {
         try
         {
-            logWarnings(stmt.getWarnings());
+            if (stmt != null)
+            {
+                logWarnings(stmt.getWarnings());
+            }
         }
         catch (SQLException e)
         {
@@ -102,7 +108,10 @@ public class JDBCUtils
     {
         try
         {
-            logWarnings(rs.getWarnings());
+            if (rs != null)
+            {
+                logWarnings(rs.getWarnings());
+            }
         }
         catch (SQLException e)
         {
