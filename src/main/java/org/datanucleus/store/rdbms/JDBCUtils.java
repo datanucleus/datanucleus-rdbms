@@ -12,13 +12,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. 
 
-
 Contributors:
     ...
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
@@ -60,25 +58,6 @@ public class JDBCUtils
         {
             NucleusLogger.DATASTORE.warn(Localiser.msg("052700", warning.getMessage()));
             warning = warning.getNextWarning();
-        }
-    }
-
-    /**
-     * Utility to log all warning for the specified Connection.
-     * @param conn The connection to the datastore
-     **/
-    public static void logWarnings(Connection conn)
-    {
-        try
-        {
-            if (conn != null)
-            {
-                logWarnings(conn.getWarnings());
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException(Localiser.msg("052701",conn),e);
         }
     }
 
