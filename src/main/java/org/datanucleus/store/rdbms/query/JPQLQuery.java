@@ -114,6 +114,12 @@ public class JPQLQuery extends AbstractJPQLQuery
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations. */
     public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jpql.navigationJoinType";
 
+    /** Extension to not apply a discriminator restriction on the candidate of the query. */
+    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.dontRestrictDiscriminator";
+
+    /** Extension to include soft-deleted objects in any results. */
+    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.includeSoftDeletes";
+
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation;
 
@@ -818,8 +824,8 @@ public class JPQLQuery extends AbstractJPQLQuery
         SelectStatement stmt = null;
         try
         {
-            boolean includeSoftDeletes = getBooleanExtensionProperty("include-soft-deletes", false);
-            boolean dontRestrictDiscrim = getBooleanExtensionProperty("dont-restrict-discriminator", false);
+            boolean includeSoftDeletes = getBooleanExtensionProperty(EXTENSION_INCLUDE_SOFT_DELETES, false);
+            boolean dontRestrictDiscrim = getBooleanExtensionProperty(EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR, false);
             Set<String> options = null;
             if (includeSoftDeletes)
             {
