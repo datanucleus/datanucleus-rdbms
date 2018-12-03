@@ -117,10 +117,10 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     public static final String EXTENSION_NAVIGATION_JOIN_TYPE = "datanucleus.query.jdoql.navigationJoinType";
 
     /** Extension to not apply a discriminator restriction on the candidate of the query. */
-    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.dontRestrictDiscriminator";
+    public static final String EXTENSION_CANDIDATE_DONT_RESTRICT_DISCRIMINATOR = "datanucleus.query.dontRestrictDiscriminator";
 
     /** Extension to include soft-deleted objects in any results. */
-    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.includeSoftDeletes";
+    public static final String EXTENSION_INCLUDE_SOFT_DELETES = "datanucleus.query.includeSoftDeletes";
 
     /** The compilation of the query for this datastore. Not applicable if totally in-memory. */
     protected transient RDBMSQueryCompilation datastoreCompilation = null;
@@ -252,7 +252,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             return;
         }
 
-        if (getExtension("include-soft-deletes") != null)
+        if (getExtension(EXTENSION_INCLUDE_SOFT_DELETES) != null)
         {
             // If using an extension that can change the datastore query then evict any existing compilation
             QueryManager qm = getQueryManager();
