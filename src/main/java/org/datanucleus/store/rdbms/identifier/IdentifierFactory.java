@@ -32,6 +32,14 @@ import org.datanucleus.store.schema.naming.NamingCase;
  */
 public interface IdentifierFactory
 {
+    public static final String PROPERTY_DEFAULT_CATALOG = "DefaultCatalog";
+    public static final String PROPERTY_DEFAULT_SCHEMA = "DefaultSchema";
+    public static final String PROPERTY_REQUIRED_CASE = "RequiredCase";
+    public static final String PROPERTY_TABLE_PREFIX = "TablePrefix";
+    public static final String PROPERTY_TABLE_SUFFIX = "TableSuffix";
+    public static final String PROPERTY_WORD_SEPARATOR = "WordSeparator";
+    public static final String PROPERTY_NAMING_FACTORY = "NamingFactory";
+
     /**
      * Accessor for the datastore adapter that we are creating identifiers for.
      * @return The datastore adapter

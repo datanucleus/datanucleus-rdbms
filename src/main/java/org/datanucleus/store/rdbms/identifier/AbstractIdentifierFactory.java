@@ -113,9 +113,9 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
 
         // Set the identifier case to be used based on what the user has requested and what the datastore supports
         int userIdentifierCase = CASE_UPPER;
-        if (props.containsKey("RequiredCase"))
+        if (props.containsKey(IdentifierFactory.PROPERTY_REQUIRED_CASE))
         {
-            String requiredCase = (String)props.get("RequiredCase");
+            String requiredCase = (String)props.get(IdentifierFactory.PROPERTY_REQUIRED_CASE);
             if (requiredCase.equalsIgnoreCase("UPPERCASE"))
             {
                 userIdentifierCase = CASE_UPPER;
@@ -251,17 +251,17 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
         }
 
         // Save the default catalog/schema - in a valid case (may be user input)
-        if (props.containsKey("DefaultCatalog"))
+        if (props.containsKey(IdentifierFactory.PROPERTY_DEFAULT_CATALOG))
         {
-            this.defaultCatalogName = getIdentifierInAdapterCase((String)props.get("DefaultCatalog"));
+            this.defaultCatalogName = getIdentifierInAdapterCase((String)props.get(IdentifierFactory.PROPERTY_DEFAULT_CATALOG));
         }
-        if (props.containsKey("DefaultSchema"))
+        if (props.containsKey(IdentifierFactory.PROPERTY_DEFAULT_SCHEMA))
         {
-            this.defaultSchemaName = getIdentifierInAdapterCase((String)props.get("DefaultSchema"));
+            this.defaultSchemaName = getIdentifierInAdapterCase((String)props.get(IdentifierFactory.PROPERTY_DEFAULT_SCHEMA));
         }
-        if (props.containsKey("NamingFactory"))
+        if (props.containsKey(IdentifierFactory.PROPERTY_NAMING_FACTORY))
         {
-            this.namingFactory = (NamingFactory)props.get("NamingFactory");
+            this.namingFactory = (NamingFactory)props.get(IdentifierFactory.PROPERTY_NAMING_FACTORY);
         }
     }
 

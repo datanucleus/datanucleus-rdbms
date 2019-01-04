@@ -80,12 +80,12 @@ public class DNIdentifierFactory extends AbstractIdentifierFactory
     {
         super(dba, clr, props);
 
-        if (props.containsKey("WordSeparator"))
+        if (props.containsKey(IdentifierFactory.PROPERTY_WORD_SEPARATOR))
         {
-            this.wordSeparator = (String)props.get("WordSeparator");
+            this.wordSeparator = (String)props.get(IdentifierFactory.PROPERTY_WORD_SEPARATOR);
         }
-        this.tablePrefix = (String)props.get("TablePrefix");
-        this.tableSuffix = (String)props.get("TableSuffix");
+        this.tablePrefix = (String)props.get(IdentifierFactory.PROPERTY_TABLE_PREFIX);
+        this.tableSuffix = (String)props.get(IdentifierFactory.PROPERTY_TABLE_SUFFIX);
     }
 
     /**

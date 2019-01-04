@@ -431,32 +431,32 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             Map props = new HashMap();
             if (catalogName != null)
             {
-                props.put("DefaultCatalog", catalogName);
+                props.put(IdentifierFactory.PROPERTY_DEFAULT_CATALOG, catalogName);
             }
             if (schemaName != null)
             {
-                props.put("DefaultSchema", schemaName);
+                props.put(IdentifierFactory.PROPERTY_DEFAULT_SCHEMA, schemaName);
             }
 
             String val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_CASE);
-            props.put("RequiredCase", val != null ? val : getDefaultIdentifierCase());
+            props.put(IdentifierFactory.PROPERTY_REQUIRED_CASE, val != null ? val : getDefaultIdentifierCase());
 
             val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_WORD_SEPARATOR);
             if (val != null)
             {
-                props.put("WordSeparator", val);
+                props.put(IdentifierFactory.PROPERTY_WORD_SEPARATOR, val);
             }
             val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_PREFIX);
             if (val != null)
             {
-                props.put("TablePrefix", val);
+                props.put(IdentifierFactory.PROPERTY_TABLE_PREFIX, val);
             }
             val = getStringProperty(PropertyNames.PROPERTY_IDENTIFIER_TABLE_SUFFIX);
             if (val != null)
             {
-                props.put("TableSuffix", val);
+                props.put(IdentifierFactory.PROPERTY_TABLE_SUFFIX, val);
             }
-            props.put("NamingFactory", getNamingFactory());
+            props.put(IdentifierFactory.PROPERTY_NAMING_FACTORY, getNamingFactory());
 
             // Create the IdentifierFactory
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
