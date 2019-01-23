@@ -17,6 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -38,11 +39,10 @@ import org.datanucleus.flush.OperationQueue;
 public class FlushReferential extends FlushOrdered
 {
     /* (non-Javadoc)
-     * @see org.datanucleus.FlushOrdered#execute(org.datanucleus.ExecutionContext, java.util.List, java.util.List, org.datanucleus.flush.OperationQueue)
+     * @see org.datanucleus.FlushOrdered#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
     @Override
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, List<ObjectProvider> primaryOPs, 
-        List<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
     {
         List<NucleusOptimisticException> flushExcps = null;
 
