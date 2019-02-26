@@ -195,6 +195,12 @@ public class SQLJoin
                 st.append(targetTable.toString());
             }
 
+            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
+            {
+                // Optional join table lock options (SQLServer)
+                st.append(" WITH ").append(dba.getSelectWithLockOption());
+            }
+
             if (type == JoinType.INNER_JOIN || type == JoinType.LEFT_OUTER_JOIN || type == JoinType.RIGHT_OUTER_JOIN)
             {
                 if (condition != null)
@@ -209,11 +215,6 @@ public class SQLJoin
                     NucleusLogger.DATASTORE_RETRIEVE.debug("Join condition has no 'on' condition defined! table=" + targetTable + 
                         " type=" + type + " joinedTable=" + sourceTable + " : so using ON clause as 1=0");
                 }
-            }
-
-            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
-            {
-                st.append(" WITH ").append(dba.getSelectWithLockOption());
             }
         }
         else
