@@ -366,7 +366,14 @@ public class NumericColumnMapping extends AbstractColumnMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getJDBCType());
+                if (useDefaultWhenNull())
+                {
+                    ps.setDouble(param, Double.valueOf(column.getDefaultValue().toString()).doubleValue());
+                }
+                else
+                {
+                    ps.setNull(param, getJDBCType());
+                }
             }
             else if (value instanceof Byte)
             {

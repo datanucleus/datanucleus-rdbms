@@ -224,7 +224,7 @@ public class IntegerColumnMapping extends AbstractColumnMapping
                 }
                 else
                 {
-                    ps.setLong(param, ((Number)value).longValue());
+                    ps.setInt(param, ((Number)value).intValue());
                 }
             }
         }

@@ -308,7 +308,7 @@ public class SmallIntColumnMapping extends AbstractColumnMapping
             {
                 if (useDefaultWhenNull())
                 {
-                    ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
+                    ps.setShort(param, Short.valueOf(column.getDefaultValue().toString()).shortValue());
                 }
                 else
                 {

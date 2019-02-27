@@ -228,7 +228,7 @@ public class DecimalColumnMapping extends AbstractColumnMapping
             {
                 if (useDefaultWhenNull())
                 {
-                    ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
+                    ps.setBigDecimal(param, new BigDecimal(column.getDefaultValue().toString()));
                 }
                 else
                 {
@@ -252,18 +252,18 @@ public class DecimalColumnMapping extends AbstractColumnMapping
                 else if (value instanceof Float)
                 {
                     ps.setDouble(param, ((Float)value).doubleValue());
-                }            
+                }
                 else if (value instanceof Double)
                 {
                     ps.setDouble(param, ((Double)value).doubleValue());
-                }                
+                }
                 else if (value instanceof BigInteger)
                 {
                     ps.setBigDecimal(param, new BigDecimal((BigInteger)value));
-                }                
+                }
                 else
                 {
-                    ps.setInt(param, ((Number)value).intValue());
+                    ps.setDouble(param, ((Number)value).doubleValue());
                 }
             }
         }

@@ -263,7 +263,7 @@ public class TinyIntColumnMapping extends AbstractColumnMapping
             {
                 if (useDefaultWhenNull())
                 {
-                    ps.setInt(param, Integer.valueOf(column.getDefaultValue().toString()).intValue());
+                    ps.setShort(param, Short.valueOf(column.getDefaultValue().toString()).shortValue());
                 }
                 else
                 {
@@ -274,19 +274,19 @@ public class TinyIntColumnMapping extends AbstractColumnMapping
             {
                 if (value instanceof Byte)
                 {
-                    ps.setInt(param, ((Byte)value).shortValue());
+                    ps.setShort(param, ((Byte)value).shortValue());
                 }
                 else if (value instanceof BigInteger)
                 {
-                    ps.setInt(param, ((BigInteger)value).shortValue());
+                    ps.setShort(param, ((BigInteger)value).shortValue());
                 }
                 else if (value instanceof String)
                 {
-                    ps.setInt(param, Integer.parseInt((String)value));
+                    ps.setShort(param, Short.parseShort((String)value));
                 }
                 else if (value instanceof Boolean)
                 {
-                    ps.setInt(param, ((Boolean)value) ? 1 : 0);
+                    ps.setShort(param, (short) (((Boolean)value) ? 1 : 0));
                 }
                 else
                 {

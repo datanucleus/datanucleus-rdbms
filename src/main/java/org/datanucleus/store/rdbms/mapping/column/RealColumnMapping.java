@@ -130,7 +130,14 @@ public class RealColumnMapping extends AbstractColumnMapping
         {
             if (value == null)
             {
-                ps.setNull(param, getJDBCType());
+                if (useDefaultWhenNull())
+                {
+                    ps.setFloat(param, Float.valueOf(column.getDefaultValue().toString()).floatValue());
+                }
+                else
+                {
+                    ps.setNull(param, getJDBCType());
+                }
             }
             else
             {

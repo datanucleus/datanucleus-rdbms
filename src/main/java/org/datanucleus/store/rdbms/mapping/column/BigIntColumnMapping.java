@@ -193,7 +193,7 @@ public class BigIntColumnMapping extends AbstractColumnMapping
             {
                 if (value instanceof Character)
                 {
-                    ps.setInt(param, (Character)value);
+                    ps.setLong(param, (Character)value);
                 }
                 else if (value instanceof String)
                 {
