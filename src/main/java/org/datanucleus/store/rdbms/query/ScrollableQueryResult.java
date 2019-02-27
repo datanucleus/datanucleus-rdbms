@@ -74,11 +74,12 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
      * @param query The Query
      * @param rof The factory to retrieve results from
      * @param rs The ResultSet from the Query Statement
+     * @param fp FetchPlan
      * @param candidates the Candidates collection. Pass this argument only when distinct = false
      */
-    public ScrollableQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, Collection candidates)
+    public ScrollableQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, FetchPlan fp, Collection candidates)
     {
-        super(query, rof, rs);
+        super(query, rof, rs, fp);
 
         if (candidates != null)
         {

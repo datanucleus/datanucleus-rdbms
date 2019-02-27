@@ -796,7 +796,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, resultMapping, elementCmd, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), resultMapping, elementCmd, clr.classForName(elementType));
                             return new ListStoreIterator(ownerOP, rs, rof, this);
                         }
                     }

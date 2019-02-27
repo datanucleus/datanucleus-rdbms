@@ -329,7 +329,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                             return new CollectionStoreIterator(ownerOP, rs, null, this);
                         }
 
-                        rof = new PersistentClassROF(ec, rs, false, iteratorMappingDef, elementCmd, clr.classForName(elementType));
+                        rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
                         return new CollectionStoreIterator(ownerOP, rs, rof, this);
                     }
                     finally

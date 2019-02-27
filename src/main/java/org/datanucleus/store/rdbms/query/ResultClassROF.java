@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
@@ -81,12 +82,13 @@ public class ResultClassROF extends AbstractROF
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
      * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
+     * @param fp FetchPlan
      * @param cls The result class to use (if any)
      * @param resultDefinition The mapping information for the result expressions
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, StatementResultMapping resultDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, StatementResultMapping resultDefinition)
     {
-        super(ec, rs, ignoreCache);
+        super(ec, rs, ignoreCache, fp);
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -155,12 +157,13 @@ public class ResultClassROF extends AbstractROF
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
      * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
+     * @param fp FetchPlan
      * @param cls The result class to use
      * @param classDefinition The mapping information for the (candidate) class
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, StatementClassMapping classDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, StatementClassMapping classDefinition)
     {
-        super(ec, rs, ignoreCache);
+        super(ec, rs, ignoreCache, fp);
 
         // Set the result class that we convert each row into
         Class tmpClass = null;
@@ -196,12 +199,13 @@ public class ResultClassROF extends AbstractROF
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
      * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
+     * @param fp FetchPlan
      * @param cls The result class to use
      * @param resultFieldNames Names for the result fields
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, Class cls, String[] resultFieldNames)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, String[] resultFieldNames)
     {
-        super(ec, rs, ignoreCache);
+        super(ec, rs, ignoreCache, fp);
 
         Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
@@ -263,7 +267,7 @@ public class ResultClassROF extends AbstractROF
                     StatementClassMapping classMap = (StatementClassMapping)stmtMap;
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
-                    PersistentClassROF rof = new PersistentClassROF(ec, rs, ignoreCache, classMap, acmd, cls);
+                    PersistentClassROF rof = new PersistentClassROF(ec, rs, ignoreCache, fp, classMap, acmd, cls);
                     fieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)

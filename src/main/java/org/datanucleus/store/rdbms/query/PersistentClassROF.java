@@ -80,13 +80,14 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
      * @param ignoreCache Whether to ignore the cache
+     * @param fp FetchPlan
      * @param resultMapping Mapping information for the result set and how it maps to the class
      * @param acmd MetaData for the (root) candidate class
      * @param persistentClass Class that this factory will create instances of (or subclasses)
      */
-    public PersistentClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, StatementClassMapping resultMapping, AbstractClassMetaData acmd, Class<T> persistentClass)
+    public PersistentClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, StatementClassMapping resultMapping, AbstractClassMetaData acmd, Class<T> persistentClass)
     {
-        super(ec, rs, ignoreCache);
+        super(ec, rs, ignoreCache, fp);
 
         this.resultMapping = resultMapping;
         this.rootCmd = acmd;
@@ -509,7 +510,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
             public FetchPlan getFetchPlanForLoading()
             {
-                return null;
+                return fp;
             }
         }, pcClass, ignoreCache, false);
     }

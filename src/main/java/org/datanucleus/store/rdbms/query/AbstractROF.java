@@ -20,6 +20,7 @@ package org.datanucleus.store.rdbms.query;
 import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 
 /**
  * Abstract result object factory, taking the ExecutionContext being operated in, and the ResultSet that will be processed.
@@ -32,17 +33,21 @@ public abstract class AbstractROF<T> implements ResultObjectFactory<T>
 
     protected boolean ignoreCache = false;
 
+    protected FetchPlan fp;
+
     /**
      * Constructor.
      * @param ec ExecutionContext
      * @param rs The JDBC ResultSet
      * @param ignoreCache Whether to ignore the cache(s) when instantiating any persistable objects in the results.
+     * @param fp FetchPlan
      */
-    public AbstractROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache)
+    public AbstractROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp)
     {
         this.ec = ec;
         this.rs = rs;
         this.ignoreCache = ignoreCache;
+        this.fp = fp;
     }
 
     /* (non-Javadoc)

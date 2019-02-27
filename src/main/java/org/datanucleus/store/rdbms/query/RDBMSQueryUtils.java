@@ -104,11 +104,11 @@ public class RDBMSQueryUtils extends QueryUtils
         AbstractRDBMSQueryResult qr = null;
         if (resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_INSENSITIVE) || resultSetType.equals(RDBMSQueryUtils.QUERY_RESULTSET_TYPE_SCROLL_SENSITIVE))
         {
-            qr = new ScrollableQueryResult(q, rof, rs, candidates);
+            qr = new ScrollableQueryResult(q, rof, rs, q.getFetchPlan(), candidates);
         }
         else
         {
-            qr = new ForwardQueryResult(q, rof, rs, candidates);
+            qr = new ForwardQueryResult(q, rof, rs, q.getFetchPlan(), candidates);
         }
         return qr;
     }
@@ -562,6 +562,6 @@ public class RDBMSQueryUtils extends QueryUtils
             // Do nothing
         }
 
-        return new ResultClassROF(ec, rs, false, requiredResultClass, resultFieldNames);
+        return new ResultClassROF(ec, rs, false, ec.getFetchPlan(), requiredResultClass, resultFieldNames);
     }
 }

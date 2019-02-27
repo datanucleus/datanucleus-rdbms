@@ -917,7 +917,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         }
                         else
                         {
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, iteratorMappingClass, elementCmd, clr.classForName(elementType));
+                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
                             return new CollectionStoreIterator(ownerOP, rs, rof, this);
                         }
                     }

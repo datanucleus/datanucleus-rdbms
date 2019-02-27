@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.datanucleus.ExecutionContext;
+import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.store.query.AbstractQueryResult;
@@ -57,6 +58,8 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
     /** ResultObjectFactory for converting the result set into objects. */
     protected ResultObjectFactory<E> rof;
 
+    protected FetchPlan fp;
+
     /** Map of field values, keyed by the "id" of the object. The value is a "Map&lt;fieldNumber, fieldValue&gt;". */
     protected Map<Object, Map<Integer, Object>> bulkLoadedValueByMemberNumber;
 
@@ -70,12 +73,14 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
      * @param query The Query
      * @param rof The factory to retrieve results from
      * @param rs The ResultSet from the Query Statement
+     * @param fp FetchPlan
      */
-    public AbstractRDBMSQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs)
+    public AbstractRDBMSQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, FetchPlan fp)
     {
         super(query);
         this.rof = rof;
         this.rs = rs;
+        this.fp = fp;
 
         this.applyRangeChecks = !query.processesRangeInDatastoreQuery();
     }
@@ -151,7 +156,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 {
                     String elementType = mmd.hasCollection() ? 
                             backingStore.getOwnerMemberMetaData().getCollection().getElementType() : backingStore.getOwnerMemberMetaData().getArray().getElementType();
-                    ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, query.getIgnoreCache(),
+                    ResultObjectFactory<E> scoROF = new PersistentClassROF(ec, rs, query.getIgnoreCache(), fp,
                         elemIterStmt.getElementClassMapping(), backingStore.getElementClassMetaData(), ec.getClassLoaderResolver().classForName(elementType));
                     while (rs.next())
                     {
