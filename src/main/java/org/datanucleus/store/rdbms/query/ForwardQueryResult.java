@@ -68,6 +68,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
      * @param query The Query
      * @param rof The factory to retrieve results from
      * @param rs The ResultSet from the Query Statement
+     * @param fp FetchPlan
      * @param candidates Candidate elements
      */
     public ForwardQueryResult(Query query, ResultObjectFactory<E> rof, ResultSet rs, FetchPlan fp, Collection candidates)
