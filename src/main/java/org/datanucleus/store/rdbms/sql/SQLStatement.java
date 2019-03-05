@@ -952,7 +952,7 @@ public abstract class SQLStatement
     /**
      * Method to uncache the generated SQL (because some condition has changed).
      */
-    protected void invalidateStatement()
+    protected synchronized void invalidateStatement()
     {
         sql = null;
     }
