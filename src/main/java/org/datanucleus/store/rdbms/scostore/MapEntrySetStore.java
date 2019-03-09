@@ -76,7 +76,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     private String sizeStmt;
 
-    private SelectStatement iteratorSelectStmt = null;
+    /** SQL statement to use for retrieving data from the map (normal). */
+    private String iteratorSelectStmtSql = null;
+
+    /** SQL statement to use for retrieving data from the map (locking). */
+    private String iteratorSelectStmtLockedSql = null;
+
     private int[] iteratorKeyResultCols = null;
     private int[] iteratorValueResultCols = null;
 
@@ -343,14 +348,16 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     public Iterator<Map.Entry<K, V>> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
-        SelectStatement selectStmt = iteratorSelectStmt;
-        if (selectStmt == null)
+        Transaction tx = ec.getTransaction();
+
+        String stmtSql = tx.getSerializeRead() ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
+
+        if (stmtSql == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement
-                selectStmt = getSQLStatementForIterator(ownerOP, ec.getFetchPlan(), true);
-                iteratorSelectStmt = selectStmt;
+                SelectStatement selectStmt = getSQLStatementForIterator(ownerOP, ec.getFetchPlan(), true);
 
                 // Input parameter(s) - the owner
                 int inputParamNum = 1;
@@ -379,13 +386,17 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 }
                 iteratorMappingParams = new StatementParameterMapping();
                 iteratorMappingParams.addMappingForParameter("owner", ownerIdx);
+
+                // Save the two possible select statements (normal, locked)
+                iteratorSelectStmtSql = selectStmt.getSQLText().toSQL();
+
+                selectStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
+                iteratorSelectStmtLockedSql = selectStmt.getSQLText().toSQL();
             }
+
+            stmtSql = tx.getSerializeRead() ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
         }
 
-        Transaction tx = ec.getTransaction();
-        selectStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, (tx.getSerializeRead() != null && tx.getSerializeRead()));
-
-        String stmt = selectStmt.getSQLText().toSQL();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -393,7 +404,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             try
             {
                 // Create the statement and set the owner
-                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmtSql);
                 StatementMappingIndex ownerIdx = iteratorMappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
@@ -403,7 +414,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
                 try
                 {
-                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
+                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmtSql, ps);
                     try
                     {
                         return new SetIterator(ownerOP, this, ownerMemberMetaData, rs, iteratorKeyResultCols, iteratorValueResultCols)
@@ -438,11 +449,11 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException("Iteration request failed: " + stmt, e);
+            throw new NucleusDataStoreException("Iteration request failed: " + stmtSql, e);
         }
         catch (MappedDatastoreException e)
         {
-            throw new NucleusDataStoreException("Iteration request failed: " + stmt, e);
+            throw new NucleusDataStoreException("Iteration request failed: " + stmtSql, e);
         }
     }
 
