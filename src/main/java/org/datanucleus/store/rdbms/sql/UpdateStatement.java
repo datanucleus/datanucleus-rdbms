@@ -86,7 +86,7 @@ public class UpdateStatement extends SQLStatement
         return false;
     }
 
-    public synchronized SQLText getSQLText()
+    public SQLText getSQLText()
     {
         if (sql != null)
         {

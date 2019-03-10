@@ -560,7 +560,7 @@ public class SelectStatement extends SQLStatement
         this.rangeCount = count;
     }
 
-    public synchronized SQLText getSQLText()
+    public SQLText getSQLText()
     {
         if (sql != null)
         {

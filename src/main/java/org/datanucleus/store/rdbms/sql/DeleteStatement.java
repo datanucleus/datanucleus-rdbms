@@ -53,7 +53,7 @@ public class DeleteStatement extends SQLStatement
         super(null, rdbmsMgr, table, alias, tableGroupName, extensions);
     }
 
-    public synchronized SQLText getSQLText()
+    public SQLText getSQLText()
     {
         if (sql != null)
         {

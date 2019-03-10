@@ -69,7 +69,7 @@ public class InsertStatement extends SQLStatement
         return selectStmt;
     }
 
-    public synchronized SQLText getSQLText()
+    public SQLText getSQLText()
     {
         if (sql != null)
         {
