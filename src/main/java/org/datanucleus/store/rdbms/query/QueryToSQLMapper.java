@@ -850,6 +850,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                         stmt.setAllowUnions(false);
                     }
 
+                    // TODO If we have something like "DISTINCT this" then maybe could actually select the FetchPlan like if it was a basic PrimaryExpression(this)
                     resultExprs[i].evaluate(this);
                     SQLExpression sqlExpr = stack.pop();
                     int[] cols = stmt.select(sqlExpr, alias);
