@@ -179,6 +179,11 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_CASCADE);
+		
+        if (datastoreMajorVersion >= 12) 
+        {
+            supportedOptions.add(IDENTITY_COLUMNS);
+        }		
     }
 
     /**
