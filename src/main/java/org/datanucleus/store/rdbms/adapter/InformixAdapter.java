@@ -67,8 +67,8 @@ public class InformixAdapter extends BaseDatastoreAdapter
         // since Informix creates an index automatically
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
 
-        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
-        supportedOptions.remove(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
+        supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION);
+        supportedOptions.remove(IDENTITY_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.remove(NULLS_KEYWORD_IN_COLUMN_OPTIONS);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
     }
@@ -127,15 +127,13 @@ public class InformixAdapter extends BaseDatastoreAdapter
         return "";
     }   
 
-    // ---------------------------- AutoIncrement Support ---------------------------
-
     /**
      * Accessor for the autoincrement sql access statement for this datastore.
      * @param table Name of the table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      */
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         String useSerial = (String)getValueForProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
         if (useSerial != null && useSerial.equalsIgnoreCase("true"))
@@ -153,7 +151,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      */
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         String useSerial = (String)getValueForProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
         if (useSerial != null && useSerial.equalsIgnoreCase("true"))

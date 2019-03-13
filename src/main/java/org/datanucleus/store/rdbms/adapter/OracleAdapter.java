@@ -448,12 +448,12 @@ public class OracleAdapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the auto-increment sql statement for this datastore.
+     * Accessor for the auto-increment sql statement for getting the last value for this table.
      * @param table Name of the table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      */
-    /*public String getAutoIncrementStmt(Table table, String columnName)
+    /*public String getIdentityLastValueStmt(Table table, String columnName)
     {
     // Oracle 12 doesnt seem to provide a mechanism for getting the identity value, so assume JDBC getGeneratedKeys works
         return "VALUES IDENTITY_VAL_LOCAL()";
@@ -463,7 +463,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      */
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         // Oracle 12+
         return "generated always as identity";

@@ -62,10 +62,24 @@ import org.datanucleus.store.schema.StoreSchemaHandler;
 public interface DatastoreAdapter
 {
     /**
-     * Whether this datastore adapter support identity fields.
-     * In SQL this would be things like "AUTOINCREMENT", "IDENTITY", "SERIAL".
+     * Whether this datastore adapter supports identity (autoincrement) fields. In SQL this would be things like "AUTOINCREMENT", "IDENTITY", "SERIAL".
      */
     public static final String IDENTITY_COLUMNS = "IdentityColumns";
+
+    /**
+     * Whether we support identity (auto-increment) keys with nullability specification.
+     */
+    public static final String IDENTITY_KEYS_NULL_SPECIFICATION = "IdentityNullSpecification";
+
+    /**
+     * Whether we support identity (auto-increment) keys with column type specification.
+     */
+    public static final String IDENTITY_COLUMN_TYPE_SPECIFICATION = "IdentityColumnTypeSpecification";
+
+    /**
+     * Whether this adapter requires any specification of primary key in the column definition of CREATE TABLE.
+     */
+    public static final String IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF = "IdentityPkInCreateTableColumnDef";
 
     /** Whether we support sequences. */
     public static final String SEQUENCES = "Sequences";
@@ -293,21 +307,6 @@ public interface DatastoreAdapter
      * Accessor for whether the RDBMS supports cross-join as "INNER 1=1" syntax.
      */
     public static final String CROSSJOIN_ASINNER11_SYNTAX = "ANSI_CrossJoinAsInner11_Syntax";
-
-    /**
-     * Whether we support auto-increment/identity keys with nullability specification.
-     */
-    public static final String AUTO_INCREMENT_KEYS_NULL_SPECIFICATION = "AutoIncrementNullSpecification";
-
-    /**
-     * Whether we support auto-increment/identity keys with column type specification.
-     */
-    public static final String AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION = "AutoIncrementColumnTypeSpecification";
-
-    /**
-     * Whether this adapter requires any specification of primary key in the column definition of CREATE TABLE.
-     */
-    public static final String AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF = "AutoIncrementPkInCreateTableColumnDef";
 
     /** Whether this datastore supports SELECT ... FOR UPDATE. */
     public static final String LOCK_WITH_SELECT_FOR_UPDATE = "LockWithSelectForUpdate";
@@ -541,11 +540,32 @@ public interface DatastoreAdapter
     int getDriverMinorVersion();
 
     /**
-     * Verifies if the given <code>columnDef</code> is an identity field type for the datastore.
+     * Verifies if the given <code>columnDef</code> is an identity (autoincrement) field type for the datastore.
      * @param columnDef the datastore type name
      * @return true when the <code>columnDef</code> has values for identity generation in the datastore
      **/
     boolean isIdentityFieldDataType(String columnDef);
+
+    /**
+     * Return the java type that represents any identity (autoincrement) column value.
+     * @param type The type of the member mapping to an IDENTITY column
+     * @return The type that should be used in generating the column
+     */
+    Class getIdentityJavaTypeForType(Class type);
+
+    /**
+     * Accessor for the identity (autoincrement) sql statement to get the latest key value for this table.
+     * @param table Table (that the autoincrement is for)
+     * @param columnName (that the autoincrement is for)
+     * @return The statement for getting the latest auto-increment/identity key
+     */
+    String getIdentityLastValueStmt(Table table, String columnName);
+
+    /**
+     * Accessor for the identity (auto-increment) keyword for generating DDLs (CREATE TABLEs...).
+     * @return The keyword for a column using auto-increment/identity
+     */
+    String getIdentityKeyword();
 
     /**
      * Method to return the maximum length of a datastore identifier of the specified type.
@@ -554,13 +574,6 @@ public interface DatastoreAdapter
      * @return The max permitted length of this type of identifier
      */
     int getDatastoreIdentifierMaxLength(IdentifierType identifierType);
-
-    /**
-     * Return the java type that represents any autoincrement/identity column value.
-     * @param type The type of the member mapping to an IDENTITY column
-     * @return The type that should be used in generating the column
-     */
-    Class getAutoIncrementJavaTypeForType(Class type);
 
     /**
      * Accessor for the maximum foreign keys by table permitted in this datastore.
@@ -633,9 +646,8 @@ public interface DatastoreAdapter
     throws SQLException;
 
     /**
-     * Method to retutn the INSERT statement to use when inserting into a table that has no
-     * columns specified. This is the case when we have a single column in the table and that column
-     * is autoincrement/identity (and so is assigned automatically in the datastore).
+     * Method to retutn the INSERT statement to use when inserting into a table that has no columns specified. 
+     * This is the case when we have a single column in the table and that column is autoincrement/identity (and so is assigned automatically in the datastore).
      * @param table The table
      * @return The statement for the INSERT
      */
@@ -649,21 +661,6 @@ public interface DatastoreAdapter
      * @return the precision value to be used when creating the column, or -1 if no value should be used.
      */
     int getUnlimitedLengthPrecisionValue(SQLTypeInfo typeInfo);
-
-    /**
-     * Accessor for the auto-increment/identity sql statement for this datastore.
-     * @param table Table (that the autoincrement is for)
-     * @param columnName (that the autoincrement is for)
-     * @return The statement for getting the latest auto-increment/identity key
-     **/
-    String getAutoIncrementStmt(Table table, String columnName);
-
-    /**
-     * Accessor for the auto-increment/identity keyword for generating DDLs.
-     * (CREATE TABLEs...).
-     * @return The keyword for a column using auto-increment/identity
-     **/
-    String getAutoIncrementKeyword();
 
     /**
      * Method to return the statement necessary to create a database with this RDBMS.

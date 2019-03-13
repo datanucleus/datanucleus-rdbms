@@ -414,15 +414,13 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         return stringBuilder.toString();
     }
 
-    // ------------------------------- Identity Methods ------------------------------------
-
     /**
      * Accessor for the auto-increment sql statement for this datastore.
      * @param table Name of the table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      **/
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         return "SELECT LAST_INSERT_ID()";
     }
@@ -431,7 +429,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      **/
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "AUTO_INCREMENT";
     }

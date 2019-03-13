@@ -279,7 +279,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
      * @param columnName Name of the column that the autoincrement is for
 	 * @return The statement for getting the latest auto-increment key
 	 **/
-	public String getAutoIncrementStmt(Table table, String columnName)
+	public String getIdentityLastValueStmt(Table table, String columnName)
 	{
 		return "VALUES IDENTITY_VAL_LOCAL()";
 	}
@@ -288,7 +288,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
 	 * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
 	 * @return The keyword for a column using auto-increment
 	 **/
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "generated always as identity (start with 1)";
     }
@@ -429,8 +429,6 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         }
         return str.toString();
     }
-
-    // ---------------------------- Sequence Support ---------------------------
 
     /**
      * Accessor for the sequence statement to create the sequence.

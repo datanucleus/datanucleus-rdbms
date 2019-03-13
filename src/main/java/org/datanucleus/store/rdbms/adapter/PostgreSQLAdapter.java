@@ -94,8 +94,8 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(ORDERBY_NULLS_DIRECTIVES);
         supportedOptions.add(PARAMETER_IN_CASE_IN_UPDATE_CLAUSE);
-        supportedOptions.remove(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
-        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
+        supportedOptions.remove(IDENTITY_COLUMN_TYPE_SPECIFICATION);
+        supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION);
         supportedOptions.remove(DISTINCT_WITH_SELECT_FOR_UPDATE);
         supportedOptions.remove(PERSIST_OF_UNASSIGNED_CHAR);
         if ((datastoreMajorVersion == 7 && datastoreMinorVersion < 2))
@@ -421,15 +421,13 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         return stringBuilder.toString();
     }
 
-    // ---------------------------- Identity Support ---------------------------
-
     /**
      * Accessor for the autoincrement sql access statement for this datastore.
      * @param table Table that the autoincrement is for
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      */
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         StringBuilder stmt=new StringBuilder("SELECT currval('");
 
@@ -465,12 +463,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      */
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "SERIAL";
     }
-
-    // ---------------------------- Sequence Support ---------------------------
 
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#sequenceExists(java.sql.Connection, java.lang.String, java.lang.String, java.lang.String)

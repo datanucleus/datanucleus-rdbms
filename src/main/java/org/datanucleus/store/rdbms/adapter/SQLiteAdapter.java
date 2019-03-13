@@ -59,12 +59,12 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
         supportedOptions.add(UNIQUE_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(FK_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(IDENTITY_COLUMNS);
-        supportedOptions.add(AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF);
+        supportedOptions.add(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF);
         supportedOptions.add(ORDERBY_NULLS_USING_COLUMN_IS_NULL);
 
         supportedOptions.remove(TX_ISOLATION_READ_COMMITTED);
         supportedOptions.remove(TX_ISOLATION_REPEATABLE_READ);
-        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
+        supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION);
 
         supportedOptions.remove(RIGHT_OUTER_JOIN);
         supportedOptions.remove(SOME_ANY_ALL_SUBQUERY_EXPRESSIONS);
@@ -306,19 +306,19 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     }
 
     @Override
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         return "SELECT last_insert_rowid()";
     }
 
     @Override
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "autoincrement";
     }
 
     @Override
-    public Class getAutoIncrementJavaTypeForType(Class type)
+    public Class getIdentityJavaTypeForType(Class type)
     {
         // SQLite only seems to allow INTEGER columns for AUTOINCREMENT
         if (type.isPrimitive())

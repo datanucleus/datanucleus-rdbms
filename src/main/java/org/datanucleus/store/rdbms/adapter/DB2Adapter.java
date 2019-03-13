@@ -244,26 +244,6 @@ public class DB2Adapter extends BaseDatastoreAdapter
     }
 
     /**
-     * Accessor for the auto-increment sql statement for this datastore.
-     * @param table Name of the table that the autoincrement is for
-     * @param columnName Name of the column that the autoincrement is for
-     * @return The statement for getting the latest auto-increment key
-     */
-    public String getAutoIncrementStmt(Table table, String columnName)
-    {
-        return "VALUES IDENTITY_VAL_LOCAL()";
-    }
-
-    /**
-     * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
-     * @return The keyword for a column using auto-increment
-     */
-    public String getAutoIncrementKeyword()
-    {
-        return "generated always as identity (start with 1)";
-    }
-
-    /**
      * Continuation string to use where the SQL statement goes over more than 1
      * line. DB2 doesn't convert newlines into continuation characters and so
      * we just provide a space so that it accepts the statement.
@@ -273,8 +253,26 @@ public class DB2Adapter extends BaseDatastoreAdapter
     {
         return "";
     }
-    
-    // ---------------------------- Sequence Support ---------------------------
+
+    /**
+     * Accessor for the auto-increment sql statement for this datastore.
+     * @param table Name of the table that the autoincrement is for
+     * @param columnName Name of the column that the autoincrement is for
+     * @return The statement for getting the latest auto-increment key
+     */
+    public String getIdentityLastValueStmt(Table table, String columnName)
+    {
+        return "VALUES IDENTITY_VAL_LOCAL()";
+    }
+
+    /**
+     * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @return The keyword for a column using auto-increment
+     */
+    public String getIdentityKeyword()
+    {
+        return "generated always as identity (start with 1)";
+    }
 
     /**
      * Accessor for the sequence statement to create the sequence.

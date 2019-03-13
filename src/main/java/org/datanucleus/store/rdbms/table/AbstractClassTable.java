@@ -356,7 +356,7 @@ public abstract class AbstractClassTable extends TableImpl
         Class valueGeneratedType = Long.class;
         if (strategyName != null && ValueGenerationStrategy.IDENTITY.toString().equals(strategyName))
         {
-            valueGeneratedType = dba.getAutoIncrementJavaTypeForType(valueGeneratedType);
+            valueGeneratedType = dba.getIdentityJavaTypeForType(valueGeneratedType);
             if (valueGeneratedType != Long.class)
             {
                 NucleusLogger.DATASTORE_SCHEMA.debug("Class " + cmd.getFullClassName() + " uses IDENTITY strategy and rather than using BIGINT " +

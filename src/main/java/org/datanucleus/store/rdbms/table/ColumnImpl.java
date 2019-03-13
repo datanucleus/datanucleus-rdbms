@@ -387,7 +387,7 @@ public class ColumnImpl implements Column
         DatastoreAdapter adapter = getStoreManager().getDatastoreAdapter();
 
         // Add any type specification.
-        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION))
+        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMN_TYPE_SPECIFICATION))
         {
             // Don't add type
         }
@@ -468,13 +468,13 @@ public class ColumnImpl implements Column
             def.append(" ").append(getDefaultDefinition());
         }
 
-        if (isIdentity() && isPrimaryKey() && adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF))
+        if (isIdentity() && isPrimaryKey() && adapter.supportsOption(DatastoreAdapter.IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF))
         {
             def.append(" PRIMARY KEY");
         }
 
         // Nullability
-        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.AUTO_INCREMENT_KEYS_NULL_SPECIFICATION))
+        if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity() && !adapter.supportsOption(DatastoreAdapter.IDENTITY_KEYS_NULL_SPECIFICATION))
         {
             // Do nothing since the adapter doesn't allow NULL specifications with autoincrement/identity
         }
@@ -513,7 +513,7 @@ public class ColumnImpl implements Column
         // Auto Increment
         if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity())
         {
-            def.append(" " + adapter.getAutoIncrementKeyword());
+            def.append(" " + adapter.getIdentityKeyword());
         }
 
         // Uniqueness

@@ -429,7 +429,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
      * @param columnName Name of the column that the autoincrement is for
 	 * @return The statement for getting the latest auto-increment key
 	 **/
-	public String getAutoIncrementStmt(Table table, String columnName)
+	public String getIdentityLastValueStmt(Table table, String columnName)
 	{
 		return "SELECT @@IDENTITY";
 	}
@@ -438,7 +438,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
 	 * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
 	 * @return The keyword for a column using auto-increment
 	 **/
-	public String getAutoIncrementKeyword()
+	public String getIdentityKeyword()
 	{
 		return "IDENTITY";
 	}

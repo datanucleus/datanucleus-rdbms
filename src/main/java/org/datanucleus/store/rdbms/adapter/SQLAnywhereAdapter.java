@@ -215,7 +215,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         supportedOptions.add(ALTER_TABLE_DROP_FOREIGN_KEY_CONSTRAINT);
         supportedOptions.add(STATEMENT_BATCHING);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
-        supportedOptions.add(AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF);
+        supportedOptions.add(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(LOCK_OPTION_PLACED_AFTER_FROM);
         supportedOptions.add(OPERATOR_BITWISE_AND);
@@ -225,7 +225,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(DEFERRED_CONSTRAINTS); // No
         supportedOptions.remove(ANSI_JOIN_SYNTAX); // Deprecated
         supportedOptions.remove(ANSI_CROSSJOIN_SYNTAX); // Deprecated
-        supportedOptions.remove(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION); // No
+        supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION); // No
         supportedOptions.remove(BOOLEAN_COMPARISON); // No
 
         // Add the supported and unsupported JDBC types for lookups
@@ -323,7 +323,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
             if (pk != null && pk.size() > 0)
             {
                 boolean includePk = true;
-                if (supportsOption(AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF))
+                if (supportsOption(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF))
                 {
                     for (Column pkCol : pk.getColumns())
                     {
@@ -544,7 +544,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      */
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         return "SELECT @@IDENTITY";
     }
@@ -553,7 +553,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      */
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "NOT NULL DEFAULT AUTOINCREMENT";
     }

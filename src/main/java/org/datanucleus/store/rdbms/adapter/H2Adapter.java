@@ -275,7 +275,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest auto-increment key
      **/
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         return "CALL IDENTITY()";
     }
@@ -284,7 +284,7 @@ public class H2Adapter extends BaseDatastoreAdapter
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
      * @return The keyword for a column using auto-increment
      **/
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         return "IDENTITY";
     }
@@ -309,8 +309,6 @@ public class H2Adapter extends BaseDatastoreAdapter
     {
         return true;
     }
-
-    // ---------------------------- Sequence Support ---------------------------
 
     /**
      * Accessor for the sequence statement to create the sequence.

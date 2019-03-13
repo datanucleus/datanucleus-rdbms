@@ -584,7 +584,7 @@ public class InsertRequest extends Request
                     }
                 }
             }
-            String autoIncStmt = storeMgr.getDatastoreAdapter().getAutoIncrementStmt(table, columnName);
+            String autoIncStmt = storeMgr.getDatastoreAdapter().getIdentityLastValueStmt(table, columnName);
             PreparedStatement psAutoIncrement = sqlControl.getStatementForQuery(mconn, autoIncStmt);
             ResultSet rs = null;
             try

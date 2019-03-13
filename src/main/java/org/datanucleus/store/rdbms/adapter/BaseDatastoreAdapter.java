@@ -537,8 +537,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(DEFAULT_BEFORE_NULL_IN_COLUMN_OPTIONS);
         supportedOptions.add(ANSI_JOIN_SYNTAX);
         supportedOptions.add(ANSI_CROSSJOIN_SYNTAX);
-        supportedOptions.add(AUTO_INCREMENT_KEYS_NULL_SPECIFICATION);
-        supportedOptions.add(AUTO_INCREMENT_COLUMN_TYPE_SPECIFICATION);
+        supportedOptions.add(IDENTITY_KEYS_NULL_SPECIFICATION);
+        supportedOptions.add(IDENTITY_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.add(INCLUDE_ORDERBY_COLS_IN_SELECT);
         supportedOptions.add(ACCESS_PARENTQUERY_IN_SUBQUERY_JOINED);
         supportedOptions.add(SUBQUERY_IN_HAVING);
@@ -1181,7 +1181,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param columnName Name of the column that the autoincrement is for
      * @return The statement for getting the latest autoincremented key
      */
-    public String getAutoIncrementStmt(Table table, String columnName)
+    public String getIdentityLastValueStmt(Table table, String columnName)
     {
         throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
@@ -1191,13 +1191,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * (CREATE TABLEs...).
      * @return The keyword for a column using autoincrement
      */
-    public String getAutoIncrementKeyword()
+    public String getIdentityKeyword()
     {
         throw new UnsupportedOperationException(Localiser.msg("051019"));
     }
 
     @Override
-    public Class getAutoIncrementJavaTypeForType(Class type)
+    public Class getIdentityJavaTypeForType(Class type)
     {
         // Most datastores have no restrictions (maybe we should limit to Long, Integer, Short?)
         return type;
@@ -1319,7 +1319,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             if (pk != null && pk.size() > 0)
             {
                 boolean includePk = true;
-                if (supportsOption(AUTO_INCREMENT_PK_IN_CREATE_TABLE_COLUMN_DEF))
+                if (supportsOption(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF))
                 {
                     for (Column pkCol : pk.getColumns())
                     {

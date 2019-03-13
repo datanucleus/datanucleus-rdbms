@@ -1524,7 +1524,7 @@ public class MappingManagerImpl implements MappingManager
                     if (strategyName != null && ValueGenerationStrategy.IDENTITY.toString().equals(strategyName))
                     {
                         Class requestedType = clr.classForName(javaType);
-                        Class requiredType = storeMgr.getDatastoreAdapter().getAutoIncrementJavaTypeForType(requestedType);
+                        Class requiredType = storeMgr.getDatastoreAdapter().getIdentityJavaTypeForType(requestedType);
                         if (requiredType != mmd.getType())
                         {
                             NucleusLogger.DATASTORE_SCHEMA.debug("Member " + mmd.getFullFieldName() + " uses IDENTITY strategy and rather than using memberType of " + mmd.getTypeName() +
