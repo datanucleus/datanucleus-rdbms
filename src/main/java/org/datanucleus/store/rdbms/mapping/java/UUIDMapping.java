@@ -136,7 +136,7 @@ public class UUIDMapping extends SingleFieldMapping
         }
         else
         {
-            if (columnMappings.length > 0)
+            if (columnMappings.length > 0 && columnMappings[0].getColumn() != null)
             {
                 ColumnMetaData colmd = columnMappings[0].getColumn().getColumnMetaData();
                 if (colmd.getSqlType() != null)
@@ -165,7 +165,7 @@ public class UUIDMapping extends SingleFieldMapping
             return super.getObject(ec, resultSet, exprIndex);
         }
 
-        if (columnMappings.length > 0)
+        if (columnMappings.length > 0 && columnMappings[0].getColumn() != null)
         {
             ColumnMetaData colmd = columnMappings[0].getColumn().getColumnMetaData();
             if (colmd.getSqlType() != null)
