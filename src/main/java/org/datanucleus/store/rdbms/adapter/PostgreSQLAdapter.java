@@ -859,6 +859,8 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         registerColumnMapping(java.util.Date.class.getName(), org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping.class, JDBCType.BIGINT, "BIGINT", false);
 
         registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.OtherColumnMapping.class, JDBCType.OTHER, "UUID", false);
+        registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
+        registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
 
         // Use Collection as the way to signal that we want an ARRAY type
         registerColumnMapping(java.util.Collection.class.getName(), org.datanucleus.store.rdbms.mapping.column.ArrayColumnMapping.class, JDBCType.ARRAY, "TEXT ARRAY", false);

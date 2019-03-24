@@ -622,6 +622,8 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         {
             // Native UUID supported from v2.4. Seems to need to be specified using stmt.setObject(...), and retrieved using rs.getObject(), so use OTHER
             registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.OtherColumnMapping.class, JDBCType.OTHER, "UUID", false);
+            registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarCharColumnMapping.class, JDBCType.VARCHAR, "VARCHAR", false);
+            registerColumnMapping(java.util.UUID.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         }
 
         registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
