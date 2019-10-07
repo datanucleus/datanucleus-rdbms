@@ -162,6 +162,10 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
+                "varbinary", (short)Types.VARBINARY, 8000, null, null, "(max)", 1, false, (short)1, false, false, false, "varbinary", (short)0, (short)0, 0);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.VARBINARY, sqlType, true);
+
+        sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
             "TEXT", (short)Types.CLOB, 2147483647, null, null, null, 1, true, (short)1, false, false, false, "TEXT", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
