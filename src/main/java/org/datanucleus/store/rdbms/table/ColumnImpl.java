@@ -430,6 +430,23 @@ public class ColumnImpl implements Column
                 {
                     precSpec.append("," + columnMetaData.getScale());
                 }
+                /*
+                 * Starting with version 11.2 Oracle defaults to byte
+                 * as the precision unit for string columns for reasons
+                 * of backwards compatibility. Unfortunately this means
+                 * that the column length attribute is no longer a reliable
+                 * measure for unicode characters if 'char' as a unit is
+                 * omitted from the definition.
+                 */
+                if ("oracle".equals(adapter.getVendorID())) {
+                    double oracleVersion = Double.parseDouble(String.format("%d.%d",
+                        adapter.getDriverMajorVersion(),
+                        adapter.getDriverMinorVersion()
+                    ));
+                    if (oracleVersion >= 11.2 && this.datastoreMapping.isStringBased()) {
+                        precSpec.append(" CHAR");
+                    }
+                }
             }
             else if (sqlPrecision > 0 && !typeInfo.isAllowsPrecisionSpec())
             {
