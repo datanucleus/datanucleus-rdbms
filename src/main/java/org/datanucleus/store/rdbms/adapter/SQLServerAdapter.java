@@ -162,7 +162,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
-                "varbinary", (short)Types.VARBINARY, 8000, null, null, "(max)", 1, false, (short)1, false, false, false, "varbinary", (short)0, (short)0, 0);
+            "varbinary", (short)Types.VARBINARY, 8000, "0x", null, "(max)", 1, false, (short)2, false, false, false, "varbinary", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.VARBINARY, sqlType, true);
 
         sqlType = new org.datanucleus.store.rdbms.adapter.SQLServerTypeInfo(
@@ -388,6 +388,15 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         // Discard TINYINT type because it doesn't support negative values.
         String typeName = ti.getTypeName();
         if (typeName.toLowerCase().startsWith("tinyint"))
+        {
+            return null;
+        }
+
+        // Discard VARBINARY type generated from driver info,
+        // because it uses a bad String in "createParams" ('max length' instead of '(max)')
+        // in combination with "datanucleus.rdbms.useDefaultSqlType" false, this leads to
+        // wrong data length in the DB (varbinary(1) for java.io.Serializable - e.g. ByteArrays)
+        if (typeName.toLowerCase().startsWith("varbinary"))
         {
             return null;
         }
