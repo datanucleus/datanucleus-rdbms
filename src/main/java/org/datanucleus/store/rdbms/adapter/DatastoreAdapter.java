@@ -404,6 +404,9 @@ public interface DatastoreAdapter
 
     public static final String PARAMETER_IN_CASE_IN_UPDATE_CLAUSE = "ParameterInCaseInUpdateClause";
 
+    /** Whether it supports specifying length "type" for a column, e.g VARCHAR(50 BYTE). */
+    public static final String COLUMN_LENGTH_SEMANTICS = "ColumnLengthSemantics";
+
     /**
      * Initialise the datastore adapter.
      * @param handler SchemaHandler that we initialise the types for

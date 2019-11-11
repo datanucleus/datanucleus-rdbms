@@ -426,9 +426,20 @@ public class ColumnImpl implements Column
             if (sqlPrecision > 0 && typeInfo.isAllowsPrecisionSpec())
             {
                 precSpec.append(sqlPrecision);
+
+                // Optional "scale" for the precision e.g BIGDECIMAL(8,3)
                 if (columnMetaData.getScale() != null)
                 {
                     precSpec.append("," + columnMetaData.getScale());
+                }
+
+                // Optional "type" for the precision, where the database supports it
+                if (adapter.supportsOption(DatastoreAdapter.COLUMN_LENGTH_SEMANTICS))
+                {
+                    if (columnMetaData.hasExtension("column-length-semantic"))
+                    {
+                        precSpec.append(" " + columnMetaData.getValueForExtension("column-length-semantic"));
+                    }
                 }
             }
             else if (sqlPrecision > 0 && !typeInfo.isAllowsPrecisionSpec())

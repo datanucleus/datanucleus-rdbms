@@ -179,11 +179,16 @@ public class OracleAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(FK_UPDATE_ACTION_RESTRICT);
         supportedOptions.remove(FK_UPDATE_ACTION_NULL);
         supportedOptions.remove(FK_UPDATE_ACTION_CASCADE);
-		
+
         if (datastoreMajorVersion >= 12) 
         {
             supportedOptions.add(IDENTITY_COLUMNS);
-        }		
+        }
+        if ((datastoreMajorVersion == 11 && datastoreMinorVersion >= 2) || datastoreMajorVersion >= 12)
+        {
+            // In 11.2+ Oracle supports things like "VARCHAR(50 BYTE)"
+            supportedOptions.add(COLUMN_LENGTH_SEMANTICS);
+        }
     }
 
     /**
