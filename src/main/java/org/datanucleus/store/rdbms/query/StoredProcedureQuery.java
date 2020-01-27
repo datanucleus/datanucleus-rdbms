@@ -313,7 +313,9 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                             }
                         }
 
-                        if (param.getMode() == StoredProcQueryParameterMode.OUT || param.getMode() == StoredProcQueryParameterMode.INOUT)
+                        if (param.getMode() == StoredProcQueryParameterMode.OUT || 
+                            param.getMode() == StoredProcQueryParameterMode.INOUT || 
+                            param.getMode() == StoredProcQueryParameterMode.REF_CURSOR)
                         {
                             // Register output params
                             if (param.getType() == Integer.class)
@@ -448,7 +450,9 @@ public class StoredProcedureQuery extends AbstractStoredProcedureQuery
                 {
                     for (StoredProcedureParameter param : storedProcParams)
                     {
-                        if (param.getMode() == StoredProcQueryParameterMode.OUT || param.getMode() == StoredProcQueryParameterMode.INOUT)
+                        if (param.getMode() == StoredProcQueryParameterMode.OUT ||
+                            param.getMode() == StoredProcQueryParameterMode.INOUT ||
+                            param.getMode() == StoredProcQueryParameterMode.REF_CURSOR)
                         {
                             Object value = null;
                             if (param.getType() == Integer.class)
