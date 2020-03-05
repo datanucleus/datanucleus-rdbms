@@ -92,6 +92,18 @@ public abstract class AbstractClassTable extends TableImpl
     /** Mapping for any soft-delete column. */
     protected JavaTypeMapping softDeleteMapping;
 
+    /** Mapping for any create user column. */
+    protected JavaTypeMapping createUserMapping;
+
+    /** Mapping for any update user column. */
+    protected JavaTypeMapping updateUserMapping;
+
+    /** Mapping for any create timestamp column. */
+    protected JavaTypeMapping createTimestampMapping;
+
+    /** Mapping for any update timestamp column. */
+    protected JavaTypeMapping updateTimestampMapping;
+
     /** MetaData for versioning of objects stored in this table. */
     protected VersionMetaData versionMetaData;
 
@@ -449,7 +461,23 @@ public abstract class AbstractClassTable extends TableImpl
         {
             return softDeleteMapping != null ? softDeleteMapping.getColumnMapping(0).getColumn() : null;
         }
-        // TODO Support other column types
+        else if (colType == SurrogateColumnType.CREATE_USER)
+        {
+            return createUserMapping != null ? createUserMapping.getColumnMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.CREATE_TIMESTAMP)
+        {
+            return createTimestampMapping != null ? createTimestampMapping.getColumnMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_USER)
+        {
+            return updateUserMapping != null ? updateUserMapping.getColumnMapping(0).getColumn() : null;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
+        {
+            return updateTimestampMapping != null ? updateTimestampMapping.getColumnMapping(0).getColumn() : null;
+        }
+
         return null;
     }
 
@@ -479,6 +507,22 @@ public abstract class AbstractClassTable extends TableImpl
         else if (colType == SurrogateColumnType.SOFTDELETE)
         {
             return softDeleteMapping;
+        }
+        else if (colType == SurrogateColumnType.CREATE_USER)
+        {
+            return createUserMapping;
+        }
+        else if (colType == SurrogateColumnType.CREATE_TIMESTAMP)
+        {
+            return createTimestampMapping;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_USER)
+        {
+            return updateUserMapping;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
+        {
+            return updateTimestampMapping;
         }
 
         return super.getSurrogateMapping(colType, allowSuperclasses);
@@ -582,6 +626,34 @@ public abstract class AbstractClassTable extends TableImpl
             if (softDeleteMapping != null)
             {
                 consumer.consumeMapping(softDeleteMapping, MappingType.SOFTDELETE);
+            }
+        }
+        else if (colType == SurrogateColumnType.CREATE_USER)
+        {
+            if (createUserMapping != null)
+            {
+                consumer.consumeMapping(createUserMapping, MappingType.CREATEUSER);
+            }
+        }
+        else if (colType == SurrogateColumnType.CREATE_TIMESTAMP)
+        {
+            if (createTimestampMapping != null)
+            {
+                consumer.consumeMapping(createTimestampMapping, MappingType.CREATETIMESTAMP);
+            }
+        }
+        else if (colType == SurrogateColumnType.UPDATE_USER)
+        {
+            if (updateUserMapping != null)
+            {
+                consumer.consumeMapping(updateUserMapping, MappingType.UPDATEUSER);
+            }
+        }
+        else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
+        {
+            if (updateTimestampMapping != null)
+            {
+                consumer.consumeMapping(updateTimestampMapping, MappingType.UPDATETIMESTAMP);
             }
         }
         else

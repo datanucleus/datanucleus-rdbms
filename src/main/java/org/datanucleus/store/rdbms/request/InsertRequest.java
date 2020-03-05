@@ -132,6 +132,18 @@ public class InsertRequest extends Request
     /** StatementExpressionIndex for soft-delete. **/
     private StatementMappingIndex softDeleteStmtMapping;
 
+    /** StatementExpressionIndex for create-user. **/
+    private StatementMappingIndex createUserStmtMapping;
+
+    /** StatementExpressionIndex for create-timestamp. **/
+    private StatementMappingIndex createTimestampStmtMapping;
+
+    /** StatementExpressionIndex for update-user. **/
+    private StatementMappingIndex updateUserStmtMapping;
+
+    /** StatementExpressionIndex for update-timestamp. **/
+    private StatementMappingIndex updateTimestampStmtMapping;
+
     /** StatementExpressionIndex for external FKs */
     private StatementMappingIndex[] externalFKStmtMappings;
 
@@ -162,6 +174,10 @@ public class InsertRequest extends Request
         table.provideSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.MULTITENANCY, consumer);
         table.provideSurrogateMapping(SurrogateColumnType.SOFTDELETE, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.CREATE_USER, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.CREATE_TIMESTAMP, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.UPDATE_USER, consumer);
+        table.provideSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, consumer);
         table.provideExternalMappings(consumer, MappingType.EXTERNAL_FK);
         table.provideExternalMappings(consumer, MappingType.EXTERNAL_FK_DISCRIMINATOR);
         table.provideExternalMappings(consumer, MappingType.EXTERNAL_INDEX);
@@ -173,6 +189,10 @@ public class InsertRequest extends Request
         discriminatorStmtMapping = consumer.getDiscriminatorStatementMapping();
         multitenancyStmtMapping = consumer.getMultitenancyStatementMapping();
         softDeleteStmtMapping = consumer.getSoftDeleteStatementMapping();
+        createUserStmtMapping = consumer.getCreateUserStatementMapping();
+        createTimestampStmtMapping = consumer.getCreateTimestampStatementMapping();
+        updateUserStmtMapping = consumer.getUpdateUserStatementMapping();
+        updateTimestampStmtMapping = consumer.getUpdateTimestampStatementMapping();
 
         externalFKStmtMappings = consumer.getExternalFKStatementMapping();
         externalFKDiscrimStmtMappings = consumer.getExternalFKDiscrimStatementMapping();
@@ -275,7 +295,6 @@ public class InsertRequest extends Request
                     // This provides "persistence-by-reachability" for these fields
                     if (insertFieldNumbers.length > 0)
                     {
-                        // TODO Support surrogate current-user, create-timestamp
                         int numberOfFieldsToProvide = 0;
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
@@ -339,6 +358,27 @@ public class InsertRequest extends Request
                     {
                         // Soft-Delete mapping
                         table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false).setObject(ec, ps, softDeleteStmtMapping.getParameterPositionsForOccurrence(0), Boolean.FALSE);
+                    }
+
+                    if (createUserStmtMapping != null)
+                    {
+                        table.getSurrogateMapping(SurrogateColumnType.CREATE_USER, false).setObject(ec, ps, createUserStmtMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getCurrentUser(ec));
+                    }
+                    if (createTimestampStmtMapping != null)
+                    {
+                        table.getSurrogateMapping(SurrogateColumnType.CREATE_TIMESTAMP, false).setObject(ec, ps, createTimestampStmtMapping.getParameterPositionsForOccurrence(0), 
+                            new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
+                    }
+
+                    if (updateUserStmtMapping != null)
+                    {
+                        // TODO Do we need to specify this on INSERT? can they be nullable?
+                        table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false).setObject(ec, ps, updateUserStmtMapping.getParameterPositionsForOccurrence(0), "");
+                    }
+                    if (updateTimestampStmtMapping != null)
+                    {
+                        // TODO Do we need to specify this on INSERT? can they be nullable?
+                        table.getSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, false).setObject(ec, ps, updateTimestampStmtMapping.getParameterPositionsForOccurrence(0), null);
                     }
 
                     JavaTypeMapping discrimMapping = table.getSurrogateMapping(SurrogateColumnType.DISCRIMINATOR, false);
@@ -662,6 +702,11 @@ public class InsertRequest extends Request
         /** StatementExpressionIndex for soft-delete. **/
         private StatementMappingIndex softDeleteStatementMapping;
 
+        private StatementMappingIndex createUserStatementMapping;
+        private StatementMappingIndex createTimestampStatementMapping;
+        private StatementMappingIndex updateUserStatementMapping;
+        private StatementMappingIndex updateTimestampStatementMapping;
+
         private StatementMappingIndex[] externalFKStmtExprIndex;
 
         private StatementMappingIndex[] externalFKDiscrimStmtExprIndex;
@@ -978,6 +1023,74 @@ public class InsertRequest extends Request
                 int[] param = { paramIndex++ };
                 softDeleteStatementMapping.addParameterOccurrence(param);
             }
+            else if (mappingType == MappingType.CREATEUSER)
+            {
+                // CreateUser column
+                JavaTypeMapping createUserMapping = table.getSurrogateMapping(SurrogateColumnType.CREATE_USER, false);
+                String val = createUserMapping.getColumnMapping(0).getUpdateInputParameter();
+
+                if (columnNames.length() > 0)
+                {
+                    columnNames.append(',');
+                    columnValues.append(',');
+                }
+                columnNames.append(createUserMapping.getColumnMapping(0).getColumn().getIdentifier());
+                columnValues.append(val);
+                createUserStatementMapping = new StatementMappingIndex(createUserMapping);
+                int[] param = { paramIndex++ };
+                createUserStatementMapping.addParameterOccurrence(param);
+            }
+            else if (mappingType == MappingType.CREATETIMESTAMP)
+            {
+                // CreateTimestamp column
+                JavaTypeMapping createTimestampMapping = table.getSurrogateMapping(SurrogateColumnType.CREATE_TIMESTAMP, false);
+                String val = createTimestampMapping.getColumnMapping(0).getUpdateInputParameter();
+
+                if (columnNames.length() > 0)
+                {
+                    columnNames.append(',');
+                    columnValues.append(',');
+                }
+                columnNames.append(createTimestampMapping.getColumnMapping(0).getColumn().getIdentifier());
+                columnValues.append(val);
+                createTimestampStatementMapping = new StatementMappingIndex(createTimestampMapping);
+                int[] param = { paramIndex++ };
+                createTimestampStatementMapping.addParameterOccurrence(param);
+            }
+            else if (mappingType == MappingType.UPDATEUSER)
+            {
+                // UpdateUser column - we add it to the INSERT in case it is not nullable
+                JavaTypeMapping updateUserMapping = table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false);
+                String val = updateUserMapping.getColumnMapping(0).getUpdateInputParameter();
+
+                if (columnNames.length() > 0)
+                {
+                    columnNames.append(',');
+                    columnValues.append(',');
+                }
+                columnNames.append(updateUserMapping.getColumnMapping(0).getColumn().getIdentifier());
+                columnValues.append(val);
+                updateUserStatementMapping = new StatementMappingIndex(updateUserMapping);
+                int[] param = { paramIndex++ };
+                updateUserStatementMapping.addParameterOccurrence(param);
+            }
+            else if (mappingType == MappingType.UPDATETIMESTAMP)
+            {
+                // UpdateTimestamp column - we add it to the INSERT in case it is not nullable
+                JavaTypeMapping updateTimestampMapping = table.getSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, false);
+                String val = updateTimestampMapping.getColumnMapping(0).getUpdateInputParameter();
+
+                if (columnNames.length() > 0)
+                {
+                    columnNames.append(',');
+                    columnValues.append(',');
+                }
+                columnNames.append(updateTimestampMapping.getColumnMapping(0).getColumn().getIdentifier());
+                columnValues.append(val);
+                updateTimestampStatementMapping = new StatementMappingIndex(updateTimestampMapping);
+                int[] param = { paramIndex++ };
+                updateTimestampStatementMapping.addParameterOccurrence(param);
+            }
         }
 
         /**
@@ -1196,6 +1309,26 @@ public class InsertRequest extends Request
         public StatementMappingIndex getSoftDeleteStatementMapping()
         {
             return softDeleteStatementMapping;
+        }
+
+        public StatementMappingIndex getCreateUserStatementMapping()
+        {
+            return createUserStatementMapping;
+        }
+
+        public StatementMappingIndex getCreateTimestampStatementMapping()
+        {
+            return createTimestampStatementMapping;
+        }
+
+        public StatementMappingIndex getUpdateUserStatementMapping()
+        {
+            return updateUserStatementMapping;
+        }
+
+        public StatementMappingIndex getUpdateTimestampStatementMapping()
+        {
+            return updateTimestampStatementMapping;
         }
 
         /** 

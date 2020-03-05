@@ -105,6 +105,12 @@ public class UpdateRequest extends Request
     /** Whether we should make checks on optimistic version before updating. */
     protected boolean versionChecks = false;
 
+    /** StatementExpressionIndex for update-user. **/
+    private StatementMappingIndex updateUserStmtMapping;
+
+    /** StatementExpressionIndex for update-timestamp. **/
+    private StatementMappingIndex updateTimestampStmtMapping;
+
     /**
      * Constructor, taking the table. Uses the structure of the datastore table to build a basic query. 
      * @param table The Class Table representing the datastore table to update
@@ -175,16 +181,26 @@ public class UpdateRequest extends Request
             table.provideMappingsForMembers(consumer, reqFieldMetaData, false);
         }
 
-        // TODO Support surrogate update user/timestamp
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER))
+        {
+            table.provideSurrogateMapping(SurrogateColumnType.UPDATE_USER, consumer);
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP))
+        {
+            table.provideSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, consumer);
+        }
+        updateUserStmtMapping = consumer.getUpdateUserStatementMapping();
+        updateTimestampStmtMapping = consumer.getUpdateTimestampStatementMapping();
+
         AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
         for (int i=0;i<mmds.length;i++)
         {
-            if (mmds[i].isUpdateTimestamp()) // TODO Make this accessible from cmd
+            if (mmds[i].isUpdateTimestamp())
             {
                 AbstractMemberMetaData[] updateTsMmd = {mmds[i]};
                 table.provideMappingsForMembers(consumer, updateTsMmd, false);
             }
-            else if (mmds[i].isUpdateUser()) // TODO Make this accessible from cmd
+            else if (mmds[i].isUpdateUser())
             {
                 AbstractMemberMetaData[] updateUserMmd = {mmds[i]};
                 table.provideMappingsForMembers(consumer, updateUserMmd, false);
@@ -247,15 +263,14 @@ public class UpdateRequest extends Request
 
         if (stmt != null)
         {
-            // TODO Support surrogate update user/timestamp
             AbstractMemberMetaData[] mmds = cmd.getManagedMembers();
             for (int i=0;i<mmds.length;i++)
             {
-                if (mmds[i].isUpdateTimestamp()) // TODO Make this accessible from cmd
+                if (mmds[i].isUpdateTimestamp())
                 {
                     op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
                 }
-                else if (mmds[i].isUpdateUser()) // TODO Make this accessible from cmd
+                else if (mmds[i].isUpdateUser())
                 {
                     op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getNucleusContext().getCurrentUser(ec));
                 }
@@ -333,6 +348,17 @@ public class UpdateRequest extends Request
                                 nextVersion = ec.getLockManager().getNextVersion(versionMetaData, currentVersion);
                             }
                             op.setTransactionalVersion(nextVersion);
+                        }
+
+                        if (updateUserStmtMapping != null)
+                        {
+                            table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false).setObject(ec, ps, updateUserStmtMapping.getParameterPositionsForOccurrence(0), 
+                                ec.getNucleusContext().getCurrentUser(ec));
+                        }
+                        if (updateTimestampStmtMapping != null)
+                        {
+                            table.getSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, false).setObject(ec, ps, updateTimestampStmtMapping.getParameterPositionsForOccurrence(0), 
+                                new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
                         }
 
                         // SELECT clause - set the required fields to be updated
@@ -504,6 +530,9 @@ public class UpdateRequest extends Request
 
         private boolean whereClauseConsumption = false;
 
+        private StatementMappingIndex updateUserStatementMapping;
+        private StatementMappingIndex updateTimestampStatementMapping;
+
         /**
          * Constructor
          * @param cmd metadata for the class
@@ -658,7 +687,7 @@ public class UpdateRequest extends Request
         }
 
         /**
-         * Consumes a mapping associated to "special" columns.
+         * Consumes a mapping associated to surrogate / special columns.
          * @param m The mapping.
          * @param mappingType the Mapping type
          */
@@ -666,10 +695,10 @@ public class UpdateRequest extends Request
         {
             if (mappingType == MappingType.VERSION)
             {
-                // Surrogate version column
                 String inputParam = m.getColumnMapping(0).getUpdateInputParameter();
                 if (whereClauseConsumption)
                 {
+                    // Surrogate version column (WHERE clause)
                     if (where.length() > 0)
                     {
                         where.append(" AND ");
@@ -684,6 +713,7 @@ public class UpdateRequest extends Request
                 }
                 else
                 {
+                    // Surrogate Version column to be updated
                     String condition = m.getColumnMapping(0).getColumn().getIdentifier() + "=" + inputParam;
                     if (columnAssignments.length() > 0)
                     {
@@ -698,7 +728,7 @@ public class UpdateRequest extends Request
             }
             else if (mappingType == MappingType.DATASTORE_ID)
             {
-                // Surrogate datastore-id column
+                // Surrogate datastore-id column (WHERE clause)
                 if (where.length() > 0)
                 {
                     where.append(" AND ");
@@ -711,6 +741,32 @@ public class UpdateRequest extends Request
                 datastoreIdIdx.addParameterOccurrence(new int[]{paramIndex++});
                 stmtMappingDefinition.setWhereDatastoreId(datastoreIdIdx);
             }
+            else if (mappingType == MappingType.UPDATEUSER)
+            {
+                // Surrogate UPDATE_USER column to be updated
+                String condition = m.getColumnMapping(0).getColumn().getIdentifier() + "=" + m.getColumnMapping(0).getUpdateInputParameter();
+                if (columnAssignments.length() > 0)
+                {
+                    columnAssignments.append(", ");
+                }
+                columnAssignments.append(condition);
+
+                updateUserStatementMapping = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false));
+                updateUserStatementMapping.addParameterOccurrence(new int[]{paramIndex++});
+            }
+            else if (mappingType == MappingType.UPDATETIMESTAMP)
+            {
+                // Surrogate UPDATE_TIMESTAMP column to be updated
+                String condition = m.getColumnMapping(0).getColumn().getIdentifier() + "=" + m.getColumnMapping(0).getUpdateInputParameter();
+                if (columnAssignments.length() > 0)
+                {
+                    columnAssignments.append(", ");
+                }
+                columnAssignments.append(condition);
+
+                updateTimestampStatementMapping = new StatementMappingIndex(table.getSurrogateMapping(SurrogateColumnType.UPDATE_TIMESTAMP, false));
+                updateTimestampStatementMapping.addParameterOccurrence(new int[]{paramIndex++});
+            }
         }
 
         /**
@@ -720,6 +776,16 @@ public class UpdateRequest extends Request
         public void consumeUnmappedColumn(Column col)
         {
             // Do nothing since we don't handle unmapped columns
+        }
+
+        public StatementMappingIndex getUpdateUserStatementMapping()
+        {
+            return updateUserStatementMapping;
+        }
+
+        public StatementMappingIndex getUpdateTimestampStatementMapping()
+        {
+            return updateTimestampStatementMapping;
         }
 
         /**

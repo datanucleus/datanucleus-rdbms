@@ -37,6 +37,18 @@ public enum MappingType
     /** Soft-delete flag column. */
     SOFTDELETE,
 
+    /** Create-user audit column. */
+    CREATEUSER,
+
+    /** Update-user audit column. */
+    UPDATEUSER,
+
+    /** Create-timestamp audit column. */
+    CREATETIMESTAMP,
+
+    /** Update-timestamp audit column. */
+    UPDATETIMESTAMP,
+
     /** List index from related class. */
     EXTERNAL_INDEX,
 

@@ -102,6 +102,7 @@ import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
+import org.datanucleus.store.rdbms.mapping.java.SqlTimestampMapping;
 import org.datanucleus.store.rdbms.mapping.java.StringMapping;
 import org.datanucleus.store.rdbms.mapping.java.VersionMapping;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -297,10 +298,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
 
-        // Add Discriminator where specified in MetaData
         DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaDataForTable();
         if (dismd != null)
         {
+            // Surrogate discriminator
             discriminatorMetaData = dismd;
             if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DISCRIM_PER_SUBCLASS_TABLE))
             {
@@ -324,22 +325,22 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
 
-        // Add Multi-tenancy discriminator if applicable
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
         if (storeMgr.getNucleusContext().isClassMultiTenant(cmd))
         {
+            // Surrogate multi-tenancy discriminator
             ColumnMetaData colmd = new ColumnMetaData();
             if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
             {
                 colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME));
             }
-            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
-            {
-                colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
-            }
             if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH))
             {
                 colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
+            }
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
+            {
+                colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
             }
 
             String colName = (colmd.getName() != null) ? colmd.getName() : "TENANT_ID";
@@ -355,7 +356,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
 
         if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE))
         {
-            // SoftDelete flag column
+            // Surrogate "SoftDelete" flag column
             ColumnMetaData colmd = new ColumnMetaData();
             if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME))
             {
@@ -371,6 +372,92 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             Column tenantColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), softDeleteMapping, colmd);
             storeMgr.getMappingManager().createColumnMapping(softDeleteMapping, tenantColumn, typeName);
             logMapping("SOFTDELETE", softDeleteMapping);
+        }
+
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATEUSER))
+        {
+            // Surrogate "create user" column
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_NAME))
+            {
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_NAME));
+            }
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_LENGTH))
+            {
+                colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_CREATEUSER_COLUMN_LENGTH));
+            }
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "CREATE_USER";
+            String typeName = String.class.getName();
+
+            createUserMapping = new StringMapping();
+            createUserMapping.setTable(this);
+            createUserMapping.initialize(storeMgr, typeName);
+            Column auditColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), createUserMapping, colmd);
+            storeMgr.getMappingManager().createColumnMapping(createUserMapping, auditColumn, typeName);
+            logMapping("CREATEUSER", createUserMapping);
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP))
+        {
+            // Surrogate "create timestamp" column
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME))
+            {
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_CREATETIMESTAMP_COLUMN_NAME));
+            }
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "CREATE_TIMESTAMP";
+            String typeName = Timestamp.class.getName();
+
+            createTimestampMapping = new SqlTimestampMapping();
+            createTimestampMapping.setTable(this);
+            createTimestampMapping.initialize(storeMgr, typeName);
+            Column auditColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), createTimestampMapping, colmd);
+            storeMgr.getMappingManager().createColumnMapping(createTimestampMapping, auditColumn, typeName);
+            logMapping("CREATETIMESTAMP", createTimestampMapping);
+        }
+
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER))
+        {
+            // Surrogate "update user" column
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME))
+            {
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_NAME));
+            }
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_LENGTH))
+            {
+                colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_UPDATEUSER_COLUMN_LENGTH));
+            }
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "UPDATE_USER";
+            String typeName = String.class.getName();
+
+            updateUserMapping = new StringMapping();
+            updateUserMapping.setTable(this);
+            updateUserMapping.initialize(storeMgr, typeName);
+            Column auditColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), updateUserMapping, colmd);
+            storeMgr.getMappingManager().createColumnMapping(updateUserMapping, auditColumn, typeName);
+            logMapping("UPDATEUSER", updateUserMapping);
+        }
+        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP))
+        {
+            // Surrogate "update timestamp" column
+            ColumnMetaData colmd = new ColumnMetaData();
+            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME))
+            {
+                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_UPDATETIMESTAMP_COLUMN_NAME));
+            }
+
+            String colName = (colmd.getName() != null) ? colmd.getName() : "UPDATE_TIMESTAMP";
+            String typeName = Timestamp.class.getName();
+
+            updateTimestampMapping = new SqlTimestampMapping();
+            updateTimestampMapping.setTable(this);
+            updateTimestampMapping.initialize(storeMgr, typeName);
+            Column auditColumn = addColumn(typeName, storeMgr.getIdentifierFactory().newIdentifier(IdentifierType.COLUMN, colName), updateTimestampMapping, colmd);
+            storeMgr.getMappingManager().createColumnMapping(updateTimestampMapping, auditColumn, typeName);
+            logMapping("UPDATETIMESTAMP", updateTimestampMapping);
         }
 
         // Initialise any SecondaryTables

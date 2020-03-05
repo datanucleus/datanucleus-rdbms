@@ -315,6 +315,22 @@ public abstract class AbstractTable implements Table
         {
             return null;
         }
+        else if (colType == SurrogateColumnType.CREATE_USER)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_USER)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.CREATE_TIMESTAMP)
+        {
+            return null;
+        }
+        else if (colType == SurrogateColumnType.UPDATE_TIMESTAMP)
+        {
+            return null;
+        }
         // TODO Support other types
         return null;
     }
