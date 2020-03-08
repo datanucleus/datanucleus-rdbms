@@ -251,7 +251,7 @@ public class OracleAdapter extends BaseDatastoreAdapter
             }
         }
 
-        supportedJdbcTypesById.put(2007, "XMLTYPE");
+        supportedJdbcTypesById.put(OracleTypeInfo.TYPES_SYS_XMLTYPE, "XMLTYPE");
     }
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)
@@ -985,11 +985,15 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
         registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping.class, JDBCType.BLOB, "BLOB", true);
         registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", false);
+        registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONG RAW", false);
         registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarBinaryColumnMapping.class, JDBCType.VARBINARY, "VARBINARY", false);
+        registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.VarBinaryColumnMapping.class, JDBCType.VARBINARY, "RAW", false);
 
         registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping.class, JDBCType.BLOB, "BLOB", true);
         registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", false);
+        registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONG RAW", false);
         registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.VarBinaryColumnMapping.class, JDBCType.VARBINARY, "VARBINARY", false);
+        registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.VarBinaryColumnMapping.class, JDBCType.VARBINARY, "RAW", false);
 
         registerColumnMapping(java.io.File.class.getName(), org.datanucleus.store.rdbms.mapping.column.BinaryStreamColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
 
