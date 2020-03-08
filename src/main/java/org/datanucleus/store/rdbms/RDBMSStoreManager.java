@@ -1308,9 +1308,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     " schema=" + dba.supportsOption(DatastoreAdapter.SCHEMAS_IN_TABLE_DEFINITIONS));
             }
             NucleusLogger.DATASTORE.debug("Datastore : " +
-                (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CHECK_EXISTS_TABLES_VIEWS) ? "checkTableViewExistence" : "") +
-                ", rdbmsConstraintCreateMode=" + getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONSTRAINT_CREATE_MODE) +
-                ", initialiseColumnInfo=" + getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INIT_COLUMN_INFO));
+                "rdbmsConstraintCreateMode=" + getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CONSTRAINT_CREATE_MODE) +
+                ", initialiseColumnInfo=" + getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INIT_COLUMN_INFO) +
+                (getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_CHECK_EXISTS_TABLES_VIEWS) ? ", checkTableViewExistence" : ""));
 
             int batchLimit = getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT);
             boolean supportBatching = dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING);
