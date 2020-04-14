@@ -90,6 +90,9 @@ public interface DatastoreAdapter
     /** Whether "Types.BIT" is really mapped as BOOLEAN. */
     public static final String BIT_IS_REALLY_BOOLEAN = "BitIsReallyBoolean";
 
+    /** Whether "Types.BLOB" is really mapped as LONGVARBINARY. */
+    public static final String BLOB_IS_REALLY_LONGVARBINARY = "BlobIsReallyLongVarBinary";
+
     /** Do we support right outer join? */
     public static final String RIGHT_OUTER_JOIN = "RightOuterJoin";
 

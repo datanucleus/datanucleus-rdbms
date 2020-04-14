@@ -120,6 +120,9 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
 
         supportedOptions.add(NATIVE_ENUM_TYPE);
 
+        // BLOB is not provided via JDBC with PostgreSQL, so we map it to bytea as per LONGVARBINARY
+        supportedOptions.add(BLOB_IS_REALLY_LONGVARBINARY);
+
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING); // PostgreSQL charsets don't seem to allow this
     }
 
@@ -138,10 +141,12 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         SQLTypeInfo sqlType = new PostgreSQLTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
-        sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 9, null, null, null, 0, false, (short)3, false, false, false, "text", (short)0, (short)0, 10);
+        // Mirrored from LONGVARCHAR ("text") from JDBC driver
+        sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 0, null, null, null, 1, true, (short)3, true, false, false, "text", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
 
-        sqlType = new PostgreSQLTypeInfo("bytea", (short)Types.BLOB, 9, null, null, null, 0, false, (short)3, false, false, false, "bytea", (short)0, (short)0, 10);
+        // Mirrored from LONGVARBINARY ("bytea") from JDBC driver
+        sqlType = new PostgreSQLTypeInfo("bytea", (short)Types.BLOB, 0, null, null, null, 1, true, (short)3, true, false, false, "bytea", (short)0, (short)0, 10);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
 
         // Not present in PSQL 9.2.8 - just mirror what BIT does
