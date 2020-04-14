@@ -57,6 +57,11 @@ public class BlobColumnMapping extends AbstractLargeBinaryColumnMapping
 
     public int getJDBCType()
     {
+        if (column.getStoreManager().getDatastoreAdapter().supportsOption(DatastoreAdapter.BLOB_IS_REALLY_LONGVARBINARY))
+        {
+            // Caters for PostgreSQL inadequacy where it doesn't support BLOB as such, so we force as if LONGVARBINARY
+            return Types.LONGVARBINARY;
+        }
         return Types.BLOB;
     }
 
