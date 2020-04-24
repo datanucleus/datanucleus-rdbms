@@ -53,7 +53,11 @@ import org.datanucleus.util.StringUtils;
 
 /**
  * Provides methods for adapting SQL language elements to the MySQL database.
- * Note that this also supports the MariaDB database.
+ * Note that this also currently supports the MariaDB database.
+ * 
+ * We could contemplate splitting this into separate MySQL and MariaDB support at some point, but one of the issues to overcome with that
+ * is that "datanucleus-geospatial" adds support for Geospatial types, including MySQL types and extends this class. We would need to
+ * have an equivalent extension for MariaDB.
  */
 public class MySQLAdapter extends BaseDatastoreAdapter
 {
