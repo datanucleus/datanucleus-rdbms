@@ -60,12 +60,10 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
     /** List of Postgresql keywords that aren't in SQL92, SQL99 */
     public static final String POSTGRESQL_RESERVED_WORDS =
         "ALL,ANALYSE,ANALYZE,DO,FREEZE,ILIKE,ISNULL,OFFSET,PLACING,VERBOSE";
-        
-//    protected Map<String, String> psqlTypes;
 
     /**
      * Constructor.
-     * @param metadata MetaData for the DB
+     * @param metadata MetaData from the JDBC driver
      */
     public PostgreSQLAdapter(DatabaseMetaData metadata)
     {
@@ -120,9 +118,6 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
 
         supportedOptions.add(NATIVE_ENUM_TYPE);
 
-        // BLOB is not provided via JDBC with PostgreSQL, so we map it to bytea as per LONGVARBINARY
-        supportedOptions.add(BLOB_IS_REALLY_LONGVARBINARY);
-
         supportedOptions.remove(VALUE_GENERATION_UUID_STRING); // PostgreSQL charsets don't seem to allow this
     }
 
@@ -137,31 +132,55 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
 
         // Add on any missing JDBC types when not available from driver
 
-        // Not present in PSQL 8.1.405
+        // Add CHAR : Not present in PSQL 8.1.405
         SQLTypeInfo sqlType = new PostgreSQLTypeInfo("char", (short)Types.CHAR, 65000, null, null, null, 0, false, (short)3, false, false, false, "char", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
+        boolean added = addSQLTypeForJDBCType(handler, mconn, (short)Types.CHAR, sqlType, true);
 
-        // Mirrored from LONGVARCHAR ("text") from JDBC driver
+        // Add CLOB mirrored from LONGVARCHAR ("text") from JDBC driver ** if not provided by the driver **
         sqlType = new PostgreSQLTypeInfo("text", (short)Types.CLOB, 0, null, null, null, 1, true, (short)3, true, false, false, "text", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.CLOB, sqlType, true);
+        if (added)
+        {
+            // Mimic as if LONGVARCHAR
+            registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarcharColumnMapping.class, JDBCType.CLOB, "text", false);
+        }
+        else
+        {
+            // Support as CLOB since provided by the driver
+            registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.ClobColumnMapping.class, JDBCType.CLOB, "CLOB", false);
+        }
 
-        // Mirrored from LONGVARBINARY ("bytea") from JDBC driver
+        // Add BLOB mirrored from LONGVARBINARY ("bytea") from JDBC driver ** if not provided by the driver **
         sqlType = new PostgreSQLTypeInfo("bytea", (short)Types.BLOB, 0, null, null, null, 1, true, (short)3, true, false, false, "bytea", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.BLOB, sqlType, true);
+        if (added)
+        {
+            // Mimic as if LONGVARBINARY
+            registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.BLOB, "bytea", false);
+            registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.BLOB, "bytea", false);
+            registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.BLOB, "bytea", false);
+        }
+        else
+        {
+            // Support as BLOB since provided by the driver
+            registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
+            registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
+            registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
+        }
 
-        // Not present in PSQL 9.2.8 - just mirror what BIT does
+        // Add BOOLEAN : Not present in PSQL 9.2.8 - just mirror what BIT does
         sqlType = new PostgreSQLTypeInfo("bool", (short)Types.BOOLEAN, 0, null, null, null, 1, false, (short)3, true, false, false, "bool", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.BOOLEAN, sqlType, true);
 
-        // Not present in PSQL 9.2.8 - just mirror what SMALLINT does
+        // Add TINYINT : Not present in PSQL 9.2.8 - just mirror what SMALLINT does
         sqlType = new PostgreSQLTypeInfo("int2", (short)Types.TINYINT, 0, null, null, null, 1, false, (short)3, false, false, false, "int2", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.TINYINT, sqlType, true);
 
-        // Not present in PSQL 9.2.8
+        // Add ARRAY : Not present in PSQL 9.2.8
         sqlType = new PostgreSQLTypeInfo("text array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "text array", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
         sqlType = new PostgreSQLTypeInfo("int array", (short)Types.ARRAY, 0, null, null, null, 1, false, (short)3, false, false, false, "int array", (short)0, (short)0, 10);
-        addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
+        added = addSQLTypeForJDBCType(handler, mconn, (short)Types.ARRAY, sqlType, true);
     }
 
     /**
@@ -821,11 +840,12 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.CharColumnMapping.class, JDBCType.CHAR, "CHAR", false);
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.BigIntColumnMapping.class, JDBCType.BIGINT, "BIGINT", false);
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarcharColumnMapping.class, JDBCType.LONGVARCHAR, "LONGVARCHAR", false);
-        registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.ClobColumnMapping.class, JDBCType.CLOB, "CLOB", false);
-        registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.SqlXmlColumnMapping.class, JDBCType.SQLXML, "SQLXML", false);
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.NVarcharColumnMapping.class, JDBCType.NVARCHAR, "NVARCHAR", false);
         registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.NCharColumnMapping.class, JDBCType.NCHAR, "NCHAR", false);
+// Added in initialiseTypes dependent on JDBC driver
+//        registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.ClobColumnMapping.class, JDBCType.CLOB, "CLOB", false);
+//        registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
 
         registerColumnMapping(BigDecimal.class.getName(), org.datanucleus.store.rdbms.mapping.column.NumericColumnMapping.class, JDBCType.NUMERIC, "NUMERIC", true);
 
@@ -872,10 +892,12 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         registerColumnMapping(java.util.Collection.class.getName(), org.datanucleus.store.rdbms.mapping.column.ArrayColumnMapping.class, JDBCType.ARRAY, "INT ARRAY", false);
 
         registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
-        registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
+// Added in initialiseTypes dependent on JDBC driver
+//        registerColumnMapping(java.io.Serializable.class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
 
         registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarBinaryColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
-        registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
+// Added in initialiseTypes dependent on JDBC driver
+//        registerColumnMapping(byte[].class.getName(), org.datanucleus.store.rdbms.mapping.column.BlobColumnMapping.class, JDBCType.BLOB, "BLOB", false);
 
         registerColumnMapping(java.io.File.class.getName(), org.datanucleus.store.rdbms.mapping.column.BinaryStreamColumnMapping.class, JDBCType.LONGVARBINARY, "LONGVARBINARY", true);
 

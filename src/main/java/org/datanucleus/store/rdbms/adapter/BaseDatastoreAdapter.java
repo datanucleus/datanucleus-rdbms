@@ -725,8 +725,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * @param jdbcTypeNumber The JDBC type
      * @param sqlType The type info to use
      * @param addIfNotPresent whether to add only if JDBC type not present
+     * @return Whether the SQL type for JDBC type was added
      */
-    protected void addSQLTypeForJDBCType(StoreSchemaHandler handler, ManagedConnection mconn, short jdbcTypeNumber, SQLTypeInfo sqlType, boolean addIfNotPresent)
+    protected boolean addSQLTypeForJDBCType(StoreSchemaHandler handler, ManagedConnection mconn, short jdbcTypeNumber, SQLTypeInfo sqlType, boolean addIfNotPresent)
     {
         RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
 
@@ -735,7 +736,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         if (jdbcType != null && !addIfNotPresent)
         {
             // Already have this JDBC type so ignore
-            return;
+            return false;
         }
         else if (jdbcType == null)
         {
@@ -749,6 +750,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             // Existing JDBC type so add SQL type
             jdbcType.addChild(sqlType);
         }
+        return true;
     }
 
     /**
