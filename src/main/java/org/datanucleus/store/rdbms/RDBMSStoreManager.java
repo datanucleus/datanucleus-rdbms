@@ -1638,7 +1638,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 return;
             }
 
-            new ClassAdder(classNames, null).execute(clr);
+            int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
+                TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : dba.getTransactionIsolationForSchemaCreation();
+            new ClassAdder(classNames, null, isolationLevel).execute(clr);
         }
         finally
         {
@@ -1652,7 +1654,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void unmanageAllClasses(ClassLoaderResolver clr)
     {
-        DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
+        int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
+                TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : Connection.TRANSACTION_READ_COMMITTED;
+        DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, isolationLevel, storeDataMgr);
         boolean success = true;
         try
         {
@@ -1722,7 +1726,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void validateTable(final TableImpl table, ClassLoaderResolver clr)
     {
-        ValidateTableSchemaTransaction validateTblTxn = new ValidateTableSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, table);
+        // TODO Why use READ_COMMITTED for delete but SERIALIZABLE for add?
+        int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
+            TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : Connection.TRANSACTION_READ_COMMITTED;
+        ValidateTableSchemaTransaction validateTblTxn = new ValidateTableSchemaTransaction(this, isolationLevel, table);
         validateTblTxn.execute(clr);
     }
 
@@ -2865,10 +2872,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
          * Constructs a new class adder transaction that will add the given classes to the RDBMSManager.
          * @param classNames Names of the (initial) class(es) to be added.
          * @param writer Optional writer for DDL when we want the DDL outputting to file instead of creating the tables
+         * @param isolationLevel Txn isolation level to use for schema "class" addition
          */
-        private ClassAdder(String[] classNames, Writer writer)
+        private ClassAdder(String[] classNames, Writer writer, int isolationLevel)
         {
-            super(RDBMSStoreManager.this, dba.getTransactionIsolationForSchemaCreation());
+            super(RDBMSStoreManager.this, isolationLevel);
             this.ddlWriter = writer;
             this.classNames = classNames;
 
@@ -3912,7 +3920,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     String[] classNamesArr = getNucleusContext().getTypeManager().filterOutSupportedSecondClassNames(classNames.toArray(new String[classNames.size()]));
                     if (classNamesArr.length > 0)
                     {
-                        new ClassAdder(classNamesArr, ddlFileWriter).execute(clr);
+                        int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
+                            TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : dba.getTransactionIsolationForSchemaCreation();
+                        new ClassAdder(classNamesArr, ddlFileWriter, isolationLevel).execute(clr);
                     }
 
                     if (autoStart)
@@ -4237,8 +4247,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     String[] classNameArray = classNames.toArray(new String[classNames.size()]);
                     manageClasses(clr, classNameArray); // Add them to mgr first
 
-                    // Delete the tables of the required classes
-                    DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, Connection.TRANSACTION_READ_COMMITTED, storeDataMgr);
+                    // Delete the tables of the required classes TODO Why use READ_COMMITTED for delete but SERIALIZABLE for add?
+                    int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
+                            TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : Connection.TRANSACTION_READ_COMMITTED;
+                    DeleteTablesSchemaTransaction deleteTablesTxn = new DeleteTablesSchemaTransaction(this, isolationLevel, storeDataMgr);
                     deleteTablesTxn.setWriter(ddlWriter);
                     boolean success = true;
                     try
