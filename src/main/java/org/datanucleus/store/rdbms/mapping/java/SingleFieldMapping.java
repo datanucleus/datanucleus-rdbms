@@ -36,6 +36,9 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public abstract class SingleFieldMapping extends JavaTypeMapping
 {
+    /** Metadata extension key that the column needs a CHECK constraint in the datastore on specific values. Set it to the valid values. */
+    public static final String EXTENSION_CHECK_CONSTRAINT_VALUES = "check-constraint-values";
+
     /**
      * Initialize this JavaTypeMapping with the given DatastoreAdapter for the given FieldMetaData.
      * @param table The datastore container storing this mapping (if any)

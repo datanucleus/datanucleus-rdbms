@@ -20,6 +20,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
+
 /**
  * Mapping for Long type.
  */
@@ -31,5 +34,35 @@ public class LongMapping extends SingleFieldMapping
     public Class getJavaType()
     {
         return Long.class;
+    }
+
+    @Override
+    public Object[] getValidValues(int index)
+    {
+        if (mmd != null)
+        {
+            if (mmd.hasExtension(EXTENSION_CHECK_CONSTRAINT_VALUES))
+            {
+                String valuesStr = mmd.getValueForExtension(EXTENSION_CHECK_CONSTRAINT_VALUES);
+                String[] stringValues = StringUtils.split(valuesStr, ",");
+                Object[] values = new Long[stringValues.length];
+                for (int i=0;i<stringValues.length;i++)
+                {
+                    try
+                    {
+                        values[i] = Long.valueOf(stringValues[i]);
+                    }
+                    catch (NumberFormatException nfe)
+                    {
+                        NucleusLogger.GENERAL.warn("Member " + mmd.getFullFieldName() + 
+                            " has check constraint value that is not a long! (" + stringValues[i] + "). Values are ignored");
+                        return null;
+                    }
+                }
+                return values;
+            }
+        }
+
+        return super.getValidValues(index);
     }
 }

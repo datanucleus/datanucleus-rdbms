@@ -20,6 +20,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import org.datanucleus.util.StringUtils;
+
 /**
  * Mapping for a String type.
  */
@@ -28,5 +30,20 @@ public class StringMapping extends SingleFieldMapping
     public Class getJavaType()
     {
         return String.class;
+    }
+
+    @Override
+    public Object[] getValidValues(int index)
+    {
+        if (mmd != null)
+        {
+            if (mmd.hasExtension(EXTENSION_CHECK_CONSTRAINT_VALUES))
+            {
+                String valuesStr = mmd.getValueForExtension(EXTENSION_CHECK_CONSTRAINT_VALUES);
+                return StringUtils.split(valuesStr, ",");
+            }
+        }
+
+        return super.getValidValues(index);
     }
 }

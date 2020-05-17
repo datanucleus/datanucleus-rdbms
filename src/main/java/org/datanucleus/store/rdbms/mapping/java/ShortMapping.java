@@ -19,6 +19,9 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.StringUtils;
+
 /**
  * Mapping for the Short type.
  */
@@ -27,5 +30,35 @@ public class ShortMapping extends SingleFieldMapping
     public Class getJavaType()
     {
         return Short.class;
+    }
+
+    @Override
+    public Object[] getValidValues(int index)
+    {
+        if (mmd != null)
+        {
+            if (mmd.hasExtension(EXTENSION_CHECK_CONSTRAINT_VALUES))
+            {
+                String valuesStr = mmd.getValueForExtension(EXTENSION_CHECK_CONSTRAINT_VALUES);
+                String[] stringValues = StringUtils.split(valuesStr, ",");
+                Object[] values = new Short[stringValues.length];
+                for (int i=0;i<stringValues.length;i++)
+                {
+                    try
+                    {
+                        values[i] = Short.valueOf(stringValues[i]);
+                    }
+                    catch (NumberFormatException nfe)
+                    {
+                        NucleusLogger.GENERAL.warn("Member " + mmd.getFullFieldName() + 
+                            " has check constraint value that is not a short! (" + stringValues[i] + "). Values are ignored");
+                        return null;
+                    }
+                }
+                return values;
+            }
+        }
+
+        return super.getValidValues(index);
     }
 }
