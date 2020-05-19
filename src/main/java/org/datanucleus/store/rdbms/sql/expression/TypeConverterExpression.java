@@ -57,6 +57,10 @@ public class TypeConverterExpression extends DelegatedExpression
         {
             delegate = new NumericExpression(stmt, table, mapping);
         }
+        else if (Byte[].class.isAssignableFrom(datastoreType) || byte[].class.isAssignableFrom(datastoreType)) // TODO Any other types to use as BinaryExpression?
+        {
+            delegate = new BinaryExpression(stmt, table, mapping);
+        }
         else
         {
             throw new NucleusException(Localiser.msg("060017", mapping.getClass().getName(), datastoreType.getName()));

@@ -76,6 +76,10 @@ public class TypeConverterLiteral extends DelegatedExpression implements SQLLite
         {
             delegate = new EnumLiteral(stmt, mapping, value, parameterName);
         }
+        else if (datastoreType == Byte[].class || datastoreType == byte[].class)
+        {
+            delegate = new BinaryLiteral(stmt, mapping, value, parameterName);
+        }
         else
         {
             throw new NucleusException("Could not create TypeConverterLiteral for mapping of type " + mapping.getClass().getName() + " with datastoreType=" + datastoreType.getName() +
