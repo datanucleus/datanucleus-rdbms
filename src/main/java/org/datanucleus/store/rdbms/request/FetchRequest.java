@@ -52,6 +52,7 @@ import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLStatementHelper;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.expression.ParameterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
@@ -183,6 +184,10 @@ public class FetchRequest extends Request
             JavaTypeMapping datastoreIdMapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
             SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), datastoreIdMapping);
             SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, datastoreIdMapping, null, "ID");
+            if (val instanceof ParameterLiteral)
+            {
+                val = exprFactory.replaceParameterLiteral((ParameterLiteral)val, expr);
+            }
             sqlStatement.whereAnd(expr.eq(val), true);
 
             StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
@@ -203,6 +208,10 @@ public class FetchRequest extends Request
                 JavaTypeMapping pkMapping = table.getMemberMapping(mmd);
                 SQLExpression expr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), pkMapping);
                 SQLExpression val = exprFactory.newLiteralParameter(sqlStatement, pkMapping, null, "PK" + i);
+                if (val instanceof ParameterLiteral)
+                {
+                    val = exprFactory.replaceParameterLiteral((ParameterLiteral)val, expr);
+                }
                 sqlStatement.whereAnd(expr.eq(val), true);
 
                 StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
@@ -226,6 +235,10 @@ public class FetchRequest extends Request
             // Add restriction on multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
             SQLExpression tenantVal = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
+            if (tenantVal instanceof ParameterLiteral)
+            {
+                tenantVal = exprFactory.replaceParameterLiteral((ParameterLiteral)tenantVal, tenantExpr);
+            }
             sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
 
             StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
@@ -243,6 +256,10 @@ public class FetchRequest extends Request
             // Add restriction on soft-delete
             SQLExpression softDeleteExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), softDeleteMapping);
             SQLExpression softDeleteValParam = exprFactory.newLiteralParameter(sqlStatement, softDeleteMapping, null, "SOFTDELETE");
+            if (softDeleteValParam instanceof ParameterLiteral)
+            {
+                softDeleteValParam = exprFactory.replaceParameterLiteral((ParameterLiteral)softDeleteValParam, softDeleteExpr);
+            }
             sqlStatement.whereAnd(softDeleteExpr.eq(softDeleteValParam), true);
 
             StatementMappingIndex softDeleteIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.SOFTDELETE.getFieldNumber());

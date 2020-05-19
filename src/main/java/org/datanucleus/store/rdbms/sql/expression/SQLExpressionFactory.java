@@ -31,6 +31,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.mapping.java.UUIDMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
@@ -161,7 +162,6 @@ public class SQLExpressionFactory
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.StringMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OptionalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.OptionalExpression.class);
-        expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.UUIDMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlDateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
         expressionClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimeMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalExpression.class);
@@ -217,7 +217,7 @@ public class SQLExpressionFactory
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.StringMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OracleStringLobMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.OptionalMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.OptionalLiteral.class);
-        literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.UUIDMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.StringLiteral.class);
+
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.DateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlDateMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
         literalClassByMappingName.put(org.datanucleus.store.rdbms.mapping.java.SqlTimeMapping.class.getName(), org.datanucleus.store.rdbms.sql.expression.TemporalLiteral.class);
@@ -298,13 +298,11 @@ public class SQLExpressionFactory
             // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression)storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression", 
                 "mapping-class", mapping.getClass().getName(), "expression-class", EXPR_CREATION_ARG_TYPES, args);
-            if (sqlExpr == null)
+            if (sqlExpr != null)
             {
-                throw new NucleusException(Localiser.msg("060004", mapping.getClass().getName()));
+                expressionClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
+                return sqlExpr;
             }
-
-            expressionClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
-            return sqlExpr;
         }
         catch (Exception e)
         {
@@ -312,6 +310,16 @@ public class SQLExpressionFactory
             NucleusLogger.QUERY.error(msg, e);
             throw new NucleusException(msg, e);
         }
+
+        // No expression suitable, so add any shortcuts in case they are suitable
+        if (mapping.getClass().getName().equals(UUIDMapping.class.getName()))
+        {
+            // Special case of UUID handled as a StringExpression (default when no TypeConverter defined)
+            return (SQLExpression)ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringExpression.class, EXPR_CREATION_ARG_TYPES, 
+                new Object[] {stmt, exprSqlTbl, mapping});
+        }
+
+        throw new NucleusException(Localiser.msg("060004", mapping.getClass().getName()));
     }
 
     /**
@@ -354,13 +362,20 @@ public class SQLExpressionFactory
             // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
                 "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
-            if (sqlExpr == null)
+            if (sqlExpr != null)
             {
-                throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
+                literalClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
+                return sqlExpr;
             }
 
-            literalClassByMappingName.put(mapping.getClass().getName(), sqlExpr.getClass());
-            return sqlExpr;
+            // No expression suitable, so add any shortcuts in case they are suitable
+            if (mapping.getClass().getName().equals(UUIDMapping.class.getName()))
+            {
+                // Special case of UUID handled as a StringLiteral (default when no TypeConverter defined)
+                return (SQLExpression)ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
+            }
+
+            throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
         }
         catch (Exception e)
         {
@@ -401,11 +416,13 @@ public class SQLExpressionFactory
             // Fallback to the plugin mechanism
             SQLExpression sqlExpr = (SQLExpression) storeMgr.getNucleusContext().getPluginManager().createExecutableExtension("org.datanucleus.store.rdbms.sql_expression",
                 "mapping-class", mapping.getClass().getName(), "literal-class", LIT_CREATION_ARG_TYPES, args);
-            if (sqlExpr == null)
+            if (sqlExpr != null)
             {
-                throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
+                return sqlExpr;
             }
-            return sqlExpr;
+
+            // Define as a parameter for now, and swap out later when we see its context
+            return new ParameterLiteral(stmt, mapping, value, paramName);
         }
         catch (Exception e)
         {
@@ -413,6 +430,25 @@ public class SQLExpressionFactory
             NucleusLogger.QUERY.error("Exception creating SQLLiteral for mapping " + mappingName, e);
             throw new NucleusException(Localiser.msg("060007", mappingName));
         }
+    }
+
+    /**
+     * Convenience method to replace the provided ParameterLiteral with a "parameter-based" literal using the supplied mapping (generated before its type was known).
+     * @param paramLit The parameter literal
+     * @param comparisonExpr Expression we compare against
+     * @return The replacement expression
+     */
+    public SQLExpression replaceParameterLiteral(ParameterLiteral paramLit, SQLExpression comparisonExpr)
+    {
+        if (comparisonExpr.getJavaTypeMapping().getClass().getName().equals(UUIDMapping.class.getName()) &&
+            comparisonExpr.getClass().getName().equals(org.datanucleus.store.rdbms.sql.expression.StringExpression.class.getName()))
+        {
+            // Special case of a UUIDMapping comparison, where it is represented as a String (default), so represent the value as a String as well
+            Object[] args = new Object[] {paramLit.getSQLStatement(), comparisonExpr.getJavaTypeMapping(), paramLit.getValue(), paramLit.getParameterName()};
+            return (SQLExpression)ClassUtils.newInstance(StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
+        }
+
+        return newLiteralParameter(paramLit.getSQLStatement(), comparisonExpr.getJavaTypeMapping(), paramLit.getValue(), paramLit.getParameterName());
     }
 
     /**

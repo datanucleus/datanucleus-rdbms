@@ -91,6 +91,7 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.BooleanLiteral;
 import org.datanucleus.store.rdbms.sql.expression.BooleanSubqueryExpression;
 import org.datanucleus.store.rdbms.sql.expression.CollectionExpression;
+import org.datanucleus.store.rdbms.sql.expression.CollectionLiteral;
 import org.datanucleus.store.rdbms.sql.expression.ColumnExpression;
 import org.datanucleus.store.rdbms.sql.expression.ExpressionUtils;
 import org.datanucleus.store.rdbms.sql.expression.IntegerLiteral;
@@ -110,6 +111,7 @@ import org.datanucleus.store.rdbms.sql.expression.SubqueryExpressionComponent;
 import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
 import org.datanucleus.store.rdbms.sql.expression.TemporalLiteral;
 import org.datanucleus.store.rdbms.sql.expression.TemporalSubqueryExpression;
+import org.datanucleus.store.rdbms.sql.expression.TypeConverterExpression;
 import org.datanucleus.store.rdbms.sql.expression.UnboundExpression;
 import org.datanucleus.store.rdbms.table.ArrayTable;
 import org.datanucleus.store.rdbms.table.ClassTable;
@@ -2764,11 +2766,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         if (left.isParameter() && right.isParameter())
@@ -2874,11 +2876,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         if (left.isParameter() && right.isParameter())
@@ -2921,11 +2923,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         ExpressionUtils.checkAndCorrectExpressionMappingsForBooleanComparison(left, right);
@@ -2957,11 +2959,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         ExpressionUtils.checkAndCorrectExpressionMappingsForBooleanComparison(left, right);
@@ -2993,11 +2995,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         ExpressionUtils.checkAndCorrectExpressionMappingsForBooleanComparison(left, right);
@@ -3029,11 +3031,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         ExpressionUtils.checkAndCorrectExpressionMappingsForBooleanComparison(left, right);
@@ -4477,11 +4479,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         SQLExpression resultExpr = left.add(right);
@@ -4522,11 +4524,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         SQLExpression left = stack.pop();
         if (left instanceof ParameterLiteral && !(right instanceof ParameterLiteral))
         {
-            left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+            left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
         }
         else if (right instanceof ParameterLiteral && !(left instanceof ParameterLiteral))
         {
-            right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+            right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
         }
 
         SQLExpression resultExpr = left.sub(right);
@@ -4810,6 +4812,14 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 setNotPrecompilable();
             }
 
+            if (left instanceof TypeConverterExpression && right.getParameterName() != null && right instanceof CollectionLiteral)
+            {
+                NucleusLogger.GENERAL.debug(">> processInExpression : left=" + left + " right=" + right + " rightParamName=" + right.getParameterName());
+                // TODO Support this somehow, but would need to split up user collection parameter into multiple single params
+                throw new NucleusUserException("Query has 'elem IN collectionParam'. We don't currently support this when the element value uses a TypeConverter." +
+                    " Suggest that you rewrite it using individual parameters for the elements.");
+            }
+
             // Use Collection.contains(element)/Array.contains(element)
             List<SQLExpression> sqlExprArgs = new ArrayList();
             sqlExprArgs.add(left);
@@ -4825,11 +4835,11 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             // Replace parameter(s) with equivalent literal of correct type
             if (right instanceof ParameterLiteral)
             {
-                right = replaceParameterLiteral((ParameterLiteral)right, left.getJavaTypeMapping());
+                right = exprFactory.replaceParameterLiteral((ParameterLiteral)right, left);
             }
             if (left instanceof ParameterLiteral && !Collection.class.isAssignableFrom(right.getJavaTypeMapping().getJavaType()))
             {
-                left = replaceParameterLiteral((ParameterLiteral)left, right.getJavaTypeMapping());
+                left = exprFactory.replaceParameterLiteral((ParameterLiteral)left, right);
             }
 
             // Single valued parameter, so use equality
@@ -5078,18 +5088,6 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             return sqlExpr;
         }
         throw new NucleusUserException("Variable '" + varName + "' is unbound and cannot be determined (is it a misspelled field name? or is not intended to be a variable?)");
-    }
-
-    /**
-     * Convenience method to return a parameter-based literal using the supplied mapping to replace
-     * the provided ParameterLiteral (generated before its type was known).
-     * @param paramLit The parameter literal
-     * @param mapping Mapping to use
-     * @return The replacement expression
-     */
-    protected SQLExpression replaceParameterLiteral(ParameterLiteral paramLit, JavaTypeMapping mapping)
-    {
-        return exprFactory.newLiteralParameter(stmt, mapping, paramLit.getValue(), paramLit.getParameterName());
     }
 
     /* (non-Javadoc)
