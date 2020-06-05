@@ -26,6 +26,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.request;
 
+import static java.util.stream.Collectors.toList;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -56,6 +59,7 @@ import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
 import org.datanucleus.store.rdbms.mapping.MappingType;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -262,8 +266,19 @@ public class InsertRequest extends Request
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
+                List<String> pkColumnNames = new ArrayList<>();
+                if (table.getIdentityType() == IdentityType.DATASTORE)
+                {
+                    JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
+                    ColumnMapping[] columnMappings = mapping.getColumnMappings();
+                    pkColumnNames = Stream.of(columnMappings)
+                        .map(cm -> cm.getColumn().getIdentifier().getName())
+                        .collect(toList());
+                }
+
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
-                    hasIdentityColumn && storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT));
+                    hasIdentityColumn && storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT),
+                    pkColumnNames);
 
                 try
                 {

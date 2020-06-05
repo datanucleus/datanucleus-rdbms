@@ -17,11 +17,14 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms;
 
+import static java.util.Collections.emptyList;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -173,7 +176,7 @@ public class SQLController
     public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable)
     throws SQLException
     {
-        return getStatementForUpdate(conn, stmtText, batchable, false);
+        return getStatementForUpdate(conn, stmtText, batchable, false, emptyList());
     }
 
     /**
@@ -182,10 +185,11 @@ public class SQLController
      * @param stmtText Statement text
      * @param batchable Whether this statement is batchable. Whether we will process the statement before any other statement
      * @param getGeneratedKeysFlag whether to request getGeneratedKeys for this statement
+     * @param pkColumnNames list of auto-generated primary key names to return from an insert statement. May be empty.
      * @return The PreparedStatement
      * @throws SQLException thrown if an error occurs creating the statement
      */
-    public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable, boolean getGeneratedKeysFlag)
+    public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable, boolean getGeneratedKeysFlag, List<String> pkColumnNames)
     throws SQLException
     {
         Connection c = (Connection) conn.getConnection();
@@ -249,7 +253,10 @@ public class SQLController
             }
         }
 
-        PreparedStatement ps = getGeneratedKeysFlag ? c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(stmtText);
+        PreparedStatement ps = getGeneratedKeysFlag ?
+            pkColumnNames.isEmpty() ?
+                c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(stmtText, pkColumnNames.toArray(new String[0])) :
+            c.prepareStatement(stmtText);
         ps.clearBatch(); // In case using statement caching and given one with batched statements left hanging (C3P0)
         if (!jdbcStatements)
         {
