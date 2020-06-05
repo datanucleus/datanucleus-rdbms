@@ -891,6 +891,12 @@ public class OracleAdapter extends BaseDatastoreAdapter
         return super.getSQLMethodClass(className, methodName, clr);
     }
 
+    @Override
+    public String getInsertStatementForNoColumns(Table table)
+    {
+        return "INSERT INTO " + table.toString() + " VALUES (DEFAULT)";
+    }
+
     /**
      * Load all datastore mappings for this RDBMS database.
      * @param mgr the PluginManager
