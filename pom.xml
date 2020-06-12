@@ -97,7 +97,7 @@
         </dependency>
 
         <!-- Required for Oracle support -->
-        <dependency>
+        <dependency> <!-- Not present in Maven central, so take from DN_M2_Repo -->
             <groupId>oracle</groupId>
             <artifactId>ojdbc14_g</artifactId>
             <version>10.2.0.4</version>
@@ -139,7 +139,7 @@
         </dependency>
 
         <!-- Proxool -->
-        <dependency>
+        <dependency> <!-- Not present in Maven central, so take from DN_M2_Repo -->
             <groupId>proxool</groupId>
             <artifactId>proxool</artifactId>
             <version>0.9.0RC3</version>
