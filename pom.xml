@@ -25,17 +25,6 @@
         <dn.core.version>5.2.0-release</dn.core.version>
     </properties>
 
-    <repositories>
-        <!-- For any artifacts that aren't present in Maven Central -->
-        <repository>
-            <id>DN_M2_Repo</id>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <build>
         <plugins>
             <plugin>
@@ -87,7 +76,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.datanucleus</groupId>
@@ -97,22 +86,22 @@
         </dependency>
 
         <!-- Required for Oracle support -->
-        <dependency> <!-- Not present in Maven central, so take from DN_M2_Repo -->
-            <groupId>oracle</groupId>
-            <artifactId>ojdbc14_g</artifactId>
-            <version>10.2.0.4</version>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.4</version>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>oracle</groupId>
-            <artifactId>xdb</artifactId>
-            <version>1.0</version>
+            <groupId>com.oracle.database.xml</groupId>
+            <artifactId>xdb6</artifactId>
+            <version>11.2.0.4</version>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>oracle</groupId>
-            <artifactId>xmlparser</artifactId>
-            <version>2.0</version>
+            <groupId>com.oracle.database.xml</groupId>
+            <artifactId>xmlparserv2</artifactId>
+            <version>11.2.0.4</version>
             <optional>true</optional>
         </dependency>
 
