@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Blob;
@@ -30,8 +31,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-
-import oracle.jdbc.driver.OracleResultSet;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
@@ -61,9 +60,12 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
+import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.TypeConversionHelper;
+
+import oracle.sql.BLOB;
 
 /**
  * Mapping for an Oracle BLOB column.
@@ -418,17 +420,26 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping
                         int jdbcMajorVersion = dba.getDriverMajorVersion();
                         if (dba.getDatastoreDriverName().equalsIgnoreCase(OracleAdapter.OJDBC_DRIVER_NAME) && jdbcMajorVersion < 10)
                         {
-                            // Oracle JDBC drivers version 9 and below use some sh*tty Oracle-specific BLOB type
-                            // we have to cast to that, face west, pray whilst saying ommmmmmmmmmm
                             oracle.sql.BLOB blob = null;
                             if (jdbcMajorVersion <= 8)
                             {
-                                OracleResultSet ors = (OracleResultSet)rs;
-                                blob = ors.getBLOB(1);
+                                // Oracle JDBC <= v8
+                                // We are effectively doing the following line but don't want to impose having Oracle <= v10 in the CLASSPATH, just any Oracle driver
+//                              blob = ((oracle.jdbc.driver.OracleResultSet)rs).getBLOB(1);
+                                Method getBlobMethod = ClassUtils.getMethodForClass(rs.getClass(), "getBLOB", new Class[] {int.class});
+                                try
+                                {
+                                    blob = (BLOB) getBlobMethod.invoke(rs, new Object[] {1});
+                                }
+                                catch (Throwable thr)
+                                {
+                                    throw new NucleusDataStoreException("Error in getting BLOB", thr);
+                                }
                             }
                             else
                             {
-                                blob = (oracle.sql.BLOB)rs.getBlob(1);
+                                // Oracle JDBC v9
+                                blob = (BLOB)rs.getBlob(1);
                             }
 
                             if (blob != null)
@@ -438,7 +449,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping
                         }
                         else
                         {
-                            // Oracle JDBC drivers 10 and above supposedly use the JDBC standard class for Blobs
+                            // Oracle JDBC v10+ supposedly use the JDBC standard class for Blobs
                             java.sql.Blob blob = rs.getBlob(1);
                             if (blob != null)
                             {
