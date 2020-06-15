@@ -189,6 +189,7 @@ public class SQLController
      * @return The PreparedStatement
      * @throws SQLException thrown if an error occurs creating the statement
      */
+    @SuppressWarnings("resource")
     public PreparedStatement getStatementForUpdate(ManagedConnection conn, String stmtText, boolean batchable, boolean getGeneratedKeysFlag, List<String> pkColumnNames)
     throws SQLException
     {

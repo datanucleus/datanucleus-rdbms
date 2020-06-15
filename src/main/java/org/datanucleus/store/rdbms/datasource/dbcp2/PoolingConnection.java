@@ -311,6 +311,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * @param key the key for the {@link PreparedStatement} to be created
      * @see #createKey(String, int, int, StatementType)
      */
+    @SuppressWarnings("resource")
     @Override
     public PooledObject<DelegatingPreparedStatement> makeObject(PStmtKey key)
             throws Exception {

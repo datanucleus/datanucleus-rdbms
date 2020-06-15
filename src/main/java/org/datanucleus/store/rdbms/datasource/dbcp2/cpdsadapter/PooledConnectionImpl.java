@@ -419,6 +419,7 @@ class PooledConnectionImpl implements PooledConnection,
      * {@link PreparedStatement}s.
      * @param key the key for the {@link PreparedStatement} to be created
      */
+    @SuppressWarnings("resource")
     @Override
     public PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> makeObject(PStmtKeyCPDS key) throws Exception {
         if (null == key) {

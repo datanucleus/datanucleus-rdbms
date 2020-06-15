@@ -21,8 +21,6 @@ package org.datanucleus.store.rdbms.mapping.column;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.datanucleus.store.rdbms.mapping.column.ClobImpl;
-
 import junit.framework.TestCase;
 
 public class ClobImplTest extends TestCase
