@@ -29,7 +29,6 @@ import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.plugin.ConfigurationElement;
 import org.datanucleus.plugin.PluginManager;
-import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 
