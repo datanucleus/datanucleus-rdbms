@@ -55,7 +55,6 @@ import org.datanucleus.store.rdbms.connectionpool.DBCP2BuiltinConnectionPoolFact
 import org.datanucleus.store.rdbms.connectionpool.DBCP2ConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.DefaultConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.HikariCPConnectionPoolFactory;
-import org.datanucleus.store.rdbms.connectionpool.ProxoolConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.TomcatConnectionPoolFactory;
 import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.transaction.TransactionUtils;
@@ -234,10 +233,6 @@ public class ConnectionFactoryImpl extends AbstractConnectionFactory
                 else if (poolingType.equalsIgnoreCase("DBCP2"))
                 {
                     connPoolFactory = new DBCP2ConnectionPoolFactory();
-                }
-                else if (poolingType.equalsIgnoreCase("Proxool"))
-                {
-                    connPoolFactory = new ProxoolConnectionPoolFactory();
                 }
                 else if (poolingType.equalsIgnoreCase("None"))
                 {
