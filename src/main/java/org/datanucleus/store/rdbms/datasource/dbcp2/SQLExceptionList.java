@@ -14,31 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.datanucleus.store.rdbms.datasource.dbcp2;
 
+import java.sql.SQLException;
+import java.util.List;
+
 /**
- * Exception thrown when a connection's maximum lifetime has been exceeded.
+ * A SQLException based on a list of Throwable causes.
+ * <p>
+ * The first exception in the list is used as this exception's cause and is accessible with the usual
+ * {@link #getCause()} while the complete list is accessible with {@link #getCauseList()}.
+ * </p>
  *
- * @since 2.1
+ * @since 2.7.0
  */
-class LifetimeExceededException extends Exception {
+public class SQLExceptionList extends SQLException {
 
-    private static final long serialVersionUID = -3783783104516492659L;
-
-    /**
-     * Create a LifetimeExceededException.
-     */
-    public LifetimeExceededException() {
-        super();
-    }
+    private static final long serialVersionUID = 1L;
+    private final List<? extends Throwable> causeList;
 
     /**
-     * Create a LifetimeExceededException with the given message.
+     * Creates a new exception caused by a list of exceptions.
      *
-     * @param message
-     *            The message with which to create the exception
+     * @param causeList a list of cause exceptions.
      */
-    public LifetimeExceededException(final String message) {
-        super(message);
+    public SQLExceptionList(List<? extends Throwable> causeList) {
+        super(String.format("%,d exceptions: %s", causeList.size(), causeList), causeList.get(0));
+        this.causeList = causeList;
     }
+
+    public List<? extends Throwable> getCauseList() {
+        return causeList;
+    }
+
 }

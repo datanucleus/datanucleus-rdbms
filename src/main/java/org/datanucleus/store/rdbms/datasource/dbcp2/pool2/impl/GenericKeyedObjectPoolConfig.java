@@ -23,12 +23,12 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
  * <p>
  * This class is not thread-safe; it is only intended to be used to provide
  * attributes used when creating a pool.
+ * </p>
  *
- * @version $Revision: $
- *
+ * @param <T> Type of element pooled.
  * @since 2.0
  */
-public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
+public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     /**
      * The default value for the {@code maxTotalPerKey} configuration attribute.
@@ -91,7 +91,7 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
      *
      * @see GenericKeyedObjectPool#setMaxTotal(int)
      */
-    public void setMaxTotal(int maxTotal) {
+    public void setMaxTotal(final int maxTotal) {
         this.maxTotal = maxTotal;
     }
 
@@ -117,7 +117,7 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
      *
      * @see GenericKeyedObjectPool#setMaxTotalPerKey(int)
      */
-    public void setMaxTotalPerKey(int maxTotalPerKey) {
+    public void setMaxTotalPerKey(final int maxTotalPerKey) {
         this.maxTotalPerKey = maxTotalPerKey;
     }
 
@@ -143,7 +143,7 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
      *
      * @see GenericKeyedObjectPool#setMinIdlePerKey(int)
      */
-    public void setMinIdlePerKey(int minIdlePerKey) {
+    public void setMinIdlePerKey(final int minIdlePerKey) {
         this.minIdlePerKey = minIdlePerKey;
     }
 
@@ -169,16 +169,30 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
      *
      * @see GenericKeyedObjectPool#setMaxIdlePerKey(int)
      */
-    public void setMaxIdlePerKey(int maxIdlePerKey) {
+    public void setMaxIdlePerKey(final int maxIdlePerKey) {
         this.maxIdlePerKey = maxIdlePerKey;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public GenericKeyedObjectPoolConfig clone() {
+    public GenericKeyedObjectPoolConfig<T> clone() {
         try {
-            return (GenericKeyedObjectPoolConfig) super.clone();
-        } catch (CloneNotSupportedException e) {
+            return (GenericKeyedObjectPoolConfig<T>) super.clone();
+        } catch (final CloneNotSupportedException e) {
             throw new AssertionError(); // Can't happen
         }
+    }
+
+    @Override
+    protected void toStringAppendFields(final StringBuilder builder) {
+        super.toStringAppendFields(builder);
+        builder.append(", minIdlePerKey=");
+        builder.append(minIdlePerKey);
+        builder.append(", maxIdlePerKey=");
+        builder.append(maxIdlePerKey);
+        builder.append(", maxTotalPerKey=");
+        builder.append(maxTotalPerKey);
+        builder.append(", maxTotal=");
+        builder.append(maxTotal);
     }
 }

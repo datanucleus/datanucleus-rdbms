@@ -16,18 +16,20 @@
  */
 package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
 
+import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.BaseObject;
+
 /**
  * Provides the implementation for the common attributes shared by the
  * sub-classes. New instances of this class will be created using the defaults
  * defined by the public constants.
  * <p>
  * This class is not thread-safe.
+ * </p>
  *
- * @version $Revision: $
- *
+ * @param <T> Type of element pooled.
  * @since 2.0
  */
-public abstract class BaseObjectPoolConfig implements Cloneable {
+public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Cloneable {
 
     /**
      * The default value for the {@code lifo} configuration attribute.
@@ -66,6 +68,15 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericKeyedObjectPool#getSoftMinEvictableIdleTimeMillis()
      */
     public static final long DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS = -1;
+
+    /**
+     * The default value for {@code evictorShutdownTimeoutMillis} configuration
+     * attribute.
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public static final long DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS =
+            10L * 1000L;
 
     /**
      * The default value for the {@code numTestsPerEvictionRun} configuration
@@ -150,9 +161,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getEvictionPolicyClassName()
      * @see GenericKeyedObjectPool#getEvictionPolicyClassName()
      */
-    public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME =
-            "org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.DefaultEvictionPolicy";
-
+    public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME = DefaultEvictionPolicy.class.getName();
 
     private boolean lifo = DEFAULT_LIFO;
 
@@ -161,13 +170,18 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
     private long maxWaitMillis = DEFAULT_MAX_WAIT_MILLIS;
 
     private long minEvictableIdleTimeMillis =
-        DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
-
-    private long softMinEvictableIdleTimeMillis =
             DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
 
+    private long evictorShutdownTimeoutMillis =
+            DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS;
+
+    private long softMinEvictableIdleTimeMillis =
+            DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
+
     private int numTestsPerEvictionRun =
-        DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+            DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+
+    private EvictionPolicy<T> evictionPolicy = null; // Only 2.6.0 applications set this
 
     private String evictionPolicyClassName = DEFAULT_EVICTION_POLICY_CLASS_NAME;
 
@@ -180,7 +194,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
     private boolean testWhileIdle = DEFAULT_TEST_WHILE_IDLE;
 
     private long timeBetweenEvictionRunsMillis =
-        DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
+            DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
 
     private boolean blockWhenExhausted = DEFAULT_BLOCK_WHEN_EXHAUSTED;
 
@@ -230,7 +244,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getLifo()
      * @see GenericKeyedObjectPool#getLifo()
      */
-    public void setLifo(boolean lifo) {
+    public void setLifo(final boolean lifo) {
         this.lifo = lifo;
     }
 
@@ -244,7 +258,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getFairness()
      * @see GenericKeyedObjectPool#getFairness()
      */
-    public void setFairness(boolean fairness) {
+    public void setFairness(final boolean fairness) {
         this.fairness = fairness;
     }
 
@@ -272,7 +286,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getMaxWaitMillis()
      * @see GenericKeyedObjectPool#getMaxWaitMillis()
      */
-    public void setMaxWaitMillis(long maxWaitMillis) {
+    public void setMaxWaitMillis(final long maxWaitMillis) {
         this.maxWaitMillis = maxWaitMillis;
     }
 
@@ -300,7 +314,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getMinEvictableIdleTimeMillis()
      * @see GenericKeyedObjectPool#getMinEvictableIdleTimeMillis()
      */
-    public void setMinEvictableIdleTimeMillis(long minEvictableIdleTimeMillis) {
+    public void setMinEvictableIdleTimeMillis(final long minEvictableIdleTimeMillis) {
         this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
 
@@ -332,7 +346,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericKeyedObjectPool#getSoftMinEvictableIdleTimeMillis()
      */
     public void setSoftMinEvictableIdleTimeMillis(
-            long softMinEvictableIdleTimeMillis) {
+            final long softMinEvictableIdleTimeMillis) {
         this.softMinEvictableIdleTimeMillis = softMinEvictableIdleTimeMillis;
     }
 
@@ -360,8 +374,38 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getNumTestsPerEvictionRun()
      * @see GenericKeyedObjectPool#getNumTestsPerEvictionRun()
      */
-    public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
+    public void setNumTestsPerEvictionRun(final int numTestsPerEvictionRun) {
         this.numTestsPerEvictionRun = numTestsPerEvictionRun;
+    }
+
+    /**
+     * Get the value for the {@code evictorShutdownTimeoutMillis} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code evictorShutdownTimeoutMillis} for
+     *          this configuration instance
+     *
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public long getEvictorShutdownTimeoutMillis() {
+        return evictorShutdownTimeoutMillis;
+    }
+
+    /**
+     * Set the value for the {@code evictorShutdownTimeoutMillis} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @param evictorShutdownTimeoutMillis The new setting of
+     *        {@code evictorShutdownTimeoutMillis} for this configuration
+     *        instance
+     *
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public void setEvictorShutdownTimeoutMillis(
+            final long evictorShutdownTimeoutMillis) {
+        this.evictorShutdownTimeoutMillis = evictorShutdownTimeoutMillis;
     }
 
     /**
@@ -392,7 +436,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      *
      * @since 2.2
      */
-    public void setTestOnCreate(boolean testOnCreate) {
+    public void setTestOnCreate(final boolean testOnCreate) {
         this.testOnCreate = testOnCreate;
     }
 
@@ -420,7 +464,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getTestOnBorrow()
      * @see GenericKeyedObjectPool#getTestOnBorrow()
      */
-    public void setTestOnBorrow(boolean testOnBorrow) {
+    public void setTestOnBorrow(final boolean testOnBorrow) {
         this.testOnBorrow = testOnBorrow;
     }
 
@@ -448,7 +492,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getTestOnReturn()
      * @see GenericKeyedObjectPool#getTestOnReturn()
      */
-    public void setTestOnReturn(boolean testOnReturn) {
+    public void setTestOnReturn(final boolean testOnReturn) {
         this.testOnReturn = testOnReturn;
     }
 
@@ -476,7 +520,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getTestWhileIdle()
      * @see GenericKeyedObjectPool#getTestWhileIdle()
      */
-    public void setTestWhileIdle(boolean testWhileIdle) {
+    public void setTestWhileIdle(final boolean testWhileIdle) {
         this.testWhileIdle = testWhileIdle;
     }
 
@@ -506,8 +550,23 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericKeyedObjectPool#getTimeBetweenEvictionRunsMillis()
      */
     public void setTimeBetweenEvictionRunsMillis(
-            long timeBetweenEvictionRunsMillis) {
+            final long timeBetweenEvictionRunsMillis) {
         this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
+    }
+
+    /**
+     * Get the value for the {@code evictionPolicyClass} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code evictionPolicyClass} for this
+     *          configuration instance
+     *
+     * @see GenericObjectPool#getEvictionPolicy()
+     * @see GenericKeyedObjectPool#getEvictionPolicy()
+     * @since 2.6.0
+     */
+    public EvictionPolicy<T> getEvictionPolicy() {
+        return evictionPolicy;
     }
 
     /**
@@ -525,6 +584,21 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
     }
 
     /**
+     * Set the value for the {@code evictionPolicyClass} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @param evictionPolicy The new setting of
+     *        {@code evictionPolicyClass} for this configuration instance
+     *
+     * @see GenericObjectPool#getEvictionPolicy()
+     * @see GenericKeyedObjectPool#getEvictionPolicy()
+     * @since 2.6.0
+     */
+    public void setEvictionPolicy(final EvictionPolicy<T> evictionPolicy) {
+        this.evictionPolicy = evictionPolicy;
+    }
+
+    /**
      * Set the value for the {@code evictionPolicyClassName} configuration
      * attribute for pools created with this configuration instance.
      *
@@ -534,7 +608,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getEvictionPolicyClassName()
      * @see GenericKeyedObjectPool#getEvictionPolicyClassName()
      */
-    public void setEvictionPolicyClassName(String evictionPolicyClassName) {
+    public void setEvictionPolicyClassName(final String evictionPolicyClassName) {
         this.evictionPolicyClassName = evictionPolicyClassName;
     }
 
@@ -562,7 +636,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericObjectPool#getBlockWhenExhausted()
      * @see GenericKeyedObjectPool#getBlockWhenExhausted()
      */
-    public void setBlockWhenExhausted(boolean blockWhenExhausted) {
+    public void setBlockWhenExhausted(final boolean blockWhenExhausted) {
         this.blockWhenExhausted = blockWhenExhausted;
     }
 
@@ -584,7 +658,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @param jmxEnabled The new setting of {@code jmxEnabled}
      *        for this configuration instance
      */
-    public void setJmxEnabled(boolean jmxEnabled) {
+    public void setJmxEnabled(final boolean jmxEnabled) {
         this.jmxEnabled = jmxEnabled;
     }
 
@@ -610,7 +684,7 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @param jmxNameBase The new setting of {@code jmxNameBase}
      *        for this configuration instance
      */
-    public void setJmxNameBase(String jmxNameBase) {
+    public void setJmxNameBase(final String jmxNameBase) {
         this.jmxNameBase = jmxNameBase;
     }
 
@@ -634,7 +708,43 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @param jmxNamePrefix The new setting of {@code jmxNamePrefix}
      *        for this configuration instance
      */
-    public void setJmxNamePrefix(String jmxNamePrefix) {
+    public void setJmxNamePrefix(final String jmxNamePrefix) {
         this.jmxNamePrefix = jmxNamePrefix;
+    }
+
+    @Override
+    protected void toStringAppendFields(final StringBuilder builder) {
+        builder.append("lifo=");
+        builder.append(lifo);
+        builder.append(", fairness=");
+        builder.append(fairness);
+        builder.append(", maxWaitMillis=");
+        builder.append(maxWaitMillis);
+        builder.append(", minEvictableIdleTimeMillis=");
+        builder.append(minEvictableIdleTimeMillis);
+        builder.append(", softMinEvictableIdleTimeMillis=");
+        builder.append(softMinEvictableIdleTimeMillis);
+        builder.append(", numTestsPerEvictionRun=");
+        builder.append(numTestsPerEvictionRun);
+        builder.append(", evictionPolicyClassName=");
+        builder.append(evictionPolicyClassName);
+        builder.append(", testOnCreate=");
+        builder.append(testOnCreate);
+        builder.append(", testOnBorrow=");
+        builder.append(testOnBorrow);
+        builder.append(", testOnReturn=");
+        builder.append(testOnReturn);
+        builder.append(", testWhileIdle=");
+        builder.append(testWhileIdle);
+        builder.append(", timeBetweenEvictionRunsMillis=");
+        builder.append(timeBetweenEvictionRunsMillis);
+        builder.append(", blockWhenExhausted=");
+        builder.append(blockWhenExhausted);
+        builder.append(", jmxEnabled=");
+        builder.append(jmxEnabled);
+        builder.append(", jmxNamePrefix=");
+        builder.append(jmxNamePrefix);
+        builder.append(", jmxNameBase=");
+        builder.append(jmxNameBase);
     }
 }

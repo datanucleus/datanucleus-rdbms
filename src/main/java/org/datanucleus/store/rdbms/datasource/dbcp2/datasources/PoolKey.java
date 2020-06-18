@@ -20,47 +20,62 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.datasources;
 import java.io.Serializable;
 
 /**
- * @version $Id: PoolKey.java 1649430 2015-01-04 21:29:32Z tn $
  * @since 2.0
  */
 class PoolKey implements Serializable {
     private static final long serialVersionUID = 2252771047542484533L;
 
-    private final String datasourceName;
-    private final String username;
+    private final String dataSourceName;
+    private final String userName;
 
-    PoolKey(String datasourceName, String username) {
-        this.datasourceName = datasourceName;
-        this.username = username;
+    PoolKey(final String dataSourceName, final String userName) {
+        this.dataSourceName = dataSourceName;
+        this.userName = userName;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof PoolKey) {
-            PoolKey pk = (PoolKey)obj;
-            return (null == datasourceName ? null == pk.datasourceName : datasourceName.equals(pk.datasourceName)) &&
-                (null == username ? null == pk.username : username.equals(pk.username));
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
         }
-        return false;
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PoolKey other = (PoolKey) obj;
+        if (dataSourceName == null) {
+            if (other.dataSourceName != null) {
+                return false;
+            }
+        } else if (!dataSourceName.equals(other.dataSourceName)) {
+            return false;
+        }
+        if (userName == null) {
+            if (other.userName != null) {
+                return false;
+            }
+        } else if (!userName.equals(other.userName)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int h = 0;
-        if (datasourceName != null) {
-            h += datasourceName.hashCode();
-        }
-        if (username != null) {
-            h = 29 * h + username.hashCode();
-        }
-        return h;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((dataSourceName == null) ? 0 : dataSourceName.hashCode());
+        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        return result;
     }
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(50);
+        final StringBuffer sb = new StringBuffer(50);
         sb.append("PoolKey(");
-        sb.append(username).append(", ").append(datasourceName);
+        sb.append(userName).append(", ").append(dataSourceName);
         sb.append(')');
         return sb.toString();
     }

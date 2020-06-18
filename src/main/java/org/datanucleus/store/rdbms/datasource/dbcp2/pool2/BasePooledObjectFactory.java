@@ -28,11 +28,9 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
  * @see PooledObjectFactory
  * @see BaseKeyedPooledObjectFactory
  *
- * @version $Revision: 1333925 $
- *
  * @since 2.0
  */
-public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<T> {
+public abstract class BasePooledObjectFactory<T> extends BaseObject implements PooledObjectFactory<T> {
     /**
      * Creates an object instance, to be wrapped in a {@link PooledObject}.
      * <p>This method <strong>must</strong> support concurrent, multi-threaded
@@ -66,8 +64,9 @@ public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<
      *  @param p ignored
      */
     @Override
-    public void destroyObject(PooledObject<T> p)
+    public void destroyObject(final PooledObject<T> p)
         throws Exception  {
+        // The default implementation is a no-op.
     }
 
     /**
@@ -78,7 +77,7 @@ public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<
      * @return {@code true}
      */
     @Override
-    public boolean validateObject(PooledObject<T> p) {
+    public boolean validateObject(final PooledObject<T> p) {
         return true;
     }
 
@@ -88,7 +87,8 @@ public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<
      *  @param p ignored
      */
     @Override
-    public void activateObject(PooledObject<T> p) throws Exception {
+    public void activateObject(final PooledObject<T> p) throws Exception {
+        // The default implementation is a no-op.
     }
 
     /**
@@ -97,7 +97,8 @@ public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<
      * @param p ignored
      */
     @Override
-    public void passivateObject(PooledObject<T> p)
+    public void passivateObject(final PooledObject<T> p)
         throws Exception {
+        // The default implementation is a no-op.
     }
 }

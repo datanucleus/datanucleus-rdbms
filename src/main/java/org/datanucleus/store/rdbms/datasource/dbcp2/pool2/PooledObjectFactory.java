@@ -22,6 +22,7 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
  * <p>
  * By contract, when an {@link ObjectPool} delegates to a
  * {@link PooledObjectFactory},
+ * </p>
  * <ol>
  *  <li>
  *   {@link #makeObject} is called whenever a new instance is needed.
@@ -61,18 +62,18 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
  * {@link PooledObject PooledObject&lt;V&gt;}.  These are the object wrappers that
  * pools use to track and maintain state information about the objects that
  * they manage.
+ * </p>
  *
  * @param <T> Type of element managed in this factory.
  *
  * @see ObjectPool
  *
- * @version $Revision: 1333925 $
- *
  * @since 2.0
  */
 public interface PooledObjectFactory<T> {
+
   /**
-   * Create an instance that can be served by the pool and wrap it in a
+   * Creates an instance that can be served by the pool and wrap it in a
    * {@link PooledObject} to be managed by the pool.
    *
    * @return a {@code PooledObject} wrapping an instance that can be served by the pool
@@ -88,6 +89,7 @@ public interface PooledObjectFactory<T> {
    * It is important for implementations of this method to be aware that there
    * is no guarantee about what state <code>obj</code> will be in and the
    * implementation should be prepared to handle unexpected errors.
+   * </p>
    * <p>
    * Also, an implementation must take in to consideration that instances lost
    * to the garbage collector may never be destroyed.
@@ -114,7 +116,7 @@ public interface PooledObjectFactory<T> {
   boolean validateObject(PooledObject<T> p);
 
   /**
-   * Reinitialize an instance to be returned by the pool.
+   * Reinitializes an instance to be returned by the pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be activated
    *
@@ -126,7 +128,7 @@ public interface PooledObjectFactory<T> {
   void activateObject(PooledObject<T> p) throws Exception;
 
   /**
-   * Uninitialize an instance to be returned to the idle object pool.
+   * Uninitializes an instance to be returned to the idle object pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be passivated
    *

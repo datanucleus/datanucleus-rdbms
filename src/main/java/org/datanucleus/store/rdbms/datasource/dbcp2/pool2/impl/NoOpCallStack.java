@@ -14,23 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
+package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
+
+import java.io.PrintWriter;
 
 /**
- * This interface allows pooled objects to make information available about when
- * and how they were used available to the object pool. The object pool may, but
- * is not required, to use this information to make more informed decisions when
- * determining the state of a pooled object - for instance whether or not the
- * object has been abandoned.
+ * CallStack strategy using no-op implementations of all functionality. Can be used by default when abandoned object
+ * logging is disabled.
  *
- * @since 2.0
+ * @since 2.5
  */
-public interface TrackedUse {
+public class NoOpCallStack implements CallStack {
 
     /**
-     * Get the last time this object was used in ms.
-     *
-     * @return long time in ms
+     * Singleton instance.
      */
-    long getLastUsed();
+    public static final CallStack INSTANCE = new NoOpCallStack();
+
+    /**
+     * Constructs the singleton instance.
+     */
+    private NoOpCallStack() {
+    }
+
+    @Override
+    public boolean printStackTrace(final PrintWriter writer) {
+        return false;
+    }
+
+    @Override
+    public void fillInStackTrace() {
+        // no-op
+    }
+
+    @Override
+    public void clear() {
+        // no-op
+    }
 }

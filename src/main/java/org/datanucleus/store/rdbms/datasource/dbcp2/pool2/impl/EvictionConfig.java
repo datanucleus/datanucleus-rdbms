@@ -22,8 +22,7 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
  * its own specific configuration attributes.
  * <p>
  * This class is immutable and thread-safe.
- *
- * @version $Revision: $
+ * </p>
  *
  * @since 2.0
  */
@@ -32,7 +31,6 @@ public class EvictionConfig {
     private final long idleEvictTime;
     private final long idleSoftEvictTime;
     private final int minIdle;
-
 
     /**
      * Create a new eviction configuration with the specified parameters.
@@ -46,8 +44,8 @@ public class EvictionConfig {
      *        {@link GenericObjectPool#getMinIdle()} or
      *        {@link GenericKeyedObjectPool#getMinIdlePerKey()}
      */
-    public EvictionConfig(long poolIdleEvictTime, long poolIdleSoftEvictTime,
-            int minIdle) {
+    public EvictionConfig(final long poolIdleEvictTime, final long poolIdleSoftEvictTime,
+            final int minIdle) {
         if (poolIdleEvictTime > 0) {
             idleEvictTime = poolIdleEvictTime;
         } else {
@@ -97,5 +95,21 @@ public class EvictionConfig {
      */
     public int getMinIdle() {
         return minIdle;
+    }
+
+    /**
+     * @since 2.4
+     */
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("EvictionConfig [idleEvictTime=");
+        builder.append(idleEvictTime);
+        builder.append(", idleSoftEvictTime=");
+        builder.append(idleSoftEvictTime);
+        builder.append(", minIdle=");
+        builder.append(minIdle);
+        builder.append("]");
+        return builder.toString();
     }
 }

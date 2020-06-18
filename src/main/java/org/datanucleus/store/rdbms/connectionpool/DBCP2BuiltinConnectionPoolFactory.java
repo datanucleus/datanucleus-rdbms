@@ -28,7 +28,6 @@ import org.datanucleus.store.rdbms.datasource.dbcp2.DriverManagerConnectionFacto
 import org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnection;
 import org.datanucleus.store.rdbms.datasource.dbcp2.PoolableConnectionFactory;
 import org.datanucleus.store.rdbms.datasource.dbcp2.PoolingDataSource;
-import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.ObjectPool;
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl.GenericObjectPool;
 import org.datanucleus.util.StringUtils;
 
@@ -156,8 +155,8 @@ public class DBCP2BuiltinConnectionPoolFactory extends AbstractConnectionPoolFac
     public class DBCPConnectionPool implements ConnectionPool
     {
         final PoolingDataSource dataSource;
-        final ObjectPool pool;
-        public DBCPConnectionPool(PoolingDataSource ds, ObjectPool pool)
+        final GenericObjectPool<PoolableConnection> pool;
+        public DBCPConnectionPool(PoolingDataSource ds, GenericObjectPool<PoolableConnection> pool)
         {
             this.dataSource = ds;
             this.pool = pool;

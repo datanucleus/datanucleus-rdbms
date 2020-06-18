@@ -18,133 +18,114 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Provides a shared idle object eviction timer for all pools. This class wraps
- * the standard {@link Timer} and keeps track of how many pools are using it.
- * If no pools are using the timer, it is canceled. This prevents a thread
- * being left running which, in application server environments, can lead to
- * memory leads and/or prevent applications from shutting down or reloading
- * cleanly.
+ * Provides a shared idle object eviction timer for all pools.
  * <p>
- * This class has package scope to prevent its inclusion in the pool public API.
- * The class declaration below should *not* be changed to public.
+ * This class is currently implemented using {@link ScheduledThreadPoolExecutor}. This implementation may change in any
+ * future release. This class keeps track of how many pools are using it. If no pools are using the timer, it is
+ * cancelled. This prevents a thread being left running which, in application server environments, can lead to memory
+ * leads and/or prevent applications from shutting down or reloading cleanly.
+ * </p>
+ * <p>
+ * This class has package scope to prevent its inclusion in the pool public API. The class declaration below should
+ * *not* be changed to public.
+ * </p>
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @since 2.0
  */
 class EvictionTimer {
 
-    /** Timer instance */
-    private static Timer _timer; //@GuardedBy("EvictionTimer.class")
+    /** Executor instance */
+    private static ScheduledThreadPoolExecutor executor; //@GuardedBy("EvictionTimer.class")
 
-    /** Static usage count tracker */
-    private static int _usageCount; //@GuardedBy("EvictionTimer.class")
-
-    /** Prevent instantiation */
+    /** Prevents instantiation */
     private EvictionTimer() {
         // Hide the default constructor
     }
 
+
     /**
-     * Add the specified eviction task to the timer. Tasks that are added with a
-     * call to this method *must* call {@link #cancel(TimerTask)} to cancel the
+     * @since 2.4.3
+     */
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("EvictionTimer []");
+        return builder.toString();
+    }
+
+
+    /**
+     * Adds the specified eviction task to the timer. Tasks that are added with a
+     * call to this method *must* call {@link #cancel()} to cancel the
      * task to prevent memory and/or thread leaks in application server
      * environments.
-     * @param task      Task to be scheduled
-     * @param delay     Delay in milliseconds before task is executed
-     * @param period    Time in milliseconds between executions
+     *
+     * @param task      Task to be scheduled.
+     * @param delay     Delay in milliseconds before task is executed.
+     * @param period    Time in milliseconds between executions.
      */
-    static synchronized void schedule(TimerTask task, long delay, long period) {
-        if (null == _timer) {
-            // Force the new Timer thread to be created with a context class
-            // loader set to the class loader that loaded this library
-            ClassLoader ccl = AccessController.doPrivileged(
-                    new PrivilegedGetTccl());
+    static synchronized void schedule(
+            final BaseGenericObjectPool<?>.Evictor task, final long delay, final long period) {
+        if (null == executor) {
+            executor = new ScheduledThreadPoolExecutor(1, new EvictorThreadFactory());
+            executor.setRemoveOnCancelPolicy(true);
+        }
+        final ScheduledFuture<?> scheduledFuture =
+                executor.scheduleWithFixedDelay(task, delay, period, TimeUnit.MILLISECONDS);
+        task.setScheduledFuture(scheduledFuture);
+    }
+
+    /**
+     * Removes the specified eviction task from the timer.
+     *
+     * @param evictor   Task to be cancelled.
+     * @param timeout   If the associated executor is no longer required, how
+     *                  long should this thread wait for the executor to
+     *                  terminate?
+     * @param unit      The units for the specified timeout.
+     */
+    static synchronized void cancel(
+            final BaseGenericObjectPool<?>.Evictor evictor, final long timeout, final TimeUnit unit) {
+        if (evictor != null) {
+            evictor.cancel();
+        }
+        if (executor != null && executor.getQueue().isEmpty()) {
+            executor.shutdown();
             try {
-                AccessController.doPrivileged(new PrivilegedSetTccl(
-                        EvictionTimer.class.getClassLoader()));
-                _timer = AccessController.doPrivileged(new PrivilegedNewEvictionTimer());
-            } finally {
-                AccessController.doPrivileged(new PrivilegedSetTccl(ccl));
+                executor.awaitTermination(timeout, unit);
+            } catch (final InterruptedException e) {
+                // Swallow
+                // Significant API changes would be required to propagate this
             }
-        }
-        _usageCount++;
-        _timer.schedule(task, delay, period);
-    }
-
-    /**
-     * Remove the specified eviction task from the timer.
-     * @param task      Task to be scheduled
-     */
-    static synchronized void cancel(TimerTask task) {
-        task.cancel();
-        _usageCount--;
-        if (_usageCount == 0) {
-            _timer.cancel();
-            _timer = null;
+            executor.setCorePoolSize(0);
+            executor = null;
         }
     }
 
     /**
-     * {@link PrivilegedAction} used to get the ContextClassLoader
+     * Thread factory that creates a daemon thread, with the context class loader from this class.
      */
-    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
+    private static class EvictorThreadFactory implements ThreadFactory {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
-        public ClassLoader run() {
-            return Thread.currentThread().getContextClassLoader();
-        }
-    }
+        public Thread newThread(final Runnable runnable) {
+            final Thread thread = new Thread(null, runnable, "commons-pool-evictor-thread");
+            thread.setDaemon(true); // POOL-363 - Required for applications using Runtime.addShutdownHook().
+            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                thread.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
+                return null;
+            });
 
-    /**
-     * {@link PrivilegedAction} used to set the ContextClassLoader
-     */
-    private static class PrivilegedSetTccl implements PrivilegedAction<Void> {
-
-        /** ClassLoader */
-        private final ClassLoader cl;
-
-        /**
-         * Create a new PrivilegedSetTccl using the given classloader
-         * @param cl ClassLoader to use
-         */
-        PrivilegedSetTccl(ClassLoader cl) {
-            this.cl = cl;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Void run() {
-            Thread.currentThread().setContextClassLoader(cl);
-            return null;
-        }
-    }
-
-    /**
-     * {@link PrivilegedAction} used to create a new Timer. Creating the timer
-     * with a privileged action means the associated Thread does not inherit the
-     * current access control context. In a container environment, inheriting
-     * the current access control context is likely to result in retaining a
-     * reference to the thread context class loader which would be a memory
-     * leak.
-     */
-    private static class PrivilegedNewEvictionTimer implements PrivilegedAction<Timer> {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Timer run() {
-            return new Timer("commons-pool-EvictionTimer", true);
+            return thread;
         }
     }
 }

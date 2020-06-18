@@ -17,20 +17,29 @@
 package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
 
 /**
- * This interface allows pooled objects to make information available about when
- * and how they were used available to the object pool. The object pool may, but
- * is not required, to use this information to make more informed decisions when
- * determining the state of a pooled object - for instance whether or not the
- * object has been abandoned.
+ * A base class for common functionality.
  *
- * @since 2.0
+ * @since 2.4.3
  */
-public interface TrackedUse {
+public abstract class BaseObject {
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append(getClass().getSimpleName());
+        builder.append(" [");
+        toStringAppendFields(builder);
+        builder.append("]");
+        return builder.toString();
+    }
 
     /**
-     * Get the last time this object was used in ms.
+     * Used by sub-classes to include the fields defined by the sub-class in the
+     * {@link #toString()} output.
      *
-     * @return long time in ms
+     * @param builder Field names and values are appended to this object
      */
-    long getLastUsed();
+    protected void toStringAppendFields(final StringBuilder builder) {
+        // do nothing by default, needed for b/w compatibility.
+    }
 }

@@ -19,11 +19,10 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
 /**
  * Provides the possible states that a {@link PooledObject} may be in.
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public enum PooledObjectState {
+
     /**
      * In the queue, not in use.
      */

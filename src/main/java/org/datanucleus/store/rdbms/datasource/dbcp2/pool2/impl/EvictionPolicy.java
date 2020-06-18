@@ -25,8 +25,6 @@ import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.PooledObject;
  *
  * @param <T> the type of objects in the pool
  *
- * @version $Revision: $
- *
  * @since 2.0
  */
 public interface EvictionPolicy<T> {
@@ -42,6 +40,5 @@ public interface EvictionPolicy<T> {
      * @return <code>true</code> if the object should be evicted, otherwise
      *             <code>false</code>
      */
-    boolean evict(EvictionConfig config, PooledObject<T> underTest,
-            int idleCount);
+    boolean evict(EvictionConfig config, PooledObject<T> underTest, int idleCount);
 }

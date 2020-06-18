@@ -22,14 +22,13 @@ package org.datanucleus.store.rdbms.datasource.dbcp2.pool2;
  * indicating it is unsupported or throw {@link UnsupportedOperationException}.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T> Type of element pooled in this pool.
  *
- * @version $Revision: 1566605 $
- *
  * @since 2.0
  */
-public abstract class BaseObjectPool<T> implements ObjectPool<T> {
+public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool<T> {
 
     @Override
     public abstract T borrowObject() throws Exception;
@@ -88,6 +87,7 @@ public abstract class BaseObjectPool<T> implements ObjectPool<T> {
      * <p>
      * This affects the behavior of <code>isClosed</code> and
      * <code>assertOpen</code>.
+     * </p>
      */
     @Override
     public void close() {
@@ -118,4 +118,10 @@ public abstract class BaseObjectPool<T> implements ObjectPool<T> {
     }
 
     private volatile boolean closed = false;
+
+    @Override
+    protected void toStringAppendFields(final StringBuilder builder) {
+        builder.append("closed=");
+        builder.append(closed);
+    }
 }

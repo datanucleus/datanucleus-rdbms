@@ -16,24 +16,21 @@
  */
 package org.datanucleus.store.rdbms.datasource.dbcp2.pool2.impl;
 
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Deque;
-
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.PooledObject;
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.PooledObjectState;
 import org.datanucleus.store.rdbms.datasource.dbcp2.pool2.TrackedUse;
+
+import java.io.PrintWriter;
+import java.util.Deque;
 
 /**
  * This wrapper is used to track the additional information, such as state, for
  * the pooled objects.
  * <p>
  * This class is intended to be thread-safe.
+ * </p>
  *
  * @param <T> the type of object in the pool
- *
- * @version $Revision: $
  *
  * @since 2.0
  */
@@ -46,17 +43,17 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     private volatile long lastUseTime = createTime;
     private volatile long lastReturnTime = createTime;
     private volatile boolean logAbandoned = false;
-    private volatile Exception borrowedBy = null;
-    private volatile Exception usedBy = null;
+    private volatile CallStack borrowedBy = NoOpCallStack.INSTANCE;
+    private volatile CallStack usedBy = NoOpCallStack.INSTANCE;
     private volatile long borrowedCount = 0;
 
     /**
-     * Create a new instance that wraps the provided object so that the pool can
+     * Creates a new instance that wraps the provided object so that the pool can
      * track the state of the pooled object.
      *
      * @param object The object to wrap
      */
-    public DefaultPooledObject(T object) {
+    public DefaultPooledObject(final T object) {
         this.object = object;
     }
 
@@ -73,8 +70,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public long getActiveTimeMillis() {
         // Take copies to avoid threading issues
-        long rTime = lastReturnTime;
-        long bTime = lastBorrowTime;
+        final long rTime = lastReturnTime;
+        final long bTime = lastBorrowTime;
 
         if (rTime > bTime) {
             return rTime - bTime;
@@ -85,10 +82,10 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public long getIdleTimeMillis() {
         final long elapsed = System.currentTimeMillis() - lastReturnTime;
-     // elapsed may be negative if:
-     // - another thread updates lastReturnTime during the calculation window
-     // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
-     return elapsed >= 0 ? elapsed : 0;
+        // elapsed may be negative if:
+        // - another thread updates lastReturnTime during the calculation window
+        // - System.currentTimeMillis() is not monotonic (e.g. system time is set back)
+        return elapsed >= 0 ? elapsed : 0;
     }
 
     @Override
@@ -102,16 +99,17 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     }
 
     /**
-     * Get the number of times this object has been borrowed.
+     * Gets the number of times this object has been borrowed.
      * @return The number of times this object has been borrowed.
      * @since 2.1
      */
+    @Override
     public long getBorrowedCount() {
         return borrowedCount;
     }
 
     /**
-     * Return an estimate of the last time this object was used.  If the class
+     * Returns an estimate of the last time this object was used.  If the class
      * of the pooled object implements {@link TrackedUse}, what is returned is
      * the maximum of {@link TrackedUse#getLastUsed()} and
      * {@link #getLastBorrowTime()}; otherwise this method gives the same
@@ -128,7 +126,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     }
 
     @Override
-    public int compareTo(PooledObject<T> other) {
+    public int compareTo(final PooledObject<T> other) {
         final long lastActiveDiff = this.getLastReturnTime() - other.getLastReturnTime();
         if (lastActiveDiff == 0) {
             // Make sure the natural ordering is broadly consistent with equals
@@ -143,7 +141,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append("Object: ");
         result.append(object.toString());
         result.append(", State: ");
@@ -166,7 +164,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
     @Override
     public synchronized boolean endEvictionTest(
-            Deque<PooledObject<T>> idleQueue) {
+            final Deque<PooledObject<T>> idleQueue) {
         if (state == PooledObjectState.EVICTION) {
             state = PooledObjectState.IDLE;
             return true;
@@ -193,7 +191,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
             lastUseTime = lastBorrowTime;
             borrowedCount++;
             if (logAbandoned) {
-                borrowedBy = new AbandonedObjectCreatedException();
+                borrowedBy.fillInStackTrace();
             }
             return true;
         } else if (state == PooledObjectState.EVICTION) {
@@ -218,7 +216,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
                 state == PooledObjectState.RETURNING) {
             state = PooledObjectState.IDLE;
             lastReturnTime = System.currentTimeMillis();
-            borrowedBy = null;
+            borrowedBy.clear();
             return true;
         }
 
@@ -236,22 +234,13 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public void use() {
         lastUseTime = System.currentTimeMillis();
-        usedBy = new Exception("The last code to use this object was:");
+        usedBy.fillInStackTrace();
     }
 
     @Override
-    public void printStackTrace(PrintWriter writer) {
-        boolean written = false;
-        Exception borrowedByCopy = this.borrowedBy;
-        if (borrowedByCopy != null) {
-            borrowedByCopy.printStackTrace(writer);
-            written = true;
-        }
-        Exception usedByCopy = this.usedBy;
-        if (usedByCopy != null) {
-            usedByCopy.printStackTrace(writer);
-            written = true;
-        }
+    public void printStackTrace(final PrintWriter writer) {
+        boolean written = borrowedBy.printStackTrace(writer);
+        written |= usedBy.printStackTrace(writer);
         if (written) {
             writer.flush();
         }
@@ -283,46 +272,27 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     }
 
     @Override
-    public void setLogAbandoned(boolean logAbandoned) {
+    public void setLogAbandoned(final boolean logAbandoned) {
         this.logAbandoned = logAbandoned;
     }
 
     /**
-     * Used to track how an object was obtained from the pool (the stack trace
-     * of the exception will show which code borrowed the object) and when the
-     * object was borrowed.
+     * Configures the stack trace generation strategy based on whether or not fully
+     * detailed stack traces are required. When set to false, abandoned logs may
+     * only include caller class information rather than method names, line numbers,
+     * and other normal metadata available in a full stack trace.
+     *
+     * @param requireFullStackTrace the new configuration setting for abandoned object
+     *                              logging
+     * @since 2.5
      */
-    static class AbandonedObjectCreatedException extends Exception {
-
-        private static final long serialVersionUID = 7398692158058772916L;
-
-        /** Date format */
-        //@GuardedBy("format")
-        private static final SimpleDateFormat format = new SimpleDateFormat
-            ("'Pooled object created' yyyy-MM-dd HH:mm:ss Z " +
-             "'by the following code has not been returned to the pool:'");
-
-        private final long _createdTime;
-
-        /**
-         * Create a new instance.
-         * <p>
-         * @see Exception#Exception()
-         */
-        public AbandonedObjectCreatedException() {
-            super();
-            _createdTime = System.currentTimeMillis();
-        }
-
-        // Override getMessage to avoid creating objects and formatting
-        // dates unless the log message will actually be used.
-        @Override
-        public String getMessage() {
-            String msg;
-            synchronized(format) {
-                msg = format.format(new Date(_createdTime));
-            }
-            return msg;
-        }
+    @Override
+    public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
+        borrowedBy = CallStackUtils.newCallStack("'Pooled object created' " +
+            "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'",
+            true, requireFullStackTrace);
+        usedBy = CallStackUtils.newCallStack("The last code to use this object was:",
+            false, requireFullStackTrace);
     }
+
 }

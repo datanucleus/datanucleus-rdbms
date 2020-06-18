@@ -22,17 +22,15 @@ import java.sql.SQLException;
 /**
  * Abstract factory interface for creating {@link java.sql.Connection}s.
  *
- * @author Rodney Waldhoff
- * @version $Id: ConnectionFactory.java 1649430 2015-01-04 21:29:32Z tn $
  * @since 2.0
  */
 public interface ConnectionFactory {
     /**
-     * Create a new {@link java.sql.Connection} in an
-     * implementation specific fashion.
+     * Create a new {@link java.sql.Connection} in an implementation specific fashion.
      *
      * @return a new {@link java.sql.Connection}
-     * @throws SQLException if a database error occurs creating the connection
+     * @throws SQLException
+     *             if a database error occurs creating the connection
      */
     Connection createConnection() throws SQLException;
 }

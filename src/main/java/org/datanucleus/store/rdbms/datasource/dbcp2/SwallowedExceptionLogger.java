@@ -21,41 +21,41 @@ import org.datanucleus.util.NucleusLogger;
 
 /**
  * Class for logging swallowed exceptions.
- * @version $Id: SwallowedExceptionLogger.java 1651275 2015-01-13 04:11:09Z psteitz $
+ *
  * @since 2.0
  */
-public class SwallowedExceptionLogger implements SwallowedExceptionListener{
+public class SwallowedExceptionLogger implements SwallowedExceptionListener {
 
     private final NucleusLogger log;
     private final boolean logExpiredConnections;
 
     /**
-     * Create a SwallowedExceptionLogger with the given logger.  By default,
-     * expired connection logging is turned on.
+     * Create a SwallowedExceptionLogger with the given logger. By default, expired connection logging is turned on.
      *
-     * @param log logger
+     * @param log
+     *            logger
      */
-    public SwallowedExceptionLogger(NucleusLogger log) {
-        this(log, true);    
+    public SwallowedExceptionLogger(final NucleusLogger log) {
+        this(log, true);
     }
-    
+
     /**
-     * Create a SwallowedExceptionLogger with the given logger and expired
-     * connection logging property.
+     * Create a SwallowedExceptionLogger with the given logger and expired connection logging property.
      *
-     * @param log logger
-     * @param logExpiredConnections false suppresses logging of expired connection events
+     * @param log
+     *            logger
+     * @param logExpiredConnections
+     *            false suppresses logging of expired connection events
      */
-    public SwallowedExceptionLogger(NucleusLogger log, boolean logExpiredConnections) {
+    public SwallowedExceptionLogger(final NucleusLogger log, final boolean logExpiredConnections) {
         this.log = log;
         this.logExpiredConnections = logExpiredConnections;
     }
 
     @Override
-    public void onSwallowException(Exception e) {
+    public void onSwallowException(final Exception e) {
         if (logExpiredConnections || !(e instanceof LifetimeExceededException)) {
-            log.warn(Utils.getMessage(
-                    "swallowedExceptionLogger.onSwallowedException"), e);
+            log.warn(Utils.getMessage("swallowedExceptionLogger.onSwallowedException"), e);
         }
     }
 }

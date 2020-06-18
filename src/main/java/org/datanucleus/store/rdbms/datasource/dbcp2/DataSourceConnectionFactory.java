@@ -18,35 +18,94 @@ package org.datanucleus.store.rdbms.datasource.dbcp2;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
 /**
  * A {@link DataSource}-based implementation of {@link ConnectionFactory}.
  *
- * @author Rodney Waldhoff
- * @version $Id: DataSourceConnectionFactory.java 1649430 2015-01-04 21:29:32Z tn $
  * @since 2.0
  */
 public class DataSourceConnectionFactory implements ConnectionFactory {
-    public DataSourceConnectionFactory(DataSource source) {
-        this(source,null,null);
+
+    private final DataSource dataSource;
+
+    private final String userName;
+
+    private final char[] userPassword;
+
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource) {
+        this(dataSource, null, (char[]) null);
     }
 
-    public DataSourceConnectionFactory(DataSource source, String uname, String passwd) {
-        _source = source;
-        _uname = uname;
-        _passwd = passwd;
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     * @param userName
+     *            The user name.
+     * @param userPassword
+     *            The user password.
+     * @since 2.4.0
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource, final String userName, final char[] userPassword) {
+        this.dataSource = dataSource;
+        this.userName = userName;
+        this.userPassword = Utils.clone(userPassword);
+    }
+
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     * @param userName
+     *            The user name.
+     * @param password
+     *            The user password.
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource, final String userName, final String password) {
+        this.dataSource = dataSource;
+        this.userName = userName;
+        this.userPassword = Utils.toCharArray(password);
     }
 
     @Override
     public Connection createConnection() throws SQLException {
-        if(null == _uname && null == _passwd) {
-            return _source.getConnection();
+        if (null == userName && null == userPassword) {
+            return dataSource.getConnection();
         }
-        return _source.getConnection(_uname,_passwd);
+        return dataSource.getConnection(userName, Utils.toString(userPassword));
     }
 
-    private final String _uname;
-    private final String _passwd;
-    private final DataSource _source;
+    /**
+     * @return The data source.
+     * @since 2.6.0
+     */
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * @return The user name.
+     * @since 2.6.0
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * @return The user password.
+     * @since 2.6.0
+     */
+    public char[] getUserPassword() {
+        return userPassword;
+    }
 }
