@@ -25,6 +25,17 @@
         <dn.core.version>5.2.0-release</dn.core.version>
     </properties>
 
+    <repositories>
+        <!-- For any artifacts that aren't present in Maven Central -->
+        <repository>
+            <id>DN_M2_Repo</id>
+            <url>http://www.datanucleus.org/downloads/maven2/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
