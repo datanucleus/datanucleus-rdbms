@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
@@ -191,6 +192,18 @@ public final class SQLQuery extends Query
                 }
             }
         }
+    }
+
+    /**
+     * Method to return the names of the extensions supported by this query.
+     * To be overridden by subclasses where they support additional extensions.
+     * @return The supported extension names
+     */
+    public Set<String> getSupportedExtensions()
+    {
+        Set<String> supported = super.getSupportedExtensions();
+        supported.add(EXTENSION_SQL_SYNTAX_CHECKS);
+        return supported;
     }
 
     public String getLanguage()
