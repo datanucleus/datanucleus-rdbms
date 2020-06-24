@@ -383,7 +383,7 @@ public class SQLController
      * @param stmt The statement text
      * @param ps The Prepared Statement
      * @param processNow Whether to process this statement now (only applies if is batched)
-     * @return The numer of rows affected (as per PreparedStatement.executeUpdate)
+     * @return The number of rows affected (as per PreparedStatement.executeUpdate)
      * @throws SQLException Thrown if an error occurs
      */
     public int[] executeStatementUpdate(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps, boolean processNow)
@@ -455,7 +455,7 @@ public class SQLController
      * @param conn The connection (required since the one on PreparedStatement is not always the same so we can't use it)
      * @param stmt The statement text
      * @param ps The Prepared Statement
-     * @return The numer of rows affected (as per PreparedStatement.execute)
+     * @return The number of rows affected (as per PreparedStatement.execute)
      * @throws SQLException Thrown if an error occurs
      */
     public boolean executeStatement(ExecutionContext ec, ManagedConnection conn, String stmt, PreparedStatement ps)
