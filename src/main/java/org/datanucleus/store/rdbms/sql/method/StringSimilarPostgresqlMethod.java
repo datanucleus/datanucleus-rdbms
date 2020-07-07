@@ -25,7 +25,6 @@ import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.CharacterLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
-import org.datanucleus.store.rdbms.sql.method.StringMatchesMethod;
 
 /**
  * Support for a String.matches like functionality but using Postgresql's "SIMILAR TO" operator.

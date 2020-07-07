@@ -18,7 +18,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.exceptions;
 
-import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
 import org.datanucleus.util.Localiser;
 
 /**
