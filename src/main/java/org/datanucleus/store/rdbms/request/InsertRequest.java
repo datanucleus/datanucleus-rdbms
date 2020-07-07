@@ -319,7 +319,17 @@ public class InsertRequest extends Request
                                 if (mmd.isCreateTimestamp())
                                 {
                                     // Set create timestamp to time for the start of this transaction
-                                    op.replaceField(insertFieldNumbers[i], new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
+                                    if (mmd.getType().isAssignableFrom(java.time.Instant.class))
+                                    {
+                                        op.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                                java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
+                                    }
+                                    else
+                                    {
+                                        op.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                                new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
+                                    }
+                                    // TODO Throw exception if invalid member type
                                 }
                                 else if (mmd.isCreateUser())
                                 {

@@ -268,7 +268,17 @@ public class UpdateRequest extends Request
             {
                 if (mmds[i].isUpdateTimestamp())
                 {
-                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), new Timestamp(ec.getTransaction().getIsActive() ? ec.getTransaction().getBeginTime() : System.currentTimeMillis()));
+                    if (mmds[i].getType().isAssignableFrom(java.time.Instant.class))
+                    {
+                        op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
+                            java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
+                    }
+                    else
+                    {
+                        op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
+                            new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
+                    }
+                    // TODO Throw exception if invalid member type
                 }
                 else if (mmds[i].isUpdateUser())
                 {
