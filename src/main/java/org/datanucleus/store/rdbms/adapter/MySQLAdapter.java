@@ -83,6 +83,8 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         "USER_RESOURCES,VARBINARY,VARCHARACTER,WARNINGS,XOR,YEAR_MONTH," +
         "ZEROFILL";
 
+    boolean isMariaDB = false;
+
     /**
      * Constructor.
      * Overridden so we can add on our own list of NON SQL92 reserved words which is returned incorrectly with the JDBC driver.
@@ -91,6 +93,11 @@ public class MySQLAdapter extends BaseDatastoreAdapter
     public MySQLAdapter(DatabaseMetaData metadata)
     {
         super(metadata);
+
+        if (driverName.equalsIgnoreCase("mariadb-jdbc"))
+        {
+            isMariaDB = true;
+        }
 
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(NONSQL92_RESERVED_WORDS));
 
@@ -133,18 +140,22 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_ISNULL);
 
-        // MySQL DATETIME/TIMESTAMP doesn't store millisecs!
-        // http://feedblog.org/2007/05/26/why-doesnt-mysql-support-millisecond-datetime-resolution/
-        // TODO Actually this is no longer true ... MariaDB 5.3+, MySQL 5.7+ but can have problems storing nanos
-        supportedOptions.remove(DATETIME_STORES_MILLISECS);
-
-        if (driverName.equalsIgnoreCase("mariadb-jdbc"))
+        // MySQL DATETIME/TIMESTAMP millisec storage
+        if (isMariaDB && (datastoreMajorVersion < 5 || (datastoreMajorVersion == 5 && datastoreMinorVersion < 3)))
         {
-            if (datastoreMajorVersion > 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion >= 3))
-            {
-                // Sequences added to MariaDB v10.3
-                supportedOptions.add(SEQUENCES);
-            }
+            // MariaDB before v5.3 doesn't store millisecs
+            supportedOptions.remove(DATETIME_STORES_MILLISECS);
+        }
+        else if (!isMariaDB && (datastoreMajorVersion < 5 || (datastoreMajorVersion == 5 && datastoreMinorVersion < 7)))
+        {
+            // MySQL before v5.7 doesn't store millisecs
+            supportedOptions.remove(DATETIME_STORES_MILLISECS);
+        }
+
+        if (isMariaDB && (datastoreMajorVersion > 10 || (datastoreMajorVersion == 10 && datastoreMinorVersion >= 3)))
+        {
+            // Sequences added to MariaDB v10.3
+            supportedOptions.add(SEQUENCES);
         }
 
         supportedOptions.add(OPERATOR_BITWISE_AND);
