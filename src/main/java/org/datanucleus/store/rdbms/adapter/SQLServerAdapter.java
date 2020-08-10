@@ -117,6 +117,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(LOCK_ROW_USING_OPTION_WITHIN_JOIN);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
+        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
@@ -826,5 +827,16 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         registerColumnMapping(DatastoreId.class.getName(), org.datanucleus.store.rdbms.mapping.column.IntegerColumnMapping.class, JDBCType.INTEGER, "INT", false);
 
         super.loadColumnMappings(mgr, clr);
+    }
+
+    public String generateLockWithSelectForUpdate(String statement)
+    {
+        String modifier = " with (updlock)";
+        int wherePos = statement.toUpperCase().indexOf(" WHERE ");
+        if (wherePos < 0) {
+            return statement + modifier;
+        }
+        return statement.substring(0, wherePos) + modifier +
+                statement.substring(wherePos, statement.length());
     }
 }

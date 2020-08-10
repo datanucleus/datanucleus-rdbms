@@ -112,7 +112,7 @@ public class SequenceTable extends TableImpl
         fetchStmt += " WHERE " + colSequenceName.getIdentifier() + "=?";
         if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
         {
-            fetchStmt += " FOR UPDATE";
+            fetchStmt = dba.generateLockWithSelectForUpdate(fetchStmt);
         }
 
         storeMgr.registerTableInitialized(this);

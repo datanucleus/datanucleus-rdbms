@@ -2280,4 +2280,10 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         }
         throw new NucleusException(Localiser.msg("054004", javaType, jdbcType, sqlType)).setFatal();
     }
+
+    public String generateLockWithSelectForUpdate(String statement)
+    {
+        return statement += " FOR UPDATE";
+    }
+
 }
