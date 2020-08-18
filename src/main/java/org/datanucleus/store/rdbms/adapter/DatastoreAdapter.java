@@ -311,6 +311,9 @@ public interface DatastoreAdapter
     /** Whether this datastore supports SELECT ... FOR UPDATE. */
     public static final String LOCK_WITH_SELECT_FOR_UPDATE = "LockWithSelectForUpdate";
 
+    /** Whether this datastore supports SELECT ... WITH UPDLOCK. */
+    public static final String LOCK_WITH_SELECT_WITH_UPDLOCK = "LockWithSelectWithUpdlock";
+
     /** Whether this datastore supports SELECT ... FOR UPDATE NOWAIT. */
     public static final String SELECT_FOR_UPDATE_NOWAIT = "SelectForUpdateNoWait";
 
