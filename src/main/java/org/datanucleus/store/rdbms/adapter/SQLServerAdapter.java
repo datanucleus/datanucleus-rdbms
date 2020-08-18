@@ -828,5 +828,4 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
 
         super.loadColumnMappings(mgr, clr);
     }
-
 }
