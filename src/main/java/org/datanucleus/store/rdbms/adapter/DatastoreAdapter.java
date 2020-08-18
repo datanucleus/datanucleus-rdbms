@@ -304,6 +304,9 @@ public interface DatastoreAdapter
     /** Whether the row lock should use SELECT ... FOR UPDATE. */
     public static final String LOCK_ROW_USING_SELECT_FOR_UPDATE = "LockRowUsingSelectForUpdate";
 
+    /** Whether this datastore supports SELECT ... WITH UPDLOCK. */
+    public static final String LOCK_WITH_SELECT_WITH_UPDLOCK = "LockWithSelectWithUpdlock";
+
     /** Whether the row lock, when using SELECT ... FOR UPDATE, should also append NOWAIT. */
     public static final String LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT = "LockRowSelectForUpdateNowait";
 

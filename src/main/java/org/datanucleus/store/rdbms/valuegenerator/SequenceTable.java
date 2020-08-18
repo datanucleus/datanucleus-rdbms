@@ -114,7 +114,16 @@ public class SequenceTable extends TableImpl
         {
             fetchStmt = dba.generateLockWithSelectForUpdate(fetchStmt);
         }
-
+        if (dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_WITH_UPDLOCK))
+        {
+            String modifier = " with (updlock)";
+            int wherePos = fetchStmt.toUpperCase().indexOf(" WHERE ");
+            if (wherePos < 0) {
+                fetchStmt = fetchStmt + modifier;
+            }else{
+                fetchStmt = fetchStmt.substring(0, wherePos) + modifier + fetchStmt.substring(wherePos, fetchStmt.length());
+            }
+        }
         storeMgr.registerTableInitialized(this);
         state = TABLE_STATE_INITIALIZED;
     }

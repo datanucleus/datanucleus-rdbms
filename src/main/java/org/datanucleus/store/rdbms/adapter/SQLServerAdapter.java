@@ -118,6 +118,7 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_CASE_NULL);
         supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_WITH_SELECT_WITH_UPDLOCK);
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
