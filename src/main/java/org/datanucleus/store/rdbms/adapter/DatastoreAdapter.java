@@ -1076,6 +1076,13 @@ public interface DatastoreAdapter
     String getDefaultSqlTypeForJavaType(String javaType, String jdbcType);
 
     /**
+     * generate select for update lock
+     * @param statement
+     * @return updated statement
+     */
+    String generateLockWithSelectForUpdate(String statement);
+
+    /**
      * Method to return the column mapping class to use for the specified java type (and optional JDBC / SQL types).
      * @param javaType The java type of the member
      * @param jdbcType The JDBC type (optional). If provided is used in preference to the java type
