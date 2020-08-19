@@ -108,11 +108,18 @@ public class SequenceTable extends TableImpl
             colNextVal.getIdentifier() + "+?) WHERE " + colSequenceName.getIdentifier() + "=?";
         deleteStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + colSequenceName.getIdentifier() + "=?";
         deleteAllStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false);
-        fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false) + " WHERE " + colSequenceName.getIdentifier() + "=?";
+
+        fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false);
+        if (dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_AFTER_FROM))
+        {
+            fetchStmt += " WITH " + dba.getSelectWithLockOption();
+        }
+        fetchStmt += " WHERE " + colSequenceName.getIdentifier() + "=?";
         if (dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE))
         {
             fetchStmt += " FOR UPDATE";
         }
+
         fetchAllStmt = "SELECT " + colNextVal.getIdentifier() + "," + colSequenceName.getIdentifier() + 
             " FROM " + identifier.getFullyQualifiedName(false) + " ORDER BY " + colSequenceName.getIdentifier();
 
