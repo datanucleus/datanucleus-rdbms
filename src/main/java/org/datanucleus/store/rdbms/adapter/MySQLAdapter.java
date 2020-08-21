@@ -136,7 +136,7 @@ public class MySQLAdapter extends BaseDatastoreAdapter
         supportedOptions.add(CLOB_SET_USING_SETSTRING);
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
         supportedOptions.add(IDENTITY_COLUMNS);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(ORDERBY_NULLS_USING_ISNULL);
 

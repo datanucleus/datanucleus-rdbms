@@ -93,7 +93,7 @@ public class DerbyAdapter extends BaseDatastoreAdapter
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(DERBY_RESERVED_WORDS));
 
         supportedOptions.add(IDENTITY_COLUMNS);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(SEQUENCES);

@@ -639,8 +639,9 @@ public class SelectStatement extends SQLStatement
         // FROM ...
         sql.append(" FROM ");
         sql.append(primaryTable.toString());
-        if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_AFTER_FROM))
+        if (lock && dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM))
         {
+            // Add locking after FROM where supported
             sql.append(" WITH ").append(dba.getSelectWithLockOption());
         }
         if (joins != null)
@@ -769,47 +770,49 @@ public class SelectStatement extends SQLStatement
             }
         }
 
-        if (lock && dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE))
+        if (lock)
         {
-            // Add any required locking based on the RDBMS capability
-            if (distinct && !dba.supportsOption(DatastoreAdapter.DISTINCT_WITH_SELECT_FOR_UPDATE))
+            if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
             {
-                NucleusLogger.QUERY.warn(Localiser.msg("052502"));
-            }
-            else if (groupingExpressions != null && !dba.supportsOption(DatastoreAdapter.GROUPING_WITH_SELECT_FOR_UPDATE))
-            {
-                NucleusLogger.QUERY.warn(Localiser.msg("052506"));
-            }
-            else if (having != null && !dba.supportsOption(DatastoreAdapter.HAVING_WITH_SELECT_FOR_UPDATE))
-            {
-                NucleusLogger.QUERY.warn(Localiser.msg("052507"));
-            }
-            else if (orderingExpressions != null && !dba.supportsOption(DatastoreAdapter.ORDERING_WITH_SELECT_FOR_UPDATE))
-            {
-                NucleusLogger.QUERY.warn(Localiser.msg("052508"));
-            }
-            else if (joins != null && !joins.isEmpty() && !dba.supportsOption(DatastoreAdapter.MULTITABLES_WITH_SELECT_FOR_UPDATE))
-            {
-                NucleusLogger.QUERY.warn(Localiser.msg("052509"));
-            }
-            else
-            {
-                sql.append(" " + dba.getSelectForUpdateText());
-                if (dba.supportsOption(DatastoreAdapter.SELECT_FOR_UPDATE_NOWAIT))
+                // Add any required locking based on the RDBMS capability
+                if (distinct && !dba.supportsOption(DatastoreAdapter.DISTINCT_WITH_SELECT_FOR_UPDATE))
                 {
-                    Boolean nowait = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE_NOWAIT);
-                    if (nowait != null)
+                    NucleusLogger.QUERY.warn(Localiser.msg("052502"));
+                }
+                else if (groupingExpressions != null && !dba.supportsOption(DatastoreAdapter.GROUPING_WITH_SELECT_FOR_UPDATE))
+                {
+                    NucleusLogger.QUERY.warn(Localiser.msg("052506"));
+                }
+                else if (having != null && !dba.supportsOption(DatastoreAdapter.HAVING_WITH_SELECT_FOR_UPDATE))
+                {
+                    NucleusLogger.QUERY.warn(Localiser.msg("052507"));
+                }
+                else if (orderingExpressions != null && !dba.supportsOption(DatastoreAdapter.ORDERING_WITH_SELECT_FOR_UPDATE))
+                {
+                    NucleusLogger.QUERY.warn(Localiser.msg("052508"));
+                }
+                else if (joins != null && !joins.isEmpty() && !dba.supportsOption(DatastoreAdapter.MULTITABLES_WITH_SELECT_FOR_UPDATE))
+                {
+                    NucleusLogger.QUERY.warn(Localiser.msg("052509"));
+                }
+                else
+                {
+                    sql.append(" " + dba.getSelectForUpdateText());
+                    if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT))
                     {
-                        sql.append(" NOWAIT");
+                        Boolean nowait = (Boolean) getValueForExtension(EXTENSION_LOCK_FOR_UPDATE_NOWAIT);
+                        if (nowait != null)
+                        {
+                            sql.append(" NOWAIT");
+                        }
                     }
                 }
             }
-        }
-        if (lock && !dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE) &&
-            !dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_AFTER_FROM) &&
-            !dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
-        {
-            NucleusLogger.QUERY.warn("Requested locking of query statement, but this RDBMS doesn't support a convenient mechanism");
+            else if (!dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM) &&
+                     !dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_WITHIN_JOIN))
+            {
+                NucleusLogger.QUERY.warn("Requested locking of query statement, but this RDBMS doesn't support a convenient mechanism");
+            }
         }
 
         if (rangeOffset > 0 || rangeCount > -1)

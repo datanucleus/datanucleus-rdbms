@@ -110,12 +110,12 @@ public class SequenceTable extends TableImpl
         deleteAllStmt = "DELETE FROM " + identifier.getFullyQualifiedName(false);
 
         fetchStmt = "SELECT " + colNextVal.getIdentifier() + " FROM " + identifier.getFullyQualifiedName(false);
-        if (dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_AFTER_FROM))
+        if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_AFTER_FROM))
         {
             fetchStmt += " WITH " + dba.getSelectWithLockOption();
         }
         fetchStmt += " WHERE " + colSequenceName.getIdentifier() + "=?";
-        if (dba.supportsOption(DatastoreAdapter.LOCK_WITH_SELECT_FOR_UPDATE))
+        if (dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_SELECT_FOR_UPDATE))
         {
             fetchStmt += " FOR UPDATE";
         }

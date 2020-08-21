@@ -51,7 +51,7 @@ public class SAPDBAdapter extends BaseDatastoreAdapter
         super(metadata);
 
         supportedOptions.add(BOOLEAN_COMPARISON);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(SEQUENCES);
         supportedOptions.remove(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);

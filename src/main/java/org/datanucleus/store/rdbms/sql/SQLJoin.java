@@ -195,7 +195,7 @@ public class SQLJoin
                 st.append(targetTable.toString());
             }
 
-            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_OPTION_PLACED_WITHIN_JOIN))
+            if (lock && dba.supportsOption(DatastoreAdapter.LOCK_ROW_USING_OPTION_WITHIN_JOIN))
             {
                 // Optional join table lock options (SQLServer)
                 st.append(" WITH ").append(dba.getSelectWithLockOption());

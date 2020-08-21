@@ -51,7 +51,7 @@ public class SybaseAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
         supportedOptions.remove(BOOLEAN_COMPARISON);
-        supportedOptions.remove(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.remove(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION);
     }
 

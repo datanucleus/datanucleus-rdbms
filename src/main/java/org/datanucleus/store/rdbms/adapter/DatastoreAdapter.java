@@ -308,21 +308,17 @@ public interface DatastoreAdapter
      */
     public static final String CROSSJOIN_ASINNER11_SYNTAX = "ANSI_CrossJoinAsInner11_Syntax";
 
-    /** Whether this datastore supports SELECT ... FOR UPDATE. */
-    public static final String LOCK_WITH_SELECT_FOR_UPDATE = "LockWithSelectForUpdate";
+    /** Whether the row lock should use SELECT ... FOR UPDATE. */
+    public static final String LOCK_ROW_USING_SELECT_FOR_UPDATE = "LockRowUsingSelectForUpdate";
 
-    /** Whether this datastore supports SELECT ... FOR UPDATE NOWAIT. */
-    public static final String SELECT_FOR_UPDATE_NOWAIT = "SelectForUpdateNoWait";
+    /** Whether the row lock, when using SELECT ... FOR UPDATE, should also append NOWAIT. */
+    public static final String LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT = "LockRowSelectForUpdateNowait";
 
-    /**
-     * Whether the lock option (when doing SELECT FOR UPDATE) is to be placed after the FROM.
-     */
-    public static final String LOCK_OPTION_PLACED_AFTER_FROM = "LockOptionAfterFromClause";
+    /** Whether the row lock is to be placed after the FROM. */
+    public static final String LOCK_ROW_USING_OPTION_AFTER_FROM = "LockRowUsingOptionAfterFrom";
 
-    /**
-     * Whether the lock option (when doing SELECT FOR UPDATE) is to be placed within the JOIN clause.
-     */
-    public static final String LOCK_OPTION_PLACED_WITHIN_JOIN = "LockOptionWithinJoinClause";
+    /** Whether the row lock is to be placed within the JOIN clause. */
+    public static final String LOCK_ROW_USING_OPTION_WITHIN_JOIN = "LockRowUsingOptionWithinJoin";
 
     /**
      * Accessor for whether setting a BLOB value allows use of PreparedStatement.setString()

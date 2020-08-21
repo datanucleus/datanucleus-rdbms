@@ -65,7 +65,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(STORED_PROCEDURES);
 
         // NuoDB JDBC driver doesn't specify lengths in 2.0.2

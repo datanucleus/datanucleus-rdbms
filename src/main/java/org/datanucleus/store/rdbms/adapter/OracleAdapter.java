@@ -152,8 +152,8 @@ public class OracleAdapter extends BaseDatastoreAdapter
             reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(ORACLE_10_RESERVED_WORDS));
         }
 
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
-        supportedOptions.add(SELECT_FOR_UPDATE_NOWAIT);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE_NOWAIT);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(NULL_EQUALS_EMPTY_STRING);
         supportedOptions.add(ANALYSIS_METHODS);

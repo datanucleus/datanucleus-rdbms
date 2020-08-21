@@ -216,8 +216,8 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         supportedOptions.add(STATEMENT_BATCHING);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
-        supportedOptions.add(LOCK_OPTION_PLACED_AFTER_FROM);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_OPTION_AFTER_FROM);
         supportedOptions.add(OPERATOR_BITWISE_AND);
         supportedOptions.add(OPERATOR_BITWISE_OR);
         supportedOptions.add(OPERATOR_BITWISE_XOR);

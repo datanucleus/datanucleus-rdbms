@@ -83,7 +83,7 @@ public class DB2Adapter extends BaseDatastoreAdapter
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(DB2_RESERVED_WORDS));
 
         // Update supported options
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(SEQUENCES);
         supportedOptions.add(ANALYSIS_METHODS);

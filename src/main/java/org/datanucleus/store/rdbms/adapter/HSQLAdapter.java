@@ -77,7 +77,7 @@ public class HSQLAdapter extends BaseDatastoreAdapter
         if (datastoreMajorVersion >= 2)
         {
             // HSQLDB 2.0 introduced SELECT ... FOR UPDATE
-            supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+            supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
             supportedOptions.add(ORDERBY_NULLS_DIRECTIVES); // Likely came in at 2.0
         }
 

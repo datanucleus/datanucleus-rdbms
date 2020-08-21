@@ -77,7 +77,7 @@ public class H2Adapter extends BaseDatastoreAdapter
         }
 
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
-        supportedOptions.add(LOCK_WITH_SELECT_FOR_UPDATE);
+        supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);
         supportedOptions.add(IDENTITY_COLUMNS);
         supportedOptions.add(CHECK_IN_END_CREATE_STATEMENTS);
         supportedOptions.add(UNIQUE_IN_END_CREATE_STATEMENTS);
