@@ -18,6 +18,8 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.method;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
@@ -312,6 +314,7 @@ public class ArrayContainsMethod implements SQLMethod
 
     protected boolean elementTypeCompatible(Class elementType, Class collectionElementType)
     {
+        // Note that collectionElementType is not primitive here, see the caller
         if (!elementType.isPrimitive() && collectionElementType.isPrimitive() && !collectionElementType.isAssignableFrom(elementType) && !elementType.isAssignableFrom(collectionElementType))
         {
             return false;
@@ -330,26 +333,23 @@ public class ArrayContainsMethod implements SQLMethod
             {
                 return true;
             }
-            else if (elementType == double.class && collectionElementType == Double.class)
+
+            boolean elementTypeIntegral = (elementType == int.class || elementType == short.class || elementType == long.class);
+            boolean collectionElemTypeIntegral = (collectionElementType == Integer.class || collectionElementType == Short.class || collectionElementType == Long.class ||
+                    collectionElementType == BigInteger.class);
+            if (elementTypeIntegral && collectionElemTypeIntegral)
             {
                 return true;
             }
-            else if (elementType == float.class && collectionElementType == Float.class)
+
+            boolean elementTypeFloatPt = (elementType == float.class || elementType == double.class);
+            boolean collectionElemTypeFloatPt = (collectionElementType == Float.class || collectionElementType == Double.class || collectionElementType == BigDecimal.class);
+            if (elementTypeFloatPt && collectionElemTypeFloatPt)
             {
                 return true;
             }
-            else if (elementType == int.class && collectionElementType == Integer.class)
-            {
-                return true;
-            }
-            else if (elementType == long.class && collectionElementType == Long.class)
-            {
-                return true;
-            }
-            else if (elementType == short.class && collectionElementType == Short.class)
-            {
-                return true;
-            }
+
+            // TODO We could allow comparison of floating point and integral perhaps
             return false;
         }
 
