@@ -49,6 +49,7 @@ import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -172,10 +173,26 @@ public class LocateBulkRequest extends BulkRequest
         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
         if (multitenancyMapping != null)
         {
-            // Add WHERE clause restricting to tenant
+            // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
-            SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
-            sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
+
+            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+            if (tenantReadIds != null && tenantReadIds.length > 1)
+            {
+                // Add IN clause with values
+                SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];
+                for (int i=0;i<tenantReadIds.length;i++)
+                {
+                    readIdExprs[i] = sqlStatement.getSQLExpressionFactory().newLiteral(sqlStatement, multitenancyMapping, tenantReadIds[i].trim());
+                }
+                sqlStatement.whereAnd(new InExpression(tenantExpr, readIdExprs), true);
+            }
+            else
+            {
+                // Add EQ expression for tenantId TODO Use a parameter for this and set in execution
+                SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec));
+                sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
+            }
         }
 
         JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);

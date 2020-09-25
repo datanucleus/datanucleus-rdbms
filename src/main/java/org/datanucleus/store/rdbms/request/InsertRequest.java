@@ -376,7 +376,7 @@ public class InsertRequest extends Request
                     {
                         // Multitenancy mapping
                         table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
-                            ec.getNucleusContext().getMultiTenancyId(ec, op.getClassMetaData()));
+                            ec.getNucleusContext().getMultiTenancyId(ec));
                     }
 
                     if (softDeleteStmtMapping != null)

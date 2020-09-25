@@ -33,6 +33,7 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.NullLiteral;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
@@ -302,11 +303,23 @@ public class UnionStatementGenerator extends AbstractSelectStatementGenerator
         if (multitenancyMapping != null)
         {
             // Multi-tenancy restriction
-            AbstractClassMetaData cmd = table.getClassMetaData();
             SQLTable tenantSqlTbl = stmt.getTable(multitenancyMapping.getTable(), tblGroupName);
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
-            SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec, cmd));
-            stmt.whereAnd(tenantExpr.eq(tenantVal), true);
+            String[] tenantReadIds = ec.getNucleusContext().getMultiTenancyReadIds(ec);
+            if (tenantReadIds != null && tenantReadIds.length > 1)
+            {
+                SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];
+                for (int i=0;i<tenantReadIds.length;i++)
+                {
+                    readIdExprs[i] = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, tenantReadIds[i].trim());
+                }
+                stmt.whereAnd(new InExpression(tenantExpr, readIdExprs), true);
+            }
+            else
+            {
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec));
+                stmt.whereAnd(tenantExpr.eq(tenantVal), true);
+            }
         }
 
         JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);

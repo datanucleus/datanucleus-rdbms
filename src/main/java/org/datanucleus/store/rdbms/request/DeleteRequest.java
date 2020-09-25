@@ -315,7 +315,7 @@ public class DeleteRequest extends Request
                     if (multitenancyStatementMapping != null)
                     {
                         table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, 
-                            multitenancyStatementMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getMultiTenancyId(ec, cmd));
+                            multitenancyStatementMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getMultiTenancyId(ec));
                     }
 
                     if (optimisticChecks)

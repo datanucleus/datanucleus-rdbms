@@ -41,6 +41,7 @@ import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;
+import org.datanucleus.store.rdbms.sql.expression.InExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -136,18 +137,34 @@ public class LocateRequest extends Request
         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
         if (multitenancyMapping != null)
         {
-            // Add restriction on multi-tenancy
+            // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
-            SQLExpression tenantValParam = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
-            sqlStatement.whereAnd(tenantExpr.eq(tenantValParam), true);
-
-            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
-            if (multitenancyIdx == null)
+            
+            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+            if (tenantReadIds != null && tenantReadIds.length > 1)
             {
-                multitenancyIdx = new StatementMappingIndex(multitenancyMapping);
-                mappingDefinition.addMappingForMember(SurrogateColumnType.MULTITENANCY.getFieldNumber(), multitenancyIdx);
+                // Hardcode the IN clause with values
+                SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];
+                for (int i=0;i<tenantReadIds.length;i++)
+                {
+                    readIdExprs[i] = sqlStatement.getSQLExpressionFactory().newLiteral(sqlStatement, multitenancyMapping, tenantReadIds[i].trim());
+                }
+                sqlStatement.whereAnd(new InExpression(tenantExpr, readIdExprs), true);
             }
-            multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
+            else
+            {
+                // Add EQ expression with parameter for tenantId
+                SQLExpression tenantValParam = exprFactory.newLiteralParameter(sqlStatement, multitenancyMapping, null, "TENANT");
+                sqlStatement.whereAnd(tenantExpr.eq(tenantValParam), true);
+
+                StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
+                if (multitenancyIdx == null)
+                {
+                    multitenancyIdx = new StatementMappingIndex(multitenancyMapping);
+                    mappingDefinition.addMappingForMember(SurrogateColumnType.MULTITENANCY.getFieldNumber(), multitenancyIdx);
+                }
+                multitenancyIdx.addParameterOccurrence(new int[] {inputParamNum++});
+            }
         }
 
         JavaTypeMapping softDeleteMapping = table.getSurrogateMapping(SurrogateColumnType.SOFTDELETE, false);
@@ -225,12 +242,20 @@ public class LocateRequest extends Request
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            // Set MultiTenancy parameter in statement
-                            StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
-                            String tenantId = ec.getNucleusContext().getMultiTenancyId(ec, cmd);
-                            for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+                            if (tenantReadIds != null && tenantReadIds.length > 1)
                             {
-                                multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                                // Using IN clause so nothing to do since hardcoded
+                            }
+                            else
+                            {
+                                // Set MultiTenancy tenant id in statement
+                                StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
+                                String tenantId = ec.getNucleusContext().getMultiTenancyId(ec);
+                                for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
+                                {
+                                    multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);
+                                }
                             }
                         }
 
