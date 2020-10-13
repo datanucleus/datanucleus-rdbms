@@ -106,11 +106,15 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         }
         supportedOptions.add(BIT_IS_REALLY_BOOLEAN);
         supportedOptions.add(CHAR_COLUMNS_PADDED_WITH_SPACES);
-        supportedOptions.add(STORED_PROCEDURES);
+        if (datastoreMajorVersion >= 11)
+        {
+            // PostgreSQL 11 allows simple "stored procedures" but cannot select result sets or have OUT params
+            supportedOptions.add(STORED_PROCEDURES);
+        }
+
         supportedOptions.remove(TX_ISOLATION_NONE);
         supportedOptions.remove(UPDATE_STATEMENT_ALLOW_TABLE_ALIAS_IN_SET_CLAUSE);
         supportedOptions.remove(TX_ISOLATION_READ_UNCOMMITTED); // Not supported in PostgreSQL AFAIK
-        supportedOptions.remove(STORED_PROCEDURES); // PostgreSQL doesn't support these in the traditional sense
 
         supportedOptions.add(OPERATOR_BITWISE_AND);
         supportedOptions.add(OPERATOR_BITWISE_OR);
