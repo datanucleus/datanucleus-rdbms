@@ -17,6 +17,9 @@
  **********************************************************************/
 package org.datanucleus.store.rdbms.identifier;
 
+import static java.util.Collections.synchronizedMap;
+
+import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -78,14 +81,14 @@ public abstract class AbstractIdentifierFactory implements IdentifierFactory
     /** Separator to use for words in the identifiers. */
     protected String wordSeparator = "_";
 
-    protected Map<String, DatastoreIdentifier> tables = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> columns = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> foreignkeys = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> indexes = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> candidates = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> primarykeys = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> sequences = new WeakHashMap();
-    protected Map<String, DatastoreIdentifier> references = new WeakHashMap();
+    protected Map<String, DatastoreIdentifier> tables = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> columns = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> foreignkeys = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> indexes = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> candidates = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> primarykeys = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> sequences = synchronizedMap(new WeakHashMap());
+    protected Map<String, DatastoreIdentifier> references = synchronizedMap(new WeakHashMap());
 
     /** Default catalog name for any created identifiers. */
     protected String defaultCatalogName = null;
