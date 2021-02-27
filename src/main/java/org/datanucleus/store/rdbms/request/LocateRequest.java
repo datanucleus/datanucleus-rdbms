@@ -242,7 +242,7 @@ public class LocateRequest extends Request
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(op.getExecutionContext());
                             if (tenantReadIds != null && tenantReadIds.length > 1)
                             {
                                 // Using IN clause so nothing to do since hardcoded

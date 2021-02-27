@@ -230,14 +230,13 @@ public class FetchRequest extends Request
             }
         }
 
-        // TODO Cater for multiple tenant read ids
         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
         if (multitenancyMapping != null)
         {
             // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
 
-            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null); // We have no execution context!
             if (tenantReadIds != null && tenantReadIds.length > 1)
             {
                 // Hardcode the IN clause with values
@@ -398,7 +397,7 @@ public class FetchRequest extends Request
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(op.getExecutionContext());
                             if (tenantReadIds != null && tenantReadIds.length > 1)
                             {
                                 // Using IN clause so nothing to do since hardcoded
