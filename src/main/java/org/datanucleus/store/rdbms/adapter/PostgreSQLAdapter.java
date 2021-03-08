@@ -147,6 +147,8 @@ public class PostgreSQLAdapter extends BaseDatastoreAdapter
         {
             // Mimic as if LONGVARCHAR
             registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.LongVarcharColumnMapping.class, JDBCType.CLOB, "text", false);
+            // Note that <= 5.2.2 we used ClobColumnMapping here, but PSQL uses a TEXT so why would that work?
+//            registerColumnMapping(String.class.getName(), org.datanucleus.store.rdbms.mapping.column.ClobColumnMapping.class, JDBCType.CLOB, "clob", false);
         }
         else
         {
