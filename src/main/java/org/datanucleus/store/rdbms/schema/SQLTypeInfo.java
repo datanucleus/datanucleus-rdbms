@@ -31,6 +31,9 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class SQLTypeInfo implements StoreSchemaData
 {
+    /** Whether this originates from the JDBC Driver */
+    protected boolean fromJdbcDriver = true;
+
     /** The RDBMS-specific name for this data type. */
     protected String typeName;
 
@@ -102,6 +105,7 @@ public class SQLTypeInfo implements StoreSchemaData
             short maximumScale,
             int numPrecRadix)
     {
+        this.fromJdbcDriver = false;
         this.typeName = typeName;
         this.dataType = dataType;
         this.precision = precision;
@@ -204,62 +208,50 @@ public class SQLTypeInfo implements StoreSchemaData
 
     /**
      * Returns the string representation of this object.
-     * @return  string representation of this object.
+     * @return string representation of this object.
      */
     public String toString()
     {
-        StringBuilder str = new StringBuilder("SQLTypeInfo : typeName = " + getTypeName() + "\n");
-        str.append("  dataType (jdbc)   = " + getDataType() + "\n");
-        str.append("  precision         = " + getPrecision() + "\n");
-        str.append("  literalPrefix     = " + getLiteralPrefix() + "\n");
-        str.append("  literalSuffix     = " + getLiteralSuffix() + "\n");
-        str.append("  createParams      = " + getCreateParams() + "\n");
-        str.append("  nullable          = " + getNullable() + "\n");
-        str.append("  caseSensitive     = " + isCaseSensitive() + "\n");
-        str.append("  searchable        = " + getSearchable() + "\n");
-        str.append("  unsignedAttribute = " + isUnsignedAttribute() + "\n");
-        str.append("  fixedPrecScale    = " + isFixedPrecScale() + "\n");
-        str.append("  autoIncrement     = " + isAutoIncrement() + "\n");
-        str.append("  localTypeName     = " + getLocalTypeName() + "\n");
-        str.append("  minimumScale      = " + getMinimumScale() + "\n");
-        str.append("  maximumScale      = " + getMaximumScale() + "\n");
-        str.append("  numPrecRadix      = " + getNumPrecRadix() + "\n");
-        str.append("  allowsPrecisionSpec = " + isAllowsPrecisionSpec() + "\n");
-        return str.toString();
+        return toString("");
     }
 
     /**
      * Returns the string representation of this object.
-     * @param indent The indent
-     * @return  string representation of this object.
+     * @param indent The indent for each line of the output
+     * @return string representation of this object.
      */
     public String toString(String indent)
     {
-        StringBuilder str = new StringBuilder(indent).append("SQLTypeInfo : typeName = " + getTypeName() + "\n");
-        str.append(indent).append("  dataType (jdbc)   = " + getDataType() + "\n");
-        str.append(indent).append("  precision         = " + getPrecision() + "\n");
-        str.append(indent).append("  literalPrefix     = " + getLiteralPrefix() + "\n");
-        str.append(indent).append("  literalSuffix     = " + getLiteralSuffix() + "\n");
-        str.append(indent).append("  createParams      = " + getCreateParams() + "\n");
-        str.append(indent).append("  nullable          = " + getNullable() + "\n");
-        str.append(indent).append("  caseSensitive     = " + isCaseSensitive() + "\n");
-        str.append(indent).append("  searchable        = " + getSearchable() + "\n");
-        str.append(indent).append("  unsignedAttribute = " + isUnsignedAttribute() + "\n");
-        str.append(indent).append("  fixedPrecScale    = " + isFixedPrecScale() + "\n");
-        str.append(indent).append("  autoIncrement     = " + isAutoIncrement() + "\n");
-        str.append(indent).append("  localTypeName     = " + getLocalTypeName() + "\n");
-        str.append(indent).append("  minimumScale      = " + getMinimumScale() + "\n");
-        str.append(indent).append("  maximumScale      = " + getMaximumScale() + "\n");
-        str.append(indent).append("  numPrecRadix      = " + getNumPrecRadix() + "\n");
-        str.append(indent).append("  allowsPrecisionSpec = " + isAllowsPrecisionSpec() + "\n");
+        StringBuilder str = new StringBuilder(indent).append("SQLTypeInfo : ").append(fromJdbcDriver ? "[JDBC-DRIVER]" : "[DATANUCLEUS]").append("\n");
+        str.append(indent + "  ").append("type : name = " + getTypeName())
+            .append(", ").append("jdbcId = " + getDataType())
+            .append(", ").append("localName = " + getLocalTypeName())
+            .append(", ").append("createParams = " + getCreateParams())
+            .append("\n");
+        str.append(indent + "  ").append("precision = " + getPrecision())
+            .append(", ").append("allowsSpec = " + isAllowsPrecisionSpec())
+            .append(", ").append("numPrecRadix = " + getNumPrecRadix())
+            .append("\n");
+        str.append(indent + "  ").append("scale : min = " + getMinimumScale())
+            .append(", ").append("max = " + getMaximumScale())
+            .append(", ").append("fixedPrec = " + isFixedPrecScale())
+            .append("\n");
+        str.append(indent + "  ").append("literals : prefix = " + getLiteralPrefix())
+            .append(", ").append("suffix = " + getLiteralSuffix())
+            .append("\n");
+        str.append(indent + "  ").append("nullable = " + getNullable())
+            .append(", ").append("caseSensitive = " + isCaseSensitive())
+            .append(", ").append("searchable = " + getSearchable())
+            .append(", ").append("unsigned = " + isUnsignedAttribute())
+            .append(", ").append("autoIncrement = " + isAutoIncrement())
+            .append("\n");
         return str.toString();
     }
 
     /**
      * Convenience method for returning if this type is compatible with the provided column.
-     * Compares the data type of each record, and returns true if the types are equivalent. For
-     * example one could be VARCHAR, and the other LONGVARCHAR so they both store string data, and
-     * hence they are compatible.
+     * Compares the data type of each record, and returns true if the types are equivalent. 
+     * For example one could be VARCHAR, and the other LONGVARCHAR so they both store string data, and hence they are compatible.
      * @param colInfo The column
      * @return Whether they are considered compatible
      */
@@ -320,7 +312,7 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Verify if its TINYINT, SMALLINT, INTEGER, or BIGINT type.
+     * Verify if it's TINYINT, SMALLINT, INTEGER, or BIGINT type.
      * @param type The type
      * @return Whether the type is of an integer type
      */
@@ -339,7 +331,7 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Verify if its DATE, TIME, TIMESTAMP type.
+     * Verify if it's DATE, TIME, TIMESTAMP type.
      * @param type The type
      * @return Whether the type is of a date type
      */
@@ -357,7 +349,7 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Verify if its FLOAT, REAL or DOUBLE.
+     * Verify if it's FLOAT, REAL or DOUBLE.
      * @param type The type
      * @return Whether the type is of a floating point type
      */
@@ -375,7 +367,7 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Verify if its NUMERIC or DECIMAL.
+     * Verify if it's NUMERIC or DECIMAL.
      * @param type The type
      * @return Whether the type is of a numeric type
      */
@@ -392,7 +384,7 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Verify if its LONGVARCHAR or VARCHAR.
+     * Verify if it's LONGVARCHAR or VARCHAR.
      * @param type The type
      * @return Whether the type is of a character type
      */
