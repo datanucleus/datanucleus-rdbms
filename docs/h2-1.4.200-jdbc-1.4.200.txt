@@ -6,876 +6,359 @@ Driver : name="H2 JDBC Driver" version="1.4.200 (2019-10-14)" (major=1, minor=4)
 
 Database TypeInfo
 JDBC Type=null sqlTypes=RESULT_SET (default=RESULT_SET)
-    SQLTypeInfo : typeName = RESULT_SET
-      dataType (jdbc)   = -10
-      precision         = 2147483647
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = RESULT_SET
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = RESULT_SET, jdbcId = -10, localName = RESULT_SET, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=CLOB sqlTypes=CLOB (default=CLOB)
-    SQLTypeInfo : typeName = CLOB
-      dataType (jdbc)   = 2005
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = CLOB
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = CLOB, jdbcId = 2005, localName = CLOB, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=BLOB sqlTypes=BLOB (default=BLOB)
-    SQLTypeInfo : typeName = BLOB
-      dataType (jdbc)   = 2004
-      precision         = 2147483647
-      literalPrefix     = X'
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = BLOB
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BLOB, jdbcId = 2004, localName = BLOB, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=ARRAY sqlTypes=ARRAY (default=ARRAY)
-    SQLTypeInfo : typeName = ARRAY
-      dataType (jdbc)   = 2003
-      precision         = 2147483647
-      literalPrefix     = ARRAY[
-      literalSuffix     = ]
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = ARRAY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ARRAY, jdbcId = 2003, localName = ARRAY, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ARRAY[, suffix = ]
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=OTHER sqlTypes=ENUM,INTERVAL DAY,JSON,INTERVAL MINUTE TO SECOND,INTERVAL YEAR,INTERVAL MINUTE,INTERVAL DAY TO SECOND,INTERVAL SECOND,INTERVAL DAY TO HOUR,INTERVAL DAY TO MINUTE,OTHER,INTERVAL HOUR,INTERVAL YEAR TO MONTH,INTERVAL MONTH,UUID,INTERVAL HOUR TO MINUTE,INTERVAL HOUR TO SECOND,GEOMETRY (default=OTHER)
-    SQLTypeInfo : typeName = ENUM
-      dataType (jdbc)   = 1111
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = ENUM
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ENUM, jdbcId = 1111, localName = ENUM, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL DAY
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' DAY
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL DAY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY, jdbcId = 1111, localName = INTERVAL DAY, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = JSON
-      dataType (jdbc)   = 1111
-      precision         = 2147483647
-      literalPrefix     = JSON '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = JSON
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = JSON, jdbcId = 1111, localName = JSON, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = JSON ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL MINUTE TO SECOND
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' MINUTE TO SECOND
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL MINUTE TO SECOND
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MINUTE TO SECOND, jdbcId = 1111, localName = INTERVAL MINUTE TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MINUTE TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL YEAR
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' YEAR
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL YEAR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL YEAR, jdbcId = 1111, localName = INTERVAL YEAR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' YEAR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL MINUTE
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' MINUTE
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL MINUTE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MINUTE, jdbcId = 1111, localName = INTERVAL MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL DAY TO SECOND
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' DAY TO SECOND
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL DAY TO SECOND
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO SECOND, jdbcId = 1111, localName = INTERVAL DAY TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL SECOND
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' SECOND
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL SECOND
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL SECOND, jdbcId = 1111, localName = INTERVAL SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL DAY TO HOUR
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' DAY TO HOUR
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL DAY TO HOUR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO HOUR, jdbcId = 1111, localName = INTERVAL DAY TO HOUR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO HOUR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL DAY TO MINUTE
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' DAY TO MINUTE
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL DAY TO MINUTE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO MINUTE, jdbcId = 1111, localName = INTERVAL DAY TO MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = OTHER
-      dataType (jdbc)   = 1111
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = OTHER
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = OTHER, jdbcId = 1111, localName = OTHER, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL HOUR
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' HOUR
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL HOUR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR, jdbcId = 1111, localName = INTERVAL HOUR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL YEAR TO MONTH
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' YEAR TO MONTH
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL YEAR TO MONTH
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL YEAR TO MONTH, jdbcId = 1111, localName = INTERVAL YEAR TO MONTH, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' YEAR TO MONTH
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL MONTH
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' MONTH
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL MONTH
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MONTH, jdbcId = 1111, localName = INTERVAL MONTH, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MONTH
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = UUID
-      dataType (jdbc)   = 1111
-      precision         = 2147483647
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = UUID
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = UUID, jdbcId = 1111, localName = UUID, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL HOUR TO MINUTE
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' HOUR TO MINUTE
-      createParams      = PRECISION
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL HOUR TO MINUTE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR TO MINUTE, jdbcId = 1111, localName = INTERVAL HOUR TO MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR TO MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = INTERVAL HOUR TO SECOND
-      dataType (jdbc)   = 1111
-      precision         = 18
-      literalPrefix     = INTERVAL '
-      literalSuffix     = ' HOUR TO SECOND
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTERVAL HOUR TO SECOND
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR TO SECOND, jdbcId = 1111, localName = INTERVAL HOUR TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = GEOMETRY
-      dataType (jdbc)   = 1111
-      precision         = 2147483647
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = GEOMETRY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = GEOMETRY, jdbcId = 1111, localName = GEOMETRY, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=DATE sqlTypes=DATE (default=DATE)
-    SQLTypeInfo : typeName = DATE
-      dataType (jdbc)   = 91
-      precision         = 10
-      literalPrefix     = DATE '
-      literalSuffix     = '
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = DATE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DATE, jdbcId = 91, localName = DATE, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = DATE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=TIME sqlTypes=TIME (default=TIME)
-    SQLTypeInfo : typeName = TIME
-      dataType (jdbc)   = 92
-      precision         = 18
-      literalPrefix     = TIME '
-      literalSuffix     = '
-      createParams      = SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = TIME
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIME, jdbcId = 92, localName = TIME, createParams = SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIME ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=TIMESTAMP sqlTypes=TIMESTAMP (default=TIMESTAMP)
-    SQLTypeInfo : typeName = TIMESTAMP
-      dataType (jdbc)   = 93
-      precision         = 29
-      literalPrefix     = TIMESTAMP '
-      literalSuffix     = '
-      createParams      = SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = TIMESTAMP
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIMESTAMP, jdbcId = 93, localName = TIMESTAMP, createParams = SCALE
+      precision = 29, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIMESTAMP ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=VARCHAR sqlTypes=VARCHAR_IGNORECASE,VARCHAR (default=VARCHAR)
-    SQLTypeInfo : typeName = VARCHAR_IGNORECASE
-      dataType (jdbc)   = 12
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = VARCHAR_IGNORECASE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = VARCHAR_IGNORECASE, jdbcId = 12, localName = VARCHAR_IGNORECASE, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = VARCHAR
-      dataType (jdbc)   = 12
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = VARCHAR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = VARCHAR, jdbcId = 12, localName = VARCHAR, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=LONGVARCHAR sqlTypes=LONGVARCHAR (default=LONGVARCHAR)
-    SQLTypeInfo : typeName = LONGVARCHAR
-      dataType (jdbc)   = -1
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = LONGVARCHAR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = LONGVARCHAR, jdbcId = -1, localName = LONGVARCHAR, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=BINARY sqlTypes=BINARY,UUID (default=BINARY)
-    SQLTypeInfo : typeName = BINARY
-      dataType (jdbc)   = -2
-      precision         = 2147483647
-      literalPrefix     = X'
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = BINARY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BINARY, jdbcId = -2, localName = BINARY, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
-    SQLTypeInfo : typeName = UUID
-      dataType (jdbc)   = -2
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = UUID
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = UUID, jdbcId = -2, localName = UUID, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=BOOLEAN sqlTypes=BOOLEAN (default=BOOLEAN)
-    SQLTypeInfo : typeName = BOOLEAN
-      dataType (jdbc)   = 16
-      precision         = 1
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = BOOLEAN
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BOOLEAN, jdbcId = 16, localName = BOOLEAN, createParams = null
+      precision = 1, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=VARBINARY sqlTypes=VARBINARY (default=VARBINARY)
-    SQLTypeInfo : typeName = VARBINARY
-      dataType (jdbc)   = -3
-      precision         = 2147483647
-      literalPrefix     = X'
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = VARBINARY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = VARBINARY, jdbcId = -3, localName = VARBINARY, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=LONGVARBINARY sqlTypes=LONGVARBINARY (default=LONGVARBINARY)
-    SQLTypeInfo : typeName = LONGVARBINARY
-      dataType (jdbc)   = -4
-      precision         = 2147483647
-      literalPrefix     = X'
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = LONGVARBINARY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = LONGVARBINARY, jdbcId = -4, localName = LONGVARBINARY, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=BIGINT sqlTypes=IDENTITY,BIGINT (default=BIGINT)
-    SQLTypeInfo : typeName = IDENTITY
-      dataType (jdbc)   = -5
-      precision         = 19
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = true
-      localTypeName     = IDENTITY
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = IDENTITY, jdbcId = -5, localName = IDENTITY, createParams = null
+      precision = 19, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = true
 
-    SQLTypeInfo : typeName = BIGINT
-      dataType (jdbc)   = -5
-      precision         = 19
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = BIGINT
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BIGINT, jdbcId = -5, localName = BIGINT, createParams = null
+      precision = 19, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=TINYINT sqlTypes=TINYINT (default=TINYINT)
-    SQLTypeInfo : typeName = TINYINT
-      dataType (jdbc)   = -6
-      precision         = 3
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = TINYINT
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TINYINT, jdbcId = -6, localName = TINYINT, createParams = null
+      precision = 3, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=CHAR sqlTypes=CHAR (default=CHAR)
-    SQLTypeInfo : typeName = CHAR
-      dataType (jdbc)   = 1
-      precision         = 2147483647
-      literalPrefix     = '
-      literalSuffix     = '
-      createParams      = LENGTH
-      nullable          = 1
-      caseSensitive     = true
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = CHAR
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = CHAR, jdbcId = 1, localName = CHAR, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=NUMERIC sqlTypes=NUMERIC (default=NUMERIC)
-    SQLTypeInfo : typeName = NUMERIC
-      dataType (jdbc)   = 2
-      precision         = 2147483647
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = NUMERIC
-      minimumScale      = 0
-      maximumScale      = -1
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = NUMERIC, jdbcId = 2, localName = NUMERIC, createParams = PRECISION,SCALE
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = -1, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=DECIMAL sqlTypes=DECIMAL (default=DECIMAL)
-    SQLTypeInfo : typeName = DECIMAL
-      dataType (jdbc)   = 3
-      precision         = 2147483647
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = PRECISION,SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = DECIMAL
-      minimumScale      = 0
-      maximumScale      = -1
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DECIMAL, jdbcId = 3, localName = DECIMAL, createParams = PRECISION,SCALE
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = -1, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=INTEGER sqlTypes=SERIAL,INTEGER (default=INTEGER)
-    SQLTypeInfo : typeName = SERIAL
-      dataType (jdbc)   = 4
-      precision         = 10
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = true
-      localTypeName     = SERIAL
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = SERIAL, jdbcId = 4, localName = SERIAL, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = true
 
-    SQLTypeInfo : typeName = INTEGER
-      dataType (jdbc)   = 4
-      precision         = 10
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = INTEGER
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTEGER, jdbcId = 4, localName = INTEGER, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=SMALLINT sqlTypes=SMALLINT (default=SMALLINT)
-    SQLTypeInfo : typeName = SMALLINT
-      dataType (jdbc)   = 5
-      precision         = 5
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = SMALLINT
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = SMALLINT, jdbcId = 5, localName = SMALLINT, createParams = null
+      precision = 5, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=FLOAT sqlTypes=FLOAT (default=FLOAT)
-    SQLTypeInfo : typeName = FLOAT
-      dataType (jdbc)   = 6
-      precision         = 17
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = FLOAT
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = FLOAT, jdbcId = 6, localName = FLOAT, createParams = null
+      precision = 17, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=null sqlTypes=TIMESTAMP WITH TIME ZONE (default=TIMESTAMP WITH TIME ZONE)
-    SQLTypeInfo : typeName = TIMESTAMP WITH TIME ZONE
-      dataType (jdbc)   = 2014
-      precision         = 35
-      literalPrefix     = TIMESTAMP WITH TIME ZONE '
-      literalSuffix     = '
-      createParams      = SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = TIMESTAMP WITH TIME ZONE
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIMESTAMP WITH TIME ZONE, jdbcId = 2014, localName = TIMESTAMP WITH TIME ZONE, createParams = SCALE
+      precision = 35, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIMESTAMP WITH TIME ZONE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=REAL sqlTypes=REAL (default=REAL)
-    SQLTypeInfo : typeName = REAL
-      dataType (jdbc)   = 7
-      precision         = 7
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = REAL
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = REAL, jdbcId = 7, localName = REAL, createParams = null
+      precision = 7, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=null sqlTypes=TIME WITH TIME ZONE (default=TIME WITH TIME ZONE)
-    SQLTypeInfo : typeName = TIME WITH TIME ZONE
-      dataType (jdbc)   = 2013
-      precision         = 24
-      literalPrefix     = TIME WITH TIME ZONE '
-      literalSuffix     = '
-      createParams      = SCALE
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = TIME WITH TIME ZONE
-      minimumScale      = 0
-      maximumScale      = 9
-      numPrecRadix      = 0
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIME WITH TIME ZONE, jdbcId = 2013, localName = TIME WITH TIME ZONE, createParams = SCALE
+      precision = 24, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIME WITH TIME ZONE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 JDBC Type=DOUBLE sqlTypes=DOUBLE (default=DOUBLE)
-    SQLTypeInfo : typeName = DOUBLE
-      dataType (jdbc)   = 8
-      precision         = 17
-      literalPrefix     = null
-      literalSuffix     = null
-      createParams      = null
-      nullable          = 1
-      caseSensitive     = false
-      searchable        = 3
-      unsignedAttribute = false
-      fixedPrecScale    = false
-      autoIncrement     = false
-      localTypeName     = DOUBLE
-      minimumScale      = 0
-      maximumScale      = 0
-      numPrecRadix      = 10
-      allowsPrecisionSpec = true
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DOUBLE, jdbcId = 8, localName = DOUBLE, createParams = null
+      precision = 17, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
 
 
 Database Keywords
@@ -1287,6 +770,6 @@ DataNucleus SchemaTool completed successfully
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  2.348 s
-[INFO] Finished at: 2020-07-23T18:53:24+01:00
+[INFO] Total time:  2.537 s
+[INFO] Finished at: 2021-03-09T08:13:30Z
 [INFO] ------------------------------------------------------------------------
