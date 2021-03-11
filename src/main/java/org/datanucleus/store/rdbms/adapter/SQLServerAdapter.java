@@ -648,10 +648,8 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
             throw new NucleusUserException(Localiser.msg("051028"));
         }
 
-        // Do we need to quote the sequence name here?
-        StringBuilder stmt = new StringBuilder("SELECT NEXT VALUE FOR '");
+        StringBuilder stmt = new StringBuilder("SELECT NEXT VALUE FOR ");
         stmt.append(sequenceName);
-        stmt.append("'");
 
         return stmt.toString();
     }
