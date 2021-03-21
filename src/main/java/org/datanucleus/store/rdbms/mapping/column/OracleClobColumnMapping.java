@@ -59,7 +59,7 @@ import org.datanucleus.util.Localiser;
  * Mapping for an Oracle CLOB column.
  * Extends the standard JDBC handler so that we can insert an empty CLOB, and then update it (Oracle non-standard behaviour).
  */
-public class OracleClobColumnMapping extends ClobColumnMapping
+public class OracleClobColumnMapping extends ClobColumnMapping implements ColumnMappingPostInsert, ColumnMappingPostUpdate
 {
     public OracleClobColumnMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
@@ -173,6 +173,18 @@ public class OracleClobColumnMapping extends ClobColumnMapping
         return getString(rs, param);
     }
 
+    @Override
+    public void insertPostProcessing(ObjectProvider op, Object value)
+    {
+        updateClobColumn(op, getJavaTypeMapping().getTable(), this, (String)value); // TODO Remove String cast
+    }
+
+    @Override
+    public void updatePostProcessing(ObjectProvider op, Object value)
+    {
+        updateClobColumn(op, getJavaTypeMapping().getTable(), this, (String)value); // TODO Remove String cast
+    }
+
     /**
      * Convenience method to update the contents of a CLOB column.
      * Oracle requires that a CLOB is initialised with EMPTY_CLOB() and then you retrieve
@@ -193,149 +205,159 @@ public class OracleClobColumnMapping extends ClobColumnMapping
     {
         ExecutionContext ec = op.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        DatastoreClass classTable = (DatastoreClass)table; // Don't support join tables yet
-        SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
-        // Generate "SELECT {clobColumn} FROM TABLE WHERE ID=? FOR UPDATE" statement
-        SelectStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
-        sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
-        sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-        SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
-        sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
-        StatementClassMapping mappingDefinition = new StatementClassMapping();
-        AbstractClassMetaData cmd = op.getClassMetaData();
-        int inputParamNum = 1;
-        if (cmd.getIdentityType() == IdentityType.DATASTORE)
+        if (table instanceof DatastoreClass)
         {
-            // Datastore identity value for input
-            JavaTypeMapping datastoreIdMapping = classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
-            SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), datastoreIdMapping);
-            SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
-            sqlStmt.whereAnd(expr.eq(val), true);
+            // CLOB within a primary table
+            DatastoreClass classTable = (DatastoreClass)table;
 
-            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
-            if (datastoreIdx == null)
+            // Generate "SELECT {clobColumn} FROM TABLE WHERE ID=? FOR UPDATE" statement
+            SelectStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
+            sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
+            sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
+            SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
+            sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
+            StatementClassMapping mappingDefinition = new StatementClassMapping();
+            AbstractClassMetaData cmd = op.getClassMetaData();
+            SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
+
+            int inputParamNum = 1;
+            if (cmd.getIdentityType() == IdentityType.DATASTORE)
             {
-                datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
-                mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
-            }
-            datastoreIdx.addParameterOccurrence(new int[] {inputParamNum});
-        }
-        else if (cmd.getIdentityType() == IdentityType.APPLICATION)
-        {
-            // Application identity value(s) for input
-            int[] pkNums = cmd.getPKMemberPositions();
-            for (int i=0;i<pkNums.length;i++)
-            {
-                AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
-                JavaTypeMapping pkMapping = classTable.getMemberMapping(mmd);
-                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), pkMapping);
-                SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, pkMapping, null, "PK" + i);
+                // Datastore identity value for input
+                JavaTypeMapping datastoreIdMapping = classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false);
+                SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), datastoreIdMapping);
+                SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, datastoreIdMapping, null, "ID");
                 sqlStmt.whereAnd(expr.eq(val), true);
 
-                StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
-                if (pkIdx == null)
+                StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
+                if (datastoreIdx == null)
                 {
-                    pkIdx = new StatementMappingIndex(pkMapping);
-                    mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    datastoreIdx = new StatementMappingIndex(datastoreIdMapping);
+                    mappingDefinition.addMappingForMember(SurrogateColumnType.DATASTORE_ID.getFieldNumber(), datastoreIdx);
                 }
-                int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
-                for (int j=0;j<pkMapping.getNumberOfColumnMappings();j++)
-                {
-                    inputParams[j] = inputParamNum++;
-                }
-                pkIdx.addParameterOccurrence(inputParams);
+                datastoreIdx.addParameterOccurrence(new int[] {inputParamNum});
             }
-        }
-
-        String textStmt = sqlStmt.getSQLText().toSQL();
-
-        if (op.isEmbedded())
-        {
-            // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-            ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(op);
-            if (embeddedOwners != null)
+            else if (cmd.getIdentityType() == IdentityType.APPLICATION)
             {
-                // Just use the first owner
-                // TODO Should check if the owner is stored in this table
-                op = embeddedOwners[0];
-            }
-        }
+                // Application identity value(s) for input
+                int[] pkNums = cmd.getPKMemberPositions();
+                for (int i=0;i<pkNums.length;i++)
+                {
+                    AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(pkNums[i]);
+                    JavaTypeMapping pkMapping = classTable.getMemberMapping(mmd);
+                    SQLExpression expr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), pkMapping);
+                    SQLExpression val = exprFactory.newLiteralParameter(sqlStmt, pkMapping, null, "PK" + i);
+                    sqlStmt.whereAnd(expr.eq(val), true);
 
-        try
-        {
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
+                    StatementMappingIndex pkIdx = mappingDefinition.getMappingForMemberPosition(pkNums[i]);
+                    if (pkIdx == null)
+                    {
+                        pkIdx = new StatementMappingIndex(pkMapping);
+                        mappingDefinition.addMappingForMember(pkNums[i], pkIdx);
+                    }
+                    int[] inputParams = new int[pkMapping.getNumberOfColumnMappings()];
+                    for (int j=0;j<pkMapping.getNumberOfColumnMappings();j++)
+                    {
+                        inputParams[j] = inputParamNum++;
+                    }
+                    pkIdx.addParameterOccurrence(inputParams);
+                }
+            }
+
+            String textStmt = sqlStmt.getSQLText().toSQL();
+
+            if (op.isEmbedded())
+            {
+                // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
+                ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(op);
+                if (embeddedOwners != null)
+                {
+                    // Just use the first owner
+                    // TODO Should check if the owner is stored in this table
+                    op = embeddedOwners[0];
+                }
+            }
 
             try
             {
-                PreparedStatement ps = sqlControl.getStatementForQuery(mconn, textStmt);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
 
                 try
                 {
-                    // Provide the primary key field(s) to the JDBC statement
-                    if (cmd.getIdentityType() == IdentityType.DATASTORE)
-                    {
-                        StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
-                        for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
-                        {
-                            classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
-                                datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
-                        }
-                    }
-                    else if (cmd.getIdentityType() == IdentityType.APPLICATION)
-                    {
-                        op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
-                    }
+                    PreparedStatement ps = sqlControl.getStatementForQuery(mconn, textStmt);
 
-                    ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);
                     try
                     {
-                        if (!rs.next())
+                        // Provide the primary key field(s) to the JDBC statement
+                        if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
-                            throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                            StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
+                            for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
+                            {
+                                classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
+                                    datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                            }
+                        }
+                        else if (cmd.getIdentityType() == IdentityType.APPLICATION)
+                        {
+                            op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
                         }
 
-                        DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
-                        int jdbcMajorVersion = dba.getDriverMajorVersion();
-                        if (dba.getDatastoreDriverName().equalsIgnoreCase(OracleAdapter.OJDBC_DRIVER_NAME) && jdbcMajorVersion < 10)
+                        ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);
+                        try
                         {
-                            // Oracle JDBC drivers version 9 and below use some sh*tty Oracle-specific CLOB type
-                            // we have to cast to that, face west, pray whilst saying ommmmmmmmmmm
-                            oracle.sql.CLOB clob = (oracle.sql.CLOB)rs.getClob(1);
-                            if (clob != null)
+                            if (!rs.next())
                             {
-                                clob.putString(1, value); // Deprecated but what can you do
+                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                            }
+
+                            DatastoreAdapter dba = storeMgr.getDatastoreAdapter();
+                            int jdbcMajorVersion = dba.getDriverMajorVersion();
+                            if (dba.getDatastoreDriverName().equalsIgnoreCase(OracleAdapter.OJDBC_DRIVER_NAME) && jdbcMajorVersion < 10)
+                            {
+                                // Oracle JDBC drivers version 9 and below use some sh*tty Oracle-specific CLOB type
+                                oracle.sql.CLOB clob = (oracle.sql.CLOB)rs.getClob(1);
+                                if (clob != null)
+                                {
+                                    clob.putString(1, value); // Deprecated but what can you do
+                                }
+                            }
+                            else
+                            {
+                                // Oracle JDBC drivers 10 and above supposedly use the JDBC standard class for Clobs
+                                java.sql.Clob clob = rs.getClob(1);
+                                if (clob != null)
+                                {
+                                    clob.setString(1, value);
+                                }
                             }
                         }
-                        else
+                        finally
                         {
-                            // Oracle JDBC drivers 10 and above supposedly use the JDBC standard class for Clobs
-                            java.sql.Clob clob = rs.getClob(1);
-                            if (clob != null)
-                            {
-                                clob.setString(1, value);
-                            }
+                            rs.close();
                         }
                     }
                     finally
                     {
-                        rs.close();
+                        sqlControl.closeStatement(mconn, ps);
                     }
                 }
                 finally
                 {
-                    sqlControl.closeStatement(mconn, ps);
+                    mconn.release();
                 }
             }
-            finally
+            catch (SQLException e)
             {
-                mconn.release();
+                throw new NucleusDataStoreException("Update of CLOB value failed: " + textStmt, e);
             }
         }
-        catch (SQLException e)
+        else
         {
-            throw new NucleusDataStoreException("Update of CLOB value failed: " + textStmt, e);
+            // TODO Support join table
+            throw new NucleusDataStoreException("We do not support INSERT/UPDATE CLOB post processing of non-primary table " + table);
         }
     }
 }
