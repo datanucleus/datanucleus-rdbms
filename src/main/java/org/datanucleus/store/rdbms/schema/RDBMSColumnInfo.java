@@ -30,10 +30,10 @@ import org.datanucleus.store.schema.StoreSchemaData;
  */
 public class RDBMSColumnInfo implements ListStoreSchemaData
 {
-    /** The table catalog, which may be <tt>null</tt>. */
+    /** The table catalog, which may be <i>null</i>. */
     protected String tableCat;
 
-    /** The table schema, which may be <tt>null</tt>. */
+    /** The table schema, which may be <i>null</i>. */
     protected String tableSchem;
 
     /** The table name. */
@@ -60,10 +60,10 @@ public class RDBMSColumnInfo implements ListStoreSchemaData
     /** Indicates whether the column can be NULL. */
     protected int nullable;
 
-    /** An explanatory comment on the column; may be <tt>null</tt>. */
+    /** An explanatory comment on the column; may be <i>null</i>. */
     protected String remarks;
 
-    /** The default value for the column; may be <tt>null</tt>. */
+    /** The default value for the column; may be <i>null</i>. */
     protected String columnDef;
 
     /** Indicates the maximum number of bytes in the column (for char types only). */
@@ -277,10 +277,10 @@ public class RDBMSColumnInfo implements ListStoreSchemaData
     }
 
     /**
-     * Indicates whether some object is "equal to" this one. Two <tt>RDBMSColumnInfo</tt> are considered
+     * Indicates whether some object is "equal to" this one. Two <i>RDBMSColumnInfo</i> are considered
      * equal if their catalog, schema, table, and column name are all equal.
      * @param obj the reference object with which to compare
-     * @return  <tt>true</tt> if this object is equal to the obj argument; <tt>false</tt> otherwise.
+     * @return  <i>true</i> if this object is equal to the obj argument; <i>false</i> otherwise.
      */
     public final boolean equals(Object obj)
     {

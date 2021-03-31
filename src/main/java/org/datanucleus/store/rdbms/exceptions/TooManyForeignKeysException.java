@@ -23,7 +23,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>TooManyForeignKeysException</tt> is thrown when trying to add a foreign
+ * A <i>TooManyForeignKeysException</i> is thrown when trying to add a foreign
  * key to a table and the table already has the maximum allowed number of
  * foreign keys.
  */

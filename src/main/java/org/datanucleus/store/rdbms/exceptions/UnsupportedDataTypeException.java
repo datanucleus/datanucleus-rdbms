@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 
 /**
- * A <tt>UnsupportedDataTypeException</tt> is thrown if an attempt is made
+ * A <i>UnsupportedDataTypeException</i> is thrown if an attempt is made
  * to persist an object field whose data type is not supported by the database
  * and/or the persistence package.
  *

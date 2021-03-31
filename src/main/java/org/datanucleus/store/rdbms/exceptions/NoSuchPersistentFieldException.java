@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NoSuchPersistentFieldException</tt> is thrown if a reference is made
+ * A <i>NoSuchPersistentFieldException</i> is thrown if a reference is made
  * somewhere, such as in a query filter string, to a field that either doesn't
  * exist or is not persistent.
  */

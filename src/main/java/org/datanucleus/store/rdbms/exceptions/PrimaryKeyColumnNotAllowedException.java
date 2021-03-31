@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>PrimaryKeyColumnNotAllowedException</tt> is thrown if an attempt is
+ * A <i>PrimaryKeyColumnNotAllowedException</i> is thrown if an attempt is
  * made to add a primary key column to a view.
  */
 public class PrimaryKeyColumnNotAllowedException extends NucleusException

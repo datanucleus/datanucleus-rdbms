@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NotAViewException</tt> is thrown during schema validation if a
+ * A <i>NotAViewException</i> is thrown during schema validation if a
  * table should be a view but is found not to be in the database.
  */
 public class NotAViewException extends DatastoreValidationException

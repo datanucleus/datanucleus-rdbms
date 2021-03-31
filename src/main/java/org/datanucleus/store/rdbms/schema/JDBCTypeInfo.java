@@ -148,10 +148,10 @@ public class JDBCTypeInfo implements MapStoreSchemaData
     }
 
     /**
-     * Indicates whether some object is "equal to" this one. Two <tt>JDBCTypeInfo</tt> are considered
+     * Indicates whether some object is "equal to" this one. Two <i>JDBCTypeInfo</i> are considered
      * equal if their jdbc type is the same.
      * @param obj the reference object with which to compare
-     * @return  <tt>true</tt> if this object is equal to the obj argument; <tt>false</tt> otherwise.
+     * @return  <i>true</i> if this object is equal to the obj argument; <i>false</i> otherwise.
      */
     public final boolean equals(Object obj)
     {

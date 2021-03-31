@@ -111,14 +111,14 @@ public class ForeignKeyInfo implements StoreSchemaData
 
     /**
      * Indicates whether some object is "equal to" this one.
-     * Two <tt>ForeignKeyInfo</tt> objects are considered equal if their
+     * Two <i>ForeignKeyInfo</i> objects are considered equal if their
      * catalog, schema, table, and column names, both primary and foreign, are
      * all equal.
      *
      * @param   obj     the reference object with which to compare
      *
-     * @return  <tt>true</tt> if this object is equal to the obj argument;
-     *          <tt>false</tt> otherwise.
+     * @return  <i>true</i> if this object is equal to the obj argument;
+     *          <i>false</i> otherwise.
      */
     public final boolean equals(Object obj)
     {

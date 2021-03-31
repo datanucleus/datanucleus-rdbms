@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>WrongPrimaryKeyException</tt> is thrown if a table is detected not to
+ * A <i>WrongPrimaryKeyException</i> is thrown if a table is detected not to
  * have the expected primary key in the database during schema validation.
  *
  * @see org.datanucleus.store.rdbms.table.Column

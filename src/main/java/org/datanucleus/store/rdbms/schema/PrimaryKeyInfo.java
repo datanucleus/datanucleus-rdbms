@@ -94,7 +94,7 @@ public class PrimaryKeyInfo implements StoreSchemaData
 
     /**
      * Indicates whether some object is "equal to" this one.
-     * Two <tt>PrimaryKeyInfo</tt> objects are considered equal if their catalog, schema, table, and 
+     * Two <i>PrimaryKeyInfo</i> objects are considered equal if their catalog, schema, table, and 
      * column names are all equal.
      * @param obj the reference object with which to compare
      * @return Whether they are equal

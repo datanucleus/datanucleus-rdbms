@@ -27,7 +27,7 @@ import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>MissingColumnException</tt> is thrown if an expected column is
+ * A <i>MissingColumnException</i> is thrown if an expected column is
  * not found in the database during schema validation.
  * @see org.datanucleus.store.rdbms.table.Column
  */

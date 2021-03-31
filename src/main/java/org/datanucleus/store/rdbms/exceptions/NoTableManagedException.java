@@ -21,7 +21,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NoTableManagedException</tt> is thrown if an attempt is made to perform an
+ * A <i>NoTableManagedException</i> is thrown if an attempt is made to perform an
  * operation using a class that is not backed by an table or view
  * in the database and the operation is not supported on such classes.
  *

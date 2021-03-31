@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>UnexpectedColumnException</tt> is thrown if an unexpected column is
+ * A <i>UnexpectedColumnException</i> is thrown if an unexpected column is
  * encountered in the database during schema validation.
  */
 public class UnexpectedColumnException extends DatastoreValidationException

@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NotATableException</tt> is thrown during schema validation if a
+ * A <i>NotATableException</i> is thrown during schema validation if a
  * table should be a table but is found not to be in the database.
  *
  * @see org.datanucleus.store.rdbms.table.TableImpl

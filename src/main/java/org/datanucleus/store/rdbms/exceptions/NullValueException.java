@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 
 /**
- * A <tt>NullValueException</tt> is thrown if a null value is encountered
+ * A <i>NullValueException</i> is thrown if a null value is encountered
  * in a database column that should prohibit null values.
  * 
  * @version $Revision: 1.3 $

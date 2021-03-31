@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>MissingTableException</tt> is thrown if an expected table is
+ * A <i>MissingTableException</i> is thrown if an expected table is
  * not found in the database during schema validation.
  */
 public class MissingTableException extends DatastoreValidationException

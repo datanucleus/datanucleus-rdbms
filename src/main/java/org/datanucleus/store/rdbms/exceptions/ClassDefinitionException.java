@@ -22,7 +22,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * A <tt>ClassDefinitionException</tt> is thrown if the settings of a
+ * A <i>ClassDefinitionException</i> is thrown if the settings of a
  * persistent class are inconsistent with it's metadata.
  */
 public class ClassDefinitionException extends NucleusUserException

@@ -43,10 +43,10 @@ public class SQLTypeInfo implements StoreSchemaData
     /** The maximum precision/length allowed for this data type. */
     protected int precision;
 
-    /** The prefix used to quote a literal of this data type; may be <tt>null</tt>. */
+    /** The prefix used to quote a literal of this data type; may be <i>null</i>. */
     protected String literalPrefix;
 
-    /** The suffix used to quote a literal of this data type; may be <tt>null</tt>. */
+    /** The suffix used to quote a literal of this data type; may be <i>null</i>. */
     protected String literalSuffix;
 
     /** Indicates the parameters used in defining columns of this type. */
@@ -61,7 +61,7 @@ public class SQLTypeInfo implements StoreSchemaData
     /** The searchability of this data type in terms of the kinds of SQL WHERE clauses that are allowed. */
     protected short searchable;
 
-    /** <tt>true</tt> indicates the type is unsigned, <tt>false</tt> otherwise. */
+    /** <i>true</i> indicates the type is unsigned, <i>false</i> otherwise. */
     protected boolean unsignedAttribute;
 
     /** Whether the type can be assigned a fixed scale value, such as for decimal or currency types. */
@@ -177,10 +177,10 @@ public class SQLTypeInfo implements StoreSchemaData
     }
 
     /**
-     * Indicates whether some object is "equal to" this one. Two <tt>SQLTypeInfo</tt> are considered
+     * Indicates whether some object is "equal to" this one. Two <i>SQLTypeInfo</i> are considered
      * equal if their type name and data type properties are equal.
      * @param obj the reference object with which to compare
-     * @return  <tt>true</tt> if this object is equal to the obj argument; <tt>false</tt> otherwise.
+     * @return  <i>true</i> if this object is equal to the obj argument; <i>false</i> otherwise.
      */
     public final boolean equals(Object obj)
     {

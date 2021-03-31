@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>WrongPrecisionException</tt> is thrown if a column is detected to have
+ * A <i>WrongPrecisionException</i> is thrown if a column is detected to have
  * the wrong precision in the database during schema validation.
  */
 public class WrongPrecisionException extends DatastoreValidationException

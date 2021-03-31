@@ -23,7 +23,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>IncompatibleDataTypeException</tt> is thrown if a column is detected to
+ * A <i>IncompatibleDataTypeException</i> is thrown if a column is detected to
  * have an incompatible type in the database during schema validation.
  *
  * @see Column

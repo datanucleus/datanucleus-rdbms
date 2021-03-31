@@ -498,7 +498,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
 
     /**
      * Accessor for whether there are any results.
-     * @return <tt>true</tt> if these results are empty.
+     * @return <i>true</i> if these results are empty.
      */
     public synchronized boolean isEmpty()
     {

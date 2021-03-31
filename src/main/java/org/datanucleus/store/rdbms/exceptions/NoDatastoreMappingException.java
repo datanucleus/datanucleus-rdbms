@@ -23,7 +23,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>NoDatastoreMappingException</tt> is thrown if an operation is performed that
+ * A <i>NoDatastoreMappingException</i> is thrown if an operation is performed that
  * assumes that a particular persistent field is stored in a single datastore
  * field when it is not (such as if the field is a Collection or a Map).
  */

@@ -99,7 +99,7 @@ public class IndexInfo implements StoreSchemaData
 
     /**
      * Indicates whether some object is "equal to" this one.
-     * Two <tt>IndexInfo</tt> objects are considered equal if their catalog, schema, table, and 
+     * Two <i>IndexInfo</i> objects are considered equal if their catalog, schema, table, and 
      * column names AND index name are all equal.
      * @param obj the reference object with which to compare
      * @return Whether they are equal

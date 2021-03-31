@@ -49,7 +49,7 @@ public class JDBCUtils
 
     /**
      * Logs SQL warnings to the common log. 
-     * Should be called after any operation on a JDBC <tt>Statement</tt> or <tt>ResultSet</tt> object.
+     * Should be called after any operation on a JDBC <i>Statement</i> or <i>ResultSet</i> object.
      * @param warning the value returned from getWarnings().
      */
     public static void logWarnings(SQLWarning warning)

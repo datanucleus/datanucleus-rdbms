@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.DatastoreValidationException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>WrongScaleException</tt> is thrown if a column is detected to have
+ * A <i>WrongScaleException</i> is thrown if a column is detected to have
  * the wrong scale in the database during schema validation.
  */
 public class WrongScaleException extends DatastoreValidationException

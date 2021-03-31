@@ -22,7 +22,7 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>DuplicateColumnException</tt> is thrown if an attempt is made to
+ * A <i>DuplicateColumnException</i> is thrown if an attempt is made to
  * add a column to a table with a name already in-use by an existing column.
  */
 public class DuplicateColumnException extends NucleusException

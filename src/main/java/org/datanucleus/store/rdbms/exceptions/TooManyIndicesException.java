@@ -23,7 +23,7 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>TooManyIndicesException</tt> is thrown when trying to add an index
+ * A <i>TooManyIndicesException</i> is thrown when trying to add an index
  * to a table and the table already has the maximum allowed number of indices.
  */
 public class TooManyIndicesException extends NucleusDataStoreException

@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * A <tt>ColumnDefinitionException</tt> is thrown if the settings of a
+ * A <i>ColumnDefinitionException</i> is thrown if the settings of a
  * database column are incompatible with the data type of the object field
  * to which it is mapped.
  *

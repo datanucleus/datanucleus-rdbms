@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.exceptions;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>PersistentSuperclassNotAllowedException</tt> is thrown if a
+ * A <i>PersistentSuperclassNotAllowedException</i> is thrown if a
  * persistence-capable class is declared to have a persistence-capable
  * superclass when that class is backed by a view.
  *

@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.util.Localiser;
 
 /**
- * A <tt>ViewDefinitionException</tt> is thrown if the metadata extension(s)
+ * A <i>ViewDefinitionException</i> is thrown if the metadata extension(s)
  * that define a view are missing or invalid.
  *
  * @see org.datanucleus.store.rdbms.table.ClassView
