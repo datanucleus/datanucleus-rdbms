@@ -2989,13 +2989,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                         NucleusLogger.DATASTORE_SCHEMA.error(msg);
                         throw new NucleusDataStoreException(msg, sqle);
                     }
-                    catch (Exception e)
+                    catch (Throwable e)
                     {
+                        NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
                         if (NucleusException.class.isAssignableFrom(e.getClass()))
                         {
                             throw (NucleusException)e;
                         }
-                        NucleusLogger.DATASTORE_SCHEMA.error(Localiser.msg("050044", e));
                         throw new NucleusException(e.toString(), e).setFatal();
                     }
                     finally
