@@ -31,6 +31,7 @@ import java.util.Set;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
+import org.datanucleus.FetchPlanForClass;
 import org.datanucleus.NucleusContext;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -987,6 +988,7 @@ public class SQLStatementHelper
 
     /**
      * Convenience method to join to and select all required FP fields of a related object where linked via an FK at this side.
+     * Note that the FetchPlan can have null passed in here (27/04/2021) so cater for it.
      * @return Whether the caller should select the FK themselves (i.e we haven't selected anything)
      */
     private static boolean selectFetchPlanFieldsOfFKRelatedObject(SelectStatement stmt, StatementClassMapping mappingDefinition, FetchPlan fetchPlan,
@@ -998,7 +1000,6 @@ public class SQLStatementHelper
         {
             // Only want FK fetching, and not the fields of the object (so avoid the join)
         }
-        // TODO What if we don't have "fetch-fk-only" but dont have any non-PK fields in the fetch plan? Cater for that
         else
         {
             RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
@@ -1041,6 +1042,31 @@ public class SQLStatementHelper
                         return true;
                     }
                     // TODO Maybe do a LEFT OUTER JOIN to each possible?
+                }
+
+                // Check if we are only fetch the PK field(s), in which case we can avoid any join
+                if (fetchPlan != null)
+                {
+                    FetchPlanForClass relatedFP = fetchPlan.getFetchPlanForClass(relatedCmd);
+                    int[] fpFieldNums = relatedFP.getMemberNumbers();
+                    int[] pkFieldNums = relatedCmd.getPKMemberPositions();
+                    if (fpFieldNums != null && pkFieldNums != null && fpFieldNums.length == pkFieldNums.length)
+                    {
+                        boolean equal = true;
+                        for (int i=0;i<fpFieldNums.length;i++)
+                        {
+                            if (fpFieldNums[i] != pkFieldNums[i])
+                            {
+                                equal = false;
+                                break;
+                            }
+                        }
+                        if (equal)
+                        {
+                            // Solely fetching the PK fields, so no need to join (just like fetchFkOnly case above)
+                            return true;
+                        }
+                    }
                 }
 
                 // Find the table of the related class
