@@ -998,6 +998,7 @@ public class SQLStatementHelper
         {
             // Only want FK fetching, and not the fields of the object (so avoid the join)
         }
+        // TODO What if we don't have "fetch-fk-only" but dont have any non-PK fields in the fetch plan? Cater for that
         else
         {
             RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
