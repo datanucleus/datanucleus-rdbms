@@ -1044,26 +1044,36 @@ public class SQLStatementHelper
                     // TODO Maybe do a LEFT OUTER JOIN to each possible?
                 }
 
-                // Check if we are only fetch the PK field(s), in which case we can avoid any join
+                // Check if we are only fetching the PK field(s), in which case we can avoid any join
                 if (fetchPlan != null)
                 {
                     FetchPlanForClass relatedFP = fetchPlan.getFetchPlanForClass(relatedCmd);
                     int[] fpFieldNums = relatedFP.getMemberNumbers();
-                    int[] pkFieldNums = relatedCmd.getPKMemberPositions();
-                    if (fpFieldNums != null && pkFieldNums != null && fpFieldNums.length == pkFieldNums.length)
+                    if (relatedCmd.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        boolean equal = true;
-                        for (int i=0;i<fpFieldNums.length;i++)
+                        int[] pkFieldNums = relatedCmd.getPKMemberPositions();
+                        if (fpFieldNums != null && pkFieldNums != null && fpFieldNums.length == pkFieldNums.length)
                         {
-                            if (fpFieldNums[i] != pkFieldNums[i])
+                            boolean equal = true;
+                            for (int i=0;i<fpFieldNums.length;i++)
                             {
-                                equal = false;
-                                break;
+                                if (fpFieldNums[i] != pkFieldNums[i])
+                                {
+                                    equal = false;
+                                    break;
+                                }
+                            }
+                            if (equal)
+                            {
+                                // Solely fetching the PK fields, so no need to join (just like fetchFkOnly case above)
+                                return true;
                             }
                         }
-                        if (equal)
+                    }
+                    else if (relatedCmd.getIdentityType() == IdentityType.DATASTORE)
+                    {
+                        if (fpFieldNums == null || fpFieldNums.length == 0)
                         {
-                            // Solely fetching the PK fields, so no need to join (just like fetchFkOnly case above)
                             return true;
                         }
                     }
