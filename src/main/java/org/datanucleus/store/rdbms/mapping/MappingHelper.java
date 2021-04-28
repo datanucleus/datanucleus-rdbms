@@ -108,10 +108,6 @@ public class MappingHelper
         if (oid != null)
         {
             oid = ec.getNucleusContext().getIdentityManager().getDatastoreId(mapping.getType(), oid);
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
-            {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041034",oid));
-            }
         }
 
         ApiAdapter api = ec.getApiAdapter();
