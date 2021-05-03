@@ -29,7 +29,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
- * Method for evaluating SECOND({dateExpr}).
+ * Method for evaluating SECOND({dateExpr}) using Oracle.
  * Returns a NumericExpression that equates to <pre>TO_NUMBER(TO_CHAR(dateExpr, "SS"))</pre>
  */
 public class TemporalSecondMethod2 extends TemporalBaseMethod

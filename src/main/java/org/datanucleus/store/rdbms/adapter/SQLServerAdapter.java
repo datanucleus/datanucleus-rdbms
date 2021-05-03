@@ -679,6 +679,8 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
             else if ("HOUR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod4.class;
             else if ("MINUTE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod4.class;
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod4.class;
+            else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod4.class;
+            else if ("QUARTER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalQuarterMethod4.class;
         }
         else
         {

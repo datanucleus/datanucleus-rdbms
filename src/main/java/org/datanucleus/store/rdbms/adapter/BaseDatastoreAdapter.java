@@ -1901,6 +1901,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("HOUR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod.class;
             else if ("MINUTE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod.class;
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod.class;
+            else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod.class;
+            else if ("QUARTER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalQuarterMethod.class;
             else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
         }
         else

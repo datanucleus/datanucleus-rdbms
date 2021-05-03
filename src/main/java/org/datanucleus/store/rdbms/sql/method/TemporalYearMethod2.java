@@ -29,7 +29,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.sql.expression.StringExpression;
 
 /**
- * Method for evaluating YEAR({dateExpr}).
+ * Method for evaluating YEAR({dateExpr}) using Oracle.
  * Returns a NumericExpression that equates to <pre>TO_NUMBER(TO_CHAR(dateExpr, "YYYY"))</pre>
  */
 public class TemporalYearMethod2 extends TemporalBaseMethod

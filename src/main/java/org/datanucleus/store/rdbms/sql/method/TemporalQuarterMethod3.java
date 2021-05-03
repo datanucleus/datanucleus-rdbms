@@ -1,5 +1,5 @@
 /**********************************************************************
-Copyright (c) 2015 Andy Jefferson and others. All rights reserved.
+Copyright (c) 2021 Andy Jefferson and others. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -20,32 +20,34 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
-import org.datanucleus.store.rdbms.sql.expression.TemporalExpression;
-import org.datanucleus.util.Localiser;
+import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 
 /**
- * Method for evaluating {dateExpr}.getMinute() for Firebird.
- * Returns a NumericExpression that equates to <pre>extract(MINUTE FROM expr)</pre>
+ * Method for evaluating QUARTER({dateExpr}) using PostgreSQL.
+ * Returns a NumericExpression that equates to <pre>(date_part("quarter", dateExpr))</pre>
  */
-public class TemoralMinuteMethod6 implements SQLMethod
+public class TemporalQuarterMethod3 extends TemporalBaseMethod
 {
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.sql.method.SQLMethod#getExpression(org.datanucleus.store.rdbms.sql.expression.SQLExpression, java.util.List)
      */
-    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List args)
+    public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
-        if (!(expr instanceof TemporalExpression))
-        {
-            throw new NucleusException(Localiser.msg("060001", "getMinute()", expr));
-        }
+        SQLExpression invokedExpr = getInvokedExpression(expr, args, "QUARTER");
 
-        expr.toSQLText().prepend("MINUTE FROM ");
+        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
+        JavaTypeMapping mapping2 = storeMgr.getMappingManager().getMapping(String.class);
         ArrayList funcArgs = new ArrayList();
-        funcArgs.add(expr);
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", funcArgs);
+        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        funcArgs.add(exprFactory.newLiteral(stmt, mapping2, "quarter"));
+        funcArgs.add(invokedExpr);
+        NumericExpression numExpr = new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class, true), "date_part", funcArgs);
+        numExpr.encloseInParentheses();
+        return numExpr;
     }
 }
