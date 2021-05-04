@@ -1087,7 +1087,7 @@ public class SQLStatementHelper
                     AbstractClassMetaData[] ownerParentCmds = storeMgr.getClassesManagingTableForClass(relatedCmd, clr);
                     if (ownerParentCmds.length > 1)
                     {
-                        NucleusLogger.QUERY.info("Relation (" + mmd.getFullFieldName() + ") with multiple related tables (using subclass-table). Not supported so selecting FK of related object only");
+                        NucleusLogger.QUERY.warn("Relation (" + mmd.getFullFieldName() + ") with multiple related tables (using subclass-table). Not supported so selecting FK of related object only");
                         return true;
                     }
 
