@@ -190,6 +190,8 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
             else if ("HOUR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalHourMethod6.class;
             else if ("MINUTE".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMinuteMethod6.class;
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod7.class;
+            else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod5.class;
+            else if ("QUARTER".equals(methodName)) return null; // TODO Support this
         }
         else
         {

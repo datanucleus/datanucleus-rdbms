@@ -173,7 +173,11 @@ public class SybaseAdapter extends BaseDatastoreAdapter
     @Override
     public Class getSQLMethodClass(String className, String methodName, ClassLoaderResolver clr)
     {
-        if (className != null)
+        if (className == null)
+        {
+            if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod2.class;
+        }
+        else
         {
             if ("java.lang.String".equals(className))
             {

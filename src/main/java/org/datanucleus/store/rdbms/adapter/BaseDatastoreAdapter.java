@@ -1894,6 +1894,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("SQL_boolean".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLBooleanMethod.class;
             else if ("SQL_numeric".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLNumericMethod.class;
             else if ("SQL_function".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLFunctionMethod.class;
+
+            else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
+
             else if ("YEAR".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalYearMethod.class;
             else if ("MONTH".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthMethod.class;
             else if ("MONTH_JAVA".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalMonthJavaMethod.class;
@@ -1903,7 +1906,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod.class;
             else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod.class;
             else if ("QUARTER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalQuarterMethod.class;
-            else if ("ROUND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.RoundMethod.class;
         }
         else
         {
