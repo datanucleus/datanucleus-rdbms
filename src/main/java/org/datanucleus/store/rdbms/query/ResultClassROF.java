@@ -412,7 +412,7 @@ public class ResultClassROF extends AbstractROF
         {
             try
             {
-                value = newMap.getObjectClass().newInstance();
+                value = newMap.getObjectClass().getDeclaredConstructor().newInstance();
             }
             catch (Exception e)
             {

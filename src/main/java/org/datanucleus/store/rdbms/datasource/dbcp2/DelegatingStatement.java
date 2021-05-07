@@ -392,7 +392,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         // close all the wrapped statements and return any poolable statements
         // to the pool.
         close();
-        super.finalize();
     }
 
     @Override

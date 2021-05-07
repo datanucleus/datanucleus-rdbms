@@ -122,13 +122,13 @@ public class DefaultConnectionPoolFactory implements ConnectionPoolFactory
             {
                 try
                 {
-                    clr.classForName(driverName).newInstance();
+                    clr.classForName(driverName).getDeclaredConstructor().newInstance();
                 }
                 catch (Exception e)
                 {
                     try
                     {
-                        Class.forName(driverName).newInstance();
+                        Class.forName(driverName).getDeclaredConstructor().newInstance();
                     }
                     catch (Exception e2)
                     {
@@ -178,7 +178,7 @@ public class DefaultConnectionPoolFactory implements ConnectionPoolFactory
                 {
                     info.putAll(props);
                 }
-                return ((Driver) clr.classForName(driverName).newInstance()).connect(url, info);
+                return ((Driver) clr.classForName(driverName).getDeclaredConstructor().newInstance()).connect(url, info);
             }
             catch (SQLException e)
             {

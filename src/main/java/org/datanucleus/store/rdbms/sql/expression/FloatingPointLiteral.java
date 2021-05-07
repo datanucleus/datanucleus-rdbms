@@ -18,6 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql.expression;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.query.expression.Expression;
@@ -289,8 +290,7 @@ public class FloatingPointLiteral extends NumericExpression implements SQLLitera
         }
         else if (expr instanceof FloatingPointLiteral)
         {
-            return new FloatingPointLiteral(stmt, mapping,
-                value.divide(((FloatingPointLiteral)expr).value, BigDecimal.ROUND_DOWN), null);
+            return new FloatingPointLiteral(stmt, mapping, value.divide(((FloatingPointLiteral)expr).value, RoundingMode.DOWN), null);
         }
         else
         {

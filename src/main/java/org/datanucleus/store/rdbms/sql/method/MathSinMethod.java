@@ -64,13 +64,13 @@ public class MathSinMethod implements SQLMethod
             else if (expr instanceof IntegerLiteral)
             {
                 int originalValue = ((Number) ((IntegerLiteral) expr).getValue()).intValue();
-                Double absValue = new Double(Math.sin(originalValue));
+                Double absValue = Double.valueOf(Math.sin(originalValue));
                 return new FloatingPointLiteral(stmt, expr.getJavaTypeMapping(), absValue, null);
             }
             else if (expr instanceof FloatingPointLiteral)
             {
                 double originalValue = ((BigDecimal) ((FloatingPointLiteral) expr).getValue()).doubleValue();
-                Double absValue = new Double(Math.sin(originalValue));
+                Double absValue = Double.valueOf(Math.sin(originalValue));
                 return new FloatingPointLiteral(stmt, expr.getJavaTypeMapping(), absValue, null);
             }
             throw new IllegalExpressionOperationException("Math.sin()", expr);

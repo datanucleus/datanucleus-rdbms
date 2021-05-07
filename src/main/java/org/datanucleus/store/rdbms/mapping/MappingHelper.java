@@ -239,7 +239,7 @@ public class MappingHelper
         try
         {
             // Create an AID
-            Object id = objectIdClass.newInstance();
+            Object id = objectIdClass.getDeclaredConstructor().newInstance();
 
             // Set the fields of the AID
             int paramIndex = 0;

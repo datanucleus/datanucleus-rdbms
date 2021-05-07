@@ -70,7 +70,7 @@ public class MathAbsMethod implements SQLMethod
             else if (expr instanceof FloatingPointLiteral)
             {
                 double originalValue = ((BigDecimal) ((FloatingPointLiteral) expr).getValue()).doubleValue();
-                Double absValue = new Double(Math.abs(originalValue));
+                Double absValue = Double.valueOf(Math.abs(originalValue));
                 return new FloatingPointLiteral(stmt, expr.getJavaTypeMapping(), absValue, null);
             }
             throw new IllegalExpressionOperationException("Math.abs()", expr);

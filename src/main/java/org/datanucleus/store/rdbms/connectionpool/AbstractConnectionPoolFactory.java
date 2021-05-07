@@ -44,13 +44,13 @@ public abstract class AbstractConnectionPoolFactory implements ConnectionPoolFac
         // Load the database driver
         try
         {
-            clr.classForName(dbDriver).newInstance();
+            clr.classForName(dbDriver).getDeclaredConstructor().newInstance();
         }
         catch (Exception e)
         {
             try
             {
-                Class.forName(dbDriver).newInstance();
+                Class.forName(dbDriver).getDeclaredConstructor().newInstance();
             }
             catch (Exception e2)
             {

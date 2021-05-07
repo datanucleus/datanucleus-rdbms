@@ -236,7 +236,7 @@ public abstract class AbstractRDBMSQueryResult<E> extends AbstractQueryResult<E>
                 try
                 {
                     Class instanceType = SCOUtils.getContainerInstanceType(mmd.getType(), mmd.getOrderMetaData() != null);
-                    coll = (Collection<Object>) instanceType.newInstance();
+                    coll = (Collection<Object>) instanceType.getDeclaredConstructor().newInstance();
                     fieldValuesForOwner.put(mmd.getAbsoluteFieldNumber(), coll);
                 }
                 catch (Exception e)

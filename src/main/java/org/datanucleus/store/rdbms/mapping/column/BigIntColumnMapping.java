@@ -243,7 +243,7 @@ public class BigIntColumnMapping extends AbstractColumnMapping
                 catch (NumberFormatException nfe)
                 {
                     // Must be a double precision, so cast it
-                    value = Long.valueOf((new Double(str)).longValue());
+                    value = Long.valueOf((Double.valueOf(str)).longValue());
                 }
 
                 if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))

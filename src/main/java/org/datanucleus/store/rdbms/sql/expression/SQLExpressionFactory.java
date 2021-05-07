@@ -550,7 +550,7 @@ public class SQLExpressionFactory
             // Built-in SQLMethod found, so instantiate it, cache it and return it
             try
             {
-                method = (SQLMethod) sqlMethodCls.newInstance();
+                method = (SQLMethod) sqlMethodCls.getDeclaredConstructor().newInstance();
                 MethodKey key = getSQLMethodKey(datastoreId, className, methodName);
                 sqlMethodsByKey.put(key, method);
                 return method;
@@ -727,7 +727,7 @@ public class SQLExpressionFactory
             try
             {
                 // Instantiate it
-                operation = (SQLOperation) sqlOpClass.newInstance();
+                operation = (SQLOperation) sqlOpClass.getDeclaredConstructor().newInstance();
                 sqlOperationsByName.put(name, operation);
                 return operation.getExpression(expr, expr2);
             }

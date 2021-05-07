@@ -164,7 +164,7 @@ public class FloatColumnMapping extends DoubleColumnMapping
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_FLOAT))
             {
-                value = rs.wasNull() ? null : new Float(d);
+                value = rs.wasNull() ? null : Float.valueOf(d);
             }
             else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_LANG_DOUBLE))
             {

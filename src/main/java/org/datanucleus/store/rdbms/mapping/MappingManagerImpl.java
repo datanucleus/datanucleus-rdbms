@@ -432,7 +432,7 @@ public class MappingManagerImpl implements MappingManager
             mc = getOverrideMappingClass(mc, null, null);
             try
             {
-                JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+                JavaTypeMapping m = (JavaTypeMapping)mc.getDeclaredConstructor().newInstance();
                 m.initialize(storeMgr, javaType.getName());
                 if (m.hasSimpleDatastoreRepresentation())
                 {
@@ -483,7 +483,7 @@ public class MappingManagerImpl implements MappingManager
         mc = getOverrideMappingClass(mc, null, null);
         try
         {
-            JavaTypeMapping m = (JavaTypeMapping)mc.newInstance();
+            JavaTypeMapping m = (JavaTypeMapping)mc.getDeclaredConstructor().newInstance();
             m.initialize(storeMgr, javaType.getName());
             return m;
         }
@@ -553,7 +553,7 @@ public class MappingManagerImpl implements MappingManager
                     Class mc = TypeConverterMultiMapping.class;
                     try
                     {
-                        m = (JavaTypeMapping)mc.newInstance();
+                        m = (JavaTypeMapping)mc.getDeclaredConstructor().newInstance();
                         m.setRoleForMember(FieldRole.ROLE_FIELD);
                         ((TypeConverterMultiMapping)m).initialize(mmd, table, clr, conv);
                         return m;
@@ -567,7 +567,7 @@ public class MappingManagerImpl implements MappingManager
                 Class mc = TypeConverterMapping.class;
                 try
                 {
-                    m = (JavaTypeMapping)mc.newInstance();
+                    m = (JavaTypeMapping)mc.getDeclaredConstructor().newInstance();
                     m.setRoleForMember(FieldRole.ROLE_FIELD);
                     ((TypeConverterMapping)m).initialize(mmd, table, clr, conv);
                     return m;
@@ -662,7 +662,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = mc.newInstance();
+                JavaTypeMapping m = mc.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_FIELD);
                 m.initialize(mmd, table, clr);
                 if (overrideMmd != null)
@@ -681,7 +681,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_FIELD);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1024,7 +1024,7 @@ public class MappingManagerImpl implements MappingManager
             JavaTypeMapping m = null;
             try
             {
-                m = mc.newInstance();
+                m = mc.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(fieldRole);
                 m.initialize(mmd, table, clr);
                 return m;
@@ -1038,7 +1038,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(fieldRole);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1167,7 +1167,7 @@ public class MappingManagerImpl implements MappingManager
             JavaTypeMapping m = null;
             try
             {
-                m = mc.newInstance();
+                m = mc.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
                 m.initialize(mmd, table, clr);
                 return m;
@@ -1181,7 +1181,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_KEY);
                 if (m instanceof TypeConverterMapping)
                 {
@@ -1310,7 +1310,7 @@ public class MappingManagerImpl implements MappingManager
             JavaTypeMapping m = null;
             try
             {
-                m = (JavaTypeMapping)mc.newInstance();
+                m = (JavaTypeMapping)mc.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_VALUE);
                 m.initialize(mmd, table, clr);
                 return m;
@@ -1324,7 +1324,7 @@ public class MappingManagerImpl implements MappingManager
         {
             try
             {
-                JavaTypeMapping m = mcd.mappingClass.newInstance();
+                JavaTypeMapping m = mcd.mappingClass.getDeclaredConstructor().newInstance();
                 m.setRoleForMember(FieldRole.ROLE_MAP_VALUE);
                 if (m instanceof TypeConverterMapping)
                 {

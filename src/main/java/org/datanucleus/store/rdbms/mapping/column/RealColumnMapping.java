@@ -165,7 +165,7 @@ public class RealColumnMapping extends AbstractColumnMapping
             {
                 // when value is real in database, cause cause a parse error when calling getFloat
                 // JDBC error:Value can not be converted to requested type.
-                value = new Float(Float.parseFloat(rs.getString(param)));
+                value = Float.valueOf(Float.parseFloat(rs.getString(param)));
                 if (column == null || column.getColumnMetaData() == null || !column.getColumnMetaData().isAllowsNull() )
                 {
                     if (rs.wasNull())

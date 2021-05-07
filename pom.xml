@@ -4,11 +4,11 @@
     <parent>
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-maven-parent</artifactId>
-        <version>5.0.0</version>
+        <version>6.0.0-m1</version>
     </parent>
 
     <artifactId>datanucleus-rdbms</artifactId>
-    <version>5.2.8-SNAPSHOT</version>
+    <version>6.0.0-m1-SNAPSHOT</version>
 
     <name>DataNucleus RDBMS plugin</name>
     <description>
@@ -22,7 +22,7 @@
     </scm>
 
     <properties>
-        <dn.core.version>5.2.0-release</dn.core.version>
+        <dn.core.version>5.9</dn.core.version>
     </properties>
 
     <build>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.datanucleus</groupId>
             <artifactId>datanucleus-core</artifactId>
-            <version>[${dn.core.version}, 5.9)</version>
+            <version>[${dn.core.version}, 6.9)</version>
             <scope>provided</scope>
         </dependency>
 
