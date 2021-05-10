@@ -18,7 +18,7 @@ Contributors:
 package org.datanucleus.store.rdbms.sql;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.expression.JoinExpression;
+import org.datanucleus.store.query.expression.JoinExpression;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.util.NucleusLogger;
@@ -226,15 +226,15 @@ public class SQLJoin
 
     public static JoinType getJoinTypeForJoinExpressionType(JoinExpression.JoinType ejt)
     {
-        if (ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_INNER || ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_INNER_FETCH)
+        if (ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_INNER || ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_INNER_FETCH)
         {
             return JoinType.INNER_JOIN;
         }
-        else if (ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER || ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER_FETCH)
+        else if (ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER || ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_LEFT_OUTER_FETCH)
         {
             return JoinType.LEFT_OUTER_JOIN;
         }
-        else if (ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_RIGHT_OUTER || ejt == org.datanucleus.query.expression.JoinExpression.JoinType.JOIN_RIGHT_OUTER_FETCH)
+        else if (ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_RIGHT_OUTER || ejt == org.datanucleus.store.query.expression.JoinExpression.JoinType.JOIN_RIGHT_OUTER_FETCH)
         {
             return JoinType.RIGHT_OUTER_JOIN;
         }

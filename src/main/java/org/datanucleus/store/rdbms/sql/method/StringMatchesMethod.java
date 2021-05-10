@@ -20,8 +20,8 @@ package org.datanucleus.store.rdbms.sql.method;
 import java.util.List;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.expression.Expression;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.sql.SQLStatement;

@@ -19,8 +19,8 @@ package org.datanucleus.store.rdbms.sql.expression;
 
 import java.util.List;
 
-import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.query.compiler.CompilationComponent;
+import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;

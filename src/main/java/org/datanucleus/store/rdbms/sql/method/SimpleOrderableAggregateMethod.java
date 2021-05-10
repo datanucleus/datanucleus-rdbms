@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.compiler.CompilationComponent;
+import org.datanucleus.store.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SelectStatement;

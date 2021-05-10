@@ -32,7 +32,7 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.query.QueryUtils;
+import org.datanucleus.store.query.QueryUtils;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;

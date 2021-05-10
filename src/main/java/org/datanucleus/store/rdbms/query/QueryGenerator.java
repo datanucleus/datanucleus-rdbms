@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.query;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.query.compiler.CompilationComponent;
+import org.datanucleus.store.query.compiler.CompilationComponent;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLTable;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;

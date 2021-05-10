@@ -17,8 +17,8 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
-import org.datanucleus.query.compiler.CompilationComponent;
-import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.query.compiler.CompilationComponent;
+import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.NullMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;

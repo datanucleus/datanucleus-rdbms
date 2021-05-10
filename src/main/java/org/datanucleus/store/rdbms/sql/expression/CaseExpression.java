@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
-import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.query.expression.Expression;
 
 /**
  * Expression representing the SQL construct 

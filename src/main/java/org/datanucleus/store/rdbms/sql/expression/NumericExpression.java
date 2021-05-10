@@ -20,7 +20,7 @@ package org.datanucleus.store.rdbms.sql.expression;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.datanucleus.query.expression.Expression;
+import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
 import org.datanucleus.store.rdbms.sql.SQLTable;

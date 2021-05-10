@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.query.NullOrderingType;
+import org.datanucleus.store.query.NullOrderingType;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
