@@ -432,11 +432,13 @@ public class FetchRequest extends Request
                             // Check for failure to find the object
                             if (!rs.next())
                             {
+                                final String name = op.getClassMetaData().getName();
+                                final Object internalObjectId = op.getInternalObjectId();
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", op.getInternalObjectId()));
+                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", internalObjectId,name));
                                 }
-                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                                throw new NucleusObjectNotFoundException("No such database row for Class "+ name +" with id "+ internalObjectId, internalObjectId);
                             }
 
                             // Copy the results into the object

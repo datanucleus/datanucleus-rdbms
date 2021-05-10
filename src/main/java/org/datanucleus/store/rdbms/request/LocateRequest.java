@@ -276,8 +276,10 @@ public class LocateRequest extends Request
                         {
                             if (!rs.next())
                             {
-                                NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", op.getInternalObjectId()));
-                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                                final String name = op.getClassMetaData().getName();
+                                final Object internalObjectId = op.getInternalObjectId();
+                                NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", internalObjectId,name));
+                                throw new NucleusObjectNotFoundException("No such database row for Class "+ name +" with id "+ internalObjectId, internalObjectId);
                             }
                         }
                         finally
