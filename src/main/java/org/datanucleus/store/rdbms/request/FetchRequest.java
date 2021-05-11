@@ -432,11 +432,12 @@ public class FetchRequest extends Request
                             // Check for failure to find the object
                             if (!rs.next())
                             {
+                                String msg = Localiser.msg("050018", op.getInternalObjectId());
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
-                                    NucleusLogger.DATASTORE_RETRIEVE.info(Localiser.msg("050018", op.getInternalObjectId()));
+                                    NucleusLogger.DATASTORE_RETRIEVE.info(msg);
                                 }
-                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                                throw new NucleusObjectNotFoundException(msg);
                             }
 
                             // Copy the results into the object
