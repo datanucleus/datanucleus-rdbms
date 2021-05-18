@@ -275,6 +275,7 @@ public class InsertRequest extends Request
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
                 }
+                //todo:should handle oracle generated key(auto generated)
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
                     hasIdentityColumn && storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT),
