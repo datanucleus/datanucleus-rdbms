@@ -69,6 +69,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -239,6 +240,7 @@ public class InsertRequest extends Request
         {
             VersionMetaData vermd = table.getVersionMetaData();
             RDBMSStoreManager storeMgr = table.getStoreManager();
+            String datastoreProductName =storeMgr.getDatastoreAdapter().getDatastoreProductName();
             if (vermd != null && vermd.getFieldName() != null)
             {
                 // Version field - Update the version in the object
@@ -266,6 +268,7 @@ public class InsertRequest extends Request
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
+                List<Column> pkColumns =((ClassTable) table).getPrimaryKey().getColumns();
                 List<String> pkColumnNames = new ArrayList<>();
                 if (table.getIdentityType() == IdentityType.DATASTORE)
                 {
@@ -274,8 +277,12 @@ public class InsertRequest extends Request
                     pkColumnNames = Stream.of(columnMappings)
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
+                    //If the product is Oracle, also if we have a sort of primary key, we should set the pkColumnNames to achieve auto-generated key in Oracle DB
+                } else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty() && datastoreProductName.equals("Oracle")) {
+                    for (Column column : pkColumns) {
+                        pkColumnNames.add(column.getName());
+                    }
                 }
-                //todo:should handle oracle generated key(auto generated)
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
                     hasIdentityColumn && storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT),
