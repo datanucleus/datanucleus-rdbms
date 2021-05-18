@@ -240,7 +240,6 @@ public class InsertRequest extends Request
         {
             VersionMetaData vermd = table.getVersionMetaData();
             RDBMSStoreManager storeMgr = table.getStoreManager();
-            String datastoreProductName =storeMgr.getDatastoreAdapter().getDatastoreProductName();
             if (vermd != null && vermd.getFieldName() != null)
             {
                 // Version field - Update the version in the object
@@ -277,11 +276,10 @@ public class InsertRequest extends Request
                     pkColumnNames = Stream.of(columnMappings)
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
-                    //If the product is Oracle, also if we have a sort of primary key, we should set the pkColumnNames to achieve auto-generated key in Oracle DB
-                } else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty() && datastoreProductName.equals("Oracle")) {
-                    for (Column column : pkColumns) {
-                        pkColumnNames.add(column.getName());
-                    }
+                }
+                else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty())
+                {
+                    pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
                 }
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
