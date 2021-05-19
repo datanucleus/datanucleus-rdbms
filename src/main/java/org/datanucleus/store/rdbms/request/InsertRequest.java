@@ -69,6 +69,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -271,9 +272,18 @@ public class InsertRequest extends Request
                 {
                     JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
                     ColumnMapping[] columnMappings = mapping.getColumnMappings();
-                    pkColumnNames = Stream.of(columnMappings)
-                        .map(cm -> cm.getColumn().getIdentifier().getName())
-                        .collect(toList());
+                    pkColumnNames = Stream.of(columnMappings).map(cm -> cm.getColumn().getIdentifier().getName()).collect(toList());
+                }
+                else if (table.getIdentityType() == IdentityType.APPLICATION)
+                {
+                    if (table instanceof ClassTable)
+                    {
+                        List<Column> pkColumns = ((ClassTable)table).getPrimaryKey().getColumns();
+                        if (!pkColumns.isEmpty())
+                        {
+                            pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
+                        }
+                    }
                 }
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
