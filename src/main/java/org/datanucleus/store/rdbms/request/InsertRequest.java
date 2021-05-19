@@ -69,7 +69,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
-import org.datanucleus.store.rdbms.table.ClassTable;
+import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -276,13 +276,10 @@ public class InsertRequest extends Request
                 }
                 else if (table.getIdentityType() == IdentityType.APPLICATION)
                 {
-                    if (table instanceof ClassTable)
+                    List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
+                    if (!pkColumns.isEmpty())
                     {
-                        List<Column> pkColumns = ((ClassTable)table).getPrimaryKey().getColumns();
-                        if (!pkColumns.isEmpty())
-                        {
-                            pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
-                        }
+                        pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
                     }
                 }
 
@@ -313,7 +310,10 @@ public class InsertRequest extends Request
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)
                     {
-                        op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                        if (pkFieldNumbers != null && pkFieldNumbers.length > 0)
+                        {
+                            op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                        }
                     }
 
                     // Provide all non-key fields needed for the insert.
