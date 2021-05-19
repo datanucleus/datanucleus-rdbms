@@ -69,6 +69,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
+import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -267,6 +268,7 @@ public class InsertRequest extends Request
             try
             {
                 List<String> pkColumnNames = new ArrayList<>();
+                List<Column> pkColumns =((ClassTable) table).getPrimaryKey().getColumns();
                 if (table.getIdentityType() == IdentityType.DATASTORE)
                 {
                     JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
@@ -275,7 +277,10 @@ public class InsertRequest extends Request
                         .map(cm -> cm.getColumn().getIdentifier().getName())
                         .collect(toList());
                 }
-                //todo:should handle oracle generated key(auto generated)
+                else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty())
+                {
+                    pkColumnNames = pkColumns.stream().map(cm->cm.getName()).collect(toList());
+                }
 
                 PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, insertStmt, batch,
                     hasIdentityColumn && storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT),
@@ -302,7 +307,7 @@ public class InsertRequest extends Request
                             table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, paramNumber, op.getInternalObjectId());
                         }
                     }
-                    else if (table.getIdentityType() == IdentityType.APPLICATION)
+                    else if (table.getIdentityType() == IdentityType.APPLICATION && ! pkColumns.isEmpty())
                     {
                         op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
                     }
