@@ -487,10 +487,11 @@ public class InsertRequest extends Request
                     }
 
                     sqlControl.executeStatementUpdate(ec, mconn, insertStmt, ps, !batch);
+
                     if (hasIdentityColumn)
                     {
-                        // Identity was set in the datastore using auto-increment/identity/serial etc
-                        Object newId = getInsertedDatastoreIdentity(ec, sqlControl, op, mconn, ps);
+                        // Identity column was set in the datastore using auto-increment/identity/serial etc
+                        Object newId = getInsertedIdentityValue(ec, sqlControl, op, mconn, ps);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
                             NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", op.getObjectAsPrintable(), newId));
@@ -602,7 +603,7 @@ public class InsertRequest extends Request
     }
 
     /**
-     * Method to obtain the identity attributed by the datastore when using auto-increment/IDENTITY/SERIAL.
+     * Method to obtain the identity attributed by the datastore when using auto-increment/IDENTITY/SERIAL on a field.
      * @param ec execution context
      * @param sqlControl SQLController
      * @param op ObjectProvider of the object
@@ -611,10 +612,10 @@ public class InsertRequest extends Request
      * @return The identity
      * @throws SQLException Thrown if an error occurs retrieving the identity
      */
-    private Object getInsertedDatastoreIdentity(ExecutionContext ec, SQLController sqlControl, ObjectProvider op, ManagedConnection mconn, PreparedStatement ps)
+    private Object getInsertedIdentityValue(ExecutionContext ec, SQLController sqlControl, ObjectProvider op, ManagedConnection mconn, PreparedStatement ps)
     throws SQLException
     {
-        Object datastoreId = null;
+        Object identityValue = null;
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
         if (storeMgr.getDatastoreAdapter().supportsOption(DatastoreAdapter.GET_GENERATED_KEYS_STATEMENT))
@@ -626,7 +627,7 @@ public class InsertRequest extends Request
                 rs = ps.getGeneratedKeys();
                 if (rs != null && rs.next())
                 {
-                    datastoreId = rs.getObject(1);
+                    identityValue = rs.getObject(1);
                 }
             }
             catch (Throwable e)
@@ -642,11 +643,11 @@ public class InsertRequest extends Request
             }
         }
 
-        if (datastoreId == null)
+        if (identityValue == null)
         {
             // Not found, so try the native method for retrieving it
             String columnName = null;
-            JavaTypeMapping idMapping = table.getIdMapping();
+            JavaTypeMapping idMapping = table.getIdMapping(); // TODO Confirm this is ok for datastore AND application id cases. What if the column is not PK?
             if (idMapping != null)
             {
                 for (int i=0;i<idMapping.getNumberOfColumnMappings();i++)
@@ -667,7 +668,7 @@ public class InsertRequest extends Request
                 rs = sqlControl.executeStatementQuery(ec, mconn, autoIncStmt, psAutoIncrement);
                 if (rs.next())
                 {
-                    datastoreId = rs.getObject(1);
+                    identityValue = rs.getObject(1);
                 }
             }
             finally
@@ -683,12 +684,12 @@ public class InsertRequest extends Request
             }
         }
 
-        if (datastoreId == null)
+        if (identityValue == null)
         {
             throw new NucleusDataStoreException(Localiser.msg("052205", this.table));
         }
 
-        return datastoreId;
+        return identityValue;
     }
 
     /**
