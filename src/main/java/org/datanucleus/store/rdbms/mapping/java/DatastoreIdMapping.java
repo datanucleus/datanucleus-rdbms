@@ -126,7 +126,7 @@ public class DatastoreIdMapping extends SingleFieldMapping
             value = ec.getNucleusContext().getIdentityManager().getDatastoreId(getType(), value);
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041034",value));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041034", IdentityUtils.getPersistableIdentityForId(value)));
             }
         }
 
