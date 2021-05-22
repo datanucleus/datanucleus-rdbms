@@ -122,7 +122,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
             }
         }
 
@@ -232,7 +232,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
             }
 
             CollectionStore backingStore = ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
@@ -247,7 +247,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
             }
             return;
         }

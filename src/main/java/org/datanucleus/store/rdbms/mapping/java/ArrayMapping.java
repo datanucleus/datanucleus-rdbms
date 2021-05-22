@@ -139,7 +139,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 // Reachability
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
                 }
             }
 
@@ -302,13 +302,13 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
         }
 
         // Update the datastore
