@@ -607,7 +607,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()),
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", ownerOP != null ? IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()) : id,
                             mmd != null ? mmd.getFullFieldName() : null));
                     }
 
