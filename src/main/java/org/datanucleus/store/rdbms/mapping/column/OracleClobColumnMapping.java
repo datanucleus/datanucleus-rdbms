@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
@@ -310,7 +311,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
                         {
                             if (!rs.next())
                             {
-                                throw new NucleusObjectNotFoundException("No such database row", op.getInternalObjectId());
+                                throw new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
                             }
 
                             DatastoreAdapter dba = storeMgr.getDatastoreAdapter();

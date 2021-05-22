@@ -355,7 +355,7 @@ public class LocateBulkRequest extends BulkRequest
                             NucleusObjectNotFoundException[] nfes = new NucleusObjectNotFoundException[missingOps.length];
                             for (int i=0;i<nfes.length;i++)
                             {
-                                nfes[i] = new NucleusObjectNotFoundException("Object not found", missingOps[i].getInternalObjectId());
+                                nfes[i] = new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(missingOps[i].getInternalObjectId())));
                             }
                             throw new NucleusObjectNotFoundException("Some objects were not found. Look at nested exceptions for details", nfes);
                         }

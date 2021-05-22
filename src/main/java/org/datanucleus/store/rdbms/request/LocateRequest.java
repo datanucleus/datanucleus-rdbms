@@ -27,6 +27,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusObjectNotFoundException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
@@ -276,7 +277,7 @@ public class LocateRequest extends Request
                         {
                             if (!rs.next())
                             {
-                                String msg = Localiser.msg("050018", op.getInternalObjectId());
+                                String msg = Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()));
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
                                     NucleusLogger.DATASTORE_RETRIEVE.info(msg);
