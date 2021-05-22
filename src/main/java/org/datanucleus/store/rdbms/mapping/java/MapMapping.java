@@ -29,6 +29,7 @@ import java.util.Set;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -148,7 +149,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
             }
         }
 
@@ -238,7 +239,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
             }
 
             // Update the datastore with this value of map (clear old entries and add new ones)
@@ -262,7 +263,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // User doesnt want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
             }
             return;
         }

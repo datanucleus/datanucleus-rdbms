@@ -44,6 +44,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -492,11 +493,12 @@ public class InsertRequest extends Request
                     {
                         // Identity column was set in the datastore using auto-increment/identity/serial etc
                         Object newId = getInsertedIdentityValue(ec, sqlControl, op, mconn, ps);
+                        op.setPostStoreNewObjectId(newId);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", op.getObjectAsPrintable(), newId));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", op.getObjectAsPrintable(), 
+                                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
                         }
-                        op.setPostStoreNewObjectId(newId);
                     }
 
                     // Execute any mapping actions on the insert of the fields (e.g Oracle CLOBs/BLOBs)
@@ -591,7 +593,8 @@ public class InsertRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postInsert(op);
             }

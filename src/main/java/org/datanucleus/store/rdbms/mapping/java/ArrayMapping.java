@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
@@ -138,7 +139,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 // Reachability
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", mmd.getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
                 }
             }
 
@@ -169,7 +170,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             if (arrayLength > 0)
             {
                 // Add the elements direct to the datastore
-                ((ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, null)).set(ownerOP, value);
+                ((ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, null)).set(ownerOP, value);
             }
         }
     }
@@ -301,13 +302,13 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP), mmd.getFullFieldName()));
         }
 
         // Update the datastore
