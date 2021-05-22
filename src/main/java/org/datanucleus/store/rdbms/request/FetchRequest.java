@@ -340,7 +340,7 @@ public class FetchRequest extends Request
         if (fieldsToFetch != null && NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", op.getObjectAsPrintable(), fieldsToFetch, table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldsToFetch, table));
         }
 
         if (((fetchingSurrogateVersion || versionFieldName != null) && numberOfFieldsToFetch == 0) && op.isVersionLoaded())
@@ -486,7 +486,7 @@ public class FetchRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = Localiser.msg("052219", op.getObjectAsPrintable(), statement, sqle.getMessage());
+                String msg = Localiser.msg("052219", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);

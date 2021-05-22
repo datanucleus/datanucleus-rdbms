@@ -302,7 +302,7 @@ public class LocateRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = Localiser.msg("052220", op.getObjectAsPrintable(), statement, sqle.getMessage());
+                String msg = Localiser.msg("052220", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);

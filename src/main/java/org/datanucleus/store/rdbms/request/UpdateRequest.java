@@ -36,6 +36,7 @@ import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
@@ -312,7 +313,7 @@ public class UpdateRequest extends Request
                 }
 
                 // Debug information about what we are updating
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", op.getObjectAsPrintable(), fieldStr.toString(), table));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldStr.toString(), table));
             }
 
             RDBMSStoreManager storeMgr = table.getStoreManager();
@@ -469,7 +470,7 @@ public class UpdateRequest extends Request
             }
             catch (SQLException e)
             {
-                String msg = Localiser.msg("052215", op.getObjectAsPrintable(), stmt, StringUtils.getStringFromStackTrace(e));
+                String msg = Localiser.msg("052215", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), stmt, StringUtils.getStringFromStackTrace(e));
                 NucleusLogger.DATASTORE_PERSIST.error(msg);
                 List<Exception> exceptions = new ArrayList<>();
                 exceptions.add(e);
@@ -488,7 +489,8 @@ public class UpdateRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
                 }
                 callbacks[i].postUpdate(op);
             }

@@ -36,6 +36,7 @@ import org.datanucleus.PropertyNames;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusOptimisticException;
+import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ForeignKeyMetaData;
@@ -191,7 +192,7 @@ public class DeleteRequest extends Request
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are deleting
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052210", op.getObjectAsPrintable(), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052210", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), table));
         }
 
         // Process all related fields first
@@ -203,7 +204,8 @@ public class DeleteRequest extends Request
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", op.getObjectAsPrintable(), ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                    ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
             }
             callbacks[i].preDelete(op);
 
@@ -326,7 +328,7 @@ public class DeleteRequest extends Request
                         if (currentVersion == null)
                         {
                             // Somehow the version is not set on this object (not read in ?) so report the bug
-                            String msg = Localiser.msg("052202", op.getInternalObjectId(), table);
+                            String msg = Localiser.msg("052202", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), table);
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusException(msg);
                         }
@@ -341,7 +343,8 @@ public class DeleteRequest extends Request
                     if (optimisticChecks && rcs[0] == 0)
                     {
                         // No object deleted so either object disappeared or failed optimistic version checks
-                        throw new NucleusOptimisticException(Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + op.getTransactionalVersion()), op.getObject());
+                        throw new NucleusOptimisticException(Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                            "" + op.getTransactionalVersion()), op.getObject());
                     }
 
                     if (relatedObjectsToDelete != null && !relatedObjectsToDelete.isEmpty())
@@ -367,8 +370,8 @@ public class DeleteRequest extends Request
         }
         catch (SQLException e)
         {
-            String msg = Localiser.msg("052211", op.getObjectAsPrintable(), stmt, e.getMessage());
-            NucleusLogger.DATASTORE_PERSIST.warn(msg);
+            String msg = Localiser.msg("052211", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), stmt, e.getMessage());
+            NucleusLogger.PERSISTENCE.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(e);
             while((e = e.getNextException())!=null)
@@ -394,7 +397,7 @@ public class DeleteRequest extends Request
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", op.getObjectAsPrintable(), mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), mmd.getFullFieldName()));
         }
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
