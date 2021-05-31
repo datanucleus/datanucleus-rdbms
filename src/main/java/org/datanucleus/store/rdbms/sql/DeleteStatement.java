@@ -17,6 +17,7 @@ Contributors:
  **********************************************************************/
 package org.datanucleus.store.rdbms.sql;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -81,6 +82,10 @@ public class DeleteStatement extends SQLStatement
             while (joinIter.hasNext())
             {
                 SQLJoin join = joinIter.next();
+                if (subStmt.joins == null)
+                {
+                    subStmt.joins = new ArrayList<>();
+                }
                 subStmt.joins.add(join);
             }
 
