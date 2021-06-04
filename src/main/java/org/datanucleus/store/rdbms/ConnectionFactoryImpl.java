@@ -35,7 +35,6 @@ import javax.transaction.xa.Xid;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.PropertyNames;
-import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.ConnectionFactoryNotFoundException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
@@ -56,6 +55,7 @@ import org.datanucleus.store.rdbms.connectionpool.DBCP2ConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.DefaultConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.HikariCPConnectionPoolFactory;
 import org.datanucleus.store.rdbms.connectionpool.TomcatConnectionPoolFactory;
+import org.datanucleus.transaction.Transaction;
 import org.datanucleus.transaction.TransactionIsolation;
 import org.datanucleus.transaction.TransactionUtils;
 import org.datanucleus.util.Localiser;

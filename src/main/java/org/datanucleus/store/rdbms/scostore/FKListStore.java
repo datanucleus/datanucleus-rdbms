@@ -30,7 +30,6 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
-import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
@@ -1072,7 +1071,6 @@ public class FKListStore<E> extends AbstractListStore<E>
     protected ListIterator<E> listIterator(ObjectProvider ownerOP, int startIdx, int endIdx)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
-        Transaction tx = ec.getTransaction();
 
         if (elementInfo == null || elementInfo.length == 0)
         {
@@ -1110,7 +1108,8 @@ public class FKListStore<E> extends AbstractListStore<E>
             ownerIdx.addParameterOccurrence(paramPositions);
         }
 
-        if (tx.getSerializeRead() != null && tx.getSerializeRead())
+        Boolean serializeRead = ec.getTransaction().getSerializeRead();
+        if (serializeRead != null && serializeRead)
         {
             sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
         }

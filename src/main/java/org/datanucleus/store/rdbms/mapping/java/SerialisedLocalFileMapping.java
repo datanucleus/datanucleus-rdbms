@@ -25,11 +25,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.TransactionEventListener;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.transaction.TransactionEventListener;
 import org.datanucleus.util.NucleusLogger;
 
 /**

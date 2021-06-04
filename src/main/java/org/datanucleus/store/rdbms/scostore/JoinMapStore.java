@@ -26,10 +26,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.Transaction;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.MapMetaData;
@@ -681,8 +679,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
         }
 
-        Transaction tx = ec.getTransaction();
-        String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? getStmtLocked : getStmtUnlocked);
+        Boolean serializeRead = ec.getTransaction().getSerializeRead();
+        String stmt = (serializeRead != null && serializeRead ? getStmtLocked : getStmtUnlocked);
         Object value = null;
         try
         {

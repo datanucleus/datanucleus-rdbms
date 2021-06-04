@@ -26,7 +26,6 @@ import java.util.Iterator;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
-import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.DiscriminatorStrategy;
@@ -300,8 +299,8 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
             }
         }
 
-        Transaction tx = ec.getTransaction();
-        String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? iteratorStmtLocked : iteratorStmtUnlocked);
+        Boolean serializeRead = ec.getTransaction().getSerializeRead();
+        String stmt = (serializeRead != null && serializeRead ? iteratorStmtLocked : iteratorStmtUnlocked);
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);

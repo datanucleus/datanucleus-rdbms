@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
-import org.datanucleus.Transaction;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.state.ObjectProvider;
@@ -348,9 +347,9 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
     public Iterator<Map.Entry<K, V>> iterator(ObjectProvider ownerOP)
     {
         ExecutionContext ec = ownerOP.getExecutionContext();
-        Transaction tx = ec.getTransaction();
 
-        String stmtSql = tx.getSerializeRead() ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
+        Boolean serializeRead = ec.getTransaction().getSerializeRead();
+        String stmtSql = serializeRead ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
 
         if (stmtSql == null)
         {
@@ -394,7 +393,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 iteratorSelectStmtLockedSql = selectStmt.getSQLText().toSQL();
             }
 
-            stmtSql = tx.getSerializeRead() ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
+            stmtSql = serializeRead ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
         }
 
         try
