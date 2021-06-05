@@ -38,9 +38,9 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Helper class for handling mappings.
@@ -211,7 +211,7 @@ public class MappingHelper
 
             // Make sure the key type is correct for the type of SingleFieldIdentity
             Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(objectIdClass);
-            idObj = ClassUtils.convertValue(idObj, keyType);
+            idObj = TypeConversionHelper.convertTo(idObj, keyType);
             return ec.getNucleusContext().getIdentityManager().getSingleFieldId(objectIdClass, pcClass, idObj);
         }
         catch (Exception e)
@@ -261,7 +261,7 @@ public class MappingHelper
                         // when reflective setter is invoked for incompatible field type
                         // (see http://www.jpox.org/servlet/jira/browse/CORE-2624)
                         Class keyType = IdentityUtils.getKeyTypeForSingleFieldIdentityType(field.getType());
-                        obj = ClassUtils.convertValue(bigDecimal, keyType);
+                        obj = TypeConversionHelper.convertTo(bigDecimal, keyType);
                         if (!bigDecimal.subtract(new BigDecimal("" + obj)).equals(new BigDecimal("0")))
                         {
                             throw new NucleusException("Cannot convert retrieved BigInteger value to field of object id class!").setFatal();
