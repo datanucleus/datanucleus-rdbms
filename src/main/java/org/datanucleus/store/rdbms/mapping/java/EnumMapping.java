@@ -30,9 +30,9 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Table;
+import org.datanucleus.store.types.converters.EnumConversionHelper;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping for Enum type.
@@ -92,7 +92,7 @@ public class EnumMapping extends SingleFieldMapping
                         String[] valueStrings = new String[values.length];
                         for (int i=0;i<values.length;i++)
                         {
-                            valueStrings[i] = (String)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
+                            valueStrings[i] = (String)EnumConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
                         }
                         return valueStrings;
                     }
@@ -100,7 +100,7 @@ public class EnumMapping extends SingleFieldMapping
                     Integer[] valueInts = new Integer[values.length];
                     for (int i=0;i<values.length;i++)
                     {
-                        Number val = (Number)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
+                        Number val = (Number)EnumConversionHelper.getStoredValueFromEnum(mmd, roleForMember, values[i]);
                         valueInts[i] = val.intValue();
                     }
                     return valueInts;
@@ -151,7 +151,7 @@ public class EnumMapping extends SingleFieldMapping
             int intVal = 0;
             if (value instanceof Enum)
             {
-                intVal = ((Number)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value)).intValue();
+                intVal = ((Number)EnumConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value)).intValue();
             }
             else if (value instanceof BigInteger)
             {
@@ -165,7 +165,7 @@ public class EnumMapping extends SingleFieldMapping
             String stringVal = null;
             if (value instanceof Enum)
             {
-                stringVal = (String)TypeConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value);
+                stringVal = (String)EnumConversionHelper.getStoredValueFromEnum(mmd, roleForMember, (Enum)value);
             }
             else if (value instanceof String)
             {
@@ -207,7 +207,7 @@ public class EnumMapping extends SingleFieldMapping
                 enumType = ec.getClassLoaderResolver().classForName(type);
                 return enumType.getEnumConstants()[intVal];
             }
-            return TypeConversionHelper.getEnumForStoredValue(mmd, roleForMember, intVal, ec.getClassLoaderResolver());
+            return EnumConversionHelper.getEnumForStoredValue(mmd, roleForMember, intVal, ec.getClassLoaderResolver());
         }
         else if (datastoreJavaType.equals(ClassNameConstants.JAVA_LANG_STRING))
         {
@@ -217,7 +217,7 @@ public class EnumMapping extends SingleFieldMapping
                 Class enumType = ec.getClassLoaderResolver().classForName(type);
                 return Enum.valueOf(enumType, stringVal);
             }
-            return TypeConversionHelper.getEnumForStoredValue(mmd, roleForMember, stringVal, ec.getClassLoaderResolver());
+            return EnumConversionHelper.getEnumForStoredValue(mmd, roleForMember, stringVal, ec.getClassLoaderResolver());
         }
         else
         {

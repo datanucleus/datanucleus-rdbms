@@ -22,7 +22,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.EnumMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.util.TypeConversionHelper;
+import org.datanucleus.store.types.converters.EnumConversionHelper;
 
 /**
  * Representation of an Enum literal.
@@ -118,7 +118,7 @@ public class EnumLiteral extends EnumExpression implements SQLLiteral
                 EnumMapping m = (EnumMapping)mapping;
                 if (m.getMemberMetaData() != null)
                 {
-                    val = TypeConversionHelper.getStoredValueFromEnum(m.getMemberMetaData(), m.getRoleForMember(), this.value);
+                    val = EnumConversionHelper.getStoredValueFromEnum(m.getMemberMetaData(), m.getRoleForMember(), this.value);
                 }
                 else
                 {
