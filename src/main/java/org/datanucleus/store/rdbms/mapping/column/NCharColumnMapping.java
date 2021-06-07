@@ -20,10 +20,8 @@ package org.datanucleus.store.rdbms.mapping.column;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.text.ParseException;
-import java.util.Calendar;
 
 import org.datanucleus.ClassNameConstants;
 import org.datanucleus.exceptions.NucleusDataStoreException;
@@ -37,7 +35,6 @@ import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping of a NCHAR column.
@@ -317,17 +314,7 @@ public class NCharColumnMapping extends CharColumnMapping
                 }
                 else if (value instanceof java.sql.Timestamp)
                 {
-                    Calendar cal = storeMgr.getCalendarForDateTimezone();
-
-                    // pass the calendar to oracle makes it loses milliseconds
-                    if (cal != null)
-                    {
-                        ps.setTimestamp(param, (Timestamp) value, cal);
-                    }
-                    else
-                    {
-                        ps.setTimestamp(param, (Timestamp) value);
-                    }
+                    ps.setNString(param, ((java.sql.Timestamp)value).toString());
                 }
                 else if (value instanceof java.util.Date)
                 {
@@ -393,6 +380,10 @@ public class NCharColumnMapping extends CharColumnMapping
                 {
                     value = java.sql.Time.valueOf(s);
                 }
+                else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_TIMESTAMP))
+                {
+                    value = java.sql.Timestamp.valueOf(s);
+                }
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_DATE))
                 {
                     value = java.sql.Date.valueOf(s);
@@ -400,11 +391,6 @@ public class NCharColumnMapping extends CharColumnMapping
                 else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_UTIL_DATE))
                 {
                     value = getJavaUtilDateFormat().parse(s);
-                }
-                else if (getJavaTypeMapping().getJavaType().getName().equals(ClassNameConstants.JAVA_SQL_TIMESTAMP))
-                {
-                    Calendar cal = storeMgr.getCalendarForDateTimezone();
-                    value = TypeConversionHelper.stringToTimestamp(s, cal);
                 }
                 else
                 {
