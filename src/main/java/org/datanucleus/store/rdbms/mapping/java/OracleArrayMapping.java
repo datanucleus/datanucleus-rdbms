@@ -29,8 +29,8 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Oracle variant of the ArrayMapping for cases where we are serialising the field into a single column. 
@@ -86,71 +86,71 @@ public class OracleArrayMapping extends ArrayMapping
                 }
                 else if (value instanceof boolean[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromBooleanArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromBooleanArray((boolean[]) value);
                 }
                 else if (value instanceof char[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromCharArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromCharArray((char[]) value);
                 }
                 else if (value instanceof double[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromDoubleArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromDoubleArray((double[]) value);
                 }
                 else if (value instanceof float[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromFloatArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromFloatArray((float[]) value);
                 }
                 else if (value instanceof int[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromIntArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromIntArray((int[]) value);
                 }
                 else if (value instanceof long[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromLongArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromLongArray((long[]) value);
                 }
                 else if (value instanceof short[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromShortArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromShortArray((short[]) value);
                 }
                 else if (value instanceof Boolean[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromBooleanObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromBooleanObjectArray((Boolean[]) value);
                 }
                 else if (value instanceof Byte[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromByteObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromByteObjectArray((Byte[]) value);
                 }
                 else if (value instanceof Character[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromCharObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromCharObjectArray((Character[]) value);
                 }
                 else if (value instanceof Double[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromDoubleObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromDoubleObjectArray((Double[]) value);
                 }
                 else if (value instanceof Float[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromFloatObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromFloatObjectArray((Float[]) value);
                 }
                 else if (value instanceof Integer[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromIntObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromIntObjectArray((Integer[]) value);
                 }
                 else if (value instanceof Long[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromLongObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromLongObjectArray((Long[]) value);
                 }
                 else if (value instanceof Short[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromShortObjectArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromShortObjectArray((Short[]) value);
                 }
                 else if (value instanceof BigDecimal[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromBigDecimalArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromBigDecimalArray((BigDecimal[]) value);
                 }
                 else if (value instanceof BigInteger[])
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromBigIntegerArray(value);
+                    bytes = ArrayConversionHelper.getByteArrayFromBigIntegerArray((BigInteger[]) value);
                 }
                 else if (value instanceof byte[])
                 {
@@ -158,7 +158,7 @@ public class OracleArrayMapping extends ArrayMapping
                 }
                 else if (value instanceof java.util.BitSet)
                 {
-                    bytes = TypeConversionHelper.getByteArrayFromBooleanArray(TypeConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
+                    bytes = ArrayConversionHelper.getByteArrayFromBooleanArray(ArrayConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
                 }
                 else
                 {

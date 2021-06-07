@@ -36,9 +36,9 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.TypeConverterMapping;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.table.Column;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.store.types.converters.TypeConverter;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping of a large binary (e.g BLOB, LONGVARBINARY) column.
@@ -114,87 +114,87 @@ public abstract class AbstractLargeBinaryColumnMapping extends AbstractColumnMap
                 }
                 else if (value instanceof boolean[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromBooleanArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromBooleanArray((boolean[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof char[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromCharArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromCharArray((char[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof double[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromDoubleArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromDoubleArray((double[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof float[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromFloatArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromFloatArray((float[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof int[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromIntArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromIntArray((int[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof long[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromLongArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromLongArray((long[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof short[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromShortArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromShortArray((short[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Boolean[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromBooleanObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromBooleanObjectArray((Boolean[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Byte[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromByteObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromByteObjectArray((Byte[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Character[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromCharObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromCharObjectArray((Character[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Double[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromDoubleObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromDoubleObjectArray((Double[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Float[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromFloatObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromFloatObjectArray((Float[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Integer[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromIntObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromIntObjectArray((Integer[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Long[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromLongObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromLongObjectArray((Long[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof Short[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromShortObjectArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromShortObjectArray((Short[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof BigDecimal[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromBigDecimalArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromBigDecimalArray((BigDecimal[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof BigInteger[])
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromBigIntegerArray(value);
+                    byte[] data = ArrayConversionHelper.getByteArrayFromBigIntegerArray((BigInteger[]) value);
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof byte[])
@@ -203,7 +203,7 @@ public abstract class AbstractLargeBinaryColumnMapping extends AbstractColumnMap
                 }
                 else if (value instanceof java.util.BitSet)
                 {
-                    byte[] data = TypeConversionHelper.getByteArrayFromBooleanArray(TypeConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
+                    byte[] data = ArrayConversionHelper.getByteArrayFromBooleanArray(ArrayConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
                     ps.setBytes(param, data);
                 }
                 else if (value instanceof java.awt.image.BufferedImage)
@@ -262,7 +262,7 @@ public abstract class AbstractLargeBinaryColumnMapping extends AbstractColumnMap
         }
         else if (typeName.equals(ClassNameConstants.BOOLEAN_ARRAY))
         {
-            return TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.BYTE_ARRAY))
         {
@@ -270,71 +270,71 @@ public abstract class AbstractLargeBinaryColumnMapping extends AbstractColumnMap
         }
         else if (typeName.equals(ClassNameConstants.CHAR_ARRAY))
         {
-            return TypeConversionHelper.getCharArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.DOUBLE_ARRAY))
         {
-            return TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.FLOAT_ARRAY))
         {
-            return TypeConversionHelper.getFloatArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.INT_ARRAY))
         {
-            return TypeConversionHelper.getIntArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.LONG_ARRAY))
         {
-            return TypeConversionHelper.getLongArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.SHORT_ARRAY))
         {
-            return TypeConversionHelper.getShortArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_BOOLEAN_ARRAY))
         {
-            return TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_BYTE_ARRAY))
         {
-            return TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getByteObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_CHARACTER_ARRAY))
         {
-            return TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getCharObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_DOUBLE_ARRAY))
         {
-            return TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_FLOAT_ARRAY))
         {
-            return TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getFloatObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_INTEGER_ARRAY))
         {
-            return TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getIntObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_LONG_ARRAY))
         {
-            return TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getLongObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(ClassNameConstants.JAVA_LANG_SHORT_ARRAY))
         {
-            return TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getShortObjectArrayFromByteArray(bytes);
         }
         else if (typeName.equals(BigDecimal[].class.getName()))
         {
-            return TypeConversionHelper.getBigDecimalArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBigDecimalArrayFromByteArray(bytes);
         }
         else if (typeName.equals(BigInteger[].class.getName()))
         {
-            return TypeConversionHelper.getBigIntegerArrayFromByteArray(bytes);
+            return ArrayConversionHelper.getBigIntegerArrayFromByteArray(bytes);
         }
         else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals("java.util.BitSet"))
         {
-            return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
+            return ArrayConversionHelper.getBitSetFromBooleanArray(ArrayConversionHelper.getBooleanArrayFromByteArray(bytes));
         }
         else if (getJavaTypeMapping().getJavaType() != null && getJavaTypeMapping().getJavaType().getName().equals("java.awt.image.BufferedImage"))
         {

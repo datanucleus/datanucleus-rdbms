@@ -28,8 +28,8 @@ import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.util.Localiser;
-import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Mapping for a BitSet type for Oracle.
@@ -64,7 +64,7 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
             }
             else if (value instanceof java.util.BitSet)
             {
-                bytes = TypeConversionHelper.getByteArrayFromBooleanArray(TypeConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
+                bytes = ArrayConversionHelper.getByteArrayFromBooleanArray(ArrayConversionHelper.getBooleanArrayFromBitSet((java.util.BitSet) value));
             }
             else
             {

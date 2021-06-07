@@ -61,10 +61,10 @@ import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
+import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
-import org.datanucleus.util.TypeConversionHelper;
 
 import oracle.sql.BLOB;
 
@@ -153,7 +153,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.BOOLEAN_ARRAY))
                     {
-                        obj = TypeConversionHelper.getBooleanArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getBooleanArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.BYTE_ARRAY))
                     {
@@ -161,7 +161,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.CHAR_ARRAY))
                     {
-                        obj = TypeConversionHelper.getCharArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getCharArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_STRING))
                     {
@@ -169,67 +169,67 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.DOUBLE_ARRAY))
                     {
-                        obj = TypeConversionHelper.getDoubleArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getDoubleArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.FLOAT_ARRAY))
                     {
-                        obj = TypeConversionHelper.getFloatArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getFloatArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.INT_ARRAY))
                     {
-                        obj = TypeConversionHelper.getIntArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getIntArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.LONG_ARRAY))
                     {
-                        obj = TypeConversionHelper.getLongArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getLongArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.SHORT_ARRAY))
                     {
-                        obj = TypeConversionHelper.getShortArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getShortArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_BOOLEAN_ARRAY))
                     {
-                        obj = TypeConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getBooleanObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_BYTE_ARRAY))
                     {
-                        obj = TypeConversionHelper.getByteObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getByteObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_CHARACTER_ARRAY))
                     {
-                        obj = TypeConversionHelper.getCharObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getCharObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_DOUBLE_ARRAY))
                     {
-                        obj = TypeConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getDoubleObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_FLOAT_ARRAY))
                     {
-                        obj = TypeConversionHelper.getFloatObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getFloatObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_INTEGER_ARRAY))
                     {
-                        obj = TypeConversionHelper.getIntObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getIntObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_LONG_ARRAY))
                     {
-                        obj = TypeConversionHelper.getLongObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getLongObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(ClassNameConstants.JAVA_LANG_SHORT_ARRAY))
                     {
-                        obj = TypeConversionHelper.getShortObjectArrayFromByteArray(bytes);
+                        obj = ArrayConversionHelper.getShortObjectArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(BigDecimal[].class.getName()))
                     {
-                        return TypeConversionHelper.getBigDecimalArrayFromByteArray(bytes);
+                        return ArrayConversionHelper.getBigDecimalArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(BigInteger[].class.getName()))
                     {
-                        return TypeConversionHelper.getBigIntegerArrayFromByteArray(bytes);
+                        return ArrayConversionHelper.getBigIntegerArrayFromByteArray(bytes);
                     }
                     else if (getJavaTypeMapping().getType().equals(java.util.BitSet.class.getName()))
                     {
-                        return TypeConversionHelper.getBitSetFromBooleanArray(TypeConversionHelper.getBooleanArrayFromByteArray(bytes));
+                        return ArrayConversionHelper.getBitSetFromBooleanArray(ArrayConversionHelper.getBooleanArrayFromByteArray(bytes));
                     }
                     else
                     {

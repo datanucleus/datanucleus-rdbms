@@ -37,6 +37,7 @@ import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
+import org.datanucleus.util.TypeConversionHelper;
 
 /**
  * Take a ResultSet, and for each row retrieves an object of a specified result class type.
@@ -324,19 +325,20 @@ public class ResultClassROF extends AbstractROF
 
         if (QueryUtils.resultClassIsSimple(resultClass.getName()))
         {
-            // User wants a single field
-            if (fieldValues.length == 1 && (fieldValues[0] == null || resultClass.isAssignableFrom(fieldValues[0].getClass())))
+            if (fieldValues.length == 1)
             {
-                // Simple object is the correct type so just give them the field
-                return fieldValues[0];
+                if (fieldValues[0] == null)
+                {
+                    return null;
+                }
+                Object theValue = TypeConversionHelper.convertTo(fieldValues[0], resultClass);
+                if (theValue != null && resultClass.isAssignableFrom(theValue.getClass()))
+                {
+                    // TODO If we had an error handler from TypeConversionHelper.convertTo then we could detect failure to convert
+                    return theValue;
+                }
             }
-            else if (fieldValues.length == 1 && !resultClass.isAssignableFrom(fieldValues[0].getClass()))
-            {
-                // Simple object is not assignable to the ResultClass so throw an error
-                String msg = Localiser.msg("021202", resultClass.getName(), fieldValues[0].getClass().getName());
-                NucleusLogger.QUERY.error(msg);
-                throw new NucleusUserException(msg);
-            }
+            // If result class is simple yet multiple fields selected, the SQL is inconsistent
         }
         else
         {
