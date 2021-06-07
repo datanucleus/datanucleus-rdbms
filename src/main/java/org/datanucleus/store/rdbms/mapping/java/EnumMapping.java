@@ -58,7 +58,7 @@ public class EnumMapping extends SingleFieldMapping
         }
         else if (mmd != null)
         {
-            if (MetaDataUtils.isJdbcTypeNumeric(TypeConversionHelper.getJdbcTypeForEnum(mmd, roleForMember, clr)))
+            if (MetaDataUtils.isJdbcTypeNumeric(MetaDataUtils.getJdbcTypeForEnum(mmd, roleForMember, clr)))
             {
                 datastoreJavaType = ClassNameConstants.JAVA_LANG_INTEGER;
             }
