@@ -44,8 +44,27 @@ public class AvgWithCastFunction extends AvgFunction
         // Only add the CAST if the argument is a non-floating point
         if (!argType.equals(Double.class) && !argType.equals(Float.class))
         {
+            SQLExpression argExpr = (SQLExpression)args.get(0);
+
+            // Check for an arg that is "AVG(DISTINCT argExpr)", remove DISTINCT, apply CAST, reapply DISTINCT
+            boolean applyDistinct = false;
+            String argSql = argExpr.toSQLText().toString();
+            if (argSql.startsWith("DISTINCT ") && argSql.endsWith(")"))
+            {
+                // Convert argExpr from "DISTINCT arg" to "arg" prior to CAST
+                argExpr.unDistinct();
+                applyDistinct = true;
+            }
+            // Create "CAST(arg as double)"
+            SQLExpression checkedArg = new StringExpression(stmt, m, "CAST", args, asList("double"));
+            if (applyDistinct)
+            {
+                // Convert chedkedArg to "DISTINCT CAST(arg AS double)"
+                checkedArg.distinct();
+            }
+
             checkedArgs = new ArrayList<>();
-            checkedArgs.add(new StringExpression(stmt, m, "CAST", args, asList("double")));
+            checkedArgs.add(checkedArg);
         }
         else
         {
