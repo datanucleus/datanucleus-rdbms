@@ -219,6 +219,20 @@ public class SQLText
     }
 
     /**
+     * Convenience method for the specific situation where you want to remove a DISTINCT that was just applied, hence
+     * removing the last append (of ")") and prepend (of "DISTINCT (").
+     * @return the SQLText
+     */
+    public SQLText removeLastPrependAppend()
+    {
+        sql = null;
+
+        appended.remove(appended.size()-1);
+        appended.remove(0);
+        return this;
+    }
+
+    /**
      * Convenience method to change the mapping used for a parameter, if it is referenced by this
      * SQL text object.
      * @param parameterName Name of the parameter

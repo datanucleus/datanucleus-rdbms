@@ -553,6 +553,21 @@ public abstract class SQLExpression
     }
 
     /**
+     * Method to remove a previously applied DISTINCT operator, to get back to the contained expression.
+     * @return This expression with DISTINCT removed
+     */
+    public SQLExpression unDistinct()
+    {
+        String sql = st.toString();
+        if (sql.startsWith("DISTINCT (") && sql.endsWith(")"))
+        {
+            // TODO Remove the DISTINCT
+            st.removeLastPrependAppend();
+        }
+        return this;
+    }
+
+    /**
      * BITWISE AND operation.
      * @param expr expression representing the bitset
      * @return the bitwise AND expression
