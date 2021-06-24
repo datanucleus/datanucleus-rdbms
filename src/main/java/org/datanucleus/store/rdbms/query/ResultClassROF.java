@@ -76,7 +76,7 @@ public class ResultClassROF extends AbstractROF
     private final Class[] resultFieldTypes;
 
     /** Map of the ResultClass Fields, keyed by the field names (only for user-defined result classes). */
-    private final Map resultClassFieldsByName = new HashMap();
+    private final Map<String, Field> resultClassFieldsByName = new HashMap<>();
 
     /**
      * Constructor for a resultClass object factory where we have a result clause specified.
@@ -495,10 +495,23 @@ public class ResultClassROF extends AbstractROF
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field field : declaredFields)
         {
-            if (!field.isSynthetic() && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null && 
-                !field.getName().startsWith(ec.getMetaDataManager().getEnhancedMethodNamePrefix()))
+            if (!field.isSynthetic() && !field.getName().startsWith(ec.getMetaDataManager().getEnhancedMethodNamePrefix()))
             {
-                throw new NucleusUserException(Localiser.msg("021210", field.getName()));
+                Field currValue = resultClassFieldsByName.put(field.getName().toUpperCase(), field);
+                if (currValue != null)
+                {
+                    if (currValue.getName().equals(field.getName()))
+                    {
+                        // Shadowed field, same name but in superclass. Ignore for now. TODO Allow setting of this
+                        NucleusLogger.GENERAL.info("Result column=" + field.getName().toUpperCase() + " is already mapped to \"" + currValue.toString() + "\"" +
+                            " but result class also has \"" + field.toString() + "\"; this latter field will not be set.");
+                    }
+                    else
+                    {
+                        // Case sensitive field name, whereas column name is not
+                        throw new NucleusUserException(Localiser.msg("021210", field.getName()));
+                    }
+                }
             }
         }
 
