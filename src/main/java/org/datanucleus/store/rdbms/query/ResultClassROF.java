@@ -75,7 +75,7 @@ public class ResultClassROF extends AbstractROF
     private final Class[] resultFieldTypes;
 
     /** Map of the ResultClass Fields, keyed by the field names (only for user-defined result classes). */
-    private final Map resultClassFieldsByName = new HashMap();
+    private final Map<String, Field> resultClassFieldsByName = new HashMap<>();
 
     /**
      * Constructor for a resultClass object factory where we have a result clause specified.
@@ -493,7 +493,9 @@ public class ResultClassROF extends AbstractROF
         Field[] declaredFields = cls.getDeclaredFields();
         for (Field field : declaredFields)
         {
-            if (!field.isSynthetic() && resultClassFieldsByName.put(field.getName().toUpperCase(), field) != null && 
+            Field currValue = null;
+            if (!field.isSynthetic() && (currValue = resultClassFieldsByName.put(field.getName().toUpperCase(), field)) != null &&
+                    !currValue.getName().equals(field.getName()) &&
                 !field.getName().startsWith(ec.getMetaDataManager().getEnhancedMethodNamePrefix()))
             {
                 throw new NucleusUserException(Localiser.msg("021210", field.getName()));
