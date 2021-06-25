@@ -19,9 +19,8 @@ package org.datanucleus.store.rdbms.query;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-//import java.lang.reflect.Member;
-//import java.lang.reflect.Method;
-//import java.lang.reflect.Modifier;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -82,10 +81,10 @@ public class ResultClassROF extends AbstractROF
     /** Map of the ResultClass Fields, keyed by the "field" names (only for user-defined result classes). */
     private final Map<String, Field> resultClassFieldsByName = new HashMap<>();
 
-//    boolean constructionDefined = false;
-//    private Constructor resultClassArgConstructor = null;
-//    private Constructor resultClassDefaultConstructor = null;
-//    private Member[] resultClassFieldMembers = null;
+    boolean constructionDefined = false;
+    private Constructor resultClassArgConstructor = null;
+    private Constructor resultClassDefaultConstructor = null;
+    private ResultClassMemberSetter[] resultClassMemberSetters = null;
 
     /**
      * Constructor for a resultClass object factory where we have a result clause specified.
@@ -268,14 +267,7 @@ public class ResultClassROF extends AbstractROF
             resultFieldValues = new Object[stmtMappings.length];
             for (int i=0; i<stmtMappings.length; i++)
             {
-                if (stmtMappings[i] != null)
-                {
-                    resultFieldValues[i] = stmtMappings[i].getMapping().getObject(ec, rs, stmtMappings[i].getColumnPositions());
-                }
-                else
-                {
-                    resultFieldValues[i] = null;
-                }
+                resultFieldValues[i] = (stmtMappings[i] != null) ? stmtMappings[i].getMapping().getObject(ec, rs, stmtMappings[i].getColumnPositions()) : null;
             }
         }
         else
@@ -318,138 +310,311 @@ public class ResultClassROF extends AbstractROF
                     return theValue;
                 }
             }
-            // If result class is simple yet multiple fields selected, the SQL is inconsistent TODO Catch this at compile
+        }
+        else if (resultFieldValues.length == 1 && resultFieldValues[0] != null && resultClass.isAssignableFrom(resultFieldValues[0].getClass()))
+        {
+            // Special case where user has selected a single field and is of same type as result class
+            // TODO Cater for case where result field type is right type but value is null
+            return resultFieldValues[0];
         }
         else
         {
-            // User requires creation of one of his own type of objects, or a Map
-            if (resultFieldValues.length == 1 && resultFieldValues[0] != null && resultClass.isAssignableFrom(resultFieldValues[0].getClass()))
+            // Subsequent row
+            if (constructionDefined)
             {
-                // Special case where user has selected a single field and is of same type as result class
-                // TODO Cater for case where result field type is right type but value is null
-                return resultFieldValues[0];
-            }
-
-//            if (!constructionDefined)
-//            {
-//                // A. Find a constructor with the correct constructor arguments
-//                resultClassArgConstructor = QueryUtils.getResultClassConstructorForArguments(resultClass, resultFieldTypes, fieldValues);
-//                if (resultClassArgConstructor == null)
-//                {
-//                    // No argumented constructor, so create using default constructor
-//
-//                    // Extract appropriate member for setting each Field
-//                    resultClassFieldMembers = new Member[fieldValues.length];
-//                    for (int i=0;i<fieldValues.length;i++)
-//                    {
-//                        // Update the fields of our object with the field values
-//                        String fieldName = resultFieldNames[i];
-//                        Field field = resultClassFieldsByName.get(fieldName.toUpperCase());
-//                        Object value = fieldValues[i];
-//
-//                        if (resultClassFieldMembers[i] == null)
-//                        {
-//                            // Find (public) field
-//                            String declaredFieldName = (field != null) ? field.getName() : fieldName;
-//                            Field f = ClassUtils.getFieldForClass(resultClass, declaredFieldName);
-//                            if (f != null && Modifier.isPublic(f.getModifiers()))
-//                            {
-//                                // Will use this to either set directly or set to TypeConversionHelper.convertTo(value, f.getType());
-//                                resultClassFieldMembers[i] = f;
-//                            }
-//                        }
-//
-//                        if (resultClassFieldMembers[i] == null)
-//                        {
-//                            // Find (public) setXXX() method
-//                            String setMethodName = (field != null) ? 
-//                                    "set" + fieldName.substring(0,1).toUpperCase() + field.getName().substring(1) : 
-//                                        "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
-//                            Class argType = (value != null) ? value.getClass() : (field != null) ? field.getType() : null;
-//                            Method setMethod = ClassUtils.getMethodWithArgument(resultClass, setMethodName, argType);
-//                            if (setMethod != null && Modifier.isPublic(setMethod.getModifiers()))
-//                            {
-//                                // Where a set method with the exact argument type exists use it
-//                                resultClassFieldMembers[i] = setMethod;
-//                            }
-//                            else if (setMethod == null)
-//                            {
-//                                // Find a method with the right name and a single argument and try conversion of the supplied value
-//                                Method[] methods = (Method[])AccessController.doPrivileged(new PrivilegedAction() 
-//                                {
-//                                    public Object run()
-//                                    {
-//                                        return resultClass.getDeclaredMethods();
-//                                    }
-//                                });
-//                                for (int j=0;j<methods.length;j++)
-//                                {
-//                                    Class[] args = methods[j].getParameterTypes();
-//                                    if (methods[j].getName().equals(setMethodName) && Modifier.isPublic(methods[j].getModifiers()) && args != null && args.length == 1)
-//                                    {
-//                                        setMethod = methods[j];
-//                                        // Use TypeConversionHelper.convertTo(value, args[0]);
-//                                        // TODO Only do this for the method that works then set resultClassFieldMembers[i]
-//                                    }
-//                                }
-//                            }
-//                        }
-//
-//                        if (resultClassFieldMembers[i] == null)
-//                        {
-//                            // Find (public) put() method
-//                            Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
-//                            if (putMethod != null)
-//                            {
-//                                // Set using m.invoke(obj, new Object[]{fieldName, value});
-//                                resultClassFieldMembers[i] = putMethod;
-//                            }
-//                        }
-//                    }
-//                }
-//                constructionDefined = true;
-//            }
-
-            Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, resultFieldValues, resultFieldTypes);
-            if (obj != null)
-            {
-                return obj;
-            }
-            else if (NucleusLogger.QUERY.isDebugEnabled())
-            {
-                // Give debug message that no constructor was found with the right args
-                if (resultFieldNames != null)
+                if (resultClassArgConstructor != null)
                 {
-                    Class[] ctr_arg_types = new Class[resultFieldNames.length];
-                    for (int i=0;i<resultFieldNames.length;i++)
+                    return QueryUtils.createResultObjectUsingArgumentedConstructor(resultClassArgConstructor, resultFieldValues);
+                }
+                else if (resultClassDefaultConstructor != null)
+                {
+                    Object obj = null;
+                    try
                     {
-                        ctr_arg_types[i] = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass() : null;
+                        // Create the object
+                        obj = resultClassDefaultConstructor.newInstance();
                     }
-                    NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
+                    catch (Exception e)
+                    {
+                        String msg = Localiser.msg("021205", resultClass.getName());
+                        NucleusLogger.QUERY.error(msg);
+                        throw new NucleusUserException(msg);
+                    }
+
+                    for (int i=0;i<resultFieldValues.length;i++)
+                    {
+                        // Update the fields of our object with the field values
+                        ResultClassMemberSetter setMember = resultClassMemberSetters[i];
+                        if (setMember != null)
+                        {
+                            boolean set = setMember.set(obj, resultFieldNames[i], resultFieldValues[i]);
+                            if (!set)
+                            {
+                                NucleusLogger.QUERY.warn("ResultClass " + resultClass.getName() + " field=" + resultFieldNames[i] + 
+                                    " set failed (value=" + resultFieldValues[i] + ") setMember=" + setMember);
+                                String fieldType = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass().getName() : "null";
+                                String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
+                                NucleusLogger.QUERY.error(msg);
+                                throw new NucleusUserException(msg);
+                            }
+                        }
+                    }
+
+                    return obj;
+                }
+            }
+
+            // First row
+            if (!constructionDefined)
+            {
+                // A. Find a constructor with the correct constructor arguments
+                Constructor ctr = QueryUtils.getResultClassConstructorForArguments(resultClass, resultFieldTypes, resultFieldValues);
+                if (ctr != null)
+                {
+                    try
+                    {
+                        Object obj = ctr.newInstance(resultFieldValues);
+                        if (NucleusLogger.QUERY.isDebugEnabled())
+                        {
+                            NucleusLogger.QUERY.debug(Localiser.msg("021216", resultClass.getName(), StringUtils.objectArrayToString(resultFieldValues)));
+                        }
+                        resultClassArgConstructor = ctr;
+                        constructionDefined = true;
+                        return obj;
+                    }
+                    catch (Exception e)
+                    {
+                        // do nothing
+                    }
                 }
                 else
                 {
-                    StringBuilder str = new StringBuilder();
-                    if (stmtMappings != null)
+                    if (NucleusLogger.QUERY.isDebugEnabled())
                     {
-                        for (StatementMappingIndex stmtMapping : stmtMappings)
+                        // Give debug message that no constructor was found with the right args
+                        if (resultFieldNames != null)
                         {
-                            if (str.length() > 0)
+                            Class[] ctrArgTypes = new Class[resultFieldNames.length];
+                            for (int i=0;i<resultFieldNames.length;i++)
                             {
-                                str.append(",");
+                                ctrArgTypes[i] = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass() : null;
                             }
-                            Class javaType = stmtMapping.getMapping().getJavaType();
-                            str.append(javaType.getName());
+                            if (NucleusLogger.QUERY.isDebugEnabled())
+                            {
+                                NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), StringUtils.objectArrayToString(ctrArgTypes)));
+                            }
                         }
-                        NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), str.toString()));
+                        else
+                        {
+                            StringBuilder str = new StringBuilder();
+                            if (stmtMappings != null)
+                            {
+                                for (StatementMappingIndex stmtMapping : stmtMappings)
+                                {
+                                    if (str.length() > 0)
+                                    {
+                                        str.append(",");
+                                    }
+                                    Class javaType = stmtMapping.getMapping().getJavaType();
+                                    str.append(javaType.getName());
+                                }
+                                NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), str.toString()));
+                            }
+                        }
                     }
+
+                    // No argumented constructor, so create using default constructor
+                    Object obj = null;
+                    try
+                    {
+                        ctr = resultClass.getDeclaredConstructor();
+                        obj = ctr.newInstance();
+                    }
+                    catch (Exception e)
+                    {
+                        String msg = Localiser.msg("021205", resultClass.getName());
+                        NucleusLogger.QUERY.error(msg);
+                        throw new NucleusUserException(msg);
+                    }
+                    if (NucleusLogger.QUERY.isDebugEnabled())
+                    {
+                        NucleusLogger.QUERY.debug(Localiser.msg("021217", resultClass.getName()));
+                    }
+                    resultClassDefaultConstructor = ctr;
+
+                    // Extract appropriate member for setting each Field
+                    resultClassMemberSetters = new ResultClassMemberSetter[resultFieldValues.length];
+                    for (int i=0;i<resultFieldValues.length;i++)
+                    {
+                        // Update the fields of our object with the field values
+                        String fieldName = resultFieldNames[i];
+                        Field field = resultClassFieldsByName.get(fieldName.toUpperCase());
+                        Object value = resultFieldValues[i];
+
+                        // Try (public) field
+                        String declaredFieldName = (field != null) ? field.getName() : fieldName;
+                        Field f = ClassUtils.getFieldForClass(resultClass, declaredFieldName);
+                        if (f != null && Modifier.isPublic(f.getModifiers()))
+                        {
+                            try
+                            {
+                                f.set(obj, value);
+                                resultClassMemberSetters[i] = new ResultClassFieldSetter(f);
+                                if (NucleusLogger.QUERY.isDebugEnabled())
+                                {
+                                    NucleusLogger.QUERY.debug(Localiser.msg("021218", resultClass.getName(), fieldName));
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                // Unable to set directly, so try converting the value to the type of the field
+                                Object convertedValue = TypeConversionHelper.convertTo(value, f.getType());
+                                if (convertedValue != value)
+                                {
+                                    // Value has been converted so try setting the field now
+                                    try
+                                    {
+                                        f.set(obj, convertedValue);
+                                        resultClassMemberSetters[i] = new ResultClassFieldSetter(f);
+                                        if (NucleusLogger.QUERY.isDebugEnabled())
+                                        {
+                                            NucleusLogger.QUERY.debug(Localiser.msg("021219", resultClass.getName(), fieldName));
+                                        }
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        // Do nothing since unable to convert it
+                                    }
+                                }
+                            }
+
+                            if (resultClassMemberSetters[i] == null)
+                            {
+                                if (NucleusLogger.QUERY.isDebugEnabled())
+                                {
+                                    NucleusLogger.QUERY.debug(Localiser.msg("021209", obj.getClass().getName(), declaredFieldName));
+                                }
+                            }
+                        }
+
+                        if (resultClassMemberSetters[i] == null)
+                        {
+                            // Try (public) setXXX() method
+                            String setMethodName = (field != null) ? 
+                                    "set" + fieldName.substring(0,1).toUpperCase() + field.getName().substring(1) : 
+                                        "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
+                            Class argType = (value != null) ? value.getClass() : (field != null) ? field.getType() : null;
+                            Method setMethod = ClassUtils.getMethodWithArgument(resultClass, setMethodName, argType);
+                            if (setMethod != null && Modifier.isPublic(setMethod.getModifiers()))
+                            {
+                                // Where a set method with the exact argument type exists use it
+                                try
+                                {
+                                    setMethod.invoke(obj, new Object[]{value});
+                                    resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, null);
+                                    if (NucleusLogger.QUERY.isDebugEnabled())
+                                    {
+                                        NucleusLogger.QUERY.debug(Localiser.msg("021220", resultClass.getName(), fieldName));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    //do nothing
+                                }
+                            }
+                            else if (setMethod == null)
+                            {
+                                // Find a method with the right name and a single argument and try conversion of the supplied value
+                                Method[] methods = (Method[])AccessController.doPrivileged(new PrivilegedAction() 
+                                {
+                                    public Object run()
+                                    {
+                                        return resultClass.getDeclaredMethods();
+                                    }
+                                });
+                                for (int j=0;j<methods.length;j++)
+                                {
+                                    Class[] args = methods[j].getParameterTypes();
+                                    if (methods[j].getName().equals(setMethodName) && Modifier.isPublic(methods[j].getModifiers()) && args != null && args.length == 1)
+                                    {
+                                        try
+                                        {
+                                            Object convValue = TypeConversionHelper.convertTo(value, args[0]);
+                                            methods[i].invoke(obj, new Object[]{convValue});
+                                            resultClassMemberSetters[i] = new ResultClassSetMethodSetter(setMethod, args[0]);
+                                            if (NucleusLogger.QUERY.isDebugEnabled())
+                                            {
+                                                NucleusLogger.QUERY.debug(Localiser.msg("021221", resultClass.getName(), fieldName));
+                                            }
+                                            break;
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            //do nothing
+                                        }
+                                    }
+                                }
+                            }
+                            if (resultClassMemberSetters[i] == null)
+                            {
+                                if (NucleusLogger.QUERY.isDebugEnabled())
+                                {
+                                    NucleusLogger.QUERY.debug(Localiser.msg("021207", obj.getClass().getName(), setMethodName, argType != null ? argType.getName() : null));
+                                }
+                            }
+                        }
+
+                        if (resultClassMemberSetters[i] == null)
+                        {
+                            // Try (public) put() method
+                            Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
+                            if (putMethod != null)
+                            {
+                                try
+                                {
+                                    putMethod.invoke(obj, new Object[]{fieldName, value});
+                                    resultClassMemberSetters[i] = new ResultClassPutMethodSetter(putMethod);
+                                    if (NucleusLogger.QUERY.isDebugEnabled())
+                                    {
+                                        NucleusLogger.QUERY.debug(Localiser.msg("021222", resultClass.getName(), fieldName));
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    //do nothing
+                                }
+                            }
+                            else
+                            {
+                                if (NucleusLogger.QUERY.isDebugEnabled())
+                                {
+                                    NucleusLogger.QUERY.debug(Localiser.msg("021208", obj.getClass().getName(), "put"));
+                                }
+                            }
+                        }
+
+                        if (resultClassMemberSetters[i] == null)
+                        {
+                            // Impossible to set the field value
+                            if (field == null) 
+                            {
+                                // Field was null, and impossible to find setter etc either. Column doesn't exist in result class
+                                NucleusLogger.GENERAL.info(Localiser.msg("021215", resultFieldNames[i]));
+                            }
+                            else
+                            {
+                                String fieldType = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass().getName() : "null";
+                                String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
+                                NucleusLogger.QUERY.error(msg);
+                                throw new NucleusUserException(msg);
+                            }
+                        }
+                    }
+
+                    constructionDefined = true;
+                    return obj;
                 }
             }
-
-            // B. No argumented constructor exists so create an object and update fields using fields/put method/set method
-            obj = QueryUtils.createResultObjectUsingDefaultConstructorAndSetters(resultClass, resultFieldNames, resultClassFieldsByName, resultFieldValues);
-
-            return obj;
         }
 
         // Impossible to satisfy the resultClass requirements so throw exception
@@ -718,5 +883,124 @@ public class ResultClassROF extends AbstractROF
 
         // User has specified Object/Object[] so just retrieve generically
         return rs.getObject(columnNumber);
+    }
+
+    interface ResultClassMemberSetter
+    {
+        public boolean set(Object obj, String fieldName, Object value);
+    }
+
+    /**
+     * Class that sets a field of the ResultClass using a public field.
+     * This is done either using the value passed in directly, or by first converting it to the required field type.
+     */
+    class ResultClassFieldSetter implements ResultClassMemberSetter
+    {
+        Field field;
+        public ResultClassFieldSetter(Field f)
+        {
+            this.field = f;
+        }
+
+        public boolean set(Object obj, String fieldName, Object value)
+        {
+            // Field is of the precise type
+            Object fieldValue = value;
+            if (field.getType().isAssignableFrom(value.getClass()))
+            {
+                Object convertedValue = TypeConversionHelper.convertTo(value, field.getType());
+                if (convertedValue != value)
+                {
+                    fieldValue = convertedValue;
+                }
+            }
+
+            try
+            {
+                field.set(obj, fieldValue);
+                return true;
+            }
+            catch (Exception e)
+            {
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * Class that sets a field of the ResultClass using a setter method.
+     * This is done either using the value passed in directly, or by first converting it to a specified argument type.
+     */
+    class ResultClassSetMethodSetter implements ResultClassMemberSetter
+    {
+        Method setterMethod;
+        Class argType;
+        public ResultClassSetMethodSetter(Method m, Class argType)
+        {
+            this.setterMethod = m;
+            this.argType = argType;
+        }
+
+        public boolean set(Object obj, String fieldName, Object value)
+        {
+            if (argType == null)
+            {
+                // Setter takes in the precise value
+                try
+                {
+                    setterMethod.invoke(obj, new Object[]{value});
+                    return true;
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            else
+            {
+                // Setter takes in a value that needs converting first
+                try
+                {
+                    Object convValue = TypeConversionHelper.convertTo(value, argType);
+                    setterMethod.invoke(obj, new Object[]{convValue});
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    //do nothing
+                }
+            }
+
+            return false;
+        }
+    }
+
+
+    /**
+     * Class that sets a field of the ResultClass using a put() method.
+     */
+    class ResultClassPutMethodSetter implements ResultClassMemberSetter
+    {
+        Method putMethod;
+
+        public ResultClassPutMethodSetter(Method m)
+        {
+            this.putMethod = m;
+        }
+
+        public boolean set(Object obj, String fieldName, Object value)
+        {
+            try
+            {
+                putMethod.invoke(obj, new Object[]{fieldName, value});
+                return true;
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+
+            return false;
+        }
     }
 }
