@@ -350,8 +350,6 @@ public class ResultClassROF extends AbstractROF
                             boolean set = setMember.set(obj, resultFieldNames[i], resultFieldValues[i]);
                             if (!set)
                             {
-                                NucleusLogger.QUERY.warn("ResultClass " + resultClass.getName() + " field=" + resultFieldNames[i] + 
-                                    " set failed (value=" + resultFieldValues[i] + ") setMember=" + setMember);
                                 String fieldType = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass().getName() : "null";
                                 String msg = Localiser.msg("021204", resultClass.getName(), resultFieldNames[i], fieldType);
                                 NucleusLogger.QUERY.error(msg);
@@ -599,7 +597,7 @@ public class ResultClassROF extends AbstractROF
                             if (field == null) 
                             {
                                 // Field was null, and impossible to find setter etc either. Column doesn't exist in result class
-                                NucleusLogger.GENERAL.info(Localiser.msg("021215", resultFieldNames[i]));
+                                NucleusLogger.QUERY.info(Localiser.msg("021215", resultFieldNames[i]));
                             }
                             else
                             {
@@ -727,7 +725,7 @@ public class ResultClassROF extends AbstractROF
                     if (currValue.getName().equals(field.getName()))
                     {
                         // Shadowed field, same name but in superclass. Ignore for now. TODO Allow setting of this
-                        NucleusLogger.GENERAL.info("Result column=" + field.getName().toUpperCase() + " is already mapped to \"" + currValue.toString() + "\"" +
+                        NucleusLogger.QUERY.info("Result column=" + field.getName().toUpperCase() + " is already mapped to \"" + currValue.toString() + "\"" +
                             " but result class also has \"" + field.toString() + "\"; this latter field will not be set.");
                     }
                     else
