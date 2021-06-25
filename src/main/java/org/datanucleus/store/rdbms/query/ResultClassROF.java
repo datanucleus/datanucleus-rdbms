@@ -101,29 +101,20 @@ public class ResultClassROF extends AbstractROF
         super(ec, rs, ignoreCache, fp);
 
         // Set the result class that we convert each row into
-        Class tmpClass = null;
         if (cls != null && cls.getName().equals("java.util.Map"))
         {
             // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
-            tmpClass = HashMap.class;
+            this.resultClass = HashMap.class;
         }
         else if (cls == null)
         {
             // No result class specified so return Object/Object[] depending on number of expressions
-            if (resultDefinition != null && resultDefinition.getNumberOfResultExpressions() == 1)
-            {
-                tmpClass = Object.class;
-            }
-            else
-            {
-                tmpClass = Object[].class;
-            }
+            this.resultClass = (resultDefinition != null && resultDefinition.getNumberOfResultExpressions() == 1) ? Object.class : Object[].class;
         }
         else
         {
-            tmpClass = cls;
+            this.resultClass = cls;
         }
-        this.resultClass = tmpClass;
 
         this.resultDefinition = resultDefinition;
         this.stmtMappings = null;
@@ -175,18 +166,8 @@ public class ResultClassROF extends AbstractROF
     {
         super(ec, rs, ignoreCache, fp);
 
-        // Set the result class that we convert each row into
-        Class tmpClass = null;
-        if (cls != null && cls.getName().equals("java.util.Map"))
-        {
-            // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
-            tmpClass = HashMap.class;
-        }
-        else
-        {
-            tmpClass = cls;
-        }
-        this.resultClass = tmpClass;
+        // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
+        this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;
         this.resultDefinition = null;
 
         // TODO Change underlying to just save the classDefinition
@@ -245,22 +226,22 @@ public class ResultClassROF extends AbstractROF
     public Object getObject()
     {
         // Retrieve the field values from the ResultSet
-        Object[] fieldValues = null;
+        Object[] resultFieldValues = null;
         if (resultDefinition != null)
         {
-            fieldValues = new Object[resultDefinition.getNumberOfResultExpressions()];
+            resultFieldValues = new Object[resultDefinition.getNumberOfResultExpressions()];
             for (int i=0;i<resultDefinition.getNumberOfResultExpressions();i++)
             {
                 Object stmtMap = resultDefinition.getMappingForResultExpression(i);
                 if (stmtMap instanceof StatementMappingIndex)
                 {
                     StatementMappingIndex idx = (StatementMappingIndex)stmtMap;
-                    fieldValues[i] = idx.getMapping().getObject(ec, rs, idx.getColumnPositions());
+                    resultFieldValues[i] = idx.getMapping().getObject(ec, rs, idx.getColumnPositions());
                 }
                 else if (stmtMap instanceof StatementNewObjectMapping)
                 {
                     StatementNewObjectMapping newIdx = (StatementNewObjectMapping)stmtMap;
-                    fieldValues[i] = getValueForNewObject(newIdx, ec, rs);
+                    resultFieldValues[i] = getValueForNewObject(newIdx, ec, rs);
                 }
                 else if (stmtMap instanceof StatementClassMapping)
                 {
@@ -268,14 +249,14 @@ public class ResultClassROF extends AbstractROF
                     Class cls = ec.getClassLoaderResolver().classForName(classMap.getClassName());
                     AbstractClassMetaData acmd = ec.getMetaDataManager().getMetaDataForClass(cls, ec.getClassLoaderResolver());
                     PersistentClassROF rof = new PersistentClassROF(ec, rs, ignoreCache, fp, classMap, acmd, cls);
-                    fieldValues[i] = rof.getObject();
+                    resultFieldValues[i] = rof.getObject();
 
                     if (resultDefinition.getNumberOfResultExpressions() == 1)
                     {
                         if (classMap.getClassName().equals(resultClass.getName()))
                         {
                             // Special case of the result class being a persistent class so just return it
-                            return fieldValues[0];
+                            return resultFieldValues[0];
                         }
                     }
                 }
@@ -284,16 +265,16 @@ public class ResultClassROF extends AbstractROF
         else if (stmtMappings != null)
         {
             // Field mapping information available so use it to allocate our results
-            fieldValues = new Object[stmtMappings.length];
+            resultFieldValues = new Object[stmtMappings.length];
             for (int i=0; i<stmtMappings.length; i++)
             {
                 if (stmtMappings[i] != null)
                 {
-                    fieldValues[i] = stmtMappings[i].getMapping().getObject(ec, rs, stmtMappings[i].getColumnPositions());
+                    resultFieldValues[i] = stmtMappings[i].getMapping().getObject(ec, rs, stmtMappings[i].getColumnPositions());
                 }
                 else
                 {
-                    fieldValues[i] = null;
+                    resultFieldValues[i] = null;
                 }
             }
         }
@@ -302,10 +283,10 @@ public class ResultClassROF extends AbstractROF
             // No field mapping info, so allocate our results in the ResultSet parameter order.
             try
             {
-                fieldValues = new Object[resultFieldNames != null ? resultFieldNames.length : 0];
-                for (int i=0; i<fieldValues.length; i++)
+                resultFieldValues = new Object[resultFieldNames != null ? resultFieldNames.length : 0];
+                for (int i=0; i<resultFieldValues.length; i++)
                 {
-                    fieldValues[i] = getResultObject(rs, i+1);
+                    resultFieldValues[i] = getResultObject(rs, i+1);
                 }
             }
             catch (SQLException sqe)
@@ -319,18 +300,18 @@ public class ResultClassROF extends AbstractROF
         // If the user requires Object[] then just give them what we have
         if (resultClass == Object[].class)
         {
-            return fieldValues;
+            return resultFieldValues;
         }
 
         if (QueryUtils.resultClassIsSimple(resultClass.getName()))
         {
-            if (fieldValues.length == 1)
+            if (resultFieldValues.length == 1)
             {
-                if (fieldValues[0] == null)
+                if (resultFieldValues[0] == null)
                 {
                     return null;
                 }
-                Object theValue = TypeConversionHelper.convertTo(fieldValues[0], resultClass);
+                Object theValue = TypeConversionHelper.convertTo(resultFieldValues[0], resultClass);
                 if (theValue != null && resultClass.isAssignableFrom(theValue.getClass()))
                 {
                     // TODO If we had an error handler from TypeConversionHelper.convertTo then we could detect failure to convert
@@ -342,11 +323,11 @@ public class ResultClassROF extends AbstractROF
         else
         {
             // User requires creation of one of his own type of objects, or a Map
-            if (fieldValues.length == 1 && fieldValues[0] != null && resultClass.isAssignableFrom(fieldValues[0].getClass()))
+            if (resultFieldValues.length == 1 && resultFieldValues[0] != null && resultClass.isAssignableFrom(resultFieldValues[0].getClass()))
             {
                 // Special case where user has selected a single field and is of same type as result class
                 // TODO Cater for case where result field type is right type but value is null
-                return fieldValues[0];
+                return resultFieldValues[0];
             }
 
 //            if (!constructionDefined)
@@ -429,7 +410,7 @@ public class ResultClassROF extends AbstractROF
 //                constructionDefined = true;
 //            }
 
-            Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, fieldValues, resultFieldTypes);
+            Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, resultFieldValues, resultFieldTypes);
             if (obj != null)
             {
                 return obj;
@@ -442,7 +423,7 @@ public class ResultClassROF extends AbstractROF
                     Class[] ctr_arg_types = new Class[resultFieldNames.length];
                     for (int i=0;i<resultFieldNames.length;i++)
                     {
-                        ctr_arg_types[i] = (fieldValues[i] != null) ? fieldValues[i].getClass() : null;
+                        ctr_arg_types[i] = (resultFieldValues[i] != null) ? resultFieldValues[i].getClass() : null;
                     }
                     NucleusLogger.QUERY.debug(Localiser.msg("021206", resultClass.getName(), StringUtils.objectArrayToString(ctr_arg_types)));
                 }
@@ -466,7 +447,7 @@ public class ResultClassROF extends AbstractROF
             }
 
             // B. No argumented constructor exists so create an object and update fields using fields/put method/set method
-            obj = QueryUtils.createResultObjectUsingDefaultConstructorAndSetters(resultClass, resultFieldNames, resultClassFieldsByName, fieldValues);
+            obj = QueryUtils.createResultObjectUsingDefaultConstructorAndSetters(resultClass, resultFieldNames, resultClassFieldsByName, resultFieldValues);
 
             return obj;
         }
