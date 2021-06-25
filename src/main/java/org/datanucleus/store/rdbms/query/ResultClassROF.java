@@ -19,6 +19,9 @@ package org.datanucleus.store.rdbms.query;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+//import java.lang.reflect.Member;
+//import java.lang.reflect.Method;
+//import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -73,10 +76,16 @@ public class ResultClassROF extends AbstractROF
     /** Names of the result field columns (in the ResultSet). */
     private final String[] resultFieldNames;
 
+    /** Types of the result field columns (in the ResultSet). */
     private final Class[] resultFieldTypes;
 
-    /** Map of the ResultClass Fields, keyed by the field names (only for user-defined result classes). */
+    /** Map of the ResultClass Fields, keyed by the "field" names (only for user-defined result classes). */
     private final Map<String, Field> resultClassFieldsByName = new HashMap<>();
+
+//    boolean constructionDefined = false;
+//    private Constructor resultClassArgConstructor = null;
+//    private Constructor resultClassDefaultConstructor = null;
+//    private Member[] resultClassFieldMembers = null;
 
     /**
      * Constructor for a resultClass object factory where we have a result clause specified.
@@ -194,9 +203,8 @@ public class ResultClassROF extends AbstractROF
     }
 
     /**
-     * Constructor for cases where we have no candidate class and so have no mapping information
-     * to base field positions on. The fields will be retrieved in the ResultSet order.
-     * Used for SQL queries.
+     * Constructor for cases where we have no candidate class and so have no mapping information to base field positions on. 
+     * The fields will be retrieved in the ResultSet order. Used for SQL queries.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
      * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
@@ -208,17 +216,8 @@ public class ResultClassROF extends AbstractROF
     {
         super(ec, rs, ignoreCache, fp);
 
-        Class tmpClass = null;
-        if (cls != null && cls.getName().equals("java.util.Map"))
-        {
-            // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
-            tmpClass = HashMap.class;
-        }
-        else
-        {
-            tmpClass = cls;
-        }
-        this.resultClass = tmpClass;
+        // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
+        this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;
 
         if (QueryUtils.resultClassIsUserType(resultClass.getName()))
         {
@@ -338,7 +337,7 @@ public class ResultClassROF extends AbstractROF
                     return theValue;
                 }
             }
-            // If result class is simple yet multiple fields selected, the SQL is inconsistent
+            // If result class is simple yet multiple fields selected, the SQL is inconsistent TODO Catch this at compile
         }
         else
         {
@@ -350,7 +349,86 @@ public class ResultClassROF extends AbstractROF
                 return fieldValues[0];
             }
 
-            // A. Find a constructor with the correct constructor arguments
+//            if (!constructionDefined)
+//            {
+//                // A. Find a constructor with the correct constructor arguments
+//                resultClassArgConstructor = QueryUtils.getResultClassConstructorForArguments(resultClass, resultFieldTypes, fieldValues);
+//                if (resultClassArgConstructor == null)
+//                {
+//                    // No argumented constructor, so create using default constructor
+//
+//                    // Extract appropriate member for setting each Field
+//                    resultClassFieldMembers = new Member[fieldValues.length];
+//                    for (int i=0;i<fieldValues.length;i++)
+//                    {
+//                        // Update the fields of our object with the field values
+//                        String fieldName = resultFieldNames[i];
+//                        Field field = resultClassFieldsByName.get(fieldName.toUpperCase());
+//                        Object value = fieldValues[i];
+//
+//                        if (resultClassFieldMembers[i] == null)
+//                        {
+//                            // Find (public) field
+//                            String declaredFieldName = (field != null) ? field.getName() : fieldName;
+//                            Field f = ClassUtils.getFieldForClass(resultClass, declaredFieldName);
+//                            if (f != null && Modifier.isPublic(f.getModifiers()))
+//                            {
+//                                // Will use this to either set directly or set to TypeConversionHelper.convertTo(value, f.getType());
+//                                resultClassFieldMembers[i] = f;
+//                            }
+//                        }
+//
+//                        if (resultClassFieldMembers[i] == null)
+//                        {
+//                            // Find (public) setXXX() method
+//                            String setMethodName = (field != null) ? 
+//                                    "set" + fieldName.substring(0,1).toUpperCase() + field.getName().substring(1) : 
+//                                        "set" + fieldName.substring(0,1).toUpperCase() + fieldName.substring(1);
+//                            Class argType = (value != null) ? value.getClass() : (field != null) ? field.getType() : null;
+//                            Method setMethod = ClassUtils.getMethodWithArgument(resultClass, setMethodName, argType);
+//                            if (setMethod != null && Modifier.isPublic(setMethod.getModifiers()))
+//                            {
+//                                // Where a set method with the exact argument type exists use it
+//                                resultClassFieldMembers[i] = setMethod;
+//                            }
+//                            else if (setMethod == null)
+//                            {
+//                                // Find a method with the right name and a single argument and try conversion of the supplied value
+//                                Method[] methods = (Method[])AccessController.doPrivileged(new PrivilegedAction() 
+//                                {
+//                                    public Object run()
+//                                    {
+//                                        return resultClass.getDeclaredMethods();
+//                                    }
+//                                });
+//                                for (int j=0;j<methods.length;j++)
+//                                {
+//                                    Class[] args = methods[j].getParameterTypes();
+//                                    if (methods[j].getName().equals(setMethodName) && Modifier.isPublic(methods[j].getModifiers()) && args != null && args.length == 1)
+//                                    {
+//                                        setMethod = methods[j];
+//                                        // Use TypeConversionHelper.convertTo(value, args[0]);
+//                                        // TODO Only do this for the method that works then set resultClassFieldMembers[i]
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        if (resultClassFieldMembers[i] == null)
+//                        {
+//                            // Find (public) put() method
+//                            Method putMethod = QueryUtils.getPublicPutMethodForResultClass(resultClass);
+//                            if (putMethod != null)
+//                            {
+//                                // Set using m.invoke(obj, new Object[]{fieldName, value});
+//                                resultClassFieldMembers[i] = putMethod;
+//                            }
+//                        }
+//                    }
+//                }
+//                constructionDefined = true;
+//            }
+
             Object obj = QueryUtils.createResultObjectUsingArgumentedConstructor(resultClass, fieldValues, resultFieldTypes);
             if (obj != null)
             {
