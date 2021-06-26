@@ -156,14 +156,12 @@ public class ResultClassROF extends AbstractROF
      * In this case the result will match the candidate class, but may not be the actual candidate class (e.g Object[])
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
-     * @param fp FetchPlan
      * @param cls The result class to use
      * @param classDefinition The mapping information for the (candidate) class
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, StatementClassMapping classDefinition)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, StatementClassMapping classDefinition)
     {
-        super(ec, rs, ignoreCache, fp);
+        super(ec, rs, false, null);
 
         // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
         this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;
@@ -187,14 +185,12 @@ public class ResultClassROF extends AbstractROF
      * The fields will be retrieved in the ResultSet order. Used for SQL queries.
      * @param ec ExecutionContext
      * @param rs ResultSet being processed
-     * @param ignoreCache Whether we should ignore the cache(s) when instantiating persistable objects
-     * @param fp FetchPlan
      * @param cls The result class to use
      * @param resultFieldNames Names for the result fields
      */
-    public ResultClassROF(ExecutionContext ec, ResultSet rs, boolean ignoreCache, FetchPlan fp, Class cls, String[] resultFieldNames)
+    public ResultClassROF(ExecutionContext ec, ResultSet rs, Class cls, String[] resultFieldNames)
     {
-        super(ec, rs, ignoreCache, fp);
+        super(ec, rs, false, null);
 
         // JDO Spec 14.6.12 If user specifies java.util.Map, then impl chooses its own implementation Map class
         this.resultClass = (cls != null && cls.getName().equals("java.util.Map")) ? HashMap.class : cls;

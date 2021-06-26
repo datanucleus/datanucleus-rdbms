@@ -562,6 +562,6 @@ public class RDBMSQueryUtils extends QueryUtils
             // Do nothing
         }
 
-        return new ResultClassROF(ec, rs, false, ec.getFetchPlan(), requiredResultClass, resultFieldNames);
+        return new ResultClassROF(ec, rs, requiredResultClass, resultFieldNames);
     }
 }
