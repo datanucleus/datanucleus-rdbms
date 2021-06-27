@@ -1006,14 +1006,22 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
     protected StatementNewObjectMapping getStatementMappingForNewObjectExpression(NewObjectExpression expr, SelectStatement stmt)
     {
         List<SQLExpression> argExprs = expr.getConstructorArgExpressions();
+        List<String> argAliases = expr.getConstructorArgAliases();
         StatementNewObjectMapping stmtMap = new StatementNewObjectMapping(expr.getNewClass());
         if (argExprs != null)
         {
             Iterator<SQLExpression> argIter = argExprs.iterator();
+            Iterator<String> argAliasIter = (argAliases != null) ? argAliases.iterator() : null;
             int j = 0;
             while (argIter.hasNext())
             {
                 SQLExpression argExpr = argIter.next();
+                String argAlias = (argAliasIter != null) ? argAliasIter.next() : null;
+                if (argAlias != null && argAlias.equals("####"))
+                {
+                    argAlias = null;
+                }
+
                 if (argExpr instanceof SQLLiteral)
                 {
                     stmtMap.addConstructorArgMapping(j, ((SQLLiteral)argExpr).getValue());
@@ -1025,7 +1033,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 else
                 {
                     StatementMappingIndex idx = new StatementMappingIndex(argExpr.getJavaTypeMapping());
-                    int[] cols = stmt.select(argExpr, null);
+                    int[] cols = stmt.select(argExpr, argAlias);
                     idx.setColumnPositions(cols);
                     stmtMap.addConstructorArgMapping(j, idx);
                 }
@@ -4912,17 +4920,25 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
         }
 
         List<SQLExpression> ctrArgExprs = null;
+        List<String> ctrArgAliases = null;
+        boolean hasAliases = false;
         List args = expr.getArguments();
         if (args != null)
         {
             Class[] ctrArgTypes = new Class[args.size()];
             boolean[] ctrArgTypeCheck = new boolean[args.size()];
             ctrArgExprs = new ArrayList<>(args.size());
+            ctrArgAliases = new ArrayList<>(args.size());
             Iterator iter = args.iterator();
             int i = 0;
             while (iter.hasNext())
             {
                 Expression argExpr = (Expression)iter.next();
+                String argAlias = argExpr.getAlias();
+                if (argAlias != null)
+                {
+                    hasAliases = true;
+                }
                 SQLExpression sqlExpr = (SQLExpression)evaluate(argExpr);
                 // TODO Cater for "SQL_function" mapping on to ANY type of constructor argument at that position since we don't know the precise type
                 if (argExpr instanceof InvokeExpression && ((InvokeExpression)argExpr).getOperation().equalsIgnoreCase("SQL_function"))
@@ -4935,6 +4951,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
                 }
 
                 ctrArgExprs.add(sqlExpr);
+                ctrArgAliases.add(argAlias != null ? argAlias : "####");
                 if (sqlExpr instanceof NewObjectExpression)
                 {
                     ctrArgTypes[i] = ((NewObjectExpression)sqlExpr).getNewClass();
@@ -4960,6 +4977,10 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
 
         // TODO Retain the selected constructor (above)
         NewObjectExpression newExpr = new NewObjectExpression(stmt, cls, ctrArgExprs);
+        if (hasAliases)
+        {
+            newExpr.setArgAliases(ctrArgAliases);
+        }
         stack.push(newExpr);
         return newExpr;
     }

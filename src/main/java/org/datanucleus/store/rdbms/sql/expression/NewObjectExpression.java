@@ -33,6 +33,9 @@ public class NewObjectExpression extends SQLExpression
     /** The argument expressions to use in the constructor. */
     List<SQLExpression> ctrArgExprs = null;
 
+    /** Optional aliases for the constructor arg expressions. */
+    List<String> ctrArgAliases = null;
+
     /**
      * @param stmt SQLStatement that this is part of
      * @param cls Class that we create an instance of
@@ -50,6 +53,12 @@ public class NewObjectExpression extends SQLExpression
         }
     }
 
+    public void setArgAliases(List<String> aliases)
+    {
+        ctrArgAliases = new ArrayList<>();
+        ctrArgAliases.addAll(aliases);
+    }
+
     public Class getNewClass()
     {
         return newClass;
@@ -58,5 +67,10 @@ public class NewObjectExpression extends SQLExpression
     public List<SQLExpression> getConstructorArgExpressions()
     {
         return ctrArgExprs;
+    }
+
+    public List<String> getConstructorArgAliases()
+    {
+        return ctrArgAliases;
     }
 }
