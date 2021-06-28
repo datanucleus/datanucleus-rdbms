@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -88,7 +87,7 @@ public class FetchRequest extends Request
     private StatementClassMapping mappingDefinition;
 
     /** Callbacks for postFetch() operations, to be called after the fetch itself (relation fields). */
-    private final MappingCallbacks[] callbacks;
+    private final List<MappingCallbacks> mappingCallbacks;
 
     private int numberOfFieldsToFetch = 0;
 
@@ -172,9 +171,8 @@ public class FetchRequest extends Request
         // Generate the statement for the requested members
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
         mappingDefinition = new StatementClassMapping();
-        Collection<MappingCallbacks> fetchCallbacks = new HashSet<>();
-        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, fetchCallbacks, clr);
-        callbacks = fetchCallbacks.toArray(new MappingCallbacks[fetchCallbacks.size()]);
+        mappingCallbacks = new ArrayList<>();
+        numberOfFieldsToFetch = processMembersOfClass(sqlStatement, mmds, table, sqlStatement.getPrimaryTable(), mappingDefinition, mappingCallbacks, clr);
         memberNumbersToFetch = mappingDefinition.getMemberNumbers();
 
         // Add WHERE clause restricting to an object of this type
@@ -499,9 +497,12 @@ public class FetchRequest extends Request
         }
 
         // Execute any mapping actions now that we have fetched the fields
-        for (int i = 0; i < callbacks.length; ++i)
+        if (mappingCallbacks != null)
         {
-            callbacks[i].postFetch(op);
+            for (MappingCallbacks m : mappingCallbacks)
+            {
+                m.postFetch(op);
+            }
         }
     }
 

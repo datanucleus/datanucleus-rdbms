@@ -80,7 +80,7 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class DeleteRequest extends Request
 {
-    private final MappingCallbacks[] callbacks;
+    private final List<MappingCallbacks> mappingCallbacks;
 
     /** Statement for deleting the object from the datastore. */
     private final String deleteStmt;
@@ -178,7 +178,7 @@ public class DeleteRequest extends Request
         softDeleteStmt = (table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE) != null) ? consumer.getSoftDeleteStatement() : null;
 
         whereFieldNumbers = consumer.getWhereFieldNumbers();
-        callbacks = (MappingCallbacks[])consumer.getMappingCallBacks().toArray(new MappingCallbacks[consumer.getMappingCallBacks().size()]);
+        mappingCallbacks = consumer.getMappingCallBacks();
         oneToOneNonOwnerFields = consumer.getOneToOneNonOwnerFields();
     }
 
@@ -200,40 +200,43 @@ public class DeleteRequest extends Request
         // b). Null any non-dependent objects with FK at other side
         ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
         Set relatedObjectsToDelete = null;
-        for (int i = 0; i < callbacks.length; ++i)
+        if (mappingCallbacks != null)
         {
-            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+            for (MappingCallbacks m : mappingCallbacks)
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                    ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
-            }
-            callbacks[i].preDelete(op);
-
-            // Check for any dependent related 1-1 objects where we hold the FK and where the object hasn't been deleted. 
-            // This can happen if this DeleteRequest was triggered by delete-orphans and so the related object has to be deleted *after* this object.
-            // It's likely we could do this better by using AttachFieldManager and just marking the "orphan" (i.e this object) as deleted 
-            // (see AttachFieldManager TODO regarding when not copying)
-            JavaTypeMapping mapping = (JavaTypeMapping) callbacks[i];
-            AbstractMemberMetaData mmd = mapping.getMemberMetaData();
-            RelationType relationType = mmd.getRelationType(clr);
-            if (mmd.isDependent() && (relationType == RelationType.ONE_TO_ONE_UNI || (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)))
-            {
-                try
+                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    op.isLoaded(mmd.getAbsoluteFieldNumber());
-                    Object relatedPc = op.provideField(mmd.getAbsoluteFieldNumber());
-                    boolean relatedObjectDeleted = op.getExecutionContext().getApiAdapter().isDeleted(relatedPc);
-                    if (!relatedObjectDeleted)
-                    {
-                        if (relatedObjectsToDelete == null)
-                        {
-                            relatedObjectsToDelete = new HashSet();
-                        }
-                        relatedObjectsToDelete.add(relatedPc);
-                    }
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                        ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
                 }
-                catch (Exception e) // Should be XXXObjectNotFoundException but dont want to use JDO class
+                m.preDelete(op);
+
+                // Check for any dependent related 1-1 objects where we hold the FK and where the object hasn't been deleted. 
+                // This can happen if this DeleteRequest was triggered by delete-orphans and so the related object has to be deleted *after* this object.
+                // It's likely we could do this better by using AttachFieldManager and just marking the "orphan" (i.e this object) as deleted 
+                // (see AttachFieldManager TODO regarding when not copying)
+                JavaTypeMapping mapping = (JavaTypeMapping)m;
+                AbstractMemberMetaData mmd = mapping.getMemberMetaData();
+                RelationType relationType = mmd.getRelationType(clr);
+                if (mmd.isDependent() && (relationType == RelationType.ONE_TO_ONE_UNI || (relationType == RelationType.ONE_TO_ONE_BI && mmd.getMappedBy() == null)))
                 {
+                    try
+                    {
+                        op.isLoaded(mmd.getAbsoluteFieldNumber());
+                        Object relatedPc = op.provideField(mmd.getAbsoluteFieldNumber());
+                        boolean relatedObjectDeleted = op.getExecutionContext().getApiAdapter().isDeleted(relatedPc);
+                        if (!relatedObjectDeleted)
+                        {
+                            if (relatedObjectsToDelete == null)
+                            {
+                                relatedObjectsToDelete = new HashSet();
+                            }
+                            relatedObjectsToDelete.add(relatedPc);
+                        }
+                    }
+                    catch (Exception e) // Should be XXXObjectNotFoundException but dont want to use JDO class
+                    {
+                    }
                 }
             }
         }
@@ -261,14 +264,7 @@ public class DeleteRequest extends Request
         else
         {
             optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
-            if (optimisticChecks)
-            {
-                stmt = deleteStmtOptimistic;
-            }
-            else
-            {
-                stmt = deleteStmt;
-            }
+            stmt = optimisticChecks ? deleteStmtOptimistic : deleteStmt;
         }
 
         // Process the delete of this object
@@ -539,7 +535,7 @@ public class DeleteRequest extends Request
         private List oneToOneNonOwnerFields = new ArrayList();
 
         /** Mapping Callbacks to invoke at deletion. */
-        private List mc = new ArrayList();
+        private List<MappingCallbacks> callbackMappings = null;
 
         /** ClassLoaderResolver **/
         private final ClassLoaderResolver clr;
@@ -668,7 +664,11 @@ public class DeleteRequest extends Request
             // The Mapping callback called delete is the preDelete
             if (m instanceof MappingCallbacks)
             {
-                mc.add(m);
+                if (callbackMappings == null)
+                {
+                    callbackMappings = new ArrayList<>();
+                }
+                callbackMappings.add((MappingCallbacks)m);
             }
         }
 
@@ -769,9 +769,9 @@ public class DeleteRequest extends Request
          * Obtain a List of mapping callbacks that will be run for this deletion.
          * @return the mapping callbacks
          */
-        public List getMappingCallBacks()
+        public List<MappingCallbacks> getMappingCallBacks()
         {
-            return mc;
+            return callbackMappings;
         }
 
         /**
