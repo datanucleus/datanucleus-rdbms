@@ -86,8 +86,10 @@ public class UpdateRequest extends Request
     private final String updateStmtOptimistic;
 
     /** callback mappings will have their postUpdate method called after the update */
-    private final MappingCallbacks[] callbacks;
-    
+    private final List<MappingCallbacks> mappingCallbacks;
+
+    private final List<JavaTypeMapping> postSetMappings;
+
     /** the index for the expression in the update sql statement. */
     private StatementMappingDefinition stmtMappingDefinition;
 
@@ -244,7 +246,8 @@ public class UpdateRequest extends Request
         }
         updateStmtOptimistic = consumer.getStatement();
 
-        callbacks = (MappingCallbacks[])consumer.getMappingCallbacks().toArray(new MappingCallbacks[consumer.getMappingCallbacks().size()]);
+        mappingCallbacks = consumer.getMappingCallbacks();
+        postSetMappings = consumer.getPostSetMappings();
         whereFieldNumbers = consumer.getWhereFieldNumbers();
         updateFieldNumbers = consumer.getUpdateFieldNumbers();
     }
@@ -457,6 +460,19 @@ public class UpdateRequest extends Request
                             // TODO Batching : when we use batching here we need to process these somehow
                             throw new NucleusOptimisticException(Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + currentVersion), op.getObject());
                         }
+
+                        // Execute any post-set mappings
+                        if (postSetMappings != null)
+                        {
+                            for (JavaTypeMapping m : postSetMappings)
+                            {
+                                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                                {
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
+                                }
+                                m.performSetPostProcessing(op);
+                            }
+                        }
                     }
                     finally
                     {
@@ -483,21 +499,23 @@ public class UpdateRequest extends Request
         }
 
         // Execute any mapping actions now that we have done the update
-        for (int i=0; i<callbacks.length; ++i)
+        if (mappingCallbacks != null)
         {
-            try
+            for (MappingCallbacks m : mappingCallbacks)
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                try
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                            ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
+                    }
+                    m.postUpdate(op);
                 }
-                callbacks[i].postUpdate(op);
-            }
-            catch (NotYetFlushedException e)
-            {
-                op.updateFieldAfterInsert(e.getPersistable(),
-                    ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getAbsoluteFieldNumber());
+                catch (NotYetFlushedException e)
+                {
+                    op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping)m).getMemberMetaData().getAbsoluteFieldNumber());
+                }
             }
         }
     }
@@ -527,7 +545,11 @@ public class UpdateRequest extends Request
         /** Numbers of all WHERE clause fields. */
         List whereFields = new ArrayList();
 
-        List mc = new ArrayList();
+        /** Mappings that require post-set processing. */
+        List<JavaTypeMapping> postSetMappings;
+
+        /** Mappings that require callbacks calling. */
+        List<MappingCallbacks> callbackMappings = null;
 
         /** for UPDATE statement **/
         StringBuilder columnAssignments = new StringBuilder();
@@ -692,9 +714,21 @@ public class UpdateRequest extends Request
                 }
             }
 
+            if (m.requiresSetPostProcessing())
+            {
+                if (postSetMappings == null)
+                {
+                    postSetMappings = new ArrayList<>();
+                }
+                postSetMappings.add(m);
+            }
             if (m instanceof MappingCallbacks)
             {
-                mc.add(m);
+                if (callbackMappings == null)
+                {
+                    callbackMappings = new ArrayList<>();
+                }
+                callbackMappings.add((MappingCallbacks) m);
             }
         }
 
@@ -800,12 +834,14 @@ public class UpdateRequest extends Request
             return updateTimestampStatementMapping;
         }
 
-        /**
-         * @return Returns the mappingCallbacks.
-         */
-        public List getMappingCallbacks()
+        public List<JavaTypeMapping> getPostSetMappings()
         {
-            return mc;
+            return postSetMappings;
+        }
+
+        public List<MappingCallbacks> getMappingCallbacks()
+        {
+            return callbackMappings;
         }
 
         /**

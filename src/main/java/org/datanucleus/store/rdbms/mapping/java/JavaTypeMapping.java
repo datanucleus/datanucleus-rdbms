@@ -31,8 +31,7 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
-import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostInsert;
-import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostUpdate;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.util.Localiser;
 
@@ -802,15 +801,14 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Accessor for whether any of the column mappings requires INSERT post processing.
-     * TODO Not yet utilised, see RDBMS-14
-     * @return True if a column needs an INSERT post processing call
+     * Accessor for whether any of the column mappings requires INSERT/UPDATE post processing.
+     * @return True if a column needs an INSERT/UPDATE post processing call
      */
-    public boolean requiresInsertPostProcessing()
+    public boolean requiresSetPostProcessing()
     {
         for (int i=0; i<columnMappings.length; i++)
         {
-            if (columnMappings[i] instanceof ColumnMappingPostInsert)
+            if (columnMappings[i] instanceof ColumnMappingPostSet)
             {
                 return true;
             }
@@ -819,55 +817,20 @@ public abstract class JavaTypeMapping
     }
 
     /**
-     * Perform any INSERT post processing as required by constituent ColumnMappings.
-     * TODO Not yet utilised, see RDBMS-14
+     * Perform any INSERT/UPDATE post processing as required by constituent ColumnMappings.
+     * Default implementation does nothing.
      * @param op ObjectProvider of the object with this mapping
      */
-    public void insertPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider op)
     {
-        String value = (String)op.provideField(mmd.getAbsoluteFieldNumber());
-        op.isLoaded(mmd.getAbsoluteFieldNumber());
-        for (int i=0; i<columnMappings.length; i++)
-        {
-            if (columnMappings[i] instanceof ColumnMappingPostInsert)
-            {
-                ((ColumnMappingPostInsert)columnMappings[i]).insertPostProcessing(op, getValueForColumnMapping(storeMgr.getNucleusContext(), i, value));
-            }
-        }
-    }
-
-    /**
-     * Accessor for whether any of the column mappings requires UPDATE post processing.
-     * TODO Not yet utilised, see RDBMS-14
-     * @return True if a column needs an UPDATE post processing call
-     */
-    public boolean requiresUpdatePostProcessing()
-    {
-        for (int i=0; i<columnMappings.length; i++)
-        {
-            if (columnMappings[i] instanceof ColumnMappingPostUpdate)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Perform any UPDATE post processing as required by constituent ColumnMappings.
-     * TODO Not yet utilised, see RDBMS-14
-     * @param op ObjectProvider of the object with this mapping
-     */
-    public void updatePostProcessing(ObjectProvider op)
-    {
-        String value = (String)op.provideField(mmd.getAbsoluteFieldNumber());
-        op.isLoaded(mmd.getAbsoluteFieldNumber());
-        for (int i=0; i<columnMappings.length; i++)
-        {
-            if (columnMappings[i] instanceof ColumnMappingPostUpdate)
-            {
-                ((ColumnMappingPostUpdate)columnMappings[i]).updatePostProcessing(op, getValueForColumnMapping(storeMgr.getNucleusContext(), i, value));
-            }
-        }
+//        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+//        op.isLoaded(mmd.getAbsoluteFieldNumber());
+//        for (int i=0; i<columnMappings.length; i++)
+//        {
+//            if (columnMappings[i] instanceof ColumnMappingPostSet)
+//            {
+//                ((ColumnMappingPostSet)columnMappings[i]).setPostProcessing(op, getValueForColumnMapping(storeMgr.getNucleusContext(), i, value));
+//            }
+//        }
     }
 }

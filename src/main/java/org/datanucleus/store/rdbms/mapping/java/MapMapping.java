@@ -57,10 +57,6 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
     // ---------------- Implementation of MappingCallbacks --------------------
 
-    public void insertPostProcessing(ObjectProvider ownerOP)
-    {
-    }
-
     /**
      * Method to be called after the insert of the owner class element.
      * @param ownerOP ObjectProvider of the owner
@@ -275,7 +271,6 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
      */
     public void preDelete(ObjectProvider ownerOP)
     {
-        // Do nothing - dependent deletion is performed by deleteDependent()
         if (containerIsStoredInSingleColumn())
         {
             // Do nothing when serialised since we are handled in the main request

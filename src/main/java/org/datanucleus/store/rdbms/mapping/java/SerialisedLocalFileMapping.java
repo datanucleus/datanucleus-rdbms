@@ -99,10 +99,6 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         return mmd.getType();
     }
 
-    public void insertPostProcessing(ObjectProvider op)
-    {
-    }
-
     public void postInsert(final ObjectProvider op)
     {
         Object val = op.provideField(mmd.getAbsoluteFieldNumber());

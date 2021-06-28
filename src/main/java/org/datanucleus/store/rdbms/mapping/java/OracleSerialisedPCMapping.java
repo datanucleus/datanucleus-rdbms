@@ -24,20 +24,18 @@ import java.io.ObjectOutputStream;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
-import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
  * Mapping for a serialised persistable object for Oracle.
  */
-public class OracleSerialisedPCMapping extends SerialisedPCMapping implements MappingCallbacks
+public class OracleSerialisedPCMapping extends SerialisedPCMapping
 {
     /**
-     * Retrieve the empty BLOB created by the insert statement and write out the
-     * current BLOB field value to the Oracle BLOB object
+     * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
      * @param op the current ObjectProvider
      */
-    public void insertPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider op)
     {
         Object value = op.provideField(mmd.getAbsoluteFieldNumber());
         ObjectProvider sm = null;
@@ -75,40 +73,14 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping implements Ma
         }
 
         // Update the BLOB
-        OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), bytes);
+        if (columnMappings[0] instanceof ColumnMappingPostSet)
+        {
+            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+        }
 
         if (sm != null)
         {
             sm.unsetStoringPC();
         }
-    }
-
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postInsert(org.datanucleus.state.ObjectProvider)
-     */
-    public void postInsert(ObjectProvider op)
-    {
-    }
-
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postUpdate(org.datanucleus.state.ObjectProvider)
-     */
-    public void postUpdate(ObjectProvider op)
-    {
-        insertPostProcessing(op);
-    }
-
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postFetch(org.datanucleus.state.ObjectProvider)
-     */
-    public void postFetch(ObjectProvider op)
-    {
-    }
-
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#preDelete(org.datanucleus.state.ObjectProvider)
-     */
-    public void preDelete(ObjectProvider op)
-    {
     }
 }

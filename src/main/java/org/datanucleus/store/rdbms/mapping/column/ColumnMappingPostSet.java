@@ -20,15 +20,15 @@ package org.datanucleus.store.rdbms.mapping.column;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Interface implemented by any ColumnMapping that requires a post-insert step.
+ * Interface implemented by any ColumnMapping that requires a post-set (insert/update) step.
  * For example, with Oracle CLOB/BLOB the INSERT will just put "EMPTY_CLOB" or "EMPTY_BLOB" and this will SELECT the column and update it.
  */
-public interface ColumnMappingPostInsert
+public interface ColumnMappingPostSet
 {
     /**
-     * Perform any INSERT post processing on this column, using the provided value.
-     * @param op ObjectProvider for object being inserted
-     * @param value The value to use on the insert
+     * Perform any post "set" processing on this column, using the provided value.
+     * @param op ObjectProvider for object being set
+     * @param value The value to use on the set
      */
-    void insertPostProcessing(ObjectProvider op, Object value);
+    void setPostProcessing(ObjectProvider op, Object value);
 }

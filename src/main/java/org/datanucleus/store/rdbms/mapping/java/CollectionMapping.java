@@ -55,10 +55,6 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
 
     // --------------- Implementation of MappingCallbacks -------------------
 
-    public void insertPostProcessing(ObjectProvider ownerOP)
-    {
-    }
-
     /**
      * Method to be called after the insert of the owner class element.
      * @param ownerOP ObjectProvider of the owner

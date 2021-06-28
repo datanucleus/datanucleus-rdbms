@@ -23,25 +23,22 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
-import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
-import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
 import org.datanucleus.store.rdbms.mapping.column.OracleClobColumnMapping;
 
 /**
  * Mapping for a String type for Oracle when stored in a BLOB or CLOB column.
  */
-public class OracleStringLobMapping extends StringMapping implements MappingCallbacks
+public class OracleStringLobMapping extends StringMapping
 {
     /**
-     * Retrieve the empty BLOB/CLOB locator created by the insert statement
-     * and write out the current BLOB/CLOB field value to the Oracle BLOB/CLOB object
+     * Retrieve the empty BLOB/CLOB locator created by the insert statement and write out the current BLOB/CLOB field value to the Oracle BLOB/CLOB object
      * @param op The ObjectProvider owner of this field
      */
-    public void insertPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider op)
     {
         // Generate the contents for the BLOB/CLOB
         String value = (String)op.provideField(mmd.getAbsoluteFieldNumber());
@@ -63,34 +60,16 @@ public class OracleStringLobMapping extends StringMapping implements MappingCall
         }
 
         // Update BLOB/CLOB value
-        if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.BLOB)
+        if (columnMappings[0] instanceof ColumnMappingPostSet)
         {
-            OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), value.getBytes());
+            if (columnMappings[0] instanceof OracleBlobColumnMapping)
+            {
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, value.getBytes());
+            }
+            else if (columnMappings[0] instanceof OracleClobColumnMapping)
+            {
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, value);
+            }
         }
-        else if (mmd.getColumnMetaData()[0].getJdbcType() == JdbcType.CLOB)
-        {
-            OracleClobColumnMapping.updateClobColumn(op, getTable(), getColumnMapping(0), value);
-        }
-        else
-        {
-            throw new NucleusException("AssertionError: Only JDBC types BLOB and CLOB are allowed!");
-        }
-    }
-
-    public void postInsert(ObjectProvider op)
-    {
-    }
-
-    public void postFetch(ObjectProvider op)
-    {
-    }
-
-    public void postUpdate(ObjectProvider op)
-    {
-        insertPostProcessing(op);
-    }
-
-    public void preDelete(ObjectProvider op)
-    {
     }
 }

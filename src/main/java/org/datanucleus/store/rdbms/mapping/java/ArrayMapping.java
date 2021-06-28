@@ -73,10 +73,6 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     // ---------------------- Implementation of MappingCallbacks ----------------------------------
 
-    public void insertPostProcessing(ObjectProvider op)
-    {
-    }
-
     /**
      * Method to be called after the insert of the owner class element.
      * @param ownerOP ObjectProvider of the owner

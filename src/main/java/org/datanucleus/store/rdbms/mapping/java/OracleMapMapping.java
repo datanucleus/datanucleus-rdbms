@@ -27,6 +27,7 @@ import java.util.Set;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Oracle variant of the MapMapping for cases where we are serialising the field into a single column.
@@ -34,6 +35,11 @@ import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
  */
 public class OracleMapMapping extends MapMapping
 {
+    public void performSetPostProcessing(ObjectProvider op)
+    {
+        NucleusLogger.GENERAL.info(">> OracleMapMapping.performSetPostProc - DO NOTHING");
+    }
+
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the
      * current BLOB field value to the Oracle CLOB object.
@@ -143,6 +149,7 @@ public class OracleMapMapping extends MapMapping
                 }
             }
 
+            // TODO This should really just be the generate the contents of the BLOB followed by call to OracleBlobColumnMapping.updateBlobColumn
             postInsert(ownerOP);
         }
         else

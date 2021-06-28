@@ -22,20 +22,11 @@ package org.datanucleus.store.rdbms.mapping;
 import org.datanucleus.state.ObjectProvider;
 
 /**
- * Interface defining a series of callbacks that are called when this mapping goes through
- * certain lifecycle events. This interface would be implemented by any type of mapping that handles
- * a relation and so may need to perform action just before or just after a lifecycle event.
+ * Interface defining a series of callbacks that are called when this mapping goes through certain lifecycle events. 
+ * This interface would be implemented by any type of mapping that handles a relation and so may need to perform action just before or just after a lifecycle event.
  */
 public interface MappingCallbacks
 {
-    /**
-     * Hook so that we can handle any post-processing on the insert of a particular field.
-     * For example with Oracle we need to insert "EMPTY_CLOB" and then immediately after do a SELECT of it
-     * and update the contents of the CLOB/BLOB.
-     * @param op ObjectProvider
-     */
-    void insertPostProcessing(ObjectProvider op);
-
     /**
      * Method called after the insert of the object so that additional operations can be performed if necessary.
      * @param op ObjectProvider of the owner

@@ -46,10 +46,6 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
         initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), ObjectProvider.EMBEDDED_PC);
     }
 
-    public void insertPostProcessing(ObjectProvider op)
-    {
-    }
-
     /**
      * MappingCallback called when the owning object is being fetched.
      * @param op ObjectProvider of the owning object

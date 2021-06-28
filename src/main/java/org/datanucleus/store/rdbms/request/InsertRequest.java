@@ -100,7 +100,10 @@ public class InsertRequest extends Request
 {
     private static final int IDPARAMNUMBER = 1;
 
-    private final MappingCallbacks[] callbacks;
+    /** callback mappings will have their postInsert method called after the update */
+    private final List<MappingCallbacks> mappingCallbacks;
+
+    private final List<JavaTypeMapping> postSetMappings;
 
     /** Numbers of fields in the INSERT statement (excluding PK). */
     private final int[] insertFieldNumbers;
@@ -189,7 +192,8 @@ public class InsertRequest extends Request
         table.provideExternalMappings(consumer, MappingType.EXTERNAL_INDEX);
         table.provideUnmappedColumns(consumer);
 
-        callbacks = (MappingCallbacks[])consumer.getMappingCallbacks().toArray(new MappingCallbacks[consumer.getMappingCallbacks().size()]);
+        mappingCallbacks = consumer.getMappingCallbacks();
+        postSetMappings = consumer.getPostSetMappings();
         stmtMappings = consumer.getStatementMappings();
         versionStmtMapping = consumer.getVersionStatementMapping();
         discriminatorStmtMapping = consumer.getDiscriminatorStatementMapping();
@@ -502,14 +506,16 @@ public class InsertRequest extends Request
                     }
 
                     // Execute any mapping actions on the insert of the fields (e.g Oracle CLOBs/BLOBs)
-                    for (int i = 0; i < callbacks.length; ++i)
+                    if (postSetMappings != null)
                     {
-                        if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                        for (JavaTypeMapping m : postSetMappings)
                         {
-                            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(),
-                                ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                            if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                            {
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
+                            }
+                            m.performSetPostProcessing(op);
                         }
-                        callbacks[i].insertPostProcessing(op);
                     }
 
                     // Update the insert status for this table via the StoreManager
@@ -585,22 +591,24 @@ public class InsertRequest extends Request
             throw new NucleusDataStoreException(msg, exceptions.toArray(new Throwable[exceptions.size()]));
         }
 
-        // Execute any mapping actions now that we have inserted the element
-        // (things like inserting any association parent-child).
-        for (int i = 0; i < callbacks.length; ++i)
+        // Execute any mapping actions now that we have inserted the element (things like inserting any association parent-child).
+        if (mappingCallbacks != null)
         {
-            try
+            for (MappingCallbacks m : mappingCallbacks)
             {
-                if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                try
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                        ((JavaTypeMapping)callbacks[i]).getMemberMetaData().getFullFieldName()));
+                    if (NucleusLogger.PERSISTENCE.isDebugEnabled())
+                    {
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                            ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
+                    }
+                    m.postInsert(op);
                 }
-                callbacks[i].postInsert(op);
-            }
-            catch (NotYetFlushedException e)
-            {
-                op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping) callbacks[i]).getMemberMetaData().getAbsoluteFieldNumber());
+                catch (NotYetFlushedException e)
+                {
+                    op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping) m).getMemberMetaData().getAbsoluteFieldNumber());
+                }
             }
         }
     }
@@ -717,7 +725,11 @@ public class InsertRequest extends Request
 
         Map assignedColumns = new HashMap();
 
-        List mc = new ArrayList();
+        /** Mappings that require post-set processing. */
+        List<JavaTypeMapping> postSetMappings;
+
+        /** Mappings that require callbacks calling. */
+        List<MappingCallbacks> callbackMappings = null;
 
         boolean initialized = false;
 
@@ -929,9 +941,21 @@ public class InsertRequest extends Request
                     statementMappings[mmd.getAbsoluteFieldNumber()].addParameterOccurrence(parametersIndex);
                 }
             }
+            if (m.requiresSetPostProcessing())
+            {
+                if (postSetMappings == null)
+                {
+                    postSetMappings = new ArrayList<>();
+                }
+                postSetMappings.add(m);
+            }
             if (m instanceof MappingCallbacks)
             {
-                mc.add(m);
+                if (callbackMappings == null)
+                {
+                    callbackMappings = new ArrayList<>();
+                }
+                callbackMappings.add((MappingCallbacks)m);
             }
         }
 
@@ -1232,12 +1256,14 @@ public class InsertRequest extends Request
             return stmtExprIndex;
         }
 
-        /**
-         * @return Returns the mappingCallbacks.
-         */
-        public List getMappingCallbacks()
+        public List<JavaTypeMapping> getPostSetMappings()
         {
-            return mc;
+            return postSetMappings;
+        }
+
+        public List<MappingCallbacks> getMappingCallbacks()
+        {
+            return callbackMappings;
         }
 
         /**

@@ -756,15 +756,6 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * to this field and the object stored in it.
      * @param op ObjectProvider for the owner.
      */
-    public void insertPostProcessing(ObjectProvider op)
-    {
-    }
-
-    /**
-     * Method executed just after the insert of the owning object, allowing any necessary action
-     * to this field and the object stored in it.
-     * @param op ObjectProvider for the owner.
-     */
     public void postInsert(ObjectProvider op)
     {
     }

@@ -60,7 +60,7 @@ import org.datanucleus.util.Localiser;
  * Mapping for an Oracle CLOB column.
  * Extends the standard JDBC handler so that we can insert an empty CLOB, and then update it (Oracle non-standard behaviour).
  */
-public class OracleClobColumnMapping extends ClobColumnMapping implements ColumnMappingPostInsert, ColumnMappingPostUpdate
+public class OracleClobColumnMapping extends ClobColumnMapping implements ColumnMappingPostSet
 {
     public OracleClobColumnMapping(JavaTypeMapping mapping, RDBMSStoreManager storeMgr, Column col)
     {
@@ -175,13 +175,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
     }
 
     @Override
-    public void insertPostProcessing(ObjectProvider op, Object value)
-    {
-        updateClobColumn(op, getJavaTypeMapping().getTable(), this, (String)value); // TODO Remove String cast
-    }
-
-    @Override
-    public void updatePostProcessing(ObjectProvider op, Object value)
+    public void setPostProcessing(ObjectProvider op, Object value)
     {
         updateClobColumn(op, getJavaTypeMapping().getTable(), this, (String)value); // TODO Remove String cast
     }

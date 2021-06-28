@@ -31,6 +31,7 @@ import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
  * Oracle variant of the ArrayMapping for cases where we are serialising the field into a single column. 
@@ -38,6 +39,11 @@ import org.datanucleus.util.Localiser;
  */
 public class OracleArrayMapping extends ArrayMapping
 {
+    public void performSetPostProcessing(ObjectProvider op)
+    {
+        NucleusLogger.GENERAL.info(">> OracleArrayMapping.performSetPostProc - DO NOTHING");
+    }
+
     /**
      * Method to be called after the insert of the owner class element.
      * @param ownerOP ObjectProvider of the owner

@@ -25,22 +25,21 @@ import java.sql.SQLException;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
-import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
 import org.datanucleus.util.Localiser;
 
 /**
  * Mapping for a BitSet type for Oracle.
  */
-public class OracleBitSetMapping extends BitSetMapping implements MappingCallbacks
+public class OracleBitSetMapping extends BitSetMapping
 {
     /**
-     * Method to handle post-processing of the insert of the BLOB/CLOB for Oracle.
-     * @param op ObjectProvider of the owner
+     * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
+     * @param op the current ObjectProvider
      */
-    public void insertPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider op)
     {
         Object value = op.provideField(mmd.getAbsoluteFieldNumber());
         if (value == null)
@@ -86,36 +85,9 @@ public class OracleBitSetMapping extends BitSetMapping implements MappingCallbac
             // Do nothing
         }
 
-        // Update the BLOB
-        OracleBlobColumnMapping.updateBlobColumn(op, getTable(), getColumnMapping(0), bytes);
-    }
-
-    /**
-     * Method to be called after the insert of the owner class element.
-     * @param op ObjectProvider of the owner
-     **/
-    public void postInsert(ObjectProvider op)
-    {        
-    }
-
-    /**
-     * Method to be called after any update of the owner class element.
-     * @param op ObjectProvider of the owner
-     */
-    public void postUpdate(ObjectProvider op)
-    {
-        insertPostProcessing(op);
-    }
-
-    public void deleteDependent(ObjectProvider op)
-    {
-    }
-
-    public void postFetch(ObjectProvider op)
-    {
-    }
-
-    public void preDelete(ObjectProvider op)
-    {
+        if (columnMappings[0] instanceof ColumnMappingPostSet)
+        {
+            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+        }
     }
 }

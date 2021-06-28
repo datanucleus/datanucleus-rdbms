@@ -795,10 +795,6 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     {
     }
 
-    public void insertPostProcessing(ObjectProvider op)
-    {
-    }
-
     /**
      * Method executed just after the insert of the owning object, allowing any necessary action
      * to this field and the object stored in it.

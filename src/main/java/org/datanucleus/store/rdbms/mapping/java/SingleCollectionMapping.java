@@ -138,14 +138,6 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         return wrappedMapping.getJavaTypeForColumnMapping(index);
     }
 
-    public void insertPostProcessing(ObjectProvider op)
-    {
-        if (wrappedMapping instanceof MappingCallbacks)
-        {
-            ((MappingCallbacks) wrappedMapping).insertPostProcessing(op);
-        }
-    }
-
     public void postInsert(ObjectProvider op)
     {
         if (wrappedMapping instanceof MappingCallbacks)

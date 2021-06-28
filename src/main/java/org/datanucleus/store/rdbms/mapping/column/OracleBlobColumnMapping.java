@@ -72,7 +72,7 @@ import oracle.sql.BLOB;
  * Mapping for an Oracle BLOB column.
  * Extends the standard JDBC handler so that we can insert an empty BLOB, and then update it (Oracle non-standard behaviour).
  */
-public class OracleBlobColumnMapping extends AbstractColumnMapping implements ColumnMappingPostInsert, ColumnMappingPostUpdate
+public class OracleBlobColumnMapping extends AbstractColumnMapping implements ColumnMappingPostSet
 {
     /**
      * Constructor.
@@ -295,13 +295,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
     }
 
     @Override
-    public void updatePostProcessing(ObjectProvider op, Object value)
-    {
-        updateBlobColumn(op, getJavaTypeMapping().getTable(), this, (byte[])value); // TODO Remove byte[] cast
-    }
-
-    @Override
-    public void insertPostProcessing(ObjectProvider op, Object value)
+    public void setPostProcessing(ObjectProvider op, Object value)
     {
         updateBlobColumn(op, getJavaTypeMapping().getTable(), this, (byte[])value); // TODO Remove byte[] cast
     }
