@@ -26,31 +26,49 @@ import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
-import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
- * Oracle variant of the MapMapping for cases where we are serialising the field into a single column.
- * This is necessary so we can perform any necessary postInsert, postUpdate nonsense for inserting BLOBs.
+ * Oracle variant of the MapMapping for cases where we are serialising the field into a single (BLOB/CLOB) column.
  */
 public class OracleMapMapping extends MapMapping
 {
     public void performSetPostProcessing(ObjectProvider op)
     {
-        NucleusLogger.GENERAL.info(">> OracleMapMapping.performSetPostProc - DO NOTHING");
+        if (containerIsStoredInSingleColumn())
+        {
+            if (columnMappings[0] instanceof ColumnMappingPostSet)
+            {
+                // Create the value to put in the BLOB
+                java.util.Map value = (java.util.Map)op.provideField(mmd.getAbsoluteFieldNumber());
+                byte[] bytes = new byte[0];
+                if (value != null)
+                {
+                    try
+                    {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(baos);
+                        oos.writeObject(value);
+                        bytes = baos.toByteArray();
+                    }
+                    catch (IOException e1)
+                    {
+                        // Do Nothing
+                    }
+                }
+
+                // Update the BLOB
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+            }
+        }
     }
 
-    /**
-     * Retrieve the empty BLOB created by the insert statement and write out the
-     * current BLOB field value to the Oracle CLOB object.
-     * @param ownerOP ObjectProvider of the owner
-     */
-    public void postInsert(ObjectProvider ownerOP)
+    public void postInsert(ObjectProvider op)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            java.util.Map value = (java.util.Map) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = op.getExecutionContext();
+            java.util.Map value = (java.util.Map) op.provideField(mmd.getAbsoluteFieldNumber());
 
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
@@ -68,7 +86,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, op, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -76,48 +94,25 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, op, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
                 }
             }
-
-            // Generate the contents for the BLOB
-            byte[] bytes = new byte[0];
-            if (value != null)
-            {
-                try
-                {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
-                    oos.writeObject(value);
-                    bytes = baos.toByteArray();
-                }
-                catch (IOException e1)
-                {
-                    // Do Nothing
-                }
-            }
-
-            // Update the BLOB
-            OracleBlobColumnMapping.updateBlobColumn(ownerOP, getTable(), getColumnMapping(0), bytes);
         }
         else
         {
-            super.postInsert(ownerOP);
+            super.postInsert(op);
         }
     }
 
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postUpdate(org.datanucleus.state.ObjectProvider)
-     */
-    public void postUpdate(ObjectProvider ownerOP)
+    public void postUpdate(ObjectProvider op)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            java.util.Map value = (java.util.Map) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = op.getExecutionContext();
+            java.util.Map value = (java.util.Map) op.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
@@ -134,7 +129,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, op, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -142,19 +137,16 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, op, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
                 }
             }
-
-            // TODO This should really just be the generate the contents of the BLOB followed by call to OracleBlobColumnMapping.updateBlobColumn
-            postInsert(ownerOP);
         }
         else
         {
-            super.postUpdate(ownerOP);
+            super.postUpdate(op);
         }
     }
 }

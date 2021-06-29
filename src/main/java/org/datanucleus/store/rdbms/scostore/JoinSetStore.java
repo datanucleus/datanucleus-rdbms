@@ -684,6 +684,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     jdbcPosition = BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
                 }
 
+                // TODO If the element has requiresSetPostProcessing then call elementMapping.performSetPostProcessing
                 return sqlControl.executeStatementUpdate(ec, conn, addStmt, ps, executeNow);
             }
             catch (NotYetFlushedException nfe)

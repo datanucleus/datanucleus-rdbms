@@ -24,25 +24,43 @@ import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.state.ObjectProvider;
-import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
-import org.datanucleus.util.NucleusLogger;
+import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
- * Oracle variant of the CollectionMapping for cases where we are serialising the field into a single column. 
- * This is necessary so we can perform any necessary postInsert, postUpdate nonsense for inserting BLOBs.
+ * Oracle variant of the CollectionMapping for cases where we are serialising the field into a single (BLOB/CLOB) column.
  */
 public class OracleCollectionMapping extends CollectionMapping
 {
     public void performSetPostProcessing(ObjectProvider op)
     {
-        NucleusLogger.GENERAL.info(">> OracleCollectionMapping.performSetPostProc - DO NOTHING");
+        if (containerIsStoredInSingleColumn())
+        {
+            if (columnMappings[0] instanceof ColumnMappingPostSet)
+            {
+                // Create the value to put in the BLOB
+                Collection value = (Collection) op.provideField(mmd.getAbsoluteFieldNumber());
+                byte[] bytes = new byte[0];
+                if (value != null)
+                {
+                    try
+                    {
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(baos);
+                        oos.writeObject(value);
+                        bytes = baos.toByteArray();
+                    }
+                    catch (IOException e1)
+                    {
+                        // Do Nothing
+                    }
+                }
+
+                // Update the BLOB
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+            }
+        }
     }
 
-    /**
-     * Retrieve the empty BLOB created by the insert statement and write out the
-     * current BLOB field value to the Oracle BLOB object.
-     * @param ownerOP ObjectProvider of the owner
-     */
     public void postInsert(ObjectProvider ownerOP)
     {
         if (containerIsStoredInSingleColumn())
@@ -69,26 +87,6 @@ public class OracleCollectionMapping extends CollectionMapping
                     }
                 }
             }
-
-            // Generate the contents for the BLOB
-            byte[] bytes = new byte[0];
-            if (value != null)
-            {
-                try
-                {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ObjectOutputStream oos = new ObjectOutputStream(baos);
-                    oos.writeObject(value);
-                    bytes = baos.toByteArray();
-                }
-                catch (IOException e1)
-                {
-                    // Do Nothing
-                }
-            }
-
-            // Update the BLOB
-            OracleBlobColumnMapping.updateBlobColumn(ownerOP, getTable(), getColumnMapping(0), bytes);
         }
         else
         {
@@ -96,9 +94,6 @@ public class OracleCollectionMapping extends CollectionMapping
         }
     }
 
-    /**
-     * @see org.datanucleus.store.rdbms.mapping.MappingCallbacks#postUpdate(org.datanucleus.state.ObjectProvider)
-     */
     public void postUpdate(ObjectProvider ownerOP)
     {
         if (containerIsStoredInSingleColumn())
@@ -125,9 +120,6 @@ public class OracleCollectionMapping extends CollectionMapping
                     }
                 }
             }
-
-            // TODO This should really just be the generate the contents of the BLOB followed by call to OracleBlobColumnMapping.updateBlobColumn
-            postInsert(ownerOP);
         }
         else
         {
