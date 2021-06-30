@@ -804,8 +804,7 @@ public class InsertRequest extends Request
             }
             if (m.includeInInsertStatement())
             {
-                if (m.getNumberOfColumnMappings() == 0 &&
-                    (m instanceof PersistableMapping || m instanceof ReferenceMapping))
+                if (m.getNumberOfColumnMappings() == 0 && (m instanceof PersistableMapping || m instanceof ReferenceMapping))
                 {
                     // Reachable Fields (that relate to this object but have no column in the table)
                     retrievedStatementMappings[mmd.getAbsoluteFieldNumber()] = new StatementMappingIndex(m);
@@ -833,12 +832,14 @@ public class InsertRequest extends Request
                 {
                     // Fields to be "inserted" (that have a datastore column)
 
-                    // Check if the field is "insertable" (either using JPA column, or JDO extension)
+                    // Check if the field is "insertable"
+                	// a). JDO member extension
                     if (mmd.hasExtension(MetaData.EXTENSION_MEMBER_INSERTABLE) && mmd.getValueForExtension(MetaData.EXTENSION_MEMBER_INSERTABLE).equalsIgnoreCase("false"))
                     {
                         return;
                     }
 
+                    // b). JPA column
                     ColumnMetaData[] colmds = mmd.getColumnMetaData();
                     if (colmds != null && colmds.length > 0)
                     {
@@ -851,6 +852,7 @@ public class InsertRequest extends Request
                             }
                         }
                     }
+
                     RelationType relationType = mmd.getRelationType(clr);
                     if (relationType == RelationType.ONE_TO_ONE_BI)
                     {
