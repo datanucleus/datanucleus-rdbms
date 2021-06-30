@@ -174,31 +174,13 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
         return getString(rs, param);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void setPostProcessing(ObjectProvider op, Object value)
     {
-        updateClobColumn(op, getJavaTypeMapping().getTable(), this, (String)value); // TODO Remove String cast
-    }
-
-    /**
-     * Convenience method to update the contents of a CLOB column.
-     * Oracle requires that a CLOB is initialised with EMPTY_CLOB() and then you retrieve
-     * the column and update its CLOB value. Performs a statement
-     * <pre>
-     * SELECT {clobColumn} FROM TABLE WHERE ID=? FOR UPDATE
-     * </pre>
-     * and then updates the Clob value returned.
-     * @param op ObjectProvider of the object
-     * @param table Table storing the CLOB column
-     * @param mapping Datastore mapping for the CLOB column
-     * @param value The value to store in the CLOB
-     * @throws NucleusObjectNotFoundException Thrown if an object is not found
-     * @throws NucleusDataStoreException Thrown if an error occurs in datastore communication
-     */
-    @SuppressWarnings("deprecation")
-    public static void updateClobColumn(ObjectProvider op, Table table, ColumnMapping mapping, String value)
-    {
+        String stringValue = (String)value;
         ExecutionContext ec = op.getExecutionContext();
+        Table table = column.getTable();
         RDBMSStoreManager storeMgr = table.getStoreManager();
 
         if (table instanceof DatastoreClass)
@@ -210,8 +192,8 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
             SelectStatement sqlStmt = new SelectStatement(storeMgr, table, null, null);
             sqlStmt.setClassLoaderResolver(ec.getClassLoaderResolver());
             sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-            SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping.getJavaTypeMapping());
-            sqlStmt.select(blobSqlTbl, mapping.getColumn(), null);
+            SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping);
+            sqlStmt.select(blobSqlTbl, column, null);
             StatementClassMapping mappingDefinition = new StatementClassMapping();
             AbstractClassMetaData cmd = op.getClassMetaData();
             SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
@@ -316,7 +298,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
                                 oracle.sql.CLOB clob = (oracle.sql.CLOB)rs.getClob(1);
                                 if (clob != null)
                                 {
-                                    clob.putString(1, value); // Deprecated but what can you do
+                                    clob.putString(1, stringValue); // Deprecated but what can you do
                                 }
                             }
                             else
@@ -325,7 +307,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
                                 java.sql.Clob clob = rs.getClob(1);
                                 if (clob != null)
                                 {
-                                    clob.setString(1, value);
+                                    clob.setString(1, stringValue);
                                 }
                             }
                         }
