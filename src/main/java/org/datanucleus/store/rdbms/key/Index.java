@@ -31,7 +31,6 @@ public class Index extends ColumnOrderedKey
 {
     public static final String EXTENSION_INDEX_EXTENDED_SETTING = "extended-setting";
     public static final String EXTENSION_INDEX_TYPE = "index-type";
-    public static final String EXTENSION_INDEX_COLUMN_ORDERING = "index-column-ordering";
 
     private final boolean isUnique;
 

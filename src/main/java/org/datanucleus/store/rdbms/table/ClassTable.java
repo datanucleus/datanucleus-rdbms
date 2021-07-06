@@ -2302,7 +2302,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
 
             // Apply any user-provided ordering of the columns
-            String idxOrdering = imd.getValueForExtension(Index.EXTENSION_INDEX_COLUMN_ORDERING);
+            String idxOrdering = imd.getValueForExtension(MetaData.EXTENSION_INDEX_COLUMN_ORDERING);
             if (!StringUtils.isWhitespace(idxOrdering))
             {
                 index.setColumnOrdering(idxOrdering);
@@ -2330,7 +2330,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 }
 
                 // Apply any user-provided ordering of the columns
-                String idxOrdering = imd.getValueForExtension(Index.EXTENSION_INDEX_COLUMN_ORDERING);
+                String idxOrdering = imd.getValueForExtension(MetaData.EXTENSION_INDEX_COLUMN_ORDERING);
                 if (!StringUtils.isWhitespace(idxOrdering))
                 {
                     index.setColumnOrdering(idxOrdering);
