@@ -51,6 +51,7 @@ public class FirebirdAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(NULLS_IN_CANDIDATE_KEYS);
         supportedOptions.remove(NULLS_KEYWORD_IN_COLUMN_OPTIONS);
         supportedOptions.remove(INCLUDE_ORDERBY_COLS_IN_SELECT);
+        supportedOptions.remove(CREATE_INDEX_COLUMN_ORDERING);
         supportedOptions.add(ALTER_TABLE_DROP_FOREIGN_KEY_CONSTRAINT);
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
         supportedOptions.add(LOCK_ROW_USING_SELECT_FOR_UPDATE);

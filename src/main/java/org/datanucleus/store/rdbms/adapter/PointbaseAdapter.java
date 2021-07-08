@@ -47,6 +47,7 @@ public class PointbaseAdapter extends BaseDatastoreAdapter
 
         supportedOptions.remove(BOOLEAN_COMPARISON);
         supportedOptions.remove(DEFERRED_CONSTRAINTS); // Pointbase 4.4 certainly doesnt support them
+        supportedOptions.remove(CREATE_INDEX_COLUMN_ORDERING);
     }
 
     /**

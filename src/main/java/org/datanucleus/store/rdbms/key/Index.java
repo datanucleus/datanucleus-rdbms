@@ -25,7 +25,7 @@ import java.util.Map;
 import org.datanucleus.store.rdbms.table.Table;
 
 /**
- * Representation of an index.
+ * Representation of an INDEX.
  */
 public class Index extends ColumnOrderedKey
 {
@@ -128,11 +128,12 @@ public class Index extends ColumnOrderedKey
 
     /**
      * Stringify method.
+     * Generates a form of the index ready to be used in a DDL statement.
+     * e.g <pre>INDEX (col1, col2)</pre>
      * @return String version of this object.
      */
     public String toString()
     {
-        // TODO Change this to return "INDEX (...)"
-        return getColumnList();
+        return new StringBuilder("INDEX ").append(getColumnList(columns)).toString();
     }
 }

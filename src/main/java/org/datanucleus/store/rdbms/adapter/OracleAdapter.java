@@ -51,7 +51,6 @@ import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
-import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
@@ -426,32 +425,6 @@ public class OracleAdapter extends BaseDatastoreAdapter
             return "DROP TABLE " + table.toString() + " CASCADE CONSTRAINTS PURGE";
         }
         return "DROP TABLE " + table.toString() + " CASCADE CONSTRAINTS";
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.adapter.BaseDatastoreAdapter#getCreateIndexStatement(org.datanucleus.store.rdbms.key.Index, org.datanucleus.store.rdbms.identifier.IdentifierFactory)
-     */
-    @Override
-    public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
-    {
-        /**
-        CREATE [UNIQUE] INDEX indexName
-            ON tableName [tableAlias] (column [ASC|DESC], ...)
-        */
-
-        // Add support for column ordering
-        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
-        stringBuilder.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
-        stringBuilder.append(" ON ").append(idx.getTable().toString());
-        stringBuilder.append(" ").append(idx.getColumnList(true));
-        if (extendedSetting != null)
-        {
-            stringBuilder.append(" ").append(extendedSetting);
-        }
-        return stringBuilder.toString();
     }
 
     /**

@@ -60,7 +60,8 @@ public class CandidateKey extends ColumnOrderedKey
     }
 
     /**
-     * Stringify method. Returns <pre>UNIQUE (col1, ...)</pre>.
+     * Stringify method. 
+     * Returns <pre>UNIQUE (col1, ...)</pre>.
      * @return String version of this object.
      */
     public String toString()

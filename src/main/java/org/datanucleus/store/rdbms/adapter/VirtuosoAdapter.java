@@ -50,6 +50,7 @@ public class VirtuosoAdapter extends BaseDatastoreAdapter
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
         supportedOptions.add(STORED_PROCEDURES);
         supportedOptions.add(IDENTITY_COLUMNS);
+        supportedOptions.remove(CREATE_INDEX_COLUMN_ORDERING);
     }
 
     public SQLTypeInfo newSQLTypeInfo(ResultSet rs)

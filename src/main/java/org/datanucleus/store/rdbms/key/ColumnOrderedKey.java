@@ -140,7 +140,6 @@ public abstract class ColumnOrderedKey extends Key
                 s.append(',');
             }
         }
-
         s.append(')');
 
         return s.toString();

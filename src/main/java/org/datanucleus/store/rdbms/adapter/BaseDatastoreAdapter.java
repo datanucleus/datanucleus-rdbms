@@ -518,6 +518,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedOptions.add(EXISTS_SYNTAX);
         supportedOptions.add(ALTER_TABLE_DROP_CONSTRAINT_SYNTAX);
         supportedOptions.add(DEFERRED_CONSTRAINTS);
+        supportedOptions.add(CREATE_INDEX_COLUMN_ORDERING);
 
         supportedOptions.add(DISTINCT_WITH_SELECT_FOR_UPDATE);
         supportedOptions.add(GROUPING_WITH_SELECT_FOR_UPDATE);
@@ -1424,31 +1425,30 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * Returns the appropriate SQL to add a primary key to its table.
      * It should return something like:
      * <pre>
-     * ALTER TABLE FOO ADD CONSTRAINT FOO_PK PRIMARY KEY (BAR)
-     * ALTER TABLE FOO ADD PRIMARY KEY (BAR)
+     * ALTER TABLE FOO ADD [CONSTRAINT FOO_PK ]PRIMARY KEY (BAR)
      * </pre>
-     *
      * @param pk An object describing the primary key.
      * @param factory Identifier factory
      * @return The text of the SQL statement.
      */
     public String getAddPrimaryKeyStatement(PrimaryKey pk, IdentifierFactory factory)
     {
+        StringBuilder str = new StringBuilder("ALTER TABLE ").append(pk.getTable().toString()).append(" ADD ");
         if (pk.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(pk.getName());
-            return "ALTER TABLE " + pk.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + pk;
+            str.append("CONSTRAINT ").append(identifier).append(" ");
         }
+        str.append(pk.toString());
 
-        return "ALTER TABLE " + pk.getTable().toString() + " ADD " + pk;
+        return str.toString();
     }
 
     /**
      * Returns the appropriate SQL to add a candidate key to its table.
      * It should return something like:
      * <pre>
-     * ALTER TABLE FOO ADD CONSTRAINT FOO_CK UNIQUE (BAZ)
-     * ALTER TABLE FOO ADD UNIQUE (BAZ)
+     * ALTER TABLE FOO ADD [CONSTRAINT FOO_CK ]UNIQUE (BAZ)
      * </pre>
      *
      * @param ck An object describing the candidate key.
@@ -1457,16 +1457,13 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getAddCandidateKeyStatement(CandidateKey ck, IdentifierFactory factory)
     {
-        StringBuilder str = new StringBuilder("ALTER TABLE ").append(ck.getTable().toString());
+        StringBuilder str = new StringBuilder("ALTER TABLE ").append(ck.getTable().toString()).append(" ADD ");
         if (ck.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(ck.getName());
-            str.append(" ADD CONSTRAINT ").append(identifier).append(" UNIQUE ").append(ck.getColumnList());
+            str.append("CONSTRAINT ").append(identifier).append(" ");
         }
-        else
-        {
-            str.append(" ADD UNIQUE ").append(ck.getColumnList());
-        }
+        str.append(ck.toString()); // UNIQUE (col1, col2)
 
         String extendedSetting = ck.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
         if (extendedSetting != null)
@@ -1481,8 +1478,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * Returns the appropriate SQL to add a foreign key to its table.
      * It should return something like:
      * <pre>
-     * ALTER TABLE FOO ADD CONSTRAINT FOO_FK1 FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
-     * ALTER TABLE FOO ADD FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
+     * ALTER TABLE FOO ADD [CONSTRAINT FOO_FK1 ]FOREIGN KEY (BAR, BAZ) REFERENCES ABC (COL1, COL2)
      * </pre>
      * @param fk An object describing the foreign key.
      * @param factory Identifier factory
@@ -1490,13 +1486,15 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getAddForeignKeyStatement(ForeignKey fk, IdentifierFactory factory)
     {
+        StringBuilder str = new StringBuilder("ALTER TABLE ").append(fk.getTable().toString()).append(" ADD ");
         if (fk.getName() != null)
         {
             String identifier = factory.getIdentifierInAdapterCase(fk.getName());
-            return "ALTER TABLE " + fk.getTable().toString() + " ADD CONSTRAINT " + identifier + ' ' + fk;
+            str.append("CONSTRAINT ").append(identifier).append(" ");
         }
+        str.append(fk.toString());
 
-        return "ALTER TABLE " + fk.getTable().toString() + " ADD " + fk;
+        return str.toString();
     }
 
     /**
@@ -1514,8 +1512,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      * Returns the appropriate DDL to create an index.
      * It should return something like:
      * <pre>
-     * CREATE INDEX FOO_N1 ON FOO (BAR,BAZ) [Extended Settings]
-     * CREATE UNIQUE INDEX FOO_U1 ON FOO (BAR,BAZ) [Extended Settings]
+     * CREATE [UNIQUE ]INDEX FOO_U1 ON FOO (BAR,BAZ) [Extended Settings]
      * </pre>
      * @param idx An object describing the index.
      * @param factory Identifier factory
@@ -1523,12 +1520,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        // Note : we do not support column ordering by default; override in the datastore adapter to add this. Similarly for datastore-specifics
-        StringBuilder str = new StringBuilder();
-        str.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        StringBuilder str = new StringBuilder("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
         str.append(factory.newTableIdentifier(idx.getName()).getFullyQualifiedName(true));
-        str.append(" ON ").append(idx.getTable().toString());
-        str.append(" ").append(idx.getColumnList());
+        str.append(" ON ").append(idx.getTable().toString()).append(" ").append(idx.getColumnList(supportsOption(CREATE_INDEX_COLUMN_ORDERING)));
 
         String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
         if (extendedSetting != null)

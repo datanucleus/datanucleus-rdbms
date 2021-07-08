@@ -170,8 +170,7 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
     /**
      * Returns the appropriate DDL to create an index. It should return something like:
      * <pre>
-     * CREATE INDEX FOO_N1 ON FOO (BAR,BAZ) [Extended Settings]
-     * CREATE UNIQUE INDEX FOO_U1 ON FOO (BAR,BAZ) [Extended Settings]
+     * CREATE [UNIQUE ]INDEX FOO_N1 ON FOO (BAR,BAZ) [Extended Settings]
      * </pre>
      * @param idx An object describing the index.
      * @param factory Identifier factory
@@ -179,19 +178,18 @@ public class NuoDBAdapter extends BaseDatastoreAdapter
      */
     public String getCreateIndexStatement(Index idx, IdentifierFactory factory)
     {
-        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
+        // ? Doesn't use fully qualified form of the index. Is this correct?
+        StringBuilder str = new StringBuilder("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
+        str.append(factory.getIdentifierInAdapterCase(idx.getName()));
+        str.append(" ON ").append(idx.getTable().toString()).append(" ").append(idx.getColumnList(supportsOption(CREATE_INDEX_COLUMN_ORDERING)));
 
-        // Set index name
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("CREATE ").append((idx.getUnique() ? "UNIQUE " : "")).append("INDEX ");
-        stringBuilder.append(factory.getIdentifierInAdapterCase(idx.getName()));
-        stringBuilder.append(" ON ").append(idx.getTable().toString());
-        stringBuilder.append(" ").append(idx.getColumnList());
+        String extendedSetting = idx.getValueForExtension(Index.EXTENSION_INDEX_EXTENDED_SETTING);
         if (extendedSetting != null)
         {
-            stringBuilder.append(" ").append(extendedSetting);
+            str.append(" ").append(extendedSetting);
         }
-        return stringBuilder.toString();
+
+        return str.toString();
     }
 
     public String getDropDatabaseStatement(String catalogName, String schemaName)

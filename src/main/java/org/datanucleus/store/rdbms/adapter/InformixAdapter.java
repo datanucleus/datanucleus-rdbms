@@ -71,6 +71,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
         supportedOptions.remove(IDENTITY_COLUMN_TYPE_SPECIFICATION);
         supportedOptions.remove(NULLS_KEYWORD_IN_COLUMN_OPTIONS);
         supportedOptions.remove(DEFERRED_CONSTRAINTS);
+        supportedOptions.remove(CREATE_INDEX_COLUMN_ORDERING);
     }
 
     /**

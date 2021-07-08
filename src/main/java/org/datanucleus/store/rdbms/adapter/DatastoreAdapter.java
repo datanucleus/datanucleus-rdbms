@@ -335,6 +335,9 @@ public interface DatastoreAdapter
      */
     public static final String CREATE_INDEXES_BEFORE_FOREIGN_KEYS = "CreateIndexesBeforeForeignKeys";
 
+    /** Whether to support ASC|DESC on columns in an INDEX. */
+    public static final String CREATE_INDEX_COLUMN_ORDERING = "CreateIndexColumnOrdering";
+
     /**
      * Whether to include any ORDER BY columns in a SELECT.
      */
