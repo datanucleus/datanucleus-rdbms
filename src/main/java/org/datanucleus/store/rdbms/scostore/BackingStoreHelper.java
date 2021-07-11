@@ -96,7 +96,7 @@ public class BackingStoreHelper
             embedded = true;
         }
 
-        if (!bcs.getStoreManager().insertValuesOnInsert(bcs.getOwnerMapping().getColumnMapping(0)))
+        if (!bcs.getOwnerMapping().getColumnMapping(0).insertValuesOnInsert())
         {
             // Don't try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
@@ -160,7 +160,7 @@ public class BackingStoreHelper
     public static int populateElementInStatement(ExecutionContext ec, PreparedStatement ps, Object element, 
             int jdbcPosition, JavaTypeMapping elementMapping)
     {
-        if (!elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getColumnMapping(0)))
+        if (!elementMapping.getColumnMapping(0).insertValuesOnInsert())
         {
             // Don't try to insert any mappings with insert parameter that isn't ? (e.g Oracle)
             return jdbcPosition;
@@ -183,7 +183,7 @@ public class BackingStoreHelper
      */
     public static int populateElementForWhereClauseInStatement(ExecutionContext ec, PreparedStatement ps, Object element, int jdbcPosition, JavaTypeMapping elementMapping)
     {
-        if (elementMapping.getStoreManager().insertValuesOnInsert(elementMapping.getColumnMapping(0)))
+        if (elementMapping.getColumnMapping(0).insertValuesOnInsert())
         {
             if (elementMapping instanceof ReferenceMapping && elementMapping.getNumberOfColumnMappings() > 1)
             {

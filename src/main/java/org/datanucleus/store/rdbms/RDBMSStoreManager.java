@@ -67,7 +67,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -123,7 +122,6 @@ import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.identifier.JPAIdentifierFactory;
 import org.datanucleus.store.rdbms.identifier.JPOXIdentifierFactory;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
-import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.ArrayMapping;
 import org.datanucleus.store.rdbms.mapping.java.CollectionMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -703,14 +701,13 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Method to return the class(es) that has a table managing the persistence of
-     * the fields of the supplied class. For the 3 inheritance strategies, the following
-     * occurs :-
+     * Method to return the class(es) that has a table managing the persistence of the fields of the supplied class. 
+     * For the 3 inheritance strategies, the following occurs :-
      * <UL>
      * <LI>new-table : will return the same ClassMetaData</LI>
      * <LI>subclass-table : will return all subclasses that have a table managing its fields</LI>
      * <LI>superclass-table : will return the next superclass that has a table</LI>
-     * </UL> 
+     * </UL>
      * @param cmd The supplied class.
      * @param clr ClassLoader resolver
      * @return The ClassMetaData's managing the fields of the supplied class
@@ -831,9 +828,9 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /**
-     * Returns whether this object is inserted in the datastore far enough to be considered to be the
-     * supplied type. For example if we have base class A, B extends A and this object is a B, and we 
-     * pass in A here then this returns whether the A part of the object is now inserted.
+     * Returns whether this object is inserted in the datastore far enough to be considered to be the supplied type. 
+     * For example if we have base class A, B extends A and this object is a B, and we pass in A here then this returns 
+     * whether the A part of the object is now inserted.
      * @param op ObjectProvider for the object
      * @param className Name of class that we want to check the insertion level for.
      * @return Whether the object is inserted in the datastore to this level
@@ -2716,6 +2713,173 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.schema.SchemaScriptAwareStoreManager#executeScript(java.lang.String)
+     */
+    public void executeScript(String script)
+    {
+        script = StringUtils.replaceAll(script, "\n", " ");
+        script = StringUtils.replaceAll(script, "\t", " ");
+        ManagedConnection mc = connectionMgr.getConnection(-1);
+        try
+        {
+            // Execute the script on this datastore
+            // Note that we simply split the script at line delimiter (";")
+            // TODO Process out any comments from the SQL
+            Connection conn = (Connection) mc.getConnection();
+            Statement stmt = conn.createStatement();
+            try
+            {
+                StringTokenizer tokeniser = new StringTokenizer(script, ";");
+                while (tokeniser.hasMoreTokens())
+                {
+                    String token = tokeniser.nextToken().trim();
+                    if (!StringUtils.isWhitespace(token))
+                    {
+                        NucleusLogger.DATASTORE_NATIVE.debug("Executing script statement : " + token);
+                        stmt.execute(token + ";");
+                    }
+                }
+            }
+            finally
+            {
+                stmt.close();
+            }
+        }
+        catch (SQLException e)
+        {
+            NucleusLogger.DATASTORE_NATIVE.error("Exception executing user script", e);
+            throw new NucleusUserException("Exception executing user script. See nested exception for details", e);
+        }
+        finally
+        {
+            mc.release();
+        }
+    }
+
+    /**
+     * Accessor for the supported options in string form
+     */
+    public Collection getSupportedOptions()
+    {
+        Set<String> set = new HashSet<>();
+        set.add(StoreManager.OPTION_APPLICATION_ID);
+        set.add(StoreManager.OPTION_APPLICATION_COMPOSITE_ID);
+        set.add(StoreManager.OPTION_DATASTORE_ID);
+        set.add(StoreManager.OPTION_NONDURABLE_ID);
+        set.add(StoreManager.OPTION_TRANSACTION_ACID);
+        set.add(StoreManager.OPTION_ORM);
+        set.add(StoreManager.OPTION_ORM_SECONDARY_TABLE);
+        set.add(StoreManager.OPTION_ORM_EMBEDDED_PC);
+        set.add(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION);
+        set.add(StoreManager.OPTION_ORM_EMBEDDED_MAP);
+        set.add(StoreManager.OPTION_ORM_EMBEDDED_ARRAY);
+        set.add(StoreManager.OPTION_ORM_FOREIGN_KEYS);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_PC);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_COLLECTION_ELEMENT);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_ARRAY_ELEMENT);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_KEY);
+        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_VALUE);
+
+        // Add isolation levels for this database adapter
+        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_COMMITTED))
+        {
+            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED);
+        }
+        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_UNCOMMITTED))
+        {
+            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_UNCOMMITTED);
+        }
+        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_REPEATABLE_READ))
+        {
+            set.add(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ);
+        }
+        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_SERIALIZABLE))
+        {
+            set.add(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE);
+        }
+
+        // Query Cancel and Datastore Timeout is supported on JDOQL for RDBMS (unless turned off by user)
+        set.add(StoreManager.OPTION_QUERY_CANCEL);
+        set.add(StoreManager.OPTION_DATASTORE_TIMEOUT);
+        if (dba.supportsOption(DatastoreAdapter.DATETIME_STORES_MILLISECS))
+        {
+            set.add(StoreManager.OPTION_DATASTORE_TIME_STORES_MILLISECS);
+            // TODO What about nanosecs
+        }
+
+        // JDOQL Bitwise are only supported if supported by the datastore
+        if (dba.supportsOption(DatastoreAdapter.OPERATOR_BITWISE_AND))
+        {
+            set.add(StoreManager.OPTION_QUERY_JDOQL_BITWISE_OPS);
+        }
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_INSERT);
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_UPDATE);
+        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_DELETE);
+        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_UPDATE);
+        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_DELETE);
+
+        return set;
+    }
+
+    /**
+     * Convenience method to return if the datastore supports batching and the user wants batching.
+     * @return If batching of statements is permissible
+     */
+    public boolean allowsBatching()
+    {
+        return dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0;
+    }
+
+    public boolean usesBackedSCOWrappers()
+    {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.datanucleus.store.AbstractStoreManager#useBackedSCOWrapperForMember(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.store.ExecutionContext)
+     */
+    @Override
+    public boolean useBackedSCOWrapperForMember(AbstractMemberMetaData mmd, ExecutionContext ec)
+    {
+        if ((mmd.hasCollection() || mmd.hasMap()) && mmd.hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
+        {
+            // The only case where we don't use backed wrappers is for a Collection/Map that is using a converter for the whole field (so storing as a single column)
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Accessor for the Calendar to be used in handling all timezone issues with the datastore.
+     * Utilises the "serverTimeZoneID" in providing this Calendar used in time/date conversions.
+     * @return The calendar to use for dateTimezone issues.
+     */
+    public Calendar getCalendarForDateTimezone()
+    {
+        if (dateTimezoneCalendar == null)
+        {
+            TimeZone tz;
+            String serverTimeZoneID = getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
+            if (serverTimeZoneID != null)
+            {
+                tz = TimeZone.getTimeZone(serverTimeZoneID);
+            }
+            else
+            {
+                tz = TimeZone.getDefault();
+            }
+            dateTimezoneCalendar = new GregorianCalendar(tz);
+        }
+        // This returns a clone because Oracle JDBC driver was taking the Calendar and modifying it in calls. Hence passing a clone gets around that. 
+        // May be best to just return it direct here and then in Oracle usage we pass in a clone to its JDBC driver
+        return (Calendar) dateTimezoneCalendar.clone();
+    }
+
+    // --------------------------------- Schema Management -------------------------------------------
+    // TODO An amount of this ought to move to RDBMSSchemaHandler one day
+
     /**
      * Called by (container) Mapping objects to request the creation of a join table.
      * If the specified field doesn't require a join table then this returns null.
@@ -3710,137 +3874,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    /**
-     * Accessor for the supported options in string form
-     */
-    public Collection getSupportedOptions()
-    {
-        Set<String> set = new HashSet<>();
-        set.add(StoreManager.OPTION_APPLICATION_ID);
-        set.add(StoreManager.OPTION_APPLICATION_COMPOSITE_ID);
-        set.add(StoreManager.OPTION_DATASTORE_ID);
-        set.add(StoreManager.OPTION_NONDURABLE_ID);
-        set.add(StoreManager.OPTION_TRANSACTION_ACID);
-        set.add(StoreManager.OPTION_ORM);
-        set.add(StoreManager.OPTION_ORM_SECONDARY_TABLE);
-        set.add(StoreManager.OPTION_ORM_EMBEDDED_PC);
-        set.add(StoreManager.OPTION_ORM_EMBEDDED_COLLECTION);
-        set.add(StoreManager.OPTION_ORM_EMBEDDED_MAP);
-        set.add(StoreManager.OPTION_ORM_EMBEDDED_ARRAY);
-        set.add(StoreManager.OPTION_ORM_FOREIGN_KEYS);
-        set.add(StoreManager.OPTION_ORM_SERIALISED_PC);
-        set.add(StoreManager.OPTION_ORM_SERIALISED_COLLECTION_ELEMENT);
-        set.add(StoreManager.OPTION_ORM_SERIALISED_ARRAY_ELEMENT);
-        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_KEY);
-        set.add(StoreManager.OPTION_ORM_SERIALISED_MAP_VALUE);
-
-        // Add isolation levels for this database adapter
-        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_COMMITTED))
-        {
-            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_COMMITTED);
-        }
-        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_READ_UNCOMMITTED))
-        {
-            set.add(StoreManager.OPTION_TXN_ISOLATION_READ_UNCOMMITTED);
-        }
-        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_REPEATABLE_READ))
-        {
-            set.add(StoreManager.OPTION_TXN_ISOLATION_REPEATABLE_READ);
-        }
-        if (dba.supportsOption(DatastoreAdapter.TX_ISOLATION_SERIALIZABLE))
-        {
-            set.add(StoreManager.OPTION_TXN_ISOLATION_SERIALIZABLE);
-        }
-
-        // Query Cancel and Datastore Timeout is supported on JDOQL for RDBMS (unless turned off by user)
-        set.add(StoreManager.OPTION_QUERY_CANCEL);
-        set.add(StoreManager.OPTION_DATASTORE_TIMEOUT);
-        if (dba.supportsOption(DatastoreAdapter.DATETIME_STORES_MILLISECS))
-        {
-            set.add(StoreManager.OPTION_DATASTORE_TIME_STORES_MILLISECS);
-            // TODO What about nanosecs
-        }
-
-        // JDOQL Bitwise are only supported if supported by the datastore
-        if (dba.supportsOption(DatastoreAdapter.OPERATOR_BITWISE_AND))
-        {
-            set.add(StoreManager.OPTION_QUERY_JDOQL_BITWISE_OPS);
-        }
-        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_INSERT);
-        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_UPDATE);
-        set.add(StoreManager.OPTION_QUERY_JPQL_BULK_DELETE);
-        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_UPDATE);
-        set.add(StoreManager.OPTION_QUERY_JDOQL_BULK_DELETE);
-
-        return set;
-    }
-
-    /**
-     * Accessor for whether this mapping requires values inserting on an INSERT.
-     * @param columnMapping The datastore mapping
-     * @return Whether values are to be inserted into this mapping on an INSERT
-     */
-    public boolean insertValuesOnInsert(ColumnMapping columnMapping)
-    {
-        return columnMapping.insertValuesOnInsert();
-    }
-
-    /**
-     * Convenience method to return if the datastore supports batching and the user wants batching.
-     * @return If batching of statements is permissible
-     */
-    public boolean allowsBatching()
-    {
-        return dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING) && getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT) != 0;
-    }
-
-    public boolean usesBackedSCOWrappers()
-    {
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.AbstractStoreManager#useBackedSCOWrapperForMember(org.datanucleus.metadata.AbstractMemberMetaData, org.datanucleus.store.ExecutionContext)
-     */
-    @Override
-    public boolean useBackedSCOWrapperForMember(AbstractMemberMetaData mmd, ExecutionContext ec)
-    {
-        if ((mmd.hasCollection() || mmd.hasMap()) && mmd.hasExtension(MetaData.EXTENSION_MEMBER_TYPE_CONVERTER_NAME))
-        {
-            // The only case where we don't use backed wrappers is for a Collection/Map that is using a converter for the whole field (so storing as a single column)
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Accessor for the Calendar to be used in handling all timezone issues with the datastore.
-     * Utilises the "serverTimeZoneID" in providing this Calendar used in time/date conversions.
-     * @return The calendar to use for dateTimezone issues.
-     */
-    public Calendar getCalendarForDateTimezone()
-    {
-        if (dateTimezoneCalendar == null)
-        {
-            TimeZone tz;
-            String serverTimeZoneID = getStringProperty(PropertyNames.PROPERTY_SERVER_TIMEZONE_ID);
-            if (serverTimeZoneID != null)
-            {
-                tz = TimeZone.getTimeZone(serverTimeZoneID);
-            }
-            else
-            {
-                tz = TimeZone.getDefault();
-            }
-            dateTimezoneCalendar = new GregorianCalendar(tz);
-        }
-        // This returns a clone because Oracle JDBC driver was taking the Calendar and modifying it
-        // in calls. Hence passing a clone gets around that. May be best to just return it direct here
-        // and then in Oracle usage we pass in a clone to its JDBC driver
-        return (Calendar) dateTimezoneCalendar.clone();
-    }
-
     // ---------------------------------------SchemaTool------------------------------------------------
 
     public void createDatabase(String catalogName, String schemaName, Properties props)
@@ -3853,17 +3886,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         schemaHandler.deleteDatabase(catalogName, schemaName, props, null);
     }
 
-    public void createSchemaForClasses(Set<String> inputClassNames, Properties props)
+    public void createSchemaForClasses(Set<String> classNames, Properties props)
     {
-        Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
-
         String ddlFilename = props != null ? props.getProperty("ddlFilename") : null;
         String completeDdlProp = props != null ? props.getProperty("completeDdl") : null;
         boolean completeDdl = completeDdlProp != null && completeDdlProp.equalsIgnoreCase("true");
         String autoStartProp = props != null ? props.getProperty("autoStartTable") : null;
         boolean autoStart = autoStartProp != null && autoStartProp.equalsIgnoreCase("true");
 
-        if (classNames.size() > 0)
+        if (classNames != null && !classNames.isEmpty())
         {
             ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(null);
             FileWriter ddlFileWriter = null;
@@ -4185,9 +4216,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     boolean performingDeleteSchemaForClasses = false;
 
-    public void deleteSchemaForClasses(Set<String> inputClassNames, Properties props)
+    public void deleteSchemaForClasses(Set<String> classNames, Properties props)
     {
-        Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
         if (!classNames.isEmpty())
         {
             // Delete the tables
@@ -4307,9 +4337,8 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         }
     }
 
-    public void validateSchemaForClasses(Set<String> inputClassNames, Properties props)
+    public void validateSchemaForClasses(Set<String> classNames, Properties props)
     {
-        Set<String> classNames = cleanInputClassNames(nucleusContext, inputClassNames);
         if (classNames != null && !classNames.isEmpty())
         {
             // Validate the tables/constraints
@@ -4322,72 +4351,5 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             System.out.println(msg);
             throw new NucleusException(msg);
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.datanucleus.store.schema.SchemaScriptAwareStoreManager#executeScript(java.lang.String)
-     */
-    public void executeScript(String script)
-    {
-        script = StringUtils.replaceAll(script, "\n", " ");
-        script = StringUtils.replaceAll(script, "\t", " ");
-        ManagedConnection mc = connectionMgr.getConnection(-1);
-        try
-        {
-            // Execute the script on this datastore
-            // Note that we simply split the script at line delimiter (";")
-            // TODO Process out any comments from the SQL
-            Connection conn = (Connection) mc.getConnection();
-            Statement stmt = conn.createStatement();
-            try
-            {
-                StringTokenizer tokeniser = new StringTokenizer(script, ";");
-                while (tokeniser.hasMoreTokens())
-                {
-                    String token = tokeniser.nextToken().trim();
-                    if (!StringUtils.isWhitespace(token))
-                    {
-                        NucleusLogger.DATASTORE_NATIVE.debug("Executing script statement : " + token);
-                        stmt.execute(token + ";");
-                    }
-                }
-            }
-            finally
-            {
-                stmt.close();
-            }
-        }
-        catch (SQLException e)
-        {
-            NucleusLogger.DATASTORE_NATIVE.error("Exception executing user script", e);
-            throw new NucleusUserException("Exception executing user script. See nested exception for details", e);
-        }
-        finally
-        {
-            mc.release();
-        }
-    }
-
-    /**
-     * Method to generate a set of class names using the input list.
-     * If no input class names are provided then uses the list of classes known to have metadata.
-     * @param ctx NucleusContext
-     * @param inputClassNames Class names to start from
-     * @return The set of class names
-     */
-    protected static Set<String> cleanInputClassNames(NucleusContext ctx, Set<String> inputClassNames) 
-    {
-        Set<String> classNames = new TreeSet<>();
-        if (inputClassNames == null || inputClassNames.size() == 0)
-        {
-            // Use all "known" persistable classes
-            classNames.addAll(ctx.getMetaDataManager().getClassesWithMetaData());
-        }
-        else
-        {
-            // Use all input classes
-            classNames.addAll(inputClassNames);
-        }
-        return classNames;
     }
 }

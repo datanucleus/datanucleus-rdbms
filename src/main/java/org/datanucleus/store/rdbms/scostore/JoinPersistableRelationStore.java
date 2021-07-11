@@ -328,7 +328,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      */
     public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
     {
-        if (!joinTable.getStoreManager().insertValuesOnInsert(joinTable.getOwnerMapping().getColumnMapping(0)))
+        if (!joinTable.getOwnerMapping().getColumnMapping(0).insertValuesOnInsert())
         {
             // Don't try to insert any mappings with insert parameter that isnt ? (e.g Oracle)
             return jdbcPosition;
