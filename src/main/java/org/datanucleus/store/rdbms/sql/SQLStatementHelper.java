@@ -61,7 +61,7 @@ import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.BooleanExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.DatastoreElementContainer;
+import org.datanucleus.store.rdbms.table.ElementContainerTable;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.PersistableJoinTable;
 import org.datanucleus.store.rdbms.table.SecondaryDatastoreClass;
@@ -745,7 +745,7 @@ public class SQLStatementHelper
                         // N-1 bidirectional join table relation
                         // TODO Add left outer join from {sourceTable}.ID to {joinTable}.ELEM_FK
                         Table joinTable = storeMgr.getTable(relatedMmds[0]);
-                        DatastoreElementContainer collTable = (DatastoreElementContainer)joinTable;
+                        ElementContainerTable collTable = (ElementContainerTable)joinTable;
                         JavaTypeMapping selectMapping = collTable.getOwnerMapping();
                         SQLTable joinSqlTbl = null;
                         if (stmt.getPrimaryTable().getTable() != joinTable)
@@ -938,7 +938,7 @@ public class SQLStatementHelper
                         // N-1 bidirectional join table relation
                         // Add left outer join from {sourceTable}.ID to {joinTable}.ELEM_FK
                         Table joinTable = storeMgr.getTable(relatedMmds[0]);
-                        DatastoreElementContainer collTable = (DatastoreElementContainer)joinTable;
+                        ElementContainerTable collTable = (ElementContainerTable)joinTable;
                         JavaTypeMapping selectMapping = collTable.getOwnerMapping();
                         SQLTable joinSqlTbl = null;
                         if (stmt.getPrimaryTable().getTable() != joinTable)

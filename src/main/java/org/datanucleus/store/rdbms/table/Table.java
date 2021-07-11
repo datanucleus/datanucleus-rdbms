@@ -159,7 +159,7 @@ public interface Table extends org.datanucleus.store.schema.table.Table
      * @return Whether it  validates successfully
      * @throws SQLException Thrown if an error occurrs in the validation
      */
-    boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors) 
+    boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors) 
     throws SQLException;
 
     /**

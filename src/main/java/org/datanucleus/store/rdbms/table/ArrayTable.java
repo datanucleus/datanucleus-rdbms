@@ -45,7 +45,7 @@ import org.datanucleus.util.NucleusLogger;
  * </ul>
  * The primary-key is formed from the ownerMapping and the orderMapping (unless overridden by the user).
  */
-public class ArrayTable extends ElementContainerTable implements DatastoreElementContainer
+public class ArrayTable extends ElementContainerTable
 {
     /**
      * Constructor.

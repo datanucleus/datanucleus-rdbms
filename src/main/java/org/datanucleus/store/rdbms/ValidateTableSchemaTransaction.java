@@ -57,17 +57,16 @@ public class ValidateTableSchemaTransaction extends AbstractSchemaTransaction
     {
         synchronized (rdbmsMgr)
         {
-            List autoCreateErrors = new ArrayList();
+            List<Throwable> autoCreateErrors = new ArrayList<>();
             try
             {
                 table.validate(getCurrentConnection(), false, true, autoCreateErrors);
             }
             catch (Exception e)
             {
-                NucleusLogger.DATASTORE_SCHEMA.error(
-                    "Exception thrown during update of schema for table " + table, e);
-                throw new NucleusException(
-                    "Exception thrown during update of schema for table " + table, e);
+                String msg = "Exception thrown during update of schema for table " + table;
+                NucleusLogger.DATASTORE_SCHEMA.error(msg, e);
+                throw new NucleusException(msg, e);
             }
         }
     }

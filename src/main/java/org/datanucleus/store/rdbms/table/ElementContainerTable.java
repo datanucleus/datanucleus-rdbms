@@ -56,25 +56,23 @@ import org.datanucleus.util.StringUtils;
 /**
  * Representation of a join table for a container of elements.
  * Can be used for collections, lists, sets and arrays.
- * There can be multiple JoinTable objects referring to the same underlying datastore
- * object. If the JoinTable is shared by multiple fields for example then there will
- * be one for each relation.
+ * There can be multiple JoinTable objects referring to the same underlying datastore object. 
+ * If the JoinTable is shared by multiple fields, for example, then there will be one for each relation.
  */
 public abstract class ElementContainerTable extends JoinTable
 {
     /**
-     * Mapping of an element. This is either a PersistableMapping to the element table,
-     * or an EmbeddedElementPCMapping (when PC elements are embedded), or a simple mapping (when
-     * using non-PC elements), or a SerialisedPCMapping, or a SerialisedReferenceMapping.
+     * Mapping of an element. 
+     * This is either a PersistableMapping to the element table, or an EmbeddedElementPCMapping (when PC elements are embedded), 
+     * or a simple mapping (when using non-PC elements), or a SerialisedPCMapping, or a SerialisedReferenceMapping.
      * It will be specified in the MetaData using the &lt;element&gt; tag.
      */
     protected JavaTypeMapping elementMapping;
 
     /**
      * Order mapping, to provide part of the primary key.
-     * In the case of a List this represents the ordering index. In the case of a Set
-     * this represents an index for allowing duplicates, or where the element is embedded and
-     * is of a type that can't be part of the PK. 
+     * In the case of a List this represents the ordering index. 
+     * In the case of a Set this represents an index for allowing duplicates, or where the element is embedded andis of a type that can't be part of the PK. 
      * It will be specified in the MetaData using the &lt;order&gt; tag.
      */
     protected JavaTypeMapping orderMapping;
@@ -126,7 +124,7 @@ public abstract class ElementContainerTable extends JoinTable
         {
             // Column mappings defined at other side (M-N)
             // When specified at other side they use the <element> tag
-            // ** This is really only for Collections/Sets since M-N doesnt make sense for indexed Lists/arrays **
+            // ** This is really only for Collections/Sets since M-N doesn't make sense for indexed Lists/arrays **
             columnMetaData = relatedMmds[0].getElementMetaData().getColumnMetaData();
         }
 
@@ -239,8 +237,7 @@ public abstract class ElementContainerTable extends JoinTable
 
     /**
      * Accessor for the "element" mapping end of the relationship. 
-     * This is used where the element is persistable and has its own table (not embedded),
-     * or where the element is a simple type.
+     * This is used where the element is persistable and has its own table (not embedded),or where the element is a simple type.
      * @return The column mapping for the element.
      */
     public JavaTypeMapping getElementMapping()
@@ -308,8 +305,7 @@ public abstract class ElementContainerTable extends JoinTable
     }
 
     /**
-     * Convenience method to generate a ForeignKey from this join table to an element table
-     * using the specified mapping.
+     * Convenience method to generate a ForeignKey from this join table to an element table using the specified mapping.
      * @param elementTable The element table
      * @param autoMode Whether we are in auto mode (where we generate the keys regardless of what the metadata says)
      * @param m The mapping to the element table
@@ -452,8 +448,7 @@ public abstract class ElementContainerTable extends JoinTable
 
     /**
      * Accessor for the indices for this table. 
-     * This includes both the user-defined indices (via MetaData), and the ones required by 
-     * foreign keys (required by relationships).
+     * This includes both the user-defined indices (via MetaData), and the ones required by foreign keys (required by relationships).
      * @param clr The ClassLoaderResolver
      * @return The indices
      */

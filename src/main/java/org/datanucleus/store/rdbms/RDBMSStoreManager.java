@@ -3537,11 +3537,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
             if (ddlWriter != null) // TODO Why is this only done with the DDL option enabled?
             {
-                // Remove any existence of the same actual table more than once so we dont duplicate its
-                // DDL for creation. Note that this will allow more than once instance of tables with the same
-                // name (identifier) since when you have multiple inheritance trees each inheritance tree
-                // will have its own ClassTable, and you want both of these to pass through to schema generation.
-                List<Table> tmpTablesToValidate = new ArrayList();
+                // Remove any existence of the same actual table more than once so we dont duplicate its DDL for creation. 
+                // Note that this will allow more than once instance of tables with the same name (identifier) since when you have 
+                // multiple inheritance trees each inheritance tree will have its own ClassTable, and you want both of these to pass through to schema generation.
+                List<Table> tmpTablesToValidate = new ArrayList<>();
                 for (Table tbl : tablesToValidate)
                 {
                     // This just checks the identifier name - see hashCode of Table
@@ -3557,7 +3556,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             // a). Check for existence of the table
             // b). If autocreate, create the table if necessary
             // c). If validate, validate the table
-            Iterator i = tablesToValidate.iterator();
+            Iterator<Table> i = tablesToValidate.iterator();
             while (i.hasNext())
             {
                 TableImpl t = (TableImpl) i.next();

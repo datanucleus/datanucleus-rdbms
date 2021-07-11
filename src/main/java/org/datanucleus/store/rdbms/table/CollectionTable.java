@@ -57,7 +57,7 @@ import org.datanucleus.util.NucleusLogger;
  * Note that with an M-N relation there will be 2 instances of the CollectionTable - one represents the relation
  * from owner to element, and the other for the relation from element to owner.
  */
-public class CollectionTable extends ElementContainerTable implements DatastoreElementContainer
+public class CollectionTable extends ElementContainerTable
 {
     /**
      * Constructor.

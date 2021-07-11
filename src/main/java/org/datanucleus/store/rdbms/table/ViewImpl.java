@@ -83,10 +83,16 @@ public abstract class ViewImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls 
      */
-    public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors)
+    public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {
         assertIsInitialized();
+
+        long startTime = System.currentTimeMillis();
+        if (NucleusLogger.DATASTORE.isDebugEnabled())
+        {
+            NucleusLogger.DATASTORE.debug(Localiser.msg("031004",this));
+        }
 
         // Check existence and validity
         RDBMSSchemaHandler handler = (RDBMSSchemaHandler)storeMgr.getSchemaHandler();
@@ -98,12 +104,6 @@ public abstract class ViewImpl extends AbstractTable
         else if (!tableType.equals("VIEW")) // TODO Allow "MATERIALIZED VIEW" that some RDBMS support (e.g PostgreSQL)
         {
             throw new NotAViewException(this.toString(), tableType);
-        }
-
-        long startTime = System.currentTimeMillis();
-        if (NucleusLogger.DATASTORE.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("031004",this));
         }
 
         // Validate the column(s)

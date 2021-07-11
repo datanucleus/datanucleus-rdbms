@@ -145,10 +145,16 @@ public abstract class TableImpl extends AbstractTable
      * @return Whether the database was modified
      * @throws SQLException Thrown when an error occurs in the JDBC calls
      */
-    public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection autoCreateErrors)
+    public boolean validate(Connection conn, boolean validateColumnStructure, boolean autoCreate, Collection<Throwable> autoCreateErrors)
     throws SQLException
     {
         assertIsInitialized();
+
+        long startTime = System.currentTimeMillis();
+        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
+        {
+            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057032", this));
+        }
 
         // Check existence and validity
         RDBMSSchemaHandler handler = (RDBMSSchemaHandler)storeMgr.getSchemaHandler();
@@ -160,12 +166,6 @@ public abstract class TableImpl extends AbstractTable
         else if (!tableType.equals("TABLE") && !tableType.equals("BASE TABLE"))
         {
             throw new NotATableException(this.toString(), tableType);
-        }
-
-        long startTime = System.currentTimeMillis();
-        if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("057032", this));
         }
 
         // Validate the column(s)

@@ -77,7 +77,7 @@ import org.datanucleus.util.NucleusLogger;
  * This is either to provide uniqueness or ordering (and part of the PK).</li>
  * </ul>
  */
-public class MapTable extends JoinTable implements DatastoreMap
+public class MapTable extends JoinTable
 {
     protected Table ownerTable;
 

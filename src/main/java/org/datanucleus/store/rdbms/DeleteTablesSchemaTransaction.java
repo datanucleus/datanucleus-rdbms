@@ -121,16 +121,13 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                        ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
                     }
-                    else
+
+                    // Drop view if exists in the datastore
+                    StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
+                    if (info != null)
                     {
-                        // Drop view if exists in the datastore
-                        StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
-                        if (info != null)
-                        {
-                            ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
-                        }
+                        ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
                     }
                 }
 
@@ -157,31 +154,28 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                        tbl.dropConstraints(getCurrentConnection());
                     }
-                    else
-                    {
-                        // Drop constraints if exists in the datastore
-                        boolean exists = false;
-                        try
-                        {
-                            // Check table type as way of detecting existence
-                            String tableType = ((RDBMSSchemaHandler)rdbmsMgr.getSchemaHandler()).getTableType(getCurrentConnection(), tbl);
-                            if (tableType != null)
-                            {
-                                exists = true;
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            exists = false;
-                        }
 
-                        schemaExistsForTableMap.put(tbl, exists);
-                        if (exists)
+                    // Drop constraints if exists in the datastore
+                    boolean exists = false;
+                    try
+                    {
+                        // Check table type as way of detecting existence
+                        String tableType = ((RDBMSSchemaHandler)rdbmsMgr.getSchemaHandler()).getTableType(getCurrentConnection(), tbl);
+                        if (tableType != null)
                         {
-                            tbl.dropConstraints(getCurrentConnection());
+                            exists = true;
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        exists = false;
+                    }
+
+                    schemaExistsForTableMap.put(tbl, exists);
+                    if (exists)
+                    {
+                        tbl.dropConstraints(getCurrentConnection());
                     }
                 }
 
@@ -207,16 +201,13 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                         {
                             NucleusLogger.DATASTORE_SCHEMA.error("error writing DDL into file", ioe);
                         }
-                        tbl.drop(getCurrentConnection());
                     }
-                    else
+
+                    // Drop table if exists in the datastore
+                    Boolean schemaExists = schemaExistsForTableMap.get(tbl);
+                    if (schemaExists != null && schemaExists == Boolean.TRUE)
                     {
-                        // Drop table if exists in the datastore
-                        Boolean schemaExists = schemaExistsForTableMap.get(tbl);
-                        if (schemaExists != null && schemaExists == Boolean.TRUE)
-                        {
-                            tbl.drop(getCurrentConnection());
-                        }
+                        tbl.drop(getCurrentConnection());
                     }
                 }
             }

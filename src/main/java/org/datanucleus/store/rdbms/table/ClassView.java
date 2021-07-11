@@ -135,8 +135,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
             }
             else if (fmd.getPersistenceModifier() != FieldPersistenceModifier.TRANSACTIONAL)
             {
-                throw new NucleusException(Localiser.msg("031006", 
-                    cmd.getFullClassName(), fmd.getName(), fmd.getPersistenceModifier())).setFatal();
+                throw new NucleusException(Localiser.msg("031006", cmd.getFullClassName(), fmd.getName(), fmd.getPersistenceModifier())).setFatal();
             }
         }
 
@@ -149,7 +148,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
     }
 
     /**
-     * Post initilize. For things that must be set after all classes have been initialized before 
+     * Post initialise. For things that must be set after all classes have been initialised before.
      * @param clr the ClassLoaderResolver
      */
     public void postInitialize(final ClassLoaderResolver clr)
@@ -191,7 +190,7 @@ public class ClassView extends ViewImpl implements DatastoreClass
 
     /**
      * Accessor for the base datastore class (table) managing the given field.
-     * Returns null since we dont manage things the same with views.
+     * Returns null since we don't manage things the same with views.
      * @param mmd MetaData for the field
      * @return The base table.
      */

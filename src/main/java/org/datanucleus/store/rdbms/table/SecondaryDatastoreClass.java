@@ -20,8 +20,7 @@ package org.datanucleus.store.rdbms.table;
 import org.datanucleus.metadata.JoinMetaData;
 
 /**
- * Secondary datastore class, managing the mapping of some of the fields of the class
- * and dependent on a DatastoreClass.
+ * Secondary datastore class, managing the mapping of some of the fields of the class and dependent on a DatastoreClass.
  */
 public interface SecondaryDatastoreClass extends DatastoreClass
 {
