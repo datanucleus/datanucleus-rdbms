@@ -794,8 +794,8 @@ public class OracleAdapter extends BaseDatastoreAdapter
             else if ("SECOND".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalSecondMethod2.class;
             else if ("SQL_cube".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLCubeFunction.class;
             else if ("SQL_rollup".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.SQLRollupFunction.class;
-            else if ("WEEK".equals(methodName)) return null; // TODO Support this
-            else if ("QUARTER".equals(methodName)) return null; // TODO Support this
+            else if ("WEEK".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalWeekMethod6.class;
+            else if ("QUARTER".equals(methodName)) return org.datanucleus.store.rdbms.sql.method.TemporalQuarterMethod2.class;
         }
         else
         {
