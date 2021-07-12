@@ -323,6 +323,11 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 }
 
                 // Create an identifier factory - needs the database adapter to exist first
+//                getNamingFactory(); // Make sure the naming factory is created
+//                namingFactory.setMaximumLength(SchemaComponent.TABLE, dba.getDatastoreIdentifierMaxLength(IdentifierType.TABLE));
+//                namingFactory.setMaximumLength(SchemaComponent.COLUMN, dba.getDatastoreIdentifierMaxLength(IdentifierType.COLUMN));
+//                namingFactory.setMaximumLength(SchemaComponent.CONSTRAINT, dba.getDatastoreIdentifierMaxLength(IdentifierType.INDEX));
+//                namingFactory.setMaximumLength(SchemaComponent.SEQUENCE, dba.getDatastoreIdentifierMaxLength(IdentifierType.SEQUENCE));
                 initialiseIdentifierFactory(ctx);
 
                 // Now that we have the identifier factory, make sure any user-provided names were valid!
