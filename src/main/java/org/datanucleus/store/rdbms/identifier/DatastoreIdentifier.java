@@ -18,8 +18,8 @@ Contributors:
 package org.datanucleus.store.rdbms.identifier;
 
 /**
- * Representation of an datastore identifier in an ORM datastore.
- * This can be something like a table name, or column name etc.
+ * Representation of a datastore identifier in an RDBMS datastore.
+ * This can be something like a table name, column name, index name etc.
  */
 public interface DatastoreIdentifier
 {
