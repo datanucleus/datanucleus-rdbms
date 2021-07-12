@@ -43,7 +43,7 @@ public class TemporalWeekMethod4 extends TemporalBaseMethod
      */
     public SQLExpression getExpression(SQLStatement stmt, SQLExpression expr, List<SQLExpression> args)
     {
-        SQLExpression invokedExpr = getInvokedExpression(expr, args, "HOUR");
+        SQLExpression invokedExpr = getInvokedExpression(expr, args, "WEEK");
 
         RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
         JavaTypeMapping mapping = storeMgr.getMappingManager().getMapping(String.class);
