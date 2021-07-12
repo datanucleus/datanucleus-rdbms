@@ -34,6 +34,7 @@ import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -48,8 +49,7 @@ import java.util.StringTokenizer;
 import org.datanucleus.exceptions.NucleusUserException;
 
 /**
- * Wrapper for a PreparedStatement, providing access to a String representation of the statement 
- * with replaced actual parameters.
+ * Wrapper for a PreparedStatement, providing access to a String representation of the statement with replaced actual parameters.
  */
 class ParamLoggingPreparedStatement implements PreparedStatement
 {
@@ -1081,5 +1081,18 @@ class ParamLoggingPreparedStatement implements PreparedStatement
     }
 
     // Implementation of JDBC 4.2 methods
-    // TODO
+
+    @Override
+    public void setObject(int parameterIndex, Object x, SQLType targetSqlType, int scaleOrLength) throws SQLException
+    {
+        setParameter(parameterIndex, x);
+        ps.setObject(parameterIndex, x, targetSqlType, scaleOrLength);
+    }
+
+    @Override
+    public void setObject(int parameterIndex, Object x, SQLType targetSqlType) throws SQLException
+    {
+        setParameter(parameterIndex, x);
+        ps.setObject(parameterIndex, x, targetSqlType);
+    }
 }
