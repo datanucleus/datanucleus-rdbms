@@ -1728,7 +1728,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void validateTable(final TableImpl table, ClassLoaderResolver clr)
     {
-        // TODO Why use READ_COMMITTED for delete but SERIALIZABLE for add?
         int isolationLevel = hasProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION) ? 
             TransactionUtils.getTransactionIsolationLevelForName(getStringProperty(PropertyNames.PROPERTY_SCHEMA_TXN_ISOLATION)) : Connection.TRANSACTION_READ_COMMITTED;
         ValidateTableSchemaTransaction validateTblTxn = new ValidateTableSchemaTransaction(this, isolationLevel, table);
