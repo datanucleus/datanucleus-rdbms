@@ -320,7 +320,7 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
         if (supportsOption(PRIMARYKEY_IN_CREATE_STATEMENTS))
         {
             PrimaryKey pk = table.getPrimaryKey();
-            if (pk != null && pk.size() > 0)
+            if (pk != null && pk.getNumberOfColumns() > 0)
             {
                 boolean includePk = true;
                 if (supportsOption(IDENTITY_PK_IN_CREATE_TABLE_COLUMN_DEF))

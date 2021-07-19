@@ -245,8 +245,8 @@ public class ForeignKey extends Key
             }
         }
 
-        setMinSize(columns, seq + 1);
-        setMinSize(refColumns, seq + 1);
+        setListMinimumSize(columns, seq + 1);
+        setListMinimumSize(refColumns, seq + 1);
 
         columns.set(seq, col);
         refColumns.set(seq, refCol);

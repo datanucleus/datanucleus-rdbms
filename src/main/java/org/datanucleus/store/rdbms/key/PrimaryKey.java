@@ -24,7 +24,7 @@ import org.datanucleus.store.rdbms.table.Table;
 /**
  * Representation of the primary key of a table.
  */
-public class PrimaryKey extends CandidateKey // TODO Do we need to extend CandidateKey?
+public class PrimaryKey extends Key
 {
     /**
      * Creates a primary key. A default name of the primary key is created by the constructor. This name can be overwritten.
@@ -32,17 +32,8 @@ public class PrimaryKey extends CandidateKey // TODO Do we need to extend Candid
      */
     public PrimaryKey(Table table)
     {
-        super(table, null);
+        super(table);
         name = table.getStoreManager().getIdentifierFactory().newPrimaryKeyIdentifier(table).getName();
-    }
-
-    /**
-     * Accessor for the size.
-     * @return The size.
-     */
-    public int size()
-    {
-        return columns.size();
     }
 
     public boolean equals(Object obj)

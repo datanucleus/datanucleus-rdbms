@@ -346,7 +346,7 @@ public abstract class TableImpl extends AbstractTable
     {
         Map actualPKs = getExistingPrimaryKeys(conn);
         PrimaryKey expectedPK = getPrimaryKey();
-        if (expectedPK.size() == 0)
+        if (expectedPK.getNumberOfColumns() == 0)
         {
             if (!actualPKs.isEmpty())
             {
@@ -1221,7 +1221,7 @@ public abstract class TableImpl extends AbstractTable
         stmts.add(dba.getCreateTableStatement(this, cols, props, storeMgr.getIdentifierFactory()));
 
         PrimaryKey pk = getPrimaryKey();
-        if (pk.size() > 0)
+        if (pk.getNumberOfColumns() > 0)
         {
             // Some databases define the primary key on the create table
             // statement so we don't have a Statement for the primary key here.

@@ -98,8 +98,8 @@ public abstract class ColumnOrderedKey extends Key
     {
         assertSameDatastoreObject(col);
 
-        setMinSize(columns, seq + 1);
-        setMinSize(columnOrdering, seq + 1);
+        setListMinimumSize(columns, seq + 1);
+        setListMinimumSize(columnOrdering, seq + 1);
 
         if (columns.get(seq) != null)
         {

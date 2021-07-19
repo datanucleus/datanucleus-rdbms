@@ -97,6 +97,15 @@ abstract class Key
     }
 
     /**
+     * Accessor for the number of columns.
+     * @return The number of columns.
+     */
+    public int getNumberOfColumns()
+    {
+        return columns.size();
+    }
+
+    /**
      * Class to add a column to the key
      * @param col The column to add
      */
@@ -105,6 +114,25 @@ abstract class Key
         assertSameDatastoreObject(col);
 
         columns.add(col);
+    }
+
+    /**
+     * Sets a column in a specified position <code>seq</code> for this index.
+     * @param seq the specified position for the <code>col</code>
+     * @param col the Column
+     */
+    public void setColumn(int seq, Column col)
+    {
+        assertSameDatastoreObject(col);
+
+        setListMinimumSize(columns, seq + 1);
+
+        if (columns.get(seq) != null)
+        {
+            throw new NucleusException("Key position #" + seq + " for " + table + " already set").setFatal();
+        }
+
+        columns.set(seq, col);
     }
 
     /**
@@ -155,7 +183,7 @@ abstract class Key
 
     // ------------------------------- Static Utilities -----------------------------
 
-    protected static void setMinSize(List list, int size)
+    protected static void setListMinimumSize(List list, int size)
     {
         while (list.size() < size)
         {
