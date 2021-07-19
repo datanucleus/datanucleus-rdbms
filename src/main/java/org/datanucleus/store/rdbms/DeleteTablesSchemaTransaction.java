@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusException;
@@ -35,6 +37,7 @@ import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.TableImpl;
 import org.datanucleus.store.rdbms.table.ViewImpl;
 import org.datanucleus.store.schema.StoreSchemaData;
+import org.datanucleus.store.schema.table.Table;
 import org.datanucleus.util.Localiser;
 import org.datanucleus.util.NucleusLogger;
 import org.datanucleus.util.StringUtils;
@@ -78,9 +81,9 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
             {
                 NucleusLogger.DATASTORE_SCHEMA.debug(Localiser.msg("050045", rdbmsMgr.getCatalogName(), rdbmsMgr.getSchemaName()));
 
-                // Build up map of tables and views TODO Why use maps?
-                Map baseTablesByName = new HashMap();
-                Map viewsByName = new HashMap();
+                // Create definition of tables/views to drop
+                Set<Table> tables = new HashSet<>();
+                Set<Table> views = new HashSet<>();
                 for (Iterator i = storeDataMgr.getManagedStoreData().iterator(); i.hasNext();)
                 {
                     RDBMSStoreData data = (RDBMSStoreData) i.next();
@@ -94,20 +97,19 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     {
                         if (data.mapsToView())
                         {
-                            viewsByName.put(data.getDatastoreIdentifier(), data.getTable());
+                            views.add(data.getTable());
                         }
                         else
                         {
-                            baseTablesByName.put(data.getDatastoreIdentifier(), data.getTable());
+                            tables.add(data.getTable());
                         }
                     }
                 }
 
                 // Remove views
-                Iterator viewsIter = viewsByName.values().iterator();
-                while (viewsIter.hasNext())
+                for (Table tblToDrop : views)
                 {
-                    ViewImpl view = (ViewImpl)viewsIter.next();
+                    ViewImpl view = (ViewImpl)tblToDrop;
                     if (writer != null)
                     {
                         try
@@ -127,16 +129,15 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                     StoreSchemaData info = rdbmsMgr.getSchemaHandler().getSchemaData(getCurrentConnection(), RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {view});
                     if (info != null)
                     {
-                        ((ViewImpl) viewsIter.next()).drop(getCurrentConnection());
+                        view.drop(getCurrentConnection());
                     }
                 }
 
                 // Remove table constraints
                 Map<TableImpl, Boolean> schemaExistsForTableMap = new HashMap();
-                Iterator tablesIter = baseTablesByName.values().iterator();
-                while (tablesIter.hasNext())
+                for (Table tblToDrop : tables)
                 {
-                    TableImpl tbl = (TableImpl)tablesIter.next();
+                    TableImpl tbl = (TableImpl)tblToDrop;
                     if (writer != null)
                     {
                         try
@@ -180,10 +181,9 @@ public class DeleteTablesSchemaTransaction extends AbstractSchemaTransaction
                 }
 
                 // Remove tables
-                tablesIter = baseTablesByName.values().iterator();
-                while (tablesIter.hasNext())
+                for (Table tblToDrop : tables)
                 {
-                    TableImpl tbl = (TableImpl)tablesIter.next();
+                    TableImpl tbl = (TableImpl)tblToDrop;
                     if (writer != null)
                     {
                         try
