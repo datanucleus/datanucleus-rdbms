@@ -62,7 +62,6 @@ Contributors:
 
         <persistence-property name="datanucleus.rdbms.classAdditionMaxRetries" datastore="true" value="3" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.statementBatchLimit" datastore="true" value="50" validator="org.datanucleus.properties.IntegerPropertyValidator"/>
-        <persistence-property name="datanucleus.rdbms.oracleNlsSortOrder" datastore="true" value="LATIN"/>
         <persistence-property name="datanucleus.rdbms.discriminatorPerSubclassTable" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.constraintCreateMode" datastore="true" value="DataNucleus" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.uniqueConstraints.mapInverse" datastore="true" value="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
@@ -81,10 +80,12 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.allowColumnReuse" datastore="true" value="false"/>
         <persistence-property name="datanucleus.rdbms.useColumnDefaultWhenNull" datastore="true" value="true"/>
 
-        <persistence-property name="datanucleus.rdbms.adapter.informixUseSerialForIdentity" datastore="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="values-in-brackets" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
 
+        <!-- Adapter specific properties -->
+        <persistence-property name="datanucleus.rdbms.informix.useSerialForIdentity" datastore="true" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.oracle.nlsSortOrder" datastore="true" value="LATIN"/>
         <persistence-property name="datanucleus.rdbms.mysql.engineType" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.mysql.collation" datastore="true"/>
         <persistence-property name="datanucleus.rdbms.mysql.characterSet" datastore="true"/>

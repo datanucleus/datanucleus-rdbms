@@ -658,7 +658,7 @@ public abstract class AbstractClassTable extends TableImpl
         }
         else
         {
-            // TODO Support other types
+            NucleusLogger.PERSISTENCE.warn("Dont currently support surrogate field of type " + colType + ". Ignored");
         }
     }
 }

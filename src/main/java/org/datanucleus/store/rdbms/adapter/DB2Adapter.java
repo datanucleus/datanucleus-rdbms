@@ -34,6 +34,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierType;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
@@ -268,9 +269,10 @@ public class DB2Adapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr Store Manager
      * @return The keyword for a column using auto-increment
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         return "generated always as identity (start with 1)";
     }

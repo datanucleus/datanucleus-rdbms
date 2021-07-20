@@ -32,7 +32,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1134,7 +1133,6 @@ public final class SQLQuery extends Query
 
         // Go through the fields of the ResultSet and map to the required fields in the candidate
         ResultSetMetaData rsmd = rs.getMetaData();
-        HashSet remainingColumnNames = new HashSet(columnFieldNumberMap.size()); // TODO We put nothing in this, so what is it for?!
         int colCount = rsmd.getColumnCount();
         int[] datastoreIndex = null;
         int[] versionIndex = null;
@@ -1181,7 +1179,6 @@ public final class SQLQuery extends Query
                     exprIndices = new int[] {colNum};
                 }
                 stmtMappings[fieldNumber].setColumnPositions(exprIndices);
-                remainingColumnNames.remove(colName);
                 matchedFieldNumbers[fieldNumberPosition++] = fieldNumber;
             }
 

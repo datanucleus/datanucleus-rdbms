@@ -356,26 +356,6 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                     getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT),
                     getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_LOGGING));
 
-                // TODO These ought to be stored with the StoreManager, not the NucleusContext
-                // Initialise any properties controlling the adapter
-                // Just use properties matching the pattern "datanucleus.rdbms.adapter.*"
-                Map<String, Object> dbaProps = new HashMap();
-                Map<String, Object> persistenceProps = ctx.getConfiguration().getPersistenceProperties();
-                Iterator<Map.Entry<String, Object>> propIter = persistenceProps.entrySet().iterator();
-                while (propIter.hasNext())
-                {
-                    Map.Entry<String, Object> entry = propIter.next();
-                    String prop = entry.getKey();
-                    if (prop.startsWith("datanucleus.rdbms.adapter."))
-                    {
-                        dbaProps.put(prop, entry.getValue());
-                    }
-                }
-                if (dbaProps.size() > 0)
-                {
-                    dba.setProperties(dbaProps);
-                }
-
                 // Initialise the Schema
                 initialiseSchema(conn, clr);
 

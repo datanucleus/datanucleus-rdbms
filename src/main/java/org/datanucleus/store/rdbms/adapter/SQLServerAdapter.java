@@ -36,6 +36,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.Index;
@@ -449,9 +450,10 @@ public class SQLServerAdapter extends BaseDatastoreAdapter
 
 	/**
 	 * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store Manager
 	 * @return The keyword for a column using auto-increment
 	 **/
-	public String getIdentityKeyword()
+	public String getIdentityKeyword(StoreManager storeMgr)
 	{
 		return "IDENTITY";
 	}

@@ -36,6 +36,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.ForeignKey;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
@@ -551,9 +552,10 @@ public class SQLAnywhereAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store Manager
      * @return The keyword for a column using auto-increment
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         return "NOT NULL DEFAULT AUTOINCREMENT";
     }

@@ -31,6 +31,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
@@ -63,8 +64,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
         supportedOptions.add(PROJECTION_IN_TABLE_REFERENCE_JOINS);
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
 
-        // Informix 11.x: We create indexes before foreign keys to avoid duplicate indexes error
-        // since Informix creates an index automatically
+        // Informix 11.x: We create indexes before foreign keys to avoid duplicate indexes error since Informix creates an index automatically
         supportedOptions.add(CREATE_INDEXES_BEFORE_FOREIGN_KEYS);
 
         supportedOptions.remove(IDENTITY_KEYS_NULL_SPECIFICATION);
@@ -136,7 +136,7 @@ public class InformixAdapter extends BaseDatastoreAdapter
      */
     public String getIdentityLastValueStmt(Table table, String columnName)
     {
-        String useSerial = (String)getValueForProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
+        String useSerial = table.getStoreManager().getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
         if (useSerial != null && useSerial.equalsIgnoreCase("true"))
         {
             // Default in JPOX, but equates to int
@@ -144,17 +144,17 @@ public class InformixAdapter extends BaseDatastoreAdapter
         }
 
         // Default in DataNucleus, equating to long
-        // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
         return "SELECT first 1 dbinfo('serial8') from systables";
     }
 
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr Store Manager
      * @return The keyword for a column using auto-increment
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
-        String useSerial = (String)getValueForProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
+        String useSerial = storeMgr.getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_INFORMIX_USE_SERIAL_FOR_IDENTITY);
         if (useSerial != null && useSerial.equalsIgnoreCase("true"))
         {
             // Default in JPOX, but equates to int
@@ -162,7 +162,6 @@ public class InformixAdapter extends BaseDatastoreAdapter
         }
 
         // Default in DataNucleus, equating to long
-        // Refer to http://www.jpox.org/servlet/jira/browse/NUCRDBMS-161
         return "SERIAL8";
     }
 

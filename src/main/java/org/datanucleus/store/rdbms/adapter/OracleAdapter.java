@@ -441,9 +441,10 @@ public class OracleAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store Manager
      * @return The keyword for a column using auto-increment
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         // Oracle 12+
         return "generated always as identity";

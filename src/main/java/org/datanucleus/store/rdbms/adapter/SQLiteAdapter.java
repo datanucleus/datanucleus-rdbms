@@ -27,6 +27,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.exceptions.ClassNotResolvedException;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.IdentifierFactory;
 import org.datanucleus.store.rdbms.key.CandidateKey;
@@ -284,7 +285,7 @@ public class SQLiteAdapter extends BaseDatastoreAdapter
     }
 
     @Override
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         return "autoincrement";
     }

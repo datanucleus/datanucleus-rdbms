@@ -28,6 +28,7 @@ import java.sql.Types;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
+import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -160,9 +161,10 @@ public class SybaseAdapter extends BaseDatastoreAdapter
 
     /**
      * Accessor for the auto-increment keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store Manager
      * @return The keyword for a column using auto-increment
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         return "IDENTITY";
     }

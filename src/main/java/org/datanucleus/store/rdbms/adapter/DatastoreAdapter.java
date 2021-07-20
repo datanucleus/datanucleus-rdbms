@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 
 import org.datanucleus.ClassLoaderResolver;
@@ -468,12 +467,6 @@ public interface DatastoreAdapter
     String getVendorID();
 
     /**
-     * Set any properties controlling how the adapter is configured.
-     * @param props The properties
-     */
-    void setProperties(Map<String, Object> props);
-
-    /**
      * Method to check if a word is reserved for this datastore.
      * @param word The word
      * @return Whether it is reserved
@@ -565,9 +558,10 @@ public interface DatastoreAdapter
 
     /**
      * Accessor for the identity (auto-increment) keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store manager
      * @return The keyword for a column using auto-increment/identity
      */
-    String getIdentityKeyword();
+    String getIdentityKeyword(StoreManager storeMgr);
 
     /**
      * Method to return the maximum length of a datastore identifier of the specified type.

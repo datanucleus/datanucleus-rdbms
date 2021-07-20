@@ -224,9 +224,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     /** The String used to separate catalog and table name. */
     protected String catalogSeparator;
 
-    /** Optional properties controlling the configuration. */
-    protected Map<String, Object> properties = null;
-
     /** Definition of which datastore mapping should be used for which java type, JDBC type, and SQL type, and the respective default type. */
     Map<String, ColumnTypeMappings> datastoreTypeMappingsByJavaType = new HashMap<>();
 
@@ -671,32 +668,6 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
             }
         }
         return 0;
-    }
-
-    /**
-     * Set any properties controlling how the adapter is configured.
-     * @param props The properties
-     */
-    public void setProperties(Map<String, Object> props)
-    {
-        if (props != null)
-        {
-            if (properties == null)
-            {
-                properties = new HashMap<>();
-            }
-            properties.putAll(props);
-        }
-    }
-
-    /**
-     * Accessor for a property. Null implies not defined
-     * @param name Name of the property
-     * @return Its value
-     */
-    public Object getValueForProperty(String name)
-    {
-        return properties != null ? properties.get(name) : null;
     }
 
     /**
@@ -1190,11 +1161,11 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     }
 
     /**
-     * Accessor for the autoincrementing keyword for generating DDLs.
-     * (CREATE TABLEs...).
+     * Accessor for the autoincrementing keyword for generating DDLs (CREATE TABLEs...).
+     * @param storeMgr The Store Manager
      * @return The keyword for a column using autoincrement
      */
-    public String getIdentityKeyword()
+    public String getIdentityKeyword(StoreManager storeMgr)
     {
         throw new UnsupportedOperationException(Localiser.msg("051019"));
     }

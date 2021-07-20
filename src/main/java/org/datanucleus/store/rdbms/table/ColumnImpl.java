@@ -524,7 +524,7 @@ public class ColumnImpl implements Column
         // Auto Increment
         if (adapter.supportsOption(DatastoreAdapter.IDENTITY_COLUMNS) && isIdentity())
         {
-            def.append(" " + adapter.getIdentityKeyword());
+            def.append(" " + adapter.getIdentityKeyword(table.getStoreManager()));
         }
 
         // Uniqueness
