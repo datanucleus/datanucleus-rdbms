@@ -2488,7 +2488,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
     /**
      * Convenience method to add the expected FKs for an embedded PC field.
      * @param foreignKeys The list of FKs to add the FKs to
-     * @param autoMode Whether operating in "auto-mode" where JPOX can create its own FKs
+     * @param autoMode Whether operating in "auto-mode" where DataNucleus can create its own FKs
      * @param clr ClassLoader resolver
      * @param embeddedMapping The embedded PC mapping
      */
