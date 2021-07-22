@@ -23,6 +23,8 @@ import org.datanucleus.store.rdbms.table.Table;
 
 /**
  * Representation of the primary key of a table.
+ * TODO MariaDB apparently allows "ALTER TABLE ADD CONSTRAINT PRIMARY KEY (col1 ASC, col2 DESC)" not that many others do
+ * but we don't allow that here, would need to extend ColumnOrderedKey for that, plus update to MySQL Adapter
  */
 public class PrimaryKey extends Key
 {
