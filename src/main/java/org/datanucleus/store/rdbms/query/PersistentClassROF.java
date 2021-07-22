@@ -71,6 +71,8 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     protected StatementClassMapping resultMapping = null;
 
     protected ResultSetGetter resultSetGetter = null;
+    protected StatementClassMapping mappingDefinition;
+    protected int[] mappedFieldNumbers;
 
     /** Resolved classes for metadata / discriminator keyed by class names. */
     private Map resolvedClasses = new ConcurrentReferenceHashMap<>(1, ReferenceType.STRONG, ReferenceType.SOFT);
@@ -263,55 +265,53 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
 
         int[] fieldNumbers = resultMapping.getMemberNumbers();
 
-        StatementClassMapping mappingDefinition; // TODO We need this on the first object only to generate the ResultSetGetter; can we optimise this?
-        int[] mappedFieldNumbers;
-        if (rootCmd instanceof InterfaceMetaData)
-        {
-            // Persistent-interface : create new mapping definition for a result type of the implementation
-            mappingDefinition = new StatementClassMapping();
-            mappingDefinition.setNucleusTypeColumnName(resultMapping.getNucleusTypeColumnName());
-            mappedFieldNumbers = new int[fieldNumbers.length];
-            for (int i = 0; i < fieldNumbers.length; i++)
-            {
-                AbstractMemberMetaData mmd = rootCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
-                mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
-                mappingDefinition.addMappingForMember(mappedFieldNumbers[i], resultMapping.getMappingForMemberPosition(fieldNumbers[i]));
-            }
-        }
-        else
-        {
-            // Persistent class
-            mappingDefinition = resultMapping;
-            mappedFieldNumbers = fieldNumbers;
-        }
-
         if (resultSetGetter == null)
         {
+            // First time through, so generate mapping lookups and ResultSetGetter
+            if (rootCmd instanceof InterfaceMetaData)
+            {
+                // Persistent-interface : create new mapping definition for a result type of the implementation
+                mappingDefinition = new StatementClassMapping();
+                mappingDefinition.setNucleusTypeColumnName(resultMapping.getNucleusTypeColumnName());
+                mappedFieldNumbers = new int[fieldNumbers.length];
+                for (int i = 0; i < fieldNumbers.length; i++)
+                {
+                    AbstractMemberMetaData mmd = rootCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+                    mappedFieldNumbers[i] = cmd.getAbsolutePositionOfMember(mmd.getName());
+                    mappingDefinition.addMappingForMember(mappedFieldNumbers[i], resultMapping.getMappingForMemberPosition(fieldNumbers[i]));
+                }
+            }
+            else
+            {
+                // Persistent class
+                mappingDefinition = resultMapping;
+                mappedFieldNumbers = fieldNumbers;
+            }
+
             // Use this result mapping definition for our ResultSetGetter
             this.resultSetGetter = new ResultSetGetter(ec, rs, mappingDefinition, rootCmd);
         }
 
         // Extract any surrogate version
-        VersionMetaData vermd = cmd.getVersionMetaDataForClass();
         Object surrogateVersion = null;
-        StatementMappingIndex versionMapping = null;
+        VersionMetaData vermd = cmd.getVersionMetaDataForClass();
         if (vermd != null)
         {
+            StatementMappingIndex versionMappingIdx = null;
             if (vermd.getFieldName() == null)
             {
-                versionMapping = resultMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
+                versionMappingIdx = resultMapping.getMappingForMemberPosition(SurrogateColumnType.VERSION.getFieldNumber());
             }
             else
             {
-                AbstractMemberMetaData vermmd = cmd.getMetaDataForMember(vermd.getFieldName());
-                versionMapping = resultMapping.getMappingForMemberPosition(vermmd.getAbsoluteFieldNumber());
+                versionMappingIdx = resultMapping.getMappingForMemberPosition(cmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber());
             }
-        }
-        if (versionMapping != null)
-        {
-            // Surrogate version column returned by query
-            JavaTypeMapping mapping = versionMapping.getMapping();
-            surrogateVersion = mapping.getObject(ec, rs, versionMapping.getColumnPositions());
+
+            if (versionMappingIdx != null)
+            {
+                // Surrogate version column returned by query
+                surrogateVersion = versionMappingIdx.getMapping().getObject(ec, rs, versionMappingIdx.getColumnPositions());
+            }
         }
 
         // Extract the object from the ResultSet
@@ -323,7 +323,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             cmd = ec.getMetaDataManager().getMetaDataForInterface(persistentClass, clr);
             if (cmd == null)
             {
-                // Fallback to the value we had
+                // Fallback to the class we had
                 cmd = ec.getMetaDataManager().getMetaDataForClass(pcClassForObject, clr);
             }
         }
@@ -346,8 +346,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                 {
                     try
                     {
-                        Object pkObj = rs.getObject(colPositions[j]);
-                        if (pkObj != null)
+                        if (rs.getObject(colPositions[j]) != null)
                         {
                             nullObject = false;
                             break;
