@@ -42,6 +42,7 @@ import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.query.expression.Expression;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
+import org.datanucleus.store.query.QueryManager;
 import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -89,15 +90,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     private final String clearStmt;
 
-    /** JDBC statement to use for retrieving keys of the map (locking). */
-    private volatile String getStmtLocked = null;
+    private static class CachedGetStmt
+    {
+        /** JDBC statement to use for retrieving keys of the map (locking). */
+        private String stmtLocked;
 
-    /** JDBC statement to use for retrieving keys of the map (not locking). */
-    private String getStmtUnlocked = null;
+        /** JDBC statement to use for retrieving keys of the map (not locking). */
+        private String stmt;
 
-    private StatementClassMapping getMappingDef = null;
+        private StatementClassMapping mappingDef;
 
-    private StatementParameterMapping getMappingParams = null;
+        private StatementParameterMapping mappingParams;
+    }
 
     private SetStore<K> keySetStore = null;
 
@@ -185,7 +189,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     @Override
     public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
     {
-        if (m == null || m.size() == 0)
+        if (m == null || m.isEmpty())
         {
             return;
         }
@@ -199,44 +203,51 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         // Check if this is a new entry, or an update
         ArrayList<Map.Entry<? extends K, ? extends V>> puts = new ArrayList<>();
         ArrayList<Map.Entry<? extends K, ? extends V>> updates = new ArrayList<>();
-        boolean bulkSelect = m.size() > 1 && keyMapping instanceof SingleFieldMapping && keyMapping
+        boolean bulkSelect = keyMapping instanceof SingleFieldMapping && keyMapping
             .getNumberOfColumnMappings() == 1 && !(keyMapping instanceof SerialisedMapping);
         if (bulkSelect)
         {
-            this.entrySetStore(); // initialize it
             HashMap<K, Optional<V>> map = new HashMap<>();
+            this.entrySetStore(); // initialize
             final Iterator<Entry<K, V>> dbIterator = this.entrySetStore.iterator(op, m.keySet());
             while (dbIterator.hasNext())
             {
                 final Entry<K, V> e = dbIterator.next();
                 map.put(e.getKey(), Optional.ofNullable(e.getValue()));
             }
-            for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
+            if (map.isEmpty())
             {
-                K key = e.getKey();
-                if (map.containsKey(key))
+                puts.addAll(m.entrySet());
+            }
+            else
+            {
+                for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
                 {
-                    V newValue = e.getValue();
-                    Optional<V> oldValue = map.get(key);
-                    if (oldValue.isPresent())
+                    K key = e.getKey();
+                    if (map.containsKey(key))
                     {
-                        if (oldValue != newValue)
+                        V newValue = e.getValue();
+                        Optional<V> oldValue = map.get(key);
+                        if (oldValue.isPresent())
                         {
-                            updates.add(e);
+                            if (oldValue != newValue)
+                            {
+                                updates.add(e);
+                            }
+                        }
+                        else
+                        {
+                            // was null
+                            if (newValue != null)
+                            {
+                                updates.add(e);
+                            }
                         }
                     }
                     else
                     {
-                        // was null
-                        if (newValue != null)
-                        {
-                            updates.add(e);
-                        }
+                        puts.add(e);
                     }
-                }
-                else
-                {
-                    puts.add(e);
                 }
             }
         }
@@ -703,23 +714,20 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
 
         ExecutionContext ec = ownerOP.getExecutionContext();
-        if (getStmtLocked == null)
+        final QueryManager queryManager = storeMgr.getQueryManager();
+        final String cacheKey = "JoinMapStore.getValue FROM " + mapTable.toString() + " FetchGroup " + String.join(",", ec.getFetchPlan().getGroups());
+        CachedGetStmt cachedGetStmt = (CachedGetStmt) queryManager.getDatastoreQueryCompilation(storeMgr.getQueryCacheKey(), JoinMapStore.class.getSimpleName(),
+            cacheKey);
+        if (cachedGetStmt == null)
         {
-            synchronized (this) // Make sure this completes in case another thread needs the same info
-            {
-                if (getStmtLocked == null)
-                {
-                    // Generate the statement, and statement mapping/parameter information
-                    SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
-                    getStmtUnlocked = sqlStmt.getSQLText().toSQL();
-                    sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
-                    getStmtLocked = sqlStmt.getSQLText().toSQL();
-                }
-            }
+            // Generate the statement, and statement mapping/parameter information
+            cachedGetStmt = getSQLStatementForGet(ownerOP);
+            queryManager.addDatastoreQueryCompilation(storeMgr.getQueryCacheKey(), JoinMapStore.class.getSimpleName(),
+                cacheKey, cachedGetStmt);
         }
 
         Transaction tx = ec.getTransaction();
-        String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? getStmtLocked : getStmtUnlocked);
+        String stmt = (tx.getSerializeRead() != null && tx.getSerializeRead() ? cachedGetStmt.stmtLocked : cachedGetStmt.stmt);
         Object value = null;
         try
         {
@@ -729,13 +737,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Create the statement and supply owner/key params
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
-                StatementMappingIndex ownerIdx = getMappingParams.getMappingForParameter("owner");
+                StatementMappingIndex ownerIdx = cachedGetStmt.mappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance = 0; paramInstance < numParams; paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
-                StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
+                StatementMappingIndex keyIdx = cachedGetStmt.mappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance = 0; paramInstance < numParams; paramInstance++)
                 {
@@ -786,7 +794,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory<?> rof = new PersistentClassROF<>(ec, rs, false, ec.getFetchPlan(), getMappingDef, valueCmd,
+                            ResultObjectFactory<?> rof = new PersistentClassROF<>(ec, rs, false, ec.getFetchPlan(), cachedGetStmt.mappingDef, valueCmd,
                                     clr.classForName(valueType));
                             value = rof.getObject();
                         }
@@ -821,15 +829,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param ownerOP ObjectProvider for the owning object
      * @return The SQLStatement
      */
-    protected SelectStatement getSQLStatementForGet(ObjectProvider<?> ownerOP)
+    protected CachedGetStmt getSQLStatementForGet(ObjectProvider<?> ownerOP)
     {
-        SelectStatement sqlStmt = null;
+        SelectStatement sqlStmt;
+        StatementClassMapping getMappingDef;
+
         ExecutionContext ec = ownerOP.getExecutionContext();
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
         Class<?> valueCls = clr.classForName(this.valueType);
         if (valuesAreEmbedded || valuesAreSerialised)
         {
+            getMappingDef = null;
             // Value is stored in join table
             sqlStmt = new SelectStatement(storeMgr, mapTable, null, null);
             sqlStmt.setClassLoaderResolver(clr);
@@ -923,11 +934,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
             keyIdx.addParameterOccurrence(keyPositions);
         }
+        StatementParameterMapping getMappingParams;
         getMappingParams = new StatementParameterMapping();
         getMappingParams.addMappingForParameter("owner", ownerIdx);
         getMappingParams.addMappingForParameter("key", keyIdx);
 
-        return sqlStmt;
+        CachedGetStmt getStmt = new CachedGetStmt();
+        getStmt.mappingDef = getMappingDef;
+        getStmt.mappingParams = getMappingParams;
+        getStmt.stmt = sqlStmt.getSQLText().toSQL();
+        sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
+        getStmt.stmtLocked = sqlStmt.getSQLText().toSQL();
+        return getStmt;
     }
 
     protected void clearInternal(ObjectProvider<?> ownerOP)
