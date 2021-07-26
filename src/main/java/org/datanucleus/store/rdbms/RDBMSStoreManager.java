@@ -109,6 +109,7 @@ import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.Query;
+import org.datanucleus.store.rdbms.SQLController.StatementLoggingType;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapterFactory;
 import org.datanucleus.store.rdbms.autostart.SchemaAutoStarter;
@@ -354,7 +355,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
                 sqlController = new SQLController(dba.supportsOption(DatastoreAdapter.STATEMENT_BATCHING), 
                     getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_BATCH_LIMIT),
                     getIntProperty(PropertyNames.PROPERTY_DATASTORE_READ_TIMEOUT),
-                    getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_LOGGING));
+                    StatementLoggingType.valueOf(getStringProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STATEMENT_LOGGING)));
 
                 // Initialise the Schema
                 initialiseSchema(conn, clr);

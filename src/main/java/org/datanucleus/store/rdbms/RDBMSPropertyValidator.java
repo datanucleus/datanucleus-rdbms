@@ -129,9 +129,9 @@ public class RDBMSPropertyValidator implements PropertyValidator
             if (value instanceof String)
             {
                 String strVal = (String)value;
-                if (strVal.equalsIgnoreCase("jdbc") ||
-                    strVal.equalsIgnoreCase("values") ||
-                    strVal.equalsIgnoreCase("values-in-brackets"))
+                if (strVal.equalsIgnoreCase("JDBC") ||
+                    strVal.equalsIgnoreCase("PARAMS_INLINE") ||
+                    strVal.equalsIgnoreCase("PARAMS_IN_BRACKETS"))
                 {
                     return true;
                 }

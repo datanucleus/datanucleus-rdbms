@@ -80,7 +80,7 @@ Contributors:
         <persistence-property name="datanucleus.rdbms.allowColumnReuse" datastore="true" value="false"/>
         <persistence-property name="datanucleus.rdbms.useColumnDefaultWhenNull" datastore="true" value="true"/>
 
-        <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="values-in-brackets" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
+        <persistence-property name="datanucleus.rdbms.statementLogging" datastore="true" value="JDBC" validator="org.datanucleus.store.rdbms.RDBMSPropertyValidator"/>
         <persistence-property name="datanucleus.rdbms.fetchUnloadedAutomatically" datastore="true" value="false" validator="org.datanucleus.properties.BooleanPropertyValidator"/>
 
         <!-- Adapter specific properties -->

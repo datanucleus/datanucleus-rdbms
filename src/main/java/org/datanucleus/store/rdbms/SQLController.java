@@ -99,8 +99,8 @@ public class SQLController
     /** Timeout to apply to queries (where required) in milliseconds. */
     protected int queryTimeout = 0;
 
-    protected boolean jdbcStatements = false;
-    protected boolean paramValuesInBrackets = true;
+    /** Statement logging type. */
+    protected StatementLoggingType stmtLogType = StatementLoggingType.JDBC;
 
     /**
      * State of a connection.
@@ -130,6 +130,13 @@ public class SQLController
         }
     }
 
+    public enum StatementLoggingType
+    {
+        JDBC,
+        PARAMS_INLINE,
+        PARAMS_IN_BRACKETS
+    }
+
     /** Map of the ConnectionStatementState keyed by the Connection */
     Map<ManagedConnection, ConnectionStatementState> connectionStatements = new ConcurrentHashMap();
 
@@ -138,9 +145,9 @@ public class SQLController
      * @param supportsBatching Whether batching is to be supported.
      * @param maxBatchSize The maximum batch size
      * @param queryTimeout Timeout for queries (ms)
-     * @param stmtLogging Setting for statement logging
+     * @param stmtLoggingType Setting for statement logging
      */
-    public SQLController(boolean supportsBatching, int maxBatchSize, int queryTimeout, String stmtLogging)
+    public SQLController(boolean supportsBatching, int maxBatchSize, int queryTimeout, StatementLoggingType stmtLoggingType)
     {
         this.supportsBatching = supportsBatching;
         this.maxBatchSize = maxBatchSize;
@@ -151,18 +158,7 @@ public class SQLController
             this.supportsBatching = false;
         }
 
-        if (stmtLogging.equalsIgnoreCase("jdbc"))
-        {
-            this.jdbcStatements = true;
-        }
-        else if (stmtLogging.equalsIgnoreCase("values-in-brackets"))
-        {
-            this.paramValuesInBrackets = true;
-        }
-        else
-        {
-            this.paramValuesInBrackets = false;
-        }
+        this.stmtLogType = stmtLoggingType;
     }
 
     /**
@@ -259,11 +255,11 @@ public class SQLController
                 c.prepareStatement(stmtText, Statement.RETURN_GENERATED_KEYS) : c.prepareStatement(stmtText, pkColumnNames.toArray(new String[0])) :
             c.prepareStatement(stmtText);
         ps.clearBatch(); // In case using statement caching and given one with batched statements left hanging (C3P0)
-        if (!jdbcStatements)
+        if (stmtLogType != StatementLoggingType.JDBC)
         {
             // Wrap with our parameter logger
             ps = new ParamLoggingPreparedStatement(ps, stmtText);
-            ((ParamLoggingPreparedStatement)ps).setParamsInAngleBrackets(paramValuesInBrackets);
+            ((ParamLoggingPreparedStatement)ps).setParamsInAngleBrackets(stmtLogType == StatementLoggingType.PARAMS_IN_BRACKETS);
         }
         if (NucleusLogger.DATASTORE.isDebugEnabled())
         {
@@ -365,11 +361,11 @@ public class SQLController
             NucleusLogger.DATASTORE.debug(Localiser.msg("052109", ps, StringUtils.toJVMIDString(c)));
         }
 
-        if (!jdbcStatements)
+        if (stmtLogType != StatementLoggingType.JDBC)
         {
             // Wrap with our parameter logger
             ps = new ParamLoggingPreparedStatement(ps, stmtText);
-            ((ParamLoggingPreparedStatement)ps).setParamsInAngleBrackets(paramValuesInBrackets);
+            ((ParamLoggingPreparedStatement)ps).setParamsInAngleBrackets(stmtLogType == StatementLoggingType.PARAMS_IN_BRACKETS);
         }
 
         return ps;

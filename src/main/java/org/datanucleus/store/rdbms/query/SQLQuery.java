@@ -167,11 +167,23 @@ public final class SQLQuery extends Query
             type = QueryType.BULK_UPDATE;
             unique = true;
         }
+        else if (firstToken.equals("INSERT"))
+        {
+            type = QueryType.BULK_INSERT;
+            unique = true;
+        }
         else
         {
             // Stored procedures, others
             type = QueryType.OTHER;
             unique = true;
+        }
+
+        // Allow override of query type
+        String queryTypeExt = getStringExtensionProperty(EXTENSION_QUERY_TYPE, null);
+        if (!StringUtils.isWhitespace(queryTypeExt))
+        {
+            type = QueryType.valueOf(queryTypeExt);
         }
 
         if (ec.getApiAdapter().getName().equalsIgnoreCase("JDO"))
@@ -597,7 +609,7 @@ public final class SQLQuery extends Query
             throw new NucleusUserException(Localiser.msg("059019", (parameterNames!=null) ? "" + parameterNames.length : 0,"" + parameters.size()));
         }
 
-        if (type == QueryType.BULK_DELETE || type == QueryType.BULK_UPDATE)
+        if (type == QueryType.BULK_DELETE || type == QueryType.BULK_UPDATE || type == QueryType.BULK_INSERT)
         {
             // Update/Delete statement (INSERT/UPDATE/DELETE/MERGE)
             try
