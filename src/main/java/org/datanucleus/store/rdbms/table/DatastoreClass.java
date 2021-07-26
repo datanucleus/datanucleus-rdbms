@@ -65,12 +65,12 @@ public interface DatastoreClass extends Table
     DatastoreClass getBaseDatastoreClass();
 
     /**
-     * Method to return the base DatastoreClass that persists the specified field. This navigates up through the superclass
-     * tables to find a table that manages the field.
-     * @param fmd MetaData for the field required
-     * @return The DatastoreClass managing that field
+     * Method to return the base DatastoreClass that persists the specified member. 
+     * This navigates up through the superclass tables to find a table that manages the member.
+     * @param mmd MetaData for the member required
+     * @return The DatastoreClass managing that member
      */
-    public DatastoreClass getBaseDatastoreClassWithMember(AbstractMemberMetaData fmd);
+    public DatastoreClass getBaseDatastoreClassWithMember(AbstractMemberMetaData mmd);
 
     /**
      * Accessor whether the supplied DatastoreClass is a supertable of this table.
@@ -123,35 +123,34 @@ public interface DatastoreClass extends Table
 
     /**
      * Accessor for the mapping for the specified member name.
-     * Doesn't cope with fields of the same name in different subclasses - you should call the equivalent method passing FieldMetaData for those.
-     * @param memberName Name of field/property
-     * @return The Mapping for the field/property
+     * Doesn't cope with members of the same name in different subclasses - you should call the equivalent method passing AbstractMemberMetaData for those.
+     * @param memberName Name of member
+     * @return The Mapping for the member
      */
     JavaTypeMapping getMemberMapping(String memberName);
 
     /**
-     * Accessor for the mapping for the specified field.
-     * @param mmd Metadata of the field/property
-     * @return The Mapping for the field.
+     * Accessor for the mapping for the specified member.
+     * @param mmd Metadata of the member
+     * @return The Mapping for the member.
      */
     JavaTypeMapping getMemberMapping(AbstractMemberMetaData mmd);
 
     /**
-     * Accessor for the mapping for the specified field only in this datastore class.
-     * @param mmd Metadata of the field/property
-     * @return The Mapping for the field (or null if not present here)
+     * Accessor for the mapping for the specified member only in this datastore class.
+     * @param mmd Metadata of the member
+     * @return The Mapping for the member (or null if not present here)
      */
     JavaTypeMapping getMemberMappingInDatastoreClass(AbstractMemberMetaData mmd);
 
     /**
-     * Provide the mappings to the consumer for all primary-key fields mapped to
-     * this table (for application identity).
+     * Provide the mappings to the consumer for all primary-key member mapped to this table (for application identity).
      * @param consumer Consumer for the mappings
      */
     void providePrimaryKeyMappings(MappingConsumer consumer);
 
     /**
-     * Provide the mappings to the consumer for all non primary-key fields mapped to this table.
+     * Provide the mappings to the consumer for all non primary-key member mapped to this table.
      * @param consumer Consumer for the mappings
      */
     void provideNonPrimaryKeyMappings(MappingConsumer consumer);
@@ -159,13 +158,14 @@ public interface DatastoreClass extends Table
     /**
      * Provide the mappings to the consumer for all specified members.
      * @param consumer Consumer for the mappings
-     * @param mmds MetaData of the fields/properties to provide mappings for
-     * @param includeSecondaryTables Whether to supply fields in secondary tables
+     * @param mmds MetaData of the member to provide mappings for
+     * @param includeSecondaryTables Whether to supply member in secondary tables
      */
     void provideMappingsForMembers(MappingConsumer consumer, AbstractMemberMetaData[] mmds, boolean includeSecondaryTables);
 
     /**
-     * Provide the mapping for the specified surrogate column (if present). This can be datastore id, discriminator, version, multitenancy, soft-delete, etc.
+     * Provide the mapping for the specified surrogate column (if present). 
+     * This can be datastore id, discriminator, version, multitenancy, soft-delete, etc.
      * @param colType Type of surrogate column
      * @param consumer The consumer for the mapping
      */
@@ -186,19 +186,19 @@ public interface DatastoreClass extends Table
 
     /**
      * Accessor for the external mapping for the specified member of the specified mapping type.
-     * An external mapping is a mapping for which there is no field in the actual class to represent it (part of a relation).
+     * An external mapping is a mapping for which there is no member in the actual class to represent it (part of a relation).
      * The type can be FK, FK discriminator, order, etc
-     * @param mmd MetaData for the (external) field/property
+     * @param mmd MetaData for the (external) member
      * @param mappingType The type of mapping
      * @return The external mapping
      */
     JavaTypeMapping getExternalMapping(AbstractMemberMetaData mmd, MappingType mappingType);
 
     /**
-     * Accessor for the owner field metadata for the specified external mapping of the specified type
+     * Accessor for the owner member metadata for the specified external mapping of the specified type
      * @param mapping The external mapping
      * @param mappingType The type of mapping
-     * @return Field MetaData in the owner class
+     * @return Member MetaData in the owner class
      */
     AbstractMemberMetaData getMetaDataForExternalMapping(JavaTypeMapping mapping, MappingType mappingType);
 }

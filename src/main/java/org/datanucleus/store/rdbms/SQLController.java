@@ -356,16 +356,16 @@ public class SQLController
             // Apply any query timeout
             ps.setQueryTimeout(queryTimeout/1000); // queryTimeout is in milliseconds
         }
-        if (NucleusLogger.DATASTORE.isDebugEnabled())
-        {
-            NucleusLogger.DATASTORE.debug(Localiser.msg("052109", ps, StringUtils.toJVMIDString(c)));
-        }
 
         if (stmtLogType != StatementLoggingType.JDBC)
         {
             // Wrap with our parameter logger
             ps = new ParamLoggingPreparedStatement(ps, stmtText);
             ((ParamLoggingPreparedStatement)ps).setParamsInAngleBrackets(stmtLogType == StatementLoggingType.PARAMS_IN_BRACKETS);
+        }
+        if (NucleusLogger.DATASTORE.isDebugEnabled())
+        {
+            NucleusLogger.DATASTORE.debug(Localiser.msg("052109", ps, StringUtils.toJVMIDString(c)));
         }
 
         return ps;
