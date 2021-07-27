@@ -298,7 +298,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         start++;
 
                         // Execute the statement
-                        sqlControl.executeStatementUpdate(ec, mconn, addStmt, ps, !iter.hasNext());
+                        sqlControl.executeStatementUpdate(ec, mconn, addStmt, ps, !elemIter.hasNext());
                     }
                     finally
                     {
