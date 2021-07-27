@@ -580,7 +580,7 @@ public class JPQLQuery extends AbstractJPQLQuery
                     ResultSet rs = null;
                     try
                     {
-                        rs = sqlControl.executeStatementQuery(ec, mconn, toString(), ps);
+                        rs = sqlControl.executeStatementQuery(ec, mconn, datastoreCompilation.getSQL(), ps);
                     }
                     finally
                     {
