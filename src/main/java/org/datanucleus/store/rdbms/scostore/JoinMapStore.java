@@ -1018,9 +1018,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param ownerOP ObjectProvider for the owner
      * @param conn The Connection
      * @param batched Whether we are batching it
-     * @param key The key
-     * @param value The new value
-     * @param executeNow Whether to execute the statement now or wait til any batch
+     * @param updates the values to be update by key
      * @throws MappedDatastoreException Thrown if an error occurs
      */
     protected void internalUpdate(ObjectProvider<?> ownerOP, ManagedConnection conn, boolean batched, List<Map.Entry<? extends K, ? extends V>> updates)
@@ -1073,10 +1071,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param ownerOP ObjectProvider for the owner
      * @param conn The Connection
      * @param batched Whether we are batching it
-     * @param key The key
-     * @param value The value
-     * @param executeNow Whether to execute the statement now or wait til batching
-     * @return The return codes from any executed statement
+     * @param puts the list of key/values being inserted
      * @throws MappedDatastoreException Thrown if an error occurs
      */
     protected void internalPut(ObjectProvider<?> ownerOP, ManagedConnection conn, boolean batched, List<Map.Entry<? extends K, ? extends V>> puts)
