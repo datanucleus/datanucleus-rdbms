@@ -43,6 +43,7 @@ import org.datanucleus.store.rdbms.mapping.java.DoubleMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.FloatMapping;
 import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
+import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -247,42 +248,38 @@ public class ObjectExpression extends SQLExpression
         ReferenceMapping refMapping = (ReferenceMapping)refExpr.mapping;
         JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
         int subExprStart = 0;
-        int subExprEnd = 0;
 
         String implType = implExpr.mapping.getType();
+        String implActualType;
         if (implExpr instanceof ObjectLiteral && ((ObjectLiteral)implExpr).getValue() != null)
         {
             // Use type of literal directly if available. This caters for the case where we have an interface implementation and it is sharing a table with another implementation
-            implType = ((ObjectLiteral)implExpr).getValue().getClass().getName();
+        	implActualType = ((ObjectLiteral)implExpr).getValue().getClass().getName();
+        }else {
+        	implActualType = implType;
         }
 
         for (int i=0;i<implMappings.length;i++)
         {
             // TODO Handle case where we have a subclass of the implementation here
-            if (implMappings[i].getType().equals(implType))
+            // Either implementation-classes is exactly implExpr or root mapping class of implExpr, but still fail if anything between
+            if (implMappings[i].getType().equals(implActualType) || implMappings[i].getType().equals(implType))
             {
-                subExprEnd = subExprStart + implMappings[i].getNumberOfColumnMappings();
-                break;
+            	int subExprEnd = subExprStart + implMappings[i].getNumberOfColumnMappings();
+            	int implMappingNum = 0;
+                BooleanExpression bExpr = refExpr.subExprs.getExpression(subExprStart).eq(implExpr.subExprs.getExpression(implMappingNum++));
+                for (int j=subExprStart + 1;j<subExprEnd;j++)
+                {
+                    bExpr = bExpr.and(refExpr.subExprs.getExpression(j).eq(implExpr.subExprs.getExpression(implMappingNum++)));
+                }
+                return (negate ? new BooleanExpression(Expression.OP_NOT, bExpr.encloseInParentheses()) : bExpr);
             }
 
             subExprStart += implMappings[i].getNumberOfColumnMappings();
         }
 
-        BooleanExpression bExpr = null;
-        int implMappingNum = 0;
-        for (int i=subExprStart;i<subExprEnd;i++)
-        {
-            BooleanExpression subexpr = refExpr.subExprs.getExpression(i).eq(implExpr.subExprs.getExpression(implMappingNum++));
-            bExpr = (bExpr == null ? subexpr : bExpr.and(subexpr));
-        }
-
-        if (bExpr == null)
-        {
-            // Implementation not found explicitly, so just treat as if "ObjectExpression.eq(ObjectExpression)". See e.g JDO TCK "companyPMInterface" test
-            return ExpressionUtils.getEqualityExpressionForObjectExpressions((ObjectExpression) refExpr, (ObjectExpression)implExpr, true);
-        }
-
-        return (negate ? new BooleanExpression(Expression.OP_NOT, bExpr.encloseInParentheses()) : bExpr);
+        // Implementation not found explicitly, so just treat as if "ObjectExpression.eq(ObjectExpression)". See e.g JDO TCK "companyPMInterface" test
+        return ExpressionUtils.getEqualityExpressionForObjectExpressions((ObjectExpression) refExpr, (ObjectExpression)implExpr, true);
     }
 
     /**
