@@ -209,7 +209,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
-                    // Loop through all entries TODO Batch this
+                    // Loop through all entries
                     Iterator<Map.Entry> iter = puts.iterator();
                     while (iter.hasNext())
                     {
@@ -238,7 +238,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
-                    // Loop through all entries TODO Batch this
+                    // Loop through all entries
                     Iterator<Map.Entry> iter = updates.iterator();
                     while (iter.hasNext())
                     {
@@ -982,7 +982,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         SQLController sqlControl = storeMgr.getSQLController();
         try 
         {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, updateStmt, false);
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, updateStmt, batched);
             try
             {
                 int jdbcPosition = 1;
@@ -997,14 +997,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
-                if (batched)
-                {
-                    ps.addBatch();
-                }
-                else
-                {
-                    sqlControl.executeStatementUpdate(ec, conn, updateStmt, ps, true);
-                }
+                sqlControl.executeStatementUpdate(ec, conn, updateStmt, ps, executeNow);
             }
             finally
             {
@@ -1035,7 +1028,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, false);
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, batched);
             try
             {
                 int jdbcPosition = 1;
@@ -1057,7 +1050,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
                 // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, putStmt, ps, true);
+                return sqlControl.executeStatementUpdate(ec, conn, putStmt, ps, executeNow);
             }
             finally
             {
