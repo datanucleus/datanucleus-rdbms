@@ -88,15 +88,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     private StatementClassMapping getMappingDef = null;
     private StatementParameterMapping getMappingParams = null;
 
-    private SetStore keySetStore = null;
-    private CollectionStore valueSetStore = null;
+    private SetStore<K> keySetStore = null;
+    private CollectionStore<V> valueSetStore = null;
     private SetStore entrySetStore = null;
     
-    /**
-     * when the element mappings columns can't be part of the primary key
-     * by datastore limitations like BLOB types. An adapter mapping is used to be a kind of "index"
-     */
-    protected final JavaTypeMapping adapterMapping;    
+    /** Mapping used when the element mappings columns can't be part of the primary key by datastore limitations, such as BLOB types. */
+    protected final JavaTypeMapping adapterMapping;
 
     /**
      * Constructor for the backing store of a join map for RDBMS.
@@ -124,7 +121,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
 
-        Class value_class=clr.classForName(valueType);
+        Class value_class = clr.classForName(valueType);
         if (ClassUtils.isReferenceType(value_class))
         {
             // Map of reference value types (interfaces/Objects)
@@ -692,15 +689,17 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Create the statement and supply owner/key params
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+
                 StatementMappingIndex ownerIdx = getMappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
-                for (int paramInstance=0;paramInstance<numParams;paramInstance++)
+                for (int paramInstance=0; paramInstance<numParams; paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
+
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
-                for (int paramInstance=0;paramInstance<numParams;paramInstance++)
+                for (int paramInstance=0; paramInstance<numParams; paramInstance++)
                 {
                     keyIdx.getMapping().setObject(ec, ps, keyIdx.getParameterPositionsForOccurrence(paramInstance), key);
                 }
@@ -992,7 +991,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         SQLController sqlControl = storeMgr.getSQLController();
         try 
         {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, updateStmt, false);
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, updateStmt, batched);
             try
             {
                 int jdbcPosition = 1;
@@ -1007,14 +1006,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
-                if (batched)
-                {
-                    ps.addBatch();
-                }
-                else
-                {
-                    sqlControl.executeStatementUpdate(ec, conn, updateStmt, ps, true);
-                }
+                sqlControl.executeStatementUpdate(ec, conn, updateStmt, ps, executeNow);
             }
             finally
             {
@@ -1045,7 +1037,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, false);
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, batched);
             try
             {
                 int jdbcPosition = 1;
@@ -1068,7 +1060,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
                 // Execute the statement
-                return sqlControl.executeStatementUpdate(ec, conn, putStmt, ps, true);
+                return sqlControl.executeStatementUpdate(ec, conn, putStmt, ps, executeNow);
             }
             finally
             {
@@ -1140,6 +1132,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         return nextID;
     }
+
     /**
      * Generate statement for obtaining the maximum id.
      * <PRE>
