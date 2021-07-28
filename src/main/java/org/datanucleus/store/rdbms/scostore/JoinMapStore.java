@@ -86,15 +86,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     private StatementClassMapping getMappingDef = null;
     private StatementParameterMapping getMappingParams = null;
 
-    private SetStore keySetStore = null;
-    private CollectionStore valueSetStore = null;
+    private SetStore<K> keySetStore = null;
+    private CollectionStore<V> valueSetStore = null;
     private SetStore entrySetStore = null;
-    
-    /**
-     * when the element mappings columns can't be part of the primary key
-     * by datastore limitations like BLOB types. An adapter mapping is used to be a kind of "index"
-     */
-    protected final JavaTypeMapping adapterMapping;    
+
+    /** Mapping for when the element mappings columns can't be part of the primary key due to datastore limitations (e.g BLOB types). */
+    protected final JavaTypeMapping adapterMapping;
 
     /**
      * Constructor for the backing store of a join map for RDBMS.
@@ -120,14 +117,14 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         this.valuesAreEmbedded = mapTable.isEmbeddedValue();
         this.valuesAreSerialised = mapTable.isSerialisedValue();
 
-        keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
+        this.keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
 
-        Class value_class=clr.classForName(valueType);
+        Class value_class = clr.classForName(valueType);
         if (ClassUtils.isReferenceType(value_class))
         {
             // Map of reference value types (interfaces/Objects)
             NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", ownerMemberMetaData.getFullFieldName(), value_class.getName()));
-            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class,null,clr);
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class, null, clr);
             if (valueCmd != null)
             {
                 this.valueType = value_class.getName();
@@ -177,12 +174,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         Set<Map.Entry> puts = new HashSet<>();
         Set<Map.Entry> updates = new HashSet<>();
 
-        Iterator i = m.entrySet().iterator();
-        while (i.hasNext())
+        for (Map.Entry entry : m.entrySet())
         {
-            Map.Entry e = (Map.Entry)i.next();
-            Object key = e.getKey();
-            Object value = e.getValue();
+            Object key = entry.getKey();
+            Object value = entry.getValue();
 
             // Make sure the related objects are persisted (persistence-by-reachability)
             validateKeyForWriting(op, key);
@@ -194,12 +189,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 Object oldValue = getValue(op, key);
                 if (oldValue != value)
                 {
-                    updates.add(e);
+                    updates.add(entry);
                 }
             }
             catch (NoSuchElementException nsee)
             {
-                puts.add(e);
+                puts.add(entry);
             }
         }
 
@@ -214,7 +209,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
-                    // Loop through all entries
+                    // Loop through all entries TODO Batch this
                     Iterator<Map.Entry> iter = puts.iterator();
                     while (iter.hasNext())
                     {
@@ -243,7 +238,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
-                    // Loop through all entries
+                    // Loop through all entries TODO Batch this
                     Iterator<Map.Entry> iter = updates.iterator();
                     while (iter.hasNext())
                     {
@@ -503,8 +498,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * Generate statement to add an item to the Map.
      * Adds a row to the link table, linking container with value object.
      * <PRE>
-     * INSERT INTO MAPTABLE (VALUECOL, OWNERCOL, KEYCOL)
-     * VALUES (?, ?, ?)
+     * INSERT INTO MAPTABLE (VALUECOL, OWNERCOL, KEYCOL) VALUES (?, ?, ?)
      * </PRE>
      * @return Statement to add an item to the Map.
      */
@@ -579,10 +573,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * Generate statement to update an item in the Map.
      * Updates the link table row, changing the value object for this key.
      * <PRE>
-     * UPDATE MAPTABLE
-     * SET VALUECOL=?
-     * WHERE OWNERCOL=?
-     * AND KEYCOL=?
+     * UPDATE MAPTABLE SET VALUECOL=? WHERE OWNERCOL=? AND KEYCOL=?
      * </PRE>
      * @return Statement to update an item in the Map.
      */
@@ -612,9 +603,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * Generate statement to remove an item from the Map.
      * Deletes the link from the join table, leaving the value object in its own table.
      * <PRE>
-     * DELETE FROM MAPTABLE
-     * WHERE OWNERCOL=?
-     * AND KEYCOL=?
+     * DELETE FROM MAPTABLE WHERE OWNERCOL=? AND KEYCOL=?
      * </PRE>
      * @return Return an item from the Map.
      */
@@ -633,8 +622,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * Generate statement to clear the Map.
      * Deletes the links from the join table for this Map, leaving the value objects in their own table(s).
      * <PRE>
-     * DELETE FROM MAPTABLE
-     * WHERE OWNERCOL=?
+     * DELETE FROM MAPTABLE WHERE OWNERCOL=?
      * </PRE>
      * @return Statement to clear the Map.
      */
@@ -670,9 +658,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 if (getStmtLocked == null) 
                 {
-                    // Generate the statement, and statement mapping/parameter information
+                    // Generate the "get" statement for unlocked and locked situations
                     SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
+
                     getStmtUnlocked = sqlStmt.getSQLText().toSQL();
+
                     sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
                     getStmtLocked = sqlStmt.getSQLText().toSQL();
                 }
@@ -690,12 +680,14 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Create the statement and supply owner/key params
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+
                 StatementMappingIndex ownerIdx = getMappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
+
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
@@ -1059,8 +1051,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 if (adapterMapping != null)
                 {
                     // Only set the adapter mapping if we have a new object
-                    long nextIDAdapter = getNextIDForAdapterColumn(ownerOP);
-                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(nextIDAdapter));
+                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(getNextIDForAdapterColumn(ownerOP)));
                     jdbcPosition += adapterMapping.getNumberOfColumnMappings();
                 }
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
@@ -1138,11 +1129,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         return nextID;
     }
+
     /**
      * Generate statement for obtaining the maximum id.
      * <PRE>
-     * SELECT MAX(SCOID) FROM MAPTABLE
-     * WHERE OWNERCOL=?
+     * SELECT MAX(SCOID) FROM MAPTABLE WHERE OWNERCOL=?
      * </PRE>
      * @return The Statement returning the higher id
      */

@@ -99,7 +99,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         this.mapTable = mapTable;
         this.mapStore = mapStore;
         this.ownerMapping = mapTable.getOwnerMapping();
-        this.keyMapping   = mapTable.getKeyMapping();
+        this.keyMapping = mapTable.getKeyMapping();
         this.valueMapping = mapTable.getValueMapping();
         this.ownerMemberMetaData = mapTable.getOwnerMemberMetaData();
     }
@@ -233,11 +233,11 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             return false;
         }
 
-        Iterator iter=elements.iterator();
-        boolean modified=false;
+        Iterator iter = elements.iterator();
+        boolean modified = false;
         while (iter.hasNext())
         {
-            Object element=iter.next();
+            Object element = iter.next();
             Entry entry = (Entry)element;
 
             Object removed = mapStore.remove(op, entry.getKey());
@@ -406,7 +406,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmtSql);
                 StatementMappingIndex ownerIdx = iteratorMappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
-                for (int paramInstance=0;paramInstance<numParams;paramInstance++)
+                for (int paramInstance=0; paramInstance<numParams; paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
@@ -446,11 +446,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 mconn.release();
             }
         }
-        catch (SQLException e)
-        {
-            throw new NucleusDataStoreException("Iteration request failed: " + stmtSql, e);
-        }
-        catch (MappedDatastoreException e)
+        catch (SQLException | MappedDatastoreException e)
         {
             throw new NucleusDataStoreException("Iteration request failed: " + stmtSql, e);
         }
