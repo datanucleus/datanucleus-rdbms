@@ -43,7 +43,6 @@ import org.datanucleus.store.rdbms.mapping.java.DoubleMapping;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedMapping;
 import org.datanucleus.store.rdbms.mapping.java.FloatMapping;
 import org.datanucleus.store.rdbms.mapping.java.IntegerMapping;
-import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.LongMapping;
 import org.datanucleus.store.rdbms.mapping.java.PersistableIdMapping;
@@ -247,7 +246,6 @@ public class ObjectExpression extends SQLExpression
     {
         ReferenceMapping refMapping = (ReferenceMapping)refExpr.mapping;
         JavaTypeMapping[] implMappings = refMapping.getJavaTypeMapping();
-        int subExprStart = 0;
 
         String implType = implExpr.mapping.getType();
         String implActualType;
@@ -255,13 +253,15 @@ public class ObjectExpression extends SQLExpression
         {
             // Use type of literal directly if available. This caters for the case where we have an interface implementation and it is sharing a table with another implementation
         	implActualType = ((ObjectLiteral)implExpr).getValue().getClass().getName();
-        }else {
+        }
+        else
+        {
         	implActualType = implType;
         }
 
+        int subExprStart = 0;
         for (int i=0;i<implMappings.length;i++)
         {
-            // TODO Handle case where we have a subclass of the implementation here
             // Either implementation-classes is exactly implExpr or root mapping class of implExpr, but still fail if anything between
             if (implMappings[i].getType().equals(implActualType) || implMappings[i].getType().equals(implType))
             {
