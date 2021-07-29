@@ -37,6 +37,7 @@ import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
+import org.datanucleus.store.rdbms.mapping.java.EmbeddedValuePCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
 import org.datanucleus.store.rdbms.mapping.java.SerialisedMapping;
@@ -60,6 +61,7 @@ import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
+import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.MapStore;
 import org.datanucleus.store.types.scostore.SetStore;
@@ -72,6 +74,12 @@ import org.datanucleus.util.NucleusLogger;
  */
 public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 {
+    /** Join table storing the map relation between key and value. */
+    protected JoinTable mapTable;
+
+    /** Table storing the values. */
+    protected DatastoreClass valueTable;
+
     private String putStmt;
     private String updateStmt;
     private String removeStmt;
@@ -101,9 +109,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     public JoinMapStore(MapTable mapTable, ClassLoaderResolver clr)
     {
         super(mapTable.getStoreManager(), clr);
+        setOwner(mapTable.getOwnerMemberMetaData());
 
         this.mapTable = mapTable;
-        setOwner(mapTable.getOwnerMemberMetaData());
 
         this.ownerMapping = mapTable.getOwnerMapping();
         this.keyMapping = mapTable.getKeyMapping();
@@ -119,40 +127,36 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         this.keyCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(clr.classForName(keyType), clr);
 
-        Class value_class = clr.classForName(valueType);
-        if (ClassUtils.isReferenceType(value_class))
+        Class valueClass = clr.classForName(valueType);
+        if (ClassUtils.isReferenceType(valueClass))
         {
             // Map of reference value types (interfaces/Objects)
-            NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", ownerMemberMetaData.getFullFieldName(), value_class.getName()));
-            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(value_class, null, clr);
+            NucleusLogger.PERSISTENCE.warn(Localiser.msg("056066", ownerMemberMetaData.getFullFieldName(), valueType));
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForImplementationOfReference(valueClass, null, clr);
             if (valueCmd != null)
             {
-                this.valueType = value_class.getName();
-                // TODO This currently just grabs the cmd of the first implementation. It needs to
-                // get the cmds for all implementations, so we can have a handle to all possible elements.
+                // TODO This currently just grabs the cmd of the first implementation.
+                // It needs to get the cmds for all implementations, so we can have a handle to all possible elements.
                 // This would mean changing the SCO classes to have multiple valueTable/valueMapping etc.
                 valueTable = storeMgr.getDatastoreClass(valueCmd.getFullClassName(), clr);
             }
         }
         else
         {
-            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(value_class, clr);
+            valueCmd = storeMgr.getNucleusContext().getMetaDataManager().getMetaDataForClass(valueClass, clr);
             if (valueCmd != null)
             {
-                this.valueType = valueCmd.getFullClassName();
-                if (valuesAreEmbedded)
-                {
-                    valueTable = null;
-                }
-                else
-                {
-                    valueTable = storeMgr.getDatastoreClass(valueType, clr);
-                }
+                valueTable = valuesAreEmbedded ? null : storeMgr.getDatastoreClass(valueType, clr);
             }
         }
 
+        // Create any statements that can be cached
         initialise();
+    }
 
+    protected void initialise()
+    {
+        containsValueStmt = getContainsValueStmt(getOwnerMapping(), getValueMapping(), mapTable);
         putStmt = getPutStmt();
         updateStmt = getUpdateStmt();
         removeStmt = getRemoveStmt();
@@ -719,7 +723,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                                 valueMapping instanceof EmbeddedKeyPCMapping)
                             {
                                 // Value = Serialised
-                                int ownerFieldNumber = ((JoinTable)mapTable).getOwnerMemberMetaData().getAbsoluteFieldNumber();
+                                int ownerFieldNumber = mapTable.getOwnerMemberMetaData().getAbsoluteFieldNumber();
                                 value = valueMapping.getObject(ec, rs, param, ownerOP, ownerFieldNumber);
                             }
                             else
@@ -837,10 +841,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         // Apply condition on key
         if (keyMapping instanceof SerialisedMapping)
         {
-            // if the keyMapping contains a BLOB column (or any other column not supported by the database
-            // as primary key), uses like instead of the operator OP_EQ (=)
-            // in future do not check if the keyMapping is of ObjectMapping, but use the database 
-            // adapter to check the data types not supported as primary key
+            // if the keyMapping contains a BLOB column (or any other column not supported by the database as primary key), uses like instead of the operator OP_EQ (=)
+            // in future do not check if the keyMapping is of ObjectMapping, but use the database adapter to check the data types not supported as primary key
             // if object mapping (BLOB) use like
             SQLExpression keyExpr = exprFactory.newExpression(sqlStmt, sqlStmt.getPrimaryTable(), keyMapping);
             SQLExpression keyVal = exprFactory.newLiteralParameter(sqlStmt, keyMapping, null, "KEY");
@@ -992,7 +994,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, (JoinTable)mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, mapTable, this);
                 }
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
@@ -1038,7 +1040,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, (JoinTable)mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, mapTable, this);
                 }
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 if (adapterMapping != null)
@@ -1138,6 +1140,243 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         stmt.append(" WHERE ");
         BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
 
+        return stmt.toString();
+    }
+
+    /**
+     * Method to update a field of an embedded key.
+     * @param op ObjectProvider of the owner
+     * @param key The key to update
+     * @param fieldNumber The number of the field to update
+     * @param newValue The new value
+     */
+    public boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue)
+    {
+        boolean modified = false;
+        if (keyMapping != null && keyMapping instanceof EmbeddedKeyPCMapping)
+        {
+            String fieldName = valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            if (fieldName == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+            JavaTypeMapping fieldMapping = ((EmbeddedKeyPCMapping)keyMapping).getJavaTypeMapping(fieldName);
+            if (fieldMapping == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+
+            // Update the embedded key
+            String stmt = getUpdateEmbeddedKeyStmt(fieldMapping, getOwnerMapping(), getKeyMapping(), mapTable);
+            try
+            {
+                ExecutionContext ec = op.getExecutionContext();
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
+
+                try
+                {
+                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                    try
+                    {
+                        int jdbcPosition = 1;
+                        fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), key);
+                        jdbcPosition += fieldMapping.getNumberOfColumnMappings();
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(op, key, ps, jdbcPosition, mapTable, this);
+
+                        sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                        modified = true;
+                    }
+                    finally
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (SQLException e)
+            {
+                NucleusLogger.DATASTORE_PERSIST.warn("Exception during backing store update of embedded key", e);
+                throw new NucleusDataStoreException(Localiser.msg("056010", stmt), e);
+            }
+        }
+
+        return modified;
+    }
+
+    /**
+     * Method to update a field of an embedded key.
+     * @param op ObjectProvider of the owner
+     * @param value The value to update
+     * @param fieldNumber The number of the field to update
+     * @param newValue The new value
+     */
+    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue)
+    {
+        boolean modified = false;
+        if (valueMapping != null && valueMapping instanceof EmbeddedValuePCMapping)
+        {
+            String fieldName = valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            if (fieldName == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+            JavaTypeMapping fieldMapping = ((EmbeddedValuePCMapping)valueMapping).getJavaTypeMapping(fieldName);
+            if (fieldMapping == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+
+            // Update the embedded value
+            String stmt = getUpdateEmbeddedValueStmt(fieldMapping, getOwnerMapping(), getValueMapping(), mapTable);
+            try
+            {
+                ExecutionContext ec = op.getExecutionContext();
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
+
+                try
+                {
+                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                    try
+                    {
+                        int jdbcPosition = 1;
+                        fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), newValue);
+                        jdbcPosition += fieldMapping.getNumberOfColumnMappings();
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(op, value, ps, jdbcPosition, mapTable, this);
+                        sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                        modified = true;
+                    }
+                    finally
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (SQLException e)
+            {
+                NucleusLogger.DATASTORE_PERSIST.warn("Exception in backing store update", e);
+                throw new NucleusDataStoreException(Localiser.msg("056011", stmt), e);
+            }
+        }
+
+        return modified;
+    }
+
+    /**
+     * Generate statement for update the field of an embedded key.
+     * <PRE>
+     * UPDATE MAPTABLE
+     * SET EMBEDDEDKEYCOL1 = ?
+     * WHERE OWNERCOL=?
+     * AND EMBEDDEDKEYCOL1 = ?
+     * AND EMBEDDEDKEYCOL2 = ? ...
+     * </PRE>
+     * @param fieldMapping The mapping for the field (of the key) to be updated
+     * @param ownerMapping The owner mapping
+     * @param keyMapping The key mapping
+     * @param mapTable The map table
+     * @return Statement for updating an embedded key in the Set
+     */
+    protected String getUpdateEmbeddedKeyStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping, JavaTypeMapping keyMapping, Table mapTable)
+    {
+        StringBuilder stmt = new StringBuilder("UPDATE ");
+        stmt.append(mapTable.toString());
+        stmt.append(" SET ");
+        for (int i=0; i<fieldMapping.getNumberOfColumnMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(",");
+            }
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(" = ");
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
+        }
+
+        stmt.append(" WHERE ");
+        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+        EmbeddedKeyPCMapping embeddedMapping = (EmbeddedKeyPCMapping)keyMapping;
+        for (int i=0;i<embeddedMapping.getNumberOfJavaTypeMappings();i++)
+        {
+            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
+            if (m != null)
+            {
+                for (int j=0;j<m.getNumberOfColumnMappings();j++)
+                {
+                    stmt.append(" AND ");
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
+                }
+            }
+        }
+        return stmt.toString();
+    }
+
+    /**
+     * Generate statement for update the field of an embedded value.
+     * <PRE>
+     * UPDATE MAPTABLE
+     * SET EMBEDDEDVALUECOL1 = ?
+     * WHERE OWNERCOL=?
+     * AND EMBEDDEDVALUECOL1 = ?
+     * AND EMBEDDEDVALUECOL2 = ? ...
+     * </PRE>
+     * @param fieldMapping The mapping for the field to be updated
+     * @param ownerMapping The owner mapping
+     * @param valueMapping mapping for the value
+     * @param mapTable The map table
+     * @return Statement for updating an embedded value in the Set
+     */
+    protected String getUpdateEmbeddedValueStmt(JavaTypeMapping fieldMapping, JavaTypeMapping ownerMapping, JavaTypeMapping valueMapping, Table mapTable)
+    {
+        StringBuilder stmt = new StringBuilder("UPDATE ");
+        stmt.append(mapTable.toString());
+        stmt.append(" SET ");
+        for (int i=0; i<fieldMapping.getNumberOfColumnMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(",");
+            }
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(" = ");
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
+        }
+
+        stmt.append(" WHERE ");
+        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+        EmbeddedValuePCMapping embeddedMapping = (EmbeddedValuePCMapping)valueMapping;
+        for (int i=0;i<embeddedMapping.getNumberOfJavaTypeMappings();i++)
+        {
+            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
+            if (m != null)
+            {
+                for (int j=0;j<m.getNumberOfColumnMappings();j++)
+                {
+                    stmt.append(" AND ");
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
+                }
+            }
+        }
         return stmt.toString();
     }
 }

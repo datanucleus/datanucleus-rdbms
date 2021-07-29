@@ -51,7 +51,6 @@ import org.datanucleus.store.rdbms.JDBCUtils;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.query.PersistentClassROF;
-import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
 import org.datanucleus.store.rdbms.query.StatementParameterMapping;
@@ -65,19 +64,23 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.SQLJoin.JoinType;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
-import org.datanucleus.store.rdbms.table.JoinTable;
+import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.types.scostore.CollectionStore;
 import org.datanucleus.store.types.scostore.MapStore;
 import org.datanucleus.store.types.scostore.SetStore;
 import org.datanucleus.util.ClassUtils;
 import org.datanucleus.util.Localiser;
+import org.datanucleus.util.NucleusLogger;
 
 /**
- * RDBMS-specific implementation of an {@link MapStore} where either the value has a FK to the owner (and the key
- * stored in the value), or whether the key has a FK to the owner (and the value stored in the key).
+ * RDBMS-specific implementation of an {@link MapStore} where either the value has a FK to the owner (and the key stored in the value), 
+ * or whether the key has a FK to the owner (and the value stored in the key).
  */
 public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 {
+    /** Table storing the values (either key table, or value table). */
+    protected DatastoreClass mapTable;
+
     /** Statement for updating a foreign key for the map. */
     private String updateFkStmt;
 
@@ -90,13 +93,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     private StatementClassMapping getMappingDef = null;
     private StatementParameterMapping getMappingParams = null;
 
-    /** Field number of owner link in value class. */
+    /** Field number of owner link in key/value class. */
     private final int ownerFieldNumber;
 
-    /** Field number of key in value class (when Key=Non-PC, Value=PC). */
+    /** Field number of key in value class (when key stored in value). */
     protected int keyFieldNumber = -1;
 
-    /** Field number of value in key class (when Key=PC, value=Non-PC). */
+    /** Field number of value in key class (when value stored in key). */
     private int valueFieldNumber = -1;
 
     /**
@@ -109,6 +112,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     {
         super(storeMgr, clr);
         setOwner(mmd);
+
         MapMetaData mapmd = (MapMetaData)mmd.getContainer();
         if (mapmd == null)
         {
@@ -133,8 +137,8 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         }
 
         // Load the key and value classes
-        keyType = mapmd.getKeyType();
-        valueType = mapmd.getValueType();
+        this.keyType = mapmd.getKeyType();
+        this.valueType = mapmd.getValueType();
         Class keyClass = clr.classForName(keyType);
         Class valueClass = clr.classForName(valueType);
 
@@ -161,7 +165,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 throw new NucleusUserException(Localiser.msg("056070", valueType, mmd.getFullFieldName()));
             }
 
-            valueTable = storeMgr.getDatastoreClass(valueType, clr);
+            DatastoreClass joiningTable = storeMgr.getDatastoreClass(valueType, clr);
             valueMapping  = storeMgr.getDatastoreClass(valueType, clr).getIdMapping();
             valuesAreEmbedded = false;
             valuesAreSerialised = false;
@@ -183,7 +187,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 }
 
                 ownerFieldNumber = valueCmd.getAbsolutePositionOfMember(ownerFieldName);
-                ownerMapping = valueTable.getMemberMapping(vofmd);
+                ownerMapping = joiningTable.getMemberMapping(vofmd);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
@@ -198,7 +202,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // 1-N Unidirectional : The value class knows nothing about the owner
                 ownerFieldNumber = -1;
-                ownerMapping = valueTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
+                ownerMapping = joiningTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType));
@@ -236,7 +240,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Set up key field
             String keyFieldName = vkfmd.getName();
             keyFieldNumber = valueCmd.getAbsolutePositionOfMember(keyFieldName);
-            keyMapping = valueTable.getMemberMapping(valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
+            keyMapping = joiningTable.getMemberMapping(valueCmd.getMetaDataForManagedMemberAtAbsolutePosition(keyFieldNumber));
             if (keyMapping == null)
             {
                 throw new NucleusUserException(Localiser.msg("056053", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), valueType, keyFieldName));
@@ -250,12 +254,12 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             keysAreEmbedded = isEmbeddedMapping(keyMapping);
             keysAreSerialised = isEmbeddedMapping(keyMapping);
 
-            mapTable = valueTable;
+            mapTable = joiningTable;
             if (mmd.getMappedBy() != null && ownerMapping.getTable() != mapTable)
             {
                 // Value and owner don't have consistent tables so use the one with the mapping
                 // e.g map value is subclass, yet superclass has the link back to the owner
-                mapTable = ownerMapping.getTable();
+                mapTable = (DatastoreClass) ownerMapping.getTable();
             }
         }
         else
@@ -268,8 +272,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 throw new NucleusUserException(Localiser.msg("056069", keyType, mmd.getFullFieldName()));
             }
 
-            // TODO This should be called keyvalueTable or something and not valueTable
-            valueTable = storeMgr.getDatastoreClass(keyType, clr);
+            DatastoreClass joiningTable = storeMgr.getDatastoreClass(keyType, clr);
             keyMapping  = storeMgr.getDatastoreClass(keyType, clr).getIdMapping();
             keysAreEmbedded = false;
             keysAreSerialised = false;
@@ -291,7 +294,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 }
 
                 ownerFieldNumber = keyCmd.getAbsolutePositionOfMember(ownerFieldName);
-                ownerMapping = valueTable.getMemberMapping(kofmd);
+                ownerMapping = joiningTable.getMemberMapping(kofmd);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.InverseOwnerMappedByFieldNotPresent", 
@@ -306,7 +309,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // 1-N Unidirectional : The key class knows nothing about the owner
                 ownerFieldNumber = -1;
-                ownerMapping = valueTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
+                ownerMapping = joiningTable.getExternalMapping(mmd, MappingType.EXTERNAL_FK);
                 if (ownerMapping == null)
                 {
                     throw new NucleusUserException(Localiser.msg("056056", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType));
@@ -344,7 +347,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Set up value field
             String valueFieldName = vkfmd.getName();
             valueFieldNumber = keyCmd.getAbsolutePositionOfMember(valueFieldName);
-            valueMapping = valueTable.getMemberMapping(keyCmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
+            valueMapping = joiningTable.getMemberMapping(keyCmd.getMetaDataForManagedMemberAtAbsolutePosition(valueFieldNumber));
             if (valueMapping == null)
             {
                 throw new NucleusUserException(Localiser.msg("056054", mmd.getAbstractClassMetaData().getFullClassName(), mmd.getName(), keyType, valueFieldName));
@@ -358,22 +361,22 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             valuesAreEmbedded = isEmbeddedMapping(valueMapping);
             valuesAreSerialised = isEmbeddedMapping(valueMapping);
 
-            mapTable = valueTable;
+            mapTable = joiningTable;
             if (mmd.getMappedBy() != null && ownerMapping.getTable() != mapTable)
             {
                 // Key and owner don't have consistent tables so use the one with the mapping
                 // e.g map key is subclass, yet superclass has the link back to the owner
-                mapTable = ownerMapping.getTable();
+                mapTable = (DatastoreClass) ownerMapping.getTable();
             }
         }
 
-        // Generate the statements
+        // Create any statements that can be cached
         initialise();
     }
 
     protected void initialise()
     {
-        super.initialise();
+        containsValueStmt = getContainsValueStmt(getOwnerMapping(), getValueMapping(), mapTable);
         updateFkStmt = getUpdateFkStmt();
     }
 
@@ -525,7 +528,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             }
                             vsm.replaceFieldMakeDirty(keyFieldNumber, newKey);
 
-                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
+                            JavaTypeMapping externalFKMapping = mapTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
@@ -612,7 +615,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             }
                             vsm.replaceFieldMakeDirty(valueFieldNumber, newValueObj);
 
-                            JavaTypeMapping externalFKMapping = valueTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
+                            JavaTypeMapping externalFKMapping = mapTable.getExternalMapping(ownerMemberMetaData, MappingType.EXTERNAL_FK);
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
@@ -916,7 +919,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized SetStore keySetStore()
     {
-        return new MapKeySetStore(valueTable, this, clr);
+        return new MapKeySetStore(mapTable, this, clr);
     }
 
     /**
@@ -925,7 +928,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized CollectionStore valueCollectionStore()
     {
-        return new MapValueCollectionStore(valueTable, this, clr);
+        return new MapValueCollectionStore(mapTable, this, clr);
     }
 
     /**
@@ -934,7 +937,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public synchronized SetStore entrySetStore()
     {
-        return new MapEntrySetStore(valueTable, this, clr);
+        return new MapEntrySetStore(mapTable, this, clr);
     }
 
     /**
@@ -948,7 +951,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     private String getUpdateFkStmt()
     {
         StringBuilder stmt = new StringBuilder("UPDATE ");
-        stmt.append(getMapTable().toString());
+        stmt.append(mapTable.toString());
         stmt.append(" SET ");
         for (int i=0; i<ownerMapping.getNumberOfColumnMappings(); i++)
         {
@@ -1118,12 +1121,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             {
                 // Create the statement and supply owner/key params
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
+
                 StatementMappingIndex ownerIdx = getMappingParams.getMappingForParameter("owner");
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
                 }
+
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
                 numParams = keyIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
@@ -1144,6 +1149,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
                         if (valuesAreEmbedded || valuesAreSerialised)
                         {
+                            // Embedded/serialised into table of key
                             int param[] = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
@@ -1155,13 +1161,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                                 valueMapping instanceof EmbeddedKeyPCMapping)
                             {
                                 // Value = Serialised
-                                value = valueMapping.getObject(ec, rs, param, ownerOP, ((JoinTable)mapTable).getOwnerMemberMetaData().getAbsoluteFieldNumber());
+                                String msg = "You appear to have a map (persistable) value serialised/embedded into the key of the map at " + 
+                                    getOwnerMemberMetaData().getFullFieldName() + " Not supported";
+                                NucleusLogger.PERSISTENCE.error(msg);
+                                throw new NucleusDataStoreException(msg);
                             }
-                            else
-                            {
-                                // Value = Non-PC
-                                value = valueMapping.getObject(ec, rs, param);
-                            }
+
+                            // Value = Non-PC
+                            value = valueMapping.getObject(ec, rs, param);
                         }
                         else if (valueMapping instanceof ReferenceMapping)
                         {
@@ -1176,8 +1183,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         else
                         {
                             // Value = PC
-                            ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType));
-                            value = rof.getObject();
+                            value = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), getMappingDef, valueCmd, clr.classForName(valueType)).getObject();
                         }
 
                         JDBCUtils.logWarnings(rs);
@@ -1220,7 +1226,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         if (ownerMemberMetaData.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
             getMappingDef = new StatementClassMapping();
-            if (valueTable.getDiscriminatorMetaData() != null && valueTable.getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
+            if (mapTable.getDiscriminatorMetaData() != null && mapTable.getDiscriminatorMetaData().getStrategy() != DiscriminatorStrategy.NONE)
             {
                 // Value class has discriminator
                 if (ClassUtils.isReferenceType(valueCls))
@@ -1260,7 +1266,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (valueCmd != null)
             {
                 // Left outer join to value table (so we allow for null values)
-                SQLTable valueSqlTbl = sqlStmt.join(JoinType.LEFT_OUTER_JOIN, sqlStmt.getPrimaryTable(), valueMapping, valueTable, null, valueTable.getIdMapping(), 
+                SQLTable valueSqlTbl = sqlStmt.join(JoinType.LEFT_OUTER_JOIN, sqlStmt.getPrimaryTable(), valueMapping, mapTable, null, mapTable.getIdMapping(), 
                     null, null, true);
 
                 // Select the value field(s)
@@ -1343,5 +1349,19 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         getMappingParams.addMappingForParameter("key", keyIdx);
 
         return sqlStmt;
+    }
+
+    @Override
+    public boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue)
+    {
+        // We don't support embedded keys as such
+        return false;
+    }
+
+    @Override
+    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue)
+    {
+        // We don't support embedded values as such
+        return false;
     }
 }
