@@ -135,7 +135,15 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                processBatchedWrites(mconn);
+                SQLController sqlControl = storeMgr.getSQLController();
+                try
+                {
+                    sqlControl.processStatementsForConnection(mconn); // Process all waiting batched statements before we start our work
+                }
+                catch (SQLException e)
+                {
+                    throw new MappedDatastoreException("SQLException", e);
+                }
 
                 // Loop through all elements to be added
                 E element = null;
@@ -294,7 +302,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         String addStmt = getAddStmtForJoinTable();
         try
         {
-            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, addStmt, false);
+            PreparedStatement ps = sqlControl.getStatementForUpdate(conn, addStmt, batched);
             boolean notYetFlushedError = false;
             try
             {
@@ -331,19 +339,6 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         catch (SQLException e)
         {
             throw new MappedDatastoreException(addStmt, e);
-        }
-    }
-
-    public void processBatchedWrites(ManagedConnection mconn) throws MappedDatastoreException
-    {
-        SQLController sqlControl = storeMgr.getSQLController();
-        try
-        {
-            sqlControl.processStatementsForConnection(mconn); // Process all waiting batched statements before we start our work
-        }
-        catch (SQLException e)
-        {
-            throw new MappedDatastoreException("SQLException", e);
         }
     }
 }
