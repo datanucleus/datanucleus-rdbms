@@ -69,7 +69,7 @@ import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.SQLController;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
-import org.datanucleus.store.rdbms.table.ClassTable;
+import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
 import org.datanucleus.store.rdbms.table.SecondaryTable;
@@ -268,7 +268,7 @@ public class InsertRequest extends Request
             try
             {
                 List<String> pkColumnNames = new ArrayList<>();
-                List<Column> pkColumns =((ClassTable) table).getPrimaryKey().getColumns();
+                List<Column> pkColumns = ((AbstractClassTable)table).getPrimaryKey().getColumns();
                 if (table.getIdentityType() == IdentityType.DATASTORE)
                 {
                     JavaTypeMapping mapping = table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, true);
