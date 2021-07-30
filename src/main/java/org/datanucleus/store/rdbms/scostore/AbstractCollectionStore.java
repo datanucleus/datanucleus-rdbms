@@ -63,37 +63,6 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
     }
 
     /**
-     * Method to update a field of an embedded element.
-     * @param op ObjectProvider of the owner
-     * @param element The element to update
-     * @param fieldNumber The number of the field to update
-     * @param value The value
-     * @return true if the datastore was updated
-     */
-    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value)
-    {
-        boolean modified = false;
-        if (elementMapping != null && elementMapping instanceof EmbeddedElementPCMapping)
-        {
-            String fieldName = elementCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
-            if (fieldName == null)
-            {
-                // We have no mapping for this field so presumably is the owner field or a PK field
-                return false;
-            }
-            JavaTypeMapping fieldMapping = ((EmbeddedElementPCMapping)elementMapping).getJavaTypeMapping(fieldName);
-            if (fieldMapping == null)
-            {
-                // We have no mapping for this field so presumably is the owner field or a PK field
-                return false;
-            }
-            modified = updateEmbeddedElement(op, element, fieldNumber, value, fieldMapping);
-        }
-
-        return modified;
-    }
-
-    /**
      * Method to update the collection to be the supplied collection of elements.
      * @param op ObjectProvider of the object
      * @param coll The collection to use
@@ -342,99 +311,6 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         return stmt.toString();
     }
 
-    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value, JavaTypeMapping fieldMapping)
-    {
-        boolean modified = false;
-        String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
-        try
-        {
-            ExecutionContext ec = op.getExecutionContext();
-            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
-            SQLController sqlControl = storeMgr.getSQLController();
-
-            try
-            {
-                PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
-                try
-                {
-                    int jdbcPosition = 1;
-                    fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
-                    jdbcPosition += fieldMapping.getNumberOfColumnMappings();
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
-                        ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, elementCmd, this);
-
-                    sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
-                    modified = true;
-                }
-                finally
-                {
-                    sqlControl.closeStatement(mconn, ps);
-                }
-            }
-            finally
-            {
-                mconn.release();
-            }
-        }
-        catch (SQLException e)
-        {
-            NucleusLogger.DATASTORE_PERSIST.error("Exception updating embedded element in collection", e);
-            // TODO Update this localised message to reflect that it is the update of an embedded element
-            throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
-        }
-        return modified;
-    }
-
-    /**
-     * Generate statement for update the field of an embedded element.
-     * <PRE>
-     * UPDATE SETTABLE
-     * SET EMBEDDEDFIELD1 = ?
-     * WHERE OWNERCOL=?
-     * AND ELEMENTCOL = ?
-     * </PRE>
-     *
-     * @param fieldMapping The mapping for the field within the embedded object to be updated
-     * @return Statement for updating an embedded element in the Set
-     */
-    protected String getUpdateEmbeddedElementStmt(JavaTypeMapping fieldMapping)
-    {
-        JavaTypeMapping ownerMapping = getOwnerMapping();
-
-        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
-        for (int i = 0; i < fieldMapping.getNumberOfColumnMappings(); i++)
-        {
-            if (i > 0)
-            {
-                stmt.append(",");
-            }
-            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
-            stmt.append(" = ");
-            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
-        }
-
-        stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
-
-        EmbeddedElementPCMapping embeddedMapping = (EmbeddedElementPCMapping) elementMapping;
-        for (int i = 0; i < embeddedMapping.getNumberOfJavaTypeMappings(); i++)
-        {
-            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
-            if (m != null)
-            {
-                for (int j = 0; j < m.getNumberOfColumnMappings(); j++)
-                {
-                    stmt.append(" AND ");
-                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
-                    stmt.append(" = ");
-                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
-                }
-            }
-        }
-        return stmt.toString();
-    }
-
     /**
      * Generate statement for removing an element from the Collection.
      * <PRE>
@@ -485,6 +361,125 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
             BackingStoreHelper.appendWhereClauseForMapping(stmt, relationDiscriminatorMapping, containerTable.toString(), false);
         }
 
+        return stmt.toString();
+    }
+
+    /**
+     * Method to update a field of an embedded element.
+     * @param op ObjectProvider of the owner
+     * @param element The element to update
+     * @param fieldNumber The number of the field to update
+     * @param value The value
+     * @return true if the datastore was updated
+     */
+    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value)
+    {
+        // TODO Only for join table cases, so really ought to move there
+        boolean modified = false;
+        if (elementMapping != null && elementMapping instanceof EmbeddedElementPCMapping)
+        {
+            String fieldName = elementCmd.getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getName();
+            if (fieldName == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+
+            JavaTypeMapping fieldMapping = ((EmbeddedElementPCMapping)elementMapping).getJavaTypeMapping(fieldName);
+            if (fieldMapping == null)
+            {
+                // We have no mapping for this field so presumably is the owner field or a PK field
+                return false;
+            }
+
+            String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
+            try
+            {
+                ExecutionContext ec = op.getExecutionContext();
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                SQLController sqlControl = storeMgr.getSQLController();
+
+                try
+                {
+                    PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, false);
+                    try
+                    {
+                        int jdbcPosition = 1;
+                        fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
+                        jdbcPosition += fieldMapping.getNumberOfColumnMappings();
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
+                            ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, elementCmd, this);
+
+                        sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
+                        modified = true;
+                    }
+                    finally
+                    {
+                        sqlControl.closeStatement(mconn, ps);
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (SQLException e)
+            {
+                NucleusLogger.DATASTORE_PERSIST.error("Exception updating embedded element in collection", e);
+                // TODO Update this localised message to reflect that it is the update of an embedded element
+                throw new NucleusDataStoreException(Localiser.msg("056009", stmt), e);
+            }
+        }
+
+        return modified;
+    }
+
+    /**
+     * Generate statement for update the field of an embedded element.
+     * <PRE>
+     * UPDATE SETTABLE
+     * SET EMBEDDEDFIELD1 = ?
+     * WHERE OWNERCOL=?
+     * AND ELEMENTCOL = ?
+     * </PRE>
+     * @param fieldMapping The mapping for the field within the embedded object to be updated
+     * @return Statement for updating an embedded element in the Set
+     */
+    protected String getUpdateEmbeddedElementStmt(JavaTypeMapping fieldMapping)
+    {
+        JavaTypeMapping ownerMapping = getOwnerMapping();
+
+        StringBuilder stmt = new StringBuilder("UPDATE ").append(containerTable.toString()).append(" SET ");
+        for (int i = 0; i < fieldMapping.getNumberOfColumnMappings(); i++)
+        {
+            if (i > 0)
+            {
+                stmt.append(",");
+            }
+            stmt.append(fieldMapping.getColumnMapping(i).getColumn().getIdentifier().toString());
+            stmt.append(" = ");
+            stmt.append(fieldMapping.getColumnMapping(i).getUpdateInputParameter());
+        }
+
+        stmt.append(" WHERE ");
+        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+
+        EmbeddedElementPCMapping embeddedMapping = (EmbeddedElementPCMapping) elementMapping;
+        for (int i = 0; i < embeddedMapping.getNumberOfJavaTypeMappings(); i++)
+        {
+            JavaTypeMapping m = embeddedMapping.getJavaTypeMapping(i);
+            if (m != null)
+            {
+                for (int j = 0; j < m.getNumberOfColumnMappings(); j++)
+                {
+                    stmt.append(" AND ");
+                    stmt.append(m.getColumnMapping(j).getColumn().getIdentifier().toString());
+                    stmt.append(" = ");
+                    stmt.append(m.getColumnMapping(j).getUpdateInputParameter());
+                }
+            }
+        }
         return stmt.toString();
     }
 }

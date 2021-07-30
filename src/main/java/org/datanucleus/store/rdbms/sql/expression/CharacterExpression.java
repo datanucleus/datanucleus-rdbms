@@ -349,6 +349,11 @@ public class CharacterExpression extends SQLExpression
 
     public SQLExpression invoke(String methodName, List args)
     {
+        if (methodName.equals("toUpperCase") || methodName.equals("toLowerCase"))
+        {
+            // Use equivalent String method
+            return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, String.class.getName(), methodName, this, args);
+        }
         return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, Character.class.getName(), methodName, this, args);
     }
 }

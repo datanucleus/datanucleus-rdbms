@@ -17,8 +17,6 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.sql.expression;
 
-import java.util.List;
-
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
@@ -258,21 +256,6 @@ public class CharacterLiteral extends CharacterExpression implements SQLLiteral
     {
         int v = ~(value.charAt(0));
         return new IntegerLiteral(stmt, mapping, Integer.valueOf(v), null);
-    }
-
-    public SQLExpression invoke(String methodName, List args)
-    {
-        // TODO Move these into "sql.method.*"
-        if (methodName.equals("toUpperCase"))
-        {
-            return new CharacterLiteral(stmt, mapping, value.toUpperCase(), parameterName);
-        }
-        else if (methodName.equals("toLowerCase"))
-        {
-            return new CharacterLiteral(stmt, mapping, value.toLowerCase(), parameterName);
-        }
-
-        return super.invoke(methodName, args);
     }
 
     public Object getValue()

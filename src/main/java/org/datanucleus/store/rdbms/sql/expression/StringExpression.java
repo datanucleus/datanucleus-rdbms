@@ -499,7 +499,6 @@ public class StringExpression extends SQLExpression
 
     public SQLExpression invoke(String methodName, List args)
     {
-        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, String.class.getName(), 
-            methodName, this, args);
+        return stmt.getRDBMSManager().getSQLExpressionFactory().invokeMethod(stmt, String.class.getName(), methodName, this, args);
     }
 }
