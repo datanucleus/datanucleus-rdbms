@@ -186,7 +186,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             validateKeyForWriting(op, key);
             validateValueForWriting(op, value);
 
-            // Check if this is a new entry, or an update
+            // Check if this is a new entry, or an update TODO Do these getValue calls in one call
             try
             {
                 Object oldValue = getValue(op, key);
