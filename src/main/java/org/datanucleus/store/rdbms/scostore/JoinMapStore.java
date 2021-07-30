@@ -59,7 +59,6 @@ import org.datanucleus.store.rdbms.sql.UnionStatementGenerator;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpressionFactory;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
-import org.datanucleus.store.rdbms.table.JoinTable;
 import org.datanucleus.store.rdbms.table.MapTable;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.scostore.CollectionStore;
@@ -75,7 +74,7 @@ import org.datanucleus.util.NucleusLogger;
 public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 {
     /** Join table storing the map relation between key and value. */
-    protected JoinTable mapTable;
+    protected MapTable mapTable;
 
     /** Table storing the values. */
     protected DatastoreClass valueTable;
@@ -170,7 +169,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      */
     public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
     {
-        if (m == null || m.size() == 0)
+        if (m == null || m.isEmpty())
         {
             return;
         }
@@ -205,7 +204,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         boolean batched = allowsBatching();
 
         // Put any new entries
-        if (puts.size() > 0)
+        if (!puts.isEmpty())
         {
             try
             {
@@ -234,7 +233,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
 
         // Update any changed entries
-        if (updates.size() > 0)
+        if (!updates.isEmpty())
         {
             try
             {
@@ -447,7 +446,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         clearInternal(ownerOP);
 
-        if (dependentElements != null && dependentElements.size() > 0)
+        if (dependentElements != null && !dependentElements.isEmpty())
         {
             // Delete all dependent objects
             ownerOP.getExecutionContext().deleteObjects(dependentElements.toArray());
@@ -462,7 +461,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (keySetStore == null)
         {
-            keySetStore = new MapKeySetStore((MapTable)mapTable, this, clr);
+            keySetStore = new MapKeySetStore(mapTable, this, clr);
         }
         return keySetStore;
     }
@@ -475,7 +474,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (valueSetStore == null)
         {
-            valueSetStore = new MapValueCollectionStore((MapTable)mapTable, this, clr);
+            valueSetStore = new MapValueCollectionStore(mapTable, this, clr);
         }
         return valueSetStore;
     }
@@ -488,7 +487,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     {
         if (entrySetStore == null)
         {
-            entrySetStore =  new MapEntrySetStore((MapTable)mapTable, this, clr);
+            entrySetStore =  new MapEntrySetStore(mapTable, this, clr);
         }
         return entrySetStore;
     }
@@ -712,7 +711,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
                         if (valuesAreEmbedded || valuesAreSerialised)
                         {
-                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
+                            int[] param = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -735,7 +734,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         else if (valueMapping instanceof ReferenceMapping)
                         {
                             // Value = Reference (Interface/Object)
-                            int param[] = new int[valueMapping.getNumberOfColumnMappings()];
+                            int[] param = new int[valueMapping.getNumberOfColumnMappings()];
                             for (int i = 0; i < param.length; ++i)
                             {
                                 param[i] = i + 1;
@@ -785,7 +784,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         ExecutionContext ec = ownerOP.getExecutionContext();
 
         final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
-        Class valueCls = clr.classForName(this.valueType);
+        Class<?> valueCls = clr.classForName(this.valueType);
         if (valuesAreEmbedded || valuesAreSerialised)
         {
             // Value is stored in join table
@@ -859,27 +858,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         int inputParamNum = 1;
         StatementMappingIndex ownerIdx = new StatementMappingIndex(ownerMapping);
         StatementMappingIndex keyIdx = new StatementMappingIndex(keyMapping);
-        if (sqlStmt.getNumberOfUnions() > 0)
-        {
-            // Add parameter occurrence for each union of statement
-            for (int j=0;j<sqlStmt.getNumberOfUnions()+1;j++)
-            {
-                int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
-                for (int k=0;k<ownerPositions.length;k++)
-                {
-                    ownerPositions[k] = inputParamNum++;
-                }
-                ownerIdx.addParameterOccurrence(ownerPositions);
+        int numberOfUnions = sqlStmt.getNumberOfUnions();
 
-                int[] keyPositions = new int[keyMapping.getNumberOfColumnMappings()];
-                for (int k=0;k<keyPositions.length;k++)
-                {
-                    keyPositions[k] = inputParamNum++;
-                }
-                keyIdx.addParameterOccurrence(keyPositions);
-            }
-        }
-        else
+        // Add parameter occurrence for each union of statement
+        for (int j=0;j<numberOfUnions+1;j++)
         {
             int[] ownerPositions = new int[ownerMapping.getNumberOfColumnMappings()];
             for (int k=0;k<ownerPositions.length;k++)
@@ -895,6 +877,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
             keyIdx.addParameterOccurrence(keyPositions);
         }
+
         getMappingParams = new StatementParameterMapping();
         getMappingParams.addMappingForParameter("owner", ownerIdx);
         getMappingParams.addMappingForParameter("key", keyIdx);
@@ -930,7 +913,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056013",clearStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056013", clearStmt), e);
         }
     }
 
@@ -963,7 +946,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056012",removeStmt),e);
+            throw new NucleusDataStoreException(Localiser.msg("056012", removeStmt), e);
         }
     }
 
@@ -1202,8 +1185,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
             catch (SQLException e)
             {
-                NucleusLogger.DATASTORE_PERSIST.warn("Exception during backing store update of embedded key", e);
-                throw new NucleusDataStoreException(Localiser.msg("056010", stmt), e);
+                String msg = Localiser.msg("056010", stmt);
+                NucleusLogger.DATASTORE_PERSIST.warn(msg, e);
+                throw new NucleusDataStoreException(msg, e);
             }
         }
 
@@ -1268,8 +1252,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
             catch (SQLException e)
             {
-                NucleusLogger.DATASTORE_PERSIST.warn("Exception in backing store update", e);
-                throw new NucleusDataStoreException(Localiser.msg("056011", stmt), e);
+                String msg = Localiser.msg("056011", stmt);
+                NucleusLogger.DATASTORE_PERSIST.warn(msg, e);
+                throw new NucleusDataStoreException(msg, e);
             }
         }
 
