@@ -83,6 +83,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     private String updateStmt;
     private String removeStmt;
     private String clearStmt;
+    private String maxAdapterColumnIdStmt;
 
     /** JDBC statement to use for retrieving keys of the map (locking). */
     private volatile String getStmtLocked = null;
@@ -208,8 +209,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
                 try
                 {
                     // Loop through all entries
@@ -237,8 +237,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
                 try
                 {
                     // Loop through all entries
@@ -1013,6 +1012,13 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
+            int nextIdForAdapterColumn = -1;
+            if (adapterMapping != null)
+            {
+                // Only set the adapter mapping if we have a new object
+                nextIdForAdapterColumn = getNextIDForAdapterColumn(ownerOP);
+            }
+
             PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, batched);
             try
             {
@@ -1028,8 +1034,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
                 if (adapterMapping != null)
                 {
-                    // Only set the adapter mapping if we have a new object
-                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(getNextIDForAdapterColumn(ownerOP)));
+                    adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(nextIdForAdapterColumn));
                     jdbcPosition += adapterMapping.getNumberOfColumnMappings();
                 }
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
@@ -1049,8 +1054,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     /**
-     * Accessor for the higher id when elements primary key can't be part of
-     * the primary key by datastore limitations like BLOB types can't be primary keys.
+     * Accessor for the higher id when elements primary key can't be part of the primary key by datastore limitations (e.g BLOB types can't be primary keys).
      * @param op ObjectProvider for container
      * @return The next id
      */
@@ -1074,15 +1078,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
-                        if (!rs.next())
-                        {
-                            nextID = 1;
-                        }
-                        else
-                        {
-                            nextID = rs.getInt(1)+1;
-                        }
-
+                        nextID = (!rs.next()) ? nextID = 1 : rs.getInt(1)+1;
                         JDBCUtils.logWarnings(rs);
                     }
                     finally
@@ -1102,7 +1098,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
         catch (SQLException e)
         {
-            throw new NucleusDataStoreException(Localiser.msg("056020",getMaxAdapterColumnIdStmt()),e);
+            throw new NucleusDataStoreException(Localiser.msg("056020", getMaxAdapterColumnIdStmt()),e);
         }
 
         return nextID;
@@ -1117,13 +1113,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      */
     private String getMaxAdapterColumnIdStmt()
     {
-        StringBuilder stmt = new StringBuilder("SELECT MAX(" + adapterMapping.getColumnMapping(0).getColumn().getIdentifier().toString() + ")");
-        stmt.append(" FROM ");
-        stmt.append(mapTable.toString());
-        stmt.append(" WHERE ");
-        BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
+        if (maxAdapterColumnIdStmt == null)
+        {
+            StringBuilder stmt = new StringBuilder("SELECT MAX(" + adapterMapping.getColumnMapping(0).getColumn().getIdentifier().toString() + ")");
+            stmt.append(" FROM ");
+            stmt.append(mapTable.toString());
+            stmt.append(" WHERE ");
+            BackingStoreHelper.appendWhereClauseForMapping(stmt, ownerMapping, null, true);
 
-        return stmt.toString();
+            maxAdapterColumnIdStmt = stmt.toString();
+        }
+
+        return maxAdapterColumnIdStmt;
     }
 
     /**
