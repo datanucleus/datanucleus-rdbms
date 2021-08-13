@@ -262,6 +262,56 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     /**
+     * Method to put an item in the Map where we know the key is already present (to avoid the lookup).
+     * @param op ObjectProvider for the map.
+     * @param key The key to store the value against
+     * @param value The value to store.
+     * @param previousValue The previous value
+     * @param present Whether the key is already present previous to this
+     */
+    public void put(ObjectProvider op, K key, V value, V previousValue, boolean present)
+    {
+        validateKeyForWriting(op, key);
+        validateValueForWriting(op, value);
+
+        // Value changed so update the map
+        try
+        {
+            ExecutionContext ec = op.getExecutionContext();
+            ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
+            try
+            {
+                if (present)
+                {
+                    internalUpdate(op, mconn, false, key, value, true);
+                }
+                else
+                {
+                    internalPut(op, mconn, false, key, value, true);
+                }
+            }
+            finally
+            {
+                mconn.release();
+            }
+        }
+        catch (MappedDatastoreException e)
+        {
+            throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
+        }
+
+        MapMetaData mapmd = ownerMemberMetaData.getMap();
+        if (mapmd.isDependentValue() && !mapmd.isEmbeddedValue() && previousValue != null)
+        {
+            // Delete the old value if it is no longer contained and is dependent
+            if (!containsValue(op, previousValue))
+            {
+                op.getExecutionContext().deleteObjectInternal(previousValue);
+            }
+        }
+    }
+
+    /**
      * Method to put an item in the Map.
      * @param op ObjectProvider for the map.
      * @param key The key to store the value against
