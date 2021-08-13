@@ -262,7 +262,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     /**
-     * Method to put an item in the Map where we know the key is already present (to avoid the lookup).
+     * Method to put an item in the Map where we provide whether the key is present and its current value if so.
      * @param op ObjectProvider for the map.
      * @param key The key to store the value against
      * @param value The value to store.
@@ -274,7 +274,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         validateKeyForWriting(op, key);
         validateValueForWriting(op, value);
 
-        // Value changed so update the map
+        if (present && value == previousValue)
+        {
+            // Nothing to do
+            return;
+        }
+
         try
         {
             ExecutionContext ec = op.getExecutionContext();
@@ -443,10 +448,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             return;
         }
 
-        ExecutionContext ec = op.getExecutionContext();
         removeInternal(op, key);
 
         MapMetaData mapmd = ownerMemberMetaData.getMap();
+        ExecutionContext ec = op.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
         if (mapmd.isDependentKey() && !mapmd.isEmbeddedKey() && api.isPersistable(key))
         {
@@ -491,6 +496,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 }
             }
         }
+
         clearInternal(ownerOP);
 
         if (dependentElements != null && !dependentElements.isEmpty())
@@ -503,7 +509,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Accessor for the keys in the Map.
      * @return The keys
-     **/
+     */
     public synchronized SetStore keySetStore()
     {
         if (keySetStore == null)
