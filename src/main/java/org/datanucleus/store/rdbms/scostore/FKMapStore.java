@@ -667,17 +667,19 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             // Just return
             return null;
         }
-        Object oldValue = get(op, key);
-        return remove(op, key, oldValue);
+
+        V oldValue = get(op, key);
+        remove(op, key, oldValue);
+        return oldValue;
     }
 
     /**
-     * Method to remove an entry from the map.
+     * Method to remove an entry from the map where we know the value associated with the key.
      * @param op ObjectProvider for the map.
      * @param key Key of the entry to remove.
-     * @return The value that was removed.
+     * @param oldValue The value associated with the key
      */
-    public V remove(ObjectProvider op, Object key, Object oldValue)
+    public void remove(ObjectProvider op, Object key, Object oldValue)
     {
         ExecutionContext ec = op.getExecutionContext();
         if (keyFieldNumber >= 0)
@@ -808,8 +810,6 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 }
             }
         }
-
-        return (V) oldValue;
     }
 
     /**

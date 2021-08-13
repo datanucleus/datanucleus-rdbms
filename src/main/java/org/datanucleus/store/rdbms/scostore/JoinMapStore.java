@@ -431,16 +431,16 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     /**
-     * Method to remove an item from the map.
+     * Method to remove an item from the map where we know the value associated with the key.
      * @param op ObjectProvider for the map.
      * @param key Key of the item to remove.
-     * @return The value that was removed.
+     * @param oldValue Value associated with the key before removal.
      */
-    public V remove(ObjectProvider op, Object key, Object oldValue)
+    public void remove(ObjectProvider op, Object key, Object oldValue)
     {
         if (!validateKeyForReading(op, key))
         {
-            return null;
+            return;
         }
 
         ExecutionContext ec = op.getExecutionContext();
@@ -462,8 +462,6 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 ec.deleteObjectInternal(oldValue);
             }
         }
-
-        return (V) oldValue;
     }
 
     /**
