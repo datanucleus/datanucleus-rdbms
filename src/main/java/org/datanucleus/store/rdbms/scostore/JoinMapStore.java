@@ -164,6 +164,104 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     /**
+     * Method to put multiple objects where we are also provided with the map contents prior to this change to avoid lookups.
+     * @param op ObjectProvider for the owner
+     * @param m Map of objects to put
+     * @param previousMap Map prior to this put
+     */
+    public void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
+    {
+        if (m == null || m.isEmpty())
+        {
+            return;
+        }
+
+        Set<Map.Entry> puts = new HashSet<>();
+        Set<Map.Entry> updates = new HashSet<>();
+
+        for (Map.Entry entry : m.entrySet())
+        {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+
+            // Make sure the related objects are persisted (persistence-by-reachability)
+            validateKeyForWriting(op, key);
+            validateValueForWriting(op, value);
+
+            // Check if this is a new entry, or an update
+            if (previousMap.containsKey(key))
+            {
+                if (previousMap.get(key) != value)
+                {
+                    updates.add(entry);
+                }
+            }
+            else
+            {
+                puts.add(entry);
+            }
+        }
+
+        boolean batched = allowsBatching();
+
+        // Put any new entries
+        if (!puts.isEmpty())
+        {
+            try
+            {
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
+                try
+                {
+                    // Loop through all entries
+                    Iterator<Map.Entry> iter = puts.iterator();
+                    while (iter.hasNext())
+                    {
+                        // Add the row to the join table
+                        Map.Entry entry = iter.next();
+                        internalPut(op, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (MappedDatastoreException e)
+            {
+                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
+            }
+        }
+
+        // Update any changed entries
+        if (!updates.isEmpty())
+        {
+            try
+            {
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
+                try
+                {
+                    // Loop through all entries
+                    Iterator<Map.Entry> iter = updates.iterator();
+                    while (iter.hasNext())
+                    {
+                        // Update the row in the join table
+                        Map.Entry entry = iter.next();
+                        internalUpdate(op, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
+                    }
+                }
+                finally
+                {
+                    mconn.release();
+                }
+            }
+            catch (MappedDatastoreException mde)
+            {
+                throw new NucleusDataStoreException(Localiser.msg("056016", mde.getMessage()), mde);
+            }
+        }
+    }
+
+    /**
      * Method to put all elements from a Map into our Map.
      * @param op ObjectProvider for the Map
      * @param m The Map to add
