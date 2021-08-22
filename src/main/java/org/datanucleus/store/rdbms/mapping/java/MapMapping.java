@@ -22,6 +22,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -152,14 +153,14 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value.size() > 0)
         {
             // Add the entries direct to the datastore
-            ((MapStore) table.getStoreManager().getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value);
+            ((MapStore) table.getStoreManager().getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value, Collections.emptyMap());
 
             // Create a SCO wrapper with the entries loaded
             replaceFieldWithWrapper(ownerOP, value);
         }
         else
         {
-            if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
+            if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
             {
                 // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
                 replaceFieldWithWrapper(ownerOP, null);
@@ -245,10 +246,9 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             //     goes into dirty state and then flush() triggers UpdateRequest, which comes here
             MapStore store = ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
 
-            // TODO Consider making this more efficient picking the ones to remove/add
-            // e.g use an update() method on the backing store like for CollectionStore
+            // TODO Optimise this. Should mean call removeAll(Set<K>), followed by putAll(map, currentMap)
             store.clear(ownerOP);
-            store.putAll(ownerOP, value);
+            store.putAll(ownerOP, value, Collections.emptyMap());
 
             // Replace the field with a wrapper containing these entries
             replaceFieldWithWrapper(ownerOP, value);

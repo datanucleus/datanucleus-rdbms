@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -167,13 +168,20 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * Method to put multiple objects where we are also provided with the map contents prior to this change to avoid lookups.
      * @param op ObjectProvider for the owner
      * @param m Map of objects to put
-     * @param previousMap Map prior to this put
+     * @param currentMap Map prior to this put
      */
-    public void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> previousMap)
+    public void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
     {
         if (m == null || m.isEmpty())
         {
             return;
+        }
+
+        // Make sure the related objects are persisted (persistence-by-reachability)
+        for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
+        {
+            validateKeyForWriting(op, e.getKey());
+            validateValueForWriting(op, e.getValue());
         }
 
         Set<Map.Entry> puts = new HashSet<>();
@@ -184,14 +192,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             Object key = entry.getKey();
             Object value = entry.getValue();
 
-            // Make sure the related objects are persisted (persistence-by-reachability)
-            validateKeyForWriting(op, key);
-            validateValueForWriting(op, value);
-
             // Check if this is a new entry, or an update
-            if (previousMap.containsKey(key))
+            if (currentMap.containsKey(key))
             {
-                if (previousMap.get(key) != value)
+                if (currentMap.get(key) != value)
                 {
                     updates.add(entry);
                 }
@@ -202,63 +206,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
         }
 
-        boolean batched = allowsBatching();
-
-        // Put any new entries
-        if (!puts.isEmpty())
-        {
-            try
-            {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
-                try
-                {
-                    // Loop through all entries
-                    Iterator<Map.Entry> iter = puts.iterator();
-                    while (iter.hasNext())
-                    {
-                        // Add the row to the join table
-                        Map.Entry entry = iter.next();
-                        internalPut(op, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
-                    }
-                }
-                finally
-                {
-                    mconn.release();
-                }
-            }
-            catch (MappedDatastoreException e)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("056016", e.getMessage()), e);
-            }
-        }
-
-        // Update any changed entries
-        if (!updates.isEmpty())
-        {
-            try
-            {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
-                try
-                {
-                    // Loop through all entries
-                    Iterator<Map.Entry> iter = updates.iterator();
-                    while (iter.hasNext())
-                    {
-                        // Update the row in the join table
-                        Map.Entry entry = iter.next();
-                        internalUpdate(op, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
-                    }
-                }
-                finally
-                {
-                    mconn.release();
-                }
-            }
-            catch (MappedDatastoreException mde)
-            {
-                throw new NucleusDataStoreException(Localiser.msg("056016", mde.getMessage()), mde);
-            }
-        }
+        processPutsAndUpdates(op, puts, updates);
     }
 
     /**
@@ -273,33 +221,46 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             return;
         }
 
+        // Make sure the related objects are persisted (persistence-by-reachability)
+        for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
+        {
+            validateKeyForWriting(op, e.getKey());
+            validateValueForWriting(op, e.getValue());
+        }
+
+        // Extract the current map entries to compare with (single SQL call)
+        Map currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
+        SetStore<Map.Entry<K, V>> entrySet = this.entrySetStore();
+        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(op);
+        while (entrySetIter.hasNext())
+        {
+            Map.Entry<K,V> entry = entrySetIter.next();
+            currentMap.put(entry.getKey(), entry.getValue());
+        }
+
+        // Separate the changes into puts and updates
         Set<Map.Entry> puts = new HashSet<>();
         Set<Map.Entry> updates = new HashSet<>();
-
         for (Map.Entry entry : m.entrySet())
         {
             Object key = entry.getKey();
-            Object value = entry.getValue();
 
-            // Make sure the related objects are persisted (persistence-by-reachability)
-            validateKeyForWriting(op, key);
-            validateValueForWriting(op, value);
-
-            // Check if this is a new entry, or an update TODO Do these getValue calls in one call
-            try
+            // Check if this is a new entry, or an update
+            if (currentMap.containsKey(key))
             {
-                Object oldValue = getValue(op, key);
-                if (oldValue != value)
-                {
-                    updates.add(entry);
-                }
+                updates.add(entry);
             }
-            catch (NoSuchElementException nsee)
+            else
             {
                 puts.add(entry);
             }
         }
 
+        processPutsAndUpdates(op, puts, updates);
+    }
+
+    protected void processPutsAndUpdates(ObjectProvider op, Set<Map.Entry> puts, Set<Map.Entry> updates)
+    {
         boolean batched = allowsBatching();
 
         // Put any new entries
