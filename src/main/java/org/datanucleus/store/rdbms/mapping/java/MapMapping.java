@@ -246,9 +246,10 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             //     goes into dirty state and then flush() triggers UpdateRequest, which comes here
             MapStore store = ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
 
+            store.update(ownerOP, value);
             // TODO Optimise this. Should mean call removeAll(Set<K>), followed by putAll(map, currentMap)
-            store.clear(ownerOP);
-            store.putAll(ownerOP, value, Collections.emptyMap());
+//            store.clear(ownerOP);
+//            store.putAll(ownerOP, value, Collections.emptyMap());
 
             // Replace the field with a wrapper containing these entries
             replaceFieldWithWrapper(ownerOP, value);

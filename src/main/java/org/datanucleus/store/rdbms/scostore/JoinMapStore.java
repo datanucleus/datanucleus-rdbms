@@ -381,7 +381,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key The key to store the value against
      * @param value The value to store.
      * @return The value stored.
-     **/
+     */
     public V put(ObjectProvider op, K key, V value)
     {
         validateKeyForWriting(op, key);
@@ -441,6 +441,73 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         return oldValue;
     }
+
+    // TODO Enable this when tested
+//    @Override
+//    public void update(ObjectProvider op, Map<K, V> map)
+//    {
+//        if (map == null || map.isEmpty())
+//        {
+//            clear(op);
+//            return;
+//        }
+//
+//        // Make sure the related objects are persisted (persistence-by-reachability)
+//        for (Map.Entry<? extends K, ? extends V> e : map.entrySet())
+//        {
+//            validateKeyForWriting(op, e.getKey());
+//            validateValueForWriting(op, e.getValue());
+//        }
+//
+//        // Extract the current map entries to compare with (single SQL call)
+//        Map currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
+//        SetStore<Map.Entry<K, V>> entrySet = this.entrySetStore();
+//        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(op);
+//        while (entrySetIter.hasNext())
+//        {
+//            Map.Entry<K,V> entry = entrySetIter.next();
+//            currentMap.put(entry.getKey(), entry.getValue());
+//        }
+//
+//        // Separate the changes into puts, updates and removes
+//        Set<Map.Entry> puts = new HashSet<>();
+//        Set<Map.Entry> updates = new HashSet<>();
+//        Set<Map.Entry> removes = new HashSet<>();
+//
+//        Set<Map.Entry<K, V>> currentEntries = currentMap.entrySet();
+//        for (Map.Entry entry : currentEntries)
+//        {
+//            if (!map.containsKey(entry.getKey()))
+//            {
+//                removes.add(entry);
+//            }
+//        }
+//        for (Map.Entry entry : map.entrySet())
+//        {
+//            Object key = entry.getKey();
+//
+//            // Check if this is a new entry, or an update
+//            if (currentMap.containsKey(key))
+//            {
+//                updates.add(entry);
+//            }
+//            else
+//            {
+//                puts.add(entry);
+//            }
+//        }
+//
+//        if (!removes.isEmpty())
+//        {
+//            // TODO Add a removeAll option rather than N statements batched
+//            for (Map.Entry entry : removes)
+//            {
+//                remove(op, entry.getKey(), entry.getValue());
+//            }
+//        }
+//
+//        processPutsAndUpdates(op, puts, updates);
+//    }
 
     /**
      * Method to remove an entry from the map.
