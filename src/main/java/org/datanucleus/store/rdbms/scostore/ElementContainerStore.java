@@ -32,7 +32,6 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
@@ -324,8 +323,8 @@ public abstract class ElementContainerStore extends BaseContainerStore
             }
         }
 
-        boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
-        boolean elementSoftDelete = (elementInfo != null ? elementInfo[0].cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE) : false);
+        boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
+        boolean elementSoftDelete = (elementInfo != null ? elementInfo[0].cmd.isSoftDelete() : false);
 
         if (ownerSoftDelete && elementSoftDelete)
         {

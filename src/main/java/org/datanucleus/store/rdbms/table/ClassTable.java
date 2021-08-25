@@ -326,7 +326,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
-        if (storeMgr.getNucleusContext().isClassMultiTenant(cmd))
+        if (cmd.isMultitenant())
         {
             // Surrogate multi-tenancy discriminator
             ColumnMetaData colmd = new ColumnMetaData();
@@ -354,7 +354,7 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             logMapping("MULTITENANCY", multitenancyMapping);
         }
 
-        if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE))
+        if (cmd.isSoftDelete())
         {
             // Surrogate "SoftDelete" flag column
             ColumnMetaData colmd = new ColumnMetaData();

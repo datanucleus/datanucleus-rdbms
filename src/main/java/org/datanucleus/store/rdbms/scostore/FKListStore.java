@@ -37,7 +37,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.OrderMetaData.FieldOrder;
 import org.datanucleus.state.ObjectProvider;
@@ -879,7 +878,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
             if (!ownerSoftDelete)
             {
                 // Clear without delete

@@ -34,7 +34,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.state.RelationshipManager;
@@ -883,7 +882,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         }
         else
         {
-            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
 
             // Perform any necessary "managed relationships" updates on the element
             ownerOP.isLoaded(ownerMemberMetaData.getAbsoluteFieldNumber()); // Make sure the field is loaded

@@ -33,7 +33,6 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.metadata.MetaData;
 import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -433,7 +432,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
         else
         {
-            boolean ownerSoftDelete = ownerOP.getClassMetaData().hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE);
+            boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
             if (!ownerSoftDelete)
             {
                 // TODO Cater for multiple element roots
