@@ -252,7 +252,7 @@ public class LocateRequest extends Request
                             {
                                 // Set MultiTenancy tenant id in statement
                                 StatementMappingIndex multitenancyIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.MULTITENANCY.getFieldNumber());
-                                String tenantId = ec.getNucleusContext().getTenantId(ec);
+                                String tenantId = ec.getTenantId();
                                 for (int i=0;i<multitenancyIdx.getNumberOfParameterOccurrences();i++)
                                 {
                                     multitenancyMapping.setObject(ec, ps, multitenancyIdx.getParameterPositionsForOccurrence(i), tenantId);

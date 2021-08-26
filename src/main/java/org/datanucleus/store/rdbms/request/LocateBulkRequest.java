@@ -190,7 +190,7 @@ public class LocateBulkRequest extends BulkRequest
             else
             {
                 // Add EQ expression for tenantId TODO Use a parameter for this and set in execution
-                SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getNucleusContext().getTenantId(ec));
+                SQLExpression tenantVal = exprFactory.newLiteral(sqlStatement, multitenancyMapping, ec.getTenantId());
                 sqlStatement.whereAnd(tenantExpr.eq(tenantVal), true);
             }
         }

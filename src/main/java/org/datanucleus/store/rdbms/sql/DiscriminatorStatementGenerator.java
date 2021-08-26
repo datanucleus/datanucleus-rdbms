@@ -372,7 +372,7 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             }
             else
             {
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getTenantId(ec));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getTenantId());
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
         }

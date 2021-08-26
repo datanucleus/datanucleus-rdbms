@@ -390,13 +390,13 @@ public class InsertRequest extends Request
                     if (multitenancyStmtMapping != null)
                     {
                         // Multitenancy mapping
-                        String tenantId = ec.getNucleusContext().getTenantId(ec);
+                        String tenantId = ec.getTenantId();
                         if (tenantId == null)
                         {
                             NucleusLogger.PERSISTENCE.warn("Insert of object with multitenancy column but tenantId not set! Suggest that you set it.");
                         }
                         table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false).setObject(ec, ps, multitenancyStmtMapping.getParameterPositionsForOccurrence(0),
-                            ec.getNucleusContext().getTenantId(ec));
+                            tenantId);
                     }
 
                     if (softDeleteStmtMapping != null)
