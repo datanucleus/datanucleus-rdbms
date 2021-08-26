@@ -1181,7 +1181,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
             {
                 // Multi-tenancy restriction
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, stmt.getPrimaryTable(), multitenancyMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getTenantId(ec));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
 
@@ -1316,7 +1316,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
                 // Multi-tenancy restriction
                 SQLTable tenantSqlTbl = stmt.getPrimaryTable();
                 SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
-                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getMultiTenancyId(ec));
+                SQLExpression tenantVal = stmt.getSQLExpressionFactory().newLiteral(stmt, multitenancyMapping, ec.getNucleusContext().getTenantId(ec));
                 stmt.whereAnd(tenantExpr.eq(tenantVal), true);
             }
             // TODO Discriminator restriction?
