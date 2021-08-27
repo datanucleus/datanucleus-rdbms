@@ -65,6 +65,7 @@ import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.JoinMetaData;
 import org.datanucleus.metadata.MetaData;
+import org.datanucleus.metadata.MultitenancyMetaData;
 import org.datanucleus.metadata.OrderMetaData;
 import org.datanucleus.metadata.PrimaryKeyMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
@@ -326,21 +327,18 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         }
 
         // TODO Only put on root table (i.e "if (supertable != null)" then omit)
-        if (cmd.isMultitenant())
+        MultitenancyMetaData mtmd = cmd.getMultitenancyMetaData();
+        if (mtmd != null)
         {
             // Surrogate multi-tenancy discriminator
-            ColumnMetaData colmd = new ColumnMetaData();
-            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME))
+            ColumnMetaData colmd = mtmd.getColumnMetaData();
+            if (colmd == null)
             {
-                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_NAME));
-            }
-            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH))
-            {
-                colmd.setLength(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_COLUMN_LENGTH));
-            }
-            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE))
-            {
-                colmd.setJdbcType(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_MULTITENANCY_JDBC_TYPE));
+                colmd = new ColumnMetaData();
+                if (mtmd.getColumnName() != null)
+                {
+                    colmd.setName(mtmd.getColumnName());
+                }
             }
 
             String colName = (colmd.getName() != null) ? colmd.getName() : "TENANT_ID";
@@ -2170,10 +2168,31 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 {
                     index.setName(idxmd.getName());
                 }
-                int countDiscrimFields = discriminatorMapping.getNumberOfColumnMappings();
-                for (int i=0; i<countDiscrimFields; i++)
+                int numCols = discriminatorMapping.getNumberOfColumnMappings();
+                for (int i=0; i<numCols; i++)
                 {
                     index.addColumn(discriminatorMapping.getColumnMapping(i).getColumn());
+                }
+                indices.add(index);
+            }
+        }
+
+        // Check if multitenancy discriminator present and needs indexing
+        if (multitenancyMapping != null)
+        {
+            MultitenancyMetaData mtmd = cmd.getMultitenancyMetaData();
+            IndexMetaData idxmd = mtmd.getIndexMetaData();
+            if (idxmd != null)
+            {
+                Index index = new Index(this, false, null);
+                if (idxmd.getName() != null)
+                {
+                    index.setName(idxmd.getName());
+                }
+                int numCols = multitenancyMapping.getNumberOfColumnMappings();
+                for (int i=0;i<numCols;i++)
+                {
+                    index.addColumn(multitenancyMapping.getColumnMapping(i).getColumn());
                 }
                 indices.add(index);
             }
