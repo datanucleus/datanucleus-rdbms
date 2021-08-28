@@ -70,6 +70,7 @@ import org.datanucleus.metadata.OrderMetaData;
 import org.datanucleus.metadata.PrimaryKeyMetaData;
 import org.datanucleus.metadata.PropertyMetaData;
 import org.datanucleus.metadata.RelationType;
+import org.datanucleus.metadata.SoftDeleteMetaData;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
@@ -352,17 +353,22 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             logMapping("MULTITENANCY", multitenancyMapping);
         }
 
-        if (cmd.isSoftDelete())
+        SoftDeleteMetaData sdmd = cmd.getSoftDeleteMetaData();
+        if (sdmd != null)
         {
             // Surrogate "SoftDelete" flag column
-            ColumnMetaData colmd = new ColumnMetaData();
-            if (cmd.hasExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME))
+            ColumnMetaData colmd = sdmd.getColumnMetaData();
+            if (colmd == null)
             {
-                colmd.setName(cmd.getValueForExtension(MetaData.EXTENSION_CLASS_SOFTDELETE_COLUMN_NAME));
+                colmd = new ColumnMetaData();
+                if (sdmd.getColumnName() != null)
+                {
+                    colmd.setName(sdmd.getColumnName());
+                }
             }
 
             String colName = (colmd.getName() != null) ? colmd.getName() : "DELETED";
-            String typeName = Boolean.class.getName(); // TODO Allow integer?
+            String typeName = Boolean.class.getName(); // TODO Allow integer using JDBC type
 
             softDeleteMapping = new BooleanMapping();
             softDeleteMapping.setTable(this);
@@ -2193,6 +2199,27 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                 for (int i=0;i<numCols;i++)
                 {
                     index.addColumn(multitenancyMapping.getColumnMapping(i).getColumn());
+                }
+                indices.add(index);
+            }
+        }
+
+        // Check if soft delete column present and needs indexing
+        if (softDeleteMapping != null)
+        {
+            SoftDeleteMetaData sdmd = cmd.getSoftDeleteMetaData();
+            IndexMetaData idxmd = sdmd.getIndexMetaData();
+            if (idxmd != null)
+            {
+                Index index = new Index(this, false, null);
+                if (idxmd.getName() != null)
+                {
+                    index.setName(idxmd.getName());
+                }
+                int numCols = softDeleteMapping.getNumberOfColumnMappings();
+                for (int i=0;i<numCols;i++)
+                {
+                    index.addColumn(softDeleteMapping.getColumnMapping(i).getColumn());
                 }
                 indices.add(index);
             }
