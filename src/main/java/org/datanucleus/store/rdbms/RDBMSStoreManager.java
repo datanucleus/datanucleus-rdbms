@@ -88,7 +88,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
 import org.datanucleus.metadata.ClassPersistenceModifier;
-import org.datanucleus.metadata.IdentityMetaData;
+import org.datanucleus.metadata.DatastoreIdentityMetaData;
 import org.datanucleus.metadata.ValueGenerationStrategy;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InheritanceMetaData;
@@ -2046,7 +2046,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         {
             // datastore-identity surrogate field
             // always use the root IdentityMetaData since the root class defines the identity
-            IdentityMetaData idmd = cmd.getBaseIdentityMetaData();
+            DatastoreIdentityMetaData idmd = cmd.getBaseDatastoreIdentityMetaData();
             strategy = idmd.getValueStrategy();
             sequence = idmd.getSequence();
             extensions = idmd.getExtensions();
@@ -2311,7 +2311,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             else
             {
                 // datastore-identity surrogate field
-                sequence = cmd.getIdentityMetaData().getSequence();
+                sequence = cmd.getDatastoreIdentityMetaData().getSequence();
             }
 
             if (dba.supportsOption(DatastoreAdapter.SEQUENCES) && sequence != null)
@@ -4009,22 +4009,22 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             for (String className : classNames)
             {
                 AbstractClassMetaData cmd = getMetaDataManager().getMetaDataForClass(className, clr);
-                if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getValueStrategy() != null)
+                if (cmd.getDatastoreIdentityMetaData() != null && cmd.getDatastoreIdentityMetaData().getValueStrategy() != null)
                 {
-                    if (cmd.getIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.INCREMENT)
+                    if (cmd.getDatastoreIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.INCREMENT)
                     {
-                        addSequenceTableForMetaData(cmd.getIdentityMetaData(), clr, seqTablesGenerated);
+                        addSequenceTableForMetaData(cmd.getDatastoreIdentityMetaData(), clr, seqTablesGenerated);
                     }
-                    else if (cmd.getIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.SEQUENCE)
+                    else if (cmd.getDatastoreIdentityMetaData().getValueStrategy() == ValueGenerationStrategy.SEQUENCE)
                     {
-                        String seqName = cmd.getIdentityMetaData().getSequence();
+                        String seqName = cmd.getDatastoreIdentityMetaData().getSequence();
                         if (StringUtils.isWhitespace(seqName))
                         {
-                            seqName = cmd.getIdentityMetaData().getValueGeneratorName();
+                            seqName = cmd.getDatastoreIdentityMetaData().getValueGeneratorName();
                         }
                         if (!StringUtils.isWhitespace(seqName))
                         {
-                            addSequenceForMetaData(cmd.getIdentityMetaData(), seqName, clr, sequencesGenerated, ddlWriter);
+                            addSequenceForMetaData(cmd.getDatastoreIdentityMetaData(), seqName, clr, sequencesGenerated, ddlWriter);
                         }
                     }
                 }

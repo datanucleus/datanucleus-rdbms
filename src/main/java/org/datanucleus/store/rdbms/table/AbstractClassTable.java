@@ -354,10 +354,10 @@ public abstract class AbstractClassTable extends TableImpl
         idColumn.setPrimaryKey();
 
         // Set the identity column type based on the IdentityStrategy
-        String strategyName = cmd.getIdentityMetaData().getValueStrategy().toString();
-        if (cmd.getIdentityMetaData().getValueStrategy().equals(ValueGenerationStrategy.CUSTOM))
+        String strategyName = cmd.getDatastoreIdentityMetaData().getValueStrategy().toString();
+        if (cmd.getDatastoreIdentityMetaData().getValueStrategy().equals(ValueGenerationStrategy.CUSTOM))
         {
-            strategyName = cmd.getIdentityMetaData().getValueStrategy().getCustomName();
+            strategyName = cmd.getDatastoreIdentityMetaData().getValueStrategy().getCustomName();
         }
         if (strategyName != null && ValueGenerationStrategy.NATIVE.toString().equals(strategyName))
         {

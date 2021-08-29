@@ -1250,10 +1250,10 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             {
                 // datastore-identity
                 ColumnMetaData colmd = null;
-                if (cmd.getIdentityMetaData() != null && cmd.getIdentityMetaData().getColumnMetaData() != null)
+                if (cmd.getDatastoreIdentityMetaData() != null && cmd.getDatastoreIdentityMetaData().getColumnMetaData() != null)
                 {
                     // Try via <datastore-identity>...</datastore-identity>
-                    colmd = cmd.getIdentityMetaData().getColumnMetaData();
+                    colmd = cmd.getDatastoreIdentityMetaData().getColumnMetaData();
                 }
                 if (colmd == null)
                 {
