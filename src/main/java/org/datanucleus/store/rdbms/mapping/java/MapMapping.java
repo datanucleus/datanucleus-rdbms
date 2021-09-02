@@ -232,7 +232,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             return;
         }
 
-        if (mmd.isCascadeUpdate())
+        if (mmd.isCascadePersist())
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {

@@ -224,7 +224,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             return;
         }
 
-        if (mmd.isCascadeUpdate())
+        if (mmd.isCascadePersist())
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {

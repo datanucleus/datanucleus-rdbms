@@ -293,7 +293,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             return;
         }
 
-        if (!mmd.isCascadeUpdate())
+        if (!mmd.isCascadePersist())
         {
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
