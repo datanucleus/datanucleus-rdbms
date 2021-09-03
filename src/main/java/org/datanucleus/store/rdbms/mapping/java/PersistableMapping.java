@@ -944,9 +944,29 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     public void preDelete(ObjectProvider op)
     {
         int fieldNumber = mmd.getAbsoluteFieldNumber();
+        ExecutionContext ec = op.getExecutionContext();
+        ClassLoaderResolver clr = ec.getClassLoaderResolver();
+        RelationType relationType = mmd.getRelationType(clr);
+        AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
+
+        // Check if we should delete the related object when this object is deleted
+        boolean dependent = mmd.isDependent();
+        if (mmd.isCascadeRemoveOrphans())
+        {
+            // JPA allows "orphan removal" to define deletion of the other side
+            dependent = true;
+        }
+
+        // Special case of FK this side and unidirectional (and not dependent)
+        if (!dependent && relationType == RelationType.ONE_TO_ONE_UNI)
+        {
+            return;
+        }
+        // TODO If we have the FK and not dependent then should avoid the load on the related object
+
         if (!op.isFieldLoaded(fieldNumber))
         {
-            // makes sure field is loaded
+            // Load the field if we need its value
             try
             {
                 op.loadField(fieldNumber);
@@ -957,7 +977,6 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 return;
             }
         }
-
         Object pc = op.provideField(fieldNumber);
         pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
         if (pc == null)
@@ -966,11 +985,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             return;
         }
 
-        ExecutionContext ec = op.getExecutionContext();
-        ClassLoaderResolver clr = ec.getClassLoaderResolver();
-
         // N-1 Uni, so delete join table entry
-        RelationType relationType = mmd.getRelationType(clr);
         if (relationType == RelationType.MANY_TO_ONE_UNI)
         {
             // Update join table entry
@@ -978,18 +993,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             store.remove(op);
         }
 
-        // Check if we should delete the related object when this object is deleted
-        boolean dependent = mmd.isDependent();
-        if (mmd.isCascadeRemoveOrphans())
-        {
-            // JPA allows "orphan removal" to define deletion of the other side
-            dependent = true;
-        }
-
-        // Check if the field has a FK defined
-        AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
-        // TODO Cater for more than 1 related field
-
+        // Check if the field has a FK defined TODO Cater for more than 1 related field
         boolean hasFK = false;
         if (!dependent)
         {
