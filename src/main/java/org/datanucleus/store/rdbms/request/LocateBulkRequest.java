@@ -176,8 +176,8 @@ public class LocateBulkRequest extends BulkRequest
             // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
 
-            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(ops[0].getExecutionContext());
-            if (tenantReadIds != null && tenantReadIds.length > 1)
+            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(ops[0].getExecutionContext());
+            if (tenantReadIds != null && tenantReadIds.length > 0)
             {
                 // Add IN clause with values
                 SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];

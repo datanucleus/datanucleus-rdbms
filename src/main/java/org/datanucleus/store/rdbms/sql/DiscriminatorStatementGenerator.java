@@ -360,8 +360,8 @@ public class DiscriminatorStatementGenerator extends AbstractSelectStatementGene
             // Multi-tenancy restriction
             SQLTable tenantSqlTbl = stmt.getTable(multitenancyMapping.getTable(), discrimSqlTbl.getGroupName());
             SQLExpression tenantExpr = stmt.getSQLExpressionFactory().newExpression(stmt, tenantSqlTbl, multitenancyMapping);
-            String[] tenantReadIds = ec.getNucleusContext().getMultiTenancyReadIds(ec);
-            if (tenantReadIds != null && tenantReadIds.length > 1)
+            String[] tenantReadIds = ec.getNucleusContext().getTenantReadIds(ec);
+            if (tenantReadIds != null && tenantReadIds.length > 0)
             {
                 SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];
                 for (int i=0;i<tenantReadIds.length;i++)

@@ -141,8 +141,8 @@ public class LocateRequest extends Request
             // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
             
-            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(null);
-            if (tenantReadIds != null && tenantReadIds.length > 1)
+            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(null);
+            if (tenantReadIds != null && tenantReadIds.length > 0)
             {
                 // Hardcode the IN clause with values
                 SQLExpression[] readIdExprs = new SQLExpression[tenantReadIds.length];
@@ -243,8 +243,8 @@ public class LocateRequest extends Request
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            String[] tenantReadIds = storeMgr.getNucleusContext().getMultiTenancyReadIds(op.getExecutionContext());
-                            if (tenantReadIds != null && tenantReadIds.length > 1)
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(op.getExecutionContext());
+                            if (tenantReadIds != null && tenantReadIds.length > 0)
                             {
                                 // Using IN clause so nothing to do since hardcoded
                             }
