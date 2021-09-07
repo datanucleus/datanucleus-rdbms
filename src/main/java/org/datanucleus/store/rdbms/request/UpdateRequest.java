@@ -286,7 +286,7 @@ public class UpdateRequest extends Request
                 }
                 else if (mmds[i].isUpdateUser())
                 {
-                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getNucleusContext().getCurrentUser(ec));
+                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getCurrentUser());
                 }
             }
 
@@ -367,7 +367,7 @@ public class UpdateRequest extends Request
                         if (updateUserStmtMapping != null)
                         {
                             table.getSurrogateMapping(SurrogateColumnType.UPDATE_USER, false).setObject(ec, ps, updateUserStmtMapping.getParameterPositionsForOccurrence(0), 
-                                ec.getNucleusContext().getCurrentUser(ec));
+                                ec.getCurrentUser());
                         }
                         if (updateTimestampStmtMapping != null)
                         {

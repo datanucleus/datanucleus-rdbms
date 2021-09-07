@@ -349,7 +349,7 @@ public class InsertRequest extends Request
                                 else if (mmd.isCreateUser())
                                 {
                                     // Set create user to current user
-                                    op.replaceField(insertFieldNumbers[i], ec.getNucleusContext().getCurrentUser(ec));
+                                    op.replaceField(insertFieldNumbers[i], ec.getCurrentUser());
                                 }
 
                                 numberOfFieldsToProvide++;
@@ -407,7 +407,8 @@ public class InsertRequest extends Request
 
                     if (createUserStmtMapping != null)
                     {
-                        table.getSurrogateMapping(SurrogateColumnType.CREATE_USER, false).setObject(ec, ps, createUserStmtMapping.getParameterPositionsForOccurrence(0), ec.getNucleusContext().getCurrentUser(ec));
+                        table.getSurrogateMapping(SurrogateColumnType.CREATE_USER, false).setObject(ec, ps, createUserStmtMapping.getParameterPositionsForOccurrence(0), 
+                            ec.getCurrentUser());
                     }
                     if (createTimestampStmtMapping != null)
                     {
