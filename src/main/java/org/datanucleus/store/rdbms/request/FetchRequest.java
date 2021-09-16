@@ -465,6 +465,7 @@ public class FetchRequest extends Request
                             }
 
                             // Update all fields
+                            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in the ObjectProvider.
                             op.replaceFields(memberNumbersToFetch, rsGetter);
                         }
                         finally

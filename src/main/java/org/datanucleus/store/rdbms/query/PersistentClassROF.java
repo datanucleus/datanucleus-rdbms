@@ -314,9 +314,6 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
         }
 
-        // Extract the object from the ResultSet
-        T obj = null;
-        boolean needToSetVersion = false;
         if (persistentClass.isInterface() && !cmd.isImplementationOfPersistentDefinition())
         {
             // Querying by interface, and not a generated implementation so use the metadata for the interface
@@ -328,6 +325,9 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             }
         }
 
+        // Extract the object from the ResultSet
+        T obj = null;
+        boolean needToSetVersion = false;
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             // Check if the PK field(s) are all null (implies null object, when using OUTER JOIN)
@@ -475,6 +475,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     {
         return (T) ec.findObject(id, new FieldValues()
         {
+            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in the ObjectProvider.
             public void fetchFields(ObjectProvider op)
             {
                 resultSetGetter.setObjectProvider(op);
