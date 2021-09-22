@@ -319,7 +319,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to set an object in the List.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param index The item index
      * @param element What to set it to.
      * @param allowDependentField Whether to allow dependent field deletes
@@ -421,7 +421,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param coll The collection to use
      */
     public void update(ObjectProvider op, Collection coll)
@@ -569,7 +569,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * that will be removed (and the highest index present). The second step
      * removes these elements from the list. The third step updates the indices
      * of the remaining indices to fill the holes created.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */

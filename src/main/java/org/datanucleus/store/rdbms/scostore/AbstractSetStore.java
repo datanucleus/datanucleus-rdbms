@@ -64,14 +64,14 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
     /**
      * Accessor for an iterator for the set.
      * Implemented by the subclass using whatever mechanism the underlying datastore provides.
-     * @param op ObjectProvider for the set. 
+     * @param op StateManager for the set. 
      * @return Iterator for the set.
      */
     public abstract Iterator<E> iterator(ObjectProvider op);
 
     /**
      * Removes the association to one element
-     * @param op ObjectProvider for the container
+     * @param op StateManager for the container
      * @param element Element to remove
      * @param size Current size
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
@@ -153,7 +153,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
      * This implementation iterates around the remove() method doing each element 1 at a time. 
      * Please refer to the JoinSetStore and FKSetStore for the variations used there. 
      * This is used for Map key and value stores.
-     * @param op ObjectProvider for the container
+     * @param op StateManager for the container
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated
      */

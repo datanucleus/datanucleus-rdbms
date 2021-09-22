@@ -79,7 +79,7 @@ public class BackingStoreHelper
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate
@@ -321,7 +321,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded element starting at the specified jdbc position.
-     * @param op ObjectProvider of the owning container
+     * @param op StateManager of the owning container
      * @param element The embedded element
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
@@ -362,7 +362,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded map key starting at the specified jdbc position.
-     * @param op ObjectProvider of the owning container
+     * @param op StateManager of the owning container
      * @param key The embedded key
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
@@ -401,7 +401,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded map value starting at the specified jdbc position.
-     * @param op ObjectProvider of the owning container
+     * @param op StateManager of the owning container
      * @param value The embedded value
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at

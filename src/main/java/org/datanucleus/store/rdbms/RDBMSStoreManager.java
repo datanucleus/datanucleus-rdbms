@@ -764,7 +764,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for whether the specified field of the object is inserted in the datastore yet.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param fieldNumber (Absolute) field number for the object
      * @return Whether it is persistent
      */
@@ -817,7 +817,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Returns whether this object is inserted in the datastore far enough to be considered to be the supplied type. 
      * For example if we have base class A, B extends A and this object is a B, and we pass in A here then this returns 
      * whether the A part of the object is now inserted.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param className Name of class that we want to check the insertion level for.
      * @return Whether the object is inserted in the datastore to this level
      */
@@ -853,7 +853,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to set that the specified object is inserted down to the defined datastore class.
      * When the object is fully inserted (the table is the primary table for this object type)
      * it is removed from the map of objects being inserted.
-     * @param op ObjectProvider for the object
+     * @param op StateManager for the object
      * @param table Table to which it is now inserted
      */
     public void setObjectIsInsertedToLevel(ObjectProvider op, DatastoreClass table)

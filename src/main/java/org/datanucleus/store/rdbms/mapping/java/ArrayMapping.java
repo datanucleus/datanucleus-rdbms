@@ -173,7 +173,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called after any fetch of the owner class element.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     public void postFetch(ObjectProvider op)
     {

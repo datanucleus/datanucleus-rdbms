@@ -194,7 +194,7 @@ public class LocateRequest extends Request
     /**
      * Method performing the retrieval of the record from the datastore. 
      * Takes the constructed retrieval query and populates with the specific record information.
-     * @param op ObjectProvider for the record to be retrieved
+     * @param op StateManager for the record to be retrieved
      */
     public void execute(ObjectProvider op)
     {

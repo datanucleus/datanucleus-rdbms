@@ -249,7 +249,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * This seems to return the field number in the element of the relation when it is a bidirectional relation.
-     * @param op ObjectProvider for the owner.
+     * @param op StateManager for the owner.
      * @return The field number in the element for this relation
      */
     protected int getFieldNumberInElementForBidirectional(ObjectProvider op)

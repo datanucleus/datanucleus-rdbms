@@ -140,7 +140,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param coll The collection to use
      */
     public void update(ObjectProvider op, Collection coll)
@@ -239,7 +239,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Adds one element to the association owner vs elements.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      * @param element Element to add
      * @return Whether it was successful
      */
@@ -316,7 +316,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Adds all elements from a collection to the association container.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      * @param elements Collection of elements to add
      * @return Whether it was successful
      */
@@ -448,7 +448,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Remove all elements from a collection from the association owner vs elements.
-     * @param op ObjectProvider for the container
+     * @param op StateManager for the container
      * @param elements Collection of elements to remove
      * @return Whether the database was updated
      */
@@ -560,7 +560,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      *       (OWNERCOL=? AND ELEMENTCOL=?) OR
      *       (OWNERCOL=? AND ELEMENTCOL=?)
      * </PRE>
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param elements Collection of elements to remove
      * @return Statement for deleting items from the Set.
      */

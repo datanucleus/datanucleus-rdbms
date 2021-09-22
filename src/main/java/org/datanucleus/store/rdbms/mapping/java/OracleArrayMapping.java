@@ -166,7 +166,7 @@ public class OracleArrayMapping extends ArrayMapping
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     public void postInsert(ObjectProvider op)
     {
@@ -204,7 +204,7 @@ public class OracleArrayMapping extends ArrayMapping
 
     /**
      * Method to be called after any update of the owner class element.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     public void postUpdate(ObjectProvider op)
     {

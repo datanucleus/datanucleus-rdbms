@@ -48,7 +48,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object is being fetched.
-     * @param op ObjectProvider of the owning object
+     * @param op StateManager of the owning object
      */
     public void postFetch(ObjectProvider op)
     {
@@ -71,7 +71,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object has just being inserted.
-     * @param op ObjectProvider of the owning object
+     * @param op StateManager of the owning object
      */
     public void postInsert(ObjectProvider op)
     {
@@ -95,7 +95,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object has just being udpated.
-     * @param op ObjectProvider of the owning object
+     * @param op StateManager of the owning object
      */
     public void postUpdate(ObjectProvider op)
     {
@@ -119,7 +119,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object is about to be deleted.
-     * @param op ObjectProvider of the owning object
+     * @param op StateManager of the owning object
      */
     public void preDelete(ObjectProvider op)
     {

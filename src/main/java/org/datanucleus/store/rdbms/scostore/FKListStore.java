@@ -922,7 +922,7 @@ public class FKListStore<E> extends AbstractListStore<E>
     /**
      * Method to validate that an element is valid for writing to the datastore.
      * TODO Minimise differences to super.validateElementForWriting()
-     * @param op ObjectProvider for the List
+     * @param op StateManager for the List
      * @param element The element to validate
      * @param index The position that the element is being stored at in the list
      * @return Whether the element was inserted

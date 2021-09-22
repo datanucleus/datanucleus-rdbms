@@ -60,7 +60,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
     /**
      * Constructor.
      * @param rdbmsMgr RDBMSManager
-     * @param op ObjectProvider for the object being processed
+     * @param op StateManager for the object being processed
      */
     public DynamicSchemaFieldManager(RDBMSStoreManager rdbmsMgr, ObjectProvider op)
     {

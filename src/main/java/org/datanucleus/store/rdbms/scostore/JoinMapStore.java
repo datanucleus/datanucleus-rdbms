@@ -166,7 +166,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put multiple objects where we are also provided with the map contents prior to this change to avoid lookups.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param m Map of objects to put
      * @param currentMap Map prior to this put
      */
@@ -211,7 +211,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put all elements from a Map into our Map.
-     * @param op ObjectProvider for the Map
+     * @param op StateManager for the Map
      * @param m The Map to add
      */
     public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
@@ -322,7 +322,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put an item in the Map where we provide whether the key is present and its current value if so.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key The key to store the value against
      * @param value The value to store.
      * @param previousValue The previous value
@@ -377,7 +377,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put an item in the Map.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key The key to store the value against
      * @param value The value to store.
      * @return The value stored.
@@ -511,7 +511,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an entry from the map.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
@@ -563,7 +563,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an item from the map where we know the value associated with the key.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the item to remove.
      * @param oldValue Value associated with the key before removal.
      */
@@ -1235,7 +1235,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Accessor for the higher id when elements primary key can't be part of the primary key by datastore limitations (e.g BLOB types can't be primary keys).
-     * @param op ObjectProvider for container
+     * @param op StateManager for container
      * @return The next id
      */
     private int getNextIDForAdapterColumn(ObjectProvider op)
@@ -1309,7 +1309,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to update a field of an embedded key.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      * @param key The key to update
      * @param fieldNumber The number of the field to update
      * @param newValue The new value
@@ -1377,7 +1377,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to update a field of an embedded key.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      * @param value The value to update
      * @param fieldNumber The number of the field to update
      * @param newValue The new value

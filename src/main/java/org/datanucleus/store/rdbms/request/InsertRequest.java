@@ -623,7 +623,7 @@ public class InsertRequest extends Request
      * Method to obtain the identity attributed by the datastore when using auto-increment/IDENTITY/SERIAL on a field.
      * @param ec execution context
      * @param sqlControl SQLController
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param mconn The Connection
      * @param ps PreparedStatement for the INSERT
      * @return The identity

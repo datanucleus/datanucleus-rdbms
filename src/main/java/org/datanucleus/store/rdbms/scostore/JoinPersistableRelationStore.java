@@ -319,7 +319,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate

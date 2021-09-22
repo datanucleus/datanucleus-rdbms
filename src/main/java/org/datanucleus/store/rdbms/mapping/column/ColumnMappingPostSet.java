@@ -27,7 +27,7 @@ public interface ColumnMappingPostSet
 {
     /**
      * Perform any post "set" processing on this column, using the provided value.
-     * @param op ObjectProvider for object being set
+     * @param op StateManager for object being set
      * @param value The value to use on the set
      */
     void setPostProcessing(ObjectProvider op, Object value);

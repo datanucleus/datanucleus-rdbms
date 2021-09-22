@@ -141,7 +141,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Convenience method to handle the insert into the various tables that this object is persisted into.
      * @param table The table to process
-     * @param op ObjectProvider for the object being inserted
+     * @param op StateManager for the object being inserted
      * @param clr ClassLoader resolver
      */
     private void insertObjectInTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr)
@@ -384,7 +384,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     /**
      * Convenience method to handle the update into the various tables that this object is persisted into.
      * @param table The table to process
-     * @param op ObjectProvider for the object being updated
+     * @param op StateManager for the object being updated
      * @param clr ClassLoader resolver
      * @param mmds MetaData for the fields being updated
      */
@@ -562,7 +562,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     /**
      * Locates this object in the datastore.
-     * @param op ObjectProvider for the object to be found
+     * @param op StateManager for the object to be found
      * @throws NucleusObjectNotFoundException if the object doesnt exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */

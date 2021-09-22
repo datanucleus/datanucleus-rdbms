@@ -64,7 +64,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param coll The collection to use
      */
     public void update(ObjectProvider op, Collection coll)
@@ -76,7 +76,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Method to verify if the specified element is contained in this collection.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param element The element
      * @return Whether it contains the element 
      */
@@ -366,7 +366,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Method to update a field of an embedded element.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      * @param element The element to update
      * @param fieldNumber The number of the field to update
      * @param value The value

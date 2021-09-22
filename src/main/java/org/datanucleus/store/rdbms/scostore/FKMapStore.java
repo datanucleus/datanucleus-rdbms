@@ -382,7 +382,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Utility to update a foreign-key in the value in the case of a unidirectional 1-N relationship.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param value The value to update
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
@@ -400,7 +400,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Utility to update a foreign-key in the key in the case of
      * a unidirectional 1-N relationship.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param key The key to update
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
@@ -432,7 +432,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put an item in the Map.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param newKey The key to store the value against
      * @param newValue The value to store.
      * @return The value stored.
@@ -656,7 +656,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an entry from the map.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
@@ -675,7 +675,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an entry from the map where we know the value associated with the key.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the entry to remove.
      * @param oldValue The value associated with the key
      */
@@ -814,7 +814,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Utility to remove a value from the Map.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the object
      * @param oldValue Value to remove
      */
@@ -858,7 +858,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to clear the map of all values.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      */
     public void clear(ObjectProvider op)
     {
@@ -882,7 +882,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Utility to clear the key of a value from the Map.
      * If the key is non nullable, delete the value.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key Key of the object
      * @param oldValue Value to remove
      */

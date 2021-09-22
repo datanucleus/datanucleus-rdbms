@@ -154,7 +154,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to check if a key exists in the Map.
-     * @param op ObjectProvider for the map
+     * @param op StateManager for the map
      * @param key The key to check for.
      * @return Whether the key exists in the Map.
      */
@@ -178,7 +178,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to check if a value exists in the Map.
-     * @param op ObjectProvider for the map
+     * @param op StateManager for the map
      * @param value The value to check for.
      * @return Whether the value exists in the Map.
      */
@@ -245,7 +245,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to return the value for a key.
-     * @param op ObjectProvider for the Map.
+     * @param op StateManager for the Map.
      * @param key The key of the object to retrieve.
      * @return The value for this key.
      */
@@ -264,7 +264,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
     /**
      * Method to put all elements from a Map into our Map.
      * Simply performs a sequence of puts. Override to provide bulk handling.
-     * @param op ObjectProvider for the Map
+     * @param op StateManager for the Map
      * @param m The Map to add
      */
     public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
@@ -319,7 +319,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a key is ok for reading.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key The key to check.
      * @return Whether it is validated. 
      */
@@ -342,7 +342,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a value is ok for reading.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param value The value to check.
      * @return Whether it is validated.
      */
@@ -397,7 +397,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to retrieve a value from the Map given the key.
-     * @param op ObjectProvider for the map.
+     * @param op StateManager for the map.
      * @param key The key to retrieve the value for.
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found

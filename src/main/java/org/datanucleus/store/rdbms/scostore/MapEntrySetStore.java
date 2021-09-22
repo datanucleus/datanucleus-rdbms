@@ -149,7 +149,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to update an embedded element.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      * @param element The element to update
      * @param fieldNumber The number of the field to update
      * @param value The value
@@ -168,7 +168,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op ObjectProvider of the object
+     * @param op StateManager of the object
      * @param coll The collection to use
      */
     public void update(ObjectProvider op, Collection coll)
@@ -202,7 +202,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to remove an entry from the Map.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param element Entry to remove
      * @return Whether it was removed
      */
@@ -222,7 +222,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to remove entries from the Map.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param elements Entries to remove
      * @return Whether they were removed
      */
@@ -251,7 +251,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method to clear the Map.
-     * @param op ObjectProvider for the owner.
+     * @param op StateManager for the owner.
      */
     public void clear(ObjectProvider op)
     {

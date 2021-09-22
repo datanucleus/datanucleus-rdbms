@@ -77,7 +77,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
     /**
      * Clear the association from owner to all elements. Observes the necessary dependent field settings 
      * with respect to whether it should delete the element when doing so.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      */
     public void clear(ObjectProvider op)
     {
@@ -106,7 +106,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
     /**
      * Method to set the array for the specified owner to the passed value.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param array the array
      * @return Whether the array was updated successfully
      */
@@ -199,7 +199,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
     /**
      * Adds one element to the association owner vs elements
-     * @param op ObjectProvider for the container
+     * @param op StateManager for the container
      * @param element The element to add
      * @param position The position to add this element at
      * @return Whether it was successful
@@ -285,7 +285,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
     /**
      * Internal method to add a row to the join table.
      * Used by add() and set() to add a row to the join table.
-     * @param op ObjectProvider for the owner of the collection
+     * @param op StateManager for the owner of the collection
      * @param element The element to add the relation to
      * @param conn The connection
      * @param batched Whether we are batching

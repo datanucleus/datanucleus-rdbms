@@ -29,25 +29,25 @@ public interface MappingCallbacks
 {
     /**
      * Method called after the insert of the object so that additional operations can be performed if necessary.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     void postInsert(ObjectProvider op);
 
     /**
      * Method called after the retrieval of the object, so that additional operations can be performed if necessary.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     void postFetch(ObjectProvider op);
 
     /**
      * Method called after the update of the object, so that additional operations can be performed if necessary.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     void postUpdate(ObjectProvider op);
 
     /**
      * Method called before the delete of objects, so that additional operations can be performed if necessary.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      */
     void preDelete(ObjectProvider op);
 }

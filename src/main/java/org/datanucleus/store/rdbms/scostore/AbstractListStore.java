@@ -74,7 +74,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      * @return The Iterator
      */
     public Iterator<E> iterator(ObjectProvider op)
@@ -84,7 +84,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      * @return The List Iterator
      */
     public ListIterator<E> listIterator(ObjectProvider op)
@@ -94,7 +94,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op ObjectProvider for the container.
+     * @param op StateManager for the container.
      * @param startIdx The start point in the list (only for indexed lists).
      * @param endIdx The end point in the list (only for indexed lists).
      * @return The List Iterator
@@ -162,7 +162,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to retrieve an element from the List.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param index The index of the element required.
      * @return The object
      */
@@ -194,7 +194,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for the indexOf an object in the List.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param element The element.
      * @return The index
      */
@@ -206,7 +206,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to retrieve the last index of an object in the list.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param element The object
      * @return The last index
      */
@@ -218,7 +218,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to remove the specified element from the List.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      * @param element The element to remove.
      * @param size Current size of list if known. -1 if not known
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
@@ -262,7 +262,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Method to remove an object at an index in the List.
      * If the list is ordered, will remove the element completely since no index positions exist.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param index The location
      * @param size Current size of the list (if known). -1 if not known
      * @return The object that was removed
@@ -302,7 +302,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove the specified element from the List.
-     * @param op ObjectProvider of the owner
+     * @param op StateManager of the owner
      * @param element The element
      * @param size Current size of list if known. -1 if not known
      * @return Whether the List was modified
@@ -311,7 +311,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove an object at a location from the List.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param index The index of the element to remove
      * @param size Current list size (if known). -1 if not known
      */
@@ -319,7 +319,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to retrieve a list of elements in a range.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param startIdx From index (inclusive).
      * @param endIdx To index (exclusive)
      * @return Sub List of elements in this range.
@@ -346,7 +346,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Utility to find the indices of a collection of elements.
      * The returned list are in reverse order (highest index first).
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param elements The elements
      * @return The indices of the elements in the List.
      */
@@ -434,7 +434,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to find the index of an element.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param element The element
      * @param stmt The statement to find the element.
      * @return The index of the element in the List.
@@ -496,7 +496,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove an object at a location in the List.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param index The location
      * @param stmt The statement to remove the element from the List
      * @param size Current list size (if known). -1 if not known
@@ -570,7 +570,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to process a "shift" statement, updating the index in the list of the specified index.
-     * @param op ObjectProvider
+     * @param op StateManager
      * @param conn The connection
      * @param batched Whether the statement is batched
      * @param oldIndex The old index

@@ -789,7 +789,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     /**
      * Method executed just after a fetch of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op ObjectProvider for the owner.
+     * @param op StateManager for the owner.
      */
     public void postFetch(ObjectProvider op)
     {
@@ -798,7 +798,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     /**
      * Method executed just after the insert of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      */
     public void postInsert(ObjectProvider op)
     {
@@ -898,7 +898,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
     /**
      * Method executed just afer any update of the owning object, allowing any necessary action to this field and the object stored in it.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      */
     public void postUpdate(ObjectProvider op)
     {
@@ -939,7 +939,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
 
     /**
      * Method executed just before the owning object is deleted, allowing tidying up of any relation information.
-     * @param op ObjectProvider for the owner
+     * @param op StateManager for the owner
      */
     public void preDelete(ObjectProvider op)
     {

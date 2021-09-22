@@ -410,7 +410,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     /**
      * Method to replace the field that this mapping represents with a SCO wrapper.
      * The wrapper will be suitable for the passed instantiated type and if it is null will be for the declared type of the field.
-     * @param op ObjectProvider for the owning object
+     * @param op StateManager for the owning object
      * @param value The value to create the wrapper with
      * @return The SCO wrapper object that the field was replaced with
      */

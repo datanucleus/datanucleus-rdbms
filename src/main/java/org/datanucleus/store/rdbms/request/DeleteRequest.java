@@ -380,7 +380,7 @@ public class DeleteRequest extends Request
 
     /**
      * Method to update any 1-1 bidir non-owner fields where the foreign-key is stored in the other object.
-     * @param op ObjectProvider of this object
+     * @param op StateManager of this object
      * @param mmd MetaData for field that has related (owner) objects
      */
     private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider op, AbstractMemberMetaData mmd)
