@@ -200,7 +200,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * This does a single SELECT on the candidate of the class in question. Will join to inherited
      * tables as appropriate to get values persisted into other tables. Can also join to the tables of
      * related objects (1-1, N-1) as neccessary to retrieve those objects.
-     * @param op Object Provider of the object to be fetched.
+     * @param op StateManager of the object to be fetched.
      * @param memberNumbers The numbers of the members to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
