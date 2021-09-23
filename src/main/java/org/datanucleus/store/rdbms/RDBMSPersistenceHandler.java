@@ -106,28 +106,28 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * e.g When persisting an object that uses "new-table" inheritance for each level of the inheritance tree
      * then will get an INSERT into each table. When persisting an object that uses "complete-table"
      * inheritance then will get a single INSERT into its table.
-     * @param op The ObjectProvider of the object to be inserted.
+     * @param sm StateManager for the object to be inserted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void insertObject(ObjectProvider op)
+    public void insertObject(ObjectProvider sm)
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
+        assertReadOnlyForUpdateOfObject(sm);
 
         // Check if we need to do any updates to the schema before inserting this object
-        checkForSchemaUpdatesForFieldsOfObject(op, op.getLoadedFieldNumbers());
+        checkForSchemaUpdatesForFieldsOfObject(sm, sm.getLoadedFieldNumbers());
 
-        ExecutionContext ec = op.getExecutionContext();
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        String className = op.getClassMetaData().getFullClassName();
+        ExecutionContext ec = sm.getExecutionContext();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        String className = sm.getClassMetaData().getFullClassName();
         DatastoreClass dc = getDatastoreClass(className, clr);
         if (dc == null)
         {
-            if (op.getClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
+            if (sm.getClassMetaData().getInheritanceMetaData().getStrategy() == InheritanceStrategy.SUBCLASS_TABLE)
             {
                 throw new NucleusUserException(Localiser.msg("032013", className));
             }
-            throw new NucleusException(Localiser.msg("032014", className, op.getClassMetaData().getInheritanceMetaData().getStrategy())).setFatal();
+            throw new NucleusException(Localiser.msg("032014", className, sm.getClassMetaData().getInheritanceMetaData().getStrategy())).setFatal();
         }
 
         if (ec.getStatistics() != null)
@@ -135,16 +135,16 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             ec.getStatistics().incrementInsertCount();
         }
 
-        insertObjectInTable(dc, op, clr);
+        insertObjectInTable(dc, sm, clr);
     }
 
     /**
      * Convenience method to handle the insert into the various tables that this object is persisted into.
      * @param table The table to process
-     * @param op StateManager for the object being inserted
+     * @param sm StateManager for the object being inserted
      * @param clr ClassLoader resolver
      */
-    private void insertObjectInTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr)
+    private void insertObjectInTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
     {
         if (table instanceof ClassView)
         {
@@ -155,11 +155,11 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table first
-            insertObjectInTable(supertable, op, clr);
+            insertObjectInTable(supertable, sm, clr);
         }
 
         // Do the actual insert of this table
-        getInsertRequest(table, op.getClassMetaData(), clr).execute(op);
+        getInsertRequest(table, sm.getClassMetaData(), clr).execute(sm);
 
         // Process any secondary tables
         Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
@@ -168,7 +168,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                insertObjectInTable(secTable, op, clr);
+                insertObjectInTable(secTable, sm, clr);
             }
         }
     }
@@ -200,14 +200,14 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * This does a single SELECT on the candidate of the class in question. Will join to inherited
      * tables as appropriate to get values persisted into other tables. Can also join to the tables of
      * related objects (1-1, N-1) as neccessary to retrieve those objects.
-     * @param op StateManager of the object to be fetched.
+     * @param sm StateManager of the object to be fetched.
      * @param memberNumbers The numbers of the members to be fetched.
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void fetchObject(ObjectProvider op, int memberNumbers[])
+    public void fetchObject(ObjectProvider sm, int memberNumbers[])
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
         // Extract metadata of members to process
@@ -215,13 +215,13 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (memberNumbers != null && memberNumbers.length > 0)
         {
             int[] memberNumbersToProcess = memberNumbers;
-            AbstractClassMetaData cmd = op.getClassMetaData();
+            AbstractClassMetaData cmd = sm.getClassMetaData();
 
             if (storeMgr.getBooleanProperty(RDBMSPropertyNames.PROPERTY_RDBMS_FETCH_UNLOADED_AUTO))
             {
                 // Option to automatically load up any non-loaded fields as deemed appropriate
                 // Here we simply load up any unloaded non-relation or 1-1/N-1 members
-                if (!op.getLifecycleState().isDeleted())
+                if (!sm.getLifecycleState().isDeleted())
                 {
                     // Check if this will actually do a SELECT (because we don't want to impose that if not otherwise)
                     boolean fetchPerformsSelect = false;
@@ -247,7 +247,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                         }
 
                         // Check if we could retrieve any other unloaded fields in this call
-                        boolean[] loadedFlags = op.getLoadedFields();
+                        boolean[] loadedFlags = sm.getLoadedFields();
                         for (int i=0;i<loadedFlags.length;i++)
                         {
                             boolean requested = false;
@@ -288,7 +288,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
         }
 
-        if (op.isEmbedded())
+        if (sm.isEmbedded())
         {
             StringBuilder str = new StringBuilder();
             if (mmds != null)
@@ -302,7 +302,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                     str.append(mmds[i].getName());
                 }
             }
-            NucleusLogger.PERSISTENCE.info("Request to load fields \"" + str.toString() + "\" of class " + op.getClassMetaData().getFullClassName() + " but object is embedded, so ignored");
+            NucleusLogger.PERSISTENCE.info("Request to load fields \"" + str.toString() + "\" of class " + sm.getClassMetaData().getFullClassName() + " but object is embedded, so ignored");
         }
         else
         {
@@ -311,9 +311,9 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
                 ec.getStatistics().incrementFetchCount();
             }
 
-            DatastoreClass table = getDatastoreClass(op.getClassMetaData().getFullClassName(), clr);
-            Request req = getFetchRequest(table, mmds, op.getClassMetaData(), clr);
-            req.execute(op);
+            DatastoreClass table = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
+            Request req = getFetchRequest(table, mmds, sm.getClassMetaData(), clr);
+            req.execute(sm);
         }
     }
 
@@ -347,27 +347,27 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * e.g When updating an object that uses "new-table" inheritance for each level of the inheritance tree
      * then will get an UPDATE into each table. When updating an object that uses "complete-table"
      * inheritance then will get a single UPDATE into its table.
-     * @param op The ObjectProvider of the object to be updated.
+     * @param sm StateManager for the object to be updated.
      * @param fieldNumbers The numbers of the fields to be updated.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void updateObject(ObjectProvider op, int fieldNumbers[])
+    public void updateObject(ObjectProvider sm, int fieldNumbers[])
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
+        assertReadOnlyForUpdateOfObject(sm);
 
         // Check if we need to do any updates to the schema before updating this object
-        checkForSchemaUpdatesForFieldsOfObject(op, fieldNumbers);
+        checkForSchemaUpdatesForFieldsOfObject(sm, fieldNumbers);
 
         AbstractMemberMetaData[] mmds = null;
         if (fieldNumbers != null && fieldNumbers.length > 0)
         {
             // Convert the field numbers for this class into their metadata for the table
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             mmds = new AbstractMemberMetaData[fieldNumbers.length];
             for (int i=0;i<mmds.length;i++)
             {
-                mmds[i] = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
+                mmds[i] = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumbers[i]);
             }
 
             if (ec.getStatistics() != null)
@@ -376,19 +376,19 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             }
 
             ClassLoaderResolver clr = ec.getClassLoaderResolver();
-            DatastoreClass dc = getDatastoreClass(op.getObject().getClass().getName(), clr);
-            updateObjectInTable(dc, op, clr, mmds);
+            DatastoreClass dc = getDatastoreClass(sm.getObject().getClass().getName(), clr);
+            updateObjectInTable(dc, sm, clr, mmds);
         }
     }
 
     /**
      * Convenience method to handle the update into the various tables that this object is persisted into.
      * @param table The table to process
-     * @param op StateManager for the object being updated
+     * @param sm StateManager for the object being updated
      * @param clr ClassLoader resolver
      * @param mmds MetaData for the fields being updated
      */
-    private void updateObjectInTable(DatastoreClass table, ObjectProvider op, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
+    private void updateObjectInTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
     {
         if (table instanceof ClassView)
         {
@@ -399,11 +399,11 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         if (supertable != null)
         {
             // Process the superclass table first
-            updateObjectInTable(supertable, op, clr, mmds);
+            updateObjectInTable(supertable, sm, clr, mmds);
         }
 
         // Do the actual update of this table
-        getUpdateRequest(table, mmds, op.getClassMetaData(), clr).execute(op);
+        getUpdateRequest(table, mmds, sm.getClassMetaData(), clr).execute(sm);
 
         // Update any secondary tables
         Collection<SecondaryDatastoreClass> secondaryTables = table.getSecondaryDatastoreClasses();
@@ -412,7 +412,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             for (SecondaryDatastoreClass secTable : secondaryTables)
             {
                 // Process the secondary table
-                updateObjectInTable(secTable, op, clr, mmds);
+                updateObjectInTable(secTable, sm, clr, mmds);
             }
         }
     }
@@ -421,8 +421,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Returns a request object that will update a row in the given table. 
      * The store manager will cache the request object for re-use by subsequent requests to the same table.
      * @param table The table in which to update.
-     * @param mmds The metadata corresponding to the columns to be updated. 
-     *     MetaData whose columns exist in supertables will be ignored.
+     * @param mmds The metadata corresponding to the columns to be updated. MetaData whose columns exist in supertables will be ignored.
      * @param cmd ClassMetaData of the object of the request
      * @param clr ClassLoader resolver
      * @return An update request object.
@@ -447,29 +446,29 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * e.g When deleting an object that uses "new-table" inheritance for each level of the inheritance tree
      * then will get an DELETE for each table. When deleting an object that uses "complete-table"
      * inheritance then will get a single DELETE for its table.
-     * @param op The ObjectProvider of the object to be deleted.
+     * @param sm StateManager for the object to be deleted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void deleteObject(ObjectProvider op)
+    public void deleteObject(ObjectProvider sm)
     {
         // Check if read-only so update not permitted
-        assertReadOnlyForUpdateOfObject(op);
+        assertReadOnlyForUpdateOfObject(sm);
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (ec.getStatistics() != null)
         {
             ec.getStatistics().incrementDeleteCount();
         }
 
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        DatastoreClass dc = getDatastoreClass(op.getClassMetaData().getFullClassName(), clr);
-        deleteObjectFromTable(dc, op, clr);
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        DatastoreClass dc = getDatastoreClass(sm.getClassMetaData().getFullClassName(), clr);
+        deleteObjectFromTable(dc, sm, clr);
     }
 
     /**
      * Convenience method to handle the delete from the various tables that this object is persisted into.
      * @param table The table to process
-     * @param sm ObjectProvider for the object being deleted
+     * @param sm StateManager for the object being deleted
      * @param clr ClassLoader resolver
      */
     private void deleteObjectFromTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
@@ -523,54 +522,54 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     // ------------------------------ Locate ----------------------------------
 
-    public void locateObjects(ObjectProvider[] ops)
+    public void locateObjects(ObjectProvider[] sms)
     {
-        if (ops == null || ops.length == 0)
+        if (sms == null || sms.length == 0)
         {
             return;
         }
 
-        ClassLoaderResolver clr = ops[0].getExecutionContext().getClassLoaderResolver();
-        Map<DatastoreClass, List<ObjectProvider>> opsByTable = new HashMap<>();
-        for (int i=0;i<ops.length;i++)
+        ClassLoaderResolver clr = sms[0].getExecutionContext().getClassLoaderResolver();
+        Map<DatastoreClass, List<ObjectProvider>> smsByTable = new HashMap<>();
+        for (int i=0;i<sms.length;i++)
         {
-            AbstractClassMetaData cmd = ops[i].getClassMetaData();
+            AbstractClassMetaData cmd = sms[i].getClassMetaData();
             DatastoreClass table = getDatastoreClass(cmd.getFullClassName(), clr);
             table = table.getBaseDatastoreClass(); // Use root table in hierarchy
-            List<ObjectProvider> opList = opsByTable.get(table);
-            if (opList == null)
+            List<ObjectProvider> smList = smsByTable.get(table);
+            if (smList == null)
             {
-                opList = new ArrayList<>();
+                smList = new ArrayList<>();
             }
-            opList.add(ops[i]);
-            opsByTable.put(table, opList);
+            smList.add(sms[i]);
+            smsByTable.put(table, smList);
         }
 
-        Iterator<Map.Entry<DatastoreClass, List<ObjectProvider>>> tableIter = opsByTable.entrySet().iterator();
+        Iterator<Map.Entry<DatastoreClass, List<ObjectProvider>>> tableIter = smsByTable.entrySet().iterator();
         while (tableIter.hasNext())
         {
             Map.Entry<DatastoreClass, List<ObjectProvider>> entry = tableIter.next();
             DatastoreClass table = entry.getKey();
-            List<ObjectProvider> tableOps = entry.getValue();
+            List<ObjectProvider> tableSMs = entry.getValue();
 
             // TODO This just uses the base table. Could change to use the most-derived table
             // which would permit us to join to supertables and load more fields during this process
             LocateBulkRequest req = new LocateBulkRequest(table);
-            req.execute(tableOps.toArray(new ObjectProvider[tableOps.size()]));
+            req.execute(tableSMs.toArray(new ObjectProvider[tableSMs.size()]));
         }
     }
 
     /**
      * Locates this object in the datastore.
-     * @param op StateManager for the object to be found
+     * @param sm StateManager for the object to be found
      * @throws NucleusObjectNotFoundException if the object doesnt exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void locateObject(ObjectProvider op)
+    public void locateObject(ObjectProvider sm)
     {
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
-        DatastoreClass table = getDatastoreClass(op.getObject().getClass().getName(), clr);
-        getLocateRequest(table, op.getObject().getClass().getName()).execute(op);
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
+        DatastoreClass table = getDatastoreClass(sm.getObject().getClass().getName(), clr);
+        getLocateRequest(table, sm.getObject().getClass().getName()).execute(sm);
     }
 
     /**
@@ -656,7 +655,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * Check if we need to update the schema before performing an insert/update.
      * This is typically of use where the user has an interface field and some new implementation
      * is trying to be persisted to that field, so we need to update the schema.
-     * @param sm ObjectProvider for the object
+     * @param sm StateManager for the object
      * @param fieldNumbers The fields to check for required schema updates
      */
     private void checkForSchemaUpdatesForFieldsOfObject(ObjectProvider sm, int[] fieldNumbers)

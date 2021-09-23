@@ -42,55 +42,55 @@ public class FlushReferential extends FlushOrdered
      * @see org.datanucleus.FlushOrdered#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
     @Override
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primaryOPs, Collection<ObjectProvider> secondaryOPs, OperationQueue opQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primarySMs, Collection<ObjectProvider> secondarySMs, OperationQueue smQueue)
     {
         List<NucleusOptimisticException> flushExcps = null;
 
         // Phase 1 : Find all objects that have no relations or external FKs and process first
-        Set<ObjectProvider> unrelatedOPs = null;
-        if (primaryOPs != null)
+        Set<ObjectProvider> unrelatedSMs = null;
+        if (primarySMs != null)
         {
-            Iterator<ObjectProvider> opIter = primaryOPs.iterator();
+            Iterator<ObjectProvider> opIter = primarySMs.iterator();
             while (opIter.hasNext())
             {
-                ObjectProvider op = opIter.next();
-                if (!op.isEmbedded() && isClassSuitableForBatching(ec, op.getClassMetaData()))
+                ObjectProvider sm = opIter.next();
+                if (!sm.isEmbedded() && isClassSuitableForBatching(ec, sm.getClassMetaData()))
                 {
-                    if (unrelatedOPs == null)
+                    if (unrelatedSMs == null)
                     {
-                        unrelatedOPs = new HashSet<>();
+                        unrelatedSMs = new HashSet<>();
                     }
-                    unrelatedOPs.add(op);
+                    unrelatedSMs.add(sm);
                     opIter.remove();
                 }
             }
         }
-        if (secondaryOPs != null)
+        if (secondarySMs != null)
         {
-            Iterator<ObjectProvider> opIter = secondaryOPs.iterator();
-            while (opIter.hasNext())
+            Iterator<ObjectProvider> smIter = secondarySMs.iterator();
+            while (smIter.hasNext())
             {
-                ObjectProvider op = opIter.next();
-                if (!op.isEmbedded() && isClassSuitableForBatching(ec, op.getClassMetaData()))
+                ObjectProvider sm = smIter.next();
+                if (!sm.isEmbedded() && isClassSuitableForBatching(ec, sm.getClassMetaData()))
                 {
-                    if (unrelatedOPs == null)
+                    if (unrelatedSMs == null)
                     {
-                        unrelatedOPs = new HashSet<>();
+                        unrelatedSMs = new HashSet<>();
                     }
-                    unrelatedOPs.add(op);
-                    opIter.remove();
+                    unrelatedSMs.add(sm);
+                    smIter.remove();
                 }
             }
         }
-        if (unrelatedOPs != null)
+        if (unrelatedSMs != null)
         {
             // Process DELETEs, then INSERTs, then UPDATEs
             FlushNonReferential groupedFlush = new FlushNonReferential();
-            flushExcps = groupedFlush.flushDeleteInsertUpdateGrouped(unrelatedOPs, ec);
+            flushExcps = groupedFlush.flushDeleteInsertUpdateGrouped(unrelatedSMs, ec);
         }
 
         // Phase 2 : Fallback to FlushOrdered handling for remaining objects
-        List<NucleusOptimisticException> excps = super.execute(ec, primaryOPs, secondaryOPs, opQueue);
+        List<NucleusOptimisticException> excps = super.execute(ec, primarySMs, secondarySMs, smQueue);
 
         // Return any exceptions
         if (excps != null)

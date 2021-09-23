@@ -74,7 +74,6 @@ import org.datanucleus.metadata.SoftDeleteMetaData;
 import org.datanucleus.metadata.UniqueMetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
-import org.datanucleus.state.ObjectProvider;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
 import org.datanucleus.store.rdbms.exceptions.ClassDefinitionException;
 import org.datanucleus.store.rdbms.exceptions.DuplicateColumnException;
@@ -3509,20 +3508,6 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
             }
         }
         return mmd;
-    }
-
-    /**
-     * Utility to throw an exception if the object is not persistable.
-     * @param op The ObjectProvider for the object
-     */ 
-    void assertPCClass(ObjectProvider op)
-    {
-        Class c = op.getObject().getClass();
-
-        if (!op.getExecutionContext().getClassLoaderResolver().isAssignableFrom(cmd.getFullClassName(),c))
-        {
-            throw new NucleusException(Localiser.msg("057013",cmd.getFullClassName(),c)).setFatal();
-        }
     }
 
     /**

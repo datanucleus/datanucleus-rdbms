@@ -764,30 +764,30 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
     /**
      * Accessor for whether the specified field of the object is inserted in the datastore yet.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      * @param fieldNumber (Absolute) field number for the object
      * @return Whether it is persistent
      */
-    public boolean isObjectInserted(ObjectProvider op, int fieldNumber)
+    public boolean isObjectInserted(ObjectProvider sm, int fieldNumber)
     {
-        if (op == null)
+        if (sm == null)
         {
             return false;
         }
-        if (!op.isInserting())
+        if (!sm.isInserting())
         {
             // StateManager isn't inserting so must be persistent
             return true;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(op);
+        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(sm);
         if (latestTable == null)
         {
             // Not yet inserted anything
             return false;
         }
 
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd == null)
         {
             // Specified field doesn't exist for this object type!
@@ -798,7 +798,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
         if (mmd.isPrimaryKey())
         {
             // PK field so need to check if the latestTable manages the actual class here
-            className = op.getObject().getClass().getName();
+            className = sm.getObject().getClass().getName();
         }
 
         DatastoreClass datastoreCls = latestTable;
@@ -817,22 +817,22 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Returns whether this object is inserted in the datastore far enough to be considered to be the supplied type. 
      * For example if we have base class A, B extends A and this object is a B, and we pass in A here then this returns 
      * whether the A part of the object is now inserted.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      * @param className Name of class that we want to check the insertion level for.
      * @return Whether the object is inserted in the datastore to this level
      */
-    public boolean isObjectInserted(ObjectProvider op, String className)
+    public boolean isObjectInserted(ObjectProvider sm, String className)
     {
-        if (op == null)
+        if (sm == null)
         {
             return false;
         }
-        if (!op.isInserting())
+        if (!sm.isInserting())
         {
             return false;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(op);
+        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(sm);
         if (latestTable != null)
         {
             DatastoreClass datastoreCls = latestTable;
@@ -853,18 +853,18 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * Method to set that the specified object is inserted down to the defined datastore class.
      * When the object is fully inserted (the table is the primary table for this object type)
      * it is removed from the map of objects being inserted.
-     * @param op StateManager for the object
+     * @param sm StateManager for the object
      * @param table Table to which it is now inserted
      */
-    public void setObjectIsInsertedToLevel(ObjectProvider op, DatastoreClass table)
+    public void setObjectIsInsertedToLevel(ObjectProvider sm, DatastoreClass table)
     {
-        insertedDatastoreClassByObjectProvider.put(op, table);
+        insertedDatastoreClassByObjectProvider.put(sm, table);
 
-        if (table.managesClass(op.getClassMetaData().getFullClassName()))
+        if (table.managesClass(sm.getClassMetaData().getFullClassName()))
         {
             // Full insertion has just completed so update activity state in StateManager
-            op.changeActivityState(ActivityState.INSERTING_CALLBACKS);
-            insertedDatastoreClassByObjectProvider.remove(op);
+            sm.changeActivityState(ActivityState.INSERTING_CALLBACKS);
+            insertedDatastoreClassByObjectProvider.remove(sm);
         }
     }
 
