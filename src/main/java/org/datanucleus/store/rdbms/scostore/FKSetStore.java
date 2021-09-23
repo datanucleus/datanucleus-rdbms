@@ -614,7 +614,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
             return false;
         }
 
-        // Find the ObjectProvider for the element
+        // Find StateManager for the element
         Object elementToRemove = element;
         ExecutionContext ec = ownerOP.getExecutionContext();
         if (ec.getApiAdapter().isDetached(element)) // User passed in detached object to collection.remove()!

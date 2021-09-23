@@ -475,7 +475,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
     {
         return (T) ec.findObject(id, new FieldValues()
         {
-            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in the ObjectProvider.
+            // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
             public void fetchFields(ObjectProvider op)
             {
                 resultSetGetter.setObjectProvider(op);

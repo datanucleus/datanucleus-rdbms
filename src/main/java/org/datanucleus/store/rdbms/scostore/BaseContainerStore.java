@@ -130,7 +130,7 @@ public abstract class BaseContainerStore implements Store
     }
 
     /**
-     * Method to return the ObjectProvider for an embedded PC object (element, key, value).
+     * Method to return StateManager for an embedded PC object (element, key, value).
      * It creates one if the element is not currently managed.
      * @param op StateManager of the owner
      * @param obj The embedded PC object

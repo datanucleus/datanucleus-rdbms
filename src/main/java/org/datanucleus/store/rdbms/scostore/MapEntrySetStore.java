@@ -610,7 +610,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
         /**
          * Constructor for iterating the Set of entries.
-         * @param op the ObjectProvider
+         * @param op StateManager
          * @param setStore the set store
          * @param ownerMmd the owner member meta data - can be null (for non-joinTable cases)
          * @param rs the ResultSet

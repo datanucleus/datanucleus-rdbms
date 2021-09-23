@@ -210,7 +210,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
     }
 
     /**
-     * Method to serialise the value from the ObjectProvider to file.
+     * Method to serialise the value from StateManager to file.
      * @param op The ObjectProvider
      * @param value The value being serialised
      */

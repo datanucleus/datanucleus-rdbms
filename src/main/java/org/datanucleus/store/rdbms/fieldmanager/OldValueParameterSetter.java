@@ -25,7 +25,7 @@ import org.datanucleus.store.rdbms.query.StatementClassMapping;
 /**
  * Parameter setter that uses old values when available.
  * Used as part of the nondurable update process.
- * Assumes that the old value for fields are stored by the ObjectProvider under name "FIELD_VALUE.ORIGINAL.{fieldNum}".
+ * Assumes that the old value for fields are stored by StateManager under name "FIELD_VALUE.ORIGINAL.{fieldNum}".
  */
 public class OldValueParameterSetter extends ParameterSetter
 {

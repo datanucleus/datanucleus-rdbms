@@ -189,7 +189,7 @@ import org.datanucleus.util.StringUtils;
  * The RDBMS manager's responsibilities extend those for StoreManager to add :
  * <ul>
  * <li>creates and controls access to the data sources required for this datastore instance</li>
- * <li>implements insert(), fetch(), update(), delete() in the interface to the ObjectProvider.</li>
+ * <li>implements insert(), fetch(), update(), delete() in the interface to StateManager.</li>
  * <li>Providing cached access to JDBC database metadata (in particular column information).</li>
  * <li>Resolving SQL identifier macros to actual SQL identifiers.</li>
  * </ul>

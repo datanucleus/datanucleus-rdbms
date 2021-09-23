@@ -142,7 +142,7 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
     }
 
     /**
-     * Accessor for the ObjectProvider of the embedded PC object when provided with the owner object.
+     * Accessor for StateManager of the embedded PC object when provided with the owner object.
      * @param ownerOP ObjectProvider of the owner
      * @return ObjectProvider of the embedded object
      */

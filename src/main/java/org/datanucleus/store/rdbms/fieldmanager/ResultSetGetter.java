@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Contributors:
-2010 Andy Jefferson - added mode where we dont have the ObjectProvider, for just the PK fields
+2010 Andy Jefferson - added mode where we dont have StateManager, for just the PK fields
     ...
 **********************************************************************/
 package org.datanucleus.store.rdbms.fieldmanager;
@@ -69,7 +69,7 @@ public class ResultSetGetter extends AbstractFieldManager
     }
 
     /**
-     * Method to set the ObjectProvider that processing applies to.
+     * Method to set StateManager that processing applies to.
      * This is typically called just before processing the current persistable object on the current row.
      * @param op The ObjectProvider that we are applying to.
      */
