@@ -166,11 +166,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put multiple objects where we are also provided with the map contents prior to this change to avoid lookups.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param m Map of objects to put
      * @param currentMap Map prior to this put
      */
-    public void putAll(DNStateManager<?> op, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
+    public void putAll(DNStateManager<?> sm, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
     {
         if (m == null || m.isEmpty())
         {
@@ -180,8 +180,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         // Make sure the related objects are persisted (persistence-by-reachability)
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
         {
-            validateKeyForWriting(op, e.getKey());
-            validateValueForWriting(op, e.getValue());
+            validateKeyForWriting(sm, e.getKey());
+            validateValueForWriting(sm, e.getValue());
         }
 
         Set<Map.Entry> puts = new HashSet<>();
@@ -206,7 +206,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
         }
 
-        processPutsAndUpdates(op, puts, updates);
+        processPutsAndUpdates(sm, puts, updates);
     }
 
     /**
@@ -502,7 +502,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 //            // TODO Add a removeAll option rather than N statements batched
 //            for (Map.Entry entry : removes)
 //            {
-//                remove(op, entry.getKey(), entry.getValue());
+//                remove(sm, entry.getKey(), entry.getValue());
 //            }
 //        }
 //

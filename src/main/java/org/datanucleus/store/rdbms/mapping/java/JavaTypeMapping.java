@@ -829,7 +829,7 @@ public abstract class JavaTypeMapping
 //        {
 //            if (columnMappings[i] instanceof ColumnMappingPostSet)
 //            {
-//                ((ColumnMappingPostSet)columnMappings[i]).setPostProcessing(op, getValueForColumnMapping(storeMgr.getNucleusContext(), i, value));
+//                ((ColumnMappingPostSet)columnMappings[i]).setPostProcessing(sm, getValueForColumnMapping(storeMgr.getNucleusContext(), i, value));
 //            }
 //        }
     }
