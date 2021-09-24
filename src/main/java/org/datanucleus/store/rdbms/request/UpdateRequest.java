@@ -255,13 +255,13 @@ public class UpdateRequest extends Request
     /**
      * Method performing the update of the record in the datastore. 
      * Takes the constructed update query and populates with the specific record information.
-     * @param op The ObjectProvider for the record to be updated
+     * @param sm StateManager for the record to be updated
      */
-    public void execute(ObjectProvider op)
+    public void execute(ObjectProvider sm)
     {
         // Choose the statement based on whether optimistic or not
         String stmt = null;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         boolean optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
         stmt = optimisticChecks ? updateStmtOptimistic : updateStmt;
 
@@ -274,19 +274,19 @@ public class UpdateRequest extends Request
                 {
                     if (mmds[i].getType().isAssignableFrom(java.time.Instant.class))
                     {
-                        op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
+                        sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
                             java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
                     }
                     else
                     {
-                        op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
+                        sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getTransaction().getIsActive() ? 
                             new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
                     }
                     // TODO Throw exception if invalid member type
                 }
                 else if (mmds[i].isUpdateUser())
                 {
-                    op.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getCurrentUser());
+                    sm.replaceField(mmds[i].getAbsoluteFieldNumber(), ec.getCurrentUser());
                 }
             }
 
@@ -316,7 +316,7 @@ public class UpdateRequest extends Request
                 }
 
                 // Debug information about what we are updating
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldStr.toString(), table));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052214", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), fieldStr.toString(), table));
             }
 
             RDBMSStoreManager storeMgr = table.getStoreManager();
@@ -334,7 +334,7 @@ public class UpdateRequest extends Request
                     PreparedStatement ps = sqlControl.getStatementForUpdate(mconn, stmt, batch);
                     try
                     {
-                        Object currentVersion = op.getTransactionalVersion();
+                        Object currentVersion = sm.getTransactionalVersion();
                         Object nextVersion = null;
                         if (versionMetaData != null) // TODO What if strategy is NONE?
                         {
@@ -354,14 +354,14 @@ public class UpdateRequest extends Request
                                     // Cater for Integer-based versions
                                     nextVersion = Integer.valueOf(((Number)nextVersion).intValue());
                                 }
-                                op.replaceField(verfmd.getAbsoluteFieldNumber(), nextVersion);
+                                sm.replaceField(verfmd.getAbsoluteFieldNumber(), nextVersion);
                             }
                             else
                             {
                                 // Surrogate version column
                                 nextVersion = ec.getLockManager().getNextVersion(versionMetaData, currentVersion);
                             }
-                            op.setTransactionalVersion(nextVersion);
+                            sm.setTransactionalVersion(nextVersion);
                         }
 
                         if (updateUserStmtMapping != null)
@@ -387,7 +387,7 @@ public class UpdateRequest extends Request
                                     mappingDefinition.addMappingForMember(i, idxs[i]);
                                 }
                             }
-                            op.provideFields(updateFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                            sm.provideFields(updateFieldNumbers, new ParameterSetter(sm, ps, mappingDefinition));
                         }
 
                         if (versionMetaData != null && versionMetaData.getFieldName() == null)
@@ -407,7 +407,7 @@ public class UpdateRequest extends Request
                             StatementMappingIndex mapIdx = stmtMappingDefinition.getWhereDatastoreId();
                             for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                             }
                         }
                         else
@@ -426,13 +426,13 @@ public class UpdateRequest extends Request
                             FieldManager fm = null;
                             if (cmd.getIdentityType() == IdentityType.NONDURABLE)
                             {
-                                fm = new OldValueParameterSetter(op, ps, mappingDefinition);
+                                fm = new OldValueParameterSetter(sm, ps, mappingDefinition);
                             }
                             else
                             {
-                                fm = new ParameterSetter(op, ps, mappingDefinition);
+                                fm = new ParameterSetter(sm, ps, mappingDefinition);
                             }
-                            op.provideFields(whereFieldNumbers, fm);
+                            sm.provideFields(whereFieldNumbers, fm);
                         }
 
                         if (optimisticChecks)
@@ -440,7 +440,7 @@ public class UpdateRequest extends Request
                             if (currentVersion == null)
                             {
                                 // Somehow the version is not set on this object (not read in ?) so report the bug
-                                String msg = Localiser.msg("052201", op.getInternalObjectId(), table);
+                                String msg = Localiser.msg("052201", sm.getInternalObjectId(), table);
                                 NucleusLogger.PERSISTENCE.error(msg);
                                 throw new NucleusException(msg);
                             }
@@ -458,7 +458,7 @@ public class UpdateRequest extends Request
                         {
                             // No object updated so either object disappeared or failed optimistic version checks
                             // TODO Batching : when we use batching here we need to process these somehow
-                            throw new NucleusOptimisticException(Localiser.msg("052203", op.getObjectAsPrintable(), op.getInternalObjectId(), "" + currentVersion), op.getObject());
+                            throw new NucleusOptimisticException(Localiser.msg("052203", sm.getObjectAsPrintable(), sm.getInternalObjectId(), "" + currentVersion), sm.getObject());
                         }
 
                         // Execute any post-set mappings
@@ -468,9 +468,9 @@ public class UpdateRequest extends Request
                             {
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
+                                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", sm.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
                                 }
-                                m.performSetPostProcessing(op);
+                                m.performSetPostProcessing(sm);
                             }
                         }
                     }
@@ -486,7 +486,7 @@ public class UpdateRequest extends Request
             }
             catch (SQLException e)
             {
-                String msg = Localiser.msg("052215", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), stmt, StringUtils.getStringFromStackTrace(e));
+                String msg = Localiser.msg("052215", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), stmt, StringUtils.getStringFromStackTrace(e));
                 NucleusLogger.DATASTORE_PERSIST.error(msg);
                 List<Exception> exceptions = new ArrayList<>();
                 exceptions.add(e);
@@ -507,14 +507,14 @@ public class UpdateRequest extends Request
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052216", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
                             ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
                     }
-                    m.postUpdate(op);
+                    m.postUpdate(sm);
                 }
                 catch (NotYetFlushedException e)
                 {
-                    op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping)m).getMemberMetaData().getAbsoluteFieldNumber());
+                    sm.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping)m).getMemberMetaData().getAbsoluteFieldNumber());
                 }
             }
         }

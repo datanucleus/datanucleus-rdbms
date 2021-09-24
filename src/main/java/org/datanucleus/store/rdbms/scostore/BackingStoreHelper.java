@@ -50,16 +50,16 @@ public class BackingStoreHelper
     /**
      * Convenience method to return the owner ObjectProvider for a backing store. If the supplied ObjectProvider is embedded then finds its owner until it finds the
      * owner that is not embedded.
-     * @param op Input ObjectProvider
+     * @param sm Input ObjectProvider
      * @return The owner ObjectProvider
      */
-    public static ObjectProvider getOwnerObjectProviderForBackingStore(ObjectProvider op)
+    public static ObjectProvider getOwnerObjectProviderForBackingStore(ObjectProvider sm)
     {
-        ObjectProvider ownerOP = op;
+        ObjectProvider ownerOP = sm;
         while (ownerOP.isEmbedded())
         {
             // Embedded object, so get the owner object it is embedded in
-            ObjectProvider[] ownerOPs = op.getExecutionContext().getOwnersForEmbeddedObjectProvider(ownerOP);
+            ObjectProvider[] ownerOPs = sm.getExecutionContext().getOwnersForEmbeddedObjectProvider(ownerOP);
             if (ownerOPs != null && ownerOPs.length == 1)
             {
                 ownerOP = ownerOPs[0];
@@ -79,19 +79,19 @@ public class BackingStoreHelper
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
-     * @param op StateManager
+     * @param sm StateManager
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate
      * @param bcs Base container backing store
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
+    public static int populateOwnerInStatement(ObjectProvider sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
     {
         // Find the real owner in case the provide object is embedded
         boolean embedded = false;
-        ObjectProvider ownerOP = getOwnerObjectProviderForBackingStore(op);
-        if (ownerOP != op)
+        ObjectProvider ownerOP = getOwnerObjectProviderForBackingStore(sm);
+        if (ownerOP != sm)
         {
             embedded = true;
         }
@@ -321,7 +321,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded element starting at the specified jdbc position.
-     * @param op StateManager of the owning container
+     * @param sm StateManager of the owning container
      * @param element The embedded element
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
@@ -331,7 +331,7 @@ public class BackingStoreHelper
      * @param bcs Container store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedElementFieldsInStatement(ObjectProvider op, Object element, PreparedStatement ps,
+    public static int populateEmbeddedElementFieldsInStatement(ObjectProvider sm, Object element, PreparedStatement ps,
             int jdbcPosition, AbstractMemberMetaData ownerFieldMetaData, JavaTypeMapping elementMapping,
             AbstractClassMetaData emd, BaseContainerStore bcs)
     {
@@ -353,7 +353,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = bcs.getObjectProviderForEmbeddedPCObject(op, element, ownerFieldMetaData, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
+        ObjectProvider elementOP = bcs.getObjectProviderForEmbeddedPCObject(sm, element, ownerFieldMetaData, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
         elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;
@@ -362,7 +362,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded map key starting at the specified jdbc position.
-     * @param op StateManager of the owning container
+     * @param sm StateManager of the owning container
      * @param key The embedded key
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
@@ -370,7 +370,7 @@ public class BackingStoreHelper
      * @param mapStore the map store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedKeyFieldsInStatement(ObjectProvider op, Object key,
+    public static int populateEmbeddedKeyFieldsInStatement(ObjectProvider sm, Object key,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
         AbstractClassMetaData kmd = mapStore.getKeyClassMetaData();
@@ -392,7 +392,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(op, key, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_KEY_PC);
+        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(sm, key, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_KEY_PC);
         elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;
@@ -401,7 +401,7 @@ public class BackingStoreHelper
     /**
      * Convenience method to populate the passed PreparedStatement with the field values from
      * the embedded map value starting at the specified jdbc position.
-     * @param op StateManager of the owning container
+     * @param sm StateManager of the owning container
      * @param value The embedded value
      * @param ps The PreparedStatement
      * @param jdbcPosition JDBC position in the statement to start at
@@ -409,7 +409,7 @@ public class BackingStoreHelper
      * @param mapStore The map store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedValueFieldsInStatement(ObjectProvider op, Object value,
+    public static int populateEmbeddedValueFieldsInStatement(ObjectProvider sm, Object value,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
         AbstractClassMetaData vmd = mapStore.getValueClassMetaData();
@@ -431,7 +431,7 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(op, value, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_VALUE_PC);
+        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(sm, value, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_VALUE_PC);
         elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
 
         return jdbcPosition;

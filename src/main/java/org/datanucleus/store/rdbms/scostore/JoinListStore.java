@@ -166,14 +166,14 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * <li>Insert all new elements directly at their desired positions</li>
      * </ol>
      * Both steps can be batched (separately).
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param start The start location (if required)
      * @param atEnd Whether to add the element at the end
      * @param c The collection of objects to add.
      * @param size Current size of list if known. -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(ObjectProvider op, int start, boolean atEnd, Collection<E> c, int size)
+    protected boolean internalAdd(ObjectProvider sm, int start, boolean atEnd, Collection<E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -191,7 +191,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         int shift = c.size();
 
         // check all elements are valid for persisting and exist (persistence-by-reachability)
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         Iterator iter = c.iterator();
         while (iter.hasNext())
         {
@@ -210,15 +210,15 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject())));
-                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                     }
-                    else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
+                    else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
@@ -231,7 +231,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         if (size < 0)
         {
             // Get the current size from the datastore
-            currentListSize = size(op);
+            currentListSize = size(sm);
         }
         else
         {
@@ -241,7 +241,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         // Check for dynamic schema updates prior to addition
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
         {
-            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, op);
+            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, sm);
             dynamicSchemaFM.storeObjectField(getOwnerMemberMetaData().getAbsoluteFieldNumber(), c);
             if (dynamicSchemaFM.hasPerformedSchemaUpdates())
             {
@@ -264,7 +264,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     for (int i = currentListSize - 1; i >= start; i--)
                     {
                         // Shift the index for this row by "shift"
-                        internalShift(op, mconn, batched, i, shift, (i == start));
+                        internalShift(sm, mconn, batched, i, shift, (i == start));
                     }
                 }
                 else
@@ -284,7 +284,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     try
                     {
                         jdbcPosition = 1;
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (orderMapping != null)
                         {
@@ -319,20 +319,20 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to set an object in the List.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param index The item index
      * @param element What to set it to.
      * @param allowDependentField Whether to allow dependent field deletes
      * @return The value before setting.
      */
-    public E set(ObjectProvider op, int index, Object element, boolean allowDependentField)
+    public E set(ObjectProvider sm, int index, Object element, boolean allowDependentField)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         validateElementForWriting(ec, element, null);
 
         // Find the original element at this position
         E oldElement  = null;
-        List fieldVal = (List) op.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+        List fieldVal = (List) sm.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
         if (fieldVal != null && fieldVal instanceof BackedSCO && ((BackedSCO)fieldVal).isLoaded())
         {
             // Already loaded in the wrapper
@@ -340,13 +340,13 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
         else
         {
-            oldElement = get(op, index);
+            oldElement = get(sm, index);
         }
 
         // Check for dynamic schema updates prior to update
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
         {
-            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, op);
+            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, sm);
             Collection coll = new ArrayList();
             coll.add(element);
             dynamicSchemaFM.storeObjectField(getOwnerMemberMetaData().getAbsoluteFieldNumber(), coll);
@@ -368,7 +368,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 {
                     int jdbcPosition = 1;
                     jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     if (getOwnerMemberMetaData().getOrderMetaData() != null && !getOwnerMemberMetaData().getOrderMetaData().isIndexedList())
                     {
                         // Ordered list, so can't easily do a set!!!
@@ -409,7 +409,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
         if (dependent && !collmd.isEmbeddedElement() && allowDependentField)
         {
-            if (oldElement != null && !contains(op, oldElement))
+            if (oldElement != null && !contains(sm, oldElement))
             {
                 // Delete the element if it is dependent and doesn't have a duplicate entry in the list
                 ec.deleteObjectInternal(oldElement);
@@ -421,34 +421,34 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider op, Collection coll)
+    public void update(ObjectProvider sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
-            clear(op);
+            clear(sm);
             return;
         }
 
         if (ownerMemberMetaData.getCollection().isSerializedElement() || ownerMemberMetaData.getCollection().isEmbeddedElement())
         {
             // Serialized/Embedded elements so just clear and add again
-            clear(op);
-            addAll(op, coll, 0);
+            clear(sm);
+            addAll(sm, coll, 0);
             return;
         }
 
         // Find existing elements, and remove any that are no longer present
         Collection existing = new ArrayList();
-        Iterator elemIter = iterator(op);
+        Iterator elemIter = iterator(sm);
         while (elemIter.hasNext())
         {
             Object elem = elemIter.next();
             if (!coll.contains(elem))
             {
-                remove(op, elem, -1, true);
+                remove(sm, elem, -1, true);
             }
             else
             {
@@ -463,8 +463,8 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
 
         // TODO Improve this - need to allow for list element position changes etc
-        clear(op);
-        addAll(op, coll, 0);
+        clear(sm);
+        addAll(sm, coll, 0);
     }
 
     /**
@@ -529,10 +529,10 @@ public class JoinListStore<E> extends AbstractListStore<E>
         return modified;
     }
 
-    private int[] internalRemove(ObjectProvider op, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
+    private int[] internalRemove(ObjectProvider sm, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
     throws MappedDatastoreException
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         String removeStmt = getRemoveStmt(element);
         try
@@ -542,7 +542,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
             {
                 int jdbcPosition = 1;
 
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                 if (relationDiscriminatorMapping != null)
                 {
@@ -569,11 +569,11 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * that will be removed (and the highest index present). The second step
      * removes these elements from the list. The third step updates the indices
      * of the remaining indices to fill the holes created.
-     * @param op StateManager
+     * @param sm StateManager
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -581,10 +581,10 @@ public class JoinListStore<E> extends AbstractListStore<E>
         }
 
         // Get the current size of the list (and hence maximum index size)
-        int currentListSize = size(op);
+        int currentListSize = size(sm);
 
         // Get the indices of the elements we are going to remove (highest first)
-        int[] indices = getIndicesOf(op, elements);
+        int[] indices = getIndicesOf(sm, elements);
         if (indices == null)
         {
             return false;
@@ -592,7 +592,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
         boolean modified = false;
         SQLController sqlControl = storeMgr.getSQLController();
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
 
         // Remove the specified elements from the join table
         String removeAllStmt = getRemoveAllStmt(elements);
@@ -609,7 +609,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     while (iter.hasNext())
                     {
                         Object element = iter.next();
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (relationDiscriminatorMapping != null)
                         {
@@ -665,7 +665,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                     }
                     if (!removed && shift > 0)
                     {
-                        internalShift(op, mconn, batched, i, -1 * shift, (i == currentListSize - 1));
+                        internalShift(sm, mconn, batched, i, -1 * shift, (i == currentListSize - 1));
                     }
                 }
             }
@@ -690,7 +690,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         {
             // "delete-dependent" : delete elements if the collection is marked as dependent
             // TODO What if the collection contains elements that are not in the List ? should not delete them
-            op.getExecutionContext().deleteObjects(elements.toArray());
+            sm.getExecutionContext().deleteObjects(elements.toArray());
         }
 
         return modified;
@@ -698,18 +698,18 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Method to remove an element from the specified position
-     * @param op The ObjectProvider for the list
+     * @param sm StateManager for the list
      * @param index The index of the element
      * @param size Current size of list (if known). -1 if not known
      */
-    protected void internalRemoveAt(ObjectProvider op, int index, int size)
+    protected void internalRemoveAt(ObjectProvider sm, int index, int size)
     {
         if (!indexedList)
         {
             throw new NucleusUserException("Cannot remove an element from a particular position with an ordered list since no indexes exist");
         }
 
-        internalRemoveAt(op, index, getRemoveAtStmt(), size);
+        internalRemoveAt(sm, index, getRemoveAtStmt(), size);
     }
 
     /**

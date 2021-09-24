@@ -394,7 +394,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
     /**
      * Method to clear the Array.
      * This is called when the container object is being deleted and the elements are to be removed (maybe for dependent field).
-     * @param ownerOP The ObjectProvider
+     * @param ownerOP StateManager
      */
     public void clear(ObjectProvider ownerOP)
     {

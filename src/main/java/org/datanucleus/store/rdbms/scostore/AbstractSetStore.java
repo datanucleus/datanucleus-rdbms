@@ -64,29 +64,29 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
     /**
      * Accessor for an iterator for the set.
      * Implemented by the subclass using whatever mechanism the underlying datastore provides.
-     * @param op StateManager for the set. 
+     * @param sm StateManager for the set. 
      * @return Iterator for the set.
      */
-    public abstract Iterator<E> iterator(ObjectProvider op);
+    public abstract Iterator<E> iterator(ObjectProvider sm);
 
     /**
      * Removes the association to one element
-     * @param op StateManager for the container
+     * @param sm StateManager for the container
      * @param element Element to remove
      * @param size Current size
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return Whether it was successful 
      */
-    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
     {
-        if (!validateElementForReading(op, element))
+        if (!validateElementForReading(sm, element))
         {
             NucleusLogger.DATASTORE.debug("Attempt to remove element=" + StringUtils.toJVMIDString(element) + " but doesn't exist in this Set.");
             return false;
         }
 
         Object elementToRemove = element;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (ec.getApiAdapter().isDetached(element))
         {
             // Element passed in is detached so find attached version (DON'T attach this object)
@@ -106,7 +106,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, elementToRemove, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -142,7 +142,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         if (allowDependentField && dependent && !collmd.isEmbeddedElement())
         {
             // Delete the element if it is dependent
-            op.getExecutionContext().deleteObjectInternal(elementToRemove);
+            sm.getExecutionContext().deleteObjectInternal(elementToRemove);
         }
 
         return modified;
@@ -153,11 +153,11 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
      * This implementation iterates around the remove() method doing each element 1 at a time. 
      * Please refer to the JoinSetStore and FKSetStore for the variations used there. 
      * This is used for Map key and value stores.
-     * @param op StateManager for the container
+     * @param sm StateManager for the container
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated
      */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -173,7 +173,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
         while (iter.hasNext())
         {
             Object element = iter.next();
-            if (!validateElementForReading(op, element))
+            if (!validateElementForReading(sm, element))
             {
                 NucleusLogger.DATASTORE.debug("AbstractSetStore::removeAll element=" + element + " doesn't exist in this Set.");
                 return false;
@@ -182,7 +182,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
 
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
@@ -213,7 +213,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
                             try
                             {
                                 int jdbcPosition = 1;
-                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                                 jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                                 if (relationDiscriminatorMapping != null)
                                 {
@@ -268,7 +268,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't remove
             String msg = Localiser.msg("056012", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
+            throw new NucleusDataStoreException(msg, (Throwable[])exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
         }
 
         return modified;

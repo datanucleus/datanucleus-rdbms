@@ -241,14 +241,14 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
                 Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(obj));
                 if (memberValues != null)
                 {
-                    ObjectProvider op = ec.findObjectProvider(obj);
+                    ObjectProvider sm = ec.findObjectProvider(obj);
                     Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                     while (memberValIter.hasNext())
                     {
                         Map.Entry<Integer, Object> memberValueEntry = memberValIter.next();
-                        op.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
+                        sm.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
                     }
-                    op.replaceAllLoadedSCOFieldsWithWrappers();
+                    sm.replaceAllLoadedSCOFieldsWithWrappers();
                 }
             }
 

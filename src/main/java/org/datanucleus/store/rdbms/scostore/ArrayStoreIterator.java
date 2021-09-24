@@ -47,10 +47,10 @@ public class ArrayStoreIterator implements Iterator
 
     private Object lastElement = null;
 
-    ArrayStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore) 
+    ArrayStoreIterator(ObjectProvider sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore) 
     throws MappedDatastoreException
     {
-        this.ec = op.getExecutionContext();
+        this.ec = sm.getExecutionContext();
 
         ArrayList results = new ArrayList();
         if (rs != null)
@@ -75,7 +75,7 @@ public class ArrayStoreIterator implements Iterator
                         {
                             ownerFieldNumber = getOwnerFieldMetaData(backingStore.getContainerTable()).getAbsoluteFieldNumber();
                         }
-                        nextElement = elementMapping.getObject(ec, rs, param, op, ownerFieldNumber);
+                        nextElement = elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber);
                     }
                     else
                     {

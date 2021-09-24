@@ -58,12 +58,12 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
     /**
      * Accessor for the array from the datastore.
-     * @param op SM for the owner
+     * @param sm SM for the owner
      * @return The array (as a List of objects)
      */
-    public List<E> getArray(ObjectProvider op)
+    public List<E> getArray(ObjectProvider sm)
     {
-        Iterator<E> iter = iterator(op);
+        Iterator<E> iter = iterator(sm);
         List elements = new ArrayList();
         while (iter.hasNext())
         {
@@ -77,40 +77,40 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
     /**
      * Clear the association from owner to all elements. Observes the necessary dependent field settings 
      * with respect to whether it should delete the element when doing so.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      */
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider sm)
     {
         Collection dependentElements = null;
         if (ownerMemberMetaData.getArray().isDependentElement())
         {
             // Retain the dependent elements that need deleting after clearing
             dependentElements = new HashSet();
-            Iterator iter = iterator(op);
+            Iterator iter = iterator(sm);
             while (iter.hasNext())
             {
                 Object elem = iter.next();
-                if (op.getExecutionContext().getApiAdapter().isPersistable(elem))
+                if (sm.getExecutionContext().getApiAdapter().isPersistable(elem))
                 {
                     dependentElements.add(elem);
                 }
             }
         }
-        clearInternal(op);
+        clearInternal(sm);
 
         if (dependentElements != null && dependentElements.size() > 0)
         {
-            op.getExecutionContext().deleteObjects(dependentElements.toArray());
+            sm.getExecutionContext().deleteObjects(dependentElements.toArray());
         }
     }
 
     /**
      * Method to set the array for the specified owner to the passed value.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param array the array
      * @return Whether the array was updated successfully
      */
-    public boolean set(ObjectProvider op, Object array)
+    public boolean set(ObjectProvider sm, Object array)
     {
         if (array == null || Array.getLength(array) == 0)
         {
@@ -118,7 +118,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
         }
 
         // Validate all elements for writing
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         int length = Array.getLength(array);
         for (int i = 0; i < length; i++)
         {
@@ -154,7 +154,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
                     try
                     {
                         // Add the row to the join table
-                        int[] rc = internalAdd(op, element, mconn, batched, i, (i == length - 1));
+                        int[] rc = internalAdd(sm, element, mconn, batched, i, (i == length - 1));
                         if (rc != null)
                         {
                             for (int j = 0; j < rc.length; j++)
@@ -191,7 +191,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
             // record(s) didn't persist
             String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
+            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
         }
 
         return modified;
@@ -199,14 +199,14 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
     /**
      * Adds one element to the association owner vs elements
-     * @param op StateManager for the container
+     * @param sm StateManager for the container
      * @param element The element to add
      * @param position The position to add this element at
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider op, E element, int position)
+    public boolean add(ObjectProvider sm, E element, int position)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         validateElementForWriting(ec, element, null);
 
         boolean modified = false;
@@ -218,7 +218,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
             try
             {
                 // Add a row to the join table
-                int[] returnCode = internalAdd(op, element, mconn, false, position, true);
+                int[] returnCode = internalAdd(sm, element, mconn, false, position, true);
                 if (returnCode[0] > 0)
                 {
                     modified = true;
@@ -285,7 +285,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
     /**
      * Internal method to add a row to the join table.
      * Used by add() and set() to add a row to the join table.
-     * @param op StateManager for the owner of the collection
+     * @param sm StateManager for the owner of the collection
      * @param element The element to add the relation to
      * @param conn The connection
      * @param batched Whether we are batching
@@ -294,10 +294,10 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @return Whether a row was inserted
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    public int[] internalAdd(ObjectProvider op, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
+    public int[] internalAdd(ObjectProvider sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
             throws MappedDatastoreException
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         String addStmt = getAddStmtForJoinTable();
         try
@@ -308,7 +308,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
             {
                 // Insert the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, orderId, jdbcPosition, orderMapping);
                 if (relationDiscriminatorMapping != null)

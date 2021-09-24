@@ -392,10 +392,10 @@ public class LocateBulkRequest extends BulkRequest
     private ObjectProvider[] processResults(ResultSet rs, ObjectProvider[] ops)
     throws SQLException
     {
-        List<ObjectProvider> missingOps = new ArrayList<>();
+        List<ObjectProvider> missingSMs = new ArrayList<>();
         for (int i=0;i<ops.length;i++)
         {
-            missingOps.add(ops[i]);
+            missingSMs.add(ops[i]);
         }
 
         ExecutionContext ec = ops[0].getExecutionContext();
@@ -469,10 +469,10 @@ public class LocateBulkRequest extends BulkRequest
             }
 
             // Find which ObjectProvider this row is for
-            ObjectProvider op = null;
-            for (ObjectProvider missingOp : missingOps)
+            ObjectProvider sm = null;
+            for (ObjectProvider missingSM : missingSMs)
             {
-                Object opId = missingOp.getInternalObjectId();
+                Object opId = missingSM.getInternalObjectId();
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
                     Object opKey = IdentityUtils.getTargetKeyForDatastoreIdentity(opId);
@@ -482,7 +482,7 @@ public class LocateBulkRequest extends BulkRequest
                     }
                     if (opKey.equals(key))
                     {
-                        op = missingOp;
+                        sm = missingSM;
                         break;
                     }
                 }
@@ -493,7 +493,7 @@ public class LocateBulkRequest extends BulkRequest
                         Object opKey = IdentityUtils.getTargetKeyForSingleFieldIdentity(opId);
                         if (opKey.equals(key))
                         {
-                            op = missingOp;
+                            sm = missingSM;
                             break;
                         }
                     }
@@ -501,28 +501,28 @@ public class LocateBulkRequest extends BulkRequest
                     {
                         if (opId.equals(id))
                         {
-                            op = missingOp;
+                            sm = missingSM;
                             break;
                         }
                     }
                 }
             }
-            if (op != null)
+            if (sm != null)
             {
                 // Mark ObjectProvider as processed
-                missingOps.remove(op);
+                missingSMs.remove(sm);
 
                 // Load up any unloaded fields that we have selected
                 int[] selectedMemberNums = resultMapping.getMemberNumbers();
-                int[] unloadedMemberNums = ClassUtils.getFlagsSetTo(op.getLoadedFields(), selectedMemberNums, false);
+                int[] unloadedMemberNums = ClassUtils.getFlagsSetTo(sm.getLoadedFields(), selectedMemberNums, false);
                 if (unloadedMemberNums != null && unloadedMemberNums.length > 0)
                 {
-                    op.replaceFields(unloadedMemberNums, resultFM);
+                    sm.replaceFields(unloadedMemberNums, resultFM);
                 }
 
                 // Load version if present and not yet set
                 JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
-                if (op.getTransactionalVersion() == null && versionMapping != null)
+                if (sm.getTransactionalVersion() == null && versionMapping != null)
                 {
                     VersionMetaData currentVermd = table.getVersionMetaData();
                     Object datastoreVersion = null;
@@ -537,17 +537,17 @@ public class LocateBulkRequest extends BulkRequest
                         }
                         else
                         {
-                            datastoreVersion = op.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getFieldName()));
+                            datastoreVersion = sm.provideField(cmd.getAbsolutePositionOfMember(currentVermd.getFieldName()));
                         }
-                        op.setVersion(datastoreVersion);
+                        sm.setVersion(datastoreVersion);
                     }
                 }
             }
         }
 
-        if (!missingOps.isEmpty())
+        if (!missingSMs.isEmpty())
         {
-            return missingOps.toArray(new ObjectProvider[missingOps.size()]);
+            return missingSMs.toArray(new ObjectProvider[missingSMs.size()]);
         }
         return null;
     }

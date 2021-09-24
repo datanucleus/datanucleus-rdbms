@@ -37,14 +37,14 @@ import org.datanucleus.util.Localiser;
  */
 public class OracleArrayMapping extends ArrayMapping
 {
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
             if (columnMappings[0] instanceof ColumnMappingPostSet)
             {
                 // Create the value to put in the BLOB
-                Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+                Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
                 if (value == null)
                 {
                     return;
@@ -159,25 +159,25 @@ public class OracleArrayMapping extends ArrayMapping
                 }
 
                 // Update the BLOB
-                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, bytes);
             }
         }
     }
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      */
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
-            Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+            Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
             if (value == null)
             {
                 return;
             }
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
 
             if (mmd.getArray().elementIsPersistent())
             {
@@ -190,7 +190,7 @@ public class OracleArrayMapping extends ArrayMapping
                         ObjectProvider elemOP = ec.findObjectProvider(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, op, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -198,24 +198,24 @@ public class OracleArrayMapping extends ArrayMapping
         }
         else
         {
-            super.postInsert(op);
+            super.postInsert(sm);
         }
     }
 
     /**
      * Method to be called after any update of the owner class element.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      */
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
-            Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+            Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
             if (value == null)
             {
                 return;
             }
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
 
             if (mmd.getArray().elementIsPersistent())
             {
@@ -228,7 +228,7 @@ public class OracleArrayMapping extends ArrayMapping
                         ObjectProvider elemOP = ec.findObjectProvider(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, op, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -236,7 +236,7 @@ public class OracleArrayMapping extends ArrayMapping
         }
         else
         {
-            super.postUpdate(op);
+            super.postUpdate(sm);
         }
     }
 }

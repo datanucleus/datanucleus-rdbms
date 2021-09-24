@@ -45,21 +45,21 @@ import org.datanucleus.util.Localiser;
  */
 public class ParameterSetter extends AbstractFieldManager
 {
-    protected final ObjectProvider op;
+    protected final ObjectProvider sm;
     protected final ExecutionContext ec;
     protected final PreparedStatement statement;
     protected final StatementClassMapping stmtMappings;
 
     /**
      * Constructor.
-     * @param op The ObjectProvider for the object.
+     * @param sm StateManager for the object.
      * @param stmt The Statement to set values on.
      * @param stmtMappings mappings for parameters in the statement.
      */
-    public ParameterSetter(ObjectProvider op, PreparedStatement stmt, StatementClassMapping stmtMappings)
+    public ParameterSetter(ObjectProvider sm, PreparedStatement stmt, StatementClassMapping stmtMappings)
     {
-        this.op = op;
-        this.ec = op.getExecutionContext();
+        this.sm = sm;
+        this.ec = sm.getExecutionContext();
         this.statement = stmt;
         this.stmtMappings = stmtMappings;
     }
@@ -188,7 +188,7 @@ public class ParameterSetter extends AbstractFieldManager
                     // Set this value for all occurrences of this parameter
                     if (provideOwner)
                     {
-                        mapping.setObject(ec, statement, mapIdx.getParameterPositionsForOccurrence(i), value, op, fieldNumber);
+                        mapping.setObject(ec, statement, mapIdx.getParameterPositionsForOccurrence(i), value, sm, fieldNumber);
                     }
                     else
                     {
@@ -201,7 +201,7 @@ public class ParameterSetter extends AbstractFieldManager
                 // Important : call setObject even if the paramIndices is null (reachability)
                 if (provideOwner)
                 {
-                    mapping.setObject(ec, statement, null, value, op, fieldNumber);
+                    mapping.setObject(ec, statement, null, value, sm, fieldNumber);
                 }
                 else
                 {
@@ -209,25 +209,25 @@ public class ParameterSetter extends AbstractFieldManager
                 }
             }
 
-            AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+            AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
             RelationType relationType = mmd.getRelationType(ec.getClassLoaderResolver());
-            if (op.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
+            if (sm.getClassMetaData().getSCOMutableMemberFlags()[fieldNumber])
             {
-                SCOUtils.wrapSCOField(op, fieldNumber, value, true);
+                SCOUtils.wrapSCOField(sm, fieldNumber, value, true);
             }
             else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
             {
                 // Embedded PC, so make sure the field is wrapped where appropriate TODO This should be part of ManagedRelationships
-                op.updateOwnerFieldInEmbeddedField(fieldNumber, value);
+                sm.updateOwnerFieldInEmbeddedField(fieldNumber, value);
             }
         }
         catch (NotYetFlushedException e)
         {
-            if (op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getNullValue() == NullValue.EXCEPTION)
+            if (sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber).getNullValue() == NullValue.EXCEPTION)
             {
                 throw e;
             }
-            op.updateFieldAfterInsert(e.getPersistable(),fieldNumber);
+            sm.updateFieldAfterInsert(e.getPersistable(),fieldNumber);
         }
     }
 }

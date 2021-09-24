@@ -476,16 +476,16 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         return (T) ec.findObject(id, new FieldValues()
         {
             // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
-            public void fetchFields(ObjectProvider op)
+            public void fetchFields(ObjectProvider sm)
             {
-                resultSetGetter.setObjectProvider(op);
-                op.replaceFields(fieldNumbers, resultSetGetter, false);
+                resultSetGetter.setObjectProvider(sm);
+                sm.replaceFields(fieldNumbers, resultSetGetter, false);
 
                 // Set version
                 if (surrogateVersion != null)
                 {
                     // Surrogate version field
-                    op.setVersion(surrogateVersion);
+                    sm.setVersion(surrogateVersion);
                 }
                 else if (cmd.getVersionMetaData() != null && cmd.getVersionMetaData().getFieldName() != null)
                 {
@@ -494,18 +494,18 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        Object verFieldValue = op.provideField(versionFieldNumber);
+                        Object verFieldValue = sm.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
-                            op.setVersion(verFieldValue);
+                            sm.setVersion(verFieldValue);
                         }
                     }
                 }
             }
-            public void fetchNonLoadedFields(ObjectProvider op)
+            public void fetchNonLoadedFields(ObjectProvider sm)
             {
-                resultSetGetter.setObjectProvider(op);
-                op.replaceNonLoadedFields(fieldNumbers, resultSetGetter);
+                resultSetGetter.setObjectProvider(sm);
+                sm.replaceNonLoadedFields(fieldNumbers, resultSetGetter);
             }
 
             public FetchPlan getFetchPlanForLoading()

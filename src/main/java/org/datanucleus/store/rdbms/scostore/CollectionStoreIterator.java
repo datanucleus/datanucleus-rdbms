@@ -41,16 +41,16 @@ import org.datanucleus.store.rdbms.table.Table;
 class CollectionStoreIterator<E> implements Iterator<E>
 {
     private final AbstractCollectionStore<E> collStore;
-    private final ObjectProvider op;
+    private final ObjectProvider sm;
     private final ExecutionContext ec;
     private final Iterator<E> delegate;
     private E lastElement = null;
 
-    CollectionStoreIterator(ObjectProvider op, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
+    CollectionStoreIterator(ObjectProvider sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
     throws MappedDatastoreException
     {
-        this.op = op;
-        this.ec = op.getExecutionContext();
+        this.sm = sm;
+        this.ec = sm.getExecutionContext();
         this.collStore = store;
         ArrayList results = new ArrayList();
         if (rs != null)
@@ -76,7 +76,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
                         {
                             ownerFieldNumber = getOwnerMemberMetaData(collStore.containerTable).getAbsoluteFieldNumber();
                         }
-                        nextElement = collStore.elementMapping.getObject(ec, rs, param, op, ownerFieldNumber);
+                        nextElement = collStore.elementMapping.getObject(ec, rs, param, sm, ownerFieldNumber);
                     }
                     else
                     {
@@ -125,7 +125,7 @@ class CollectionStoreIterator<E> implements Iterator<E>
             throw new IllegalStateException("No entry to remove");
         }
 
-        collStore.remove(op, lastElement, -1, true);
+        collStore.remove(sm, lastElement, -1, true);
         delegate.remove();
 
         lastElement = null;

@@ -74,101 +74,101 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      * @return The Iterator
      */
-    public Iterator<E> iterator(ObjectProvider op)
+    public Iterator<E> iterator(ObjectProvider sm)
     {
-        return listIterator(op);
+        return listIterator(sm);
     }
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      * @return The List Iterator
      */
-    public ListIterator<E> listIterator(ObjectProvider op)
+    public ListIterator<E> listIterator(ObjectProvider sm)
     {
-        return listIterator(op, -1, -1);
+        return listIterator(sm, -1, -1);
     }
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      * @param startIdx The start point in the list (only for indexed lists).
      * @param endIdx The end point in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected abstract ListIterator<E> listIterator(ObjectProvider op, int startIdx, int endIdx);
+    protected abstract ListIterator<E> listIterator(ObjectProvider sm, int startIdx, int endIdx);
 
     /**
      * Method to add an element to the List.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param element The element to remove
      * @param size Size of the current list (if known, -1 if not)
      * @return Whether it was added successfully.
      */
-    public boolean add(ObjectProvider op, E element, int size)
+    public boolean add(ObjectProvider sm, E element, int size)
     {
-        return internalAdd(op, 0, true, Collections.singleton(element), size);
+        return internalAdd(sm, 0, true, Collections.singleton(element), size);
     }
 
     /**
      * Method to add an element to the List.
      * @param element The element to add.
      * @param index The location to add at
-     * @param op The ObjectProvider.
+     * @param sm StateManager.
      */
-    public void add(ObjectProvider op, E element, int index, int size)
+    public void add(ObjectProvider sm, E element, int index, int size)
     {
-        internalAdd(op, index, false, Collections.singleton(element), size);
+        internalAdd(sm, index, false, Collections.singleton(element), size);
     }
 
     /**
      * Method to add a collection of elements to the List.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param elements The elements to remove
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether they were added successfully.
      */
-    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
+    public boolean addAll(ObjectProvider sm, Collection<E> elements, int size)
     {
-        return internalAdd(op, 0, true, elements, size);
+        return internalAdd(sm, 0, true, elements, size);
     }
 
     /**
      * Method to add all elements from a Collection to the List.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param elements The collection
      * @param index The location to add at
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider op, Collection<E> elements, int index, int size)
+    public boolean addAll(ObjectProvider sm, Collection<E> elements, int index, int size)
     {
-        return internalAdd(op, index, false, elements, size);
+        return internalAdd(sm, index, false, elements, size);
     }
 
     /**
      * Internal method for adding an item to the List.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param startAt The start position
      * @param atEnd Whether to add at the end
      * @param elements The Collection of elements to add.
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(ObjectProvider op, int startAt, boolean atEnd, Collection<E> elements, int size);
+    protected abstract boolean internalAdd(ObjectProvider sm, int startAt, boolean atEnd, Collection<E> elements, int size);
 
     /**
      * Method to retrieve an element from the List.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param index The index of the element required.
      * @return The object
      */
-    public E get(ObjectProvider op, int index)
+    public E get(ObjectProvider sm, int index)
     {
-        ListIterator<E> iter = listIterator(op, index, index);
+        ListIterator<E> iter = listIterator(sm, index, index);
         if (iter == null || !iter.hasNext())
         {
             return null;
@@ -194,52 +194,52 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Accessor for the indexOf an object in the List.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param element The element.
      * @return The index
      */
-    public int indexOf(ObjectProvider op, Object element)
+    public int indexOf(ObjectProvider sm, Object element)
     {
-        validateElementForReading(op, element);
-        return internalIndexOf(op, element, getIndexOfStmt(element));
+        validateElementForReading(sm, element);
+        return internalIndexOf(sm, element, getIndexOfStmt(element));
     }
 
     /**
      * Method to retrieve the last index of an object in the list.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param element The object
      * @return The last index
      */
-    public int lastIndexOf(ObjectProvider op, Object element)
+    public int lastIndexOf(ObjectProvider sm, Object element)
     {
-        validateElementForReading(op, element);
-        return internalIndexOf(op, element, getLastIndexOfStmt(element));
+        validateElementForReading(sm, element);
+        return internalIndexOf(sm, element, getLastIndexOfStmt(element));
     }
 
     /**
      * Method to remove the specified element from the List.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param element The element to remove.
      * @param size Current size of list if known. -1 if not known
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return Whether it was removed successfully.
      */
-    public boolean remove(ObjectProvider op, Object element, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
     {
-        if (!validateElementForReading(op, element))
+        if (!validateElementForReading(sm, element))
         {
             return false;
         }
 
         Object elementToRemove = element;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (ec.getApiAdapter().isDetached(element))
         {
             // Element passed in is detached so find attached version (DON'T attach this object)
             elementToRemove = ec.findObject(ec.getApiAdapter().getIdForObject(element), true, false, element.getClass().getName());
         }
 
-        boolean modified = internalRemove(op, elementToRemove, size);
+        boolean modified = internalRemove(sm, elementToRemove, size);
 
         if (allowDependentField)
         {
@@ -252,7 +252,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             if (dependent && !collmd.isEmbeddedElement())
             {
                 // Delete the element if it is dependent
-                op.getExecutionContext().deleteObjectInternal(elementToRemove);
+                sm.getExecutionContext().deleteObjectInternal(elementToRemove);
             }
         }
 
@@ -262,23 +262,23 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Method to remove an object at an index in the List.
      * If the list is ordered, will remove the element completely since no index positions exist.
-     * @param op StateManager
+     * @param sm StateManager
      * @param index The location
      * @param size Current size of the list (if known). -1 if not known
      * @return The object that was removed
      */
-    public E remove(ObjectProvider op, int index, int size)
+    public E remove(ObjectProvider sm, int index, int size)
     {
-        E element = get(op, index);
+        E element = get(sm, index);
         if (indexedList)
         {
             // Remove the element at this position
-            internalRemoveAt(op, index, size);
+            internalRemoveAt(sm, index, size);
         }
         else
         {
             // Ordered list doesn't allow indexed removal so just remove the element
-            internalRemove(op, element, size);
+            internalRemove(sm, element, size);
         }
 
         // Dependent element
@@ -290,10 +290,10 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         }
         if (dependent && !collmd.isEmbeddedElement())
         {
-            if (!contains(op, element))
+            if (!contains(sm, element))
             {
                 // Delete the element if it is dependent and doesn't have a duplicate entry in the list
-                op.getExecutionContext().deleteObjectInternal(element);
+                sm.getExecutionContext().deleteObjectInternal(element);
             }
         }
 
@@ -302,31 +302,31 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove the specified element from the List.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      * @param element The element
      * @param size Current size of list if known. -1 if not known
      * @return Whether the List was modified
      */
-    protected abstract boolean internalRemove(ObjectProvider op, Object element, int size);
+    protected abstract boolean internalRemove(ObjectProvider sm, Object element, int size);
 
     /**
      * Internal method to remove an object at a location from the List.
-     * @param op StateManager
+     * @param sm StateManager
      * @param index The index of the element to remove
      * @param size Current list size (if known). -1 if not known
      */
-    protected abstract void internalRemoveAt(ObjectProvider op, int index, int size);
+    protected abstract void internalRemoveAt(ObjectProvider sm, int index, int size);
 
     /**
      * Method to retrieve a list of elements in a range.
-     * @param op StateManager
+     * @param sm StateManager
      * @param startIdx From index (inclusive).
      * @param endIdx To index (exclusive)
      * @return Sub List of elements in this range.
      */
-    public java.util.List<E> subList(ObjectProvider op, int startIdx, int endIdx)
+    public java.util.List<E> subList(ObjectProvider sm, int startIdx, int endIdx)
     {
-        ListIterator iter = listIterator(op, startIdx, endIdx);
+        ListIterator iter = listIterator(sm, startIdx, endIdx);
         java.util.List list = new ArrayList();
         while (iter.hasNext())
         {
@@ -346,11 +346,11 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
     /**
      * Utility to find the indices of a collection of elements.
      * The returned list are in reverse order (highest index first).
-     * @param op StateManager
+     * @param sm StateManager
      * @param elements The elements
      * @return The indices of the elements in the List.
      */
-    protected int[] getIndicesOf(ObjectProvider op, Collection elements)
+    protected int[] getIndicesOf(ObjectProvider sm, Collection elements)
     {
         if (elements == null || elements.isEmpty())
         {
@@ -360,13 +360,13 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
         Iterator iter = elements.iterator();
         while (iter.hasNext())
         {
-            validateElementForReading(op, iter.next());
+            validateElementForReading(sm, iter.next());
         }
 
         String stmt = getIndicesOfStmt(elements);
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -380,7 +380,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                     {
                         Object element = elemIter.next();
 
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (relationDiscriminatorMapping != null)
                         {
@@ -434,16 +434,16 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to find the index of an element.
-     * @param op StateManager
+     * @param sm StateManager
      * @param element The element
      * @param stmt The statement to find the element.
      * @return The index of the element in the List.
      */
-    protected int internalIndexOf(ObjectProvider op, Object element, String stmt)
+    protected int internalIndexOf(ObjectProvider sm, Object element, String stmt)
     {
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -453,7 +453,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 {
                     int jdbcPosition = 1;
 
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -496,25 +496,25 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Internal method to remove an object at a location in the List.
-     * @param op StateManager
+     * @param sm StateManager
      * @param index The location
      * @param stmt The statement to remove the element from the List
      * @param size Current list size (if known). -1 if not known
      */
-    protected void internalRemoveAt(ObjectProvider op, int index, String stmt, int size)
+    protected void internalRemoveAt(ObjectProvider sm, int index, String stmt, int size)
     {
         int currentListSize = 0;
         if (size < 0)
         {
             // Get the current size from the datastore
-            currentListSize = size(op);
+            currentListSize = size(sm);
         }
         else
         {
             currentListSize = size;
         }
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -525,7 +525,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -549,7 +549,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
                     for (int i = index + 1; i < currentListSize; i++)
                     {
                         // Shift this index down 1
-                        internalShift(op, mconn, false, i, -1, true);
+                        internalShift(sm, mconn, false, i, -1, true);
                     }
                 }
             }
@@ -570,7 +570,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
 
     /**
      * Method to process a "shift" statement, updating the index in the list of the specified index.
-     * @param op StateManager
+     * @param sm StateManager
      * @param conn The connection
      * @param batched Whether the statement is batched
      * @param oldIndex The old index
@@ -579,10 +579,10 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @return Return code(s) from any executed statements
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalShift(ObjectProvider op, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
+    protected int[] internalShift(ObjectProvider sm, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
     throws MappedDatastoreException
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         String shiftStmt = getShiftStmt();
         try
@@ -592,7 +592,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
             {
                 int jdbcPosition = 1;
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, amount, jdbcPosition, orderMapping);
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, oldIndex, jdbcPosition, orderMapping);
                 if (relationDiscriminatorMapping != null)
                 {

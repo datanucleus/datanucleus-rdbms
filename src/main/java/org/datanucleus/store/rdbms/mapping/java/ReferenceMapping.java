@@ -635,23 +635,23 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     {
         if (ec.getApiAdapter().isPersistable(value))
         {
-            ObjectProvider op = ec.findObjectProvider(value);
-            if (op == null)
+            ObjectProvider sm = ec.findObjectProvider(value);
+            if (sm == null)
             {
                 // Referenced object is not yet persistent, so persist it
                 ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
-                op = ec.findObjectProvider(value);
-                op.flush(); // Make sure the object is in the datastore so the id is set
+                sm = ec.findObjectProvider(value);
+                sm.flush(); // Make sure the object is in the datastore so the id is set
             }
 
             String refString = null;
             if (mappingStrategy == ID_MAPPING)
             {
-                refString = value.getClass().getName() + ":" + op.getInternalObjectId();
+                refString = value.getClass().getName() + ":" + sm.getInternalObjectId();
             }
             else if (mappingStrategy == XCALIA_MAPPING)
             {
-                AbstractClassMetaData cmd = op.getClassMetaData();
+                AbstractClassMetaData cmd = sm.getClassMetaData();
                 DiscriminatorMetaData dismd = cmd.getDiscriminatorMetaData();
                 String definer = null;
                 if (dismd != null && dismd.getValue() != null)
@@ -664,11 +664,11 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
                 }
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
                 {
-                    refString = definer + ":" + IdentityUtils.getTargetKeyForDatastoreIdentity(op.getInternalObjectId());
+                    refString = definer + ":" + IdentityUtils.getTargetKeyForDatastoreIdentity(sm.getInternalObjectId());
                 }
                 else
                 {
-                    refString = definer + ":" + op.getInternalObjectId().toString();
+                    refString = definer + ":" + sm.getInternalObjectId().toString();
                 }
             }
             return refString;
@@ -745,36 +745,36 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     /**
      * Method executed just after a fetch of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      */
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
     }
 
     /**
      * Method executed just after the insert of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      */
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
     }
 
     /**
      * Method executed just afer any update of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      */
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
     }
 
     /**
      * Method executed just before the owning object is deleted, allowing tidying up of any
      * relation information.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      */
-    public void preDelete(ObjectProvider op)
+    public void preDelete(ObjectProvider sm)
     {
         boolean isDependentElement = mmd.isDependent();
         if (!isDependentElement)
@@ -791,16 +791,16 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             {
                 // makes sure field is loaded
                 int fieldNumber = getMemberMetaData().getAbsoluteFieldNumber();
-                op.isLoaded(fieldNumber);
-                Object pc = op.provideField(fieldNumber);
+                sm.isLoaded(fieldNumber);
+                Object pc = sm.provideField(fieldNumber);
                 if (pc != null)
                 {
                     // Null out the FK in the datastore using a direct update (since we are deleting)
-                    op.replaceFieldMakeDirty(fieldNumber, null);
-                    storeMgr.getPersistenceHandler().updateObject(op, new int[]{fieldNumber});
+                    sm.replaceFieldMakeDirty(fieldNumber, null);
+                    storeMgr.getPersistenceHandler().updateObject(sm, new int[]{fieldNumber});
 
                     // delete object
-                    op.getExecutionContext().deleteObjectInternal(pc);
+                    sm.getExecutionContext().deleteObjectInternal(pc);
                 }
             }
         }

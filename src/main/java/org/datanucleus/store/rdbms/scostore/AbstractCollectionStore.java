@@ -64,25 +64,25 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider op, Collection coll)
+    public void update(ObjectProvider sm, Collection coll)
     {
         // Crude update - remove existing and add new!
-        clear(op);
-        addAll(op, coll, 0);
+        clear(sm);
+        addAll(sm, coll, 0);
     }
 
     /**
      * Method to verify if the specified element is contained in this collection.
-     * @param op StateManager
+     * @param sm StateManager
      * @param element The element
      * @return Whether it contains the element 
      */
-    public boolean contains(ObjectProvider op, Object element)
+    public boolean contains(ObjectProvider sm, Object element)
     {
-        if (!validateElementForReading(op, element))
+        if (!validateElementForReading(sm, element))
         {
             return false;
         }
@@ -91,7 +91,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         String stmt = getContainsStmt(element);
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -100,7 +100,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
 
                     // TODO Remove the containerTable == part of this so that the discrim restriction applies to JoinTable case too
@@ -366,13 +366,13 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
 
     /**
      * Method to update a field of an embedded element.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      * @param element The element to update
      * @param fieldNumber The number of the field to update
      * @param value The value
      * @return true if the datastore was updated
      */
-    public boolean updateEmbeddedElement(ObjectProvider op, E element, int fieldNumber, Object value)
+    public boolean updateEmbeddedElement(ObjectProvider sm, E element, int fieldNumber, Object value)
     {
         // TODO Only for join table cases, so really ought to move there
         boolean modified = false;
@@ -395,7 +395,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
             String stmt = getUpdateEmbeddedElementStmt(fieldMapping);
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = sm.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
@@ -407,8 +407,8 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
                         int jdbcPosition = 1;
                         fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), value);
                         jdbcPosition += fieldMapping.getNumberOfColumnMappings();
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(op, element, 
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedElementFieldsInStatement(sm, element, 
                             ps, jdbcPosition, ((JoinTable) containerTable).getOwnerMemberMetaData(), elementMapping, elementCmd, this);
 
                         sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);

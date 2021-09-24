@@ -819,9 +819,9 @@ public abstract class JavaTypeMapping
     /**
      * Perform any INSERT/UPDATE post processing as required by constituent ColumnMappings.
      * Default implementation does nothing.
-     * @param op StateManager of the object with this mapping
+     * @param sm StateManager of the object with this mapping
      */
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
 //        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
 //        op.isLoaded(mmd.getAbsoluteFieldNumber());

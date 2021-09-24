@@ -382,37 +382,37 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Utility to update a foreign-key in the value in the case of a unidirectional 1-N relationship.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param value The value to update
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
      */
-    private boolean updateValueFk(ObjectProvider op, Object value, Object owner)
+    private boolean updateValueFk(ObjectProvider sm, Object value, Object owner)
     {
         if (value == null)
         {
             return false;
         }
-        validateValueForWriting(op, value);
-        return updateValueFkInternal(op, value, owner);
+        validateValueForWriting(sm, value);
+        return updateValueFkInternal(sm, value, owner);
     }
 
     /**
      * Utility to update a foreign-key in the key in the case of
      * a unidirectional 1-N relationship.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param key The key to update
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
      */
-    private boolean updateKeyFk(ObjectProvider op, Object key, Object owner)
+    private boolean updateKeyFk(ObjectProvider sm, Object key, Object owner)
     {
         if (key == null)
         {
             return false;
         }
-        validateKeyForWriting(op, key);
-        return updateKeyFkInternal(op, key, owner);
+        validateKeyForWriting(sm, key);
+        return updateKeyFkInternal(sm, key, owner);
     }
 
     /**
@@ -432,27 +432,27 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put an item in the Map.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param newKey The key to store the value against
      * @param newValue The value to store.
      * @return The value stored.
      */
-    public V put(final ObjectProvider op, final K newKey, V newValue)
+    public V put(final ObjectProvider sm, final K newKey, V newValue)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (keyFieldNumber >= 0)
         {
-            validateKeyForWriting(op, newKey);
+            validateKeyForWriting(sm, newKey);
             validateValueType(ec.getClassLoaderResolver(), newValue);
         }
         else
         {
             validateKeyType(ec.getClassLoaderResolver(), newKey);
-            validateValueForWriting(op, newValue);
+            validateValueForWriting(sm, newValue);
         }
 
         // Check if there is an existing value for this key
-        V oldValue = get(op, newKey);
+        V oldValue = get(sm, newKey);
         if (oldValue != newValue)
         {
             if (valueCmd != null)
@@ -460,10 +460,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 if (oldValue != null && !oldValue.equals(newValue))
                 {
                     // Key is stored in the value and the value has changed so remove the old value
-                    removeValue(op, newKey, oldValue);
+                    removeValue(sm, newKey, oldValue);
                 }
 
-                final Object newOwner = op.getObject();
+                final Object newOwner = sm.getObject();
 
                 if (ec.getApiAdapter().isPersistent(newValue))
                 {
@@ -496,7 +496,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     }
                     else
                     {
-                        updateValueFk(op, newValue, newOwner);
+                        updateValueFk(sm, newValue, newOwner);
                     }
 
                     // Ensure the current key field is loaded, and replace with new value
@@ -532,10 +532,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
-                                vsm.setAssociatedValue(externalFKMapping, op.getObject());
+                                vsm.setAssociatedValue(externalFKMapping, sm.getObject());
                             }
                         }
-                        public void fetchNonLoadedFields(ObjectProvider op)
+                        public void fetchNonLoadedFields(ObjectProvider sm)
                         {
                         }
                         public FetchPlan getFetchPlanForLoading()
@@ -548,7 +548,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             else
             {
                 // Value is stored in the key
-                final Object newOwner = op.getObject();
+                final Object newOwner = sm.getObject();
 
                 if (ec.getApiAdapter().isPersistent(newKey))
                 {
@@ -582,7 +582,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     }
                     else
                     {
-                        updateKeyFk(op, newKey, newOwner);
+                        updateKeyFk(sm, newKey, newOwner);
                     }
 
                     // Ensure the current value field is loaded, and replace with new value
@@ -619,10 +619,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             if (externalFKMapping != null)
                             {
                                 // Set the owner in the value object where appropriate
-                                vsm.setAssociatedValue(externalFKMapping, op.getObject());
+                                vsm.setAssociatedValue(externalFKMapping, sm.getObject());
                             }
                         }
-                        public void fetchNonLoadedFields(ObjectProvider op)
+                        public void fetchNonLoadedFields(ObjectProvider sm)
                         {
                         }
                         public FetchPlan getFetchPlanForLoading()
@@ -645,7 +645,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         if (ownerMemberMetaData.getMap().isDependentValue() && oldValue != null)
         {
             // Delete the old value if it is no longer contained and is dependent
-            if (!containsValue(op, oldValue))
+            if (!containsValue(sm, oldValue))
             {
                 ec.deleteObjectInternal(oldValue);
             }
@@ -656,11 +656,11 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an entry from the map.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public V remove(ObjectProvider op, Object key)
+    public V remove(ObjectProvider sm, Object key)
     {
         if (!allowNulls && key == null)
         {
@@ -668,20 +668,20 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             return null;
         }
 
-        V oldValue = get(op, key);
-        remove(op, key, oldValue);
+        V oldValue = get(sm, key);
+        remove(sm, key, oldValue);
         return oldValue;
     }
 
     /**
      * Method to remove an entry from the map where we know the value associated with the key.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the entry to remove.
      * @param oldValue The value associated with the key
      */
-    public void remove(ObjectProvider op, Object key, Object oldValue)
+    public void remove(ObjectProvider sm, Object key, Object oldValue)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (keyFieldNumber >= 0)
         {
             // Key stored in value
@@ -713,7 +713,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     else
                     {
                         // Update the external FK in the value in the datastore
-                        updateValueFkInternal(op, oldValue, null);
+                        updateValueFkInternal(sm, oldValue, null);
                     }
                 }
                 else
@@ -777,7 +777,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     else
                     {
                         // Update the external FK in the key in the datastore
-                        updateKeyFkInternal(op, key, null);
+                        updateKeyFkInternal(sm, key, null);
                     }
                 }
                 else
@@ -814,13 +814,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Utility to remove a value from the Map.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the object
      * @param oldValue Value to remove
      */
-    private void removeValue(ObjectProvider op, Object key, Object oldValue)
+    private void removeValue(ObjectProvider sm, Object key, Object oldValue)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         
         // Null out the key and owner fields if they are nullable
         if (keyMapping.isNullable())
@@ -846,7 +846,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             }
             else
             {
-                updateValueFk(op, oldValue, null);
+                updateValueFk(sm, oldValue, null);
             }
         }
         // otherwise just delete the item
@@ -858,13 +858,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to clear the map of all values.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      */
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider sm)
     {
         // TODO Fix this. Should not be retrieving objects only to remove them since they
         // may be cached in the SCO object. But we need to utilise delete-dependent correctly too
-        Iterator iter = keySetStore().iterator(op);
+        Iterator iter = keySetStore().iterator(sm);
         while (iter.hasNext())
         {
             Object key = iter.next();
@@ -874,7 +874,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             }
             else
             {
-                remove(op, key);
+                remove(sm, key);
             }
         }
     }
@@ -882,13 +882,13 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Utility to clear the key of a value from the Map.
      * If the key is non nullable, delete the value.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the object
      * @param oldValue Value to remove
      */
-    public void clearKeyOfValue(ObjectProvider op, Object key, Object oldValue)
+    public void clearKeyOfValue(ObjectProvider sm, Object key, Object oldValue)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
 
         if (keyMapping.isNullable())
         {
@@ -976,10 +976,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return stmt.toString();
     }
 
-    protected boolean updateValueFkInternal(ObjectProvider op, Object value, Object owner)
+    protected boolean updateValueFkInternal(ObjectProvider sm, Object value, Object owner)
     {
         boolean retval;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -994,7 +994,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, sm, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1004,7 +1004,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     }
                     else
                     {
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     }
                     jdbcPosition = BackingStoreHelper.populateValueInStatement(ec, ps, value, jdbcPosition, valueMapping);
 
@@ -1029,10 +1029,10 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return retval;
     }
 
-    protected boolean updateKeyFkInternal(ObjectProvider op, Object key, Object owner)
+    protected boolean updateKeyFkInternal(ObjectProvider sm, Object key, Object owner)
     {
         boolean retval;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -1047,7 +1047,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         if (ownerMemberMetaData != null)
                         {
-                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, op, ownerMemberMetaData.getAbsoluteFieldNumber());
+                            ownerMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1,ownerMapping), null, sm, ownerMemberMetaData.getAbsoluteFieldNumber());
                         }
                         else
                         {
@@ -1057,7 +1057,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     }
                     else
                     {
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     }
                     jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
@@ -1352,14 +1352,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     @Override
-    public boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue)
     {
         // We don't support embedded keys as such
         return false;
     }
 
     @Override
-    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue)
     {
         // We don't support embedded values as such
         return false;

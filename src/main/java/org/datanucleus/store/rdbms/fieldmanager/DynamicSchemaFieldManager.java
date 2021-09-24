@@ -51,8 +51,8 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
     /** Manager for the RDBMS datastore. */
     RDBMSStoreManager rdbmsMgr;
 
-    /** ObjectProvider of the object being processed. */
-    ObjectProvider op;
+    /** StateManager of the object being processed. */
+    ObjectProvider sm;
 
     /** Flag for whether we have updated the schema. */
     boolean schemaUpdatesPerformed = false;
@@ -60,12 +60,12 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
     /**
      * Constructor.
      * @param rdbmsMgr RDBMSManager
-     * @param op StateManager for the object being processed
+     * @param sm StateManager for the object being processed
      */
-    public DynamicSchemaFieldManager(RDBMSStoreManager rdbmsMgr, ObjectProvider op)
+    public DynamicSchemaFieldManager(RDBMSStoreManager rdbmsMgr, ObjectProvider sm)
     {
         this.rdbmsMgr = rdbmsMgr;
-        this.op = op;
+        this.sm = sm;
     }
 
     /**
@@ -89,13 +89,13 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
             return; // No value so nothing to do
         }
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
 
-        AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
+        AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(fieldNumber);
         if (mmd != null)
         {
-            DatastoreClass table = rdbmsMgr.getDatastoreClass(op.getObject().getClass().getName(), clr);
+            DatastoreClass table = rdbmsMgr.getDatastoreClass(sm.getObject().getClass().getName(), clr);
             JavaTypeMapping fieldMapping = table.getMemberMapping(mmd);
             if (fieldMapping != null)
             {

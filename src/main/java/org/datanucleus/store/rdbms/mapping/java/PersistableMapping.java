@@ -299,13 +299,13 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
             AbstractMemberMetaData mmd = cmd.getMetaDataForManagedMemberAtAbsolutePosition(cmd.getPKMemberPositions()[index]);
-            ObjectProvider op = null;
+            ObjectProvider sm = null;
             if (ec != null)
             {
-                op = ec.findObjectProvider(value);
+                sm = ec.findObjectProvider(value);
             }
 
-            if (op == null)
+            if (sm == null)
             {
                 // Transient or detached maybe, so use reflection to get PK field values
                 if (mmd instanceof FieldMetaData)
@@ -318,10 +318,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             if (!mmd.isPrimaryKey())
             {
                 // Make sure the field is loaded
-                op.isLoaded(mmd.getAbsoluteFieldNumber());
+                sm.isLoaded(mmd.getAbsoluteFieldNumber());
             }
             FieldManager fm = new SingleValueFieldManager();
-            op.provideFields(new int[] {mmd.getAbsoluteFieldNumber()}, fm);
+            sm.provideFields(new int[] {mmd.getAbsoluteFieldNumber()}, fm);
             return fm.fetchObjectField(mmd.getAbsoluteFieldNumber());
         }
         else if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -789,21 +789,21 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     /**
      * Method executed just after a fetch of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      */
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
     }
 
     /**
      * Method executed just after the insert of the owning object, allowing any necessary action
      * to this field and the object stored in it.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      */
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
-        Object pc = op.provideField(mmd.getAbsoluteFieldNumber());
-        TypeManager typeManager = op.getExecutionContext().getTypeManager();        
+        Object pc = sm.provideField(mmd.getAbsoluteFieldNumber());
+        TypeManager typeManager = sm.getExecutionContext().getTypeManager();        
         pc = mmd.isSingleCollection() ? singleCollectionValue(typeManager, pc) : pc;
         
         if (pc == null)
@@ -812,18 +812,18 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             return;
         }
 
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
         RelationType relationType = mmd.getRelationType(clr);
         if (relationType == RelationType.ONE_TO_ONE_BI)
         {
-            ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+            ObjectProvider otherOP = sm.getExecutionContext().findObjectProvider(pc);
             if (otherOP == null)
             {
                 return;
             }
 
-            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, op.getObject(), pc);
+            AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, sm.getObject(), pc);
             if (relatedMmd == null)
             {
                 // Fsck knows why
@@ -838,30 +838,30 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 // Managed Relations : Other side not set so update it in memory
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("041018", op.getObjectAsPrintable(), mmd.getFullFieldName(),
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("041018", sm.getObjectAsPrintable(), mmd.getFullFieldName(),
                         StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName()));
                 }
 
-                Object replaceValue = op.getObject();
+                Object replaceValue = sm.getObject();
                 if (relatedMmd.isSingleCollection())
                 {
                     ElementContainerHandler containerHandler = typeManager.getContainerHandler(relatedMmd.getType());
-					replaceValue = containerHandler.newContainer(relatedMmd, op.getObject());
+					replaceValue = containerHandler.newContainer(relatedMmd, sm.getObject());
                 }
                         
                 otherOP.replaceField(relatedMmd.getAbsoluteFieldNumber(), replaceValue);
             }
-            else if (relatedValue != op.getObject())
+            else if (relatedValue != sm.getObject())
             {
                 // Managed Relations : Other side is inconsistent so throw exception
-                throw new NucleusUserException(Localiser.msg("041020", op.getObjectAsPrintable(), mmd.getFullFieldName(),
+                throw new NucleusUserException(Localiser.msg("041020", sm.getObjectAsPrintable(), mmd.getFullFieldName(),
                         StringUtils.toJVMIDString(pc), StringUtils.toJVMIDString(relatedValue)));
             }
         }
         else if (relationType == RelationType.MANY_TO_ONE_BI && relatedMmds[0].hasCollection())
         {
             // TODO Make sure we have this PC in the collection at the other side
-            ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+            ObjectProvider otherOP = sm.getExecutionContext().findObjectProvider(pc);
             if (otherOP != null)
             {
                 // Managed Relations : add to the collection on the other side
@@ -869,10 +869,10 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 if (relatedColl != null && !(relatedColl instanceof SCOCollection))
                 {
                     // TODO Make sure the collection is a wrapper
-                    boolean contained = relatedColl.contains(op.getObject());
+                    boolean contained = relatedColl.contains(sm.getObject());
                     if (!contained)
                     {
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("041022", op.getObjectAsPrintable(), mmd.getFullFieldName(),
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("041022", sm.getObjectAsPrintable(), mmd.getFullFieldName(),
                                 StringUtils.toJVMIDString(pc), relatedMmds[0].getFullFieldName()));
                         // TODO Enable this. Currently causes issues with PMImplTest, InheritanceStrategyTest, TCK "inheritance1.conf"
                         /*relatedColl.add(op.getObject());*/
@@ -882,29 +882,29 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
         else if (relationType == RelationType.MANY_TO_ONE_UNI)
         {
-            ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+            ObjectProvider otherOP = sm.getExecutionContext().findObjectProvider(pc);
             if (otherOP == null)
             {
                 // Related object is not yet persisted so persist it
-                Object other = op.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
-                otherOP = op.getExecutionContext().findObjectProvider(other);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
+                otherOP = sm.getExecutionContext().findObjectProvider(other);
             }
 
             // Add join table entry
             PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-            store.add(op, otherOP);
+            store.add(sm, otherOP);
         }
     }
 
     /**
      * Method executed just afer any update of the owning object, allowing any necessary action to this field and the object stored in it.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      */
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
-        Object pc = op.provideField(mmd.getAbsoluteFieldNumber());
+        Object pc = sm.provideField(mmd.getAbsoluteFieldNumber());
         pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         RelationType relationType = mmd.getRelationType(clr);
         if (pc == null)
         {
@@ -912,20 +912,20 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
             {
                 // Update join table entry
                 PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-                store.remove(op);
+                store.remove(sm);
             }
 
             return;
         }
 
-        ObjectProvider otherOP = op.getExecutionContext().findObjectProvider(pc);
+        ObjectProvider otherOP = sm.getExecutionContext().findObjectProvider(pc);
         if (otherOP == null)
         {
             if (relationType == RelationType.ONE_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_BI || relationType == RelationType.MANY_TO_ONE_UNI)
             {
                 // Related object is not yet persisted (e.g 1-1 with FK at other side) so persist it
-                Object other = op.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
-                otherOP = op.getExecutionContext().findObjectProvider(other);
+                Object other = sm.getExecutionContext().persistObjectInternal(pc, null, -1, ObjectProvider.PC);
+                otherOP = sm.getExecutionContext().findObjectProvider(other);
             }
         }
 
@@ -933,18 +933,18 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         {
             // Update join table entry
             PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-            store.update(op, otherOP);
+            store.update(sm, otherOP);
         }
     }
 
     /**
      * Method executed just before the owning object is deleted, allowing tidying up of any relation information.
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      */
-    public void preDelete(ObjectProvider op)
+    public void preDelete(ObjectProvider sm)
     {
         int fieldNumber = mmd.getAbsoluteFieldNumber();
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         RelationType relationType = mmd.getRelationType(clr);
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
@@ -964,12 +964,12 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         }
         // TODO If we have the FK and not dependent then should avoid the load on the related object
 
-        if (!op.isFieldLoaded(fieldNumber))
+        if (!sm.isFieldLoaded(fieldNumber))
         {
             // Load the field if we need its value
             try
             {
-                op.loadField(fieldNumber);
+                sm.loadField(fieldNumber);
             }
             catch (NucleusObjectNotFoundException onfe)
             {
@@ -977,7 +977,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                 return;
             }
         }
-        Object pc = op.provideField(fieldNumber);
+        Object pc = sm.provideField(fieldNumber);
         pc = mmd.isSingleCollection() ? SCOUtils.singleCollectionValue(getStoreManager().getNucleusContext().getTypeManager(), pc) : pc;
         if (pc == null)
         {
@@ -990,7 +990,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         {
             // Update join table entry
             PersistableRelationStore store = (PersistableRelationStore) storeMgr.getBackingStoreForField(clr, mmd, mmd.getType());
-            store.remove(op);
+            store.remove(sm);
         }
 
         // Check if the field has a FK defined TODO Cater for more than 1 related field
@@ -1029,8 +1029,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     // Other object not yet deleted, but the field is nullable so just null out the FK
                     // TODO Not doing this would cause errors in 1-1 uni relations (e.g AttachDetachTest)
                     // TODO Log this since it affects the resultant objects
-                    op.replaceFieldMakeDirty(fieldNumber, null);
-                    storeMgr.getPersistenceHandler().updateObject(op, new int[]{fieldNumber});
+                    sm.replaceFieldMakeDirty(fieldNumber, null);
+                    storeMgr.getPersistenceHandler().updateObject(sm, new int[]{fieldNumber});
                     if (!relatedObjectDeleted)
                     {
                         // Mark the other object for deletion since not yet tagged
@@ -1042,14 +1042,14 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                     // Can't just delete the other object since that would cause a FK constraint violation. Do nothing - handled by DeleteRequest on other object
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("041017", StringUtils.toJVMIDString(op.getObject()), mmd.getFullFieldName()));
+                        NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("041017", StringUtils.toJVMIDString(sm.getObject()), mmd.getFullFieldName()));
                     }
                 }
             }
             else
             {
                 // We're deleting the FK at this side so shouldn't be an issue
-                AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, op.getObject(), pc);
+                AbstractMemberMetaData relatedMmd = mmd.getRelatedMemberMetaDataForObject(clr, sm.getObject(), pc);
                 if (relatedMmd != null)
                 {
                     ObjectProvider otherOP = ec.findObjectProvider(pc);
@@ -1061,13 +1061,13 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041019", StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName(), op.getObjectAsPrintable()));
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("041019", StringUtils.toJVMIDString(pc), relatedMmd.getFullFieldName(), sm.getObjectAsPrintable()));
                             }
                             otherOP.replaceFieldMakeDirty(relatedMmd.getAbsoluteFieldNumber(), null);
 
                             if (ec.getManageRelations())
                             {
-                                otherOP.getExecutionContext().getRelationshipManager(otherOP).relationChange(relatedMmd.getAbsoluteFieldNumber(), op.getObject(), null);
+                                otherOP.getExecutionContext().getRelationshipManager(otherOP).relationChange(relatedMmd.getAbsoluteFieldNumber(), sm.getObject(), null);
                             }
                         }
                     }
@@ -1106,7 +1106,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         // Managed Relations : 1-1 bidir, so null out the object at the other
                         if (ec.getManageRelations())
                         {
-                            otherOP.getExecutionContext().getRelationshipManager(otherOP).relationChange(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject(), null);
+                            otherOP.getExecutionContext().getRelationshipManager(otherOP).relationChange(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject(), null);
                         }
                     }
                 }
@@ -1139,8 +1139,8 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                         {
                             // TODO Datastore nullability info can be unreliable so try to avoid this call
                             // Null out the FK in the datastore using a direct update (since we are deleting)
-                            op.replaceFieldMakeDirty(fieldNumber, null);
-                            storeMgr.getPersistenceHandler().updateObject(op, new int[]{fieldNumber});
+                            sm.replaceFieldMakeDirty(fieldNumber, null);
+                            storeMgr.getPersistenceHandler().updateObject(sm, new int[]{fieldNumber});
                         }
 
                         if (ec.getApiAdapter().isDeleted(pc))
@@ -1171,11 +1171,11 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                                 {
                                     if (ec.getManageRelations())
                                     {
-                                        otherOP.getExecutionContext().getRelationshipManager(otherOP).relationRemove(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                                        otherOP.getExecutionContext().getRelationshipManager(otherOP).relationRemove(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                                     }
                                     // TODO Localise this message
                                     NucleusLogger.PERSISTENCE.debug("ManagedRelationships : delete of object causes removal from collection at " + relatedMmds[0].getFullFieldName());
-                                    otherColl.remove(op.getObject());
+                                    otherColl.remove(sm.getObject());
                                 }
                             }
                         }
@@ -1212,7 +1212,7 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
                             {
                                 // TODO Localise this
                                 NucleusLogger.PERSISTENCE.debug("ManagedRelationships : delete of object causes removal from collection at " + relatedMmds[0].getFullFieldName());
-                                otherColl.remove(op.getObject());
+                                otherColl.remove(sm.getObject());
                             }
                         }
                     }

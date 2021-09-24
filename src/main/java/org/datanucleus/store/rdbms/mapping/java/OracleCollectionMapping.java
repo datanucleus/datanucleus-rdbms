@@ -31,14 +31,14 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
  */
 public class OracleCollectionMapping extends CollectionMapping
 {
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
             if (columnMappings[0] instanceof ColumnMappingPostSet)
             {
                 // Create the value to put in the BLOB
-                Collection value = (Collection) op.provideField(mmd.getAbsoluteFieldNumber());
+                Collection value = (Collection) sm.provideField(mmd.getAbsoluteFieldNumber());
                 byte[] bytes = new byte[0];
                 if (value != null)
                 {
@@ -56,7 +56,7 @@ public class OracleCollectionMapping extends CollectionMapping
                 }
 
                 // Update the BLOB
-                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, bytes);
             }
         }
     }

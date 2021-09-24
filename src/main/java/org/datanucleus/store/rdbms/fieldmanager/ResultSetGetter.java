@@ -48,7 +48,7 @@ public class ResultSetGetter extends AbstractFieldManager
     protected final ResultSet rs;
     protected final StatementClassMapping resultMappings;
 
-    protected ObjectProvider op;
+    protected ObjectProvider sm;
     protected AbstractClassMetaData cmd;
 
     /**
@@ -64,19 +64,19 @@ public class ResultSetGetter extends AbstractFieldManager
         this.rs = rs;
         this.resultMappings = resultMappings;
 
-        this.op = null;
+        this.sm = null;
         this.cmd = cmd;
     }
 
     /**
      * Method to set StateManager that processing applies to.
      * This is typically called just before processing the current persistable object on the current row.
-     * @param op The ObjectProvider that we are applying to.
+     * @param sm StateManager that we are applying to.
      */
-    public void setObjectProvider(ObjectProvider op)
+    public void setObjectProvider(ObjectProvider sm)
     {
-        this.op = op;
-        this.cmd = op.getClassMetaData();
+        this.sm = sm;
+        this.cmd = sm.getClassMetaData();
     }
 
     public boolean fetchBooleanField(int fieldNumber)
@@ -143,7 +143,7 @@ public class ResultSetGetter extends AbstractFieldManager
         Object value;
         if (mapping instanceof EmbeddedPCMapping || mapping instanceof SerialisedPCMapping || mapping instanceof SerialisedReferenceMapping)
         {
-            value = mapping.getObject(ec, rs, mapIdx.getColumnPositions(), op, fieldNumber);
+            value = mapping.getObject(ec, rs, mapIdx.getColumnPositions(), sm, fieldNumber);
         }
         else
         {
@@ -182,17 +182,17 @@ public class ResultSetGetter extends AbstractFieldManager
             }
         }
 
-        if (op != null)
+        if (sm != null)
         {
             if (cmd.getSCOMutableMemberFlags()[fieldNumber])
             {
                 // Wrap any SCO mutable fields
-                return SCOUtils.wrapSCOField(op, fieldNumber, value, false);
+                return SCOUtils.wrapSCOField(sm, fieldNumber, value, false);
             }
             else if (RelationType.isRelationSingleValued(relationType) && (mmd.getEmbeddedMetaData() != null && mmd.getEmbeddedMetaData().getOwnerMember() != null))
             {
                 // Embedded PC, so make sure the field is wrapped where appropriate TODO This should be part of ManagedRelationships
-                op.updateOwnerFieldInEmbeddedField(fieldNumber, value);
+                sm.updateOwnerFieldInEmbeddedField(fieldNumber, value);
                 return value;
             }
         }

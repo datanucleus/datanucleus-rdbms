@@ -37,11 +37,11 @@ public class OracleBitSetMapping extends BitSetMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param op the current ObjectProvider
+     * @param sm the current ObjectProvider
      */
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
-        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+        Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
@@ -87,7 +87,7 @@ public class OracleBitSetMapping extends BitSetMapping
 
         if (columnMappings[0] instanceof ColumnMappingPostSet)
         {
-            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, bytes);
         }
     }
 }

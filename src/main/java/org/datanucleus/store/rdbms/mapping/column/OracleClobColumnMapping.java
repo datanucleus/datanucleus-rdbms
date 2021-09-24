@@ -176,10 +176,10 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
 
     @SuppressWarnings("deprecation")
     @Override
-    public void setPostProcessing(ObjectProvider op, Object value)
+    public void setPostProcessing(ObjectProvider sm, Object value)
     {
         String stringValue = (String)value;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         Table table = column.getTable();
         RDBMSStoreManager storeMgr = table.getStoreManager();
 
@@ -195,7 +195,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
             SQLTable blobSqlTbl = SQLStatementHelper.getSQLTableForMappingOfTable(sqlStmt, sqlStmt.getPrimaryTable(), mapping);
             sqlStmt.select(blobSqlTbl, column, null);
             StatementClassMapping mappingDefinition = new StatementClassMapping();
-            AbstractClassMetaData cmd = op.getClassMetaData();
+            AbstractClassMetaData cmd = sm.getClassMetaData();
             SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
             int inputParamNum = 1;
@@ -244,15 +244,15 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
 
             String textStmt = sqlStmt.getSQLText().toSQL();
 
-            if (op.isEmbedded())
+            if (sm.isEmbedded())
             {
                 // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-                ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(op);
+                ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(sm);
                 if (embeddedOwners != null)
                 {
                     // Just use the first owner
                     // TODO Should check if the owner is stored in this table
-                    op = embeddedOwners[0];
+                    sm = embeddedOwners[0];
                 }
             }
 
@@ -274,12 +274,12 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
                                 classTable.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps,
-                                    datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                    datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
+                            sm.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sm, ps, mappingDefinition));
                         }
 
                         ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, textStmt, ps);
@@ -287,7 +287,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
                         {
                             if (!rs.next())
                             {
-                                throw new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
+                                throw new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId())));
                             }
 
                             DatastoreAdapter dba = storeMgr.getDatastoreAdapter();

@@ -45,7 +45,7 @@ public abstract class Request
 
     /**
      * Method to execute the request - to be implemented by deriving classes.
-     * @param op The ObjectProvider for the object in question. 
+     * @param sm StateManager for the object in question. 
      */
-    public abstract void execute(ObjectProvider op);
+    public abstract void execute(ObjectProvider sm);
 }

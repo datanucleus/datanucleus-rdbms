@@ -173,9 +173,9 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called after any fetch of the owner class element.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      */
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -183,7 +183,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             return;
         }
 
-        List elements = ((ArrayStore) storeMgr.getBackingStoreForField(op.getExecutionContext().getClassLoaderResolver(),mmd,null)).getArray(op);
+        List elements = ((ArrayStore) storeMgr.getBackingStoreForField(sm.getExecutionContext().getClassLoaderResolver(),mmd,null)).getArray(sm);
         if (elements != null)
         {
             boolean primitiveArray = mmd.getType().getComponentType().isPrimitive();
@@ -234,16 +234,16 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             }
             if (elements.size() == 0)
             {
-                op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
+                sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
             }
             else
             {
-                op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), array);
+                sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), array);
             }
         }
         else
         {
-            op.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
+            sm.replaceFieldMakeDirty(getAbsoluteFieldNumber(), null);
         }
     }
 

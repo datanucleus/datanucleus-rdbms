@@ -221,12 +221,12 @@ public abstract class MultiPersistableMapping extends MultiMapping
             return;
         }
 
-        ObjectProvider op = (value != null ? ec.findObjectProvider(value) : null);
+        ObjectProvider sm = (value != null ? ec.findObjectProvider(value) : null);
         try
         {
-            if (op != null)
+            if (sm != null)
             {
-                op.setStoringPC();
+                sm.setStoringPC();
             }
 
             int n = 0;
@@ -282,9 +282,9 @@ public abstract class MultiPersistableMapping extends MultiMapping
         }
         finally
         {
-            if (op != null)
+            if (sm != null)
             {
-                op.unsetStoringPC();
+                sm.unsetStoringPC();
             }
         }
     }

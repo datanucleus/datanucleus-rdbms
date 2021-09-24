@@ -102,10 +102,10 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     /* (non-Javadoc)
      * @see org.datanucleus.store.scostore.PersistableRelationStore#add(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
      */
-    public boolean add(ObjectProvider op1, ObjectProvider op2)
+    public boolean add(ObjectProvider sm1, ObjectProvider sm2)
     {
         String addStmt = getAddStmt();
-        ExecutionContext ec = op1.getExecutionContext();
+        ExecutionContext ec = sm1.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -115,8 +115,8 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             {
                 // Insert the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = populateOwnerInStatement(op1, ec, ps, jdbcPosition, joinTable);
-                BackingStoreHelper.populateElementInStatement(ec, ps, op2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
+                jdbcPosition = populateOwnerInStatement(sm1, ec, ps, jdbcPosition, joinTable);
+                BackingStoreHelper.populateElementInStatement(ec, ps, sm2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, addStmt, ps, true);
@@ -137,10 +137,10 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     /* (non-Javadoc)
      * @see org.datanucleus.store.scostore.PersistableRelationStore#remove(org.datanucleus.store.ObjectProvider)
      */
-    public boolean remove(ObjectProvider op)
+    public boolean remove(ObjectProvider sm)
     {
         String removeStmt = getRemoveStmt();
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -150,7 +150,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             {
                 // Update the join table row
                 int jdbcPosition = 1;
-                populateOwnerInStatement(op, ec, ps, jdbcPosition, joinTable);
+                populateOwnerInStatement(sm, ec, ps, jdbcPosition, joinTable);
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, removeStmt, ps, true);
@@ -171,10 +171,10 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     /* (non-Javadoc)
      * @see org.datanucleus.store.scostore.PersistableRelationStore#update(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
      */
-    public boolean update(ObjectProvider op1, ObjectProvider op2)
+    public boolean update(ObjectProvider sm1, ObjectProvider sm2)
     {
         String updateStmt = getUpdateStmt();
-        ExecutionContext ec = op1.getExecutionContext();
+        ExecutionContext ec = sm1.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -184,8 +184,8 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
             {
                 // Update the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, op2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
-                populateOwnerInStatement(op1, ec, ps, jdbcPosition, joinTable);
+                jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, sm2.getObject(), jdbcPosition, joinTable.getRelatedMapping());
+                populateOwnerInStatement(sm1, ec, ps, jdbcPosition, joinTable);
 
                 // Execute the statement
                 int[] nums = sqlControl.executeStatementUpdate(ec, mconn, updateStmt, ps, true);
@@ -319,14 +319,14 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
 
     /**
      * Convenience method to populate the passed PreparedStatement with the value from the owner.
-     * @param op StateManager
+     * @param sm StateManager
      * @param ec execution context
      * @param ps The PreparedStatement
      * @param jdbcPosition Position in JDBC statement to populate
      * @param joinTable Join table
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider op, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
+    public static int populateOwnerInStatement(ObjectProvider sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
     {
         if (!joinTable.getOwnerMapping().getColumnMapping(0).insertValuesOnInsert())
         {
@@ -337,11 +337,11 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
         if (joinTable.getOwnerMemberMetaData() != null)
         {
             joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()),
-                op.getObject(), op, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+                sm.getObject(), sm, joinTable.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
-            joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()), op.getObject());
+            joinTable.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, joinTable.getOwnerMapping()), sm.getObject());
         }
         return jdbcPosition + joinTable.getOwnerMapping().getNumberOfColumnMappings();
     }

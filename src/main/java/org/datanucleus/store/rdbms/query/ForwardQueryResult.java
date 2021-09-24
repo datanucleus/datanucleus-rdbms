@@ -192,14 +192,14 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
             Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(nextElement));
             if (memberValues != null)
             {
-                ObjectProvider op = query.getExecutionContext().findObjectProvider(nextElement);
+                ObjectProvider sm = query.getExecutionContext().findObjectProvider(nextElement);
                 Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                 while (memberValIter.hasNext())
                 {
                     Map.Entry<Integer, Object> memberValueEntry = memberValIter.next();
-                    op.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
+                    sm.replaceField(memberValueEntry.getKey(), memberValueEntry.getValue());
                 }
-                op.replaceAllLoadedSCOFieldsWithWrappers();
+                sm.replaceAllLoadedSCOFieldsWithWrappers();
             }
         }
 

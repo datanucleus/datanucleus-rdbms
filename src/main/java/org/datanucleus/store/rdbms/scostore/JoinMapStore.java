@@ -211,10 +211,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put all elements from a Map into our Map.
-     * @param op StateManager for the Map
+     * @param sm StateManager for the Map
      * @param m The Map to add
      */
-    public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
+    public void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m)
     {
         if (m == null || m.isEmpty())
         {
@@ -224,14 +224,14 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         // Make sure the related objects are persisted (persistence-by-reachability)
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
         {
-            validateKeyForWriting(op, e.getKey());
-            validateValueForWriting(op, e.getValue());
+            validateKeyForWriting(sm, e.getKey());
+            validateValueForWriting(sm, e.getValue());
         }
 
         // Extract the current map entries to compare with (single SQL call)
         Map currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
         SetStore<Map.Entry<K, V>> entrySet = this.entrySetStore();
-        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(op);
+        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(sm);
         while (entrySetIter.hasNext())
         {
             Map.Entry<K,V> entry = entrySetIter.next();
@@ -256,10 +256,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
         }
 
-        processPutsAndUpdates(op, puts, updates);
+        processPutsAndUpdates(sm, puts, updates);
     }
 
-    protected void processPutsAndUpdates(ObjectProvider op, Set<Map.Entry> puts, Set<Map.Entry> updates)
+    protected void processPutsAndUpdates(ObjectProvider sm, Set<Map.Entry> puts, Set<Map.Entry> updates)
     {
         boolean batched = allowsBatching();
 
@@ -268,7 +268,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             try
             {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
                 try
                 {
                     // Loop through all entries
@@ -277,7 +277,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         // Add the row to the join table
                         Map.Entry entry = iter.next();
-                        internalPut(op, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
+                        internalPut(sm, mconn, batched, entry.getKey(), entry.getValue(), (!iter.hasNext()));
                     }
                 }
                 finally
@@ -296,7 +296,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         {
             try
             {
-                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(op.getExecutionContext());
+                ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(sm.getExecutionContext());
                 try
                 {
                     // Loop through all entries
@@ -305,7 +305,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                     {
                         // Update the row in the join table
                         Map.Entry entry = iter.next();
-                        internalUpdate(op, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
+                        internalUpdate(sm, mconn, batched, entry.getKey(), entry.getValue(), !iter.hasNext());
                     }
                 }
                 finally
@@ -322,16 +322,16 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to put an item in the Map where we provide whether the key is present and its current value if so.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key The key to store the value against
      * @param value The value to store.
      * @param previousValue The previous value
      * @param present Whether the key is already present previous to this
      */
-    public void put(ObjectProvider op, K key, V value, V previousValue, boolean present)
+    public void put(ObjectProvider sm, K key, V value, V previousValue, boolean present)
     {
-        validateKeyForWriting(op, key);
-        validateValueForWriting(op, value);
+        validateKeyForWriting(sm, key);
+        validateValueForWriting(sm, value);
 
         if (present && value == previousValue)
         {
@@ -341,17 +341,17 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
                 if (present)
                 {
-                    internalUpdate(op, mconn, false, key, value, true);
+                    internalUpdate(sm, mconn, false, key, value, true);
                 }
                 else
                 {
-                    internalPut(op, mconn, false, key, value, true);
+                    internalPut(sm, mconn, false, key, value, true);
                 }
             }
             finally
@@ -368,30 +368,30 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         if (mapmd.isDependentValue() && !mapmd.isEmbeddedValue() && previousValue != null)
         {
             // Delete the old value if it is no longer contained and is dependent
-            if (!containsValue(op, previousValue))
+            if (!containsValue(sm, previousValue))
             {
-                op.getExecutionContext().deleteObjectInternal(previousValue);
+                sm.getExecutionContext().deleteObjectInternal(previousValue);
             }
         }
     }
 
     /**
      * Method to put an item in the Map.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key The key to store the value against
      * @param value The value to store.
      * @return The value stored.
      */
-    public V put(ObjectProvider op, K key, V value)
+    public V put(ObjectProvider sm, K key, V value)
     {
-        validateKeyForWriting(op, key);
-        validateValueForWriting(op, value);
+        validateKeyForWriting(sm, key);
+        validateValueForWriting(sm, value);
 
         boolean exists = false;
         V oldValue;
         try
         {
-            oldValue = getValue(op, key);
+            oldValue = getValue(sm, key);
             exists = true;
         }
         catch (NoSuchElementException e)
@@ -405,17 +405,17 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             // Value changed so update the map
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = sm.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 try
                 {
                     if (exists)
                     {
-                        internalUpdate(op, mconn, false, key, value, true);
+                        internalUpdate(sm, mconn, false, key, value, true);
                     }
                     else
                     {
-                        internalPut(op, mconn, false, key, value, true);
+                        internalPut(sm, mconn, false, key, value, true);
                     }
                 }
                 finally
@@ -433,9 +433,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         if (mapmd.isDependentValue() && !mapmd.isEmbeddedValue() && oldValue != null)
         {
             // Delete the old value if it is no longer contained and is dependent
-            if (!containsValue(op, oldValue))
+            if (!containsValue(sm, oldValue))
             {
-                op.getExecutionContext().deleteObjectInternal(oldValue);
+                sm.getExecutionContext().deleteObjectInternal(oldValue);
             }
         }
 
@@ -444,25 +444,25 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     // TODO Enable this when tested
 //    @Override
-//    public void update(ObjectProvider op, Map<K, V> map)
+//    public void update(ObjectProvider sm, Map<K, V> map)
 //    {
 //        if (map == null || map.isEmpty())
 //        {
-//            clear(op);
+//            clear(sm);
 //            return;
 //        }
 //
 //        // Make sure the related objects are persisted (persistence-by-reachability)
 //        for (Map.Entry<? extends K, ? extends V> e : map.entrySet())
 //        {
-//            validateKeyForWriting(op, e.getKey());
-//            validateValueForWriting(op, e.getValue());
+//            validateKeyForWriting(sm, e.getKey());
+//            validateValueForWriting(sm, e.getValue());
 //        }
 //
 //        // Extract the current map entries to compare with (single SQL call)
 //        Map currentMap = new HashMap<>(); // TODO If this is large then we should avoid pulling all in, so just pull in the keys that are being put here
 //        SetStore<Map.Entry<K, V>> entrySet = this.entrySetStore();
-//        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(op);
+//        Iterator<Map.Entry<K,V>> entrySetIter = entrySet.iterator(sm);
 //        while (entrySetIter.hasNext())
 //        {
 //            Map.Entry<K,V> entry = entrySetIter.next();
@@ -506,18 +506,18 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 //            }
 //        }
 //
-//        processPutsAndUpdates(op, puts, updates);
+//        processPutsAndUpdates(sm, puts, updates);
 //    }
 
     /**
      * Method to remove an entry from the map.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public V remove(ObjectProvider op, Object key)
+    public V remove(ObjectProvider sm, Object key)
     {
-        if (!validateKeyForReading(op, key))
+        if (!validateKeyForReading(sm, key))
         {
             return null;
         }
@@ -526,7 +526,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         boolean exists;
         try
         {
-            oldValue = getValue(op, key);
+            oldValue = getValue(sm, key);
             exists = true;
         }
         catch (NoSuchElementException e)
@@ -535,10 +535,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             exists = false;
         }
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (exists)
         {
-            removeInternal(op, key);
+            removeInternal(sm, key);
         }
 
         MapMetaData mapmd = ownerMemberMetaData.getMap();
@@ -551,7 +551,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         if (mapmd.isDependentValue() && !mapmd.isEmbeddedValue() && api.isPersistable(oldValue))
         {
-            if (!containsValue(op, oldValue))
+            if (!containsValue(sm, oldValue))
             {
                 // Delete the value if it is dependent and is not keyed by another key
                 ec.deleteObjectInternal(oldValue);
@@ -563,21 +563,21 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to remove an item from the map where we know the value associated with the key.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key Key of the item to remove.
      * @param oldValue Value associated with the key before removal.
      */
-    public void remove(ObjectProvider op, Object key, Object oldValue)
+    public void remove(ObjectProvider sm, Object key, Object oldValue)
     {
-        if (!validateKeyForReading(op, key))
+        if (!validateKeyForReading(sm, key))
         {
             return;
         }
 
-        removeInternal(op, key);
+        removeInternal(sm, key);
 
         MapMetaData mapmd = ownerMemberMetaData.getMap();
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ApiAdapter api = ec.getApiAdapter();
         if (mapmd.isDependentKey() && !mapmd.isEmbeddedKey() && api.isPersistable(key))
         {
@@ -587,7 +587,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
         if (mapmd.isDependentValue() && !mapmd.isEmbeddedValue() && api.isPersistable(oldValue))
         {
-            if (!containsValue(op, oldValue))
+            if (!containsValue(sm, oldValue))
             {
                 // Delete the value if it is dependent and is not keyed by another key
                 ec.deleteObjectInternal(oldValue);
@@ -1096,9 +1096,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    protected void removeInternal(ObjectProvider op, Object key)
+    protected void removeInternal(ObjectProvider sm, Object key)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -1109,7 +1109,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
                     sqlControl.executeStatementUpdate(ec, mconn, removeStmt, ps, true);
                 }
@@ -1235,15 +1235,15 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Accessor for the higher id when elements primary key can't be part of the primary key by datastore limitations (e.g BLOB types can't be primary keys).
-     * @param op StateManager for container
+     * @param sm StateManager for container
      * @return The next id
      */
-    private int getNextIDForAdapterColumn(ObjectProvider op)
+    private int getNextIDForAdapterColumn(ObjectProvider sm)
     {
         int nextID;
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -1254,7 +1254,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 try
                 {
                     int jdbcPosition = 1;
-                    BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmt, ps);
                     try
                     {
@@ -1309,12 +1309,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to update a field of an embedded key.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      * @param key The key to update
      * @param fieldNumber The number of the field to update
      * @param newValue The new value
      */
-    public boolean updateEmbeddedKey(ObjectProvider op, Object key, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue)
     {
         boolean modified = false;
         if (keyMapping != null && keyMapping instanceof EmbeddedKeyPCMapping)
@@ -1336,7 +1336,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             String stmt = getUpdateEmbeddedKeyStmt(fieldMapping, getOwnerMapping(), getKeyMapping(), mapTable);
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = sm.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
@@ -1348,8 +1348,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         int jdbcPosition = 1;
                         fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), key);
                         jdbcPosition += fieldMapping.getNumberOfColumnMappings();
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(op, key, ps, jdbcPosition, mapTable, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedKeyFieldsInStatement(sm, key, ps, jdbcPosition, mapTable, this);
 
                         sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                         modified = true;
@@ -1377,12 +1377,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to update a field of an embedded key.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      * @param value The value to update
      * @param fieldNumber The number of the field to update
      * @param newValue The new value
      */
-    public boolean updateEmbeddedValue(ObjectProvider op, Object value, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue)
     {
         boolean modified = false;
         if (valueMapping != null && valueMapping instanceof EmbeddedValuePCMapping)
@@ -1404,7 +1404,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             String stmt = getUpdateEmbeddedValueStmt(fieldMapping, getOwnerMapping(), getValueMapping(), mapTable);
             try
             {
-                ExecutionContext ec = op.getExecutionContext();
+                ExecutionContext ec = sm.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
 
@@ -1416,8 +1416,8 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                         int jdbcPosition = 1;
                         fieldMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, fieldMapping), newValue);
                         jdbcPosition += fieldMapping.getNumberOfColumnMappings();
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
-                        jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(op, value, ps, jdbcPosition, mapTable, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(sm, value, ps, jdbcPosition, mapTable, this);
                         sqlControl.executeStatementUpdate(ec, mconn, stmt, ps, true);
                         modified = true;
                     }

@@ -137,27 +137,27 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         } 
     }
 
-    public boolean add(ObjectProvider op, K key, int size)
+    public boolean add(ObjectProvider sm, K key, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    public boolean addAll(ObjectProvider op, Collection keys, int size)
+    public boolean addAll(ObjectProvider sm, Collection keys, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    public boolean remove(ObjectProvider op, Object key, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider sm, Object key, int size, boolean allowDependentField)
     {
         throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    public boolean removeAll(ObjectProvider op, Collection keys, int size)
+    public boolean removeAll(ObjectProvider sm, Collection keys, int size)
     {
         throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider sm)
     {
         throw new UnsupportedOperationException("Cannot clear a map through its key set");
     }

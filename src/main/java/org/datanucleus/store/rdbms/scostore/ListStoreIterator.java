@@ -41,7 +41,7 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public class ListStoreIterator<E> implements ListIterator<E>
 {
-    private final ObjectProvider op;
+    private final ObjectProvider sm;
 
     private final ListIterator<E> delegate;
 
@@ -51,13 +51,13 @@ public class ListStoreIterator<E> implements ListIterator<E>
 
     private final AbstractListStore<E> abstractListStore;
 
-    ListStoreIterator(ObjectProvider op, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
+    ListStoreIterator(ObjectProvider sm, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
     throws MappedDatastoreException
     {
-        this.op = op;
+        this.sm = sm;
         this.abstractListStore = als;
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ArrayList results = new ArrayList();
         if (resultSet != null)
         {
@@ -87,7 +87,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
                             ownerFieldNumber =
                                 getOwnerMemberMetaData(abstractListStore.containerTable).getAbsoluteFieldNumber();
                         }
-                        nextElement = elementMapping.getObject(ec, resultSet, param, op, ownerFieldNumber);
+                        nextElement = elementMapping.getObject(ec, resultSet, param, sm, ownerFieldNumber);
                     }
                     else
                     {
@@ -119,7 +119,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
     public void add(E elem)
     {
         currentIndex = delegate.nextIndex();
-        abstractListStore.add(op, elem, currentIndex, -1);
+        abstractListStore.add(sm, elem, currentIndex, -1);
         delegate.add(elem);
         lastElement = null;
     }
@@ -167,7 +167,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
             throw new IllegalStateException("No entry to remove");
         }
 
-        abstractListStore.remove(op, currentIndex, -1);
+        abstractListStore.remove(sm, currentIndex, -1);
         delegate.remove();
 
         lastElement = null;
@@ -181,7 +181,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
             throw new IllegalStateException("No entry to replace");
         }
 
-        abstractListStore.set(op, currentIndex, elem, true);
+        abstractListStore.set(sm, currentIndex, elem, true);
         delegate.set(elem);
         lastElement = elem;
     }

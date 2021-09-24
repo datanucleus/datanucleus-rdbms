@@ -36,13 +36,13 @@ public class OracleStringLobMapping extends StringMapping
 {
     /**
      * Retrieve the empty BLOB/CLOB locator created by the insert statement and write out the current BLOB/CLOB field value to the Oracle BLOB/CLOB object
-     * @param op The ObjectProvider owner of this field
+     * @param sm StateManager owner of this field
      */
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
         // Generate the contents for the BLOB/CLOB
-        String value = (String)op.provideField(mmd.getAbsoluteFieldNumber());
-        op.isLoaded(mmd.getAbsoluteFieldNumber());
+        String value = (String)sm.provideField(mmd.getAbsoluteFieldNumber());
+        sm.isLoaded(mmd.getAbsoluteFieldNumber());
         if (value == null)
         {
             value = "";
@@ -64,11 +64,11 @@ public class OracleStringLobMapping extends StringMapping
         {
             if (columnMappings[0] instanceof OracleBlobColumnMapping)
             {
-                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, value.getBytes());
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, value.getBytes());
             }
             else if (columnMappings[0] instanceof OracleClobColumnMapping)
             {
-                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, value);
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, value);
             }
         }
     }

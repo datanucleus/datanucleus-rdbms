@@ -333,24 +333,24 @@ public class FetchRequest extends Request
     /* (non-Javadoc)
      * @see org.datanucleus.store.rdbms.request.Request#execute(org.datanucleus.state.ObjectProvider)
      */
-    public void execute(ObjectProvider op)
+    public void execute(ObjectProvider sm)
     {
         if (fieldsToFetch != null && NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are retrieving
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), fieldsToFetch, table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052218", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), fieldsToFetch, table));
         }
 
-        if (((fetchingSurrogateVersion || versionFieldName != null) && numberOfFieldsToFetch == 0) && op.isVersionLoaded())
+        if (((fetchingSurrogateVersion || versionFieldName != null) && numberOfFieldsToFetch == 0) && sm.isVersionLoaded())
         {
             // Fetching only the version and it is already loaded, so do nothing
         }
         else if (statementLocked != null)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             RDBMSStoreManager storeMgr = table.getStoreManager();
-            boolean locked = ec.getSerializeReadForClass(op.getClassMetaData().getFullClassName());
-            LockMode lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
+            boolean locked = ec.getSerializeReadForClass(sm.getClassMetaData().getFullClassName());
+            LockMode lockType = ec.getLockManager().getLockMode(sm.getInternalObjectId());
             if (lockType != LockMode.LOCK_NONE)
             {
                 if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
@@ -376,7 +376,7 @@ public class FetchRequest extends Request
                 {
                     PreparedStatement ps = sqlControl.getStatementForQuery(mconn, statement);
 
-                    AbstractClassMetaData cmd = op.getClassMetaData();
+                    AbstractClassMetaData cmd = sm.getClassMetaData();
                     try
                     {
                         // Provide the primary key field(s) to the JDBC statement
@@ -385,18 +385,18 @@ public class FetchRequest extends Request
                             StatementMappingIndex datastoreIdx = mappingDef.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDef));
+                            sm.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sm, ps, mappingDef));
                         }
 
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(op.getExecutionContext());
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(sm.getExecutionContext());
                             if (tenantReadIds != null && tenantReadIds.length > 0)
                             {
                                 // Using IN clause so nothing to do since hardcoded
@@ -431,7 +431,7 @@ public class FetchRequest extends Request
                             // Check for failure to find the object
                             if (!rs.next())
                             {
-                                String msg = Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()));
+                                String msg = Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()));
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
                                     NucleusLogger.DATASTORE_RETRIEVE.info(msg);
@@ -440,11 +440,11 @@ public class FetchRequest extends Request
                             }
 
                             // Copy the results into the object
-                            ResultSetGetter rsGetter = new ResultSetGetter(ec, rs, mappingDef, op.getClassMetaData());
-                            rsGetter.setObjectProvider(op);
+                            ResultSetGetter rsGetter = new ResultSetGetter(ec, rs, mappingDef, sm.getClassMetaData());
+                            rsGetter.setObjectProvider(sm);
 
                             // Make sure the version is set first
-                            if (op.getTransactionalVersion() == null)
+                            if (sm.getTransactionalVersion() == null)
                             {
                                 // Object has no version set so update it from this fetch
                                 Object datastoreVersion = null;
@@ -458,15 +458,15 @@ public class FetchRequest extends Request
                                 {
                                     // Version field - populate it in the object and access it from the field
                                     int verAbsFieldNum = cmd.getAbsolutePositionOfMember(versionFieldName);
-                                    op.replaceFields(new int[] {verAbsFieldNum}, rsGetter);
-                                    datastoreVersion = op.provideField(verAbsFieldNum);
+                                    sm.replaceFields(new int[] {verAbsFieldNum}, rsGetter);
+                                    datastoreVersion = sm.provideField(verAbsFieldNum);
                                 }
-                                op.setVersion(datastoreVersion);
+                                sm.setVersion(datastoreVersion);
                             }
 
                             // Update all fields
                             // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
-                            op.replaceFields(memberNumbersToFetch, rsGetter);
+                            sm.replaceFields(memberNumbersToFetch, rsGetter);
                         }
                         finally
                         {
@@ -485,7 +485,7 @@ public class FetchRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = Localiser.msg("052219", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), statement, sqle.getMessage());
+                String msg = Localiser.msg("052219", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);
@@ -502,7 +502,7 @@ public class FetchRequest extends Request
         {
             for (MappingCallbacks m : mappingCallbacks)
             {
-                m.postFetch(op);
+                m.postFetch(sm);
             }
         }
     }

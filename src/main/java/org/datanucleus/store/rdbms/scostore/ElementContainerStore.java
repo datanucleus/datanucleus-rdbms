@@ -233,20 +233,20 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
     /**
      * Method to check if an element is already persistent or is persistent but managed by a different ExecutionContext.
-     * @param op The ObjectProvider of this owner
+     * @param sm StateManager of this owner
      * @param element The element
      * @return Whether it is valid for reading.
      */
-    protected boolean validateElementForReading(ObjectProvider op, Object element)
+    protected boolean validateElementForReading(ObjectProvider sm, Object element)
     {
-        if (!validateElementType(op.getExecutionContext().getClassLoaderResolver(), element))
+        if (!validateElementType(sm.getExecutionContext().getClassLoaderResolver(), element))
         {
             return false;
         }
 
         if (element != null && !elementsAreEmbedded && !elementsAreSerialised)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             if ((!ec.getApiAdapter().isPersistent(element) || ec != ec.getApiAdapter().getExecutionContext(element)) && !ec.getApiAdapter().isDetached(element))
             {
                 return false;
@@ -514,12 +514,12 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
     /**
      * Method to return the size of the container.
-     * @param op The ObjectProvider.
+     * @param sm StateManager.
      * @return The size.
      */
-    public int size(ObjectProvider op)
+    public int size(ObjectProvider sm)
     {
-        return getSize(op);
+        return getSize(sm);
     }
 
     public int getSize(ObjectProvider ownerOP)

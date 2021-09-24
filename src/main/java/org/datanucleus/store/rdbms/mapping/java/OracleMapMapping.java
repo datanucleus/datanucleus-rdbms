@@ -33,14 +33,14 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
  */
 public class OracleMapMapping extends MapMapping
 {
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
             if (columnMappings[0] instanceof ColumnMappingPostSet)
             {
                 // Create the value to put in the BLOB
-                java.util.Map value = (java.util.Map)op.provideField(mmd.getAbsoluteFieldNumber());
+                java.util.Map value = (java.util.Map)sm.provideField(mmd.getAbsoluteFieldNumber());
                 byte[] bytes = new byte[0];
                 if (value != null)
                 {
@@ -58,17 +58,17 @@ public class OracleMapMapping extends MapMapping
                 }
 
                 // Update the BLOB
-                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+                ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, bytes);
             }
         }
     }
 
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = op.getExecutionContext();
-            java.util.Map value = (java.util.Map) op.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = sm.getExecutionContext();
+            java.util.Map value = (java.util.Map) sm.provideField(mmd.getAbsoluteFieldNumber());
 
             // Do nothing when serialised since we are handled in the main request
             if (value != null)
@@ -86,7 +86,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, op, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -94,7 +94,7 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, op, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -103,16 +103,16 @@ public class OracleMapMapping extends MapMapping
         }
         else
         {
-            super.postInsert(op);
+            super.postInsert(sm);
         }
     }
 
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = op.getExecutionContext();
-            java.util.Map value = (java.util.Map) op.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = sm.getExecutionContext();
+            java.util.Map value = (java.util.Map) sm.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
@@ -129,7 +129,7 @@ public class OracleMapMapping extends MapMapping
                             Object key = entry.getKey();
                             if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, op, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
@@ -137,7 +137,7 @@ public class OracleMapMapping extends MapMapping
                             Object val = entry.getValue();
                             if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, op, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -146,7 +146,7 @@ public class OracleMapMapping extends MapMapping
         }
         else
         {
-            super.postUpdate(op);
+            super.postUpdate(sm);
         }
     }
 }

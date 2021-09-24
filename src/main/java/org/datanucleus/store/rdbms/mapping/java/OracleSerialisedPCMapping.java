@@ -33,20 +33,20 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param op the current ObjectProvider
+     * @param ownerSM the current ObjectProvider
      */
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider ownerSM)
     {
-        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+        Object value = ownerSM.provideField(mmd.getAbsoluteFieldNumber());
         ObjectProvider sm = null;
         if (value != null)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             sm = ec.findObjectProvider(value);
             if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
             {
                 // Assign a ObjectProvider to the serialised object since none present
-                sm = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, op, mmd.getAbsoluteFieldNumber());
+                sm = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber());
             }
         }
 
@@ -75,7 +75,7 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping
         // Update the BLOB
         if (columnMappings[0] instanceof ColumnMappingPostSet)
         {
-            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(ownerSM, bytes);
         }
 
         if (sm != null)

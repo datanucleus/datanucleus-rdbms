@@ -154,11 +154,11 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to check if a key exists in the Map.
-     * @param op StateManager for the map
+     * @param sm StateManager for the map
      * @param key The key to check for.
      * @return Whether the key exists in the Map.
      */
-    public boolean containsKey(ObjectProvider op, Object key)
+    public boolean containsKey(ObjectProvider sm, Object key)
     {
         if (key == null)
         {
@@ -167,7 +167,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         }
         try
         {
-            getValue(op, key);
+            getValue(sm, key);
             return true;
         }
         catch (NoSuchElementException e)
@@ -178,18 +178,18 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to check if a value exists in the Map.
-     * @param op StateManager for the map
+     * @param sm StateManager for the map
      * @param value The value to check for.
      * @return Whether the value exists in the Map.
      */
-    public boolean containsValue(ObjectProvider op, Object value)
+    public boolean containsValue(ObjectProvider sm, Object value)
     {
         if (value == null)
         {
             // nulls not allowed
             return false;
         }
-        if (!validateValueForReading(op, value))
+        if (!validateValueForReading(sm, value))
         {
             return false;
         }
@@ -197,7 +197,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
         boolean exists = false;
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -206,7 +206,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     BackingStoreHelper.populateValueInStatement(ec, ps, value, jdbcPosition, getValueMapping());
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, containsValueStmt, ps);
@@ -245,15 +245,15 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to return the value for a key.
-     * @param op StateManager for the Map.
+     * @param sm StateManager for the Map.
      * @param key The key of the object to retrieve.
      * @return The value for this key.
      */
-    public V get(ObjectProvider op, Object key)
+    public V get(ObjectProvider sm, Object key)
     {
         try
         {
-            return getValue(op, key);
+            return getValue(sm, key);
         }
         catch (NoSuchElementException e)
         {
@@ -264,16 +264,16 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
     /**
      * Method to put all elements from a Map into our Map.
      * Simply performs a sequence of puts. Override to provide bulk handling.
-     * @param op StateManager for the Map
+     * @param sm StateManager for the Map
      * @param m The Map to add
      */
-    public void putAll(ObjectProvider op, Map<? extends K, ? extends V> m)
+    public void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m)
     {
         Iterator i = m.entrySet().iterator();
         while (i.hasNext())
         {
             Map.Entry<K, V> e = (Map.Entry)i.next();
-            put(op, e.getKey(), e.getValue());
+            put(sm, e.getKey(), e.getValue());
         }
     }
 
@@ -319,17 +319,17 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a key is ok for reading.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key The key to check.
      * @return Whether it is validated. 
      */
-    protected boolean validateKeyForReading(ObjectProvider op, Object key)
+    protected boolean validateKeyForReading(ObjectProvider sm, Object key)
     {
-        validateKeyType(op.getExecutionContext().getClassLoaderResolver(), key);
+        validateKeyType(sm.getExecutionContext().getClassLoaderResolver(), key);
 
         if (!keysAreEmbedded && !keysAreSerialised)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             if (key!=null && (!ec.getApiAdapter().isPersistent(key) ||
                 ec != ec.getApiAdapter().getExecutionContext(key)) && !ec.getApiAdapter().isDetached(key))
             {
@@ -342,17 +342,17 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a value is ok for reading.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param value The value to check.
      * @return Whether it is validated.
      */
-    protected boolean validateValueForReading(ObjectProvider op, Object value)
+    protected boolean validateValueForReading(ObjectProvider sm, Object value)
     {
-        validateValueType(op.getExecutionContext().getClassLoaderResolver(), value);
+        validateValueType(sm.getExecutionContext().getClassLoaderResolver(), value);
 
         if (!valuesAreEmbedded && !valuesAreSerialised)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             if (value != null && (!ec.getApiAdapter().isPersistent(value) ||
                 ec != ec.getApiAdapter().getExecutionContext(value)) && !ec.getApiAdapter().isDetached(value))
             {
@@ -397,12 +397,12 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Method to retrieve a value from the Map given the key.
-     * @param op StateManager for the map.
+     * @param sm StateManager for the map.
      * @param key The key to retrieve the value for.
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found
      */
-    protected abstract V getValue(ObjectProvider op, Object key)
+    protected abstract V getValue(ObjectProvider sm, Object key)
     throws NoSuchElementException;
 
     /**

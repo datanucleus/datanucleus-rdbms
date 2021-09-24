@@ -140,34 +140,34 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Method to update the collection to be the supplied collection of elements.
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider op, Collection coll)
+    public void update(ObjectProvider sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
-            clear(op);
+            clear(sm);
             return;
         }
 
         if (ownerMemberMetaData.getCollection().isSerializedElement() || ownerMemberMetaData.getCollection().isEmbeddedElement())
         {
             // Serialized/Embedded elements so just clear and add again
-            clear(op);
-            addAll(op, coll, 0);
+            clear(sm);
+            addAll(sm, coll, 0);
             return;
         }
 
         // Find existing elements, and remove any that are no longer present
-        Iterator elemIter = iterator(op);
+        Iterator elemIter = iterator(sm);
         Collection existing = new HashSet();
         while (elemIter.hasNext())
         {
             Object elem = elemIter.next();
             if (!coll.contains(elem))
             {
-                remove(op, elem, -1, true);
+                remove(sm, elem, -1, true);
             }
             else
             {
@@ -184,7 +184,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 E elem = iter.next();
                 if (!existing.contains(elem))
                 {
-                    add(op, elem, 0);
+                    add(sm, elem, 0);
                 }
             }
         }
@@ -239,14 +239,14 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Adds one element to the association owner vs elements.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      * @param element Element to add
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider op, E element, int size)
+    public boolean add(ObjectProvider sm, E element, int size)
     {
         // Check that the object is valid for writing
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         validateElementForWriting(ec, element, null);
 
         if (relationType == RelationType.ONE_TO_MANY_BI)
@@ -261,15 +261,15 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 if (elementOwner == null)
                 {
                     // No owner, so correct it
-                    NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                    NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                         StringUtils.toJVMIDString(elementOP.getObject())));
-                    elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                    elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                 }
-                else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
+                else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                 {
                     // Owner of the element is neither this container nor being attached
                     // Inconsistent owner, so throw exception
-                    throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                    throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                         StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                 }
             }
@@ -280,7 +280,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         boolean toBeInserted = true;
         if (relationType == RelationType.MANY_TO_MANY_BI)
         {
-            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
+            toBeInserted = !elementAlreadyContainsOwnerInMtoN(sm, element);
         }
 
         if (toBeInserted)
@@ -291,8 +291,8 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 try
                 {
                     // Add a row to the join table
-                    int orderID = orderMapping != null ? getNextIDForOrderColumn(op) : -1;
-                    int[] returnCode = doInternalAdd(op, element, mconn, false, orderID, true);
+                    int orderID = orderMapping != null ? getNextIDForOrderColumn(sm) : -1;
+                    int[] returnCode = doInternalAdd(sm, element, mconn, false, orderID, true);
                     if (returnCode[0] > 0)
                     {
                         modified = true;
@@ -316,11 +316,11 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Adds all elements from a collection to the association container.
-     * @param op StateManager for the container.
+     * @param sm StateManager for the container.
      * @param elements Collection of elements to add
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider op, Collection<E> elements, int size)
+    public boolean addAll(ObjectProvider sm, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -331,7 +331,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         boolean batched = (elements.size() > 1);
 
         // Validate all elements for writing
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         Iterator<E> iter = elements.iterator();
         while (iter.hasNext())
         {
@@ -342,7 +342,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
                 // Managed Relations : make sure we have consistency of relation
-                ObjectProvider elementOP = op.getExecutionContext().findObjectProvider(element);
+                ObjectProvider elementOP = sm.getExecutionContext().findObjectProvider(element);
                 if (elementOP != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
@@ -350,15 +350,15 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     if (elementOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(elementOP.getObject())));
-                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), op.getObject());
+                        elementOP.replaceField(relatedMmds[0].getAbsoluteFieldNumber(), sm.getObject());
                     }
-                    else if (elementOwner != op.getObject() && op.getReferencedPC() == null)
+                    else if (elementOwner != sm.getObject() && sm.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor its referenced object
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(),
+                        throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(),
                             ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(elementOP.getObject()), StringUtils.toJVMIDString(elementOwner)));
                     }
                 }
@@ -382,7 +382,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     throw new MappedDatastoreException("SQLException", e);
                 }
 
-                int nextOrderID = orderMapping != null ? getNextIDForOrderColumn(op) : 0;
+                int nextOrderID = orderMapping != null ? getNextIDForOrderColumn(sm) : 0;
 
                 // Loop through all elements to be added
                 iter = elements.iterator();
@@ -397,12 +397,12 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         boolean toBeInserted = true;
                         if (relationType == RelationType.MANY_TO_MANY_BI)
                         {
-                            toBeInserted = !elementAlreadyContainsOwnerInMtoN(op, element);
+                            toBeInserted = !elementAlreadyContainsOwnerInMtoN(sm, element);
                         }
 
                         if (toBeInserted)
                         {
-                            int[] rc = doInternalAdd(op, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
+                            int[] rc = doInternalAdd(sm, element, mconn, batched, nextOrderID, !batched || (batched && !iter.hasNext()));
                             if (rc != null)
                             {
                                 for (int i = 0; i < rc.length; i++)
@@ -440,7 +440,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             // Throw all exceptions received as the cause of a NucleusDataStoreException so the user can see which record(s) didn't persist
             String msg = Localiser.msg("056009", ((Exception) exceptions.get(0)).getMessage());
             NucleusLogger.DATASTORE.error(msg);
-            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), op.getObject());
+            throw new NucleusDataStoreException(msg, (Throwable[]) exceptions.toArray(new Throwable[exceptions.size()]), sm.getObject());
         }
 
         return modified;
@@ -448,18 +448,18 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Remove all elements from a collection from the association owner vs elements.
-     * @param op StateManager for the container
+     * @param sm StateManager for the container
      * @param elements Collection of elements to remove
      * @return Whether the database was updated
      */
-    public boolean removeAll(ObjectProvider op, Collection elements, int size)
+    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
             return false;
         }
 
-        boolean modified = removeAllInternal(op, elements, size);
+        boolean modified = removeAllInternal(sm, elements, size);
         boolean dependent = ownerMemberMetaData.getCollection().isDependentElement();
         if (ownerMemberMetaData.isCascadeRemoveOrphans())
         {
@@ -469,20 +469,20 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // "delete-dependent" : delete elements if the collection is marked as dependent
             // TODO What if the collection contains elements that are not in the Set ? should not delete them
-            op.getExecutionContext().deleteObjects(elements.toArray());
+            sm.getExecutionContext().deleteObjects(elements.toArray());
         }
 
         return modified;
     }
 
-    protected boolean removeAllInternal(ObjectProvider op, Collection elements, int size)
+    protected boolean removeAllInternal(ObjectProvider sm, Collection elements, int size)
     {
         boolean modified = false;
 
-        String removeAllStmt = getRemoveAllStmt(op, elements);
+        String removeAllStmt = getRemoveAllStmt(sm, elements);
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -495,7 +495,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                     while (iter.hasNext())
                     {
                         Object element = iter.next();
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                         jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                         if (relationDiscriminatorMapping != null)
                         {
@@ -560,11 +560,11 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      *       (OWNERCOL=? AND ELEMENTCOL=?) OR
      *       (OWNERCOL=? AND ELEMENTCOL=?)
      * </PRE>
-     * @param op StateManager for the owner
+     * @param sm StateManager for the owner
      * @param elements Collection of elements to remove
      * @return Statement for deleting items from the Set.
      */
-    protected String getRemoveAllStmt(ObjectProvider op, Collection elements)
+    protected String getRemoveAllStmt(ObjectProvider sm, Collection elements)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -593,13 +593,13 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    private boolean locate(ObjectProvider op, Object element)
+    private boolean locate(ObjectProvider sm, Object element)
     {
         boolean exists = true;
         String stmt = getLocateStmt(element);
         try
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -608,7 +608,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     jdbcPosition = BackingStoreHelper.populateElementForWhereClauseInStatement(ec, ps, element, jdbcPosition, elementMapping);
                     if (relationDiscriminatorMapping != null)
                     {
@@ -646,13 +646,13 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return exists;
     }
 
-    protected int[] doInternalAdd(ObjectProvider op, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
+    protected int[] doInternalAdd(ObjectProvider sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
     throws MappedDatastoreException
     {
         // Check for dynamic schema updates prior to addition
         if (storeMgr.getBooleanObjectProperty(RDBMSPropertyNames.PROPERTY_RDBMS_DYNAMIC_SCHEMA_UPDATES).booleanValue())
         {
-            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, op);
+            DynamicSchemaFieldManager dynamicSchemaFM = new DynamicSchemaFieldManager(storeMgr, sm);
             Collection coll = new HashSet();
             coll.add(element);
             dynamicSchemaFM.storeObjectField(ownerMemberMetaData.getAbsoluteFieldNumber(), coll);
@@ -664,7 +664,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
         String addStmt = getAddStmtForJoinTable();
         boolean notYetFlushedError = false;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -673,7 +673,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             {
                 // Insert the join table row
                 int jdbcPosition = 1;
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateElementInStatement(ec, ps, element, jdbcPosition, elementMapping);
                 if (orderMapping != null)
                 {
@@ -749,10 +749,10 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    protected int getNextIDForOrderColumn(ObjectProvider op)
+    protected int getNextIDForOrderColumn(ObjectProvider sm)
     {
         int nextID;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         String stmt = getMaxOrderColumnIdStmt();
         try
         {
@@ -765,7 +765,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     if (relationDiscriminatorMapping != null)
                     {
                         BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);

@@ -99,20 +99,20 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         return mmd.getType();
     }
 
-    public void postInsert(final ObjectProvider op)
+    public void postInsert(final ObjectProvider sm)
     {
-        Object val = op.provideField(mmd.getAbsoluteFieldNumber());
-        serialiseFieldValue(op, val);
+        Object val = sm.provideField(mmd.getAbsoluteFieldNumber());
+        serialiseFieldValue(sm, val);
 
-        if (op.getExecutionContext().getTransaction().isActive())
+        if (sm.getExecutionContext().getTransaction().isActive())
         {
             // Catch any rollback
-            op.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
+            sm.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
             {
                 public void transactionPreRollBack()
                 {
                     // Remove the file
-                    File fieldFile = new File(getFilenameForObjectProvider(op));
+                    File fieldFile = new File(getFilenameForObjectProvider(sm));
                     if (fieldFile.exists())
                     {
                         fieldFile.delete();
@@ -132,28 +132,28 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
-        Object value = deserialiseFieldValue(op);
-        op.replaceField(mmd.getAbsoluteFieldNumber(), value);
+        Object value = deserialiseFieldValue(sm);
+        sm.replaceField(mmd.getAbsoluteFieldNumber(), value);
     }
 
-    public void postUpdate(final ObjectProvider op)
+    public void postUpdate(final ObjectProvider sm)
     {
-        final Object oldValue = deserialiseFieldValue(op);
+        final Object oldValue = deserialiseFieldValue(sm);
 
-        Object val = op.provideField(mmd.getAbsoluteFieldNumber());
-        serialiseFieldValue(op, val);
+        Object val = sm.provideField(mmd.getAbsoluteFieldNumber());
+        serialiseFieldValue(sm, val);
 
-        if (op.getExecutionContext().getTransaction().isActive())
+        if (sm.getExecutionContext().getTransaction().isActive())
         {
             // Catch any rollback
-            op.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
+            sm.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
             {
                 public void transactionPreRollBack()
                 {
                     // Reset to previous value
-                    serialiseFieldValue(op, oldValue);
+                    serialiseFieldValue(sm, oldValue);
                 }
                 public void transactionStarted() {}
                 public void transactionRolledBack() {}
@@ -169,26 +169,26 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    public void preDelete(final ObjectProvider op)
+    public void preDelete(final ObjectProvider sm)
     {
-        final Object oldValue = op.provideField(mmd.getAbsoluteFieldNumber());
+        final Object oldValue = sm.provideField(mmd.getAbsoluteFieldNumber());
 
         // Delete the file for this field of this ObjectProvider
-        File fieldFile = new File(getFilenameForObjectProvider(op));
+        File fieldFile = new File(getFilenameForObjectProvider(sm));
         if (fieldFile.exists())
         {
             fieldFile.delete();
         }
 
-        if (op.getExecutionContext().getTransaction().isActive())
+        if (sm.getExecutionContext().getTransaction().isActive())
         {
             // Catch any rollback
-            op.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
+            sm.getExecutionContext().getTransaction().addTransactionEventListener(new TransactionEventListener()
             {
                 public void transactionPreRollBack()
                 {
                     // Reset to previous value
-                    serialiseFieldValue(op, oldValue);
+                    serialiseFieldValue(sm, oldValue);
                 }
                 public void transactionStarted() {}
                 public void transactionRolledBack() {}
@@ -204,22 +204,22 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    protected String getFilenameForObjectProvider(ObjectProvider op)
+    protected String getFilenameForObjectProvider(ObjectProvider sm)
     {
-        return folderName + System.getProperty("file.separator") + op.getInternalObjectId();
+        return folderName + System.getProperty("file.separator") + sm.getInternalObjectId();
     }
 
     /**
      * Method to serialise the value from StateManager to file.
-     * @param op The ObjectProvider
+     * @param sm StateManager
      * @param value The value being serialised
      */
-    protected void serialiseFieldValue(ObjectProvider op, Object value)
+    protected void serialiseFieldValue(ObjectProvider sm, Object value)
     {
         try
         {
             // Serialise the field value to the appropriate file in this folder
-            FileOutputStream fileOut = new FileOutputStream(getFilenameForObjectProvider(op));
+            FileOutputStream fileOut = new FileOutputStream(getFilenameForObjectProvider(sm));
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(value);
             out.close();
@@ -233,16 +233,16 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
 
     /**
      * Method to deserialise the value from file and return it.
-     * @param op The ObjectProvider to get the value for
+     * @param sm StateManager to get the value for
      * @return The value currently stored
      */
-    protected Object deserialiseFieldValue(ObjectProvider op)
+    protected Object deserialiseFieldValue(ObjectProvider sm)
     {
         Object value = null;
         try
         {
             // Deserialise the field value from the appropriate file in this folder
-            FileInputStream fileIn = new FileInputStream(getFilenameForObjectProvider(op));
+            FileInputStream fileIn = new FileInputStream(getFilenameForObjectProvider(sm));
             ObjectInputStream in = new ObjectInputStream(fileIn);
             value = in.readObject();
             in.close();

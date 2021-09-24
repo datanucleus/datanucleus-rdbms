@@ -132,19 +132,19 @@ public abstract class BaseContainerStore implements Store
     /**
      * Method to return StateManager for an embedded PC object (element, key, value).
      * It creates one if the element is not currently managed.
-     * @param op StateManager of the owner
+     * @param sm StateManager of the owner
      * @param obj The embedded PC object
      * @param ownerMmd The meta data for the owner field
      * @param pcType Object type for the embedded object (see ObjectProvider EMBEDDED_PC etc)
-     * @return The ObjectProvider
+     * @return StateManager
      */
-    public ObjectProvider getObjectProviderForEmbeddedPCObject(ObjectProvider op, Object obj, AbstractMemberMetaData ownerMmd, short pcType)
+    public ObjectProvider getObjectProviderForEmbeddedPCObject(ObjectProvider sm, Object obj, AbstractMemberMetaData ownerMmd, short pcType)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ObjectProvider objOP = ec.findObjectProvider(obj);
         if (objOP == null)
         {
-            objOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, op, ownerMmd.getAbsoluteFieldNumber());
+            objOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, sm, ownerMmd.getAbsoluteFieldNumber());
         }
         objOP.setPcObjectType(pcType);
         return objOP;

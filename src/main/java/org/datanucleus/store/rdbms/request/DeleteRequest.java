@@ -185,20 +185,20 @@ public class DeleteRequest extends Request
     /**
      * Method performing the deletion of the record from the datastore.
      * Takes the constructed deletion query and populates with the specific record information.
-     * @param op The ObjectProvider for the record to be deleted.
+     * @param sm StateManager for the record to be deleted.
      */
-    public void execute(ObjectProvider op)
+    public void execute(ObjectProvider sm)
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are deleting
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052210", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052210", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), table));
         }
 
         // Process all related fields first
         // a). Delete any dependent objects
         // b). Null any non-dependent objects with FK at other side
-        ClassLoaderResolver clr = op.getExecutionContext().getClassLoaderResolver();
+        ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         Set relatedObjectsToDelete = null;
         if (mappingCallbacks != null)
         {
@@ -206,10 +206,10 @@ public class DeleteRequest extends Request
             {
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("052212", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
                         ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
                 }
-                m.preDelete(op);
+                m.preDelete(sm);
 
                 // Check for any dependent related 1-1 objects where we hold the FK and where the object hasn't been deleted. 
                 // This can happen if this DeleteRequest was triggered by delete-orphans and so the related object has to be deleted *after* this object.
@@ -222,9 +222,9 @@ public class DeleteRequest extends Request
                 {
                     try
                     {
-                        op.isLoaded(mmd.getAbsoluteFieldNumber());
-                        Object relatedPc = op.provideField(mmd.getAbsoluteFieldNumber());
-                        boolean relatedObjectDeleted = op.getExecutionContext().getApiAdapter().isDeleted(relatedPc);
+                        sm.isLoaded(mmd.getAbsoluteFieldNumber());
+                        Object relatedPc = sm.provideField(mmd.getAbsoluteFieldNumber());
+                        boolean relatedObjectDeleted = sm.getExecutionContext().getApiAdapter().isDeleted(relatedPc);
                         if (!relatedObjectDeleted)
                         {
                             if (relatedObjectsToDelete == null)
@@ -248,13 +248,13 @@ public class DeleteRequest extends Request
             for (int i=0;i<oneToOneNonOwnerFields.length;i++)
             {
                 AbstractMemberMetaData relatedFmd = oneToOneNonOwnerFields[i];
-                updateOneToOneBidirectionalOwnerObjectForField(op, relatedFmd);
+                updateOneToOneBidirectionalOwnerObjectForField(sm, relatedFmd);
             }
         }
 
         // Choose the statement based on whether optimistic or not
         String stmt = null;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
         boolean optimisticChecks = false;
         if (table.getSurrogateColumn(SurrogateColumnType.SOFTDELETE) != null)
@@ -293,7 +293,7 @@ public class DeleteRequest extends Request
                         StatementMappingIndex mapIdx = mappingStatementIndex.getWhereDatastoreId();
                         for (int i=0;i<mapIdx.getNumberOfParameterOccurrences();i++)
                         {
-                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, mapIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                         }
                     }
                     else
@@ -307,7 +307,7 @@ public class DeleteRequest extends Request
                                 mappingDefinition.addMappingForMember(i, idxs[i]);
                             }
                         }
-                        op.provideFields(whereFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                        sm.provideFields(whereFieldNumbers, new ParameterSetter(sm, ps, mappingDefinition));
                     }
 
                     if (multitenancyStatementMapping != null)
@@ -320,11 +320,11 @@ public class DeleteRequest extends Request
                     {
                         // WHERE clause - current version discriminator
                         JavaTypeMapping verMapping = mappingStatementIndex.getWhereVersion().getMapping();
-                        Object currentVersion = op.getTransactionalVersion();
+                        Object currentVersion = sm.getTransactionalVersion();
                         if (currentVersion == null)
                         {
                             // Somehow the version is not set on this object (not read in ?) so report the bug
-                            String msg = Localiser.msg("052202", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), table);
+                            String msg = Localiser.msg("052202", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), table);
                             NucleusLogger.PERSISTENCE.error(msg);
                             throw new NucleusException(msg);
                         }
@@ -339,8 +339,8 @@ public class DeleteRequest extends Request
                     if (optimisticChecks && rcs[0] == 0)
                     {
                         // No object deleted so either object disappeared or failed optimistic version checks
-                        throw new NucleusOptimisticException(Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
-                            "" + op.getTransactionalVersion()), op.getObject());
+                        throw new NucleusOptimisticException(Localiser.msg("052203", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
+                            "" + sm.getTransactionalVersion()), sm.getObject());
                     }
 
                     if (relatedObjectsToDelete != null && !relatedObjectsToDelete.isEmpty())
@@ -366,7 +366,7 @@ public class DeleteRequest extends Request
         }
         catch (SQLException e)
         {
-            String msg = Localiser.msg("052211", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), stmt, e.getMessage());
+            String msg = Localiser.msg("052211", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), stmt, e.getMessage());
             NucleusLogger.PERSISTENCE.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(e);
@@ -380,10 +380,10 @@ public class DeleteRequest extends Request
 
     /**
      * Method to update any 1-1 bidir non-owner fields where the foreign-key is stored in the other object.
-     * @param op StateManager of this object
+     * @param sm StateManager of this object
      * @param mmd MetaData for field that has related (owner) objects
      */
-    private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider op, AbstractMemberMetaData mmd)
+    private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider sm, AbstractMemberMetaData mmd)
     {
         if (softDeleteStmt != null)
         {
@@ -393,11 +393,11 @@ public class DeleteRequest extends Request
 
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052217", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), mmd.getFullFieldName()));
         }
 
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
         AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
 
@@ -481,7 +481,7 @@ public class DeleteRequest extends Request
                         try
                         {
                             ps = sqlControl.getStatementForUpdate(mconn, clearLinkStmt.toString(), false);
-                            refMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1, refMapping), op.getObject());
+                            refMapping.setObject(ec, ps, MappingHelper.getMappingIndices(1, refMapping), sm.getObject());
 
                             sqlControl.executeStatementUpdate(ec, mconn, clearLinkStmt.toString(), ps, true);
                         }

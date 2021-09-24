@@ -194,16 +194,16 @@ public class LocateRequest extends Request
     /**
      * Method performing the retrieval of the record from the datastore. 
      * Takes the constructed retrieval query and populates with the specific record information.
-     * @param op StateManager for the record to be retrieved
+     * @param sm StateManager for the record to be retrieved
      */
-    public void execute(ObjectProvider op)
+    public void execute(ObjectProvider sm)
     {
         if (statementLocked != null)
         {
-            ExecutionContext ec = op.getExecutionContext();
+            ExecutionContext ec = sm.getExecutionContext();
             RDBMSStoreManager storeMgr = table.getStoreManager();
-            boolean locked = ec.getSerializeReadForClass(op.getClassMetaData().getFullClassName());
-            LockMode lockType = ec.getLockManager().getLockMode(op.getInternalObjectId());
+            boolean locked = ec.getSerializeReadForClass(sm.getClassMetaData().getFullClassName());
+            LockMode lockType = ec.getLockManager().getLockMode(sm.getInternalObjectId());
             if (lockType != LockMode.LOCK_NONE)
             {
                 if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
@@ -223,7 +223,7 @@ public class LocateRequest extends Request
                 {
                     PreparedStatement ps = sqlControl.getStatementForQuery(mconn, statement);
 
-                    AbstractClassMetaData cmd = op.getClassMetaData();
+                    AbstractClassMetaData cmd = sm.getClassMetaData();
                     try
                     {
                         // Provide the primary key field(s)
@@ -232,18 +232,18 @@ public class LocateRequest extends Request
                             StatementMappingIndex datastoreIdx = mappingDefinition.getMappingForMemberPosition(SurrogateColumnType.DATASTORE_ID.getFieldNumber());
                             for (int i=0;i<datastoreIdx.getNumberOfParameterOccurrences();i++)
                             {
-                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), op.getInternalObjectId());
+                                table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(i), sm.getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            op.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(op, ps, mappingDefinition));
+                            sm.provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sm, ps, mappingDefinition));
                         }
 
                         JavaTypeMapping multitenancyMapping = table.getSurrogateMapping(SurrogateColumnType.MULTITENANCY, false);
                         if (multitenancyMapping != null)
                         {
-                            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(op.getExecutionContext());
+                            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(sm.getExecutionContext());
                             if (tenantReadIds != null && tenantReadIds.length > 0)
                             {
                                 // Using IN clause so nothing to do since hardcoded
@@ -277,7 +277,7 @@ public class LocateRequest extends Request
                         {
                             if (!rs.next())
                             {
-                                String msg = Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()));
+                                String msg = Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()));
                                 if (NucleusLogger.DATASTORE_RETRIEVE.isInfoEnabled())
                                 {
                                     NucleusLogger.DATASTORE_RETRIEVE.info(msg);
@@ -302,7 +302,7 @@ public class LocateRequest extends Request
             }
             catch (SQLException sqle)
             {
-                String msg = Localiser.msg("052220", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), statement, sqle.getMessage());
+                String msg = Localiser.msg("052220", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), statement, sqle.getMessage());
                 NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
                 List exceptions = new ArrayList();
                 exceptions.add(sqle);

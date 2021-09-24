@@ -922,14 +922,14 @@ public class FKListStore<E> extends AbstractListStore<E>
     /**
      * Method to validate that an element is valid for writing to the datastore.
      * TODO Minimise differences to super.validateElementForWriting()
-     * @param op StateManager for the List
+     * @param sm StateManager for the List
      * @param element The element to validate
      * @param index The position that the element is being stored at in the list
      * @return Whether the element was inserted
      */
-    protected boolean validateElementForWriting(final ObjectProvider op, final Object element, final int index)
+    protected boolean validateElementForWriting(final ObjectProvider sm, final Object element, final int index)
     {
-        final Object newOwner = op.getObject();
+        final Object newOwner = sm.getObject();
 
         ComponentInfo info = getComponentInfoForElement(element);
 
@@ -953,7 +953,7 @@ public class FKListStore<E> extends AbstractListStore<E>
         }
 
         // Check if element is ok for use in the datastore, specifying any external mappings that may be required
-        boolean inserted = super.validateElementForWriting(op.getExecutionContext(), element, new FieldValues()
+        boolean inserted = super.validateElementForWriting(sm.getExecutionContext(), element, new FieldValues()
         {
             public void fetchFields(ObjectProvider elemOP)
             {
@@ -964,7 +964,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                     if (externalFKMapping != null)
                     {
                         // The element has an external FK mapping so set the value it needs to use in the INSERT
-                        elemOP.setAssociatedValue(externalFKMapping, op.getObject());
+                        elemOP.setAssociatedValue(externalFKMapping, sm.getObject());
                     }
                     if (relationDiscriminatorMapping != null)
                     {
@@ -1015,7 +1015,7 @@ public class FKListStore<E> extends AbstractListStore<E>
                             otherMmd = otherCmd.getMetaDataForMember(thisMappedBy);
 
                             Object holderValueAtField = ownerHolderOP.provideField(otherMmd.getAbsoluteFieldNumber());
-                            ownerHolderOP = op.getExecutionContext().findObjectProviderForEmbedded(holderValueAtField, ownerHolderOP, otherMmd);
+                            ownerHolderOP = sm.getExecutionContext().findObjectProviderForEmbedded(holderValueAtField, ownerHolderOP, otherMmd);
 
                             remainingMappedBy = remainingMappedBy.substring(dotPosition+1);
                             otherCmd = storeMgr.getMetaDataManager().getMetaDataForClass(otherMmd.getTypeName(), clr);
@@ -1035,20 +1035,20 @@ public class FKListStore<E> extends AbstractListStore<E>
                     if (currentOwner == null)
                     {
                         // No owner, so correct it
-                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        NucleusLogger.PERSISTENCE.info(Localiser.msg("056037", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(ownerHolderOP.getObject())));
                         ownerHolderOP.replaceFieldMakeDirty(ownerFieldNumberInHolder, newOwner);
                     }
-                    else if (currentOwner != newOwner && op.getReferencedPC() == null)
+                    else if (currentOwner != newOwner && sm.getReferencedPC() == null)
                     {
                         // Owner of the element is neither this container nor is it being attached
                         // Inconsistent owner, so throw exception
-                        throw new NucleusUserException(Localiser.msg("056038", op.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
+                        throw new NucleusUserException(Localiser.msg("056038", sm.getObjectAsPrintable(), ownerMemberMetaData.getFullFieldName(), 
                             StringUtils.toJVMIDString(ownerHolderOP.getObject()), StringUtils.toJVMIDString(currentOwner)));
                     }
                 }
             }
-            public void fetchNonLoadedFields(ObjectProvider op)
+            public void fetchNonLoadedFields(ObjectProvider sm)
             {
             }
             public FetchPlan getFetchPlanForLoading()

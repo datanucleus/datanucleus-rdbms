@@ -154,38 +154,38 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         }
     }
 
-    public boolean add(ObjectProvider op, V value, int size)
+    public boolean add(ObjectProvider sm, V value, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    public boolean addAll(ObjectProvider op, Collection<V> values, int size)
+    public boolean addAll(ObjectProvider sm, Collection<V> values, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    public boolean remove(ObjectProvider op, Object value, int size, boolean allowDependentField)
+    public boolean remove(ObjectProvider sm, Object value, int size, boolean allowDependentField)
     {
         // TODO Why does this even allow the possibility of removal via the values store?
-        if (!validateElementForReading(op, value))
+        if (!validateElementForReading(sm, value))
         {
             return false;
         }
 
-        return remove(op, value);
+        return remove(sm, value);
     }
 
-    public boolean removeAll(ObjectProvider op, Collection values, int size)
+    public boolean removeAll(ObjectProvider sm, Collection values, int size)
     {
         throw new NucleusUserException("Cannot remove values from a map through its values collection");
     }
 
-    public void clear(ObjectProvider op)
+    public void clear(ObjectProvider sm)
     {
         throw new NucleusUserException("Cannot clear a map through its values collection");
     }
 
-    protected boolean remove(ObjectProvider op, Object value)
+    protected boolean remove(ObjectProvider sm, Object value)
     {
         if (findKeyStmt == null)
         {
@@ -194,7 +194,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
         Object key = null;
         boolean keyExists = false;
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
 
         try
         {
@@ -208,7 +208,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(op, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(sm, ec, ps, jdbcPosition, this);
                     BackingStoreHelper.populateElementInStatement(ec, ps, value, jdbcPosition, elementMapping);
 
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, findKeyStmt, ps);
@@ -244,7 +244,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
         if (keyExists)
         {
-            mapStore.remove(op, key);
+            mapStore.remove(sm, key);
             return true;
         }
         return false;

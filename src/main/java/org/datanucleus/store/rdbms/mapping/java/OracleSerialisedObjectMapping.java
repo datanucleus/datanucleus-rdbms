@@ -32,13 +32,13 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param op the current ObjectProvider
+     * @param sm the current ObjectProvider
      */
-    public void performSetPostProcessing(ObjectProvider op)
+    public void performSetPostProcessing(ObjectProvider sm)
     {
         // Generate the contents for the BLOB
         byte[] bytes = new byte[0];
-        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
+        Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
         if (value != null)
         {
             try
@@ -57,7 +57,7 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping
         if (columnMappings[0] instanceof ColumnMappingPostSet)
         {
             // Update the BLOB
-            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(op, bytes);
+            ((ColumnMappingPostSet)columnMappings[0]).setPostProcessing(sm, bytes);
         }
     }
 }

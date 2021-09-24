@@ -48,12 +48,12 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object is being fetched.
-     * @param op StateManager of the owning object
+     * @param sm StateManager of the owning object
      */
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -71,12 +71,12 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object has just being inserted.
-     * @param op StateManager of the owning object
+     * @param sm StateManager of the owning object
      */
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -95,12 +95,12 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object has just being udpated.
-     * @param op StateManager of the owning object
+     * @param sm StateManager of the owning object
      */
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -119,12 +119,12 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * MappingCallback called when the owning object is about to be deleted.
-     * @param op StateManager of the owning object
+     * @param sm StateManager of the owning object
      */
-    public void preDelete(ObjectProvider op)
+    public void preDelete(ObjectProvider sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(op);
+        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;

@@ -138,35 +138,35 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         return wrappedMapping.getJavaTypeForColumnMapping(index);
     }
 
-    public void postInsert(ObjectProvider op)
+    public void postInsert(ObjectProvider sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
-            ((MappingCallbacks) wrappedMapping).postInsert(op);
+            ((MappingCallbacks) wrappedMapping).postInsert(sm);
         }
     }
 
-    public void postFetch(ObjectProvider op)
+    public void postFetch(ObjectProvider sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
-            ((MappingCallbacks) wrappedMapping).postFetch(op);
+            ((MappingCallbacks) wrappedMapping).postFetch(sm);
         }
     }
 
-    public void postUpdate(ObjectProvider op)
+    public void postUpdate(ObjectProvider sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
-            ((MappingCallbacks) wrappedMapping).postUpdate(op);
+            ((MappingCallbacks) wrappedMapping).postUpdate(sm);
         }
     }
 
-    public void preDelete(ObjectProvider op)
+    public void preDelete(ObjectProvider sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
-            ((MappingCallbacks) wrappedMapping).preDelete(op);
+            ((MappingCallbacks) wrappedMapping).preDelete(sm);
         }
     }
 

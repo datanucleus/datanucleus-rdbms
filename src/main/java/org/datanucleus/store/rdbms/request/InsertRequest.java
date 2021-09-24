@@ -230,15 +230,15 @@ public class InsertRequest extends Request
     /**
      * Method performing the insertion of the record from the datastore. 
      * Takes the constructed insert query and populates with the specific record information.
-     * @param op The ObjectProvider for the record to be inserted
+     * @param sm StateManager for the record to be inserted
      */
-    public void execute(ObjectProvider op)
+    public void execute(ObjectProvider sm)
     {
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
             // Debug information about what we are inserting
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052207", op.getObjectAsPrintable(), table));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("052207", sm.getObjectAsPrintable(), table));
         }
 
         try
@@ -249,7 +249,7 @@ public class InsertRequest extends Request
             {
                 // Version field - Update the version in the object
                 AbstractMemberMetaData verfmd = ((AbstractClassMetaData)vermd.getParent()).getMetaDataForMember(vermd.getFieldName());
-                Object currentVersion = op.getVersion();
+                Object currentVersion = sm.getVersion();
                 if (currentVersion instanceof Number)
                 {
                     // Cater for Integer based versions
@@ -262,11 +262,11 @@ public class InsertRequest extends Request
                     // Cater for Integer based versions
                     nextOptimisticVersion = Integer.valueOf(((Number)nextOptimisticVersion).intValue());
                 }
-                op.replaceField(verfmd.getAbsoluteFieldNumber(), nextOptimisticVersion);
+                sm.replaceField(verfmd.getAbsoluteFieldNumber(), nextOptimisticVersion);
             }
 
             // Set the state to "inserting" (may already be at this state if multiple inheritance level INSERT)
-            op.changeActivityState(ActivityState.INSERTING);
+            sm.changeActivityState(ActivityState.INSERTING);
 
             SQLController sqlControl = storeMgr.getSQLController();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -310,14 +310,14 @@ public class InsertRequest extends Request
                         if (!table.isObjectIdDatastoreAttributed() || !table.isBaseDatastoreClass())
                         {
                             int[] paramNumber = {IDPARAMNUMBER};
-                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, paramNumber, op.getInternalObjectId());
+                            table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, paramNumber, sm.getInternalObjectId());
                         }
                     }
                     else if (table.getIdentityType() == IdentityType.APPLICATION)
                     {
                         if (pkFieldNumbers != null && pkFieldNumbers.length > 0)
                         {
-                            op.provideFields(pkFieldNumbers, new ParameterSetter(op, ps, mappingDefinition));
+                            sm.provideFields(pkFieldNumbers, new ParameterSetter(sm, ps, mappingDefinition));
                         }
                     }
 
@@ -328,20 +328,20 @@ public class InsertRequest extends Request
                         int numberOfFieldsToProvide = 0;
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
-                            if (insertFieldNumbers[i] < op.getClassMetaData().getMemberCount())
+                            if (insertFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
                             {
-                                AbstractMemberMetaData mmd = op.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
+                                AbstractMemberMetaData mmd = sm.getClassMetaData().getMetaDataForManagedMemberAtAbsolutePosition(insertFieldNumbers[i]);
                                 if (mmd.isCreateTimestamp())
                                 {
                                     // Set create timestamp to time for the start of this transaction
                                     if (mmd.getType().isAssignableFrom(java.time.Instant.class))
                                     {
-                                        op.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
                                                 java.time.Instant.ofEpochMilli(ec.getTransaction().getBeginTime()) : java.time.Instant.now());
                                     }
                                     else
                                     {
-                                        op.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
+                                        sm.replaceField(insertFieldNumbers[i], ec.getTransaction().getIsActive() ? 
                                                 new Timestamp(ec.getTransaction().getBeginTime()) : new Timestamp(System.currentTimeMillis()));
                                     }
                                     // TODO Throw exception if invalid member type
@@ -349,7 +349,7 @@ public class InsertRequest extends Request
                                 else if (mmd.isCreateUser())
                                 {
                                     // Set create user to current user
-                                    op.replaceField(insertFieldNumbers[i], ec.getCurrentUser());
+                                    sm.replaceField(insertFieldNumbers[i], ec.getCurrentUser());
                                 }
 
                                 numberOfFieldsToProvide++;
@@ -359,32 +359,32 @@ public class InsertRequest extends Request
                         int[] fieldNums = new int[numberOfFieldsToProvide];
                         for (int i = 0; i < insertFieldNumbers.length; i++)
                         {
-                            if (insertFieldNumbers[i] < op.getClassMetaData().getMemberCount())
+                            if (insertFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
                             {
                                 fieldNums[j++] = insertFieldNumbers[i];
                             }
                         }
-                        op.provideFields(fieldNums, new ParameterSetter(op, ps, mappingDefinition));
+                        sm.provideFields(fieldNums, new ParameterSetter(sm, ps, mappingDefinition));
                     }
 
                     JavaTypeMapping versionMapping = table.getSurrogateMapping(SurrogateColumnType.VERSION, false);
                     if (versionMapping != null)
                     {
                         // Surrogate version - set the new version for the object
-                        Object currentVersion = op.getVersion();
+                        Object currentVersion = sm.getVersion();
                         Object nextOptimisticVersion = ec.getLockManager().getNextVersion(vermd, currentVersion);
                         for (int k=0;k<versionStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
                             versionMapping.setObject(ec, ps, versionStmtMapping.getParameterPositionsForOccurrence(k), nextOptimisticVersion);
                         }
-                        op.setTransactionalVersion(nextOptimisticVersion);
+                        sm.setTransactionalVersion(nextOptimisticVersion);
                     }
                     else if (vermd != null && vermd.getFieldName() != null)
                     {
                         // Version field - set the new version for the object
-                        Object currentVersion = op.getVersion();
+                        Object currentVersion = sm.getVersion();
                         Object nextOptimisticVersion = ec.getLockManager().getNextVersion(vermd, currentVersion);
-                        op.setTransactionalVersion(nextOptimisticVersion);
+                        sm.setTransactionalVersion(nextOptimisticVersion);
                     }
 
                     if (multitenancyStmtMapping != null)
@@ -431,7 +431,7 @@ public class InsertRequest extends Request
                     if (discrimMapping != null)
                     {
                         // Discriminator mapping
-                        Object discVal = op.getClassMetaData().getDiscriminatorValue();
+                        Object discVal = sm.getClassMetaData().getDiscriminatorValue();
                         for (int k=0;k<discriminatorStmtMapping.getNumberOfParameterOccurrences();k++)
                         {
                             discrimMapping.setObject(ec, ps, discriminatorStmtMapping.getParameterPositionsForOccurrence(k), discVal);
@@ -443,7 +443,7 @@ public class InsertRequest extends Request
                     {
                         for (int i=0;i<externalFKStmtMappings.length;i++)
                         {
-                            Object fkValue = op.getAssociatedValue(externalFKStmtMappings[i].getMapping());
+                            Object fkValue = sm.getAssociatedValue(externalFKStmtMappings[i].getMapping());
                             if (fkValue != null)
                             {
                                 // Need to provide the owner field number so PCMapping can work out if it is inserted yet
@@ -471,7 +471,7 @@ public class InsertRequest extends Request
                     {
                         for (int i=0;i<externalFKDiscrimStmtMappings.length;i++)
                         {
-                            Object discrimValue = op.getAssociatedValue(externalFKDiscrimStmtMappings[i].getMapping());
+                            Object discrimValue = sm.getAssociatedValue(externalFKDiscrimStmtMappings[i].getMapping());
                             for (int k=0;k<externalFKDiscrimStmtMappings[i].getNumberOfParameterOccurrences();k++)
                             {
                                 externalFKDiscrimStmtMappings[i].getMapping().setObject(ec, ps, externalFKDiscrimStmtMappings[i].getParameterPositionsForOccurrence(k), discrimValue);
@@ -484,7 +484,7 @@ public class InsertRequest extends Request
                     {
                         for (int i=0;i<externalOrderStmtMappings.length;i++)
                         {
-                            Object orderValue = op.getAssociatedValue(externalOrderStmtMappings[i].getMapping());
+                            Object orderValue = sm.getAssociatedValue(externalOrderStmtMappings[i].getMapping());
                             if (orderValue == null)
                             {
                                 // No order value so use -1
@@ -502,12 +502,12 @@ public class InsertRequest extends Request
                     if (hasIdentityColumn)
                     {
                         // Identity column was set in the datastore using auto-increment/identity/serial etc
-                        Object newId = getInsertedIdentityValue(ec, sqlControl, op, mconn, ps);
-                        op.setPostStoreNewObjectId(newId);
+                        Object newId = getInsertedIdentityValue(ec, sqlControl, sm, mconn, ps);
+                        sm.setPostStoreNewObjectId(newId);
                         if (NucleusLogger.DATASTORE_PERSIST.isDebugEnabled())
                         {
-                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", op.getObjectAsPrintable(), 
-                                IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId())));
+                            NucleusLogger.DATASTORE_PERSIST.debug(Localiser.msg("052206", sm.getObjectAsPrintable(), 
+                                IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId())));
                         }
                     }
 
@@ -518,14 +518,14 @@ public class InsertRequest extends Request
                         {
                             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                             {
-                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", op.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
+                                NucleusLogger.PERSISTENCE.debug(Localiser.msg("052222", sm.getObjectAsPrintable(), m.getMemberMetaData().getFullFieldName()));
                             }
-                            m.performSetPostProcessing(op);
+                            m.performSetPostProcessing(sm);
                         }
                     }
 
                     // Update the insert status for this table via the StoreManager
-                    storeMgr.setObjectIsInsertedToLevel(op, table);
+                    storeMgr.setObjectIsInsertedToLevel(sm, table);
 
                     // Make sure all relation fields (1-1, N-1 with FK) we processed in the INSERT are attached.
                     // This is necessary because with a bidir relation and the other end attached we can just
@@ -533,11 +533,11 @@ public class InsertRequest extends Request
                     // (if we did it the other way around we would get a NotYetFlushedException thrown above).
                     for (int i=0;i<relationFieldNumbers.length;i++)
                     {
-                        Object value = op.provideField(relationFieldNumbers[i]);
+                        Object value = sm.provideField(relationFieldNumbers[i]);
                         if (value != null && ec.getApiAdapter().isDetached(value))
                         {
                             Object valueAttached = ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
-                            op.replaceField(relationFieldNumbers[i], valueAttached);
+                            sm.replaceField(relationFieldNumbers[i], valueAttached);
                         }
                     }
 
@@ -547,7 +547,7 @@ public class InsertRequest extends Request
                         int numberOfReachableFields = 0;
                         for (int i = 0; i < reachableFieldNumbers.length; i++)
                         {
-                            if (reachableFieldNumbers[i] < op.getClassMetaData().getMemberCount())
+                            if (reachableFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
                             {
                                 numberOfReachableFields++;
                             }
@@ -556,7 +556,7 @@ public class InsertRequest extends Request
                         int j = 0;
                         for (int i = 0; i < reachableFieldNumbers.length; i++)
                         {
-                            if (reachableFieldNumbers[i] < op.getClassMetaData().getMemberCount())
+                            if (reachableFieldNumbers[i] < sm.getClassMetaData().getMemberCount())
                             {
                                 fieldNums[j++] = reachableFieldNumbers[i];
                             }
@@ -571,7 +571,7 @@ public class InsertRequest extends Request
                             }
                         }
                         NucleusLogger.PERSISTENCE.debug("Performing reachability on fields " + StringUtils.intArrayToString(fieldNums));
-                        op.provideFields(fieldNums, new ParameterSetter(op, ps, mappingDefinition));
+                        sm.provideFields(fieldNums, new ParameterSetter(sm, ps, mappingDefinition));
                     }
                 }
                 finally
@@ -586,7 +586,7 @@ public class InsertRequest extends Request
         }
         catch (SQLException e)
         {
-            String msg = Localiser.msg("052208", op.getObjectAsPrintable(), insertStmt, e.getMessage());
+            String msg = Localiser.msg("052208", sm.getObjectAsPrintable(), insertStmt, e.getMessage());
             NucleusLogger.DATASTORE_PERSIST.warn(msg);
             List<Exception> exceptions = new ArrayList<>();
             exceptions.add(e);
@@ -606,14 +606,14 @@ public class InsertRequest extends Request
                 {
                     if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                     {
-                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", IdentityUtils.getPersistableIdentityForId(op.getInternalObjectId()), 
+                        NucleusLogger.PERSISTENCE.debug(Localiser.msg("052209", IdentityUtils.getPersistableIdentityForId(sm.getInternalObjectId()), 
                             ((JavaTypeMapping)m).getMemberMetaData().getFullFieldName()));
                     }
-                    m.postInsert(op);
+                    m.postInsert(sm);
                 }
                 catch (NotYetFlushedException e)
                 {
-                    op.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping) m).getMemberMetaData().getAbsoluteFieldNumber());
+                    sm.updateFieldAfterInsert(e.getPersistable(), ((JavaTypeMapping) m).getMemberMetaData().getAbsoluteFieldNumber());
                 }
             }
         }
@@ -623,13 +623,13 @@ public class InsertRequest extends Request
      * Method to obtain the identity attributed by the datastore when using auto-increment/IDENTITY/SERIAL on a field.
      * @param ec execution context
      * @param sqlControl SQLController
-     * @param op StateManager of the object
+     * @param sm StateManager of the object
      * @param mconn The Connection
      * @param ps PreparedStatement for the INSERT
      * @return The identity
      * @throws SQLException Thrown if an error occurs retrieving the identity
      */
-    private Object getInsertedIdentityValue(ExecutionContext ec, SQLController sqlControl, ObjectProvider op, ManagedConnection mconn, PreparedStatement ps)
+    private Object getInsertedIdentityValue(ExecutionContext ec, SQLController sqlControl, ObjectProvider sm, ManagedConnection mconn, PreparedStatement ps)
     throws SQLException
     {
         Object identityValue = null;

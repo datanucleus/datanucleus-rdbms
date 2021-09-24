@@ -410,11 +410,11 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
     /**
      * Method to replace the field that this mapping represents with a SCO wrapper.
      * The wrapper will be suitable for the passed instantiated type and if it is null will be for the declared type of the field.
-     * @param op StateManager for the owning object
+     * @param sm StateManager for the owning object
      * @param value The value to create the wrapper with
      * @return The SCO wrapper object that the field was replaced with
      */
-    protected SCO replaceFieldWithWrapper(ObjectProvider op, Object value)
+    protected SCO replaceFieldWithWrapper(ObjectProvider sm, Object value)
     {
         Class type = mmd.getType();
         if (value != null)
@@ -432,14 +432,14 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             }
         }
 
-        ExecutionContext ec = op.getExecutionContext();
+        ExecutionContext ec = sm.getExecutionContext();
         if (mmd.getAbsoluteFieldNumber() < 0)
         {
             // The metadata being used here is an embedded form, so swap for the real one
             mmd = ec.getMetaDataManager().getMetaDataForClass(mmd.getClassName(true), ec.getClassLoaderResolver()).getMetaDataForMember(mmd.getName());
         }
 
-        return ec.getTypeManager().createSCOInstance(op, mmd, type, value, true);
+        return ec.getTypeManager().createSCOInstance(sm, mmd, type, value, true);
     }
 
     // ---------------- Implementation of MappingCallbacks --------------------

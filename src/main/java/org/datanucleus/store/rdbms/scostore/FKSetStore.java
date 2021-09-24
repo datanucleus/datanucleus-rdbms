@@ -249,10 +249,10 @@ public class FKSetStore<E> extends AbstractSetStore<E>
 
     /**
      * This seems to return the field number in the element of the relation when it is a bidirectional relation.
-     * @param op StateManager for the owner.
+     * @param sm StateManager for the owner.
      * @return The field number in the element for this relation
      */
-    protected int getFieldNumberInElementForBidirectional(ObjectProvider op)
+    protected int getFieldNumberInElementForBidirectional(ObjectProvider sm)
     {
         if (ownerMemberMetaData.getMappedBy() == null)
         {
@@ -265,7 +265,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
         // yet the ownerMemberMetaData.getRelatedMetaData returns 8 since the generated implementation will have all fields in a single MetaData (numbering from 0), 
         // whereas in a normal inheritance tree there will be multiple MetaData (the root starting from 0)
         // TODO Support DOT notation in mappedBy
-        return op.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
+        return sm.getClassMetaData().getAbsolutePositionOfMember(ownerMemberMetaData.getMappedBy());
     }
 
     /**
@@ -497,7 +497,7 @@ public class FKSetStore<E> extends AbstractSetStore<E>
                 }
             }
 
-            public void fetchNonLoadedFields(ObjectProvider op)
+            public void fetchNonLoadedFields(ObjectProvider sm)
             {
             }
             public FetchPlan getFetchPlanForLoading()

@@ -280,15 +280,15 @@ public class ResultMetaDataROF extends AbstractROF
 
                     obj = ec.findObject(id, new FieldValues()
                     {
-                        public void fetchFields(ObjectProvider op)
+                        public void fetchFields(ObjectProvider sm)
                         {
-                            rsGetter.setObjectProvider(op);
-                            op.replaceFields(resultFieldNumbers, rsGetter, false);
+                            rsGetter.setObjectProvider(sm);
+                            sm.replaceFields(resultFieldNumbers, rsGetter, false);
                         }
-                        public void fetchNonLoadedFields(ObjectProvider op)
+                        public void fetchNonLoadedFields(ObjectProvider sm)
                         {
-                            rsGetter.setObjectProvider(op);
-                            op.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
+                            rsGetter.setObjectProvider(sm);
+                            sm.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
                         }
                         public FetchPlan getFetchPlanForLoading()
                         {
@@ -311,15 +311,15 @@ public class ResultMetaDataROF extends AbstractROF
 
                     obj = ec.findObject(id, new FieldValues()
                     {
-                        public void fetchFields(ObjectProvider op)
+                        public void fetchFields(ObjectProvider sm)
                         {
-                            rsGetter.setObjectProvider(op);
-                            op.replaceFields(resultFieldNumbers, rsGetter, false);
+                            rsGetter.setObjectProvider(sm);
+                            sm.replaceFields(resultFieldNumbers, rsGetter, false);
                         }
-                        public void fetchNonLoadedFields(ObjectProvider op)
+                        public void fetchNonLoadedFields(ObjectProvider sm)
                         {
-                            rsGetter.setObjectProvider(op);
-                            op.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
+                            rsGetter.setObjectProvider(sm);
+                            sm.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
                         }
                         public FetchPlan getFetchPlanForLoading()
                         {
