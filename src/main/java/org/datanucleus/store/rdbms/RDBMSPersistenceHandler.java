@@ -36,7 +36,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.InheritanceStrategy;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.AbstractPersistenceHandler;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.DynamicSchemaFieldManager;
@@ -91,10 +91,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
     // ------------------------------ Insert ----------------------------------
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.AbstractPersistenceHandler#insertObjects(org.datanucleus.state.ObjectProvider[])
+     * @see org.datanucleus.store.AbstractPersistenceHandler#insertObjects(org.datanucleus.state.DNStateManager[])
      */
     @Override
-    public void insertObjects(ObjectProvider... ops)
+    public void insertObjects(DNStateManager... ops)
     {
         // TODO Implement this in such a way as it process all objects of a type in one call (after checking hasRelations)
         super.insertObjects(ops);
@@ -109,7 +109,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager for the object to be inserted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void insertObject(ObjectProvider sm)
+    public void insertObject(DNStateManager sm)
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -144,7 +144,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager for the object being inserted
      * @param clr ClassLoader resolver
      */
-    private void insertObjectInTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
+    private void insertObjectInTable(DatastoreClass table, DNStateManager sm, ClassLoaderResolver clr)
     {
         if (table instanceof ClassView)
         {
@@ -205,7 +205,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesn't exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void fetchObject(ObjectProvider sm, int memberNumbers[])
+    public void fetchObject(DNStateManager sm, int memberNumbers[])
     {
         ExecutionContext ec = sm.getExecutionContext();
         ClassLoaderResolver clr = ec.getClassLoaderResolver();
@@ -351,7 +351,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param fieldNumbers The numbers of the fields to be updated.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void updateObject(ObjectProvider sm, int fieldNumbers[])
+    public void updateObject(DNStateManager sm, int fieldNumbers[])
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -388,7 +388,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param clr ClassLoader resolver
      * @param mmds MetaData for the fields being updated
      */
-    private void updateObjectInTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
+    private void updateObjectInTable(DatastoreClass table, DNStateManager sm, ClassLoaderResolver clr, AbstractMemberMetaData[] mmds)
     {
         if (table instanceof ClassView)
         {
@@ -449,7 +449,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager for the object to be deleted.
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void deleteObject(ObjectProvider sm)
+    public void deleteObject(DNStateManager sm)
     {
         // Check if read-only so update not permitted
         assertReadOnlyForUpdateOfObject(sm);
@@ -471,7 +471,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager for the object being deleted
      * @param clr ClassLoader resolver
      */
-    private void deleteObjectFromTable(DatastoreClass table, ObjectProvider sm, ClassLoaderResolver clr)
+    private void deleteObjectFromTable(DatastoreClass table, DNStateManager sm, ClassLoaderResolver clr)
     {
         if (table instanceof ClassView)
         {
@@ -522,7 +522,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
 
     // ------------------------------ Locate ----------------------------------
 
-    public void locateObjects(ObjectProvider[] sms)
+    public void locateObjects(DNStateManager[] sms)
     {
         if (sms == null || sms.length == 0)
         {
@@ -530,13 +530,13 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
         }
 
         ClassLoaderResolver clr = sms[0].getExecutionContext().getClassLoaderResolver();
-        Map<DatastoreClass, List<ObjectProvider>> smsByTable = new HashMap<>();
+        Map<DatastoreClass, List<DNStateManager>> smsByTable = new HashMap<>();
         for (int i=0;i<sms.length;i++)
         {
             AbstractClassMetaData cmd = sms[i].getClassMetaData();
             DatastoreClass table = getDatastoreClass(cmd.getFullClassName(), clr);
             table = table.getBaseDatastoreClass(); // Use root table in hierarchy
-            List<ObjectProvider> smList = smsByTable.get(table);
+            List<DNStateManager> smList = smsByTable.get(table);
             if (smList == null)
             {
                 smList = new ArrayList<>();
@@ -545,17 +545,17 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
             smsByTable.put(table, smList);
         }
 
-        Iterator<Map.Entry<DatastoreClass, List<ObjectProvider>>> tableIter = smsByTable.entrySet().iterator();
+        Iterator<Map.Entry<DatastoreClass, List<DNStateManager>>> tableIter = smsByTable.entrySet().iterator();
         while (tableIter.hasNext())
         {
-            Map.Entry<DatastoreClass, List<ObjectProvider>> entry = tableIter.next();
+            Map.Entry<DatastoreClass, List<DNStateManager>> entry = tableIter.next();
             DatastoreClass table = entry.getKey();
-            List<ObjectProvider> tableSMs = entry.getValue();
+            List<DNStateManager> tableSMs = entry.getValue();
 
             // TODO This just uses the base table. Could change to use the most-derived table
             // which would permit us to join to supertables and load more fields during this process
             LocateBulkRequest req = new LocateBulkRequest(table);
-            req.execute(tableSMs.toArray(new ObjectProvider[tableSMs.size()]));
+            req.execute(tableSMs.toArray(new DNStateManager[tableSMs.size()]));
         }
     }
 
@@ -565,7 +565,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @throws NucleusObjectNotFoundException if the object doesnt exist
      * @throws NucleusDataStoreException when an error occurs in the datastore communication
      */
-    public void locateObject(ObjectProvider sm)
+    public void locateObject(DNStateManager sm)
     {
         ClassLoaderResolver clr = sm.getExecutionContext().getClassLoaderResolver();
         DatastoreClass table = getDatastoreClass(sm.getObject().getClass().getName(), clr);
@@ -658,7 +658,7 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @param sm StateManager for the object
      * @param fieldNumbers The fields to check for required schema updates
      */
-    private void checkForSchemaUpdatesForFieldsOfObject(ObjectProvider sm, int[] fieldNumbers)
+    private void checkForSchemaUpdatesForFieldsOfObject(DNStateManager sm, int[] fieldNumbers)
     {
         if (fieldNumbers == null || fieldNumbers.length == 0)
         {

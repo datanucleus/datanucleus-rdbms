@@ -45,7 +45,7 @@ import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
@@ -187,7 +187,7 @@ public class DeleteRequest extends Request
      * Takes the constructed deletion query and populates with the specific record information.
      * @param sm StateManager for the record to be deleted.
      */
-    public void execute(ObjectProvider sm)
+    public void execute(DNStateManager sm)
     {
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -383,7 +383,7 @@ public class DeleteRequest extends Request
      * @param sm StateManager of this object
      * @param mmd MetaData for field that has related (owner) objects
      */
-    private void updateOneToOneBidirectionalOwnerObjectForField(ObjectProvider sm, AbstractMemberMetaData mmd)
+    private void updateOneToOneBidirectionalOwnerObjectForField(DNStateManager sm, AbstractMemberMetaData mmd)
     {
         if (softDeleteStmt != null)
         {

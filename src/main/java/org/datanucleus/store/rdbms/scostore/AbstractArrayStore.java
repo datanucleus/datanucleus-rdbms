@@ -31,7 +31,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NotYetFlushedException;
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.types.scostore.ArrayStore;
@@ -61,7 +61,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @param sm SM for the owner
      * @return The array (as a List of objects)
      */
-    public List<E> getArray(ObjectProvider sm)
+    public List<E> getArray(DNStateManager sm)
     {
         Iterator<E> iter = iterator(sm);
         List elements = new ArrayList();
@@ -79,7 +79,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * with respect to whether it should delete the element when doing so.
      * @param sm StateManager for the container.
      */
-    public void clear(ObjectProvider sm)
+    public void clear(DNStateManager sm)
     {
         Collection dependentElements = null;
         if (ownerMemberMetaData.getArray().isDependentElement())
@@ -110,7 +110,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @param array the array
      * @return Whether the array was updated successfully
      */
-    public boolean set(ObjectProvider sm, Object array)
+    public boolean set(DNStateManager sm, Object array)
     {
         if (array == null || Array.getLength(array) == 0)
         {
@@ -204,7 +204,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @param position The position to add this element at
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider sm, E element, int position)
+    public boolean add(DNStateManager sm, E element, int position)
     {
         ExecutionContext ec = sm.getExecutionContext();
         validateElementForWriting(ec, element, null);
@@ -239,17 +239,17 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
 
     /**
      * Accessor for an iterator through the array elements.
-     * @param ownerOP ObjectProvider for the container.
+     * @param ownerSM StateManager for the container.
      * @return The Iterator
      */
-    public abstract Iterator<E> iterator(ObjectProvider ownerOP);
+    public abstract Iterator<E> iterator(DNStateManager ownerSM);
 
-    public void clearInternal(ObjectProvider ownerOP)
+    public void clearInternal(DNStateManager ownerSM)
     {
         String clearStmt = getClearStmt();
         try
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = getStoreManager().getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -258,7 +258,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
                 try
                 {
                     int jdbcPosition = 1;
-                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                    jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     if (relationDiscriminatorMapping != null)
                     {
                         BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -294,7 +294,7 @@ public abstract class AbstractArrayStore<E> extends ElementContainerStore implem
      * @return Whether a row was inserted
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    public int[] internalAdd(ObjectProvider sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
+    public int[] internalAdd(DNStateManager sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow) 
             throws MappedDatastoreException
     {
         ExecutionContext ec = sm.getExecutionContext();

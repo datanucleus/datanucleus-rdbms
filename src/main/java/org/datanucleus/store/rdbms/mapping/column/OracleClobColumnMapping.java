@@ -33,7 +33,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.ColumnDefinitionException;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
@@ -176,7 +176,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
 
     @SuppressWarnings("deprecation")
     @Override
-    public void setPostProcessing(ObjectProvider sm, Object value)
+    public void setPostProcessing(DNStateManager sm, Object value)
     {
         String stringValue = (String)value;
         ExecutionContext ec = sm.getExecutionContext();
@@ -247,7 +247,7 @@ public class OracleClobColumnMapping extends ClobColumnMapping implements Column
             if (sm.isEmbedded())
             {
                 // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-                ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(sm);
+                DNStateManager[] embeddedOwners = ec.getOwnersForEmbeddedStateManager(sm);
                 if (embeddedOwners != null)
                 {
                     // Just use the first owner

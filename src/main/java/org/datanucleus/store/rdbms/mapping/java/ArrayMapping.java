@@ -26,7 +26,7 @@ import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.scostore.ArrayStore;
@@ -75,12 +75,12 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      **/
-    public void postInsert(ObjectProvider ownerOP)
+    public void postInsert(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        Object value = ownerOP.provideField(getAbsoluteFieldNumber());
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        Object value = ownerSM.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
@@ -90,16 +90,16 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         {
             if (mmd.getArray().elementIsPersistent())
             {
-                // Make sure all persistable elements have ObjectProviders
+                // Make sure all persistable elements have StateManagers
                 Object[] arrElements = (Object[])value;
                 for (Object elem : arrElements)
                 {
                     if (elem != null)
                     {
-                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -135,13 +135,13 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
                 // Reachability
                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                 {
-                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                    NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
                 }
             }
 
             for (int i=0;i<arrayLength;i++)
             {
-                if (ownerOP.getExecutionContext().getApiAdapter().isDetached(array[i]))
+                if (ownerSM.getExecutionContext().getApiAdapter().isDetached(array[i]))
                 {
                     needsAttaching = true;
                     break;
@@ -152,13 +152,13 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         if (needsAttaching)
         {
             // Create a wrapper and attach the elements (and add the others)
-            SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
+            SCO collWrapper = replaceFieldWithWrapper(ownerSM, null);
             if (arrayLength > 0)
             {
                 collWrapper.attachCopy(value);
 
                 // The attach will have put entries in the operationQueue if using optimistic, so flush them
-                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
+                ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
             }
         }
         else
@@ -166,7 +166,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             if (arrayLength > 0)
             {
                 // Add the elements direct to the datastore
-                ((ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, null)).set(ownerOP, value);
+                ((ArrayStore) storeMgr.getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(), mmd, null)).set(ownerSM, value);
             }
         }
     }
@@ -175,7 +175,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
      * Method to be called after any fetch of the owner class element.
      * @param sm StateManager of the owner
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -256,28 +256,28 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
      * <li>Persist a new object, and it needed to wait til the element was inserted so
      * goes into dirty state and then flush() triggers UpdateRequest, which comes here</li>
      * </ul>
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postUpdate(ObjectProvider ownerOP)
+    public void postUpdate(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        Object value = ownerOP.provideField(getAbsoluteFieldNumber());
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        Object value = ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             if (value != null)
             {
                 if (mmd.getArray().elementIsPersistent())
                 {
-                    // Make sure all persistable elements have ObjectProviders
+                    // Make sure all persistable elements have StateManagers
                     Object[] arrElements = (Object[])value;
                     for (Object elem : arrElements)
                     {
                         if (elem != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(elem);
+                            DNStateManager elemOP = ec.findStateManager(elem);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -289,7 +289,7 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         if (value == null)
         {
             // array is now null so remove any elements in the array
-            ((ArrayStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(),mmd,null)).clear(ownerOP);
+            ((ArrayStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(),mmd,null)).clear(ownerSM);
             return;
         }
 
@@ -298,27 +298,27 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
             return;
         }
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
-            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+            NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
         }
 
         // Update the datastore
         // TODO Do this more efficiently, removing elements no longer present, and adding new ones
         ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null);
-        backingStore.clear(ownerOP);
-        backingStore.set(ownerOP, value);
+        backingStore.clear(ownerSM);
+        backingStore.set(ownerSM, value);
     }
 
     /**
      * Method to be called before any delete of the owner class element, if the field in the owner is dependent
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void preDelete(ObjectProvider ownerOP)
+    public void preDelete(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -327,15 +327,15 @@ public class ArrayMapping extends AbstractContainerMapping implements MappingCal
         }
 
         // makes sure field is loaded
-        ownerOP.isLoaded(getAbsoluteFieldNumber());
-        Object value = ownerOP.provideField(getAbsoluteFieldNumber());
+        ownerSM.isLoaded(getAbsoluteFieldNumber());
+        Object value = ownerSM.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
         }
 
         // Clear the array via its backing store
-        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(), mmd, null);
-        backingStore.clear(ownerOP);
+        ArrayStore backingStore = (ArrayStore) storeMgr.getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(), mmd, null);
+        backingStore.clear(ownerSM);
     }
 }

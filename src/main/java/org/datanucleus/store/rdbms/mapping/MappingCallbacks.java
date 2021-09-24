@@ -19,7 +19,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface defining a series of callbacks that are called when this mapping goes through certain lifecycle events. 
@@ -31,23 +31,23 @@ public interface MappingCallbacks
      * Method called after the insert of the object so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postInsert(ObjectProvider sm);
+    void postInsert(DNStateManager sm);
 
     /**
      * Method called after the retrieval of the object, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postFetch(ObjectProvider sm);
+    void postFetch(DNStateManager sm);
 
     /**
      * Method called after the update of the object, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void postUpdate(ObjectProvider sm);
+    void postUpdate(DNStateManager sm);
 
     /**
      * Method called before the delete of objects, so that additional operations can be performed if necessary.
      * @param sm StateManager of the owner
      */
-    void preDelete(ObjectProvider sm);
+    void preDelete(DNStateManager sm);
 }

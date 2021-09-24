@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.request;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -43,7 +43,7 @@ public abstract class BulkRequest
 
     /**
      * Method to execute the request - to be implemented by deriving classes.
-     * @param ops ObjectProviders to execute this request for. 
+     * @param sms StateManagers to execute this request for. 
      */
-    public abstract void execute(ObjectProvider[] ops);
+    public abstract void execute(DNStateManager[] sms);
 }

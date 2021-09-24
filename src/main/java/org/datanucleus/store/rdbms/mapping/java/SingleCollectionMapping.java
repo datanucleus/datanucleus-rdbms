@@ -27,7 +27,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
 import org.datanucleus.metadata.ElementMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Table;
@@ -109,7 +109,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
     }
 
     @Override
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, ObjectProvider ownerOP, int ownerFieldNumber)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new RuntimeException("Not implemented yet!");
     }
@@ -138,7 +138,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         return wrappedMapping.getJavaTypeForColumnMapping(index);
     }
 
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
@@ -146,7 +146,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
@@ -154,7 +154,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {
@@ -162,7 +162,7 @@ public class SingleCollectionMapping extends JavaTypeMapping implements MappingC
         }
     }
 
-    public void preDelete(ObjectProvider sm)
+    public void preDelete(DNStateManager sm)
     {
         if (wrappedMapping instanceof MappingCallbacks)
         {

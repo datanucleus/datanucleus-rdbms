@@ -30,7 +30,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData.MapType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
@@ -154,17 +154,17 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         }
     }
 
-    public boolean add(ObjectProvider sm, V value, int size)
+    public boolean add(DNStateManager sm, V value, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    public boolean addAll(ObjectProvider sm, Collection<V> values, int size)
+    public boolean addAll(DNStateManager sm, Collection<V> values, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its values collection");
     }
 
-    public boolean remove(ObjectProvider sm, Object value, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager sm, Object value, int size, boolean allowDependentField)
     {
         // TODO Why does this even allow the possibility of removal via the values store?
         if (!validateElementForReading(sm, value))
@@ -175,17 +175,17 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
         return remove(sm, value);
     }
 
-    public boolean removeAll(ObjectProvider sm, Collection values, int size)
+    public boolean removeAll(DNStateManager sm, Collection values, int size)
     {
         throw new NucleusUserException("Cannot remove values from a map through its values collection");
     }
 
-    public void clear(ObjectProvider sm)
+    public void clear(DNStateManager sm)
     {
         throw new NucleusUserException("Cannot clear a map through its values collection");
     }
 
-    protected boolean remove(ObjectProvider sm, Object value)
+    protected boolean remove(DNStateManager sm, Object value)
     {
         if (findKeyStmt == null)
         {
@@ -281,18 +281,18 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
 
     /**
      * Accessor for an iterator for the set.
-     * @param ownerOP ObjectProvider for the set. 
+     * @param ownerSM StateManager for the set. 
      * @return Iterator for the set.
      **/
-    public Iterator<V> iterator(ObjectProvider ownerOP)
+    public Iterator<V> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (iteratorStmtLocked == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement, and statement mapping/parameter information
-                SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
+                SQLStatement sqlStmt = getSQLStatementForIterator(ownerSM);
                 iteratorStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
                 iteratorStmtLocked = sqlStmt.getSQLText().toSQL();
@@ -313,7 +313,7 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerSM.getObject());
                 }
 
                 try
@@ -325,11 +325,11 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new CollectionStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerSM, rs, null, this);
                         }
 
                         rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
-                        return new CollectionStoreIterator(ownerOP, rs, rof, this);
+                        return new CollectionStoreIterator(ownerSM, rs, rof, this);
                     }
                     finally
                     {
@@ -362,13 +362,13 @@ class MapValueCollectionStore<V> extends AbstractCollectionStore<V>
      * Creates a statement that selects the value table(s), and adds any necessary join to the containerTable
      * if that is not the value table. If the value is embedded then selects the table it is embedded in.
      * Adds a restriction on the ownerMapping of the containerTable so we can restrict to the owner object.
-     * @param ownerOP ObjectProvider for the owner object
+     * @param ownerSM StateManager for the owner object
      * @return The SQLStatement
      */
-    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForIterator(DNStateManager ownerSM)
     {
         SelectStatement sqlStmt = null;
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         final ClassLoaderResolver clr = ec.getClassLoaderResolver();
         final Class valueCls = clr.classForName(elementType);

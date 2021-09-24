@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -41,12 +41,12 @@ import org.datanucleus.store.rdbms.table.Table;
 class CollectionStoreIterator<E> implements Iterator<E>
 {
     private final AbstractCollectionStore<E> collStore;
-    private final ObjectProvider sm;
+    private final DNStateManager sm;
     private final ExecutionContext ec;
     private final Iterator<E> delegate;
     private E lastElement = null;
 
-    CollectionStoreIterator(ObjectProvider sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
+    CollectionStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, AbstractCollectionStore<E> store)
     throws MappedDatastoreException
     {
         this.sm = sm;

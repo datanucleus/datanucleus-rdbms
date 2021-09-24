@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
@@ -33,7 +33,7 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
  */
 public class OracleMapMapping extends MapMapping
 {
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -63,7 +63,7 @@ public class OracleMapMapping extends MapMapping
         }
     }
 
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -75,7 +75,7 @@ public class OracleMapMapping extends MapMapping
             {
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
-                    // Make sure all persistable keys/values have ObjectProviders
+                    // Make sure all persistable keys/values have StateManagers
                     Set entries = value.entrySet();
                     Iterator iter = entries.iterator();
                     while (iter.hasNext())
@@ -84,17 +84,17 @@ public class OracleMapMapping extends MapMapping
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
-                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
-                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -107,7 +107,7 @@ public class OracleMapMapping extends MapMapping
         }
     }
 
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -118,7 +118,7 @@ public class OracleMapMapping extends MapMapping
             {
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
-                    // Make sure all persistable keys/values have ObjectProviders
+                    // Make sure all persistable keys/values have StateManagers
                     Set entries = value.entrySet();
                     Iterator iter = entries.iterator();
                     while (iter.hasNext())
@@ -127,17 +127,17 @@ public class OracleMapMapping extends MapMapping
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
-                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
-                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, sm, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }

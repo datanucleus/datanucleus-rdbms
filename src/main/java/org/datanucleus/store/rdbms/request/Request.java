@@ -19,7 +19,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.request;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.table.AbstractClassTable;
 import org.datanucleus.store.rdbms.table.DatastoreClass;
@@ -47,5 +47,5 @@ public abstract class Request
      * Method to execute the request - to be implemented by deriving classes.
      * @param sm StateManager for the object in question. 
      */
-    public abstract void execute(ObjectProvider sm);
+    public abstract void execute(DNStateManager sm);
 }

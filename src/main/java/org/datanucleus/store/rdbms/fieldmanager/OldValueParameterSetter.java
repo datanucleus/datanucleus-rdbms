@@ -19,7 +19,7 @@ package org.datanucleus.store.rdbms.fieldmanager;
 
 import java.sql.PreparedStatement;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 
 /**
@@ -35,14 +35,14 @@ public class OldValueParameterSetter extends ParameterSetter
      * @param stmt The Statement to set values on.
      * @param stmtMappings mappings for parameters in the statement.
      */
-    public OldValueParameterSetter(ObjectProvider sm, PreparedStatement stmt, StatementClassMapping stmtMappings)
+    public OldValueParameterSetter(DNStateManager sm, PreparedStatement stmt, StatementClassMapping stmtMappings)
     {
         super(sm, stmt, stmtMappings);
     }
 
     public void storeBooleanField(int fieldNumber, boolean value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeBooleanField(fieldNumber, (Boolean) oldValue);
@@ -55,7 +55,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeCharField(int fieldNumber, char value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeCharField(fieldNumber, (Character) oldValue);
@@ -68,7 +68,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeByteField(int fieldNumber, byte value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeByteField(fieldNumber, (Byte) oldValue);
@@ -81,7 +81,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeShortField(int fieldNumber, short value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeShortField(fieldNumber, (Short) oldValue);
@@ -94,7 +94,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeIntField(int fieldNumber, int value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeIntField(fieldNumber, (Integer) oldValue);
@@ -107,7 +107,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeLongField(int fieldNumber, long value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeLongField(fieldNumber, (Long) oldValue);
@@ -120,7 +120,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeFloatField(int fieldNumber, float value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeFloatField(fieldNumber, (Float) oldValue);
@@ -133,7 +133,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeDoubleField(int fieldNumber, double value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeDoubleField(fieldNumber, (Double) oldValue);
@@ -146,7 +146,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeStringField(int fieldNumber, String value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeStringField(fieldNumber, (String) oldValue);
@@ -159,7 +159,7 @@ public class OldValueParameterSetter extends ParameterSetter
 
     public void storeObjectField(int fieldNumber, Object value)
     {
-        Object oldValue = sm.getAssociatedValue(ObjectProvider.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
+        Object oldValue = sm.getAssociatedValue(DNStateManager.ORIGINAL_FIELD_VALUE_KEY_PREFIX + fieldNumber);
         if (oldValue != null)
         {
             super.storeObjectField(fieldNumber, oldValue);

@@ -99,7 +99,7 @@ import org.datanucleus.metadata.QueryLanguage;
 import org.datanucleus.metadata.SequenceMetaData;
 import org.datanucleus.metadata.TableGeneratorMetaData;
 import org.datanucleus.state.ActivityState;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.state.ReferentialStateManagerImpl;
 import org.datanucleus.store.AbstractStoreManager;
 import org.datanucleus.store.BackedSCOStoreManager;
@@ -220,10 +220,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     protected MappingManager mappingManager;
 
     /**
-     * Map of DatastoreClass keyed by ObjectProvider, for objects currently being inserted.
+     * Map of DatastoreClass keyed by StateManager, for objects currently being inserted.
      * Defines to what level an object is inserted in the datastore.
      */
-    protected Map<ObjectProvider, DatastoreClass> insertedDatastoreClassByObjectProvider = new ConcurrentHashMap();
+    protected Map<DNStateManager, DatastoreClass> insertedDatastoreClassByStateManager = new ConcurrentHashMap();
 
     /** 
      * Lock object aimed at providing a lock on the schema definition managed here, preventing
@@ -513,10 +513,10 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.AbstractStoreManager#getDefaultObjectProviderClassName()
+     * @see org.datanucleus.store.AbstractStoreManager#getDefaultStateManagerClassName()
      */
     @Override
-    public String getDefaultObjectProviderClassName()
+    public String getDefaultStateManagerClassName()
     {
         return ReferentialStateManagerImpl.class.getName();
     }
@@ -768,7 +768,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param fieldNumber (Absolute) field number for the object
      * @return Whether it is persistent
      */
-    public boolean isObjectInserted(ObjectProvider sm, int fieldNumber)
+    public boolean isObjectInserted(DNStateManager sm, int fieldNumber)
     {
         if (sm == null)
         {
@@ -780,7 +780,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return true;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(sm);
+        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(sm);
         if (latestTable == null)
         {
             // Not yet inserted anything
@@ -821,7 +821,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param className Name of class that we want to check the insertion level for.
      * @return Whether the object is inserted in the datastore to this level
      */
-    public boolean isObjectInserted(ObjectProvider sm, String className)
+    public boolean isObjectInserted(DNStateManager sm, String className)
     {
         if (sm == null)
         {
@@ -832,7 +832,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             return false;
         }
 
-        DatastoreClass latestTable = insertedDatastoreClassByObjectProvider.get(sm);
+        DatastoreClass latestTable = insertedDatastoreClassByStateManager.get(sm);
         if (latestTable != null)
         {
             DatastoreClass datastoreCls = latestTable;
@@ -856,15 +856,15 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      * @param sm StateManager for the object
      * @param table Table to which it is now inserted
      */
-    public void setObjectIsInsertedToLevel(ObjectProvider sm, DatastoreClass table)
+    public void setObjectIsInsertedToLevel(DNStateManager sm, DatastoreClass table)
     {
-        insertedDatastoreClassByObjectProvider.put(sm, table);
+        insertedDatastoreClassByStateManager.put(sm, table);
 
         if (table.managesClass(sm.getClassMetaData().getFullClassName()))
         {
             // Full insertion has just completed so update activity state in StateManager
             sm.changeActivityState(ActivityState.INSERTING_CALLBACKS);
-            insertedDatastoreClassByObjectProvider.remove(sm);
+            insertedDatastoreClassByStateManager.remove(sm);
         }
     }
 

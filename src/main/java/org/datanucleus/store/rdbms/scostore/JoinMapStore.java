@@ -32,7 +32,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.MapMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.expression.Expression;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
@@ -170,7 +170,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param m Map of objects to put
      * @param currentMap Map prior to this put
      */
-    public void putAll(ObjectProvider<?> op, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
+    public void putAll(DNStateManager<?> op, Map<? extends K, ? extends V> m, Map<K, V> currentMap)
     {
         if (m == null || m.isEmpty())
         {
@@ -214,7 +214,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param sm StateManager for the Map
      * @param m The Map to add
      */
-    public void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m)
+    public void putAll(DNStateManager sm, Map<? extends K, ? extends V> m)
     {
         if (m == null || m.isEmpty())
         {
@@ -259,7 +259,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         processPutsAndUpdates(sm, puts, updates);
     }
 
-    protected void processPutsAndUpdates(ObjectProvider sm, Set<Map.Entry> puts, Set<Map.Entry> updates)
+    protected void processPutsAndUpdates(DNStateManager sm, Set<Map.Entry> puts, Set<Map.Entry> updates)
     {
         boolean batched = allowsBatching();
 
@@ -328,7 +328,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param previousValue The previous value
      * @param present Whether the key is already present previous to this
      */
-    public void put(ObjectProvider sm, K key, V value, V previousValue, boolean present)
+    public void put(DNStateManager sm, K key, V value, V previousValue, boolean present)
     {
         validateKeyForWriting(sm, key);
         validateValueForWriting(sm, value);
@@ -382,7 +382,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param value The value to store.
      * @return The value stored.
      */
-    public V put(ObjectProvider sm, K key, V value)
+    public V put(DNStateManager sm, K key, V value)
     {
         validateKeyForWriting(sm, key);
         validateValueForWriting(sm, value);
@@ -444,7 +444,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     // TODO Enable this when tested
 //    @Override
-//    public void update(ObjectProvider sm, Map<K, V> map)
+//    public void update(DNStateManager sm, Map<K, V> map)
 //    {
 //        if (map == null || map.isEmpty())
 //        {
@@ -515,7 +515,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public V remove(ObjectProvider sm, Object key)
+    public V remove(DNStateManager sm, Object key)
     {
         if (!validateKeyForReading(sm, key))
         {
@@ -567,7 +567,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the item to remove.
      * @param oldValue Value associated with the key before removal.
      */
-    public void remove(ObjectProvider sm, Object key, Object oldValue)
+    public void remove(DNStateManager sm, Object key, Object oldValue)
     {
         if (!validateKeyForReading(sm, key))
         {
@@ -597,17 +597,17 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to clear the map of all values.
-     * @param ownerOP ObjectProvider for the map.
+     * @param ownerSM StateManager for the map.
      */
-    public void clear(ObjectProvider ownerOP)
+    public void clear(DNStateManager ownerSM)
     {
         Collection dependentElements = null;
         if (ownerMemberMetaData.getMap().isDependentKey() || ownerMemberMetaData.getMap().isDependentValue())
         {
             // Retain the PC dependent keys/values that need deleting after clearing
             dependentElements = new HashSet();
-            ApiAdapter api = ownerOP.getExecutionContext().getApiAdapter();
-            Iterator iter = entrySetStore().iterator(ownerOP);
+            ApiAdapter api = ownerSM.getExecutionContext().getApiAdapter();
+            Iterator iter = entrySetStore().iterator(ownerSM);
             while (iter.hasNext())
             {
                 Map.Entry entry = (Map.Entry)iter.next();
@@ -623,12 +623,12 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             }
         }
 
-        clearInternal(ownerOP);
+        clearInternal(ownerSM);
 
         if (dependentElements != null && !dependentElements.isEmpty())
         {
             // Delete all dependent objects
-            ownerOP.getExecutionContext().deleteObjects(dependentElements.toArray());
+            ownerSM.getExecutionContext().deleteObjects(dependentElements.toArray());
         }
     }
 
@@ -820,20 +820,20 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to retrieve a value from the Map given the key.
-     * @param ownerOP ObjectProvider for the owner of the map.
+     * @param ownerSM StateManager for the owner of the map.
      * @param key The key to retrieve the value for.
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found
      */
-    protected V getValue(ObjectProvider ownerOP, Object key)
+    protected V getValue(DNStateManager ownerSM, Object key)
     throws NoSuchElementException
     {
-        if (!validateKeyForReading(ownerOP, key))
+        if (!validateKeyForReading(ownerSM, key))
         {
             return null;
         }
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (getStmtLocked == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
@@ -841,7 +841,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 if (getStmtLocked == null) 
                 {
                     // Generate the "get" statement for unlocked and locked situations
-                    SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
+                    SQLStatement sqlStmt = getSQLStatementForGet(ownerSM);
 
                     getStmtUnlocked = sqlStmt.getSQLText().toSQL();
 
@@ -867,7 +867,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerSM.getObject());
                 }
 
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
@@ -902,7 +902,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                             {
                                 // Value = Serialised
                                 int ownerFieldNumber = mapTable.getOwnerMemberMetaData().getAbsoluteFieldNumber();
-                                value = valueMapping.getObject(ec, rs, param, ownerOP, ownerFieldNumber);
+                                value = valueMapping.getObject(ec, rs, param, ownerSM, ownerFieldNumber);
                             }
                             else
                             {
@@ -954,15 +954,15 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Method to return an SQLStatement for retrieving the value for a key.
      * Selects the join table and optionally joins to the value table if it has its own table.
-     * @param ownerOP ObjectProvider for the owning object
+     * @param ownerSM StateManager for the owning object
      * @return The SQLStatement
      */
-    protected SelectStatement getSQLStatementForGet(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForGet(DNStateManager ownerSM)
     {
         SelectStatement sqlStmt = null;
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
-        final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
+        final ClassLoaderResolver clr = ownerSM.getExecutionContext().getClassLoaderResolver();
         Class<?> valueCls = clr.classForName(this.valueType);
         if (valuesAreEmbedded || valuesAreSerialised)
         {
@@ -1064,11 +1064,11 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         return sqlStmt;
     }
 
-    protected void clearInternal(ObjectProvider ownerOP)
+    protected void clearInternal(DNStateManager ownerSM)
     {
         try
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -1077,7 +1077,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 try
                 {
                     int jdbcPosition = 1;
-                    BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                    BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     sqlControl.executeStatementUpdate(ec, mconn, clearStmt, ps, true);
                 }
                 finally
@@ -1096,7 +1096,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
         }
     }
 
-    protected void removeInternal(ObjectProvider sm, Object key)
+    protected void removeInternal(DNStateManager sm, Object key)
     {
         ExecutionContext ec = sm.getExecutionContext();
         try
@@ -1131,7 +1131,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to process an "update" statement (where the key already has a value in the join table).
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param conn The Connection
      * @param batched Whether we are batching it
      * @param key The key
@@ -1139,10 +1139,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param executeNow Whether to execute the statement now or wait til any batch
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected void internalUpdate(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) 
+    protected void internalUpdate(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow) 
     throws MappedDatastoreException
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try 
         {
@@ -1156,9 +1156,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerSM, value, ps, jdbcPosition, mapTable, this);
                 }
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                 jdbcPosition = BackingStoreHelper.populateKeyInStatement(ec, ps, key, jdbcPosition, keyMapping);
 
                 sqlControl.executeStatementUpdate(ec, conn, updateStmt, ps, executeNow);
@@ -1176,7 +1176,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to process a "put" statement (where the key has no value in the join table).
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param conn The Connection
      * @param batched Whether we are batching it
      * @param key The key
@@ -1185,10 +1185,10 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @return The return codes from any executed statement
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalPut(ObjectProvider ownerOP, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow)
+    protected int[] internalPut(DNStateManager ownerSM, ManagedConnection conn, boolean batched, Object key, Object value, boolean executeNow)
     throws MappedDatastoreException
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         SQLController sqlControl = storeMgr.getSQLController();
         try
         {
@@ -1196,7 +1196,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
             if (adapterMapping != null)
             {
                 // Only set the adapter mapping if we have a new object
-                nextIdForAdapterColumn = getNextIDForAdapterColumn(ownerOP);
+                nextIdForAdapterColumn = getNextIDForAdapterColumn(ownerSM);
             }
 
             PreparedStatement ps = sqlControl.getStatementForUpdate(conn, putStmt, batched);
@@ -1209,9 +1209,9 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
                 }
                 else
                 {
-                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerOP, value, ps, jdbcPosition, mapTable, this);
+                    jdbcPosition = BackingStoreHelper.populateEmbeddedValueFieldsInStatement(ownerSM, value, ps, jdbcPosition, mapTable, this);
                 }
-                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                 if (adapterMapping != null)
                 {
                     adapterMapping.setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, adapterMapping), Long.valueOf(nextIdForAdapterColumn));
@@ -1238,7 +1238,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param sm StateManager for container
      * @return The next id
      */
-    private int getNextIDForAdapterColumn(ObjectProvider sm)
+    private int getNextIDForAdapterColumn(DNStateManager sm)
     {
         int nextID;
         try
@@ -1314,7 +1314,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param fieldNumber The number of the field to update
      * @param newValue The new value
      */
-    public boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedKey(DNStateManager sm, Object key, int fieldNumber, Object newValue)
     {
         boolean modified = false;
         if (keyMapping != null && keyMapping instanceof EmbeddedKeyPCMapping)
@@ -1382,7 +1382,7 @@ public class JoinMapStore<K, V> extends AbstractMapStore<K, V>
      * @param fieldNumber The number of the field to update
      * @param newValue The new value
      */
-    public boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedValue(DNStateManager sm, Object value, int fieldNumber, Object newValue)
     {
         boolean modified = false;
         if (valueMapping != null && valueMapping instanceof EmbeddedValuePCMapping)

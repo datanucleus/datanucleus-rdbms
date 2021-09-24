@@ -23,7 +23,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.java;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSPropertyNames;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.rdbms.mapping.column.OracleBlobColumnMapping;
@@ -38,7 +38,7 @@ public class OracleStringLobMapping extends StringMapping
      * Retrieve the empty BLOB/CLOB locator created by the insert statement and write out the current BLOB/CLOB field value to the Oracle BLOB/CLOB object
      * @param sm StateManager owner of this field
      */
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         // Generate the contents for the BLOB/CLOB
         String value = (String)sm.provideField(mmd.getAbsoluteFieldNumber());

@@ -30,7 +30,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.NullValueException;
 import org.datanucleus.store.rdbms.table.Column;
 import org.datanucleus.util.Localiser;
@@ -123,10 +123,10 @@ public abstract class MultiPersistableMapping extends MultiMapping
      * @param ps a datastore object that executes statements in the database
      * @param pos The position(s) of the PreparedStatement to populate
      * @param value the value stored in this field
-     * @param ownerOP the owner ObjectProvider
+     * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         boolean setValueFKOnly = false;
         if (pos != null && pos.length < getNumberOfColumnMappings())
@@ -156,7 +156,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
 
                 // Check if the persistable exists in this datastore
                 boolean requiresPersisting = false;
-                if (ec.getApiAdapter().isDetached(value) && ownerOP != null)
+                if (ec.getApiAdapter().isDetached(value) && ownerSM != null)
                 {
                     // Detached object that needs attaching (or persisting if detached from a different datastore)
                     requiresPersisting = true;
@@ -178,29 +178,29 @@ public abstract class MultiPersistableMapping extends MultiMapping
                 if (requiresPersisting)
                 {
                     // The object is either not yet persistent or is detached and so needs attaching
-                    Object pcNew = ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
+                    Object pcNew = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
                     ec.flushInternal(false);
                     id = api.getIdForObject(pcNew);
-                    if (ec.getApiAdapter().isDetached(value) && ownerOP != null)
+                    if (ec.getApiAdapter().isDetached(value) && ownerSM != null)
                     {
                         // Update any detached reference to refer to the attached variant
-                        ownerOP.replaceFieldMakeDirty(ownerFieldNumber, pcNew);
+                        ownerSM.replaceFieldMakeDirty(ownerFieldNumber, pcNew);
                         if (mmd != null)
                         {
                             RelationType relationType = mmd.getRelationType(clr);
                             if (relationType == RelationType.ONE_TO_ONE_BI)
                             {
-                                ObjectProvider relatedSM = ec.findObjectProvider(pcNew);
+                                DNStateManager relatedSM = ec.findStateManager(pcNew);
                                 AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(clr);
                                 // TODO Allow for multiple related fields
-                                relatedSM.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerOP.getObject());
+                                relatedSM.replaceFieldMakeDirty(relatedMmds[0].getAbsoluteFieldNumber(), ownerSM.getObject());
                             }
                             else if (relationType == RelationType.MANY_TO_ONE_BI)
                             {
                                 // TODO Update the container element with the attached variant
                                 if (NucleusLogger.PERSISTENCE.isDebugEnabled())
                                 {
-                                    NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerOP.getInternalObjectId() + " has field " + ownerFieldNumber +
+                                    NucleusLogger.PERSISTENCE.debug("PCMapping.setObject : object " + ownerSM.getInternalObjectId() + " has field " + ownerFieldNumber +
                                             " that is 1-N bidirectional - should really update the reference in the relation. Not yet supported");
                                 }
                             }
@@ -221,7 +221,7 @@ public abstract class MultiPersistableMapping extends MultiMapping
             return;
         }
 
-        ObjectProvider sm = (value != null ? ec.findObjectProvider(value) : null);
+        DNStateManager sm = (value != null ? ec.findStateManager(value) : null);
         try
         {
             if (sm != null)

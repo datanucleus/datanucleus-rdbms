@@ -32,7 +32,7 @@ import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.CollectionMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -237,7 +237,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * @param element The element
      * @return Whether it is valid for reading.
      */
-    protected boolean validateElementForReading(ObjectProvider sm, Object element)
+    protected boolean validateElementForReading(DNStateManager sm, Object element)
     {
         if (!validateElementType(sm.getExecutionContext().getClassLoaderResolver(), element))
         {
@@ -279,10 +279,10 @@ public abstract class ElementContainerStore extends BaseContainerStore
         }
         else
         {
-            ObjectProvider elementSM = ec.findObjectProvider(element);
+            DNStateManager elementSM = ec.findStateManager(element);
             if (elementSM != null && elementSM.isEmbedded())
             {
-                // Element is already with ObjectProvider and is embedded in another field!
+                // Element is already with StateManager and is embedded in another field!
                 throw new NucleusUserException(Localiser.msg("056028", ownerMemberMetaData.getFullFieldName(), element));
             }
 
@@ -293,17 +293,17 @@ public abstract class ElementContainerStore extends BaseContainerStore
 
     /**
      * Accessor for an iterator through the container elements.
-     * @param ownerOP ObjectProvider for the container.
+     * @param ownerSM StateManager for the container.
      * @return The Iterator
      */
-    public abstract Iterator iterator(ObjectProvider ownerOP);
+    public abstract Iterator iterator(DNStateManager ownerSM);
 
     /**
      * Clear the association from owner to all elements.
      * Provides cascade-delete when the elements being deleted are PC types.
-     * @param ownerOP ObjectProvider for the container. 
+     * @param ownerSM StateManager for the container. 
      */
-    public void clear(ObjectProvider ownerOP)
+    public void clear(DNStateManager ownerSM)
     {
         Collection dependentElements = null;
         CollectionMetaData collmd = ownerMemberMetaData.getCollection();
@@ -316,14 +316,14 @@ public abstract class ElementContainerStore extends BaseContainerStore
         {
             // Retain the dependent elements that need deleting after clearing
             dependentElements = new HashSet();
-            Iterator iter = iterator(ownerOP);
+            Iterator iter = iterator(ownerSM);
             while (iter.hasNext())
             {
                 dependentElements.add(iter.next());
             }
         }
 
-        boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
+        boolean ownerSoftDelete = ownerSM.getClassMetaData().isSoftDelete();
         boolean elementSoftDelete = (elementInfo != null ? elementInfo[0].cmd.isSoftDelete() : false);
 
         if (ownerSoftDelete && elementSoftDelete)
@@ -339,7 +339,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
             String clearStmt = getClearStmt();
             try
             {
-                ExecutionContext ec = ownerOP.getExecutionContext();
+                ExecutionContext ec = ownerSM.getExecutionContext();
                 ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                 SQLController sqlControl = storeMgr.getSQLController();
                 try
@@ -348,7 +348,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     try
                     {
                         int jdbcPosition = 1;
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                         if (relationDiscriminatorMapping != null)
                         {
                             BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -379,13 +379,13 @@ public abstract class ElementContainerStore extends BaseContainerStore
             while (iter.hasNext())
             {
                 Object obj = iter.next();
-                if (ownerOP.getExecutionContext().getApiAdapter().isDeleted(obj))
+                if (ownerSM.getExecutionContext().getApiAdapter().isDeleted(obj))
                 {
                     // Element is tagged for deletion so will be deleted at flush(), and we dont need it immediately
                 }
                 else
                 {
-                    ownerOP.getExecutionContext().deleteObjectInternal(obj);
+                    ownerSM.getExecutionContext().deleteObjectInternal(obj);
                 }
             }
         }
@@ -517,19 +517,19 @@ public abstract class ElementContainerStore extends BaseContainerStore
      * @param sm StateManager.
      * @return The size.
      */
-    public int size(ObjectProvider sm)
+    public int size(DNStateManager sm)
     {
         return getSize(sm);
     }
 
-    public int getSize(ObjectProvider ownerOP)
+    public int getSize(DNStateManager ownerSM)
     {
         int numRows;
 
         String sizeStmt = getSizeStmt();
         try
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             SQLController sqlControl = storeMgr.getSQLController();
             try
@@ -540,13 +540,13 @@ public abstract class ElementContainerStore extends BaseContainerStore
                     int jdbcPosition = 1;
                     if (elementInfo == null)
                     {
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     }
                     else
                     {
                         if (usingJoinTable())
                         {
-                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                             if (elementInfo[0].getDiscriminatorMapping() != null)
                             {
                                 jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[0], clr);
@@ -560,7 +560,7 @@ public abstract class ElementContainerStore extends BaseContainerStore
                         {
                             for (int i=0;i<elementInfo.length;i++)
                             {
-                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                                jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                                 if (elementInfo[i].getDiscriminatorMapping() != null)
                                 {
                                     jdbcPosition = BackingStoreHelper.populateElementDiscriminatorInStatement(ec, ps, jdbcPosition, true, elementInfo[i], clr);

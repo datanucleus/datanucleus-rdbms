@@ -30,7 +30,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ClassMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.fieldmanager.ResultSetGetter;
@@ -170,11 +170,11 @@ public class MappingHelper
         Class type = ec.getClassLoaderResolver().classForName(cmd.getFullClassName());
         return ec.findObject(id, new FieldValues()
         {
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(DNStateManager sm)
             {
                 sm.replaceFields(pkFieldNumbers, resultsFM);
             }
-            public void fetchNonLoadedFields(ObjectProvider sm)
+            public void fetchNonLoadedFields(DNStateManager sm)
             {
                 sm.replaceNonLoadedFields(pkFieldNumbers, resultsFM);
             }

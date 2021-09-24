@@ -24,7 +24,7 @@ import java.util.ListIterator;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -41,7 +41,7 @@ import org.datanucleus.store.rdbms.table.Table;
  */
 public class ListStoreIterator<E> implements ListIterator<E>
 {
-    private final ObjectProvider sm;
+    private final DNStateManager sm;
 
     private final ListIterator<E> delegate;
 
@@ -51,7 +51,7 @@ public class ListStoreIterator<E> implements ListIterator<E>
 
     private final AbstractListStore<E> abstractListStore;
 
-    ListStoreIterator(ObjectProvider sm, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
+    ListStoreIterator(DNStateManager sm, ResultSet resultSet, ResultObjectFactory rof, AbstractListStore<E> als)
     throws MappedDatastoreException
     {
         this.sm = sm;

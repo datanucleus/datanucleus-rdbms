@@ -37,7 +37,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.CollectionMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -77,7 +77,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param sm StateManager for the container.
      * @return The Iterator
      */
-    public Iterator<E> iterator(ObjectProvider sm)
+    public Iterator<E> iterator(DNStateManager sm)
     {
         return listIterator(sm);
     }
@@ -87,7 +87,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param sm StateManager for the container.
      * @return The List Iterator
      */
-    public ListIterator<E> listIterator(ObjectProvider sm)
+    public ListIterator<E> listIterator(DNStateManager sm)
     {
         return listIterator(sm, -1, -1);
     }
@@ -99,7 +99,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param endIdx The end point in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected abstract ListIterator<E> listIterator(ObjectProvider sm, int startIdx, int endIdx);
+    protected abstract ListIterator<E> listIterator(DNStateManager sm, int startIdx, int endIdx);
 
     /**
      * Method to add an element to the List.
@@ -108,7 +108,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Size of the current list (if known, -1 if not)
      * @return Whether it was added successfully.
      */
-    public boolean add(ObjectProvider sm, E element, int size)
+    public boolean add(DNStateManager sm, E element, int size)
     {
         return internalAdd(sm, 0, true, Collections.singleton(element), size);
     }
@@ -119,7 +119,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param index The location to add at
      * @param sm StateManager.
      */
-    public void add(ObjectProvider sm, E element, int index, int size)
+    public void add(DNStateManager sm, E element, int index, int size)
     {
         internalAdd(sm, index, false, Collections.singleton(element), size);
     }
@@ -131,7 +131,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether they were added successfully.
      */
-    public boolean addAll(ObjectProvider sm, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
     {
         return internalAdd(sm, 0, true, elements, size);
     }
@@ -144,7 +144,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of the list (if known). -1 if not known
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider sm, Collection<E> elements, int index, int size)
+    public boolean addAll(DNStateManager sm, Collection<E> elements, int index, int size)
     {
         return internalAdd(sm, index, false, elements, size);
     }
@@ -158,7 +158,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of List (if known). -1 if not known
      * @return Whether it was successful
      */
-    protected abstract boolean internalAdd(ObjectProvider sm, int startAt, boolean atEnd, Collection<E> elements, int size);
+    protected abstract boolean internalAdd(DNStateManager sm, int startAt, boolean atEnd, Collection<E> elements, int size);
 
     /**
      * Method to retrieve an element from the List.
@@ -166,7 +166,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param index The index of the element required.
      * @return The object
      */
-    public E get(ObjectProvider sm, int index)
+    public E get(DNStateManager sm, int index)
     {
         ListIterator<E> iter = listIterator(sm, index, index);
         if (iter == null || !iter.hasNext())
@@ -198,7 +198,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param element The element.
      * @return The index
      */
-    public int indexOf(ObjectProvider sm, Object element)
+    public int indexOf(DNStateManager sm, Object element)
     {
         validateElementForReading(sm, element);
         return internalIndexOf(sm, element, getIndexOfStmt(element));
@@ -210,7 +210,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param element The object
      * @return The last index
      */
-    public int lastIndexOf(ObjectProvider sm, Object element)
+    public int lastIndexOf(DNStateManager sm, Object element)
     {
         validateElementForReading(sm, element);
         return internalIndexOf(sm, element, getLastIndexOfStmt(element));
@@ -224,7 +224,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return Whether it was removed successfully.
      */
-    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementForReading(sm, element))
         {
@@ -267,7 +267,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of the list (if known). -1 if not known
      * @return The object that was removed
      */
-    public E remove(ObjectProvider sm, int index, int size)
+    public E remove(DNStateManager sm, int index, int size)
     {
         E element = get(sm, index);
         if (indexedList)
@@ -307,7 +307,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param size Current size of list if known. -1 if not known
      * @return Whether the List was modified
      */
-    protected abstract boolean internalRemove(ObjectProvider sm, Object element, int size);
+    protected abstract boolean internalRemove(DNStateManager sm, Object element, int size);
 
     /**
      * Internal method to remove an object at a location from the List.
@@ -315,7 +315,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param index The index of the element to remove
      * @param size Current list size (if known). -1 if not known
      */
-    protected abstract void internalRemoveAt(ObjectProvider sm, int index, int size);
+    protected abstract void internalRemoveAt(DNStateManager sm, int index, int size);
 
     /**
      * Method to retrieve a list of elements in a range.
@@ -324,7 +324,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param endIdx To index (exclusive)
      * @return Sub List of elements in this range.
      */
-    public java.util.List<E> subList(ObjectProvider sm, int startIdx, int endIdx)
+    public java.util.List<E> subList(DNStateManager sm, int startIdx, int endIdx)
     {
         ListIterator iter = listIterator(sm, startIdx, endIdx);
         java.util.List list = new ArrayList();
@@ -350,7 +350,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param elements The elements
      * @return The indices of the elements in the List.
      */
-    protected int[] getIndicesOf(ObjectProvider sm, Collection elements)
+    protected int[] getIndicesOf(DNStateManager sm, Collection elements)
     {
         if (elements == null || elements.isEmpty())
         {
@@ -439,7 +439,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param stmt The statement to find the element.
      * @return The index of the element in the List.
      */
-    protected int internalIndexOf(ObjectProvider sm, Object element, String stmt)
+    protected int internalIndexOf(DNStateManager sm, Object element, String stmt)
     {
         try
         {
@@ -501,7 +501,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @param stmt The statement to remove the element from the List
      * @param size Current list size (if known). -1 if not known
      */
-    protected void internalRemoveAt(ObjectProvider sm, int index, String stmt, int size)
+    protected void internalRemoveAt(DNStateManager sm, int index, String stmt, int size)
     {
         int currentListSize = 0;
         if (size < 0)
@@ -579,7 +579,7 @@ public abstract class AbstractListStore<E> extends AbstractCollectionStore<E> im
      * @return Return code(s) from any executed statements
      * @throws MappedDatastoreException Thrown if an error occurs
      */
-    protected int[] internalShift(ObjectProvider sm, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
+    protected int[] internalShift(DNStateManager sm, ManagedConnection conn, boolean batched, int oldIndex, int amount, boolean executeNow) 
     throws MappedDatastoreException
     {
         ExecutionContext ec = sm.getExecutionContext();

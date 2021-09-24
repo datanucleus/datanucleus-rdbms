@@ -24,7 +24,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.adapter.DatastoreAdapter;
@@ -100,9 +100,9 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.scostore.PersistableRelationStore#add(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
+     * @see org.datanucleus.store.scostore.PersistableRelationStore#add(org.datanucleus.state.DNStateManager, org.datanucleus.state.DNStateManager)
      */
-    public boolean add(ObjectProvider sm1, ObjectProvider sm2)
+    public boolean add(DNStateManager sm1, DNStateManager sm2)
     {
         String addStmt = getAddStmt();
         ExecutionContext ec = sm1.getExecutionContext();
@@ -135,9 +135,9 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.scostore.PersistableRelationStore#remove(org.datanucleus.store.ObjectProvider)
+     * @see org.datanucleus.store.scostore.PersistableRelationStore#remove(org.datanucleus.state.DNStateManager)
      */
-    public boolean remove(ObjectProvider sm)
+    public boolean remove(DNStateManager sm)
     {
         String removeStmt = getRemoveStmt();
         ExecutionContext ec = sm.getExecutionContext();
@@ -169,9 +169,9 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.scostore.PersistableRelationStore#update(org.datanucleus.store.ObjectProvider, org.datanucleus.store.ObjectProvider)
+     * @see org.datanucleus.store.scostore.PersistableRelationStore#update(org.datanucleus.state.DNStateManager, org.datanucleus.state.DNStateManager)
      */
-    public boolean update(ObjectProvider sm1, ObjectProvider sm2)
+    public boolean update(DNStateManager sm1, DNStateManager sm2)
     {
         String updateStmt = getUpdateStmt();
         ExecutionContext ec = sm1.getExecutionContext();
@@ -326,7 +326,7 @@ public class JoinPersistableRelationStore implements PersistableRelationStore
      * @param joinTable Join table
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
+    public static int populateOwnerInStatement(DNStateManager sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, PersistableJoinTable joinTable)
     {
         if (!joinTable.getOwnerMapping().getColumnMapping(0).insertValuesOnInsert())
         {

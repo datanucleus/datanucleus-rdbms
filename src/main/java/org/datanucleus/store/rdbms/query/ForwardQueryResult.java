@@ -34,7 +34,7 @@ import java.util.NoSuchElementException;
 
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -192,7 +192,7 @@ public final class ForwardQueryResult<E> extends AbstractRDBMSQueryResult<E> imp
             Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(nextElement));
             if (memberValues != null)
             {
-                ObjectProvider sm = query.getExecutionContext().findObjectProvider(nextElement);
+                DNStateManager sm = query.getExecutionContext().findStateManager(nextElement);
                 Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                 while (memberValIter.hasNext())
                 {

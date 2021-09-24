@@ -31,7 +31,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedKeyPCMapping;
@@ -155,7 +155,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param value The value
      * @return Whether the element was modified
      */
-    public boolean updateEmbeddedElement(ObjectProvider sm, Map.Entry<K, V> element, int fieldNumber, Object value)
+    public boolean updateEmbeddedElement(DNStateManager sm, Map.Entry<K, V> element, int fieldNumber, Object value)
     {
         // Do nothing since of no use here
         return false;
@@ -171,7 +171,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider sm, Collection coll)
+    public void update(DNStateManager sm, Collection coll)
     {
         // Crude update - remove existing and add new!
         // TODO Update this to just remove what is not needed, and add what is really new
@@ -179,7 +179,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         addAll(sm, coll, 0);
     }
 
-    public boolean contains(ObjectProvider sm, Object element)
+    public boolean contains(DNStateManager sm, Object element)
     {
         if (!validateElementType(element))
         {
@@ -190,12 +190,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
         return mapStore.containsKey(sm, entry.getKey());
     }
 
-    public boolean add(ObjectProvider sm, Map.Entry<K, V> entry, int size)
+    public boolean add(DNStateManager sm, Map.Entry<K, V> entry, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its entry set");
     }
 
-    public boolean addAll(ObjectProvider sm, Collection entries, int size)
+    public boolean addAll(DNStateManager sm, Collection entries, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its entry set");
     }
@@ -206,7 +206,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param element Entry to remove
      * @return Whether it was removed
      */
-    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementType(element))
         {
@@ -226,7 +226,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * @param elements Entries to remove
      * @return Whether they were removed
      */
-    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+    public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -253,12 +253,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * Method to clear the Map.
      * @param sm StateManager for the owner.
      */
-    public void clear(ObjectProvider sm)
+    public void clear(DNStateManager sm)
     {
         mapStore.clear(sm);
     }
 
-    public int size(ObjectProvider sm)
+    public int size(DNStateManager sm)
     {
         int numRows;
 
@@ -341,12 +341,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
 
     /**
      * Method returning an iterator across the entries in the map for this owner object.
-     * @param ownerOP ObjectProvider of the owning object
+     * @param ownerSM StateManager of the owning object
      * @return The iterator for the entries (<pre>map.entrySet().iterator()</pre>).
      */
-    public Iterator<Map.Entry<K, V>> iterator(ObjectProvider ownerOP)
+    public Iterator<Map.Entry<K, V>> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         Boolean serializeRead = ec.getTransaction().getSerializeRead();
         String stmtSql = serializeRead ? iteratorSelectStmtLockedSql : iteratorSelectStmtSql;
@@ -356,7 +356,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement
-                SelectStatement selectStmt = getSQLStatementForIterator(ownerOP, ec.getFetchPlan(), true);
+                SelectStatement selectStmt = getSQLStatementForIterator(ownerSM, ec.getFetchPlan(), true);
 
                 // Input parameter(s) - the owner
                 int inputParamNum = 1;
@@ -408,7 +408,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0; paramInstance<numParams; paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerSM.getObject());
                 }
 
                 try
@@ -416,7 +416,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, stmtSql, ps);
                     try
                     {
-                        return new SetIterator(ownerOP, this, ownerMemberMetaData, rs, iteratorKeyResultCols, iteratorValueResultCols)
+                        return new SetIterator(ownerSM, this, ownerMemberMetaData, rs, iteratorKeyResultCols, iteratorValueResultCols)
                         {
                             protected boolean next(Object rs) throws MappedDatastoreException
                             {
@@ -460,13 +460,13 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      * <pre>
      * SELECT KEY, VALUE FROM MAP_TABLE WHERE OWNER_ID=? AND KEY IS NOT NULL
      * </pre>
-     * @param ownerOP ObjectProvider for the owner object
+     * @param ownerSM StateManager for the owner object
      * @param fp Fetch Plan to observe when selecting key/value
      * @param addRestrictionOnOwner Whether to add a restriction on the owner object for this map
      * @return The SelectStatement
      * TODO Change this to return KeyValueIteratorStatement
      */
-    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP, FetchPlan fp, boolean addRestrictionOnOwner)
+    protected SelectStatement getSQLStatementForIterator(DNStateManager ownerSM, FetchPlan fp, boolean addRestrictionOnOwner)
     {
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
 
@@ -603,7 +603,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      */
     public static abstract class SetIterator implements Iterator
     {
-        private final ObjectProvider sm;
+        private final DNStateManager sm;
         private final Iterator delegate;
         private Entry lastElement = null;
         private final MapEntrySetStore setStore;
@@ -618,7 +618,7 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
          * @param valueResultCols Column(s) for the value id
          * @throws MappedDatastoreException Thrown if an error occurs extracting the results
          */
-        protected SetIterator(ObjectProvider sm, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
+        protected SetIterator(DNStateManager sm, MapEntrySetStore setStore, AbstractMemberMetaData ownerMmd,
                 ResultSet rs, int[] keyResultCols, int[] valueResultCols) throws MappedDatastoreException
         {
             this.sm = sm;
@@ -695,12 +695,12 @@ class MapEntrySetStore<K, V> extends BaseContainerStore implements SetStore<Map.
      */
     private static class EntryImpl<K, V> implements Entry<K, V>
     {
-        private final ObjectProvider ownerSM;
+        private final DNStateManager ownerSM;
         private final K key;
         private final V value;
         private final MapStore<K, V> mapStore;
 
-        public EntryImpl(ObjectProvider sm, K key, V value, MapStore<K, V> mapStore)
+        public EntryImpl(DNStateManager sm, K key, V value, MapStore<K, V> mapStore)
         {
             this.ownerSM = sm;
             this.key = key;

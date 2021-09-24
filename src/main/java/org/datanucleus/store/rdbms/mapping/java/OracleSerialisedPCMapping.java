@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
@@ -33,20 +33,20 @@ public class OracleSerialisedPCMapping extends SerialisedPCMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param ownerSM the current ObjectProvider
+     * @param ownerSM the current StateManager
      */
-    public void performSetPostProcessing(ObjectProvider ownerSM)
+    public void performSetPostProcessing(DNStateManager ownerSM)
     {
         Object value = ownerSM.provideField(mmd.getAbsoluteFieldNumber());
-        ObjectProvider sm = null;
+        DNStateManager sm = null;
         if (value != null)
         {
             ExecutionContext ec = ownerSM.getExecutionContext();
-            sm = ec.findObjectProvider(value);
+            sm = ec.findStateManager(value);
             if (sm == null || sm.getExecutionContext().getApiAdapter().getExecutionContext(value) == null)
             {
-                // Assign a ObjectProvider to the serialised object since none present
-                sm = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber());
+                // Assign a StateManager to the serialised object since none present
+                sm = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, mmd.getAbsoluteFieldNumber());
             }
         }
 

@@ -44,7 +44,7 @@ import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
@@ -257,7 +257,7 @@ public class UpdateRequest extends Request
      * Takes the constructed update query and populates with the specific record information.
      * @param sm StateManager for the record to be updated
      */
-    public void execute(ObjectProvider sm)
+    public void execute(DNStateManager sm)
     {
         // Choose the statement based on whether optimistic or not
         String stmt = null;

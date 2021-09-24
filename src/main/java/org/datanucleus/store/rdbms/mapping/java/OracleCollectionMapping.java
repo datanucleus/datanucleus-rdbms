@@ -23,7 +23,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
@@ -31,7 +31,7 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
  */
 public class OracleCollectionMapping extends CollectionMapping
 {
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -61,27 +61,27 @@ public class OracleCollectionMapping extends CollectionMapping
         }
     }
 
-    public void postInsert(ObjectProvider ownerOP)
+    public void postInsert(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            Collection value = (Collection) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            Collection value = (Collection) ownerSM.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
                 if (mmd.getCollection().elementIsPersistent())
                 {
-                    // Make sure all persistable elements have ObjectProviders
+                    // Make sure all persistable elements have StateManagers
                     Object[] collElements = value.toArray();
                     for (Object elem : collElements)
                     {
                         if (elem != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(elem);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            DNStateManager elemSM = ec.findStateManager(elem);
+                            if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -90,31 +90,31 @@ public class OracleCollectionMapping extends CollectionMapping
         }
         else
         {
-            super.postInsert(ownerOP);
+            super.postInsert(ownerSM);
         }
     }
 
-    public void postUpdate(ObjectProvider ownerOP)
+    public void postUpdate(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
-            ExecutionContext ec = ownerOP.getExecutionContext();
-            Collection value = (Collection) ownerOP.provideField(mmd.getAbsoluteFieldNumber());
+            ExecutionContext ec = ownerSM.getExecutionContext();
+            Collection value = (Collection) ownerSM.provideField(mmd.getAbsoluteFieldNumber());
 
             if (value != null)
             {
                 if (mmd.getCollection().elementIsPersistent())
                 {
-                    // Make sure all persistable elements have ObjectProviders
+                    // Make sure all persistable elements have StateManagers
                     Object[] collElements = value.toArray();
                     for (Object elem : collElements)
                     {
                         if (elem != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(elem);
-                            if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
+                            DNStateManager elemSM = ec.findStateManager(elem);
+                            if (elemSM == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -123,7 +123,7 @@ public class OracleCollectionMapping extends CollectionMapping
         }
         else
         {
-            super.postUpdate(ownerOP);
+            super.postUpdate(ownerSM);
         }
     }
 }

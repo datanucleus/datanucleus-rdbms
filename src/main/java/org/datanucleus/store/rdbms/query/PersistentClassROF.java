@@ -43,7 +43,7 @@ import org.datanucleus.metadata.DiscriminatorMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.InterfaceMetaData;
 import org.datanucleus.metadata.VersionMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.schema.table.SurrogateColumnType;
@@ -437,7 +437,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
             // Set the version of the object where possible
             if (surrogateVersion != null)
             {
-                ObjectProvider objOP = ec.findObjectProvider(obj);
+                DNStateManager objOP = ec.findStateManager(obj);
                 objOP.setVersion(surrogateVersion);
             }
             else
@@ -448,7 +448,7 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     int versionFieldNumber = rootCmd.getMetaDataForMember(vermd.getFieldName()).getAbsoluteFieldNumber();
                     if (resultMapping.getMappingForMemberPosition(versionFieldNumber) != null)
                     {
-                        ObjectProvider objOP = ec.findObjectProvider(obj);
+                        DNStateManager objOP = ec.findStateManager(obj);
                         Object verFieldValue = objOP.provideField(versionFieldNumber);
                         if (verFieldValue != null)
                         {
@@ -476,9 +476,9 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
         return (T) ec.findObject(id, new FieldValues()
         {
             // TODO If we ever support just loading a FK value but not instantiating this needs to store the value in StateManager.
-            public void fetchFields(ObjectProvider sm)
+            public void fetchFields(DNStateManager sm)
             {
-                resultSetGetter.setObjectProvider(sm);
+                resultSetGetter.setStateManager(sm);
                 sm.replaceFields(fieldNumbers, resultSetGetter, false);
 
                 // Set version
@@ -502,9 +502,9 @@ public final class PersistentClassROF<T> extends AbstractROF<T>
                     }
                 }
             }
-            public void fetchNonLoadedFields(ObjectProvider sm)
+            public void fetchNonLoadedFields(DNStateManager sm)
             {
-                resultSetGetter.setObjectProvider(sm);
+                resultSetGetter.setStateManager(sm);
                 sm.replaceNonLoadedFields(fieldNumbers, resultSetGetter);
             }
 

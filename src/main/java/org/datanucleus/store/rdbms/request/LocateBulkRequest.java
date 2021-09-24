@@ -35,7 +35,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.LockMode;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -85,7 +85,7 @@ public class LocateBulkRequest extends BulkRequest
         super(table);
     }
 
-    protected String getStatement(DatastoreClass table, ObjectProvider[] ops, boolean lock)
+    protected String getStatement(DatastoreClass table, DNStateManager[] ops, boolean lock)
     {
         RDBMSStoreManager storeMgr = table.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
@@ -277,12 +277,12 @@ public class LocateBulkRequest extends BulkRequest
 
     /**
      * Method performing the location of the records in the datastore. 
-     * @param ops ObjectProviders to be located
+     * @param sms StateManagers to be located
      * @throws NucleusObjectNotFoundException with nested exceptions for each of missing objects (if any)
      */
-    public void execute(ObjectProvider[] ops)
+    public void execute(DNStateManager[] sms)
     {
-        if (ops == null || ops.length == 0)
+        if (sms == null || sms.length == 0)
         {
             return;
         }
@@ -291,22 +291,22 @@ public class LocateBulkRequest extends BulkRequest
         {
             // Debug information about what we are retrieving
             StringBuilder str = new StringBuilder();
-            for (int i=0;i<ops.length;i++)
+            for (int i=0;i<sms.length;i++)
             {
                 if (i > 0)
                 {
                     str.append(", ");
                 }
-                str.append(ops[i].getInternalObjectId());
+                str.append(sms[i].getInternalObjectId());
             }
             NucleusLogger.PERSISTENCE.debug(Localiser.msg("052223", str.toString(), table));
         }
 
-        ExecutionContext ec = ops[0].getExecutionContext();
+        ExecutionContext ec = sms[0].getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        AbstractClassMetaData cmd = ops[0].getClassMetaData();
+        AbstractClassMetaData cmd = sms[0].getClassMetaData();
         boolean locked = ec.getSerializeReadForClass(cmd.getFullClassName());
-        LockMode lockType = ec.getLockManager().getLockMode(ops[0].getInternalObjectId());
+        LockMode lockType = ec.getLockManager().getLockMode(sms[0].getInternalObjectId());
         if (lockType != LockMode.LOCK_NONE)
         {
             if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
@@ -315,7 +315,7 @@ public class LocateBulkRequest extends BulkRequest
                 locked = true;
             }
         }
-        String statement = getStatement(table, ops, locked);
+        String statement = getStatement(table, sms, locked);
 
         try
         {
@@ -328,7 +328,7 @@ public class LocateBulkRequest extends BulkRequest
                 try
                 {
                     // Provide the primary key field(s)
-                    for (int i=0;i<ops.length;i++)
+                    for (int i=0;i<sms.length;i++)
                     {
                         if (cmd.getIdentityType() == IdentityType.DATASTORE)
                         {
@@ -336,12 +336,12 @@ public class LocateBulkRequest extends BulkRequest
                             for (int j=0;j<datastoreIdx.getNumberOfParameterOccurrences();j++)
                             {
                                 table.getSurrogateMapping(SurrogateColumnType.DATASTORE_ID, false).setObject(ec, ps, datastoreIdx.getParameterPositionsForOccurrence(j), 
-                                    ops[i].getInternalObjectId());
+                                    sms[i].getInternalObjectId());
                             }
                         }
                         else if (cmd.getIdentityType() == IdentityType.APPLICATION)
                         {
-                            ops[i].provideFields(cmd.getPKMemberPositions(), new ParameterSetter(ops[i], ps, mappingDefinitions[i]));
+                            sms[i].provideFields(cmd.getPKMemberPositions(), new ParameterSetter(sms[i], ps, mappingDefinitions[i]));
                         }
                     }
 
@@ -349,7 +349,7 @@ public class LocateBulkRequest extends BulkRequest
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
                     try
                     {
-                        ObjectProvider[] missingOps = processResults(rs, ops);
+                        DNStateManager[] missingOps = processResults(rs, sms);
                         if (missingOps != null && missingOps.length > 0)
                         {
                             NucleusObjectNotFoundException[] nfes = new NucleusObjectNotFoundException[missingOps.length];
@@ -377,7 +377,7 @@ public class LocateBulkRequest extends BulkRequest
         }
         catch (SQLException sqle)
         {
-            String msg = Localiser.msg("052220", ops[0].getObjectAsPrintable(), statement, sqle.getMessage());
+            String msg = Localiser.msg("052220", sms[0].getObjectAsPrintable(), statement, sqle.getMessage());
             NucleusLogger.DATASTORE_RETRIEVE.warn(msg);
             List exceptions = new ArrayList();
             exceptions.add(sqle);
@@ -389,10 +389,10 @@ public class LocateBulkRequest extends BulkRequest
         }
     }
 
-    private ObjectProvider[] processResults(ResultSet rs, ObjectProvider[] ops)
+    private DNStateManager[] processResults(ResultSet rs, DNStateManager[] ops)
     throws SQLException
     {
-        List<ObjectProvider> missingSMs = new ArrayList<>();
+        List<DNStateManager> missingSMs = new ArrayList<>();
         for (int i=0;i<ops.length;i++)
         {
             missingSMs.add(ops[i]);
@@ -468,9 +468,9 @@ public class LocateBulkRequest extends BulkRequest
                 }
             }
 
-            // Find which ObjectProvider this row is for
-            ObjectProvider sm = null;
-            for (ObjectProvider missingSM : missingSMs)
+            // Find which StateManager this row is for
+            DNStateManager sm = null;
+            for (DNStateManager missingSM : missingSMs)
             {
                 Object opId = missingSM.getInternalObjectId();
                 if (cmd.getIdentityType() == IdentityType.DATASTORE)
@@ -509,7 +509,7 @@ public class LocateBulkRequest extends BulkRequest
             }
             if (sm != null)
             {
-                // Mark ObjectProvider as processed
+                // Mark StateManager as processed
                 missingSMs.remove(sm);
 
                 // Load up any unloaded fields that we have selected
@@ -547,7 +547,7 @@ public class LocateBulkRequest extends BulkRequest
 
         if (!missingSMs.isEmpty())
         {
-            return missingSMs.toArray(new ObjectProvider[missingSMs.size()]);
+            return missingSMs.toArray(new DNStateManager[missingSMs.size()]);
         }
         return null;
     }

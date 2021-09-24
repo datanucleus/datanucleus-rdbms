@@ -41,7 +41,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
@@ -296,7 +296,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
 
     @SuppressWarnings("deprecation")
     @Override
-    public void setPostProcessing(ObjectProvider sm, Object value)
+    public void setPostProcessing(DNStateManager sm, Object value)
     {
         // Oracle requires that a BLOB is initialised with EMPTY_BLOB() and then you retrieve the column and update its BLOB value. Performs a statement
         // SELECT {blobColumn} FROM TABLE WHERE ID=? FOR UPDATE
@@ -369,7 +369,7 @@ public class OracleBlobColumnMapping extends AbstractColumnMapping implements Co
             if (sm.isEmbedded())
             {
                 // This mapping is embedded, so navigate back to the real owner since that is the "id" in the table
-                ObjectProvider[] embeddedOwners = ec.getOwnersForEmbeddedObjectProvider(sm);
+                DNStateManager[] embeddedOwners = ec.getOwnersForEmbeddedStateManager(sm);
                 if (embeddedOwners != null)
                 {
                     // Just use the first owner

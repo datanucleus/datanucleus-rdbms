@@ -35,7 +35,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -158,7 +158,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param key The key to check for.
      * @return Whether the key exists in the Map.
      */
-    public boolean containsKey(ObjectProvider sm, Object key)
+    public boolean containsKey(DNStateManager sm, Object key)
     {
         if (key == null)
         {
@@ -182,7 +182,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param value The value to check for.
      * @return Whether the value exists in the Map.
      */
-    public boolean containsValue(ObjectProvider sm, Object value)
+    public boolean containsValue(DNStateManager sm, Object value)
     {
         if (value == null)
         {
@@ -249,7 +249,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param key The key of the object to retrieve.
      * @return The value for this key.
      */
-    public V get(ObjectProvider sm, Object key)
+    public V get(DNStateManager sm, Object key)
     {
         try
         {
@@ -267,7 +267,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param sm StateManager for the Map
      * @param m The Map to add
      */
-    public void putAll(ObjectProvider sm, Map<? extends K, ? extends V> m)
+    public void putAll(DNStateManager sm, Map<? extends K, ? extends V> m)
     {
         Iterator i = m.entrySet().iterator();
         while (i.hasNext())
@@ -323,7 +323,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param key The key to check.
      * @return Whether it is validated. 
      */
-    protected boolean validateKeyForReading(ObjectProvider sm, Object key)
+    protected boolean validateKeyForReading(DNStateManager sm, Object key)
     {
         validateKeyType(sm.getExecutionContext().getClassLoaderResolver(), key);
 
@@ -346,7 +346,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @param value The value to check.
      * @return Whether it is validated.
      */
-    protected boolean validateValueForReading(ObjectProvider sm, Object value)
+    protected boolean validateValueForReading(DNStateManager sm, Object value)
     {
         validateValueType(sm.getExecutionContext().getClassLoaderResolver(), value);
 
@@ -365,13 +365,13 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a key is ok for writing (present in the datastore).
-     * @param ownerOP ObjectProvider for the owner of the map
+     * @param ownerSM StateManager for the owner of the map
      * @param key The key to check.
      */
-    protected void validateKeyForWriting(ObjectProvider ownerOP, Object key)
+    protected void validateKeyForWriting(DNStateManager ownerSM, Object key)
     {
         // TODO Pass in cascade flag and if key not present then throw exception
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         validateKeyType(ec.getClassLoaderResolver(), key);
         if (!keysAreEmbedded && !keysAreSerialised)
         {
@@ -381,13 +381,13 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
 
     /**
      * Utility to validate a value is ok for writing (present in the datastore).
-     * @param ownerOP ObjectProvider for the owner of the map
+     * @param ownerSM StateManager for the owner of the map
      * @param value The value to check.
      */
-    protected void validateValueForWriting(ObjectProvider ownerOP, Object value)
+    protected void validateValueForWriting(DNStateManager ownerSM, Object value)
     {
         // TODO Pass in cascade flag and if value not present then throw exception
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         validateValueType(ec.getClassLoaderResolver(), value);
         if (!valuesAreEmbedded && !valuesAreSerialised)
         {
@@ -402,7 +402,7 @@ public abstract class AbstractMapStore<K, V> extends BaseContainerStore implemen
      * @return The value for this key
      * @throws NoSuchElementException if the value for the key was not found
      */
-    protected abstract V getValue(ObjectProvider sm, Object key)
+    protected abstract V getValue(DNStateManager sm, Object key)
     throws NoSuchElementException;
 
     /**

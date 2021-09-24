@@ -33,7 +33,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ArrayMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
@@ -246,13 +246,13 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Update a FK and element position in the element.
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param element The element to update
      * @param owner The owner object to set in the FK
      * @param index The index position (or -1 if not known)
      * @return Whether it was performed successfully
      */
-    private boolean updateElementFk(ObjectProvider ownerOP, E element, Object owner, int index)
+    private boolean updateElementFk(DNStateManager ownerSM, E element, Object owner, int index)
     {
         if (element == null)
         {
@@ -261,7 +261,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
         boolean retval;
         String updateFkStmt = getUpdateFkStmt();
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         try
         {
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
@@ -291,7 +291,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                     }
                     else
                     {
-                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                        jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                     }
                     jdbcPosition = BackingStoreHelper.populateOrderInStatement(ec, ps, index, jdbcPosition, orderMapping);
                     if (relationDiscriminatorMapping != null)
@@ -394,9 +394,9 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
     /**
      * Method to clear the Array.
      * This is called when the container object is being deleted and the elements are to be removed (maybe for dependent field).
-     * @param ownerOP StateManager
+     * @param ownerSM StateManager
      */
-    public void clear(ObjectProvider ownerOP)
+    public void clear(DNStateManager ownerSM)
     {
         boolean deleteElements = false;
         if (ownerMemberMetaData.getArray().isDependentElement())
@@ -423,16 +423,16 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
         if (deleteElements)
         {
-            ownerOP.isLoaded(ownerMemberMetaData.getAbsoluteFieldNumber()); // Make sure the field is loaded
-            Object[] value = (Object[]) ownerOP.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
+            ownerSM.isLoaded(ownerMemberMetaData.getAbsoluteFieldNumber()); // Make sure the field is loaded
+            Object[] value = (Object[]) ownerSM.provideField(ownerMemberMetaData.getAbsoluteFieldNumber());
             if (value != null && value.length > 0)
             {
-                ownerOP.getExecutionContext().deleteObjects(value);
+                ownerSM.getExecutionContext().deleteObjects(value);
             }
         }
         else
         {
-            boolean ownerSoftDelete = ownerOP.getClassMetaData().isSoftDelete();
+            boolean ownerSoftDelete = ownerSM.getClassMetaData().isSoftDelete();
             if (!ownerSoftDelete)
             {
                 // TODO Cater for multiple element roots
@@ -440,7 +440,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 String clearNullifyStmt = getClearNullifyStmt();
                 try
                 {
-                    ExecutionContext ec = ownerOP.getExecutionContext();
+                    ExecutionContext ec = ownerSM.getExecutionContext();
                     ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
                     SQLController sqlControl = storeMgr.getSQLController();
                     try
@@ -449,7 +449,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                         try
                         {
                             int jdbcPosition = 1;
-                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerOP, ec, ps, jdbcPosition, this);
+                            jdbcPosition = BackingStoreHelper.populateOwnerInStatement(ownerSM, ec, ps, jdbcPosition, this);
                             if (relationDiscriminatorMapping != null)
                             {
                                 BackingStoreHelper.populateRelationDiscriminatorInStatement(ec, ps, jdbcPosition, this);
@@ -541,11 +541,11 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Method to set the array for the specified owner to the passed value.
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param array the array
      * @return Whether the array was updated successfully
      */
-    public boolean set(ObjectProvider ownerOP, Object array)
+    public boolean set(DNStateManager ownerSM, Object array)
     {
         if (array == null)
         {
@@ -555,7 +555,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         // Check that all elements are inserted
         for (int i=0;i<Array.getLength(array);i++)
         {
-            validateElementForWriting(ownerOP.getExecutionContext(), Array.get(array, i), null);
+            validateElementForWriting(ownerSM.getExecutionContext(), Array.get(array, i), null);
         }
 
         // Update the FK and position of all elements
@@ -563,7 +563,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         for (int i=0;i<length;i++)
         {
             E obj = (E)Array.get(array, i);
-            updateElementFk(ownerOP, obj, ownerOP.getObject(), i);
+            updateElementFk(ownerSM, obj, ownerSM.getObject(), i);
         }
 
         return true;
@@ -571,12 +571,12 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Accessor for an iterator for the set.
-     * @param ownerOP ObjectProvider for the set.
+     * @param ownerSM StateManager for the set.
      * @return Iterator for the set.
      */
-    public Iterator<E> iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         if (elementInfo == null || elementInfo.length == 0)
         {
@@ -584,7 +584,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
         }
 
         // Generate the statement, and statement mapping/parameter information
-        ElementIteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ownerOP.getExecutionContext().getFetchPlan(), true);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ownerSM.getExecutionContext(), ownerSM.getExecutionContext().getFetchPlan(), true);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping iteratorMappingDef = iterStmt.getElementClassMapping();
 
@@ -633,7 +633,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
+                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -652,7 +652,7 @@ public class FKArrayStore<E> extends AbstractArrayStore<E>
                         }
 
                         rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
-                        return new ArrayStoreIterator(ownerOP, rs, rof, this);
+                        return new ArrayStoreIterator(ownerSM, rs, rof, this);
                     }
                     finally
                     {

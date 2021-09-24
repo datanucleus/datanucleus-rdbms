@@ -40,7 +40,7 @@ import org.datanucleus.metadata.QueryResultMetaData;
 import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeColumn;
 import org.datanucleus.metadata.QueryResultMetaData.ConstructorTypeMapping;
 import org.datanucleus.metadata.QueryResultMetaData.PersistentTypeMapping;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.table.Column;
@@ -280,14 +280,14 @@ public class ResultMetaDataROF extends AbstractROF
 
                     obj = ec.findObject(id, new FieldValues()
                     {
-                        public void fetchFields(ObjectProvider sm)
+                        public void fetchFields(DNStateManager sm)
                         {
-                            rsGetter.setObjectProvider(sm);
+                            rsGetter.setStateManager(sm);
                             sm.replaceFields(resultFieldNumbers, rsGetter, false);
                         }
-                        public void fetchNonLoadedFields(ObjectProvider sm)
+                        public void fetchNonLoadedFields(DNStateManager sm)
                         {
-                            rsGetter.setObjectProvider(sm);
+                            rsGetter.setStateManager(sm);
                             sm.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
                         }
                         public FetchPlan getFetchPlanForLoading()
@@ -311,14 +311,14 @@ public class ResultMetaDataROF extends AbstractROF
 
                     obj = ec.findObject(id, new FieldValues()
                     {
-                        public void fetchFields(ObjectProvider sm)
+                        public void fetchFields(DNStateManager sm)
                         {
-                            rsGetter.setObjectProvider(sm);
+                            rsGetter.setStateManager(sm);
                             sm.replaceFields(resultFieldNumbers, rsGetter, false);
                         }
-                        public void fetchNonLoadedFields(ObjectProvider sm)
+                        public void fetchNonLoadedFields(DNStateManager sm)
                         {
-                            rsGetter.setObjectProvider(sm);
+                            rsGetter.setStateManager(sm);
                             sm.replaceNonLoadedFields(resultFieldNumbers, rsGetter);
                         }
                         public FetchPlan getFetchPlanForLoading()

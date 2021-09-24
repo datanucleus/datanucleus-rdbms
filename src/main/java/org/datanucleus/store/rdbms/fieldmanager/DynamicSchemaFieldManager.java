@@ -27,7 +27,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -52,7 +52,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
     RDBMSStoreManager rdbmsMgr;
 
     /** StateManager of the object being processed. */
-    ObjectProvider sm;
+    DNStateManager sm;
 
     /** Flag for whether we have updated the schema. */
     boolean schemaUpdatesPerformed = false;
@@ -62,7 +62,7 @@ public class DynamicSchemaFieldManager extends AbstractFieldManager
      * @param rdbmsMgr RDBMSManager
      * @param sm StateManager for the object being processed
      */
-    public DynamicSchemaFieldManager(RDBMSStoreManager rdbmsMgr, ObjectProvider sm)
+    public DynamicSchemaFieldManager(RDBMSStoreManager rdbmsMgr, DNStateManager sm)
     {
         this.rdbmsMgr = rdbmsMgr;
         this.sm = sm;

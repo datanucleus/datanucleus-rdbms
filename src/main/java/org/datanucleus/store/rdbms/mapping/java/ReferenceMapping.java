@@ -42,7 +42,7 @@ import org.datanucleus.metadata.KeyMetaData;
 import org.datanucleus.metadata.MetaData;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.ValueMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.NoTableManagedException;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
@@ -540,10 +540,10 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * @param ps a datastore object that executes statements in the database
      * @param pos The position(s) of the PreparedStatement to populate
      * @param value the value stored in this field
-     * @param ownerOP the owner ObjectProvider
+     * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] pos, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         // TODO Cater for case where this mapping has no datastore columns (N-1 join table)
       /*if (getNumberOfColumnMappings() == 0)
@@ -554,7 +554,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
             }
             else
             {
-                ObjectProvider valueSM = ec.findObjectProvider(value);
+                StateManager valueSM = ec.findStateManager(value);
                 NucleusLogger.GENERAL.info(">> RefMapping.setObject need to process " + valueSM);
                 return;
             }
@@ -562,7 +562,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
 
         if (mappingStrategy == PER_IMPLEMENTATION_MAPPING)
         {
-            super.setObject(ec, ps, pos, value, ownerOP, ownerFieldNumber);
+            super.setObject(ec, ps, pos, value, ownerSM, ownerFieldNumber);
         }
         else if (mappingStrategy == ID_MAPPING || mappingStrategy == XCALIA_MAPPING)
         {
@@ -635,12 +635,12 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
     {
         if (ec.getApiAdapter().isPersistable(value))
         {
-            ObjectProvider sm = ec.findObjectProvider(value);
+            DNStateManager sm = ec.findStateManager(value);
             if (sm == null)
             {
                 // Referenced object is not yet persistent, so persist it
-                ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
-                sm = ec.findObjectProvider(value);
+                ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
+                sm = ec.findStateManager(value);
                 sm.flush(); // Make sure the object is in the datastore so the id is set
             }
 
@@ -747,7 +747,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * to this field and the object stored in it.
      * @param sm StateManager for the owner.
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
     }
 
@@ -756,7 +756,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * to this field and the object stored in it.
      * @param sm StateManager for the owner.
      */
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(DNStateManager sm)
     {
     }
 
@@ -765,7 +765,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * to this field and the object stored in it.
      * @param sm StateManager for the owner.
      */
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(DNStateManager sm)
     {
     }
 
@@ -774,7 +774,7 @@ public abstract class ReferenceMapping extends MultiPersistableMapping implement
      * relation information.
      * @param sm StateManager for the owner.
      */
-    public void preDelete(ObjectProvider sm)
+    public void preDelete(DNStateManager sm)
     {
         boolean isDependentElement = mmd.isDependent();
         if (!isDependentElement)

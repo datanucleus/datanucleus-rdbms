@@ -34,7 +34,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData;
 import org.datanucleus.metadata.MapMetaData.MapType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.FieldValues;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.query.expression.Expression;
@@ -387,7 +387,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
      */
-    private boolean updateValueFk(ObjectProvider sm, Object value, Object owner)
+    private boolean updateValueFk(DNStateManager sm, Object value, Object owner)
     {
         if (value == null)
         {
@@ -405,7 +405,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param owner The owner object to set in the FK
      * @return Whether it was performed successfully
      */
-    private boolean updateKeyFk(ObjectProvider sm, Object key, Object owner)
+    private boolean updateKeyFk(DNStateManager sm, Object key, Object owner)
     {
         if (key == null)
         {
@@ -437,7 +437,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param newValue The value to store.
      * @return The value stored.
      */
-    public V put(final ObjectProvider sm, final K newKey, V newValue)
+    public V put(final DNStateManager sm, final K newKey, V newValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
         if (keyFieldNumber >= 0)
@@ -481,7 +481,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         throw new NucleusUserException(Localiser.msg("RDBMS.SCO.Map.WriteValueInvalidWithDifferentPM"), ec.getApiAdapter().getIdForObject(newValue));
                     }
 
-                    ObjectProvider vsm = ec.findObjectProvider(newValue);
+                    DNStateManager vsm = ec.findStateManager(newValue);
                     
                     // Ensure the current owner field is loaded, and replace with new value
                     if (ownerFieldNumber >= 0)
@@ -520,7 +520,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                      */
                     ec.persistObjectInternal(newValue, new FieldValues()
                         {
-                        public void fetchFields(ObjectProvider vsm)
+                        public void fetchFields(DNStateManager vsm)
                         {
                             if (ownerFieldNumber >= 0)
                             {
@@ -535,14 +535,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                                 vsm.setAssociatedValue(externalFKMapping, sm.getObject());
                             }
                         }
-                        public void fetchNonLoadedFields(ObjectProvider sm)
+                        public void fetchNonLoadedFields(DNStateManager sm)
                         {
                         }
                         public FetchPlan getFetchPlanForLoading()
                         {
                             return null;
                         }
-                        }, ObjectProvider.PC);
+                        }, DNStateManager.PC);
                 }
             }
             else
@@ -567,7 +567,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                             ec.getApiAdapter().getIdForObject(newKey));
                     }
 
-                    ObjectProvider valOP = ec.findObjectProvider(newKey);
+                    DNStateManager valOP = ec.findStateManager(newKey);
 
                     // Ensure the current owner field is loaded, and replace with new key
                     if (ownerFieldNumber >= 0)
@@ -607,7 +607,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                     final Object newValueObj = newValue;
                     ec.persistObjectInternal(newKey, new FieldValues()
                         {
-                        public void fetchFields(ObjectProvider vsm)
+                        public void fetchFields(DNStateManager vsm)
                         {
                             if (ownerFieldNumber >= 0)
                             {
@@ -622,14 +622,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                                 vsm.setAssociatedValue(externalFKMapping, sm.getObject());
                             }
                         }
-                        public void fetchNonLoadedFields(ObjectProvider sm)
+                        public void fetchNonLoadedFields(DNStateManager sm)
                         {
                         }
                         public FetchPlan getFetchPlanForLoading()
                         {
                             return null;
                         }
-                        }, ObjectProvider.PC
+                        }, DNStateManager.PC
                     );
 
                     /*if (ownerFieldNumber < 0)
@@ -660,7 +660,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the entry to remove.
      * @return The value that was removed.
      */
-    public V remove(ObjectProvider sm, Object key)
+    public V remove(DNStateManager sm, Object key)
     {
         if (!allowNulls && key == null)
         {
@@ -679,7 +679,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the entry to remove.
      * @param oldValue The value associated with the key
      */
-    public void remove(ObjectProvider sm, Object key, Object oldValue)
+    public void remove(DNStateManager sm, Object key, Object oldValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
         if (keyFieldNumber >= 0)
@@ -688,7 +688,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (oldValue != null)
             {
                 boolean deletingValue = false;
-                ObjectProvider valueOP = ec.findObjectProvider(oldValue);
+                DNStateManager valueOP = ec.findStateManager(oldValue);
                 if (ownerMemberMetaData.getMap().isDependentValue())
                 {
                     // Delete the value if it is dependent
@@ -741,7 +741,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         }
                     }
                     ec.deleteObjectInternal(key);
-                    ObjectProvider keyOP = ec.findObjectProvider(key);
+                    DNStateManager keyOP = ec.findStateManager(key);
                     keyOP.flush();
                 }
             }
@@ -752,7 +752,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
             if (key != null)
             {
                 boolean deletingKey = false;
-                ObjectProvider keyOP = ec.findObjectProvider(key);
+                DNStateManager keyOP = ec.findStateManager(key);
                 if (ownerMemberMetaData.getMap().isDependentKey())
                 {
                     // Delete the key if it is dependent
@@ -805,7 +805,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                         }
                     }
                     ec.deleteObjectInternal(oldValue);
-                    ObjectProvider valOP = ec.findObjectProvider(oldValue);
+                    DNStateManager valOP = ec.findStateManager(oldValue);
                     valOP.flush();
                 }
             }
@@ -818,14 +818,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the object
      * @param oldValue Value to remove
      */
-    private void removeValue(ObjectProvider sm, Object key, Object oldValue)
+    private void removeValue(DNStateManager sm, Object key, Object oldValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
         
         // Null out the key and owner fields if they are nullable
         if (keyMapping.isNullable())
         {
-            ObjectProvider vsm = ec.findObjectProvider(oldValue);
+            DNStateManager vsm = ec.findStateManager(oldValue);
             
             // Null the key field
             vsm.replaceFieldMakeDirty(keyFieldNumber, null);
@@ -860,7 +860,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * Method to clear the map of all values.
      * @param sm StateManager for the map.
      */
-    public void clear(ObjectProvider sm)
+    public void clear(DNStateManager sm)
     {
         // TODO Fix this. Should not be retrieving objects only to remove them since they
         // may be cached in the SCO object. But we need to utilise delete-dependent correctly too
@@ -886,14 +886,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
      * @param key Key of the object
      * @param oldValue Value to remove
      */
-    public void clearKeyOfValue(ObjectProvider sm, Object key, Object oldValue)
+    public void clearKeyOfValue(DNStateManager sm, Object key, Object oldValue)
     {
         ExecutionContext ec = sm.getExecutionContext();
 
         if (keyMapping.isNullable())
         {
             // Null out the key and owner fields if they are nullable
-            ObjectProvider vsm = ec.findObjectProvider(oldValue);
+            DNStateManager vsm = ec.findStateManager(oldValue);
 
             // Check that the value hasn't already been deleted due to being removed from the map
             if (!ec.getApiAdapter().isDeleted(oldValue))
@@ -976,7 +976,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return stmt.toString();
     }
 
-    protected boolean updateValueFkInternal(ObjectProvider sm, Object value, Object owner)
+    protected boolean updateValueFkInternal(DNStateManager sm, Object value, Object owner)
     {
         boolean retval;
         ExecutionContext ec = sm.getExecutionContext();
@@ -1029,7 +1029,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
         return retval;
     }
 
-    protected boolean updateKeyFkInternal(ObjectProvider sm, Object key, Object owner)
+    protected boolean updateKeyFkInternal(DNStateManager sm, Object key, Object owner)
     {
         boolean retval;
         ExecutionContext ec = sm.getExecutionContext();
@@ -1084,26 +1084,26 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
 
     /**
      * Method to retrieve a value from the Map given the key.
-     * @param ownerOP ObjectProvider for the owner of the map.
+     * @param ownerSM StateManager for the owner of the map.
      * @param key The key to retrieve the value for.
      * @return The value for this key
      * @throws NoSuchElementException if the key was not found
      */
-    protected V getValue(ObjectProvider ownerOP, Object key)
+    protected V getValue(DNStateManager ownerSM, Object key)
     throws NoSuchElementException
     {
-        if (!validateKeyForReading(ownerOP, key))
+        if (!validateKeyForReading(ownerSM, key))
         {
             return null;
         }
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (getStmtLocked == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement, and statement mapping/parameter information
-                SQLStatement sqlStmt = getSQLStatementForGet(ownerOP);
+                SQLStatement sqlStmt = getSQLStatementForGet(ownerSM);
                 getStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
                 getStmtLocked = sqlStmt.getSQLText().toSQL();
@@ -1126,7 +1126,7 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
-                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                    ownerIdx.getMapping().setObject(ec, ps, ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerSM.getObject());
                 }
 
                 StatementMappingIndex keyIdx = getMappingParams.getMappingForParameter("key");
@@ -1213,15 +1213,15 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     /**
      * Method to return an SQLStatement for retrieving the value for a key.
      * Selects the join table and optionally joins to the value table if it has its own table.
-     * @param ownerOP ObjectProvider for the owning object
+     * @param ownerSM StateManager for the owning object
      * @return The SQLStatement
      */
-    protected SelectStatement getSQLStatementForGet(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForGet(DNStateManager ownerSM)
     {
         SelectStatement sqlStmt = null;
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
-        final ClassLoaderResolver clr = ownerOP.getExecutionContext().getClassLoaderResolver();
+        final ClassLoaderResolver clr = ownerSM.getExecutionContext().getClassLoaderResolver();
         final Class valueCls = clr.classForName(this.valueType);
         if (ownerMemberMetaData.getMap().getMapType() == MapType.MAP_TYPE_KEY_IN_VALUE)
         {
@@ -1352,14 +1352,14 @@ public class FKMapStore<K, V> extends AbstractMapStore<K, V>
     }
 
     @Override
-    public boolean updateEmbeddedKey(ObjectProvider sm, Object key, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedKey(DNStateManager sm, Object key, int fieldNumber, Object newValue)
     {
         // We don't support embedded keys as such
         return false;
     }
 
     @Override
-    public boolean updateEmbeddedValue(ObjectProvider sm, Object value, int fieldNumber, Object newValue)
+    public boolean updateEmbeddedValue(DNStateManager sm, Object value, int fieldNumber, Object newValue)
     {
         // We don't support embedded values as such
         return false;

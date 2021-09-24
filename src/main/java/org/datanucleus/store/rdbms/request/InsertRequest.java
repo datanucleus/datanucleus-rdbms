@@ -54,7 +54,7 @@ import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.ActivityState;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.identifier.DatastoreIdentifier;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -232,7 +232,7 @@ public class InsertRequest extends Request
      * Takes the constructed insert query and populates with the specific record information.
      * @param sm StateManager for the record to be inserted
      */
-    public void execute(ObjectProvider sm)
+    public void execute(DNStateManager sm)
     {
         ExecutionContext ec = sm.getExecutionContext();
         if (NucleusLogger.PERSISTENCE.isDebugEnabled())
@@ -536,7 +536,7 @@ public class InsertRequest extends Request
                         Object value = sm.provideField(relationFieldNumbers[i]);
                         if (value != null && ec.getApiAdapter().isDetached(value))
                         {
-                            Object valueAttached = ec.persistObjectInternal(value, null, -1, ObjectProvider.PC);
+                            Object valueAttached = ec.persistObjectInternal(value, null, -1, DNStateManager.PC);
                             sm.replaceField(relationFieldNumbers[i], valueAttached);
                         }
                     }
@@ -629,7 +629,7 @@ public class InsertRequest extends Request
      * @return The identity
      * @throws SQLException Thrown if an error occurs retrieving the identity
      */
-    private Object getInsertedIdentityValue(ExecutionContext ec, SQLController sqlControl, ObjectProvider sm, ManagedConnection mconn, PreparedStatement ps)
+    private Object getInsertedIdentityValue(ExecutionContext ec, SQLController sqlControl, DNStateManager sm, ManagedConnection mconn, PreparedStatement ps)
     throws SQLException
     {
         Object identityValue = null;

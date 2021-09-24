@@ -35,7 +35,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.CollectionMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.types.scostore.SetStore;
@@ -67,7 +67,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
      * @param sm StateManager for the set. 
      * @return Iterator for the set.
      */
-    public abstract Iterator<E> iterator(ObjectProvider sm);
+    public abstract Iterator<E> iterator(DNStateManager sm);
 
     /**
      * Removes the association to one element
@@ -77,7 +77,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
      * @param allowDependentField Whether to allow any cascade deletes caused by this removal
      * @return Whether it was successful 
      */
-    public boolean remove(ObjectProvider sm, Object element, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager sm, Object element, int size, boolean allowDependentField)
     {
         if (!validateElementForReading(sm, element))
         {
@@ -157,7 +157,7 @@ public abstract class AbstractSetStore<E> extends AbstractCollectionStore<E> imp
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated
      */
-    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+    public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {

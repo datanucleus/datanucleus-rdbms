@@ -30,7 +30,7 @@ import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.types.SCO;
 import org.datanucleus.store.types.SCOUtils;
@@ -57,28 +57,28 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postInsert(ObjectProvider ownerOP)
+    public void postInsert(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        Collection value = (Collection) ownerOP.provideField(getAbsoluteFieldNumber());
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        Collection value = (Collection) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             if (value != null)
             {
                 if (mmd.getCollection().elementIsPersistent())
                 {
-                    // Make sure all persistable elements have ObjectProviders
+                    // Make sure all persistable elements have StateManagers
                     Object[] collElements = value.toArray();
                     for (Object elem : collElements)
                     {
                         if (elem != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(elem);
+                            DNStateManager elemOP = ec.findStateManager(elem);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -90,7 +90,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         if (value == null)
         {
             // replace null collections with an empty SCO wrapper
-            replaceFieldWithWrapper(ownerOP, null);
+            replaceFieldWithWrapper(ownerSM, null);
             return;
         }
 
@@ -118,7 +118,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
         }
 
@@ -127,7 +127,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         boolean needsAttaching = false;
         for (Object collElement : collElements)
         {
-            if (ownerOP.getExecutionContext().getApiAdapter().isDetached(collElement))
+            if (ownerSM.getExecutionContext().getApiAdapter().isDetached(collElement))
             {
                 needsAttaching = true;
                 break;
@@ -137,13 +137,13 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         if (needsAttaching)
         {
             // Create a wrapper and attach the elements (and add the others)
-            SCO collWrapper = replaceFieldWithWrapper(ownerOP, null);
+            SCO collWrapper = replaceFieldWithWrapper(ownerSM, null);
             if (value.size() > 0)
             {
                 collWrapper.attachCopy(value);
 
                 // The attach will have put entries in the operationQueue if using optimistic, so flush them
-                ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerOP);
+                ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)collWrapper).getBackingStore(), ownerSM);
             }
         }
         else
@@ -151,22 +151,22 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             if (value.size() > 0)
             {
                 // Add the elements direct to the datastore
-                ((CollectionStore) storeMgr.getBackingStoreForField(ownerOP.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerOP, value, 0);
+                ((CollectionStore) storeMgr.getBackingStoreForField(ownerSM.getExecutionContext().getClassLoaderResolver(),mmd, value.getClass())).addAll(ownerSM, value, 0);
 
                 // Create a SCO wrapper with the elements loaded
-                replaceFieldWithWrapper(ownerOP, value);
+                replaceFieldWithWrapper(ownerSM, value);
             }
             else
             {
-                if (mmd.getRelationType(ownerOP.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
+                if (mmd.getRelationType(ownerSM.getExecutionContext().getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
                 {
                     // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                    replaceFieldWithWrapper(ownerOP, null);
+                    replaceFieldWithWrapper(ownerSM, null);
                 }
                 else
                 {
                     // Create a SCO wrapper, pass in empty collection to avoid loading from DB (extra SQL)
-                    replaceFieldWithWrapper(ownerOP, value);
+                    replaceFieldWithWrapper(ownerSM, value);
                 }
             }
         }
@@ -179,28 +179,28 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
      * <li>Update a collection field of an object by replacing the collection with a new collection, so UpdateRequest is called, which calls here</li>
      * <li>Persist a new object, and it needed to wait til the element was inserted so goes into dirty state and then flush() triggers UpdateRequest, which comes here</li>
      * </ul>
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postUpdate(ObjectProvider ownerOP)
+    public void postUpdate(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        Collection value = (Collection) ownerOP.provideField(getAbsoluteFieldNumber());
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        Collection value = (Collection) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             if (value != null)
             {
                 if (mmd.getCollection().elementIsPersistent())
                 {
-                    // Make sure all persistable elements have ObjectProviders
+                    // Make sure all persistable elements have StateManagers
                     Object[] collElements = value.toArray();
                     for (Object collElement : collElements)
                     {
                         if (collElement != null)
                         {
-                            ObjectProvider elemOP = ec.findObjectProvider(collElement);
+                            DNStateManager elemOP = ec.findStateManager(collElement);
                             if (elemOP == null || ec.getApiAdapter().getExecutionContext(collElement) == null)
                             {
-                                elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, collElement, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, collElement, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -212,15 +212,15 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         if (value == null)
         {
             // remove any elements in the collection and replace it with an empty SCO wrapper
-            ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerOP);
-            replaceFieldWithWrapper(ownerOP, null);
+            ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerSM);
+            replaceFieldWithWrapper(ownerSM, null);
             return;
         }
 
         if (value instanceof BackedSCO)
         {
             // Already have a SCO value, so flush outstanding updates
-            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
             return;
         }
 
@@ -228,14 +228,14 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
 
             CollectionStore backingStore = ((CollectionStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
-            backingStore.update(ownerOP, value);
+            backingStore.update(ownerSM, value);
 
             // Replace the field with a wrapper containing these elements
-            replaceFieldWithWrapper(ownerOP, value);
+            replaceFieldWithWrapper(ownerSM, value);
         }
         else
         {
@@ -243,7 +243,7 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // User doesn't want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
             return;
         }
@@ -251,9 +251,9 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
 
     /**
      * Method to be called before any delete of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void preDelete(ObjectProvider ownerOP)
+    public void preDelete(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -262,8 +262,8 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
         }
 
         // makes sure field is loaded
-        ownerOP.isLoaded(getAbsoluteFieldNumber());
-        Collection value = (Collection) ownerOP.provideField(getAbsoluteFieldNumber());
+        ownerSM.isLoaded(getAbsoluteFieldNumber());
+        Collection value = (Collection) ownerSM.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             return;
@@ -288,22 +288,22 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
                 // FK collection, using <field> FK spec
                 hasFK = true;
             }
-            AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(ownerOP.getExecutionContext().getClassLoaderResolver());
+            AbstractMemberMetaData[] relatedMmds = mmd.getRelatedMemberMetaData(ownerSM.getExecutionContext().getClassLoaderResolver());
             if (relatedMmds != null && relatedMmds[0].getForeignKeyMetaData() != null)
             {
                 // FK collection (bidir), using <field> FK spec at other end
                 hasFK = true;
             }
         }
-        if (ownerOP.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
+        if (ownerSM.getExecutionContext().getStringProperty(PropertyNames.PROPERTY_DELETION_POLICY).equals("JDO2"))
         {
             // JDO doesn't currently take note of foreign-key
             hasFK = false;
         }
 
-        if (ownerOP.getExecutionContext().getManageRelations())
+        if (ownerSM.getExecutionContext().getManageRelations())
         {
-            ownerOP.getExecutionContext().getRelationshipManager(ownerOP).relationChange(getAbsoluteFieldNumber(), value, null);
+            ownerSM.getExecutionContext().getRelationshipManager(ownerSM).relationChange(getAbsoluteFieldNumber(), value, null);
         }
 
         // TODO Why dont we just do clear here always ? The backing store should take care of if nulling or deleting etc
@@ -314,12 +314,12 @@ public class CollectionMapping extends AbstractContainerMapping implements Mappi
             // or there are no FKs specified (in which case we need to clean up)
             if (!(value instanceof SCO))
             {
-                value = (Collection)SCOUtils.wrapSCOField(ownerOP, getAbsoluteFieldNumber(), value, true);
+                value = (Collection)SCOUtils.wrapSCOField(ownerSM, getAbsoluteFieldNumber(), value, true);
             }
             value.clear();
 
             // Flush any outstanding updates
-            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
         }
     }
 }

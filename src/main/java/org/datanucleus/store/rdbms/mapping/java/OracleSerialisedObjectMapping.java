@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 
 /**
@@ -32,9 +32,9 @@ public class OracleSerialisedObjectMapping extends SerialisedMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param sm the current ObjectProvider
+     * @param sm the current StateManager
      */
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         // Generate the contents for the BLOB
         byte[] bytes = new byte[0];

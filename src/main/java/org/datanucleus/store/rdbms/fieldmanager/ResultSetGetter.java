@@ -25,7 +25,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -48,7 +48,7 @@ public class ResultSetGetter extends AbstractFieldManager
     protected final ResultSet rs;
     protected final StatementClassMapping resultMappings;
 
-    protected ObjectProvider sm;
+    protected DNStateManager sm;
     protected AbstractClassMetaData cmd;
 
     /**
@@ -73,7 +73,7 @@ public class ResultSetGetter extends AbstractFieldManager
      * This is typically called just before processing the current persistable object on the current row.
      * @param sm StateManager that we are applying to.
      */
-    public void setObjectProvider(ObjectProvider sm)
+    public void setStateManager(DNStateManager sm)
     {
         this.sm = sm;
         this.cmd = sm.getClassMetaData();

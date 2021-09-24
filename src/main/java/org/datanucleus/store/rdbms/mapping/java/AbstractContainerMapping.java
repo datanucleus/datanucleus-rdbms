@@ -35,7 +35,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.JdbcType;
 import org.datanucleus.metadata.MetaDataUtils;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.NoDatastoreMappingException;
 import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
@@ -174,7 +174,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             throw new NucleusException(failureMessage("setObject")).setFatal();
         }
 
-        ObjectProvider[] sms = null;
+        DNStateManager[] sms = null;
         ApiAdapter api = ec.getApiAdapter();
         if (value != null)
         {
@@ -187,7 +187,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                     Object elem = elementsIter.next();
                     if (api.isPersistable(elem))
                     {
-                        ObjectProvider sm = ec.findObjectProvider(elem);
+                        DNStateManager sm = ec.findStateManager(elem);
                         if (sm != null)
                         {
                             if (smsColl == null)
@@ -209,7 +209,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                     Object val = entry.getValue();
                     if (api.isPersistable(key))
                     {
-                        ObjectProvider sm = ec.findObjectProvider(key);
+                        DNStateManager sm = ec.findStateManager(key);
                         if (sm != null)
                         {
                             if (smsColl == null)
@@ -221,7 +221,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
                     }
                     if (api.isPersistable(val))
                     {
-                        ObjectProvider sm = ec.findObjectProvider(val);
+                        DNStateManager sm = ec.findStateManager(val);
                         if (sm != null)
                         {
                             if (smsColl == null)
@@ -235,7 +235,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
             }
             if (smsColl != null)
             {
-                sms = (ObjectProvider[])smsColl.toArray(new ObjectProvider[smsColl.size()]);
+                sms = (DNStateManager[])smsColl.toArray(new DNStateManager[smsColl.size()]);
             }
         }
 
@@ -414,7 +414,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * @param value The value to create the wrapper with
      * @return The SCO wrapper object that the field was replaced with
      */
-    protected SCO replaceFieldWithWrapper(ObjectProvider sm, Object value)
+    protected SCO replaceFieldWithWrapper(DNStateManager sm, Object value)
     {
         Class type = mmd.getType();
         if (value != null)
@@ -448,7 +448,7 @@ public abstract class AbstractContainerMapping extends SingleFieldMapping
      * Method to be called after any fetch of the owner class element.
      * @param sm StateManager of the owner
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {

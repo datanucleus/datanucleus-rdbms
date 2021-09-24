@@ -17,7 +17,7 @@ Contributors:
 **********************************************************************/
 package org.datanucleus.store.rdbms.mapping.column;
 
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Interface implemented by any ColumnMapping that requires a post-set (insert/update) step.
@@ -30,5 +30,5 @@ public interface ColumnMappingPostSet
      * @param sm StateManager for object being set
      * @param value The value to use on the set
      */
-    void setPostProcessing(ObjectProvider sm, Object value);
+    void setPostProcessing(DNStateManager sm, Object value);
 }

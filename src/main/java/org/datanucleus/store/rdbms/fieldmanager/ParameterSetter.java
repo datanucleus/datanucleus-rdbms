@@ -27,7 +27,7 @@ import org.datanucleus.exceptions.NucleusUserException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.NullValue;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.AbstractFieldManager;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.InterfaceMapping;
@@ -45,7 +45,7 @@ import org.datanucleus.util.Localiser;
  */
 public class ParameterSetter extends AbstractFieldManager
 {
-    protected final ObjectProvider sm;
+    protected final DNStateManager sm;
     protected final ExecutionContext ec;
     protected final PreparedStatement statement;
     protected final StatementClassMapping stmtMappings;
@@ -56,7 +56,7 @@ public class ParameterSetter extends AbstractFieldManager
      * @param stmt The Statement to set values on.
      * @param stmtMappings mappings for parameters in the statement.
      */
-    public ParameterSetter(ObjectProvider sm, PreparedStatement stmt, StatementClassMapping stmtMappings)
+    public ParameterSetter(DNStateManager sm, PreparedStatement stmt, StatementClassMapping stmtMappings)
     {
         this.sm = sm;
         this.ec = sm.getExecutionContext();
@@ -177,7 +177,7 @@ public class ParameterSetter extends AbstractFieldManager
                 mapping instanceof PersistableMapping ||
                 mapping instanceof InterfaceMapping)
             {
-                // Pass in the owner ObjectProvider/field for any mappings that have relations
+                // Pass in the owner StateManager/field for any mappings that have relations
                 provideOwner = true;
             }
 

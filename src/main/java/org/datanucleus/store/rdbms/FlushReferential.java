@@ -26,7 +26,7 @@ import java.util.Set;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusOptimisticException;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.table.ClassTable;
 import org.datanucleus.flush.FlushNonReferential;
 import org.datanucleus.flush.FlushOrdered;
@@ -42,18 +42,18 @@ public class FlushReferential extends FlushOrdered
      * @see org.datanucleus.FlushOrdered#execute(org.datanucleus.ExecutionContext, java.util.Collection, java.util.Collection, org.datanucleus.flush.OperationQueue)
      */
     @Override
-    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<ObjectProvider> primarySMs, Collection<ObjectProvider> secondarySMs, OperationQueue smQueue)
+    public List<NucleusOptimisticException> execute(ExecutionContext ec, Collection<DNStateManager> primarySMs, Collection<DNStateManager> secondarySMs, OperationQueue smQueue)
     {
         List<NucleusOptimisticException> flushExcps = null;
 
         // Phase 1 : Find all objects that have no relations or external FKs and process first
-        Set<ObjectProvider> unrelatedSMs = null;
+        Set<DNStateManager> unrelatedSMs = null;
         if (primarySMs != null)
         {
-            Iterator<ObjectProvider> opIter = primarySMs.iterator();
+            Iterator<DNStateManager> opIter = primarySMs.iterator();
             while (opIter.hasNext())
             {
-                ObjectProvider sm = opIter.next();
+                DNStateManager sm = opIter.next();
                 if (!sm.isEmbedded() && isClassSuitableForBatching(ec, sm.getClassMetaData()))
                 {
                     if (unrelatedSMs == null)
@@ -67,10 +67,10 @@ public class FlushReferential extends FlushOrdered
         }
         if (secondarySMs != null)
         {
-            Iterator<ObjectProvider> smIter = secondarySMs.iterator();
+            Iterator<DNStateManager> smIter = secondarySMs.iterator();
             while (smIter.hasNext())
             {
-                ObjectProvider sm = smIter.next();
+                DNStateManager sm = smIter.next();
                 if (!sm.isEmbedded() && isClassSuitableForBatching(ec, sm.getClassMetaData()))
                 {
                     if (unrelatedSMs == null)

@@ -28,7 +28,7 @@ import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.ColumnMetaData;
 import org.datanucleus.metadata.FieldRole;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
@@ -696,10 +696,10 @@ public abstract class JavaTypeMapping
      * @param ps PreparedStatement
      * @param exprIndex the position of the value in the statement
      * @param value the value
-     * @param ownerOP the owner ObjectProvider
+     * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
      */    
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, ObjectProvider ownerOP, int ownerFieldNumber)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new NucleusException(failureMessage("setObject")).setFatal();
     }
@@ -721,11 +721,11 @@ public abstract class JavaTypeMapping
      * @param ec ExecutionContext
      * @param rs an object returned from the datastore with values 
      * @param exprIndex the position of the value in the result
-     * @param ownerOP the owner ObjectProvider
+     * @param ownerSM the owner StateManager
      * @param ownerFieldNumber the owner absolute field number
      * @return the value
      */
-    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, ObjectProvider ownerOP, int ownerFieldNumber)
+    public Object getObject(ExecutionContext ec, ResultSet rs, int[] exprIndex, DNStateManager ownerSM, int ownerFieldNumber)
     {
         throw new NucleusException(failureMessage("getObject")).setFatal();
     }
@@ -821,7 +821,7 @@ public abstract class JavaTypeMapping
      * Default implementation does nothing.
      * @param sm StateManager of the object with this mapping
      */
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
 //        Object value = op.provideField(mmd.getAbsoluteFieldNumber());
 //        op.isLoaded(mmd.getAbsoluteFieldNumber());

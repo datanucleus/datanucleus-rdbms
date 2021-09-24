@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
@@ -37,9 +37,9 @@ public class OracleBitSetMapping extends BitSetMapping
 {
     /**
      * Retrieve the empty BLOB created by the insert statement and write out the current BLOB field value to the Oracle BLOB object
-     * @param sm the current ObjectProvider
+     * @param sm the current StateManager
      */
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         Object value = sm.provideField(mmd.getAbsoluteFieldNumber());
         if (value == null)

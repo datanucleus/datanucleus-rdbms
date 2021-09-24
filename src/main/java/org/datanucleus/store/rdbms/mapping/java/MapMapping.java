@@ -32,7 +32,7 @@ import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.exceptions.ReachableObjectNotCascadedException;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.types.SCO;
@@ -60,12 +60,12 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
     /**
      * Method to be called after the insert of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postInsert(ObjectProvider ownerOP)
+    public void postInsert(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        java.util.Map value = (java.util.Map) ownerOP.provideField(getAbsoluteFieldNumber());
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        java.util.Map value = (java.util.Map) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             // Do nothing when serialised since we are handled in the main request
@@ -73,7 +73,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             {
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
-                    // Make sure all persistable keys/values have ObjectProviders
+                    // Make sure all persistable keys/values have StateManagers
                     Set entries = value.entrySet();
                     Iterator iter = entries.iterator();
                     while (iter.hasNext())
@@ -82,17 +82,17 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
-                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
-                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -104,7 +104,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value == null)
         {
             // replace null map with an empty SCO wrapper
-            replaceFieldWithWrapper(ownerOP, null);
+            replaceFieldWithWrapper(ownerSM, null);
             return;
         }
 
@@ -146,42 +146,42 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // Reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007007", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
         }
 
         if (value.size() > 0)
         {
             // Add the entries direct to the datastore
-            ((MapStore) table.getStoreManager().getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerOP, value, Collections.emptyMap());
+            ((MapStore) table.getStoreManager().getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass())).putAll(ownerSM, value, Collections.emptyMap());
 
             // Create a SCO wrapper with the entries loaded
-            replaceFieldWithWrapper(ownerOP, value);
+            replaceFieldWithWrapper(ownerSM, value);
         }
         else
         {
             if (mmd.getRelationType(ec.getClassLoaderResolver()) == RelationType.MANY_TO_MANY_BI)
             {
                 // Create a SCO wrapper, pass in null so it loads any from the datastore (on other side?)
-                replaceFieldWithWrapper(ownerOP, null);
+                replaceFieldWithWrapper(ownerSM, null);
             }
             else
             {
                 // Create a SCO wrapper, pass in empty map to avoid loading from DB (extra SQL)
-                replaceFieldWithWrapper(ownerOP, value);
+                replaceFieldWithWrapper(ownerSM, value);
             }
         }
     }
 
     /**
      * Method to be called after any update of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void postUpdate(ObjectProvider ownerOP)
+    public void postUpdate(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
-        java.util.Map value = (java.util.Map) ownerOP.provideField(getAbsoluteFieldNumber());
+        java.util.Map value = (java.util.Map) ownerSM.provideField(getAbsoluteFieldNumber());
         if (containerIsStoredInSingleColumn())
         {
             // Do nothing when serialised since we are handled in the main request
@@ -189,7 +189,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             {
                 if (mmd.getMap().keyIsPersistent() || mmd.getMap().valueIsPersistent())
                 {
-                    // Make sure all persistable keys/values have ObjectProviders
+                    // Make sure all persistable keys/values have StateManagers
                     Set entries = value.entrySet();
                     Iterator iter = entries.iterator();
                     while (iter.hasNext())
@@ -198,17 +198,17 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
                         if (mmd.getMap().keyIsPersistent() && entry.getKey() != null)
                         {
                             Object key = entry.getKey();
-                            if (ec.findObjectProvider(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
+                            if (ec.findStateManager(key) == null || ec.getApiAdapter().getExecutionContext(key) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, key, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, key, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                         if (mmd.getMap().valueIsPersistent() && entry.getValue() != null)
                         {
                             Object val = entry.getValue();
-                            if (ec.findObjectProvider(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
+                            if (ec.findStateManager(val) == null || ec.getApiAdapter().getExecutionContext(val) == null)
                             {
-                                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, val, false, ownerOP, mmd.getAbsoluteFieldNumber());
+                                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, val, false, ownerSM, mmd.getAbsoluteFieldNumber());
                             }
                         }
                     }
@@ -220,15 +220,15 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (value == null)
         {
             // remove any entries in the map and replace it with an empty SCO wrapper
-            ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerOP);
-            replaceFieldWithWrapper(ownerOP, null);
+            ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, null)).clear(ownerSM);
+            replaceFieldWithWrapper(ownerSM, null);
             return;
         }
 
         if (value instanceof BackedSCO)
         {
             // Already have a SCO value, so flush outstanding updates
-            ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+            ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
             return;
         }
 
@@ -236,7 +236,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         {
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007009", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
 
             // Update the datastore with this value of map (clear old entries and add new ones)
@@ -246,13 +246,13 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             //     goes into dirty state and then flush() triggers UpdateRequest, which comes here
             MapStore store = ((MapStore) storeMgr.getBackingStoreForField(ec.getClassLoaderResolver(), mmd, value.getClass()));
 
-            store.update(ownerOP, value);
+            store.update(ownerSM, value);
             // TODO Optimise this. Should mean call removeAll(Set<K>), followed by putAll(map, currentMap)
-//            store.clear(ownerOP);
-//            store.putAll(ownerOP, value, Collections.emptyMap());
+//            store.clear(ownerSM);
+//            store.putAll(ownerSM, value, Collections.emptyMap());
 
             // Replace the field with a wrapper containing these entries
-            replaceFieldWithWrapper(ownerOP, value);
+            replaceFieldWithWrapper(ownerSM, value);
         }
         else
         {
@@ -260,7 +260,7 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
             // User doesnt want to update by reachability
             if (NucleusLogger.PERSISTENCE.isDebugEnabled())
             {
-                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerOP.getInternalObjectId()), mmd.getFullFieldName()));
+                NucleusLogger.PERSISTENCE.debug(Localiser.msg("007008", IdentityUtils.getPersistableIdentityForId(ownerSM.getInternalObjectId()), mmd.getFullFieldName()));
             }
             return;
         }
@@ -268,9 +268,9 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
 
     /**
      * Method to be called before any delete of the owner class element.
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      */
-    public void preDelete(ObjectProvider ownerOP)
+    public void preDelete(DNStateManager ownerSM)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -279,8 +279,8 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         }
 
         // makes sure field is loaded
-        ownerOP.isLoaded(getAbsoluteFieldNumber());
-        java.util.Map value = (java.util.Map) ownerOP.provideField(getAbsoluteFieldNumber());
+        ownerSM.isLoaded(getAbsoluteFieldNumber());
+        java.util.Map value = (java.util.Map) ownerSM.provideField(getAbsoluteFieldNumber());
         if (value == null)
         {
             // Do nothing
@@ -290,11 +290,11 @@ public class MapMapping extends AbstractContainerMapping implements MappingCallb
         if (!(value instanceof SCO))
         {
             // Make sure we have a SCO wrapper so we can clear from the datastore
-            value = (java.util.Map)SCOUtils.wrapSCOField(ownerOP, mmd.getAbsoluteFieldNumber(), value, true);
+            value = (java.util.Map)SCOUtils.wrapSCOField(ownerSM, mmd.getAbsoluteFieldNumber(), value, true);
         }
         value.clear();
 
         // Flush any outstanding updates for this backing store
-        ownerOP.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerOP);
+        ownerSM.getExecutionContext().flushOperationsForBackingStore(((BackedSCO)value).getBackingStore(), ownerSM);
     }
 }

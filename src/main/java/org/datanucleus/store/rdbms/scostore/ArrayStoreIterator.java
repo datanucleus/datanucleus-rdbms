@@ -24,7 +24,7 @@ import java.util.Iterator;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.EmbeddedElementPCMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -47,7 +47,7 @@ public class ArrayStoreIterator implements Iterator
 
     private Object lastElement = null;
 
-    ArrayStoreIterator(ObjectProvider sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore) 
+    ArrayStoreIterator(DNStateManager sm, ResultSet rs, ResultObjectFactory rof, ElementContainerStore backingStore) 
     throws MappedDatastoreException
     {
         this.ec = sm.getExecutionContext();

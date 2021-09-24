@@ -28,7 +28,7 @@ import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
 import org.datanucleus.store.query.expression.Expression;
@@ -191,7 +191,7 @@ public class ExpressionUtils
             // TODO What if this is a property?
         }
 
-        ObjectProvider sm = ec.findObjectProvider(object);
+        DNStateManager sm = ec.findStateManager(object);
         if (!mmd.isPrimaryKey())
         {
             // Make sure the field is loaded

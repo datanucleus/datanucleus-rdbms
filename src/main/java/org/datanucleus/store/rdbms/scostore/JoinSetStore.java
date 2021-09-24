@@ -39,7 +39,7 @@ import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -143,7 +143,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider sm, Collection coll)
+    public void update(DNStateManager sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
@@ -192,44 +192,44 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Convenience method to check if an element already refers to the owner in an M-N relation (i.e added from other side).
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      * @param element The element
      * @return Whether the element contains the owner
      */
-    private boolean elementAlreadyContainsOwnerInMtoN(ObjectProvider ownerOP, Object element)
+    private boolean elementAlreadyContainsOwnerInMtoN(DNStateManager ownerSM, Object element)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         if (ec.getOperationQueue() != null)
         {
             // Optimistic add, so additions are queued. No point checking the SCO on the other side, so just query the datastore whether already added (from other side)
             // TODO This means we always do a "SELECT 1 FROM JOINTABLE" for every addition when optimistic. Should seek to avoid this by updates to operationQueue maybe
-            if (locate(ownerOP, element))
+            if (locate(ownerSM, element))
             {
-                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerSM.getObject()), element));
                 return true;
             }
             return false;
         }
 
-        ObjectProvider elementOP = ec.findObjectProvider(element);
+        DNStateManager elementOP = ec.findStateManager(element);
         if (elementOP != null)
         {
             // Check the collection at the other side whether already added (to avoid the locate call)
             AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(ec.getClassLoaderResolver());
             Object elementColl = elementOP.provideField(relatedMmds[0].getAbsoluteFieldNumber());
-            if (elementColl != null && elementColl instanceof Collection && elementColl instanceof SCO && ((Collection)elementColl).contains(ownerOP.getObject()))
+            if (elementColl != null && elementColl instanceof Collection && elementColl instanceof SCO && ((Collection)elementColl).contains(ownerSM.getObject()))
             {
-                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerSM.getObject()), element));
                 return true;
             }
         }
         else
         {
             // Element is still detached
-            if (locate(ownerOP, element))
+            if (locate(ownerSM, element))
             {
-                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerOP.getObject()), element));
+                NucleusLogger.DATASTORE.info(Localiser.msg("056040", ownerMemberMetaData.getFullFieldName(), StringUtils.toJVMIDString(ownerSM.getObject()), element));
                 return true;
             }
         }
@@ -243,7 +243,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param element Element to add
      * @return Whether it was successful
      */
-    public boolean add(ObjectProvider sm, E element, int size)
+    public boolean add(DNStateManager sm, E element, int size)
     {
         // Check that the object is valid for writing
         ExecutionContext ec = sm.getExecutionContext();
@@ -253,7 +253,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         {
             // TODO This is ManagedRelations - move into RelationshipManager
             // Managed Relations : make sure we have consistency of relation
-            ObjectProvider elementOP = ec.findObjectProvider(element);
+            DNStateManager elementOP = ec.findStateManager(element);
             if (elementOP != null)
             {
                 AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
@@ -320,7 +320,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param elements Collection of elements to add
      * @return Whether it was successful
      */
-    public boolean addAll(ObjectProvider sm, Collection<E> elements, int size)
+    public boolean addAll(DNStateManager sm, Collection<E> elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -342,7 +342,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
                 // Managed Relations : make sure we have consistency of relation
-                ObjectProvider elementOP = sm.getExecutionContext().findObjectProvider(element);
+                DNStateManager elementOP = sm.getExecutionContext().findStateManager(element);
                 if (elementOP != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
@@ -452,7 +452,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param elements Collection of elements to remove
      * @return Whether the database was updated
      */
-    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+    public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -475,7 +475,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return modified;
     }
 
-    protected boolean removeAllInternal(ObjectProvider sm, Collection elements, int size)
+    protected boolean removeAllInternal(DNStateManager sm, Collection elements, int size)
     {
         boolean modified = false;
 
@@ -564,7 +564,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
      * @param elements Collection of elements to remove
      * @return Statement for deleting items from the Set.
      */
-    protected String getRemoveAllStmt(ObjectProvider sm, Collection elements)
+    protected String getRemoveAllStmt(DNStateManager sm, Collection elements)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -593,7 +593,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    private boolean locate(ObjectProvider sm, Object element)
+    private boolean locate(DNStateManager sm, Object element)
     {
         boolean exists = true;
         String stmt = getLocateStmt(element);
@@ -646,7 +646,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return exists;
     }
 
-    protected int[] doInternalAdd(ObjectProvider sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
+    protected int[] doInternalAdd(DNStateManager sm, E element, ManagedConnection conn, boolean batched, int orderId, boolean executeNow)
     throws MappedDatastoreException
     {
         // Check for dynamic schema updates prior to addition
@@ -749,7 +749,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
         return stmt.toString();
     }
 
-    protected int getNextIDForOrderColumn(ObjectProvider sm)
+    protected int getNextIDForOrderColumn(DNStateManager sm)
     {
         int nextID;
         ExecutionContext ec = sm.getExecutionContext();
@@ -840,12 +840,12 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
 
     /**
      * Accessor for an iterator for the set.
-     * @param ownerOP ObjectProvider for the set.
+     * @param ownerSM StateManager for the set.
      * @return Iterator for the set.
      */
-    public Iterator<E> iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
         ElementIteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
@@ -894,7 +894,7 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
+                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerStmtMapIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -909,17 +909,17 @@ public class JoinSetStore<E> extends AbstractSetStore<E>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new CollectionStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerSM, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new CollectionStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerSM, rs, null, this);
                         }
                         else
                         {
                             ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
-                            return new CollectionStoreIterator(ownerOP, rs, rof, this);
+                            return new CollectionStoreIterator(ownerSM, rs, rof, this);
                         }
                     }
                     finally

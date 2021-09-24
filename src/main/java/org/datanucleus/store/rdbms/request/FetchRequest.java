@@ -35,7 +35,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.state.LockMode;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -331,9 +331,9 @@ public class FetchRequest extends Request
     }
 
     /* (non-Javadoc)
-     * @see org.datanucleus.store.rdbms.request.Request#execute(org.datanucleus.state.ObjectProvider)
+     * @see org.datanucleus.store.rdbms.request.Request#execute(org.datanucleus.state.DNStateManager)
      */
-    public void execute(ObjectProvider sm)
+    public void execute(DNStateManager sm)
     {
         if (fieldsToFetch != null && NucleusLogger.PERSISTENCE.isDebugEnabled())
         {
@@ -441,7 +441,7 @@ public class FetchRequest extends Request
 
                             // Copy the results into the object
                             ResultSetGetter rsGetter = new ResultSetGetter(ec, rs, mappingDef, sm.getClassMetaData());
-                            rsGetter.setObjectProvider(sm);
+                            rsGetter.setStateManager(sm);
 
                             // Make sure the version is set first
                             if (sm.getTransactionalVersion() == null)

@@ -27,7 +27,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.fieldmanager.ParameterSetter;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
@@ -48,18 +48,18 @@ public class BackingStoreHelper
     private BackingStoreHelper(){}
 
     /**
-     * Convenience method to return the owner ObjectProvider for a backing store. If the supplied ObjectProvider is embedded then finds its owner until it finds the
+     * Convenience method to return the owner StateManager for a backing store. If the supplied StateManager is embedded then finds its owner until it finds the
      * owner that is not embedded.
-     * @param sm Input ObjectProvider
-     * @return The owner ObjectProvider
+     * @param sm Input StateManager
+     * @return The owner StateManager
      */
-    public static ObjectProvider getOwnerObjectProviderForBackingStore(ObjectProvider sm)
+    public static DNStateManager getOwnerStateManagerForBackingStore(DNStateManager sm)
     {
-        ObjectProvider ownerOP = sm;
+        DNStateManager ownerOP = sm;
         while (ownerOP.isEmbedded())
         {
             // Embedded object, so get the owner object it is embedded in
-            ObjectProvider[] ownerOPs = sm.getExecutionContext().getOwnersForEmbeddedObjectProvider(ownerOP);
+            DNStateManager[] ownerOPs = sm.getExecutionContext().getOwnersForEmbeddedStateManager(ownerOP);
             if (ownerOPs != null && ownerOPs.length == 1)
             {
                 ownerOP = ownerOPs[0];
@@ -86,12 +86,12 @@ public class BackingStoreHelper
      * @param bcs Base container backing store
      * @return The next position in the JDBC statement
      */
-    public static int populateOwnerInStatement(ObjectProvider sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
+    public static int populateOwnerInStatement(DNStateManager sm, ExecutionContext ec, PreparedStatement ps, int jdbcPosition, BaseContainerStore bcs)
     {
         // Find the real owner in case the provide object is embedded
         boolean embedded = false;
-        ObjectProvider ownerOP = getOwnerObjectProviderForBackingStore(sm);
-        if (ownerOP != sm)
+        DNStateManager ownerSM = getOwnerStateManagerForBackingStore(sm);
+        if (ownerSM != sm)
         {
             embedded = true;
         }
@@ -104,13 +104,13 @@ public class BackingStoreHelper
 
         if (bcs.getOwnerMemberMetaData() != null && !embedded)
         {
-            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerOP.getObject(),
-                ownerOP, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerSM.getObject(),
+                ownerSM, bcs.getOwnerMemberMetaData().getAbsoluteFieldNumber());
         }
         else
         {
             // Either we have no member info, or we are setting the owner when the provided owner is embedded, so are navigating back to the real owner
-            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerOP.getObject());
+            bcs.getOwnerMapping().setObject(ec, ps, MappingHelper.getMappingIndices(jdbcPosition, bcs.getOwnerMapping()), ownerSM.getObject());
         }
         return jdbcPosition + bcs.getOwnerMapping().getNumberOfColumnMappings();
     }
@@ -331,7 +331,7 @@ public class BackingStoreHelper
      * @param bcs Container store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedElementFieldsInStatement(ObjectProvider sm, Object element, PreparedStatement ps,
+    public static int populateEmbeddedElementFieldsInStatement(DNStateManager sm, Object element, PreparedStatement ps,
             int jdbcPosition, AbstractMemberMetaData ownerFieldMetaData, JavaTypeMapping elementMapping,
             AbstractClassMetaData emd, BaseContainerStore bcs)
     {
@@ -353,8 +353,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = bcs.getObjectProviderForEmbeddedPCObject(sm, element, ownerFieldMetaData, ObjectProvider.EMBEDDED_COLLECTION_ELEMENT_PC);
-        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
+        DNStateManager elementSM = bcs.getStateManagerForEmbeddedPCObject(sm, element, ownerFieldMetaData, DNStateManager.EMBEDDED_COLLECTION_ELEMENT_PC);
+        elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;
     }
@@ -370,7 +370,7 @@ public class BackingStoreHelper
      * @param mapStore the map store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedKeyFieldsInStatement(ObjectProvider sm, Object key,
+    public static int populateEmbeddedKeyFieldsInStatement(DNStateManager sm, Object key,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
         AbstractClassMetaData kmd = mapStore.getKeyClassMetaData();
@@ -392,8 +392,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(sm, key, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_KEY_PC);
-        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
+        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, key, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_KEY_PC);
+        elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;
     }
@@ -409,7 +409,7 @@ public class BackingStoreHelper
      * @param mapStore The map store
      * @return The next JDBC position
      */
-    public static int populateEmbeddedValueFieldsInStatement(ObjectProvider sm, Object value,
+    public static int populateEmbeddedValueFieldsInStatement(DNStateManager sm, Object value,
             PreparedStatement ps, int jdbcPosition, JoinTable joinTable, AbstractMapStore mapStore)
     {
         AbstractClassMetaData vmd = mapStore.getValueClassMetaData();
@@ -431,8 +431,8 @@ public class BackingStoreHelper
             mappingDefinition.addMappingForMember(absFieldNum, stmtMapping);
         }
 
-        ObjectProvider elementOP = mapStore.getObjectProviderForEmbeddedPCObject(sm, value, joinTable.getOwnerMemberMetaData(), ObjectProvider.EMBEDDED_MAP_VALUE_PC);
-        elementOP.provideFields(elementFieldNumbers, new ParameterSetter(elementOP, ps, mappingDefinition));
+        DNStateManager elementSM = mapStore.getStateManagerForEmbeddedPCObject(sm, value, joinTable.getOwnerMemberMetaData(), DNStateManager.EMBEDDED_MAP_VALUE_PC);
+        elementSM.provideFields(elementFieldNumbers, new ParameterSetter(elementSM, ps, mappingDefinition));
 
         return jdbcPosition;
     }

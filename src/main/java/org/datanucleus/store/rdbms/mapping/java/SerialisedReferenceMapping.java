@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.ApiAdapter;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 
 /**
  * Mapping for a serialised reference (Interface/Object) field.
@@ -58,28 +58,27 @@ public class SerialisedReferenceMapping extends SerialisedMapping
      * @param ps The Prepared Statement
      * @param exprIndex The parameter positions to populate
      * @param value The value of the PC to use in populating the parameter positions
-     * @param ownerOP ObjectProvider for the owning object
+     * @param ownerSM StateManager for the owning object
      * @param fieldNumber field number of this object in the owning object
      */
-    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, 
-            ObjectProvider ownerOP, int fieldNumber)
+    public void setObject(ExecutionContext ec, PreparedStatement ps, int[] exprIndex, Object value, DNStateManager ownerSM, int fieldNumber)
     {
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(value))
         {
             // Assign a StateManager to the serialised object if none present
-            ObjectProvider embSM = ec.findObjectProvider(value);
+            DNStateManager embSM = ec.findStateManager(value);
             if (embSM == null || api.getExecutionContext(value) == null)
             {
-                embSM = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, fieldNumber);
+                embSM = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, fieldNumber);
             }
         }
 
-        ObjectProvider sm = null;
+        DNStateManager sm = null;
         if (api.isPersistable(value))
         {
             // Find SM for serialised PC object
-            sm = ec.findObjectProvider(value);
+            sm = ec.findStateManager(value);
         }
 
         if (sm != null)
@@ -114,21 +113,21 @@ public class SerialisedReferenceMapping extends SerialisedMapping
      * @param ec execution context
      * @param resultSet The ResultSet
      * @param exprIndex The parameter positions in the result set to use.
-     * @param ownerOP ObjectProvider for the owning object
+     * @param ownerSM StateManager for the owning object
      * @param fieldNumber Absolute number of field in owner object
      * @return The (deserialised) persistable object
      */
-    public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, ObjectProvider ownerOP, int fieldNumber)
+    public Object getObject(ExecutionContext ec, ResultSet resultSet, int[] exprIndex, DNStateManager ownerSM, int fieldNumber)
     {
         Object obj = getColumnMapping(0).getObject(resultSet, exprIndex[0]);
         ApiAdapter api = ec.getApiAdapter();
         if (api.isPersistable(obj))
         {
             // Assign a StateManager to the serialised object if none present
-            ObjectProvider embSM = ec.findObjectProvider(obj);
+            DNStateManager embSM = ec.findStateManager(obj);
             if (embSM == null || api.getExecutionContext(obj) == null)
             {
-                ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, obj, false, ownerOP, fieldNumber);
+                ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, obj, false, ownerSM, fieldNumber);
             }
         }
         return obj;

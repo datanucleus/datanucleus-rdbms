@@ -36,7 +36,7 @@ import org.datanucleus.ExecutionContext;
 import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.exceptions.NucleusUserException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.AbstractQueryResultIterator;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.rdbms.JDBCUtils;
@@ -241,7 +241,7 @@ public final class ScrollableQueryResult<E> extends AbstractRDBMSQueryResult<E> 
                 Map<Integer, Object> memberValues = bulkLoadedValueByMemberNumber.get(api.getIdForObject(obj));
                 if (memberValues != null)
                 {
-                    ObjectProvider sm = ec.findObjectProvider(obj);
+                    DNStateManager sm = ec.findStateManager(obj);
                     Iterator<Map.Entry<Integer, Object>> memberValIter = memberValues.entrySet().iterator();
                     while (memberValIter.hasNext())
                     {

@@ -21,7 +21,7 @@ package org.datanucleus.store.rdbms.mapping.java;
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.store.types.TypeManager;
@@ -43,17 +43,17 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      */
     public void initialize(AbstractMemberMetaData mmd, Table table, ClassLoaderResolver clr)
     {
-        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), ObjectProvider.EMBEDDED_PC);
+        initialize(mmd, table, clr, mmd.getEmbeddedMetaData(), mmd.getTypeName(), DNStateManager.EMBEDDED_PC);
     }
 
     /**
      * MappingCallback called when the owning object is being fetched.
      * @param sm StateManager of the owning object
      */
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
+        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -73,10 +73,10 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      * MappingCallback called when the owning object has just being inserted.
      * @param sm StateManager of the owning object
      */
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(DNStateManager sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
+        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -97,10 +97,10 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      * MappingCallback called when the owning object has just being udpated.
      * @param sm StateManager of the owning object
      */
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(DNStateManager sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
+        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -121,10 +121,10 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
      * MappingCallback called when the owning object is about to be deleted.
      * @param sm StateManager of the owning object
      */
-    public void preDelete(ObjectProvider sm)
+    public void preDelete(DNStateManager sm)
     {
         // Find the OP for the embedded PC object
-        ObjectProvider thisOP = getObjectProviderForEmbeddedObject(sm);
+        DNStateManager thisOP = getStateManagerForEmbeddedObject(sm);
         if (thisOP == null)
         {
             return;
@@ -143,27 +143,27 @@ public class EmbeddedPCMapping extends EmbeddedMapping implements MappingCallbac
 
     /**
      * Accessor for StateManager of the embedded PC object when provided with the owner object.
-     * @param ownerOP ObjectProvider of the owner
-     * @return ObjectProvider of the embedded object
+     * @param ownerSM StateManager of the owner
+     * @return StateManager of the embedded object
      */
-    private ObjectProvider getObjectProviderForEmbeddedObject(ObjectProvider ownerOP)
+    private DNStateManager getStateManagerForEmbeddedObject(DNStateManager ownerSM)
     {
         AbstractMemberMetaData theMmd = getRealMemberMetaData();
 
-        Object value = ownerOP.provideField(theMmd.getAbsoluteFieldNumber()); // Owner (non-embedded) PC
-        TypeManager typeManager = ownerOP.getExecutionContext().getTypeManager();
+        Object value = ownerSM.provideField(theMmd.getAbsoluteFieldNumber()); // Owner (non-embedded) PC
+        TypeManager typeManager = ownerSM.getExecutionContext().getTypeManager();
         value = mmd.isSingleCollection() ? typeManager.getContainerAdapter(value).iterator().next() : value;
         if (value == null)
         {
             return null;
         }
 
-        ExecutionContext ec = ownerOP.getExecutionContext();
-        ObjectProvider thisOP = ec.findObjectProvider(value);
+        ExecutionContext ec = ownerSM.getExecutionContext();
+        DNStateManager thisOP = ec.findStateManager(value);
         if (thisOP == null)
         {
-            // Assign a ObjectProvider to manage our embedded object
-            thisOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, value, false, ownerOP, theMmd.getAbsoluteFieldNumber());
+            // Assign a StateManager to manage our embedded object
+            thisOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, value, false, ownerSM, theMmd.getAbsoluteFieldNumber());
             thisOP.setPcObjectType(objectType);
         }
 

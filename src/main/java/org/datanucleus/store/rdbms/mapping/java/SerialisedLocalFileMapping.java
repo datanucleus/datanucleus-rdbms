@@ -26,7 +26,7 @@ import java.io.ObjectOutputStream;
 
 import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.metadata.AbstractMemberMetaData;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.table.Table;
 import org.datanucleus.transaction.TransactionEventListener;
@@ -99,7 +99,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         return mmd.getType();
     }
 
-    public void postInsert(final ObjectProvider sm)
+    public void postInsert(final DNStateManager sm)
     {
         Object val = sm.provideField(mmd.getAbsoluteFieldNumber());
         serialiseFieldValue(sm, val);
@@ -112,7 +112,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
                 public void transactionPreRollBack()
                 {
                     // Remove the file
-                    File fieldFile = new File(getFilenameForObjectProvider(sm));
+                    File fieldFile = new File(getFilenameForStateManager(sm));
                     if (fieldFile.exists())
                     {
                         fieldFile.delete();
@@ -132,13 +132,13 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    public void postFetch(ObjectProvider sm)
+    public void postFetch(DNStateManager sm)
     {
         Object value = deserialiseFieldValue(sm);
         sm.replaceField(mmd.getAbsoluteFieldNumber(), value);
     }
 
-    public void postUpdate(final ObjectProvider sm)
+    public void postUpdate(final DNStateManager sm)
     {
         final Object oldValue = deserialiseFieldValue(sm);
 
@@ -169,12 +169,12 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    public void preDelete(final ObjectProvider sm)
+    public void preDelete(final DNStateManager sm)
     {
         final Object oldValue = sm.provideField(mmd.getAbsoluteFieldNumber());
 
-        // Delete the file for this field of this ObjectProvider
-        File fieldFile = new File(getFilenameForObjectProvider(sm));
+        // Delete the file for this field of this StateManager
+        File fieldFile = new File(getFilenameForStateManager(sm));
         if (fieldFile.exists())
         {
             fieldFile.delete();
@@ -204,7 +204,7 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
         }
     }
 
-    protected String getFilenameForObjectProvider(ObjectProvider sm)
+    protected String getFilenameForStateManager(DNStateManager sm)
     {
         return folderName + System.getProperty("file.separator") + sm.getInternalObjectId();
     }
@@ -214,12 +214,12 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
      * @param sm StateManager
      * @param value The value being serialised
      */
-    protected void serialiseFieldValue(ObjectProvider sm, Object value)
+    protected void serialiseFieldValue(DNStateManager sm, Object value)
     {
         try
         {
             // Serialise the field value to the appropriate file in this folder
-            FileOutputStream fileOut = new FileOutputStream(getFilenameForObjectProvider(sm));
+            FileOutputStream fileOut = new FileOutputStream(getFilenameForStateManager(sm));
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(value);
             out.close();
@@ -236,13 +236,13 @@ public class SerialisedLocalFileMapping extends JavaTypeMapping implements Mappi
      * @param sm StateManager to get the value for
      * @return The value currently stored
      */
-    protected Object deserialiseFieldValue(ObjectProvider sm)
+    protected Object deserialiseFieldValue(DNStateManager sm)
     {
         Object value = null;
         try
         {
             // Deserialise the field value from the appropriate file in this folder
-            FileInputStream fileIn = new FileInputStream(getFilenameForObjectProvider(sm));
+            FileInputStream fileIn = new FileInputStream(getFilenameForStateManager(sm));
             ObjectInputStream in = new ObjectInputStream(fileIn);
             value = in.readObject();
             in.close();

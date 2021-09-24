@@ -40,7 +40,7 @@ import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.MetaDataUtils;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.OrderMetaData.FieldOrder;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -173,7 +173,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param size Current size of list if known. -1 if not known
      * @return Whether it was successful
      */
-    protected boolean internalAdd(ObjectProvider sm, int start, boolean atEnd, Collection<E> c, int size)
+    protected boolean internalAdd(DNStateManager sm, int start, boolean atEnd, Collection<E> c, int size)
     {
         if (c == null || c.size() == 0)
         {
@@ -201,7 +201,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
             if (relationType == RelationType.ONE_TO_MANY_BI)
             {
                 // TODO This is ManagedRelations - move into RelationshipManager
-                ObjectProvider elementOP = ec.findObjectProvider(element);
+                DNStateManager elementOP = ec.findStateManager(element);
                 if (elementOP != null)
                 {
                     AbstractMemberMetaData[] relatedMmds = ownerMemberMetaData.getRelatedMemberMetaData(clr);
@@ -325,7 +325,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param allowDependentField Whether to allow dependent field deletes
      * @return The value before setting.
      */
-    public E set(ObjectProvider sm, int index, Object element, boolean allowDependentField)
+    public E set(DNStateManager sm, int index, Object element, boolean allowDependentField)
     {
         ExecutionContext ec = sm.getExecutionContext();
         validateElementForWriting(ec, element, null);
@@ -424,7 +424,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider sm, Collection coll)
+    public void update(DNStateManager sm, Collection coll)
     {
         if (coll == null || coll.isEmpty())
         {
@@ -470,11 +470,11 @@ public class JoinListStore<E> extends AbstractListStore<E>
     /**
      * Convenience method to remove the specified element from the List.
      * @param element The element
-     * @param ownerOP ObjectProvider of the owner
+     * @param ownerSM StateManager of the owner
      * @param size Current size of list if known. -1 if not known
      * @return Whether the List was modified
      */
-    protected boolean internalRemove(ObjectProvider ownerOP, Object element, int size)
+    protected boolean internalRemove(DNStateManager ownerSM, Object element, int size)
     {
         boolean modified = false;
         if (indexedList)
@@ -484,7 +484,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
             // This is done because the element could be duplicated in the list.
             Collection elements = new ArrayList();
             elements.add(element);
-            int[] indices = getIndicesOf(ownerOP, elements);
+            int[] indices = getIndicesOf(ownerSM, elements);
             if (indices == null)
             {
                 return false;
@@ -494,18 +494,18 @@ public class JoinListStore<E> extends AbstractListStore<E>
             // TODO : Change this to remove all in one go and then shift once
             for (int i=0;i<indices.length;i++)
             {
-                internalRemoveAt(ownerOP, indices[i], size);
+                internalRemoveAt(ownerSM, indices[i], size);
                 modified = true;
             }
         }
         else
         {
             // Ordered List - just remove the list item since no indexing present
-            ExecutionContext ec = ownerOP.getExecutionContext();
+            ExecutionContext ec = ownerSM.getExecutionContext();
             ManagedConnection mconn = storeMgr.getConnectionManager().getConnection(ec);
             try
             {
-                int[] rcs = internalRemove(ownerOP, mconn, false, element, true);
+                int[] rcs = internalRemove(ownerSM, mconn, false, element, true);
                 if (rcs != null)
                 {
                     if (rcs[0] > 0)
@@ -518,7 +518,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
             {
                 String msg = Localiser.msg("056012", sqe.getMessage());
                 NucleusLogger.DATASTORE.error(msg, sqe.getCause());
-                throw new NucleusDataStoreException(msg, sqe, ownerOP.getObject());
+                throw new NucleusDataStoreException(msg, sqe, ownerSM.getObject());
             }
             finally
             {
@@ -529,7 +529,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
         return modified;
     }
 
-    private int[] internalRemove(ObjectProvider sm, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
+    private int[] internalRemove(DNStateManager sm, ManagedConnection conn, boolean batched, Object element, boolean executeNow) 
     throws MappedDatastoreException
     {
         ExecutionContext ec = sm.getExecutionContext();
@@ -573,7 +573,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param elements Collection of elements to remove 
      * @return Whether the database was updated 
      */
-    public boolean removeAll(ObjectProvider sm, Collection elements, int size)
+    public boolean removeAll(DNStateManager sm, Collection elements, int size)
     {
         if (elements == null || elements.size() == 0)
         {
@@ -702,7 +702,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
      * @param index The index of the element
      * @param size Current size of list (if known). -1 if not known
      */
-    protected void internalRemoveAt(ObjectProvider sm, int index, int size)
+    protected void internalRemoveAt(DNStateManager sm, int index, int size)
     {
         if (!indexedList)
         {
@@ -714,17 +714,17 @@ public class JoinListStore<E> extends AbstractListStore<E>
 
     /**
      * Accessor for an iterator through the list elements.
-     * @param ownerOP ObjectProvider for the owner
+     * @param ownerSM StateManager for the owner
      * @param startIdx The start point in the list (only for indexed lists).
      * @param endIdx End index in the list (only for indexed lists).
      * @return The List Iterator
      */
-    protected ListIterator<E> listIterator(ObjectProvider ownerOP, int startIdx, int endIdx)
+    protected ListIterator<E> listIterator(DNStateManager ownerSM, int startIdx, int endIdx)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         // Generate the statement. Note that this is not cached since depends on the current FetchPlan and other things
-        ElementIteratorStatement iterStmt = getIteratorStatement(ownerOP.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
+        ElementIteratorStatement iterStmt = getIteratorStatement(ownerSM.getExecutionContext(), ec.getFetchPlan(), true, startIdx, endIdx);
         SelectStatement sqlStmt = iterStmt.getSelectStatement();
         StatementClassMapping resultMapping = iterStmt.getElementClassMapping();
 
@@ -771,7 +771,7 @@ public class JoinListStore<E> extends AbstractListStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
+                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -786,17 +786,17 @@ public class JoinListStore<E> extends AbstractListStore<E>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(ownerOP, rs, null, this);
+                            return new ListStoreIterator(ownerSM, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ListStoreIterator(ownerOP, rs, null, this);
+                            return new ListStoreIterator(ownerSM, rs, null, this);
                         }
                         else
                         {
                             ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), resultMapping, elementCmd, clr.classForName(elementType));
-                            return new ListStoreIterator(ownerOP, rs, rof, this);
+                            return new ListStoreIterator(ownerSM, rs, rof, this);
                         }
                     }
                     finally

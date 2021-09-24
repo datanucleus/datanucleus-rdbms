@@ -29,7 +29,7 @@ import org.datanucleus.FetchPlan;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.MapMetaData.MapType;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
@@ -137,45 +137,45 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
         } 
     }
 
-    public boolean add(ObjectProvider sm, K key, int size)
+    public boolean add(DNStateManager sm, K key, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    public boolean addAll(ObjectProvider sm, Collection keys, int size)
+    public boolean addAll(DNStateManager sm, Collection keys, int size)
     {
         throw new UnsupportedOperationException("Cannot add to a map through its key set");
     }
 
-    public boolean remove(ObjectProvider sm, Object key, int size, boolean allowDependentField)
+    public boolean remove(DNStateManager sm, Object key, int size, boolean allowDependentField)
     {
         throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    public boolean removeAll(ObjectProvider sm, Collection keys, int size)
+    public boolean removeAll(DNStateManager sm, Collection keys, int size)
     {
         throw new UnsupportedOperationException("Cannot remove from a map through its key set");
     }
 
-    public void clear(ObjectProvider sm)
+    public void clear(DNStateManager sm)
     {
         throw new UnsupportedOperationException("Cannot clear a map through its key set");
     }
 
     /**
      * Accessor for an iterator for the set.
-     * @param ownerOP ObjectProvider for the set. 
+     * @param ownerSM StateManager for the set. 
      * @return Iterator for the set.
      */
-    public Iterator<K> iterator(ObjectProvider ownerOP)
+    public Iterator<K> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
         if (iteratorStmtLocked == null)
         {
             synchronized (this) // Make sure this completes in case another thread needs the same info
             {
                 // Generate the statement, and statement mapping/parameter information
-                SQLStatement sqlStmt = getSQLStatementForIterator(ownerOP);
+                SQLStatement sqlStmt = getSQLStatementForIterator(ownerSM);
                 iteratorStmtUnlocked = sqlStmt.getSQLText().toSQL();
                 sqlStmt.addExtension(SQLStatement.EXTENSION_LOCK_FOR_UPDATE, true);
                 iteratorStmtLocked = sqlStmt.getSQLText().toSQL();
@@ -197,7 +197,7 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
                     ownerIdx.getMapping().setObject(ec, ps,
-                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerOP.getObject());
+                        ownerIdx.getParameterPositionsForOccurrence(paramInstance), ownerSM.getObject());
                 }
 
                 try
@@ -209,11 +209,11 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new CollectionStoreIterator(ownerOP, rs, null, this);
+                            return new CollectionStoreIterator(ownerSM, rs, null, this);
                         }
 
                         rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingDef, elementCmd, clr.classForName(elementType));
-                        return new CollectionStoreIterator(ownerOP, rs, rof, this);
+                        return new CollectionStoreIterator(ownerSM, rs, rof, this);
                     }
                     finally
                     {
@@ -246,13 +246,13 @@ class MapKeySetStore<K> extends AbstractSetStore<K>
      * Creates a statement that selects the key table(s), and adds any necessary join to the containerTable
      * if that is not the key table. If the key is embedded then selects the table it is embedded in.
      * Adds a restriction on the ownerMapping of the containerTable so we can restrict to the owner object.
-     * @param ownerOP ObjectProvider for the owner object
+     * @param ownerSM StateManager for the owner object
      * @return The SQLStatement
      */
-    protected SelectStatement getSQLStatementForIterator(ObjectProvider ownerOP)
+    protected SelectStatement getSQLStatementForIterator(DNStateManager ownerSM)
     {
         SelectStatement sqlStmt = null;
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         final ClassLoaderResolver clr = ec.getClassLoaderResolver();
         final Class keyCls = clr.classForName(elementType);

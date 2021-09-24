@@ -32,7 +32,7 @@ import org.datanucleus.metadata.AbstractClassMetaData;
 import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 import org.datanucleus.state.LockMode;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
@@ -196,7 +196,7 @@ public class LocateRequest extends Request
      * Takes the constructed retrieval query and populates with the specific record information.
      * @param sm StateManager for the record to be retrieved
      */
-    public void execute(ObjectProvider sm)
+    public void execute(DNStateManager sm)
     {
         if (statementLocked != null)
         {

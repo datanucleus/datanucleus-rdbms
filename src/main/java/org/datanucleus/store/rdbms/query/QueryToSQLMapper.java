@@ -38,7 +38,7 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.metadata.RelationType;
 import org.datanucleus.metadata.VersionMetaData;
 import org.datanucleus.metadata.VersionStrategy;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.query.NullOrderingType;
 import org.datanucleus.store.query.Query;
 import org.datanucleus.store.query.QueryUtils;
@@ -5196,7 +5196,7 @@ public class QueryToSQLMapper extends AbstractExpressionEvaluator implements Que
             Object paramFieldValue = null;
             if (ec.getApiAdapter().isPersistable(obj))
             {
-                ObjectProvider paramOP = ec.findObjectProvider(obj);
+                DNStateManager paramOP = ec.findStateManager(obj);
                 AbstractClassMetaData paramCmd = ec.getMetaDataManager().getMetaDataForClass(obj.getClass(), clr);
                 AbstractMemberMetaData paramFieldMmd = paramCmd.getMetaDataForMember(fieldName);
                 if (paramOP != null)

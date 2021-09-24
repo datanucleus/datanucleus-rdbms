@@ -26,7 +26,7 @@ import java.sql.SQLException;
 
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.column.BlobImpl;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMappingPostSet;
 import org.datanucleus.store.types.converters.ArrayConversionHelper;
@@ -37,7 +37,7 @@ import org.datanucleus.util.Localiser;
  */
 public class OracleArrayMapping extends ArrayMapping
 {
-    public void performSetPostProcessing(ObjectProvider sm)
+    public void performSetPostProcessing(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -168,7 +168,7 @@ public class OracleArrayMapping extends ArrayMapping
      * Method to be called after the insert of the owner class element.
      * @param sm StateManager of the owner
      */
-    public void postInsert(ObjectProvider sm)
+    public void postInsert(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -181,16 +181,16 @@ public class OracleArrayMapping extends ArrayMapping
 
             if (mmd.getArray().elementIsPersistent())
             {
-                // Make sure all persistable elements have ObjectProviders
+                // Make sure all persistable elements have StateManagers
                 Object[] arrElements = (Object[])value;
                 for (Object elem : arrElements)
                 {
                     if (elem != null)
                     {
-                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
                         }
                     }
                 }
@@ -206,7 +206,7 @@ public class OracleArrayMapping extends ArrayMapping
      * Method to be called after any update of the owner class element.
      * @param sm StateManager of the owner
      */
-    public void postUpdate(ObjectProvider sm)
+    public void postUpdate(DNStateManager sm)
     {
         if (containerIsStoredInSingleColumn())
         {
@@ -219,16 +219,16 @@ public class OracleArrayMapping extends ArrayMapping
 
             if (mmd.getArray().elementIsPersistent())
             {
-                // Make sure all persistable elements have ObjectProviders
+                // Make sure all persistable elements have StateManagers
                 Object[] arrElements = (Object[])value;
                 for (Object elem : arrElements)
                 {
                     if (elem != null)
                     {
-                        ObjectProvider elemOP = ec.findObjectProvider(elem);
+                        DNStateManager elemOP = ec.findStateManager(elem);
                         if (elemOP == null || ec.getApiAdapter().getExecutionContext(elem) == null)
                         {
-                            elemOP = ec.getNucleusContext().getObjectProviderFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
+                            elemOP = ec.getNucleusContext().getStateManagerFactory().newForEmbedded(ec, elem, false, sm, mmd.getAbsoluteFieldNumber());
                         }
                     }
                 }

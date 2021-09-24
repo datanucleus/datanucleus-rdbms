@@ -33,7 +33,7 @@ import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.DiscriminatorStrategy;
 import org.datanucleus.metadata.FieldRole;
 import org.datanucleus.metadata.MetaDataUtils;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.exceptions.MappedDatastoreException;
 import org.datanucleus.store.rdbms.mapping.java.ReferenceMapping;
@@ -135,11 +135,11 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
 
     /**
      * Method to return an iterator to the array.
-     * @param ownerOP ObjectProvider for the owner of the array
+     * @param ownerSM StateManager for the owner of the array
      */
-    public Iterator<E> iterator(ObjectProvider ownerOP)
+    public Iterator<E> iterator(DNStateManager ownerSM)
     {
-        ExecutionContext ec = ownerOP.getExecutionContext();
+        ExecutionContext ec = ownerSM.getExecutionContext();
 
         // Generate the statement, and statement mapping/parameter information
         ElementIteratorStatement iterStmt = getIteratorStatement(ec, ec.getFetchPlan(), true);
@@ -191,7 +191,7 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                 PreparedStatement ps = sqlControl.getStatementForQuery(mconn, stmt);
 
                 // Set the owner
-                ObjectProvider stmtOwnerOP = BackingStoreHelper.getOwnerObjectProviderForBackingStore(ownerOP);
+                DNStateManager stmtOwnerOP = BackingStoreHelper.getOwnerStateManagerForBackingStore(ownerSM);
                 int numParams = ownerIdx.getNumberOfParameterOccurrences();
                 for (int paramInstance=0;paramInstance<numParams;paramInstance++)
                 {
@@ -206,17 +206,17 @@ public class JoinArrayStore<E> extends AbstractArrayStore<E>
                         if (elementsAreEmbedded || elementsAreSerialised)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ArrayStoreIterator(ownerOP, rs, null, this);
+                            return new ArrayStoreIterator(ownerSM, rs, null, this);
                         }
                         else if (elementMapping instanceof ReferenceMapping)
                         {
                             // No ResultObjectFactory needed - handled by SetStoreIterator
-                            return new ArrayStoreIterator(ownerOP, rs, null, this);
+                            return new ArrayStoreIterator(ownerSM, rs, null, this);
                         }
                         else
                         {
                             ResultObjectFactory rof = new PersistentClassROF(ec, rs, false, ec.getFetchPlan(), iteratorMappingClass, elementCmd, clr.classForName(elementType));
-                            return new ArrayStoreIterator(ownerOP, rs, rof, this);
+                            return new ArrayStoreIterator(ownerSM, rs, rof, this);
                         }
                     }
                     finally

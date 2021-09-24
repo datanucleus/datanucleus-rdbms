@@ -28,7 +28,7 @@ import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.exceptions.NucleusDataStoreException;
 import org.datanucleus.exceptions.NucleusException;
-import org.datanucleus.state.ObjectProvider;
+import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.mapping.MappingHelper;
 import org.datanucleus.store.rdbms.mapping.MappingType;
@@ -67,7 +67,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      * @param sm StateManager of the object
      * @param coll The collection to use
      */
-    public void update(ObjectProvider sm, Collection coll)
+    public void update(DNStateManager sm, Collection coll)
     {
         // Crude update - remove existing and add new!
         clear(sm);
@@ -80,7 +80,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      * @param element The element
      * @return Whether it contains the element 
      */
-    public boolean contains(ObjectProvider sm, Object element)
+    public boolean contains(DNStateManager sm, Object element)
     {
         if (!validateElementForReading(sm, element))
         {
@@ -264,7 +264,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
         BackingStoreHelper.appendWhereClauseForElement(stmt, elemMapping, element, elementsAreSerialised, containerAlias, false);
 
         // TODO Remove the "containerTable == " clause and make discriminator restriction part of the JoinTable statement too
-        // Needs to pass TCK M-M relationship test. see contains(ObjectProvider, Object) method also
+        // Needs to pass TCK M-M relationship test. see contains(StateManager, Object) method also
         if (!usingJoinTable && elemInfo.getDiscriminatorMapping() != null)
         {
             // TODO What if we have the discriminator in a supertable? the mapping will be null so we don't get this clause added!
@@ -372,7 +372,7 @@ public abstract class AbstractCollectionStore<E> extends ElementContainerStore i
      * @param value The value
      * @return true if the datastore was updated
      */
-    public boolean updateEmbeddedElement(ObjectProvider sm, E element, int fieldNumber, Object value)
+    public boolean updateEmbeddedElement(DNStateManager sm, E element, int fieldNumber, Object value)
     {
         // TODO Only for join table cases, so really ought to move there
         boolean modified = false;
