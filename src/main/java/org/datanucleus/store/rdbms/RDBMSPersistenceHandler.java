@@ -94,10 +94,10 @@ public class RDBMSPersistenceHandler extends AbstractPersistenceHandler
      * @see org.datanucleus.store.AbstractPersistenceHandler#insertObjects(org.datanucleus.state.DNStateManager[])
      */
     @Override
-    public void insertObjects(DNStateManager... ops)
+    public void insertObjects(DNStateManager... sms)
     {
         // TODO Implement this in such a way as it process all objects of a type in one call (after checking hasRelations)
-        super.insertObjects(ops);
+        super.insertObjects(sms);
     }
 
     /**

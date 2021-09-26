@@ -48,8 +48,8 @@ public class BackingStoreHelper
     private BackingStoreHelper(){}
 
     /**
-     * Convenience method to return the owner StateManager for a backing store. If the supplied StateManager is embedded then finds its owner until it finds the
-     * owner that is not embedded.
+     * Convenience method to return the owner StateManager for a backing store. 
+     * If the supplied StateManager is embedded then finds its owner until it finds the owner that is not embedded.
      * @param sm Input StateManager
      * @return The owner StateManager
      */
@@ -59,19 +59,19 @@ public class BackingStoreHelper
         while (ownerOP.isEmbedded())
         {
             // Embedded object, so get the owner object it is embedded in
-            DNStateManager[] ownerOPs = sm.getExecutionContext().getOwnersForEmbeddedStateManager(ownerOP);
-            if (ownerOPs != null && ownerOPs.length == 1)
+            DNStateManager[] ownerSMs = sm.getExecutionContext().getOwnersForEmbeddedStateManager(ownerOP);
+            if (ownerSMs != null && ownerSMs.length == 1)
             {
-                ownerOP = ownerOPs[0];
+                ownerOP = ownerSMs[0];
             }
-            else if (ownerOPs == null || ownerOPs.length == 0)
+            else if (ownerSMs == null || ownerSMs.length == 0)
             {
                 return null;
             }
             else
             {
                 // Multiple owners so take first one
-                ownerOP = ownerOPs[0];
+                ownerOP = ownerSMs[0];
             }
         }
         return ownerOP;

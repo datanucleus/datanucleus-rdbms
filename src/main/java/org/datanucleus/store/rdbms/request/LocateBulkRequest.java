@@ -85,13 +85,13 @@ public class LocateBulkRequest extends BulkRequest
         super(table);
     }
 
-    protected String getStatement(DatastoreClass table, DNStateManager[] ops, boolean lock)
+    protected String getStatement(DatastoreClass table, DNStateManager[] sms, boolean lock)
     {
         RDBMSStoreManager storeMgr = table.getStoreManager();
         ClassLoaderResolver clr = storeMgr.getNucleusContext().getClassLoaderResolver(null);
         SQLExpressionFactory exprFactory = storeMgr.getSQLExpressionFactory();
         cmd = storeMgr.getMetaDataManager().getMetaDataForClass(table.getType(), clr);
-        ExecutionContext ec = ops[0].getExecutionContext();
+        ExecutionContext ec = sms[0].getExecutionContext();
 
         SelectStatement sqlStatement = new SelectStatement(storeMgr, table, null, null);
 
@@ -176,7 +176,7 @@ public class LocateBulkRequest extends BulkRequest
             // Add WHERE clause for multi-tenancy
             SQLExpression tenantExpr = exprFactory.newExpression(sqlStatement, sqlStatement.getPrimaryTable(), multitenancyMapping);
 
-            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(ops[0].getExecutionContext());
+            String[] tenantReadIds = storeMgr.getNucleusContext().getTenantReadIds(sms[0].getExecutionContext());
             if (tenantReadIds != null && tenantReadIds.length > 0)
             {
                 // Add IN clause with values
@@ -205,9 +205,9 @@ public class LocateBulkRequest extends BulkRequest
         }
 
         // Add WHERE clause restricting to the identities of the objects
-        mappingDefinitions = new StatementClassMapping[ops.length];
+        mappingDefinitions = new StatementClassMapping[sms.length];
         int inputParamNum = 1;
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
             mappingDefinitions[i] = new StatementClassMapping();
             if (table.getIdentityType() == IdentityType.DATASTORE)
@@ -349,13 +349,13 @@ public class LocateBulkRequest extends BulkRequest
                     ResultSet rs = sqlControl.executeStatementQuery(ec, mconn, statement, ps);
                     try
                     {
-                        DNStateManager[] missingOps = processResults(rs, sms);
-                        if (missingOps != null && missingOps.length > 0)
+                        DNStateManager[] missingSMs = processResults(rs, sms);
+                        if (missingSMs != null && missingSMs.length > 0)
                         {
-                            NucleusObjectNotFoundException[] nfes = new NucleusObjectNotFoundException[missingOps.length];
+                            NucleusObjectNotFoundException[] nfes = new NucleusObjectNotFoundException[missingSMs.length];
                             for (int i=0;i<nfes.length;i++)
                             {
-                                nfes[i] = new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(missingOps[i].getInternalObjectId())));
+                                nfes[i] = new NucleusObjectNotFoundException(Localiser.msg("050018", IdentityUtils.getPersistableIdentityForId(missingSMs[i].getInternalObjectId())));
                             }
                             throw new NucleusObjectNotFoundException("Some objects were not found. Look at nested exceptions for details", nfes);
                         }
@@ -389,16 +389,16 @@ public class LocateBulkRequest extends BulkRequest
         }
     }
 
-    private DNStateManager[] processResults(ResultSet rs, DNStateManager[] ops)
+    private DNStateManager[] processResults(ResultSet rs, DNStateManager[] sms)
     throws SQLException
     {
         List<DNStateManager> missingSMs = new ArrayList<>();
-        for (int i=0;i<ops.length;i++)
+        for (int i=0;i<sms.length;i++)
         {
-            missingSMs.add(ops[i]);
+            missingSMs.add(sms[i]);
         }
 
-        ExecutionContext ec = ops[0].getExecutionContext();
+        ExecutionContext ec = sms[0].getExecutionContext();
         while (rs.next())
         {
             FieldManager resultFM = new ResultSetGetter(ec, rs, resultMapping, cmd);
