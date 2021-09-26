@@ -108,7 +108,7 @@ public class JDOQLQuery extends AbstractJDOQLQuery
     public static final String EXTENSION_NON_DISTINCT_IMPLICIT_JOIN = "datanucleus.query.jdoql.dropDistinctFromImplicitJoin";
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
-    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.forUpdateNowait";
+    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait";
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations, when part of the filter. */
     public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jdoql.navigationJoinTypeForFilter";

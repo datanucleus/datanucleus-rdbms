@@ -106,7 +106,7 @@ public class JPQLQuery extends AbstractJPQLQuery
     public static final String EXTENSION_USE_IS_NULL_WHEN_EQUALS_NULL_PARAM = "datanucleus.useIsNullWhenEqualsNullParameter";
 
     /** Extension to add NOWAIT when using FOR UPDATE (when supported). */
-    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.forUpdateNowait";
+    public static final String EXTENSION_FOR_UPDATE_NOWAIT = "datanucleus.query.forUpdateNowait";
 
     /** Extension to define the JOIN TYPE to use when navigating single-valued relations, when part of the filter. */
     public static final String EXTENSION_NAVIGATION_JOIN_TYPE_FILTER = "datanucleus.query.jpql.navigationJoinTypeForFilter";
