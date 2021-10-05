@@ -59,10 +59,10 @@ public class SQLExpressionFactory
     ClassLoaderResolver clr;
 
     /** Cache of expression class, keyed by the mapping class name. */
-    Map<String, Class> expressionClassByMappingName = new ConcurrentHashMap<>();
+    Map<String, Class<? extends SQLExpression>> expressionClassByMappingName = new ConcurrentHashMap<>();
 
     /** Cache of literal class, keyed by the mapping class name. */
-    Map<String, Class> literalClassByMappingName = new ConcurrentHashMap<>();
+    Map<String, Class<? extends SQLExpression>> literalClassByMappingName = new ConcurrentHashMap<>();
 
     /** Keys of SQLMethods that are supported. */
     Set<MethodKey> pluginSqlMethodsKeysSupported = new HashSet<>();
@@ -315,7 +315,7 @@ public class SQLExpressionFactory
         if (mapping.getClass().getName().equals(UUIDMapping.class.getName()))
         {
             // Special case of UUID handled as a StringExpression (default when no TypeConverter defined)
-            return (SQLExpression)ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringExpression.class, EXPR_CREATION_ARG_TYPES, 
+            return ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringExpression.class, EXPR_CREATION_ARG_TYPES, 
                 new Object[] {stmt, exprSqlTbl, mapping});
         }
 
@@ -337,11 +337,11 @@ public class SQLExpressionFactory
 
         if (mapping != null)
         {
-            Class literalClass = literalClassByMappingName.get(mapping.getClass().getName());
+            Class<? extends SQLExpression> literalClass = literalClassByMappingName.get(mapping.getClass().getName());
             if (literalClass != null)
             {
                 // Use cached literal class
-                return (SQLExpression)ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
             }
         }
 
@@ -349,14 +349,14 @@ public class SQLExpressionFactory
         {
             if (mapping == null)
             {
-                return (SQLExpression)ClassUtils.newInstance(NullLiteral.class, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(NullLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
-            Class literalClass = literalClassByMappingName.get(mapping.getClass().getName());
+            Class<? extends SQLExpression> literalClass = literalClassByMappingName.get(mapping.getClass().getName());
             if (literalClass != null)
             {
                 // Use built-in literal class
-                return (SQLExpression)ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
             }
 
             // Fallback to the plugin mechanism
@@ -372,7 +372,7 @@ public class SQLExpressionFactory
             if (mapping.getClass().getName().equals(UUIDMapping.class.getName()))
             {
                 // Special case of UUID handled as a StringLiteral (default when no TypeConverter defined)
-                return (SQLExpression)ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(org.datanucleus.store.rdbms.sql.expression.StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
             throw new NucleusException(Localiser.msg("060006", mapping.getClass().getName()));
@@ -403,14 +403,14 @@ public class SQLExpressionFactory
         {
             if (mapping == null)
             {
-                return (SQLExpression)ClassUtils.newInstance(ParameterLiteral.class, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(ParameterLiteral.class, LIT_CREATION_ARG_TYPES, args);
             }
 
-            Class literalClass = literalClassByMappingName.get(mapping.getClass().getName());
+            Class<? extends SQLExpression> literalClass = literalClassByMappingName.get(mapping.getClass().getName());
             if (literalClass != null)
             {
                 // Use built-in literal class
-                return (SQLExpression)ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
+                return ClassUtils.newInstance(literalClass, LIT_CREATION_ARG_TYPES, args);
             }
 
             // Fallback to the plugin mechanism
@@ -445,7 +445,7 @@ public class SQLExpressionFactory
         {
             // Special case of a UUIDMapping comparison, where it is represented as a String (default), so represent the value as a String as well
             Object[] args = new Object[] {paramLit.getSQLStatement(), comparisonExpr.getJavaTypeMapping(), paramLit.getValue(), paramLit.getParameterName()};
-            return (SQLExpression)ClassUtils.newInstance(StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
+            return ClassUtils.newInstance(StringLiteral.class, LIT_CREATION_ARG_TYPES, args);
         }
 
         return newLiteralParameter(paramLit.getSQLStatement(), comparisonExpr.getJavaTypeMapping(), paramLit.getValue(), paramLit.getParameterName());
