@@ -71,20 +71,20 @@ public class MapValueMethod implements SQLMethod
 
     /**
      * Implementation of VALUE(map) using a join to the table representing the map, and returning the value.
-     * @param stmt SQLStatement
+     * @param parentStmt The parent SQL statement
      * @param mapExpr The map expression
      * @return The value expression
      */
-    protected SQLExpression getAsJoin(SQLStatement stmt, MapExpression mapExpr)
+    protected SQLExpression getAsJoin(SQLStatement parentStmt, MapExpression mapExpr)
     {
         JavaTypeMapping m = mapExpr.getJavaTypeMapping();
-        RDBMSStoreManager storeMgr = stmt.getRDBMSManager();
-        ClassLoaderResolver clr = stmt.getQueryGenerator().getClassLoaderResolver();
-        SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
+        RDBMSStoreManager storeMgr = parentStmt.getRDBMSManager();
+        ClassLoaderResolver clr = parentStmt.getQueryGenerator().getClassLoaderResolver();
+        SQLExpressionFactory exprFactory = parentStmt.getSQLExpressionFactory();
         AbstractMemberMetaData mmd = m.getMemberMetaData();
 
         // Use the statement of the table for this Map expression, since it could be in an outer query
-        stmt = mapExpr.getSQLTable().getSQLStatement();
+        SQLStatement stmt = mapExpr.getSQLTable().getSQLStatement();
 
         if (mmd != null)
         {
