@@ -31,8 +31,8 @@ import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.table.Table;
-import org.datanucleus.store.types.ContainerAdapter;
-import org.datanucleus.store.types.ElementContainerHandler;
+import org.datanucleus.store.types.containers.ContainerAdapter;
+import org.datanucleus.store.types.containers.ElementContainerHandler;
 
 /**
  * Maps single collection elements as 1-1 instead of 1-N, by wrapping and reusing the JavaTypeMappings and member metadata of the element types.

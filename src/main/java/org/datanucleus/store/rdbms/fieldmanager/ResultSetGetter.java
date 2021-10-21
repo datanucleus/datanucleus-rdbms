@@ -36,8 +36,8 @@ import org.datanucleus.store.rdbms.query.PersistentClassROF;
 import org.datanucleus.store.rdbms.query.ResultObjectFactory;
 import org.datanucleus.store.rdbms.query.StatementClassMapping;
 import org.datanucleus.store.rdbms.query.StatementMappingIndex;
-import org.datanucleus.store.types.ElementContainerHandler;
 import org.datanucleus.store.types.SCOUtils;
+import org.datanucleus.store.types.containers.ElementContainerHandler;
 
 /**
  * ResultSet getter implementation of a field manager, extracting field values from a ResultSet.

@@ -22,8 +22,8 @@ import java.util.Iterator;
 import org.datanucleus.exceptions.NucleusException;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.sql.SQLStatement;
-import org.datanucleus.store.types.ContainerAdapter;
 import org.datanucleus.store.types.TypeManager;
+import org.datanucleus.store.types.containers.ContainerAdapter;
 
 /**
  * Literal for java.util.Optional.
