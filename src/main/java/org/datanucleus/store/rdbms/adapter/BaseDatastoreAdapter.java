@@ -254,7 +254,9 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         supportedJdbcTypesById.put(Integer.valueOf(Types.REAL), "REAL");
         supportedJdbcTypesById.put(Integer.valueOf(Types.SMALLINT), "SMALLINT");
         supportedJdbcTypesById.put(Integer.valueOf(Types.TIME), "TIME");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.TIME_WITH_TIMEZONE), "TIME_WITH_TIMEZONE");
         supportedJdbcTypesById.put(Integer.valueOf(Types.TIMESTAMP), "TIMESTAMP");
+        supportedJdbcTypesById.put(Integer.valueOf(Types.TIMESTAMP_WITH_TIMEZONE), "TIMESTAMP_WITH_TIMEZONE");
         supportedJdbcTypesById.put(Integer.valueOf(Types.TINYINT), "TINYINT");
         supportedJdbcTypesById.put(Integer.valueOf(Types.VARBINARY), "VARBINARY");
         supportedJdbcTypesById.put(Integer.valueOf(Types.VARCHAR), "VARCHAR");
@@ -272,6 +274,8 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF), "REF");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.STRUCT), "STRUCT");
         unsupportedJdbcTypesById.put(Integer.valueOf(Types.REF_CURSOR), "REF_CURSOR");
+
+        unsupportedJdbcTypesById.put(Integer.valueOf(-10), "RESULT_SET");
 
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQL92_RESERVED_WORDS));
         reservedKeywords.addAll(StringUtils.convertCommaSeparatedStringToSet(SQL99_RESERVED_WORDS));
