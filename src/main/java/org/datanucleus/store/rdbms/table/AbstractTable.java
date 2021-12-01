@@ -569,21 +569,14 @@ public abstract class AbstractTable implements Table
     {
         assertIsInitialized();
 
-        // Get column info for table to check for existence
-        // Note that unless the schema is specified here with Oracle then it can often come back 
-        // with crap like "SYNONYM" as the table type (10.2.0.4 driver).
+        // Check table existence via DatabaseMetaData
+        // Note that unless the schema is specified here with Oracle then it can often come back with crap like "SYNONYM" as the table type (10.2.0.4 driver).
         String type = ((RDBMSSchemaHandler)storeMgr.getSchemaHandler()).getTableType(conn, this);
         if (NucleusLogger.DATASTORE_SCHEMA.isDebugEnabled())
         {
-            if (type == null)
-            {
-                NucleusLogger.DATASTORE_SCHEMA.debug("Check of existence of " + this + " returned no table");
-            }
-            else
-            {
-                NucleusLogger.DATASTORE_SCHEMA.debug("Check of existence of " + this + " returned table type of " + type);
-            }
+            NucleusLogger.DATASTORE_SCHEMA.debug("Check of existence of " + this + " returned " + ((type == null) ? "no table" : ("table type of " + type)));
         }
+
         if (type == null || (allowDDLOutput() && storeMgr.getDdlWriter() != null && storeMgr.getCompleteDDL()))
         {
             // Table is missing, or we're running SchemaTool with a DDL file

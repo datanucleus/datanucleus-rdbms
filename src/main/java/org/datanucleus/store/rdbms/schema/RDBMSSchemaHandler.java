@@ -421,6 +421,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         {
             tableName = c[2];
         }
+        // TODO If the catalog/schema are null on the table then we should use the defaults from storeMgr
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
@@ -433,8 +434,7 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
                 boolean insensitive = identifiersCaseInsensitive();
                 while (rs.next())
                 {
-                    if ((insensitive && tableName.equalsIgnoreCase(rs.getString(3))) ||
-                        (!insensitive && tableName.equals(rs.getString(3))))
+                    if ((insensitive && tableName.equalsIgnoreCase(rs.getString(3))) || (!insensitive && tableName.equals(rs.getString(3))))
                     {
                         tableType = rs.getString(4).toUpperCase();
                         break;
