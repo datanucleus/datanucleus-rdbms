@@ -406,22 +406,18 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
-        String catalogName = table.getCatalogName();
-        String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getName();
-        if (c[0] != null)
+        String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
+        if (catalogName == null)
         {
-            catalogName = c[0];
+            catalogName = rdbmsStoreMgr.getCatalogName();
         }
-        if (c[1] != null)
+        String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
+        if (schemaName == null)
         {
-            schemaName = c[1];
+            schemaName = rdbmsStoreMgr.getSchemaName();
         }
-        if (c[2] != null)
-        {
-            tableName = c[2];
-        }
-        // TODO If the catalog/schema are null on the table then we should use the defaults from storeMgr
+        String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
+
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
@@ -643,21 +639,18 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
-        String catalogName = table.getCatalogName();
-        String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getName();
-        if (c[0] != null)
+        String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
+        if (catalogName == null)
         {
-            catalogName = c[0];
+            catalogName = rdbmsStoreMgr.getCatalogName();
         }
-        if (c[1] != null)
+        String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
+        if (schemaName == null)
         {
-            schemaName = c[1];
+            schemaName = rdbmsStoreMgr.getSchemaName();
         }
-        if (c[2] != null)
-        {
-            tableName = c[2];
-        }
+        String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
+
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
@@ -717,21 +710,18 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
         String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
-        String catalogName = table.getCatalogName();
-        String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getName();
-        if (c[0] != null)
+        String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
+        if (catalogName == null)
         {
-            catalogName = c[0];
+            catalogName = rdbmsStoreMgr.getCatalogName();
         }
-        if (c[1] != null)
+        String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
+        if (schemaName == null)
         {
-            schemaName = c[1];
+            schemaName = rdbmsStoreMgr.getSchemaName();
         }
-        if (c[2] != null)
-        {
-            tableName = c[2];
-        }
+        String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
+
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
@@ -790,23 +780,19 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     {
         // Calculate the catalog/schema names since we need to search fully qualified
         DatastoreAdapter dba = getDatastoreAdapter();
-        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), 
-            table.getIdentifier().getName());
-        String catalogName = table.getCatalogName();
-        String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getName();
-        if (c[0] != null)
+        String[] c = splitTableIdentifierName(dba.getCatalogSeparator(), table.getIdentifier().getName());
+        String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
+        if (catalogName == null)
         {
-            catalogName = c[0];
+            catalogName = rdbmsStoreMgr.getCatalogName();
         }
-        if (c[1] != null)
+        String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
+        if (schemaName == null)
         {
-            schemaName = c[1];
+            schemaName = rdbmsStoreMgr.getSchemaName();
         }
-        if (c[2] != null)
-        {
-            tableName = c[2];
-        }
+        String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
+
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
@@ -974,21 +960,18 @@ public class RDBMSSchemaHandler extends AbstractStoreSchemaHandler
     protected RDBMSTableInfo getRDBMSTableInfoForTable(Connection conn, Table table)
     {
         String[] c = splitTableIdentifierName(getDatastoreAdapter().getCatalogSeparator(), table.getIdentifier().getName());
-        String catalogName = table.getCatalogName();
-        String schemaName = table.getSchemaName();
-        String tableName = table.getIdentifier().getName();
-        if (c[0] != null)
+        String catalogName = (c[0] != null) ? c[0] : table.getCatalogName();
+        if (catalogName == null)
         {
-            catalogName = c[0];
+            catalogName = rdbmsStoreMgr.getCatalogName();
         }
-        if (c[1] != null)
+        String schemaName  = (c[1] != null) ? c[1] : table.getSchemaName();
+        if (schemaName == null)
         {
-            schemaName = c[1];
+            schemaName = rdbmsStoreMgr.getSchemaName();
         }
-        if (c[2] != null)
-        {
-            tableName = c[2];
-        }
+        String tableName   = (c[2] != null) ? c[2] : table.getIdentifier().getName();
+
         catalogName = getIdentifierForUseWithDatabaseMetaData(catalogName);
         schemaName = getIdentifierForUseWithDatabaseMetaData(schemaName);
         tableName = getIdentifierForUseWithDatabaseMetaData(tableName);
