@@ -775,7 +775,7 @@ public abstract class TableImpl extends AbstractTable
         // There's no need to drop indices; we assume they'll go away quietly when the table is dropped.
         Set<String> fkNames = new HashSet<>();
         StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-        RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
+        RDBMSTableFKInfo fkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_FKS, new Object[] {this});
         Iterator iter = fkInfo.getChildren().iterator();
         while (iter.hasNext())
         {
@@ -921,7 +921,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTablePKInfo tablePkInfo = (RDBMSTablePKInfo)handler.getSchemaData(conn, "primary-keys", new Object[] {this});
+            RDBMSTablePKInfo tablePkInfo = (RDBMSTablePKInfo)handler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_PKS, new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator pkColsIter = tablePkInfo.getChildren().iterator();
             while (pkColsIter.hasNext())
@@ -976,7 +976,7 @@ public abstract class TableImpl extends AbstractTable
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
-            RDBMSTableFKInfo tableFkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, "foreign-keys", new Object[] {this});
+            RDBMSTableFKInfo tableFkInfo = (RDBMSTableFKInfo)handler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_FKS, new Object[] {this});
             Iterator fksIter = tableFkInfo.getChildren().iterator();
             while (fksIter.hasNext())
             {
@@ -1061,7 +1061,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", new Object[] {this});
+            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_INDICES, new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())
@@ -1117,7 +1117,7 @@ public abstract class TableImpl extends AbstractTable
         if (tableExistsInDatastore(conn))
         {
             StoreSchemaHandler handler = storeMgr.getSchemaHandler();
-            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, "indices", new Object[] {this});
+            RDBMSTableIndexInfo tableIndexInfo = (RDBMSTableIndexInfo)handler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_INDICES, new Object[] {this});
             IdentifierFactory idFactory = storeMgr.getIdentifierFactory();
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())

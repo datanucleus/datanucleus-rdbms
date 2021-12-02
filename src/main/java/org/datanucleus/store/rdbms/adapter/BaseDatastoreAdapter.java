@@ -67,6 +67,7 @@ import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.JavaTypeMapping;
 import org.datanucleus.store.rdbms.schema.ForeignKeyInfo;
 import org.datanucleus.store.rdbms.schema.RDBMSColumnInfo;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.schema.RDBMSTypesInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.rdbms.sql.SQLTable;
@@ -572,7 +573,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
         // Initialise any types, including artificial ones added for the datastore when not provided by the JDBC driver
         initialiseTypes(handler, mconn);
 
-        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
+        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), RDBMSSchemaHandler.TYPE_TYPES, null);
 
         Iterator<Map.Entry<Integer, String>> entryIter = supportedJdbcTypesById.entrySet().iterator();
         while (entryIter.hasNext())
@@ -623,7 +624,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
     public void initialiseTypes(StoreSchemaHandler handler, ManagedConnection mconn)
     {
         // Load the types from the schema handler
-        handler.getSchemaData(mconn.getConnection(), "types", null);
+        handler.getSchemaData(mconn.getConnection(), RDBMSSchemaHandler.TYPE_TYPES, null);
     }
 
     /**
@@ -683,7 +684,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     protected Collection<SQLTypeInfo> getSQLTypeInfoForJdbcType(StoreSchemaHandler handler, ManagedConnection mconn, short jdbcTypeNumber)
     {
-        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
+        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), RDBMSSchemaHandler.TYPE_TYPES, null);
 
         String key = "" + jdbcTypeNumber;
         org.datanucleus.store.rdbms.schema.JDBCTypeInfo jdbcType = (org.datanucleus.store.rdbms.schema.JDBCTypeInfo)types.getChild(key);
@@ -705,7 +706,7 @@ public class BaseDatastoreAdapter implements DatastoreAdapter
      */
     protected boolean addSQLTypeForJDBCType(StoreSchemaHandler handler, ManagedConnection mconn, short jdbcTypeNumber, SQLTypeInfo sqlType, boolean addIfNotPresent)
     {
-        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
+        RDBMSTypesInfo types = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), RDBMSSchemaHandler.TYPE_TYPES, null);
 
         String key = "" + jdbcTypeNumber;
         org.datanucleus.store.rdbms.schema.JDBCTypeInfo jdbcType = (org.datanucleus.store.rdbms.schema.JDBCTypeInfo)types.getChild(key);

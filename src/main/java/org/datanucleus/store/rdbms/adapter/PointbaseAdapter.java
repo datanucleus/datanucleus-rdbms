@@ -28,6 +28,7 @@ import org.datanucleus.identity.DatastoreId;
 import org.datanucleus.plugin.PluginManager;
 import org.datanucleus.store.connection.ManagedConnection;
 import org.datanucleus.store.rdbms.schema.JDBCTypeInfo;
+import org.datanucleus.store.rdbms.schema.RDBMSSchemaHandler;
 import org.datanucleus.store.rdbms.schema.RDBMSTypesInfo;
 import org.datanucleus.store.rdbms.schema.SQLTypeInfo;
 import org.datanucleus.store.schema.StoreSchemaHandler;
@@ -62,7 +63,7 @@ public class PointbaseAdapter extends BaseDatastoreAdapter
         // Add on any missing JDBC types
         // Based on PointbaseAdapter : PointBase version=5.1 ECF build 295, major=5, minor=1, revision=0
         // Driver name=PointBase JDBC Driver, version=5.1 ECF build 295, major=5, minor=1
-        RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), "types", null);
+        RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)handler.getSchemaData(mconn.getConnection(), RDBMSSchemaHandler.TYPE_TYPES, null);
 
         JDBCTypeInfo jdbcType = (JDBCTypeInfo)typesInfo.getChild("9");
         if (jdbcType != null && jdbcType.getNumberOfChildren() > 0)

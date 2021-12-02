@@ -1314,7 +1314,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
 
             // JDBC Types
             NucleusLogger.DATASTORE.debug("Java-Types : string-default-length=" + getIntProperty(RDBMSPropertyNames.PROPERTY_RDBMS_STRING_DEFAULT_LENGTH));
-            RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, "types", null);
+            RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, RDBMSSchemaHandler.TYPE_TYPES, null);
             if (typesInfo != null && typesInfo.getNumberOfChildren() > 0)
             {
                 StringBuilder typeStr = new StringBuilder();
@@ -2345,7 +2345,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public SQLTypeInfo getSQLTypeInfoForJDBCType(int jdbcType, String sqlType)
     throws UnsupportedDataTypeException
     {
-        RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, "types", null);
+        RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, RDBMSSchemaHandler.TYPE_TYPES, null);
         JDBCTypeInfo jdbcTypeInfo = (JDBCTypeInfo)typesInfo.getChild("" + jdbcType);
 
         if (jdbcTypeInfo.getNumberOfChildren() == 0)
@@ -2393,7 +2393,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public RDBMSColumnInfo getColumnInfoForColumnName(Table table, Connection conn, DatastoreIdentifier column)
     throws SQLException
     {
-        return (RDBMSColumnInfo)schemaHandler.getSchemaData(conn, "column", new Object[] {table, column.getName()});
+        return (RDBMSColumnInfo)schemaHandler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_COLUMN, new Object[] {table, column.getName()});
     }
 
     /**
@@ -2415,7 +2415,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
     public List<StoreSchemaData> getColumnInfoForTable(Table table, Connection conn)
     throws SQLException
     {
-        RDBMSTableInfo tableInfo = (RDBMSTableInfo)schemaHandler.getSchemaData(conn, "columns", new Object[] {table});
+        RDBMSTableInfo tableInfo = (RDBMSTableInfo)schemaHandler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_COLUMNS, new Object[] {table});
         if (tableInfo == null)
         {
             return Collections.EMPTY_LIST;
@@ -2434,7 +2434,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
      */
     public void invalidateColumnInfoForTable(Table table)
     {
-        RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(null, "tables", null);
+        RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(null, RDBMSSchemaHandler.TYPE_TABLES, null);
         if (schemaInfo != null && schemaInfo.getNumberOfChildren() > 0)
         {
             schemaInfo.getChildren().remove(table.getIdentifier().getFullyQualifiedName(true));
@@ -2595,7 +2595,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             ps.println();
             ps.println("Database TypeInfo");
 
-            RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, "types", null);
+            RDBMSTypesInfo typesInfo = (RDBMSTypesInfo)schemaHandler.getSchemaData(null, RDBMSSchemaHandler.TYPE_TYPES, null);
             if (typesInfo != null)
             {
                 Iterator iter = typesInfo.getChildren().keySet().iterator();
@@ -2667,7 +2667,7 @@ public class RDBMSStoreManager extends AbstractStoreManager implements BackedSCO
             try
             {
                 Connection conn = (Connection)mc.getConnection();
-                RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(conn, "tables", new Object[] {this.catalogName, this.schemaName});
+                RDBMSSchemaInfo schemaInfo = (RDBMSSchemaInfo)schemaHandler.getSchemaData(conn, RDBMSSchemaHandler.TYPE_TABLES, new Object[] {this.catalogName, this.schemaName});
                 if (schemaInfo != null)
                 {
                     Iterator tableIter = schemaInfo.getChildren().values().iterator();
