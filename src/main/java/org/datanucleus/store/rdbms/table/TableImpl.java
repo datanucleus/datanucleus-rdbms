@@ -1123,12 +1123,12 @@ public abstract class TableImpl extends AbstractTable
             while (indexIter.hasNext())
             {
                 IndexInfo indexInfo = (IndexInfo)indexIter.next();
-                short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
-                if (idxType == DatabaseMetaData.tableIndexStatistic)
-                {
-                    // Ignore
-                    continue;
-                }
+//                short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
+//                if (idxType == DatabaseMetaData.tableIndexStatistic)
+//                {
+//                    // Ignore
+//                    continue;
+//                }
     
                 String indexName = (String)indexInfo.getProperty("index_name");
                 DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, indexName);
