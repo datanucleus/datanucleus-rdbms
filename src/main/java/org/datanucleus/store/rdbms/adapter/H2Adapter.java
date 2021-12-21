@@ -60,21 +60,24 @@ public class H2Adapter extends BaseDatastoreAdapter
     {
         super(metadata);
 
-        // Set schema name
-        try
+        if (datastoreMajorVersion < 2)
         {
-            ResultSet rs = metadata.getSchemas();
-            while (rs.next())
+            // H2 v1 has an "IS_DEFAULT" column returned from getSchemas(). Not in v2 seemingly. Use it to set the default schema name
+            try
             {
-                if (rs.getBoolean("IS_DEFAULT"))
+                ResultSet rs = metadata.getSchemas();
+                while (rs.next())
                 {
-                    schemaName = rs.getString("TABLE_SCHEM");
+                    if (rs.getBoolean("IS_DEFAULT"))
+                    {
+                        schemaName = rs.getString("TABLE_SCHEM");
+                    }
                 }
             }
-        }
-        catch (SQLException e)
-        {
-            NucleusLogger.DATASTORE_SCHEMA.warn("Exception when trying to get default schema name for datastore", e);
+            catch (SQLException e)
+            {
+                NucleusLogger.DATASTORE_SCHEMA.warn("Exception when trying to get default schema name for datastore", e);
+            }
         }
 
         supportedOptions.add(PRIMARYKEY_IN_CREATE_STATEMENTS);
@@ -282,7 +285,11 @@ public class H2Adapter extends BaseDatastoreAdapter
      **/
     public String getIdentityKeyword(StoreManager storeMgr)
     {
-        return "IDENTITY";
+        if (datastoreMajorVersion < 2)
+        {
+            return "IDENTITY";
+        }
+        return "GENERATED ALWAYS AS IDENTITY";
     }
 
     /**
