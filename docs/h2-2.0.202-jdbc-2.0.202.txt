@@ -1,0 +1,734 @@
+DataNucleus SchemaTool : Database information
+StoreManager : "rdbms" using the URL "jdbc:h2:mem:nucleus" - datastore-mode=read-write
+================ DatabaseAdapter ==================
+Adapter : org.datanucleus.store.rdbms.adapter.H2Adapter
+Datastore : name="H2" version="2.0.202 (2021-11-25)" (major=2, minor=0, revision=20202115)
+Driver : name="H2 JDBC Driver" version="2.0.202 (2021-11-25)" (major=2, minor=0)
+===================================================
+
+Database TypeInfo
+JDBC Type=VARCHAR sqlTypes=VARCHAR_IGNORECASE,CHARACTER VARYING (default=CHARACTER VARYING)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = VARCHAR_IGNORECASE, jdbcId = 12, localName = VARCHAR_IGNORECASE, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = CHARACTER VARYING, jdbcId = 12, localName = CHARACTER VARYING, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=BINARY sqlTypes=BINARY,UUID (default=BINARY)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BINARY, jdbcId = -2, localName = BINARY, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = UUID, jdbcId = -2, localName = UUID, createParams = null
+      precision = 16, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=BOOLEAN sqlTypes=BOOLEAN (default=BOOLEAN)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BOOLEAN, jdbcId = 16, localName = BOOLEAN, createParams = null
+      precision = 1, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=VARBINARY sqlTypes=BINARY VARYING (default=BINARY VARYING)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BINARY VARYING, jdbcId = -3, localName = BINARY VARYING, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=BIGINT sqlTypes=BIGINT (default=BIGINT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BIGINT, jdbcId = -5, localName = BIGINT, createParams = null
+      precision = 64, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TINYINT sqlTypes=TINYINT (default=TINYINT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TINYINT, jdbcId = -6, localName = TINYINT, createParams = null
+      precision = 8, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=JAVA_OBJECT sqlTypes=JAVA_OBJECT (default=JAVA_OBJECT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = JAVA_OBJECT, jdbcId = 2000, localName = JAVA_OBJECT, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=CHAR sqlTypes=CHARACTER (default=CHARACTER)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = CHARACTER, jdbcId = 1, localName = CHARACTER, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=NUMERIC sqlTypes=NUMERIC,DECFLOAT (default=NUMERIC)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = NUMERIC, jdbcId = 2, localName = NUMERIC, createParams = PRECISION,SCALE
+      precision = 100000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 32767, fixedPrec = true
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DECFLOAT, jdbcId = 2, localName = DECFLOAT, createParams = PRECISION
+      precision = 100000, allowsSpec = true, numPrecRadix = 10
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=INTEGER sqlTypes=INTEGER (default=INTEGER)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTEGER, jdbcId = 4, localName = INTEGER, createParams = null
+      precision = 32, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=CLOB sqlTypes=CHARACTER LARGE OBJECT (default=CHARACTER LARGE OBJECT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = CHARACTER LARGE OBJECT, jdbcId = 2005, localName = CHARACTER LARGE OBJECT, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=SMALLINT sqlTypes=SMALLINT (default=SMALLINT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = SMALLINT, jdbcId = 5, localName = SMALLINT, createParams = null
+      precision = 16, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=BLOB sqlTypes=BINARY LARGE OBJECT (default=BINARY LARGE OBJECT)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = BINARY LARGE OBJECT, jdbcId = 2004, localName = BINARY LARGE OBJECT, createParams = LENGTH
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = X', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=ARRAY sqlTypes=ARRAY (default=ARRAY)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ARRAY, jdbcId = 2003, localName = ARRAY, createParams = CARDINALITY
+      precision = 65536, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ARRAY[, suffix = ]
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TIMESTAMP_WITH_TIMEZONE sqlTypes=TIMESTAMP WITH TIME ZONE (default=TIMESTAMP WITH TIME ZONE)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIMESTAMP WITH TIME ZONE, jdbcId = 2014, localName = TIMESTAMP WITH TIME ZONE, createParams = SCALE
+      precision = 35, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIMESTAMP WITH TIME ZONE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=REAL sqlTypes=REAL (default=REAL)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = REAL, jdbcId = 7, localName = REAL, createParams = null
+      precision = 24, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=OTHER sqlTypes=ENUM,INTERVAL DAY,JSON,INTERVAL MINUTE TO SECOND,INTERVAL YEAR,INTERVAL MINUTE,INTERVAL DAY TO SECOND,INTERVAL SECOND,INTERVAL DAY TO HOUR,INTERVAL DAY TO MINUTE,INTERVAL HOUR,INTERVAL YEAR TO MONTH,INTERVAL MONTH,ROW,UUID,INTERVAL HOUR TO MINUTE,INTERVAL HOUR TO SECOND,GEOMETRY (default=INTERVAL YEAR)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ENUM, jdbcId = 1111, localName = ENUM, createParams = ELEMENT [,...]
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY, jdbcId = 1111, localName = INTERVAL DAY, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = JSON, jdbcId = 1111, localName = JSON, createParams = LENGTH
+      precision = 1048576, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = JSON ', suffix = '
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MINUTE TO SECOND, jdbcId = 1111, localName = INTERVAL MINUTE TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MINUTE TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL YEAR, jdbcId = 1111, localName = INTERVAL YEAR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' YEAR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MINUTE, jdbcId = 1111, localName = INTERVAL MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO SECOND, jdbcId = 1111, localName = INTERVAL DAY TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL SECOND, jdbcId = 1111, localName = INTERVAL SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO HOUR, jdbcId = 1111, localName = INTERVAL DAY TO HOUR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO HOUR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL DAY TO MINUTE, jdbcId = 1111, localName = INTERVAL DAY TO MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' DAY TO MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR, jdbcId = 1111, localName = INTERVAL HOUR, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL YEAR TO MONTH, jdbcId = 1111, localName = INTERVAL YEAR TO MONTH, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' YEAR TO MONTH
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL MONTH, jdbcId = 1111, localName = INTERVAL MONTH, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' MONTH
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = ROW, jdbcId = 1111, localName = ROW, createParams = NAME DATA_TYPE [,...]
+      precision = 0, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = ROW(, suffix = )
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = UUID, jdbcId = 1111, localName = UUID, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR TO MINUTE, jdbcId = 1111, localName = INTERVAL HOUR TO MINUTE, createParams = PRECISION
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR TO MINUTE
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = INTERVAL HOUR TO SECOND, jdbcId = 1111, localName = INTERVAL HOUR TO SECOND, createParams = PRECISION,SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = INTERVAL ', suffix = ' HOUR TO SECOND
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+    SQLTypeInfo : [DATANUCLEUS]
+      type : name = GEOMETRY, jdbcId = 1111, localName = GEOMETRY, createParams = null
+      precision = 2147483647, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = true, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TIME_WITH_TIMEZONE sqlTypes=TIME WITH TIME ZONE (default=TIME WITH TIME ZONE)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIME WITH TIME ZONE, jdbcId = 2013, localName = TIME WITH TIME ZONE, createParams = SCALE
+      precision = 24, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIME WITH TIME ZONE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=DOUBLE sqlTypes=DOUBLE PRECISION (default=DOUBLE PRECISION)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DOUBLE PRECISION, jdbcId = 8, localName = DOUBLE PRECISION, createParams = null
+      precision = 53, allowsSpec = true, numPrecRadix = 2
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = null, suffix = null
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=DATE sqlTypes=DATE (default=DATE)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = DATE, jdbcId = 91, localName = DATE, createParams = null
+      precision = 10, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 0, fixedPrec = false
+      literals : prefix = DATE ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TIME sqlTypes=TIME (default=TIME)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIME, jdbcId = 92, localName = TIME, createParams = SCALE
+      precision = 18, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIME ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+JDBC Type=TIMESTAMP sqlTypes=TIMESTAMP (default=TIMESTAMP)
+    SQLTypeInfo : [JDBC-DRIVER]
+      type : name = TIMESTAMP, jdbcId = 93, localName = TIMESTAMP, createParams = SCALE
+      precision = 29, allowsSpec = true, numPrecRadix = 0
+      scale : min = 0, max = 9, fixedPrec = false
+      literals : prefix = TIMESTAMP ', suffix = '
+      nullable = 1, caseSensitive = false, searchable = 3, unsigned = false, autoIncrement = false
+
+
+Database Keywords
+PATH
+GROUPS
+TRIM
+TRANSLATION
+MUMPS
+STATIC
+MINUS
+CATALOG
+YEAR
+MESSAGE_LENGTH
+DISCONNECT
+PARTITION
+LEFT
+SEARCH
+CURRENT_PATH
+SIZE
+CURRENT_DEFAULT_TRANSFORM_GROUP
+RESTRICT
+CUBE
+RELEASE
+WHERE
+SQLWARNING
+AS
+AT
+TIMEZONE_MINUTE
+ALTER
+DOMAIN
+SET
+C
+MERGE
+CONSTRAINT
+PRECISION
+SPACE
+ROLE
+UPPER
+COLLATION_NAME
+BY
+CHARACTER
+OCTET_LENGTH
+INTERVAL
+COLLATION_SCHEMA
+CATALOG_NAME
+CONNECTION
+CONTINUE
+PAD
+REF
+SETS
+ADA
+CURSOR
+SYSTEM
+CONSTRAINT_SCHEMA
+ADD
+TABLE_NAME
+SQLERROR
+DO
+FOUND
+HOLD
+EXTRACT
+VARYING
+FOR
+ITERATE
+CURRENT
+USING
+EXEC
+RETURNED_SQLSTATE
+DEFERRABLE
+END
+CONNECTION_NAME
+PRESERVE
+UNDO
+BINARY
+STATE
+WITHIN
+NCHAR
+ABSOLUTE
+SOME
+SCHEMA
+OUTER
+FILTER
+GO
+BIT
+INTERSECT
+WITH
+INITIALLY
+OVER
+GRANT
+CURRENT_ROLE
+CLASS_ORIGIN
+ACTION
+START
+CHAR_LENGTH
+DEFAULT
+CHARACTER_LENGTH
+JOIN
+UNNEST
+NULLIF
+SESSION_USER
+MULTISET
+ELSE
+IF
+BIT_LENGTH
+PARAMETER
+LANGUAGE
+NCLOB
+CHARACTER_SET_SCHEMA
+NATIONAL
+IN
+DISTINCT
+IS
+CURRENT_TRANSFORM_GROUP_FOR_TYPE
+SPECIFICTYPE
+TOP
+FORTRAN
+MAP
+EXIT
+ASYMMETRIC
+COLLATION
+GOTO
+MAX
+CASCADE
+TRANSACTION
+SYSTEM_USER
+USAGE
+CURSOR_NAME
+RIGHT
+UPDATE
+FETCH
+NUMERIC
+REVOKE
+RETURNS
+SQLEXCEPTION
+FIRST
+SELECT
+DYNAMIC
+INTERSECTS
+CALLED
+ELEMENT
+DEPTH
+ALL
+CURRENT_USER
+NEW
+ARRAY
+ATOMIC
+COLUMN_NAME
+COLUMN
+DECIMAL
+VALUE
+SERIALIZABLE
+COALESCE
+ALLOCATE
+CORRESPONDING
+TIMESTAMP
+MINUTE
+SCALE
+DESCRIBE
+MESSAGE_OCTET_LENGTH
+NULL
+RETURNED_LENGTH
+TRUE
+OBJECT
+PRIVILEGES
+SQL
+READ
+MODULE
+AND
+SQLCODE
+REAL
+ROW
+CURRENT_DATE
+MESSAGE_TEXT
+DIAGNOSTICS
+RANGE
+NO
+FLOAT
+CURRENT_TIMESTAMP
+HOUR
+ROUTINE
+ANY
+PLI
+ROLLBACK
+MEMBER
+NATURAL
+EXTERNAL
+UNNAMED
+OF
+GROUPING
+READS
+ON
+OR
+EQUALS
+PRIMARY
+CURRENT_CATALOG
+TRANSLATE
+SECOND
+UNKNOWN
+MATCH
+REFERENCES
+ROWS
+MONTH
+ELSEIF
+CREATE
+OLD
+TRIGGER
+BETWEEN
+AFTER
+CLOSE
+CONVERT
+POSITION
+_ROWID_
+END-EXEC
+DEALLOCATE
+INNER
+EACH
+PRIOR
+SUM
+BIGINT
+IDENTITY
+MIN
+ARE
+VARCHAR
+THEN
+CONDITION
+KEY
+ORDINALITY
+CALL
+INTO
+REPEAT
+EXCEPTION
+INDICATOR
+FREE
+RETURNED_OCTET_LENGTH
+ASC
+GROUP
+DELETE
+DATETIME_INTERVAL_PRECISION
+TEMPORARY
+OFFSET
+SIMILAR
+PROCEDURE
+COBOL
+UNDER
+NULLABLE
+COMMITTED
+OPEN
+REFERENCING
+TO
+CONSTRUCTOR
+UNION
+BREADTH
+LOCATOR
+SCOPE
+LOOP
+IMMEDIATE
+VIEW
+DESC
+ASSERTION
+CONSTRAINTS
+CURRENT_TIME
+DEFERRED
+INTEGER
+NUMBER
+OUTPUT
+UNIQUE
+TRAILING
+FULL
+BOOLEAN
+NAME
+QUALIFY
+AVG
+NOT
+ROW_COUNT
+LAST
+LOWER
+SPECIFIC
+HAVING
+SQLSTATE
+LOCALTIME
+COMMAND_FUNCTION
+GENERAL
+DROP
+RETURN
+REGEXP
+FOREIGN
+NEXT
+GLOBAL
+LEAVE
+SERVER_NAME
+EXISTS
+PARTIAL
+TIME
+ESCAPE
+FALSE
+SECTION
+ROWNUM
+DATETIME_INTERVAL_CODE
+SYMMETRIC
+LOCALTIMESTAMP
+TABLE
+WHEN
+LOCAL
+CONSTRAINT_CATALOG
+COLLATION_CATALOG
+NONE
+TYPE
+CYCLE
+CAST
+DESCRIPTOR
+OPTION
+WHENEVER
+LEVEL
+LEADING
+FUNCTION
+MODIFIES
+ASENSITIVE
+CASE
+OUT
+OVERLAPS
+PREPARE
+GET
+CHECK
+PUBLIC
+WORK
+WITHOUT
+COUNT
+HANDLER
+TREAT
+NAMES
+LENGTH
+ILIKE
+CHAR
+CONNECT
+BEGIN
+TABLESAMPLE
+WRITE
+ORDER
+ISOLATION
+RELATIVE
+LARGE
+VALUES
+DOUBLE
+CHARACTER_SET_NAME
+SIGNAL
+TIMEZONE_HOUR
+SUBMULTISET
+COLLATE
+UNCOMMITTED
+CURRENT_SCHEMA
+SESSION
+RESIGNAL
+WINDOW
+EXECUTE
+MORE
+REPEATABLE
+DAY
+AUTHORIZATION
+BLOB
+INPUT
+SUBSTRING
+ZONE
+RECURSIVE
+ONLY
+FROM
+DEREF
+LATERAL
+INSENSITIVE
+BOTH
+SENSITIVE
+SUBCLASS_ORIGIN
+CHARACTER_SET_CATALOG
+EXCEPT
+DATE
+SCHEMA_NAME
+ROLLUP
+LIKE
+SCROLL
+DATA
+METHOD
+INSERT
+INOUT
+CONSTRAINT_NAME
+LIMIT
+INT
+PASCAL
+DEC
+CLOB
+CASCADED
+COMMIT
+DETERMINISTIC
+USER
+SAVEPOINT
+UNTIL
+DYNAMIC_FUNCTION
+CONDITION_NUMBER
+BEFORE
+DECLARE
+CROSS
+SMALLINT
+WHILE
+RESULT
+
+DataNucleus SchemaTool completed successfully
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.503 s
+[INFO] Finished at: 2021-12-21T17:51:29Z
+[INFO] ------------------------------------------------------------------------
