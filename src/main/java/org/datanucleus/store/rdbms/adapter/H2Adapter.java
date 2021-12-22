@@ -109,6 +109,14 @@ public class H2Adapter extends BaseDatastoreAdapter
 
         sqlType = new H2TypeInfo("GEOMETRY", (short)1111, 2147483647, null, null, null, 1, true, (short)3, false, false, false, "GEOMETRY", (short)0, (short)0, 0);
         addSQLTypeForJDBCType(handler, mconn, (short)Types.OTHER, sqlType, true);
+
+        // Not explicitly admitted by H2 v2 so add it
+        sqlType = new H2TypeInfo("LONGVARBINARY", (short)-4, 2147483647, "X'", "'", "LENGTH", 1, false, (short)3, false, false, false, "LONGVARBINARY", (short)0, (short)0, 0);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.LONGVARBINARY, sqlType, true);
+        sqlType = new H2TypeInfo("FLOAT", (short)6, 17, null, null, null, 1, false, (short)3, false, false, false, "FLOAT", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.FLOAT, sqlType, true);
+        sqlType = new H2TypeInfo("DECIMAL", (short)3, 2147483647, null, null, "PRECISION,SCALE", 1, false, (short)3, false, false, false, "DECIMAL", (short)0, (short)0, 10);
+        addSQLTypeForJDBCType(handler, mconn, (short)Types.DECIMAL, sqlType, true);
     }
 
     /**
@@ -300,7 +308,11 @@ public class H2Adapter extends BaseDatastoreAdapter
      */
     public String getInsertStatementForNoColumns(Table table)
     {
-        return "INSERT INTO " + table.toString() + " VALUES(NULL)";
+        if (datastoreMajorVersion < 2)
+        {
+            return "INSERT INTO " + table.toString() + " VALUES(NULL)";
+        }
+        return super.getInsertStatementForNoColumns(table);
     }
 
     /**
@@ -457,9 +469,11 @@ public class H2Adapter extends BaseDatastoreAdapter
         registerColumnMapping(Character.class.getName(), org.datanucleus.store.rdbms.mapping.column.IntegerColumnMapping.class, JDBCType.INTEGER, "INTEGER", false);
 
         registerColumnMapping(Double.class.getName(), org.datanucleus.store.rdbms.mapping.column.DoubleColumnMapping.class, JDBCType.DOUBLE, "DOUBLE", true);
+        registerColumnMapping(Double.class.getName(), org.datanucleus.store.rdbms.mapping.column.NumericColumnMapping.class, JDBCType.NUMERIC, "NUMERIC", false);
         registerColumnMapping(Double.class.getName(), org.datanucleus.store.rdbms.mapping.column.DecimalColumnMapping.class, JDBCType.DECIMAL, "DECIMAL", false);
 
         registerColumnMapping(Float.class.getName(), org.datanucleus.store.rdbms.mapping.column.FloatColumnMapping.class, JDBCType.FLOAT, "FLOAT", true);
+        registerColumnMapping(Float.class.getName(), org.datanucleus.store.rdbms.mapping.column.NumericColumnMapping.class, JDBCType.NUMERIC, "NUMERIC", false);
         registerColumnMapping(Float.class.getName(), org.datanucleus.store.rdbms.mapping.column.DoubleColumnMapping.class, JDBCType.DOUBLE, "DOUBLE", false);
         registerColumnMapping(Float.class.getName(), org.datanucleus.store.rdbms.mapping.column.RealColumnMapping.class, JDBCType.REAL, "REAL", false);
         registerColumnMapping(Float.class.getName(), org.datanucleus.store.rdbms.mapping.column.DecimalColumnMapping.class, JDBCType.DECIMAL, "DECIMAL", false);
