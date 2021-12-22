@@ -1070,14 +1070,15 @@ public abstract class TableImpl extends AbstractTable
                 boolean isUnique = !((Boolean)indexInfo.getProperty("non_unique")).booleanValue();
                 if (isUnique)
                 {
-                    // Only utilise unique indexes
-                    short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
-                    if (idxType == DatabaseMetaData.tableIndexStatistic)
-                    {
-                        // Ignore
-                        continue;
-                    }
-    
+                    // No idea of why this was being used, so commented out (H2 v2 fails if enabled)
+//                    short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
+//                    if (idxType == DatabaseMetaData.tableIndexStatistic)
+//                    {
+//                        // Ignore
+//                        continue;
+//                    }
+
+                    // Only utilise unique indexes    
                     String keyName = (String)indexInfo.getProperty("index_name");
                     DatastoreIdentifier idxName = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, keyName);
                     CandidateKey key = candidateKeysByName.get(idxName);
@@ -1122,14 +1123,15 @@ public abstract class TableImpl extends AbstractTable
             Iterator indexIter = tableIndexInfo.getChildren().iterator();
             while (indexIter.hasNext())
             {
-                IndexInfo indexInfo = (IndexInfo)indexIter.next();
+                // No idea of why this was being used, so commented out (H2 v2 fails if enabled)
 //                short idxType = ((Short)indexInfo.getProperty("type")).shortValue();
 //                if (idxType == DatabaseMetaData.tableIndexStatistic)
 //                {
 //                    // Ignore
 //                    continue;
 //                }
-    
+
+                IndexInfo indexInfo = (IndexInfo)indexIter.next();    
                 String indexName = (String)indexInfo.getProperty("index_name");
                 DatastoreIdentifier indexIdentifier = idFactory.newIdentifier(IdentifierType.CANDIDATE_KEY, indexName);
                 Index idx = indicesByName.get(indexIdentifier);
