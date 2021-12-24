@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.datanucleus.ExecutionContext;
-import org.datanucleus.api.ApiAdapter;
 import org.datanucleus.identity.IdentityUtils;
 import org.datanucleus.util.ClassUtils;
 
@@ -61,8 +60,8 @@ public class PersistableIdMapping extends PersistableMapping
         Object value = super.getObject(ec, rs, param);
         if (value != null)
         {
-            ApiAdapter api = ec.getApiAdapter();
-            return api.getIdForObject(value);
+            // Return the "id" for this object
+            return ec.getApiAdapter().getIdForObject(value);
         }
         return null;
     }
@@ -82,11 +81,7 @@ public class PersistableIdMapping extends PersistableMapping
             return;
         }
 
-        if (cmd == null)
-        {
-            cmd = ec.getMetaDataManager().getMetaDataForClass(getType(),ec.getClassLoaderResolver());
-        }
-
+        // Convert from "id" to the object represented
         if (IdentityUtils.isDatastoreIdentity(value))
         {
             if (getJavaTypeMapping()[0] instanceof DatastoreIdMapping)

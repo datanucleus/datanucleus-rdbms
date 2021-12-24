@@ -60,6 +60,7 @@ import org.datanucleus.state.DNStateManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.fieldmanager.FieldManager;
 import org.datanucleus.store.fieldmanager.SingleValueFieldManager;
+import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.rdbms.mapping.AppIDObjectIdFieldManager;
 import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingCallbacks;
@@ -85,7 +86,7 @@ import org.datanucleus.util.StringUtils;
  */
 public class PersistableMapping extends MultiMapping implements MappingCallbacks
 {
-    /** ClassMetaData for the represented class; creating a new one on each getObject invoke is expensive **/
+    /** ClassMetaData for the represented class. */
     protected AbstractClassMetaData cmd;
 
     /**
@@ -117,6 +118,16 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         super.initialize(mmd, table, clr);
 
         prepareColumnMapping(clr);
+
+        cmd = storeMgr.getMetaDataManager().getMetaDataForClass(getType(), storeMgr.getNucleusContext().getClassLoaderResolver(null));
+    }
+
+    @Override
+    public void initialize(RDBMSStoreManager storeMgr, String type)
+    {
+        super.initialize(storeMgr, type);
+
+        cmd = storeMgr.getMetaDataManager().getMetaDataForClass(getType(), storeMgr.getNucleusContext().getClassLoaderResolver(null));
     }
 
     /**
@@ -290,11 +301,6 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
     public Object getValueForColumnMapping(NucleusContext nucleusCtx, int index, Object value)
     {
         ExecutionContext ec = nucleusCtx.getApiAdapter().getExecutionContext(value);
-        if (cmd == null)
-        {
-            cmd = nucleusCtx.getMetaDataManager().getMetaDataForClass(getType(), 
-                ec != null ? ec.getClassLoaderResolver() : nucleusCtx.getClassLoaderResolver(null));
-        }
 
         if (cmd.getIdentityType() == IdentityType.APPLICATION)
         {
@@ -747,11 +753,6 @@ public class PersistableMapping extends MultiMapping implements MappingCallbacks
         {
             // Assumption : if the first param is null, then the field is null
             return null;
-        }
-
-        if (cmd == null)
-        {
-            cmd = ec.getMetaDataManager().getMetaDataForClass(getType(),ec.getClassLoaderResolver());
         }
 
         // Return the object represented by this mapping
