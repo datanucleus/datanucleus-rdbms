@@ -25,7 +25,7 @@ import org.datanucleus.store.rdbms.sql.expression.NumericExpression;
 import org.datanucleus.store.rdbms.sql.expression.SQLExpression;
 
 /**
- * Method for evaluating {dateExpr}.getMonth() for Firebird.
+ * Method for evaluating {dateExpr}.getMonth() for Firebird and CloudSpanner.
  * Returns a NumericExpression that equates to <pre>extract(MONTH FROM expr)</pre>
  */
 public class TemporalMonthJavaMethod5 extends TemporalBaseMethod
@@ -38,8 +38,6 @@ public class TemporalMonthJavaMethod5 extends TemporalBaseMethod
         SQLExpression invokedExpr = getInvokedExpression(expr, args, "MONTH_JAVA");
 
         expr.toSQLText().prepend("MONTH FROM ");
-        ArrayList funcArgs = new ArrayList();
-        funcArgs.add(invokedExpr);
-        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", funcArgs);
+        return new NumericExpression(stmt, stmt.getSQLExpressionFactory().getMappingForType(int.class), "EXTRACT", List.of(invokedExpr));
     }
 }

@@ -142,6 +142,12 @@ public class StringMatchesMethod implements SQLMethod
 
     protected BooleanExpression getBooleanLikeExpression(SQLStatement stmt, SQLExpression expr, SQLExpression regExpr, SQLExpression escapeExpr)
     {
+        if(stmt.getDatastoreAdapter().supportsOption(DatastoreAdapter.RAW_PREFIX_LIKE_STATEMENTS)) {
+            // for spanner escape of Like statements should be done by double backslash '\\' or we should use raw strings r''
+            // we choose raw strings approach otherwise we have to change the escape logic in datanucleus-core
+            // see https://cloud.google.com/spanner/docs/operators#comparison_operators
+            regExpr.toSQLText().prepend("r");
+        }
         SQLExpressionFactory exprFactory = stmt.getSQLExpressionFactory();
         BooleanExpression likeExpr = new BooleanExpression(stmt, exprFactory.getMappingForType(boolean.class, false));
         SQLText sql= likeExpr.toSQLText();
