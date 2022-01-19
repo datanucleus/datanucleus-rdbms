@@ -164,41 +164,44 @@ public class StatementClassMapping
             return memberNumbers;
         }
 
-        int length = mappings.size();
-        if (mappings.containsKey(SurrogateColumnType.DATASTORE_ID.getFieldNumber()))
+        synchronized (this)
         {
-            length--; // Ignore datastore id
-        }
-        if (mappings.containsKey(SurrogateColumnType.VERSION.getFieldNumber()))
-        {
-            length--; // Ignore version
-        }
-        if (mappings.containsKey(SurrogateColumnType.DISCRIMINATOR.getFieldNumber()))
-        {
-            length--; // Ignore discriminator
-        }
-        if (mappings.containsKey(SurrogateColumnType.MULTITENANCY.getFieldNumber()))
-        {
-            length--; // Ignore multitenancy
-        }
-        if (mappings.containsKey(SurrogateColumnType.SOFTDELETE.getFieldNumber()))
-        {
-            length--; // Ignore softDelete
-        }
-
-        int[] positions = new int[length];
-        Iterator<Integer> iter = mappings.keySet().iterator();
-        int i = 0;
-        while (iter.hasNext())
-        {
-            Integer val = iter.next();
-            if (val >= 0)
+            int length = mappings.size();
+            if (mappings.containsKey(SurrogateColumnType.DATASTORE_ID.getFieldNumber()))
             {
-                positions[i++] = val;
+                length--; // Ignore datastore id
             }
+            if (mappings.containsKey(SurrogateColumnType.VERSION.getFieldNumber()))
+            {
+                length--; // Ignore version
+            }
+            if (mappings.containsKey(SurrogateColumnType.DISCRIMINATOR.getFieldNumber()))
+            {
+                length--; // Ignore discriminator
+            }
+            if (mappings.containsKey(SurrogateColumnType.MULTITENANCY.getFieldNumber()))
+            {
+                length--; // Ignore multitenancy
+            }
+            if (mappings.containsKey(SurrogateColumnType.SOFTDELETE.getFieldNumber()))
+            {
+                length--; // Ignore softDelete
+            }
+
+            int[] positions = new int[length];
+            Iterator<Integer> iter = mappings.keySet().iterator();
+            int i = 0;
+            while (iter.hasNext())
+            {
+                Integer val = iter.next();
+                if (val >= 0)
+                {
+                    positions[i++] = val;
+                }
+            }
+            memberNumbers = positions;
+            return positions;
         }
-        memberNumbers = positions;
-        return positions;
     }
 
     public void addMappingForMember(int position, StatementMappingIndex mapping)
