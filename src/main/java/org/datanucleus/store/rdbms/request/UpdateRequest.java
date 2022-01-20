@@ -140,10 +140,12 @@ public class UpdateRequest extends Request
         // Fields to update
         if (versionMetaData != null)
         {
+            // We update the record whether or not there are any (other) columns to update in this table 
+            // i.e when we just have an SCO collection/map field in a related table, so the version is upped in that situation also
+            // TODO Allow the option of not updating the version in that situation
             if (versionMetaData.getFieldName() != null)
             {
                 // Version field
-                // TODO If the passed fields arent included in the statement (e.g SCO collection) update version?
                 int numUpdateFields = reqFieldMetaData.length;
                 boolean includesVersion = false;
                 for (int i=0;i<reqFieldMetaData.length;i++)
@@ -230,10 +232,12 @@ public class UpdateRequest extends Request
         // Add on the optimistic discriminator (if appropriate) to get the update statement for optimistic txns
         if (versionMetaData != null)
         {
+            // We update the record whether or not there are any (other) columns to update in this table 
+            // i.e when we just have an SCO collection/map field in a related table, so the version is upped in that situation also
+            // TODO Allow the option of not updating the version in that situation
             if (versionMetaData.getFieldName() != null)
             {
                 // Version field
-                // TODO If the passed fields arent included in the statement (e.g SCO collection) update version?
                 AbstractMemberMetaData[] updateFmds = new AbstractMemberMetaData[1];
                 updateFmds[0] = cmd.getMetaDataForMember(versionMetaData.getFieldName());
                 table.provideMappingsForMembers(consumer, updateFmds, false);
@@ -345,15 +349,21 @@ public class UpdateRequest extends Request
                                 AbstractMemberMetaData verfmd = cmd.getMetaDataForMember(table.getVersionMetaData().getFieldName());
                                 if (currentVersion instanceof Number)
                                 {
-                                    // Cater for Integer-based versions
                                     currentVersion = Long.valueOf(((Number)currentVersion).longValue());
                                 }
+
                                 nextVersion = ec.getLockManager().getNextVersion(versionMetaData, currentVersion);
                                 if (verfmd.getType() == Integer.class || verfmd.getType() == int.class)
                                 {
                                     // Cater for Integer-based versions
                                     nextVersion = Integer.valueOf(((Number)nextVersion).intValue());
                                 }
+                                else if (verfmd.getType() == Short.class || verfmd.getType() == short.class)
+                                {
+                                    // Cater for Short-based versions
+                                    nextVersion = Short.valueOf(((Number)nextVersion).shortValue());
+                                }
+
                                 sm.replaceField(verfmd.getAbsoluteFieldNumber(), nextVersion);
                             }
                             else
