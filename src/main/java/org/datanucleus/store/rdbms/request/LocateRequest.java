@@ -202,16 +202,12 @@ public class LocateRequest extends Request
         {
             ExecutionContext ec = sm.getExecutionContext();
             RDBMSStoreManager storeMgr = table.getStoreManager();
-            boolean locked = ec.getSerializeReadForClass(sm.getClassMetaData().getFullClassName());
+
+            // Override with pessimistic lock where specified
             LockMode lockType = ec.getLockManager().getLockMode(sm.getInternalObjectId());
-            if (lockType != LockMode.LOCK_NONE)
-            {
-                if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
-                {
-                    // Override with pessimistic lock
-                    locked = true;
-                }
-            }
+            boolean locked = (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE) ? 
+                    true : ec.getSerializeReadForClass(sm.getClassMetaData().getFullClassName());
+
             String statement = (locked ? statementLocked : statementUnlocked);
 
             try

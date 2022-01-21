@@ -305,16 +305,12 @@ public class LocateBulkRequest extends BulkRequest
         ExecutionContext ec = sms[0].getExecutionContext();
         RDBMSStoreManager storeMgr = table.getStoreManager();
         AbstractClassMetaData cmd = sms[0].getClassMetaData();
-        boolean locked = ec.getSerializeReadForClass(cmd.getFullClassName());
+
+        // Override with pessimistic lock where specified
         LockMode lockType = ec.getLockManager().getLockMode(sms[0].getInternalObjectId());
-        if (lockType != LockMode.LOCK_NONE)
-        {
-            if (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE)
-            {
-                // Override with pessimistic lock
-                locked = true;
-            }
-        }
+        boolean locked = (lockType == LockMode.LOCK_PESSIMISTIC_READ || lockType == LockMode.LOCK_PESSIMISTIC_WRITE) ? 
+                true : ec.getSerializeReadForClass(cmd.getFullClassName());
+
         String statement = getStatement(table, sms, locked);
 
         try
