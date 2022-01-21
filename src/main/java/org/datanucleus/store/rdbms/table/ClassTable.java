@@ -90,7 +90,6 @@ import org.datanucleus.store.rdbms.key.Index;
 import org.datanucleus.store.rdbms.key.PrimaryKey;
 import org.datanucleus.store.rdbms.mapping.CorrespondentColumnsMapper;
 import org.datanucleus.store.rdbms.mapping.MappingConsumer;
-import org.datanucleus.store.rdbms.mapping.MappingManager;
 import org.datanucleus.store.rdbms.mapping.MappingType;
 import org.datanucleus.store.rdbms.mapping.column.ColumnMapping;
 import org.datanucleus.store.rdbms.mapping.java.BooleanMapping;
@@ -270,17 +269,20 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
         // fields for (inheritance-strategy="subclass-table" in the superclass)
         initializeForClass(cmd, clr);
 
-        MappingManager mapMgr = storeMgr.getMappingManager();
         // Add Version where specified in MetaData
-        // TODO If there is a superclass table that has a version we should omit from here even if in MetaData
-        // See "getTableWithDiscriminator()" for the logic
+        // TODO If there is a superclass table that has a version we should omit from here even if in MetaData. See "getTableWithDiscriminator()" for the logic
         versionMetaData = cmd.getVersionMetaDataForTable();
         if (versionMetaData != null && versionMetaData.getFieldName() == null)
         {
-            if (versionMetaData.getVersionStrategy() == VersionStrategy.NONE || versionMetaData.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
+            if (versionMetaData.getVersionStrategy() == VersionStrategy.NONE)
             {
-                // No optimistic locking but the idiot wants a column for that :-)
-                versionMapping = new VersionMapping.VersionLongMapping(this, mapMgr.getMapping(Long.class));
+                // Equate NONE to an integral column (TODO Allow for using timestamp when not checking the version?)
+                // See also LockManagerImpl
+                versionMapping = new VersionMapping.VersionLongMapping(this, storeMgr.getMappingManager().getMapping(Long.class));
+            }
+            else if (versionMetaData.getVersionStrategy() == VersionStrategy.VERSION_NUMBER)
+            {
+                versionMapping = new VersionMapping.VersionLongMapping(this, storeMgr.getMappingManager().getMapping(Long.class));
             }
             else if (versionMetaData.getVersionStrategy() == VersionStrategy.DATE_TIME)
             {
@@ -291,8 +293,14 @@ public class ClassTable extends AbstractClassTable implements DatastoreClass
                         "to use date-time versioning, yet this datastore doesnt support storing " +
                         "milliseconds in DATETIME/TIMESTAMP columns. Use version-number");
                 }
-                versionMapping = new VersionMapping.VersionTimestampMapping(this, mapMgr.getMapping(Timestamp.class));
+                versionMapping = new VersionMapping.VersionTimestampMapping(this, storeMgr.getMappingManager().getMapping(Timestamp.class));
             }
+            else if (versionMetaData.getVersionStrategy() == VersionStrategy.STATE_IMAGE)
+            {
+                // TODO Support state-image strategy
+                throw new NucleusUserException("DataNucleus doesnt currently support version strategy \"state-image\"");
+            }
+
             if (versionMapping != null)
             {
                 logMapping("VERSION", versionMapping);
