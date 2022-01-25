@@ -313,9 +313,11 @@ public class SecondaryTable extends AbstractClassTable implements SecondaryDatas
 
     /**
      * Accessor for the expected foreign keys for this table.
+     * @param clr ClassLoader resolver
      * @return The expected foreign keys.
      */
-    protected List<ForeignKey> getExpectedForeignKeys()
+    @Override
+    public List<ForeignKey> getExpectedForeignKeys(ClassLoaderResolver clr)
     {
         assertIsInitialized();
 
