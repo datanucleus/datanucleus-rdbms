@@ -263,7 +263,7 @@ public class DeleteRequest extends Request
         }
         else
         {
-            optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
+            optimisticChecks = (versionChecks && ec.getTransaction().getOptimistic());
             stmt = optimisticChecks ? deleteStmtOptimistic : deleteStmt;
         }
 

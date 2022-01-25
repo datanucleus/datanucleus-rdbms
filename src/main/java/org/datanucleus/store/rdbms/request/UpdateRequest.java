@@ -266,7 +266,7 @@ public class UpdateRequest extends Request
         // Choose the statement based on whether optimistic or not
         String stmt = null;
         ExecutionContext ec = sm.getExecutionContext();
-        boolean optimisticChecks = (versionMetaData != null && ec.getTransaction().getOptimistic() && versionChecks);
+        boolean optimisticChecks = (versionChecks && ec.getTransaction().getOptimistic());
         stmt = optimisticChecks ? updateStmtOptimistic : updateStmt;
 
         if (stmt != null)
